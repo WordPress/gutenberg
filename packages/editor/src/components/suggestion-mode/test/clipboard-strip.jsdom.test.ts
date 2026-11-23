@@ -1,5 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
+	RichTextData,
+	create,
 	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
@@ -142,6 +144,61 @@ describe( 'stripSuggestionDataFromBlock', () => {
 		expect( result.innerBlocks[ 0 ].attributes ).not.toHaveProperty(
 			'metadata'
 		);
+	} );
+
+	it( 'unwraps markers in rich text nested inside an attribute', () => {
+		// A table keeps each cell's rich text inside its `body` attribute.
+		const untouchedRow = { cells: [ { content: 'plain', tag: 'td' } ] };
+		const block = {
+			name: 'core/table',
+			attributes: {
+				body: [
+					{
+						cells: [
+							{
+								content: `a ${ marker( 4, 'add', 'cell' ) }`,
+								tag: 'td',
+							},
+							{
+								content: new RichTextData(
+									create( {
+										html: 'A <mark class="wp-note" data-id="5">noted</mark> cell',
+									} ) as any
+								),
+								tag: 'td',
+							},
+						],
+					},
+					untouchedRow,
+				],
+			},
+			innerBlocks: [],
+		};
+
+		const { body } = stripSuggestionDataFromBlock( block ).attributes;
+
+		expect( body[ 0 ].cells[ 0 ] ).toEqual( {
+			content: 'a cell',
+			tag: 'td',
+		} );
+		expect( body[ 0 ].cells[ 1 ].content ).toBeInstanceOf( RichTextData );
+		expect( body[ 0 ].cells[ 1 ].content.toHTMLString() ).toBe(
+			'A noted cell'
+		);
+		expect( body[ 1 ] ).toBe( untouchedRow );
+	} );
+
+	it( 'keeps the reference when nested values hold no suggestion state', () => {
+		const block = {
+			name: 'core/table',
+			attributes: {
+				body: [ { cells: [ { content: 'plain', tag: 'td' } ] } ],
+				style: { color: { text: '#000' } },
+			},
+			innerBlocks: [],
+		};
+
+		expect( stripSuggestionDataFromBlock( block ) ).toBe( block );
 	} );
 
 	it( 'returns the same reference when there is no suggestion state', () => {

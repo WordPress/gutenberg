@@ -17,6 +17,7 @@ The feature is an experiment, and nothing here is a public API.
 | `store-interceptor.ts`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic; revert-echo identity tokens. |
 | `plan-store-content-edit.ts`| Plans a content change that reached the store directly (outside `setAttributes`) as inline markers where it can. |
 | `block-tree-version.ts`     | A cheap "has any block changed?" signal from the identity of the store's block tree. |
+| `block-ownership.ts`        | Which blocks in the canvas the current post owns, and the notice for a declined edit to one it does not: the children of a synced pattern, template part or navigation menu, and the template around Post Content. |
 | `provider.ts`               | `useSuggestionsProvider`: the `createSuggestion` / `updateSuggestion` / `deleteSuggestion` / `applySuggestion` / `rejectSuggestion` API, a thin composition of the two hooks below. |
 | `suggestion-store.ts`       | `SuggestionStore`: every read and write of a suggestion note (the comment, `_wp_suggestion`, `_wp_suggestion_status`). The swap point for another storage backend. |
 | `use-suggestion-submission.ts` | Create, update and delete: builds the payload, saves the note through the store, and links the block to it. |

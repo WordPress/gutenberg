@@ -92,6 +92,7 @@ import { notifyEditRefused } from './refuse-edit';
 import { settleInsertedSuggestionMarkers } from '../inline-suggestions';
 import { unlock } from '../../lock-unlock';
 import { getBlockTreeVersion } from './block-tree-version';
+import { createPostOwnershipCheck } from './block-ownership';
 import { APPLIED, getDecision, getSuggestionStatus } from './suggestion-status';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
@@ -1458,6 +1459,25 @@ export default function SuggestionStoreInterceptor() {
 			const live = new Set( liveClientIds );
 
 			/*
+			 * Only the post's own blocks are captured. A block another entity
+			 * owns (the children of a synced pattern, a template part or a
+			 * navigation menu, or the template around Post Content) is saved
+			 * outside the post, where a marker would never be processed, and
+			 * its controlling block replaces it wholesale whenever that entity
+			 * changes. Such a block is adopted as it is.
+			 */
+			const ownership = createPostOwnershipCheck( registry );
+			// A parent that has just left the tree is judged by its nearest
+			// surviving ancestor.
+			const ownsChildrenOf = ( parentClientId: string | null ) => {
+				let parent = parentClientId;
+				while ( parent && ! live.has( parent ) ) {
+					parent = tree.parentByClientId.get( parent ) ?? null;
+				}
+				return ownership.ownsChildrenOf( parent );
+			};
+
+			/*
 			 * Insertions captured during this fire. A `replaceBlocks` shows up
 			 * as an insertion here and as a removal further down, and the
 			 * removal is only known once this loop has finished — so the
@@ -1545,6 +1565,11 @@ export default function SuggestionStoreInterceptor() {
 				// live block. Adopt `current` as the new baseline so the
 				// next user edit diffs against the post-apply state.
 				if ( consumeInterceptorBypassRef.current?.( clientId ) ) {
+					snapshot.set( clientId, current );
+					continue;
+				}
+
+				if ( ! ownership.owns( clientId ) ) {
 					snapshot.set( clientId, current );
 					continue;
 				}
@@ -1988,7 +2013,15 @@ export default function SuggestionStoreInterceptor() {
 			// and capture the from/to anchors for the structural op.
 			// Apply leaves the block where it is; Reject dispatches
 			// `moveBlockToPosition` with the from-position.
-			const moves = detectMovedBlocks( liveClientIds, tree, blockEditor );
+			const moves = detectMovedBlocks(
+				liveClientIds,
+				tree,
+				blockEditor
+			).filter(
+				( move ) =>
+					ownsChildrenOf( move.fromParentClientId ) &&
+					ownsChildrenOf( move.toParentClientId )
+			);
 
 			/*
 			 * Containers emptied by this fire's moves (an outdent's nested
@@ -2292,6 +2325,18 @@ export default function SuggestionStoreInterceptor() {
 					// paragraph must not propose removing it. Forget it.
 					if ( isDeferredInsertion( clientId ) ) {
 						unmarkDeferredInsertion( clientId );
+						continue;
+					}
+					// A block another entity owned is not the post's to
+					// propose removing, and putting it back would fight the
+					// controlling block's own sync.
+					if (
+						! ownsChildrenOf(
+							tree.parentByClientId.get( clientId ) ?? null
+						)
+					) {
+						snapshot.delete( clientId );
+						clearStructuralCaptureRef.current( clientId );
 						continue;
 					}
 					// "Apply / reject landing": when another client

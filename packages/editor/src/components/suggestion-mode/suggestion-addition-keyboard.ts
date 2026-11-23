@@ -29,6 +29,7 @@ import { toRichTextRecord } from '../inline-suggestions/rich-text-record';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
+	refuseForeignBlockInput,
 	readEventRange,
 	readLiveInlineSelection,
 } from './keyboard-target';
@@ -875,6 +876,15 @@ export default function SuggestionAdditionKeyboard() {
 
 	const onBeforeInput = useCallback(
 		( event: any ) => {
+			// Any edit to a block the post does not own is declined; undo
+			// and redo are not edits.
+			if (
+				! event.inputType?.startsWith( 'history' ) &&
+				refuseForeignBlockInput( event, registry, getSelectionStart() )
+			) {
+				resetRun();
+				return;
+			}
 			// Plain typing only. Composition, paste, deletions, and formatting
 			// commands reset any open run and fall through to their own paths.
 			if ( event.inputType !== 'insertText' ) {
@@ -909,11 +919,17 @@ export default function SuggestionAdditionKeyboard() {
 				event.preventDefault();
 			}
 		},
-		[ getSelectionStart, insertText, resetRun ]
+		[ getSelectionStart, insertText, registry, resetRun ]
 	);
 
 	const onPaste = useCallback(
 		( event: any ) => {
+			if (
+				refuseForeignBlockInput( event, registry, getSelectionStart() )
+			) {
+				resetRun();
+				return;
+			}
 			// See `onBeforeInput`: never touch paste aimed at an editable
 			// other than the selected block's rich text.
 			if (
@@ -977,6 +993,7 @@ export default function SuggestionAdditionKeyboard() {
 			getBlockAttributes,
 			replaceBlocks,
 			insertText,
+			registry,
 			resetRun,
 		]
 	);
