@@ -16,6 +16,9 @@ function setEditorIntent( intent ) {
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'PostPublishButton', () => {
 	beforeEach( () => {
 		// The intent is registry state, not a mock, so restoring the spies

@@ -164,6 +164,9 @@ const insertPlan = ( at = 5, text = ' world' ) => ( {
 	actions: [ { type: 'insert-add', text, at, newNote: true } ],
 } );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionContentReconciler', () => {
 	it( 'writes the planned markers when the content is unchanged (happy path)', async () => {
 		const { clientId, getContent } = setup();
