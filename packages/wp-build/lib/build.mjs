@@ -29,6 +29,7 @@ import { inferStyleDependencies } from './style-dependencies.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import { i18nStubPlugin } from './i18n-stub-plugin.mjs';
 import {
 	getAllRoutes,
 	getRouteFiles,
@@ -617,6 +618,7 @@ async function bundlePackage( packageName, options = {} ) {
 				resolve: { conditionNames: defaultConditions },
 				plugins: [
 					...baseBundlePlugins,
+					noScriptDebug && i18nStubPlugin(),
 					wordpressExternalsPlugin(
 						'index.min',
 						'iife',
@@ -711,6 +713,7 @@ async function bundlePackage( packageName, options = {} ) {
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						noScriptDebug && i18nStubPlugin(),
 						wordpressExternalsPlugin(
 							`${ baseFileName }.min`,
 							'esm',
@@ -1607,6 +1610,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						noScriptDebug && i18nStubPlugin(),
 						wordpressExternalsPlugin(
 							'route.min',
 							'esm',
@@ -1680,6 +1684,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 				resolve: { conditionNames: defaultConditions },
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
+					noScriptDebug && i18nStubPlugin(),
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
@@ -1820,6 +1825,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
+						noScriptDebug && i18nStubPlugin(),
 						wordpressExternalsPlugin(
 							'render.min',
 							'esm',
@@ -1893,6 +1899,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 					resolve: { conditionNames: defaultConditions },
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						noScriptDebug && i18nStubPlugin(),
 						wordpressExternalsPlugin(
 							'widget.min',
 							'esm',

@@ -62,6 +62,14 @@ Builds only the minified `.min.js` and `.min.css` files, leaving out the non-min
 
 `wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
 
+#### Translation stubs
+
+`wp i18n make-pot`, which WordPress.org also runs to import plugin strings, skips `*.min.js` files. So that a `--no-script-debug` build stays translatable, `wp-build` writes a translation stub at the non-minified path of each bundle that has strings, such as `index.js` next to `index.min.js`. The stub lists the bundle's `__()`, `_x()`, `_n()` and `_nx()` calls with their translator comments, read from the original source files of the bundled modules (through each module's source map when it has one). Ship the stubs with the plugin: `make-pot` extracts the strings and translator comments from them, so the source maps do not need to be shipped.
+
+A stub is not runnable code: it throws an error as soon as it runs. The generated registration code never loads it, but hand-written code that picks the `.js` file when `SCRIPT_DEBUG` is enabled loads the stub and fails with that error.
+
+Translations load with no extra code. `load_script_textdomain()` removes `.min` from a script's path before it looks up the JSON translation file, so it loads the translations generated for `index.js` when the page loads `index.min.js`. From WordPress 7.0, script modules, including routes, are translated the same way.
+
 ### Build Concurrency
 
 By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
