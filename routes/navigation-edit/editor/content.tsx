@@ -100,7 +100,7 @@ export default function NavigationMenuContent( {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					showNestedAppenders
+					showInnerBlockAppenders
 					appenderLabel={ __( 'Add menu item' ) }
 					additionalBlockContent={ NavigationLinkUI }
 					showContentPopover

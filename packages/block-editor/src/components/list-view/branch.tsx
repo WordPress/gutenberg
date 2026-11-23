@@ -152,7 +152,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
-		showNestedAppenders = false,
+		showInnerBlockAppenders = false,
 		appenderLabel,
 	} = props;
 
@@ -177,11 +177,11 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				isParentSynced: isSyncedBlock( parentId ),
 				canParentAppend:
 					! isTopLevel &&
-					showNestedAppenders &&
+					showInnerBlockAppenders &&
 					canAppendInListView( select, parentId ),
 			};
 		},
-		[ parentId, isTopLevel, showNestedAppenders ]
+		[ parentId, isTopLevel, showInnerBlockAppenders ]
 	);
 
 	const syncedBranch = isSyncedBranch || isParentSynced;
@@ -207,7 +207,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 	const showAppender = isTopLevel ? showAppenderProp : canParentAppend;
 	// A block that offers no appender offers none for anything inside it
 	// either, such as the pages a Page List shows.
-	const showInnerAppenders = isTopLevel ? showNestedAppenders : showAppender;
+	const showDescendantAppenders = isTopLevel
+		? showInnerBlockAppenders
+		: showAppender;
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -343,7 +345,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						isNesting={ isNesting }
 					/>
 				) }
-				{ showInnerAppenders &&
+				{ showDescendantAppenders &&
 					showBlock &&
 					! hasNestedBlocks &&
 					! isDragged && (
@@ -366,7 +368,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
-						showNestedAppenders={ showInnerAppenders }
+						showInnerBlockAppenders={ showDescendantAppenders }
 					/>
 				) }
 			</AsyncModeProvider>

@@ -181,8 +181,8 @@ export type ListViewProps = {
 export type PrivateListViewProps = ListViewProps & {
 	/** Flag to show or hide the block appender. Defaults to `false`. */
 	showAppender?: boolean;
-	/** Flag to also end every expanded nested list with an appender. Defaults to `false`. */
-	showNestedAppenders?: boolean;
+	/** Flag to also end every expanded nested list with an appender when `showAppender` is set. Defaults to `false`. */
+	showInnerBlockAppenders?: boolean;
 	/** Label of the appender at the end of the top-level list. */
 	appenderLabel?: string;
 	/** Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component. */
@@ -220,7 +220,7 @@ export type ListViewBranchProps = {
 	parentId?: string | null;
 	isSyncedBranch?: boolean;
 	showAppender?: boolean;
-	showNestedAppenders?: boolean;
+	showInnerBlockAppenders?: boolean;
 	appenderLabel?: string;
 };
 
