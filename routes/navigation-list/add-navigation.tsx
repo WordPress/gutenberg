@@ -65,14 +65,19 @@ export const AddNavigationModal = ( {
 				} );
 			}
 		} catch ( error ) {
-			const errorMessage =
-				error instanceof Error ? error.message : 'Unknown error';
+			// A REST API error is a plain object with a `code`, not an `Error`.
+			const restError = error as
+				{ message?: string; code?: string } | undefined;
 			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be created. */
-					__( 'Unable to create navigation menu: %s' ),
-					errorMessage
-				),
+				restError?.code &&
+					restError.message &&
+					restError.code !== 'unknown_error'
+					? sprintf(
+							/* translators: %s: error message describing why the navigation menu could not be created. */
+							__( 'Unable to create navigation menu: %s' ),
+							restError.message
+						)
+					: __( 'Unable to create navigation menu.' ),
 				{
 					type: 'snackbar',
 				}

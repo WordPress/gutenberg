@@ -203,11 +203,9 @@ export default function OverlayTemplatePartSelector( {
 			// See: packages/fields/src/components/create-template-part-modal/index.tsx
 			// The 'unknown_error' code check ensures generic error codes don't show
 			// potentially confusing technical messages, instead showing a user-friendly fallback.
+			// A REST API error is a plain object with a `code`, not an `Error`.
 			const errorMessage =
-				error instanceof Error &&
-				'code' in error &&
-				error.message &&
-				error.code !== 'unknown_error'
+				error?.code && error.message && error.code !== 'unknown_error'
 					? error.message
 					: __( 'An error occurred while creating the overlay.' );
 

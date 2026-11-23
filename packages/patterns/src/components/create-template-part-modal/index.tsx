@@ -28,6 +28,7 @@ import {
 	getUniqueTemplatePartTitle,
 	useExistingTemplateParts,
 } from './utils';
+import type { RestError } from '../../types';
 
 function getAreaRadioId( value: string, instanceId: number ) {
 	return `patterns-create-template-part-modal__area-option-${ value }-${ instanceId }`;
@@ -160,12 +161,13 @@ export function CreateTemplatePartModalContents( {
 
 			// TODO: Add a success notice?
 		} catch ( error ) {
+			// A REST API error is a plain object with a `code`, not an `Error`.
+			const restError = error as RestError | undefined;
 			const errorMessage =
-				error instanceof Error &&
-				'code' in error &&
-				error.message &&
-				error.code !== 'unknown_error'
-					? error.message
+				restError?.code &&
+				restError.message &&
+				restError.code !== 'unknown_error'
+					? restError.message
 					: __(
 							'An error occurred while creating the template part.'
 						);
