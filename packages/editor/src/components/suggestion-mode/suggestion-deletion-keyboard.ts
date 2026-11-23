@@ -25,6 +25,7 @@ import type { EditRefusal } from '../inline-suggestions';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
+	refuseForeignBlockInput,
 	readEventRange,
 	readLiveInlineSelection,
 } from './keyboard-target';
@@ -34,6 +35,10 @@ import {
 } from './grapheme-boundaries';
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
+import {
+	isBlockOwnedByCurrentPost,
+	notifyForeignEditRefused,
+} from './block-ownership';
 import { rebaseRunAnchor } from './run-anchor';
 
 /**
@@ -943,6 +948,12 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
+			if (
+				refuseForeignBlockInput( event, registry, getSelectionStart() )
+			) {
+				resetRun();
+				return;
+			}
 			/*
 			 * Only intercept deletion aimed at the rich text the block-editor
 			 * selection points at. The capture listeners see every
@@ -1180,6 +1191,7 @@ export default function SuggestionDeletionKeyboard() {
 			deleteAcrossOwnSelection,
 			deleteCharacter,
 			refuseDeletion,
+			registry,
 			resetRun,
 			shrinkOwnAddition,
 			authorToken,
@@ -1196,8 +1208,23 @@ export default function SuggestionDeletionKeyboard() {
 	 */
 	const onKeyDown = useCallback(
 		( event: any ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			/*
+			 * Rich text and the block editor act on these keys at `keydown`
+			 * (a split, a merge, a block removal), with no `beforeinput` to
+			 * cancel, so in a block the post does not own they are declined
+			 * here.
+			 */
 			if (
-				event.defaultPrevented ||
+				[ 'Backspace', 'Delete', 'Enter' ].includes( event.key ) &&
+				! event.isComposing &&
+				refuseForeignBlockInput( event, registry, getSelectionStart() )
+			) {
+				return;
+			}
+			if (
 				( event.key !== 'Backspace' && event.key !== 'Delete' ) ||
 				! isEventTargetSelectedRichText( event, getSelectionStart() )
 			) {
@@ -1241,6 +1268,7 @@ export default function SuggestionDeletionKeyboard() {
 			authorId,
 			isDeferredInsertion,
 			deleteAcrossOwnSelection,
+			registry,
 		]
 	);
 
@@ -1307,6 +1335,12 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
+			// In a block the post does not own the cut is a copy only.
+			if ( ! isBlockOwnedByCurrentPost( registry, clientId ) ) {
+				resetRun();
+				notifyForeignEditRefused( registry );
+				return;
+			}
 			if (
 				deleteAcrossOwnSelection( {
 					clientId,

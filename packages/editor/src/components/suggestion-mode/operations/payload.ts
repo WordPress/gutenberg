@@ -20,6 +20,11 @@
  *   - `afterHTML`      Proposed run HTML for a `format` suggestion, used to
  *                      summarize which formats changed.
  *   - `before`/`after` The baseline and proposed values (`attribute-set`).
+ *   - `excerpt`        The start of the block's text, plain and at most
+ *                      `BLOCK_EXCERPT_MAX_CHARS` long (`block-remove`,
+ *                      `block-insert-after`), for the summary once the block
+ *                      is gone. Payloads written before it carry the whole
+ *                      block in `block`, which is only read for its text.
  */
 export interface SuggestionOperation {
 	type: string;

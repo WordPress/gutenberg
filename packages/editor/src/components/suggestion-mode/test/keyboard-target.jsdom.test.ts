@@ -1,9 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { createRegistry } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import {
 	getCandidateDocuments,
 	isEventTargetSelectedRichText,
 	readEventRange,
 	readLiveInlineSelection,
+	refuseForeignBlockInput,
 } from '../keyboard-target';
 
 /*
@@ -535,5 +544,114 @@ describe( 'getCandidateDocuments', () => {
 		const docs = getCandidateDocuments();
 		expect( docs ).toContain( iframe.contentDocument );
 		expect( docs ).toHaveLength( 2 );
+	} );
+} );
+
+describe( 'refuseForeignBlockInput', () => {
+	const BLOCK = 'test/keyboard-target-block';
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		unregisterBlockType( BLOCK );
+	} );
+
+	// A root block and a block inside a container with controlled inner
+	// blocks, which is how another entity's content sits in the canvas.
+	function setup() {
+		registerBlockType( BLOCK, {
+			apiVersion: 3,
+			title: 'Block',
+			category: 'text',
+			attributes: { content: { type: 'string' } },
+			edit: () => null,
+			save: () => null,
+		} );
+		const registry = createRegistry();
+		registry.register( blockEditorStore );
+		registry.register( noticesStore );
+		const owned = createBlock( BLOCK );
+		const container = createBlock( BLOCK );
+		const foreign = createBlock( BLOCK );
+		const dispatch: any = registry.dispatch( blockEditorStore );
+		dispatch.resetBlocks( [ owned, container ] );
+		dispatch.setHasControlledInnerBlocks( container.clientId, true );
+		dispatch.replaceInnerBlocks( container.clientId, [ foreign ] );
+		return { registry, owned: owned.clientId, foreign: foreign.clientId };
+	}
+
+	function inputAt( clientId: string, cancelable = true ) {
+		const { editable } = createBlockEditable( {
+			clientId,
+			attributeKey: 'content',
+		} );
+		return {
+			target: editable,
+			cancelable,
+			preventDefault: vi.fn(),
+			stopImmediatePropagation: vi.fn(),
+		};
+	}
+
+	const notices = ( registry: any ) =>
+		registry.select( noticesStore ).getNotices();
+
+	it( 'cancels input in a block another entity owns and says why', () => {
+		const { registry, foreign } = setup();
+		const event = inputAt( foreign );
+
+		expect(
+			refuseForeignBlockInput( event, registry, {
+				clientId: foreign,
+				attributeKey: 'content',
+			} )
+		).toBe( true );
+		expect( event.preventDefault ).toHaveBeenCalled();
+		expect( event.stopImmediatePropagation ).toHaveBeenCalled();
+		expect( notices( registry ) ).toHaveLength( 1 );
+		expect( notices( registry )[ 0 ].content ).toContain(
+			'saved outside this post'
+		);
+	} );
+
+	it( 'leaves input in the post’s own block alone', () => {
+		const { registry, owned } = setup();
+		const event = inputAt( owned );
+
+		expect(
+			refuseForeignBlockInput( event, registry, {
+				clientId: owned,
+				attributeKey: 'content',
+			} )
+		).toBe( false );
+		expect( event.preventDefault ).not.toHaveBeenCalled();
+		expect( notices( registry ) ).toHaveLength( 0 );
+	} );
+
+	it( 'leaves input outside the selected rich text alone', () => {
+		const { registry, foreign } = setup();
+		const composer = document.createElement( 'div' );
+		document.body.appendChild( composer );
+		const event = { target: composer, preventDefault: vi.fn() };
+
+		expect(
+			refuseForeignBlockInput( event, registry, {
+				clientId: foreign,
+				attributeKey: 'content',
+			} )
+		).toBe( false );
+		expect( event.preventDefault ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves an event that cannot be cancelled alone', () => {
+		const { registry, foreign } = setup();
+		const event = inputAt( foreign, false );
+
+		expect(
+			refuseForeignBlockInput( event, registry, {
+				clientId: foreign,
+				attributeKey: 'content',
+			} )
+		).toBe( false );
+		expect( notices( registry ) ).toHaveLength( 0 );
 	} );
 } );

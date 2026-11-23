@@ -63,6 +63,22 @@ describe( 'hasSuggestionMarkers', () => {
 		}
 	);
 
+	it( 'detects the placeholder the save pass leaves for a suggested block', () => {
+		expect(
+			hasSuggestionMarkers(
+				'<!-- wp:suggestion-placeholder {"id":12,"type":"pending-insert","run":0} /-->'
+			)
+		).toBe( true );
+	} );
+
+	it( 'detects an inline anchor the save pass has emptied', () => {
+		expect(
+			hasSuggestionMarkers(
+				'<!-- wp:paragraph -->\n<p>Hello <mark data-suggestion-run="0" data-suggestion-id="12" data-suggestion-type="add" data-author="3" class="wp-suggestion-add"></mark></p>\n<!-- /wp:paragraph -->'
+			)
+		).toBe( true );
+	} );
+
 	it.each( [ 'pending-remove', 'pending-insert', 'pending-move' ] )(
 		'detects a structural %s marker',
 		( type ) => {

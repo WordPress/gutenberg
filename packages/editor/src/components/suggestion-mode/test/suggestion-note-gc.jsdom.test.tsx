@@ -153,6 +153,7 @@ beforeAll( () => {
 		category: 'text',
 		attributes: {
 			content: { type: 'rich-text', source: 'rich-text' },
+			citation: { type: 'rich-text', source: 'rich-text' },
 			metadata: { type: 'object' },
 		},
 		save: () => null,
@@ -782,16 +783,19 @@ describe( 'SuggestionNoteGC scope', () => {
 	 * @param options.threads Note threads.
 	 * @param options.server  The note as a fresh server read returns it.
 	 * @param options.userId  The signed-in user, or null while unresolved.
+	 * @param options.changes The edit that takes the marker out of `content`.
 	 * @return The `saveEntityRecord` spy.
 	 */
 	async function withdraw( {
 		threads,
 		server,
 		userId = CURRENT_USER_ID,
+		changes = { content: RichTextData.fromHTMLString( 'Hello world' ) },
 	}: {
 		threads: any[];
 		server?: any;
 		userId?: number | null;
+		changes?: Record< string, any >;
 	} ) {
 		let harness: any;
 		await act( async () => {
@@ -807,9 +811,7 @@ describe( 'SuggestionNoteGC scope', () => {
 		await act( async () => {
 			harness.registry
 				.dispatch( blockEditorStore )
-				.updateBlockAttributes( harness.clientId, {
-					content: RichTextData.fromHTMLString( 'Hello world' ),
-				} );
+				.updateBlockAttributes( harness.clientId, changes );
 		} );
 		await act( async () => {
 			vi.advanceTimersByTime( 1000 );
@@ -841,6 +843,55 @@ describe( 'SuggestionNoteGC scope', () => {
 		} );
 
 		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+
+	it( 'keeps a note whose marker moved to another attribute', async () => {
+		// The payload names `content`; a transform can carry the marked
+		// text into an attribute with another name.
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			changes: {
+				content: RichTextData.fromHTMLString( '' ),
+				citation: RichTextData.fromHTMLString( MARKED ),
+			},
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+
+	it( 'drops a scheduled collection when the editor moves to another post', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} );
+		} );
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		// Inside the grace period the editor is handed another post, whose
+		// blocks say nothing about the first post's anchors.
+		serverThreads = [];
+		await act( async () => {
+			harness.registry
+				.dispatch( editorStore )
+				.setEditedPost( 'post', ( POST_ID + 1 ) as any );
+		} );
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
 	} );
 
 	it( 'collects nothing while the current user is unresolved', async () => {
