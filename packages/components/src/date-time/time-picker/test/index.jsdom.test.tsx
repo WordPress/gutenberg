@@ -559,7 +559,7 @@ describe( 'TimePicker', () => {
 			).toHaveAccessibleDescription( '(EST) America/New York' );
 		} );
 
-		it( 'should close only the time zone infotip on Escape inside a popover', async () => {
+		it( 'should close only the time zone infotip on Escape inside a popover after clicking the abbreviation', async () => {
 			const user = userEvent.setup();
 			const onClose = vi.fn();
 
