@@ -215,8 +215,12 @@
 		}
 	},
 	"selectors": {
-		"root": ".wp-block-table > table",
-		"spacing": ".wp-block-table"
+		"root": ".wp-block-table",
+		"css": ".wp-block-table > table",
+		"background": ".wp-block-table > table",
+		"color": ".wp-block-table > table",
+		"typography": ".wp-block-table > table",
+		"border": ".wp-block-table > table"
 	},
 	"styles": [
 		{
