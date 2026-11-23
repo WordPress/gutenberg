@@ -30,7 +30,9 @@ export default function UserControl( { value, onChange } ) {
 				selectedUser: value
 					? getUser( value, { context: 'view' } )
 					: null,
-				isLoading: isResolving( 'getUsers', [ query ] ),
+				isLoading:
+					isResolving( 'getUsers', [ query ] ) ||
+					isResolving( 'getUser', [ value, { context: 'view' } ] ),
 			};
 		},
 		[ filterValue, value ]
