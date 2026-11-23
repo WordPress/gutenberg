@@ -15,6 +15,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { END, HOME } from '@wordpress/keycodes';
 import ListViewBranch from './branch';
 import {
 	ListViewContext,
@@ -253,7 +254,8 @@ function ListViewComponent(
 		}
 	}, [] );
 	// Tree grid rows carry `data-block`, except appender rows. A move off an
-	// appender row goes on from the block row that focus last left.
+	// appender row goes on from the block row that focus last left, or else
+	// from the row it moves to.
 	const lastBlockRowRef = useRef< string | undefined >( undefined );
 	const focusRow = useCallback(
 		(
@@ -263,9 +265,17 @@ function ListViewComponent(
 		) => {
 			const clientId =
 				startRow?.dataset?.block ?? lastBlockRowRef.current;
-			lastBlockRowRef.current = clientId;
-			if ( event.shiftKey && clientId ) {
-				updateBlockSelection( event, clientId, endRow?.dataset?.block );
+			// Home and End jump past the rows next to the one they move to.
+			const isJump = event.keyCode === HOME || event.keyCode === END;
+			lastBlockRowRef.current =
+				isJump && ! event.shiftKey ? undefined : clientId;
+			const fromClientId = clientId ?? endRow?.dataset?.block;
+			if ( event.shiftKey && fromClientId ) {
+				updateBlockSelection(
+					event,
+					fromClientId,
+					endRow?.dataset?.block
+				);
 			}
 		},
 		[ updateBlockSelection ]

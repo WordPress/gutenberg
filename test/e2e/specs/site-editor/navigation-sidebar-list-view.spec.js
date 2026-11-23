@@ -855,9 +855,12 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					.getByRole( 'link' );
 
 			// Focus the rows without clicking them, since a click opens the
-			// Settings popover, which takes focus from the row.
-			await link( 'Top Level Item 2' ).focus();
-			await page.keyboard.press( 'Shift+ArrowDown' );
+			// Settings popover, which takes focus from the row. End moves to
+			// the menu's appender, so Shift+ArrowUp from there starts from
+			// the last item.
+			await link( 'Top Level Item 1' ).focus();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Shift+ArrowUp' );
 			await expect
 				.poll( selectedItems )
 				.toEqual( [ 'Top Level Item 2' ] );
