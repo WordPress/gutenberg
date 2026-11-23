@@ -1412,6 +1412,33 @@ test.describe( 'Image - lightbox', () => {
 			await expect( overlay ).not.toHaveClass( /active/ );
 		} );
 
+		test( 'should close the overlay with Escape even when the focus is outside of it', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image -->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+
+			await page
+				.getByRole( 'button', { name: 'Enlarge', exact: true } )
+				.click();
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( overlay ).toBeFocused();
+
+			// Moves the focus out of the overlay, to the document body.
+			await overlay.evaluate( ( element ) => element.blur() );
+			await expect( overlay ).not.toBeFocused();
+
+			await page.keyboard.press( 'Escape' );
+			await expect( overlay ).not.toHaveClass( /active/ );
+		} );
+
 		test( 'should keep the overlay intact when reopened before the close cleanup runs', async ( {
 			editor,
 			page,

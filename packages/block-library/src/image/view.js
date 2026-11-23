@@ -435,11 +435,16 @@ const { state, actions, callbacks } = store(
 				state.selectedImageId = state.galleryImages[ nextIndex ];
 				callbacks.setOverlayStyles();
 			} ),
+			handleDocumentKeydown( event ) {
+				// Listens on the document rather than the overlay, so Escape
+				// closes the overlay even if the focus has left it.
+				if ( state.overlayEnabled && event.key === 'Escape' ) {
+					actions.hideLightbox();
+				}
+			},
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
-					if ( event.key === 'Escape' ) {
-						actions.hideLightbox();
-					} else if ( event.key === 'ArrowLeft' ) {
+					if ( event.key === 'ArrowLeft' ) {
 						actions.showPreviousImage( event );
 					} else if ( event.key === 'ArrowRight' ) {
 						actions.showNextImage( event );

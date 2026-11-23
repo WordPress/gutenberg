@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { getElement, store } from '@wordpress/interactivity';
 
 type ImageStore = {
-	state: { overlayEnabled: boolean };
+	state: { overlayEnabled: boolean; metadata: Record< string, unknown > };
 	actions: {
 		handleKeydown: ( event: Partial< KeyboardEvent > ) => void;
+		handleDocumentKeydown: ( event: Partial< KeyboardEvent > ) => void;
 	};
 };
 
@@ -81,17 +82,22 @@ function pressTab( { shiftKey = false }: { shiftKey?: boolean } = {} ) {
 	return event;
 }
 
+/**
+ * Imports the view script, which registers the store, and opens the overlay.
+ */
+async function loadViewScript() {
+	vi.resetModules();
+	mockElementRef = null;
+	// The path is not a literal because the script is JavaScript, outside of
+	// the TypeScript project.
+	const viewScript = '../view.js';
+	await import( /* @vite-ignore */ viewScript );
+	mockRegisteredStore.state.metadata = {};
+	mockRegisteredStore.state.overlayEnabled = true;
+}
+
 describe( 'Image view script: lightbox focus trap', () => {
-	beforeEach( async () => {
-		vi.resetModules();
-		mockElementRef = null;
-		// Imports the view script to register the store. The path is not a
-		// literal because the script is JavaScript, outside of the TypeScript
-		// project.
-		const viewScript = '../view.js';
-		await import( /* @vite-ignore */ viewScript );
-		mockRegisteredStore.state.overlayEnabled = true;
-	} );
+	beforeEach( loadViewScript );
 
 	afterEach( () => {
 		document.body.innerHTML = '';
@@ -213,5 +219,38 @@ describe( 'Image view script: lightbox focus trap', () => {
 		const event = pressTab();
 
 		expect( event.preventDefault ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'Image view script: closing the lightbox with Escape', () => {
+	beforeEach( loadViewScript );
+
+	afterEach( () => {
+		vi.clearAllTimers();
+		vi.useRealTimers();
+		document.body.innerHTML = '';
+	} );
+
+	it( 'closes the overlay when Escape is pressed with the focus outside of it', () => {
+		vi.useFakeTimers();
+		createOverlay( { hasNavigation: false } );
+
+		mockRegisteredStore.actions.handleDocumentKeydown( {
+			key: 'Escape',
+			target: document.body,
+		} );
+
+		expect( mockRegisteredStore.state.overlayEnabled ).toBe( false );
+	} );
+
+	it( 'ignores other keys', () => {
+		createOverlay( { hasNavigation: false } );
+
+		mockRegisteredStore.actions.handleDocumentKeydown( {
+			key: 'Enter',
+			target: document.body,
+		} );
+
+		expect( mockRegisteredStore.state.overlayEnabled ).toBe( true );
 	} );
 } );

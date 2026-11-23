@@ -375,6 +375,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-watch---focus="callbacks.setOverlayFocus"
 			data-wp-watch---inert="callbacks.setInertElements"
 			data-wp-on--keydown="actions.handleKeydown"
+			data-wp-on-document--keydown="actions.handleDocumentKeydown"
 			data-wp-on--touchstart="actions.handleTouchStart"
 			data-wp-on--touchmove="actions.handleTouchMove"
 			data-wp-on--touchend="actions.handleTouchEnd"
