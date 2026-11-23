@@ -27,6 +27,13 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 
 	$content = '';
 	foreach ( $comments as $comment ) {
+		// Get an instance of the current Comment Template block.
+		$block_instance = $block->parsed_block;
+
+		// Set the block name to one that does not correspond to an existing registered block.
+		// This ensures that for the inner instances of the Comment Template block, we do not render any block supports.
+		$block_instance['blockName'] = 'core/null';
+
 		$comment_id           = $comment->comment_ID;
 		$filter_block_context = static function ( $context ) use ( $comment_id ) {
 			$context['commentId'] = $comment_id;
@@ -42,13 +49,6 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 		 * have access to the values.
 		 */
 		add_filter( 'render_block_context', $filter_block_context, 1 );
-
-		// Get an instance of the current Comment Template block.
-		$block_instance = $block->parsed_block;
-
-		// Set the block name to one that does not correspond to an existing registered block.
-		// This ensures that for the inner instances of the Comment Template block, we do not render any block supports.
-		$block_instance['blockName'] = 'core/null';
 
 		/*
 		 * We construct a new WP_Block instance from the block instance so that
