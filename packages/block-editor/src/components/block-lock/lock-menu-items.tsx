@@ -11,7 +11,7 @@ import type { BlockLockMenuProps } from './types';
 /**
  * Renders the checkbox items of the lock menu: all properties, then
  * styles, which locks editing the content and styles of the blocks, layout,
- * movement and deletion. Each change applies right away to the blocks
+ * where the blocks have one, movement and deletion. Each change applies right away to the blocks
  * and every block inside them, and the menu stays open so several properties
  * can be toggled in one pass.
  *
@@ -71,6 +71,11 @@ export default function BlockLockMenuItems( {
 	// layout is edited in the pattern itself, so it has no layout lock here.
 	const isLayoutSetByPattern = canLayoutLock && ! canChangeLayoutLock;
 
+	// Layout is an option only where it exists: a block that holds other
+	// blocks in a layout of its own, or a synced pattern, whose layout is set
+	// in the pattern. A Paragraph, an Image or a List has none to lock.
+	const hasLayoutOption = canLayoutLock || isEverySyncedPattern;
+
 	const isAllLocked =
 		isMoveLocked &&
 		isRemoveLocked &&
@@ -103,26 +108,28 @@ export default function BlockLockMenuItems( {
 			>
 				<Menu.ItemLabel>{ __( 'Styles' ) }</Menu.ItemLabel>
 			</Menu.CheckboxItem>
-			<Menu.CheckboxItem
-				checked={ isLayoutLocked }
-				disabled={ ! canChangeLayoutLock }
-				closeOnClick={ false }
-				onCheckedChange={ ( layout ) =>
-					setBlocksLock( clientIds, { layout } )
-				}
-			>
-				<Menu.ItemLabel>{ __( 'Layout' ) }</Menu.ItemLabel>
-				{ isLayoutSetByPattern && (
-					<Menu.ItemDescription>
-						{ __( 'Disabled by Pattern' ) }
-					</Menu.ItemDescription>
-				) }
-				{ isEverySyncedPattern && (
-					<Menu.ItemDescription>
-						{ __( 'Disabled by Synced pattern' ) }
-					</Menu.ItemDescription>
-				) }
-			</Menu.CheckboxItem>
+			{ hasLayoutOption && (
+				<Menu.CheckboxItem
+					checked={ isLayoutLocked }
+					disabled={ ! canChangeLayoutLock }
+					closeOnClick={ false }
+					onCheckedChange={ ( layout ) =>
+						setBlocksLock( clientIds, { layout } )
+					}
+				>
+					<Menu.ItemLabel>{ __( 'Layout' ) }</Menu.ItemLabel>
+					{ isLayoutSetByPattern && (
+						<Menu.ItemDescription>
+							{ __( 'Disabled by Pattern' ) }
+						</Menu.ItemDescription>
+					) }
+					{ isEverySyncedPattern && (
+						<Menu.ItemDescription>
+							{ __( 'Disabled by Synced pattern' ) }
+						</Menu.ItemDescription>
+					) }
+				</Menu.CheckboxItem>
+			) }
 			<Menu.CheckboxItem
 				checked={ isMoveLocked }
 				closeOnClick={ false }
