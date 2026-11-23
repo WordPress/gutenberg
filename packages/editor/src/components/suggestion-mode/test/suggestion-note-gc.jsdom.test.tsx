@@ -859,6 +859,41 @@ describe( 'SuggestionNoteGC scope', () => {
 		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
 	} );
 
+	it( 'drops a scheduled collection when the editor moves to another post', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} );
+		} );
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		// Inside the grace period the editor is handed another post, whose
+		// blocks say nothing about the first post's anchors.
+		serverThreads = [];
+		await act( async () => {
+			harness.registry
+				.dispatch( editorStore )
+				.setEditedPost( 'post', ( POST_ID + 1 ) as any );
+		} );
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+
 	it( 'collects nothing while the current user is unresolved', async () => {
 		const saveEntityRecord = await withdraw( {
 			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
