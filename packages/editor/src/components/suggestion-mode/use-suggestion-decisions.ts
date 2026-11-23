@@ -330,6 +330,7 @@ export function useSuggestionDecisions() {
 						.select( blockEditorStore )
 						.getBlockName( targetClientId ),
 					attributes: selectBlockAttributes( targetClientId ),
+					commentId,
 					payload,
 				} );
 			const refusal = findRefusal();

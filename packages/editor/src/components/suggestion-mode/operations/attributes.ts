@@ -237,6 +237,49 @@ export function applyOperations(
 }
 
 /**
+ * Whether a payload's `attribute-set` operations propose what the block's
+ * marker proposes. The marker is what the canvas shows and the payload is
+ * what accept applies; the two are written by separate requests, so one can
+ * be ahead of the other. A value on one side only still matches when the
+ * block already holds it, since applying it changes nothing.
+ *
+ * @param liveAttributes The block's current attributes.
+ * @param proposal       The marker's proposed attributes, if any.
+ * @param operations     Operations from the payload.
+ * @return True when both describe the same change.
+ */
+export function proposalMatchesOperations(
+	liveAttributes: Record< string, any > | null | undefined,
+	proposal: Record< string, unknown > | null | undefined,
+	operations: SuggestionOperation[]
+): boolean {
+	const proposed = proposal ?? {};
+	const has = ( key: string ) =>
+		Object.prototype.hasOwnProperty.call( proposed, key );
+	const covered = new Set< string >();
+	for ( const op of operations ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		covered.add( op.attribute );
+		const shown = has( op.attribute )
+			? proposed[ op.attribute ]
+			: liveAttributes?.[ op.attribute ];
+		if ( ! isAttributeEqual( op.after ?? null, shown ?? null ) ) {
+			return false;
+		}
+	}
+	return Object.keys( proposed ).every(
+		( key ) =>
+			covered.has( key ) ||
+			isAttributeEqual(
+				proposed[ key ] ?? null,
+				liveAttributes?.[ key ] ?? null
+			)
+	);
+}
+
+/**
  * The attributes that restore a block after `applyOperations`, covering
  * exactly the keys the apply touched. `updateBlockAttributes` is a partial
  * merge — passing the original attributes alone would leave keys that the

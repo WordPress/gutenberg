@@ -172,7 +172,7 @@ describe( 'accepting an attribute suggestion', () => {
 		[ 'a script tag name', { tagName: 'script' } ],
 		[ 'an attribute the block does not declare', { notDeclared: 'x' } ],
 		[ 'a script URL', { url: 'javascript:alert(1)' } ],
-		[ 'a value of the wrong type', { anchor: { id: 'x' } } ],
+		[ 'a value of the wrong type', { url: [ '/about' ] } ],
 	] )( 'refuses %s and decides nothing', async ( _label, after ) => {
 		const metadata = proposing( { anchor: 'intro', ...after } );
 		const { accept, attributes, serialized, saves, errors, successes } =
@@ -206,6 +206,93 @@ describe( 'accepting an attribute suggestion', () => {
 		expect( errors() ).toEqual( [
 			'This block changed type after the suggestion was made. Reject it to close the note.',
 		] );
+	} );
+
+	describe( 'when the note and the content disagree', () => {
+		const CHANGED =
+			'This suggestion no longer matches the post. Reload and try again, or reject it.';
+		const GONE =
+			'This suggestion is no longer in the post. Reject it to close the note.';
+
+		it( 'refuses a note whose value differs from the proposal shown', async () => {
+			const metadata = proposing( { anchor: 'shown' } );
+			const { accept, attributes, saves, errors } = setup( { metadata } );
+			await accept( payloadOf( [ set( 'anchor', 'stale' ) ] ) );
+			expect( attributes() ).toEqual( { tagName: 'div', metadata } );
+			expect( saves ).toEqual( [] );
+			expect( errors() ).toEqual( [ CHANGED ] );
+		} );
+
+		it( 'refuses a note that lacks part of the proposal shown', async () => {
+			const metadata = proposing( { anchor: 'intro', tagName: 'main' } );
+			const { accept, attributes, saves, errors } = setup( { metadata } );
+			await accept( payloadOf( [ set( 'anchor', 'intro' ) ] ) );
+			expect( attributes() ).toEqual( { tagName: 'div', metadata } );
+			expect( saves ).toEqual( [] );
+			expect( errors() ).toEqual( [ CHANGED ] );
+		} );
+
+		it( 'refuses a structural note whose proposal was added after it was saved', async () => {
+			const metadata = {
+				noteId: [ NOTE ],
+				suggestion: {
+					type: 'pending-insert',
+					authorId: 3,
+					commentId: NOTE,
+					after: { anchor: 'late' },
+				},
+			};
+			const { accept, attributes, saves, errors } = setup( { metadata } );
+			await accept(
+				payloadOf( [
+					{ type: 'block-insert-after', blockName: GROUP },
+				] )
+			);
+			expect( attributes() ).toEqual( { tagName: 'div', metadata } );
+			expect( saves ).toEqual( [] );
+			expect( errors() ).toEqual( [ CHANGED ] );
+		} );
+
+		it( 'refuses a note whose proposal is not on the block', async () => {
+			const metadata = { noteId: [ NOTE ] };
+			const { accept, attributes, saves, errors } = setup( { metadata } );
+			await accept( payloadOf( [ set( 'anchor', 'intro' ) ] ) );
+			expect( attributes() ).toEqual( { tagName: 'div', metadata } );
+			expect( saves ).toEqual( [] );
+			expect( errors() ).toEqual( [ GONE ] );
+		} );
+
+		it( 'accepts when the only difference is a value the block already has', async () => {
+			const { accept, attributes, errors } = setup( {
+				anchor: 'intro',
+				metadata: proposing( { tagName: 'main' } ),
+			} );
+			await accept(
+				payloadOf( [
+					set( 'tagName', 'main' ),
+					set( 'anchor', 'intro', 'old' ),
+				] )
+			);
+			expect( errors() ).toEqual( [] );
+			expect( attributes().tagName ).toBe( 'main' );
+			expect( attributes().metadata.suggestion ).toBeUndefined();
+		} );
+
+		it( 'matches a proposal not yet linked to its note through the block', async () => {
+			const { accept, attributes, errors } = setup( {
+				metadata: {
+					noteId: [ NOTE ],
+					suggestion: {
+						type: 'pending-attributes',
+						authorId: 3,
+						after: { anchor: 'intro' },
+					},
+				},
+			} );
+			await accept( payloadOf( [ set( 'anchor', 'intro' ) ] ) );
+			expect( errors() ).toEqual( [] );
+			expect( attributes().anchor ).toBe( 'intro' );
+		} );
 	} );
 
 	it( 'refuses an unsafe value that rides on a suggested insertion', async () => {
