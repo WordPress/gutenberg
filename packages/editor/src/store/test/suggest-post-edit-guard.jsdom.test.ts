@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { speak } from '@wordpress/a11y';
+import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
@@ -96,6 +97,9 @@ function directWriteLands( parent: any, id: number ): boolean {
 		value
 	);
 }
+
+// The stores' resolvers fetch; no request may leave the test or fail it.
+apiFetch.setFetchHandler( () => new Promise( () => {} ) );
 
 // Suggesting is only offered with the Suggestion mode experiment on.
 window.__experimentalSuggestionMode = true;
