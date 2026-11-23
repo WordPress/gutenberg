@@ -244,6 +244,31 @@ export default function SuggestionNoteGC() {
 	 */
 	const keptRef = useRef( new Set< string >() );
 
+	/*
+	 * Everything above is about one post. When the editor is handed another,
+	 * its blocks say nothing about the first post's anchors: a collection
+	 * still waiting out its grace period would find the anchor "gone" and
+	 * trash a healthy note. Declared before the collector so its cleanup
+	 * runs before the collector looks at the new post.
+	 */
+	const livePostIdRef = useRef( postId );
+	useEffect( () => {
+		livePostIdRef.current = postId;
+		const timers = timersRef.current;
+		const seen = seenRef.current;
+		const kept = keptRef.current;
+		const trashed = trashedRef.current;
+		return () => {
+			for ( const timer of timers.values() ) {
+				clearTimeout( timer );
+			}
+			timers.clear();
+			seen.clear();
+			kept.clear();
+			trashed.clear();
+		};
+	}, [ postId ] );
+
 	useEffect( () => {
 		const blockEditor = registry.select( blockEditorStore );
 		const timers = timersRef.current;
@@ -308,6 +333,10 @@ export default function SuggestionNoteGC() {
 		 * anchor back - or a peer decide the note - while it is in flight.
 		 */
 		const isWithdrawn = ( note: any, anchor: SuggestionAnchor ) => {
+			// The request can outlast the post it was made for.
+			if ( livePostIdRef.current !== postId ) {
+				return false;
+			}
 			if ( isAnchorPresent( note, anchor, indexAnchors() ) ) {
 				return false;
 			}
@@ -569,17 +598,6 @@ export default function SuggestionNoteGC() {
 		// read through refs or stable.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ presenceSignature ] );
-
-	// Cancel scheduled collections on unmount.
-	useEffect( () => {
-		const timers = timersRef.current;
-		return () => {
-			for ( const timer of timers.values() ) {
-				clearTimeout( timer );
-			}
-			timers.clear();
-		};
-	}, [] );
 
 	return null;
 }
