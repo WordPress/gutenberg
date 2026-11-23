@@ -33,6 +33,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 */
 	protected static $contributor_id;
 	protected static $subscriber_id;
+	/**
+	 * @var int
+	 */
 	protected static $author_id;
 	protected static $moderator_id;
 	protected static $user_ids = array();
@@ -71,12 +74,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'role' => 'subscriber',
 			)
 		);
-		self::$author_id      = $factory->user->create(
+		$author_id            = $factory->user->create(
 			array(
 				'role' => 'author',
 			)
 		);
-		self::$moderator_id   = $factory->user->create(
+		self::assertIsInt( $author_id );
+		self::$author_id    = $author_id;
+		self::$moderator_id = $factory->user->create(
 			array(
 				'role' => 'comment_moderator',
 			)
