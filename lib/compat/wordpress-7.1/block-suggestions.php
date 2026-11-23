@@ -1324,3 +1324,32 @@ function gutenberg_strip_pending_structural_suggestions( $block_content, $block 
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10, 2 );
+
+/**
+ * Keeps a pending insertion from rendering at all.
+ *
+ * `gutenberg_strip_pending_structural_suggestions()` drops the block's output
+ * once it has rendered, by which time its render callback and those of its
+ * inner blocks have run and enqueued their assets for a block no reader sees.
+ * Short-circuiting the render skips all of that. The `render_block` filter
+ * stays for a block rendered without `render_block()`, which this filter does
+ * not see.
+ *
+ * Hooked last: core's own `pre_render_block` callbacks return null whatever
+ * they are given, which would undo the short-circuit.
+ *
+ * @param string|null         $pre_render   Output to use in place of rendering, or null.
+ * @param array<string,mixed> $parsed_block The block about to render.
+ * @return string|null An empty string for a pending insertion, otherwise the
+ *                     value passed in.
+ */
+function gutenberg_skip_pending_insert_block_render( $pre_render, $parsed_block ) {
+	$attrs      = isset( $parsed_block['attrs'] ) && is_array( $parsed_block['attrs'] ) ? $parsed_block['attrs'] : array();
+	$metadata   = isset( $attrs['metadata'] ) && is_array( $attrs['metadata'] ) ? $attrs['metadata'] : array();
+	$suggestion = isset( $metadata['suggestion'] ) && is_array( $metadata['suggestion'] ) ? $metadata['suggestion'] : array();
+	if ( isset( $suggestion['type'] ) && 'pending-insert' === $suggestion['type'] ) {
+		return '';
+	}
+	return $pre_render;
+}
+add_filter( 'pre_render_block', 'gutenberg_skip_pending_insert_block_render', PHP_INT_MAX, 2 );
