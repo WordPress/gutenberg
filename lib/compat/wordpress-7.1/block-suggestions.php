@@ -401,6 +401,92 @@ function gutenberg_sanitize_suggestion_content_meta( $value ) {
 }
 
 /**
+ * Note meta only the server writes.
+ *
+ * @return string[] Meta keys.
+ */
+function gutenberg_get_server_only_suggestion_meta_keys(): array {
+	return array(
+		'_wp_suggestion_content',
+		'_wp_suggestion_decided_by',
+		'_wp_suggestion_resolved_by',
+		'_wp_suggestion_extraction_skipped',
+	);
+}
+
+/**
+ * Whether a server write of suggestion meta is in progress, opening or
+ * closing one when asked to.
+ *
+ * @param bool|null $open True to open a write, false to close it, null to
+ *                        only ask.
+ * @return bool Whether a write is open.
+ */
+function gutenberg_suggestion_server_write( ?bool $open = null ): bool {
+	static $depth = 0;
+	if ( null !== $open ) {
+		$depth = max( 0, $depth + ( $open ? 1 : -1 ) );
+	}
+	return $depth > 0;
+}
+
+/**
+ * Writes suggestion meta as the server.
+ *
+ * @param int    $note_id    Note ID.
+ * @param string $meta_key   Meta key.
+ * @param mixed  $meta_value Meta value, slashed like `update_comment_meta()` expects.
+ * @return bool Whether the value was written.
+ */
+function gutenberg_update_suggestion_server_meta( int $note_id, string $meta_key, $meta_value ): bool {
+	gutenberg_suggestion_server_write( true );
+	try {
+		return (bool) update_comment_meta( $note_id, $meta_key, $meta_value );
+	} finally {
+		gutenberg_suggestion_server_write( false );
+	}
+}
+
+/**
+ * Deletes suggestion meta as the server.
+ *
+ * @param int    $note_id  Note ID.
+ * @param string $meta_key Meta key.
+ * @return bool Whether the meta was deleted.
+ */
+function gutenberg_delete_suggestion_server_meta( int $note_id, string $meta_key ): bool {
+	gutenberg_suggestion_server_write( true );
+	try {
+		return delete_comment_meta( $note_id, $meta_key );
+	} finally {
+		gutenberg_suggestion_server_write( false );
+	}
+}
+
+/**
+ * Refuses a write of server-only note meta that the server did not make.
+ *
+ * An `auth_callback` only protects a key over REST. `wp_insert_comment()` and
+ * `wp_update_comment()` store any `comment_meta` they are given, and the
+ * wp-admin comment edit screen passes its whole form to the latter, so the
+ * rule is enforced where the meta is written.
+ *
+ * @param bool|null $check    Whether to short-circuit the write. Null lets it proceed.
+ * @param int       $note_id  Comment ID. Unused.
+ * @param string    $meta_key Meta key.
+ * @return bool|null False to refuse the write, the incoming value otherwise.
+ */
+function gutenberg_guard_server_only_suggestion_meta( $check, $note_id, $meta_key ) {
+	if ( null !== $check || gutenberg_suggestion_server_write() ) {
+		return $check;
+	}
+	return in_array( $meta_key, gutenberg_get_server_only_suggestion_meta_keys(), true ) ? false : $check;
+}
+add_filter( 'add_comment_metadata', 'gutenberg_guard_server_only_suggestion_meta', 10, 3 );
+add_filter( 'update_comment_metadata', 'gutenberg_guard_server_only_suggestion_meta', 10, 3 );
+add_filter( 'delete_comment_metadata', 'gutenberg_guard_server_only_suggestion_meta', 10, 3 );
+
+/**
  * Leaves the stored proposals out of WXR exports.
  *
  * An imported post gets new note ids, so the anchors in its content would not
