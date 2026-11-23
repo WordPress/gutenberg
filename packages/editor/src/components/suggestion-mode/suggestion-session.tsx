@@ -146,8 +146,8 @@ export function SuggestionSessionProvider( {
 	 * undo guard compares it against the structural captures' `seq` to
 	 * decide whether Ctrl+Z should withdraw a structural suggestion by hand
 	 * or perform a normal undo. A ref because it is written from
-	 * `registry.subscribe` and event handlers, and read synchronously inside
-	 * the wrapped undo dispatch.
+	 * `registry.subscribe` and event handlers, and read synchronously while
+	 * an undo is dispatched.
 	 */
 	const lastContentCaptureSeqRef = useRef( 0 );
 
