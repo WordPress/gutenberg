@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import * as i18n from '@wordpress/i18n';
 import { getDropTargetPosition } from '..';
 import type { BlockListOrientation, DropTargetBlockData } from '../types';
 
@@ -64,6 +65,39 @@ const mapElements =
 const verticalBlocksData = elementData.map( mapElements( 'vertical' ) );
 // Flip the elementData to make a horizontal block list.
 const horizontalBlocksData = elementData.map( mapElements( 'horizontal' ) );
+
+describe( 'insertion-only drop positions', () => {
+	it.each< [ BlockListOrientation, boolean, number, number, number ] >( [
+		[ 'vertical', false, 5, 250, 2 ],
+		[ 'horizontal', false, 150, 125, 1 ],
+		[ 'horizontal', true, 50, 125, 1 ],
+	] )(
+		'inserts after the target using document indices and layout direction (%s, RTL %s)',
+		( orientation, rtl, x, y, expected ) => {
+			vi.spyOn( i18n, 'isRTL' ).mockReturnValue( rtl );
+			const blocksData: DropTargetBlockData[] = [
+				{
+					blockIndex: orientation === 'vertical' ? 1 : 0,
+					isUnmodifiedDefaultBlock: orientation === 'horizontal',
+					getBoundingClientRect: () =>
+						( {
+							left: 0,
+							right: 200,
+							top: 100,
+							bottom: 300,
+							width: 200,
+							height: 200,
+						} ) as DOMRect,
+				},
+			];
+			expect(
+				getDropTargetPosition( blocksData, { x, y }, orientation, {
+					allowGroupAndReplace: false,
+				} )
+			).toEqual( [ expected, 'insert' ] );
+		}
+	);
+} );
 
 describe( 'getDropTargetPosition', () => {
 	it( 'returns `0` for an empty list of elements', () => {

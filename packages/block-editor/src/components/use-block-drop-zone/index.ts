@@ -68,6 +68,7 @@ export function getDropTargetPosition(
 		dropZoneElement,
 		parentBlockOrientation,
 		rootBlockIndex = 0,
+		allowGroupAndReplace = true,
 	} = options;
 
 	// Allow before/after when dragging over the top/bottom edges of the drop zone.
@@ -200,13 +201,15 @@ export function getDropTargetPosition(
 		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
 
 	// If the target index is set then group with the block at that index.
-	if ( targetBlockIndex !== null ) {
+	if ( allowGroupAndReplace && targetBlockIndex !== null ) {
 		return [ targetBlockIndex, 'group', nearestSide ];
 	}
-	// If both blocks are not unmodified default blocks then just insert between them.
+	// Insertion-only moves use the same nearest-edge position, including document
+	// indices and layout direction, rather than grouping or replacing the target.
 	if (
-		! isNearestBlockUnmodifiedDefaultBlock &&
-		! isAdjacentBlockUnmodifiedDefaultBlock
+		! allowGroupAndReplace ||
+		( ! isNearestBlockUnmodifiedDefaultBlock &&
+			! isAdjacentBlockUnmodifiedDefaultBlock )
 	) {
 		// If the user is dropping to the trailing edge of the block
 		// add 1 to the index to represent dragging after.
@@ -483,6 +486,7 @@ export default function useBlockDropZone( {
 					{ x: event.clientX, y: event.clientY },
 					getBlockListSettings( targetRootClientId )?.orientation,
 					{
+						allowGroupAndReplace: ! isNonContiguousMove,
 						dropZoneElement: isParentDropTargetValid
 							? dropZoneElement
 							: undefined,
@@ -495,24 +499,8 @@ export default function useBlockDropZone( {
 					}
 				);
 
-				let [ targetIndex, operation, nearestSide ] =
+				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
-				if (
-					isNonContiguousMove &&
-					( operation === 'group' || operation === 'replace' )
-				) {
-					// Non-contiguous blocks can only be inserted, not grouped or used to replace a block.
-					const rect =
-						blocksData[ targetIndex ]?.getBoundingClientRect();
-					if (
-						rect &&
-						event.clientY > ( rect.top + rect.bottom ) / 2
-					) {
-						targetIndex++;
-					}
-					operation = 'insert';
-					nearestSide = undefined;
-				}
 
 				// Any other operation would drop into the target itself.
 				if (
