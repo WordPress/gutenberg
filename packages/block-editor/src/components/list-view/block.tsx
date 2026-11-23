@@ -14,7 +14,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
@@ -774,12 +774,18 @@ function ListViewBlock( {
 					aria-selected={ !! isSelected }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
-						<ListViewLockButton
-							clientId={ clientId }
-							ref={ ref }
-							tabIndex={ tabIndex }
-							onFocus={ onFocus }
-						/>
+						// List View updates rows that aren't selected when
+						// the browser is idle, which left the lock showing
+						// its previous state for a moment after a click. The
+						// lock updates right away instead.
+						<AsyncModeProvider value={ false }>
+							<ListViewLockButton
+								clientId={ clientId }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
+							/>
+						</AsyncModeProvider>
 					) }
 				</TreeGridCell>
 			) }
