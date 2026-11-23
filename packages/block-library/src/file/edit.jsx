@@ -89,16 +89,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function onSelectFile( newMedia ) {
 		if ( ! newMedia || ! newMedia.url ) {
-			// Reset attributes.
-			setAttributes( {
-				href: undefined,
-				fileName: undefined,
-				textLinkHref: undefined,
-				id: undefined,
-				fileId: undefined,
-				displayPreview: undefined,
-				previewHeight: undefined,
-			} );
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -133,8 +124,23 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		setTemporaryURL();
 	}
 
+	function onResetFile() {
+		setAttributes( {
+			href: undefined,
+			fileName: undefined,
+			textLinkHref: undefined,
+			id: undefined,
+			fileId: undefined,
+			displayPreview: undefined,
+			previewHeight: undefined,
+			blob: undefined,
+		} );
+		setTemporaryURL();
+	}
+
 	function onUploadError( message ) {
-		setAttributes( { href: undefined } );
+		setAttributes( { blob: undefined } );
+		setTemporaryURL();
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
@@ -231,7 +237,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					accept="*"
 					onSelect={ onSelectFile }
 					onError={ onUploadError }
-					onReset={ () => onSelectFile( undefined ) }
+					onReset={ onResetFile }
 				/>
 				<ClipboardToolbarButton
 					text={ href }
