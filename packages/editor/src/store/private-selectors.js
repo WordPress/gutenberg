@@ -27,12 +27,13 @@ import {
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import {
-	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
 	STORE_NAME,
 	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
+import { getEffectiveEditorIntent } from './utils/editor-intent';
+import { isSuggestionModeEnabled } from '../components/suggestion-mode/gate';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -715,16 +716,17 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
  *
  * Storage: the intent is session-scoped — it lives in the editor store's
  * reducer, not the preferences store, so reloading the editor always
- * returns to the default `edit` intent. When no value has been set the
- * selector falls back to `EDITOR_INTENT_EDIT` so callers can rely on a
- * non-null result.
+ * returns to the default `edit` intent. The `suggest` intent holds only on
+ * the post it was chosen on: on any other entity, such as a template opened
+ * from that post, this is `edit`, and `suggest` again once the editor
+ * returns to the post.
  *
  * @param {Object} state Global application state.
  *
  * @return {string} The current editor intent. One of `edit`, `suggest`.
  */
 export function getEditorIntent( state ) {
-	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+	return getEffectiveEditorIntent( state );
 }
 
 /**
@@ -788,8 +790,10 @@ export function getCodeEditorUnavailableReason(
 		);
 	}
 
+	// Only with the experiment on: without it nothing can resolve them.
 	if (
 		checkPendingSuggestions &&
+		isSuggestionModeEnabled() &&
 		hasPendingSuggestionMarkers( getEditedPostContent( state ) )
 	) {
 		return __(
@@ -897,7 +901,7 @@ export const getProposedNewTerms = createSelector(
 	( state, restBase ) => {
 		const proposed = state.postFieldProposals[ restBase ]?.proposed;
 		if (
-			state.editorIntent !== EDITOR_INTENT_SUGGEST ||
+			getEffectiveEditorIntent( state ) !== EDITOR_INTENT_SUGGEST ||
 			! Array.isArray( proposed )
 		) {
 			return EMPTY_NEW_TERMS;
@@ -908,7 +912,7 @@ export const getProposedNewTerms = createSelector(
 		return newTerms.length ? newTerms : EMPTY_NEW_TERMS;
 	},
 	( state, restBase ) => [
-		state.editorIntent,
+		getEffectiveEditorIntent( state ),
 		state.postFieldProposals[ restBase ],
 	]
 );

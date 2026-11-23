@@ -9,6 +9,7 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -17,6 +18,7 @@ import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
+import { getAttributeApplyRefusal, getPostApplyRefusal } from './apply-refusal';
 import {
 	nestedMarkerFor,
 	withoutMarkerEntry,
@@ -128,7 +130,6 @@ export function useSuggestionDecisions() {
 		removeBlock,
 		insertBlock,
 		moveBlockToPosition,
-		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent: markLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
 	const {
@@ -508,6 +509,30 @@ export function useSuggestionDecisions() {
 			const postOps = findPostAttributeOps( payload.operations );
 			if ( postOps.length > 0 ) {
 				/*
+				 * Accept edits the post with the reviewer's capabilities, so
+				 * it takes only the fields a suggestion can propose. The
+				 * taxonomies are among them and may not be loaded yet.
+				 */
+				try {
+					await registry
+						.resolveSelect( coreStore )
+						.getTaxonomies( { per_page: -1 } );
+				} catch {
+					// Unloaded, a terms suggestion is refused below.
+				}
+				const postRefusal = getPostApplyRefusal(
+					postOps,
+					unlock( registry.select( STORE_NAME ) )
+						.isProposablePostField
+				);
+				if ( postRefusal ) {
+					createNotice( 'error', postRefusal, {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+					return false;
+				}
+				/*
 				 * New terms are created only now, as the reviewer, and before
 				 * the decision is recorded. When one cannot be created nothing
 				 * is decided and the note stays pending.
@@ -556,6 +581,35 @@ export function useSuggestionDecisions() {
 				);
 				return false;
 			}
+
+			/*
+			 * The attribute values a payload proposes are another author's,
+			 * and the reviewer's save writes them. They are checked before
+			 * anything is decided, and again as they land.
+			 */
+			const findRefusal = () =>
+				getAttributeApplyRefusal( {
+					blockName: registry
+						.select( blockEditorStore )
+						.getBlockName( targetClientId ),
+					attributes: selectBlockAttributes( targetClientId ),
+					commentId,
+					payload,
+				} );
+			const refusal = findRefusal();
+			if ( refusal ) {
+				createNotice( 'error', refusal, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				return false;
+			}
+			const assertApplicable = () => {
+				const late = findRefusal();
+				if ( late ) {
+					throw new Error( late );
+				}
+			};
 
 			const failureMessage = __( 'Failed to save suggestion status.' );
 
@@ -630,6 +684,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const currentAttributes =
 							selectBlockAttributes( targetClientId );
 						const applied = applyOperations(
@@ -641,7 +696,7 @@ export function useSuggestionDecisions() {
 							...applied,
 							metadata: withoutOutdatedProposals(
 								withoutMarkerEntry(
-									currentAttributes?.metadata,
+									applied.metadata,
 									commentId
 								),
 								applied
@@ -656,6 +711,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const plan = planStructuralApply(
 							structuralOp,
 							payload.operations,
@@ -674,20 +730,19 @@ export function useSuggestionDecisions() {
 				commentId,
 				'applied',
 				() => {
+					assertApplicable();
 					const currentAttributes =
 						selectBlockAttributes( targetClientId );
 					// One update lands the proposed values and drops the
 					// proposal, with any other author's proposal it left
 					// with nothing to change.
-					const clearedProposal =
-						clearProposedAttributes( currentAttributes );
 					const applied = applyOperations(
 						currentAttributes,
 						payload.operations
 					);
 					const metadata = withoutOutdatedProposals(
-						clearedProposal?.metadata ??
-							currentAttributes?.metadata,
+						clearProposedAttributes( applied )?.metadata ??
+							applied.metadata,
 						applied
 					);
 					// Bypass the Suggestion mode interceptor for this dispatch
@@ -844,9 +899,6 @@ export function useSuggestionDecisions() {
 							: null;
 					if ( clientId && remaining ) {
 						requestInterceptorBypass( clientId );
-						markNextChangeAsNotPersistent?.( {
-							history: 'ignore',
-						} );
 						updateBlockAttributes( clientId, {
 							metadata: remaining,
 						} );
@@ -864,17 +916,13 @@ export function useSuggestionDecisions() {
 						 * marker's proposal: the live block never took the
 						 * proposed value, so there is nothing to roll back,
 						 * but the proposal must go or it keeps rendering the
-						 * rejected value. Dropping it is a decision, not an
-						 * edit, so it stays off the undo stack.
+						 * rejected value.
 						 */
 						const clear = clearProposedAttributes(
 							selectBlockAttributes( clientId )
 						);
 						if ( clear ) {
 							requestInterceptorBypass( clientId );
-							markNextChangeAsNotPersistent?.( {
-								history: 'ignore',
-							} );
 							updateBlockAttributes( clientId, clear );
 						}
 					}
@@ -888,7 +936,6 @@ export function useSuggestionDecisions() {
 			resolveTarget,
 			runPlan,
 			updateBlockAttributes,
-			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
 			clearPostFieldProposals,
 			registry,

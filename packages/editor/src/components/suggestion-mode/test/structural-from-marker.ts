@@ -29,7 +29,7 @@ describe( 'structuralOpFromMarker', () => {
 		{ g: 'core/group' }
 	);
 
-	it( 'derives block-remove with the live block', () => {
+	it( 'derives block-remove without a snapshot of the block', () => {
 		expect(
 			structuralOpFromMarker(
 				'b',
@@ -42,7 +42,6 @@ describe( 'structuralOpFromMarker', () => {
 			blockName: 'core/paragraph',
 			parentBlockName: null,
 			groupId: 'r1',
-			block: block( 'b' ),
 		} );
 	} );
 
@@ -56,7 +55,6 @@ describe( 'structuralOpFromMarker', () => {
 			anchorClientId: 'b',
 			parentClientId: null,
 			parentBlockName: null,
-			block: block( 'c' ),
 		} );
 		expect(
 			structuralOpFromMarker( 'x', { type: 'pending-insert' }, t )

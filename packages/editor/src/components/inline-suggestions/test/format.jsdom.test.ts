@@ -54,6 +54,27 @@ describe( 'suggestion format', () => {
 		expect( out ).toContain( 'data-author="2"' );
 	} );
 
+	// The editor loads these as stored when the experiment is off, and
+	// must hand them back intact: this is why the formats are registered
+	// whatever the experiment says.
+	it( 'round-trips an emptied marker through rich text', () => {
+		const html =
+			'keep <mark data-suggestion-run="0" data-suggestion-id="5" data-suggestion-type="add" data-author="2" class="wp-suggestion-add"></mark> tail';
+		expect( RichTextData.fromHTMLString( html ).toHTMLString() ).toBe(
+			html
+		);
+	} );
+
+	it( 'does not round-trip an emptied marker once the formats are gone', () => {
+		const html =
+			'keep <mark data-suggestion-id="5" data-suggestion-type="add" class="wp-suggestion-add"></mark> tail';
+		unregisterSuggestionFormats();
+		const out = RichTextData.fromHTMLString( html ).toHTMLString();
+		registerSuggestionFormat();
+
+		expect( out ).not.toBe( html );
+	} );
+
 	it( 'resolves a deletion marker range by id', () => {
 		const value = RichTextData.fromHTMLString(
 			'keep <mark class="wp-suggestion-del" data-suggestion-id="5" data-suggestion-type="del">remove me</mark> tail'

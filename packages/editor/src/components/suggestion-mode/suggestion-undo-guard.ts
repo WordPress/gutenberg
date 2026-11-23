@@ -18,8 +18,8 @@
  * collector trashes the note. They are history-owned, and they stamp the
  * session's "last history-owned capture" sequence like inline markers do.
  *
- * This component wraps the core-data `undo` / `redo` actions. In every
- * intent it records each redo for `SuggestionNoteGC`, which tells a redo
+ * This component runs ahead of the editor's `undo` / `redo` actions. In
+ * every intent it records each redo for `SuggestionNoteGC`, which tells a redo
  * that lands a decision again from a withdrawal. While Suggest intent is
  * active, on undo it finds the most recent structural capture the session
  * recorded and compares it against the newest history-owned capture:
@@ -40,11 +40,13 @@
  *     as the new baseline instead of capturing it; note cleanup again falls
  *     to `SuggestionNoteGC`.
  *
- * The wrap targets `registry.dispatch( coreStore )`: the `core/editor` undo
- * and redo actions are thunks that resolve `dispatch( coreStore ).undo()` at
- * call time, so patching the core-data actions object intercepts the toolbar
- * button, the keyboard shortcut, and programmatic callers alike. Originals
- * are restored on unmount.
+ * It registers as the interceptor of the `core/editor` undo and redo actions
+ * (see `store/undo-redo-interceptor.ts`), which the toolbar buttons, the
+ * keyboard shortcuts and the block editor's `undo` setting all call. The
+ * core-data actions are left alone: editors in sub-registries share them, so
+ * a wrap there would run every editor's guard on any editor's undo. Code that
+ * dispatches the core-data `undo` directly is therefore not intercepted, and
+ * its block change is captured like any other edit.
  *
  * Known limitation: a swallowed undo doesn't consume the underlying history
  * item of the original structural dispatch; a follow-up Ctrl+Z replays that
@@ -54,6 +56,7 @@
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { nextCaptureSeq, useSuggestionSession } from './suggestion-session';
@@ -69,6 +72,7 @@ import { rememberRedo } from './decision-state';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils/metadata';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import { setUndoRedoInterceptor } from '../../store/undo-redo-interceptor';
 import { unlock } from '../../lock-unlock';
 
 /*
@@ -253,7 +257,7 @@ export default function SuggestionUndoGuard() {
 	 * core-data history: they are held in the editor store. Stamp each change
 	 * to one with the session's capture sequence, so undo can tell whether
 	 * the newest suggestion is a post field and withdraw it, newest first
-	 * alongside the block captures. A ref: read inside the wrapped undo.
+	 * alongside the block captures. A ref: read inside the undo interceptor.
 	 */
 	const proposalSeqsRef = useRef(
 		new Map< string, { proposal: PostFieldProposal; seq: number } >()
@@ -295,23 +299,20 @@ export default function SuggestionUndoGuard() {
 		}
 	}, [ proposals ] );
 
-	// Read from inside the wrapped dispatch, which outlives any single render.
+	// Read from inside the interceptor, which outlives any single render.
 	const isSuggestModeRef = useRef( isSuggestMode );
 	useEffect( () => {
 		isSuggestModeRef.current = isSuggestMode;
 	}, [ isSuggestMode ] );
 
-	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
-	clearStructuralCaptureRef.current = clearStructuralCapture;
-
-	const requestInterceptorBypassRef = useRef( requestInterceptorBypass );
-	requestInterceptorBypassRef.current = requestInterceptorBypass;
+	const onClearStructuralCapture = useEvent( clearStructuralCapture );
+	const onRequestInterceptorBypass = useEvent( requestInterceptorBypass );
 
 	/*
 	 * Tell the Undo button when there is a suggestion to withdraw. A
 	 * structural capture's compensating writes are history-ignored, so
-	 * without this the button can stay inert and never reach the wrapped
-	 * `undo` below. A `history` candidate is left to the real stack, which
+	 * without this the button can stay inert and never reach the
+	 * interceptor below. A `history` candidate is left to the real stack, which
 	 * already reports it. Captures live in a ref; every capture comes with a
 	 * marker write to the block-editor store, which is what re-runs this.
 	 */
@@ -354,11 +355,6 @@ export default function SuggestionUndoGuard() {
 	);
 
 	useEffect( () => {
-		const coreActions = registry.dispatch( coreStore );
-		if ( ! coreActions?.undo || ! coreActions?.redo ) {
-			return undefined;
-		}
-
 		/*
 		 * Withdraw a structural suggestion the way Reject restores the block.
 		 * The writes are marked `history: 'ignore'`: the withdrawal resolves
@@ -385,7 +381,7 @@ export default function SuggestionUndoGuard() {
 				readSuggestionMarker( attributes )?.commentId ?? null
 			);
 
-			requestInterceptorBypassRef.current( clientId );
+			onRequestInterceptorBypass( clientId );
 			if ( op.type === 'block-insert-after' ) {
 				markIgnored( { history: 'ignore' } );
 				removeBlock( clientId, false );
@@ -407,7 +403,7 @@ export default function SuggestionUndoGuard() {
 					);
 				} );
 			}
-			clearStructuralCaptureRef.current( clientId );
+			onClearStructuralCapture( clientId );
 		};
 
 		/*
@@ -463,9 +459,6 @@ export default function SuggestionUndoGuard() {
 			return true;
 		};
 
-		const originalUndo = coreActions.undo;
-		const originalRedo = coreActions.redo;
-
 		/*
 		 * Arm an adoption only when there is a history record to land: an
 		 * undo or redo with nothing to replay changes no block, so the token
@@ -473,38 +466,36 @@ export default function SuggestionUndoGuard() {
 		 */
 		const coreSelect = registry.select( coreStore );
 
-		coreActions.undo = ( ...args ) => {
-			if ( ! isSuggestModeRef.current ) {
-				return originalUndo( ...args );
-			}
-			if ( withdrawNewestSuggestion() ) {
-				return Promise.resolve();
-			}
-			if ( coreSelect.hasUndo?.() ?? true ) {
-				armUndoRedoAdoption();
-			}
-			return originalUndo( ...args );
-		};
-
-		coreActions.redo = ( ...args ) => {
-			if ( coreSelect.hasRedo?.() ?? true ) {
-				rememberRedo( registry );
-				if ( isSuggestModeRef.current ) {
+		return setUndoRedoInterceptor( registry, {
+			undo: () => {
+				if ( ! isSuggestModeRef.current ) {
+					return false;
+				}
+				if ( withdrawNewestSuggestion() ) {
+					return true;
+				}
+				if ( coreSelect.hasUndo?.() ?? true ) {
 					armUndoRedoAdoption();
 				}
-			}
-			return originalRedo( ...args );
-		};
-
-		return () => {
-			coreActions.undo = originalUndo;
-			coreActions.redo = originalRedo;
-		};
+				return false;
+			},
+			redo: () => {
+				if ( coreSelect.hasRedo?.() ?? true ) {
+					rememberRedo( registry );
+					if ( isSuggestModeRef.current ) {
+						armUndoRedoAdoption();
+					}
+				}
+				return false;
+			},
+		} );
 	}, [
 		registry,
 		getLastContentCaptureSeq,
 		getStructuralCaptures,
 		armUndoRedoAdoption,
+		onClearStructuralCapture,
+		onRequestInterceptorBypass,
 	] );
 
 	return null;

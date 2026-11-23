@@ -66,14 +66,6 @@ describe( 'authorMarker', () => {
 		} );
 		expect( authorMarker( { metadata }, 99 ) ).toBeNull();
 	} );
-	it( 'treats a marker without an author as anyone’s', () => {
-		expect(
-			authorMarker(
-				{ metadata: { suggestion: { type: 'pending-remove' } } },
-				bob
-			)?.type
-		).toBe( 'pending-remove' );
-	} );
 } );
 
 describe( 'withProposedAttributes across authors', () => {
@@ -486,5 +478,63 @@ describe( 'markerAnchorKeys', () => {
 			[ 12, 'pending-move' ],
 			[ 12, 'pending-attributes' ],
 		] );
+	} );
+} );
+
+describe( 'a marker with no recorded author', () => {
+	const planted = {
+		suggestion: { type: 'pending-attributes', after: { align: 'wide' } },
+	};
+
+	it( 'is not a known user’s marker', () => {
+		expect( authorMarker( { metadata: planted }, bob ) ).toBeNull();
+	} );
+	it( 'is the marker of a user who has not resolved yet', () => {
+		expect( authorMarker( { metadata: planted }, null ) ).toBe(
+			planted.suggestion
+		);
+	} );
+	it( 'does not hand an unresolved user another author’s marker', () => {
+		expect(
+			authorMarker(
+				{
+					metadata: {
+						suggestion: { type: 'pending-remove', authorId: anne },
+					},
+				},
+				null
+			)
+		).toBeNull();
+	} );
+	it( 'keeps a known user’s proposal apart from it', () => {
+		const { metadata } = withProposedAttributes( {
+			metadata: planted,
+			liveAttributes: { level: 2 },
+			changes: { level: 3 },
+			authorId: bob,
+		} );
+		expect( metadata.suggestion ).toEqual( {
+			type: 'pending-attributes',
+			after: { align: 'wide' },
+			nested: [
+				{
+					type: 'pending-attributes',
+					authorId: bob,
+					after: { level: 3 },
+				},
+			],
+		} );
+	} );
+	it( 'is nested under, not replaced by, a known user’s marker', () => {
+		expect(
+			withAuthorMarker( planted, bob, {
+				type: 'pending-remove',
+				authorId: bob,
+			} ).suggestion
+		).toEqual( {
+			type: 'pending-attributes',
+			after: { align: 'wide' },
+			nested: [ { type: 'pending-remove', authorId: bob } ],
+		} );
 	} );
 } );

@@ -28,8 +28,14 @@
 class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $admin_id;
 	protected static $editor_id;
+	/**
+	 * @var int
+	 */
 	protected static $contributor_id;
 	protected static $subscriber_id;
+	/**
+	 * @var int
+	 */
 	protected static $author_id;
 	protected static $moderator_id;
 	protected static $user_ids = array();
@@ -46,32 +52,36 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 
-		self::$admin_id       = $factory->user->create(
+		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$editor_id      = $factory->user->create(
+		self::$editor_id = $factory->user->create(
 			array(
 				'role' => 'editor',
 			)
 		);
-		self::$contributor_id = $factory->user->create(
+		$contributor_id  = $factory->user->create(
 			array(
 				'role' => 'contributor',
 			)
 		);
+		self::assertIsInt( $contributor_id );
+		self::$contributor_id = $contributor_id;
 		self::$subscriber_id  = $factory->user->create(
 			array(
 				'role' => 'subscriber',
 			)
 		);
-		self::$author_id      = $factory->user->create(
+		$author_id            = $factory->user->create(
 			array(
 				'role' => 'author',
 			)
 		);
-		self::$moderator_id   = $factory->user->create(
+		self::assertIsInt( $author_id );
+		self::$author_id    = $author_id;
+		self::$moderator_id = $factory->user->create(
 			array(
 				'role' => 'comment_moderator',
 			)
@@ -112,6 +122,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+		// Suggestion writes and the save pass need the experiment.
+		add_filter(
+			'pre_option_gutenberg-experiments',
+			static function () {
+				return array( 'gutenberg-suggestion-mode' => true );
+			}
+		);
 		wp_create_initial_comment_meta();
 		gutenberg_register_suggestion_meta();
 	}
@@ -272,6 +289,104 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$this->assertSame( '0', $new_comment->comment_approved );
 		$this->assertSame( 'note', $new_comment->comment_type );
+	}
+
+	/**
+	 * A new suggestion note is undecided, so it is stored unresolved unless
+	 * the request sets a status itself.
+	 *
+	 * @dataProvider data_create_note_default_status
+	 *
+	 * @param array<string, mixed> $params   Request params added to the note's.
+	 * @param bool                 $is_reply Whether the note replies to another.
+	 * @param string               $expected Expected `comment_approved`.
+	 */
+	public function test_create_note_default_status( array $params, bool $is_reply, string $expected ): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$params += array(
+			'post'    => $post_id,
+			'content' => 'A note',
+			'author'  => self::$author_id,
+			'type'    => 'note',
+		);
+		if ( $is_reply ) {
+			$params['parent'] = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => '0',
+					'user_id'          => self::$author_id,
+				)
+			);
+		}
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertIsInt( $data['id'] );
+		$note = get_comment( $data['id'] );
+		$this->assertInstanceOf( WP_Comment::class, $note );
+		$this->assertSame( $expected, $note->comment_approved );
+		$this->assertSame( '1' === $expected ? 'approved' : 'hold', $data['status'] );
+	}
+
+	/**
+	 * @return array<string, array{0: array<string, mixed>, 1: bool, 2: string}>
+	 */
+	public function data_create_note_default_status(): array {
+		$suggestion = array(
+			'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+		);
+		return array(
+			'a suggestion with no status'       => array( array( 'meta' => $suggestion ), false, '0' ),
+			'a suggestion sent as hold'         => array(
+				array(
+					'meta'   => $suggestion,
+					'status' => 'hold',
+				),
+				false,
+				'0',
+			),
+			'a note with no suggestion'         => array( array(), false, '1' ),
+			'a note with an empty suggestion'   => array( array( 'meta' => array( '_wp_suggestion' => '' ) ), false, '1' ),
+			'a reply that carries a suggestion' => array( array( 'meta' => $suggestion ), true, '1' ),
+		);
+	}
+
+	/**
+	 * A status the request sets is validated as before: an undecided
+	 * suggestion cannot be created resolved.
+	 */
+	public function test_create_suggestion_note_with_explicit_resolved_status_is_refused(): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'author'  => self::$author_id,
+					'type'    => 'note',
+					'status'  => 'approved',
+					'meta'    => array(
+						'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+					),
+				)
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_suggestion_pending', rest_get_server()->dispatch( $request ), 409 );
 	}
 
 	public function test_cannot_create_with_non_valid_comment_type() {
@@ -1234,6 +1349,65 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that the `excerpt` of a structural operation is stored as bounded
+	 * plain text for a user without `unfiltered_html`, and that the operation
+	 * needs no block snapshot.
+	 */
+	public function test_suggestion_payload_excerpt_is_plain_text(): void {
+		$author_id = self::$author_id;
+		$this->assertIsInt( $author_id );
+		wp_set_current_user( $author_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$this->assertIsInt( $comment_id );
+
+		$operation = static function ( string $type, $excerpt ): array {
+			return array(
+				'type'      => $type,
+				'clientId'  => 'abc',
+				'blockName' => 'core/paragraph',
+				'excerpt'   => $excerpt,
+			);
+		};
+		$payload   = (string) wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					$operation( 'block-remove', '<img src=x onerror=alert(1)>Removed <b>text</b><script>alert(2)</script>' ),
+					$operation( 'block-insert-after', str_repeat( 'é', 500 ) ),
+					$operation( 'block-remove', array( '<script>alert(3)</script>' ) ),
+				),
+			)
+		);
+
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertIsString( $stored );
+		$decoded = json_decode( $stored, true );
+		$this->assertIsArray( $decoded );
+
+		$without_excerpt = $operation( 'block-remove', null );
+		unset( $without_excerpt['excerpt'] );
+		$this->assertSame(
+			array(
+				$operation( 'block-remove', 'Removed text' ),
+				$operation( 'block-insert-after', str_repeat( 'é', 120 ) ),
+				$without_excerpt,
+			),
+			$decoded['operations'],
+			'An excerpt is stored without markup, cut to its limit, and dropped when it is not a string.'
+		);
+	}
+
+	/**
 	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
 	 * the same freedom they have in post content.
 	 */
@@ -1620,6 +1794,70 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
 		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
+	}
+
+	/**
+	 * Test that the size limit applies to the payload as it is stored: KSES
+	 * encodes a bare ampersand, so a filtered payload can outgrow the limit
+	 * its raw form met.
+	 */
+	public function test_create_rejects_suggestion_payload_oversized_once_filtered(): void {
+		wp_set_current_user( self::$contributor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author' => self::$contributor_id,
+				'post_status' => 'draft',
+			)
+		);
+		$payload = '{"operations":[{"type":"attribute-set","attribute":"content","after":"' . str_repeat( '&', (int) ( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES / 2 ) ) . '"}]}';
+		$this->assertLessThan( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES, strlen( $payload ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'post'   => $post_id,
+					'type'   => 'note',
+					'status' => 'hold',
+					'meta'   => array( '_wp_suggestion' => $payload ),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$this->assertIsInt( $comment_id );
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+		$this->assertSame( '', get_comment_meta( $comment_id, '_wp_suggestion', true ), 'The same payload is not stored outside REST either.' );
+	}
+
+	/**
+	 * Test that filtering does not grow a payload of non-ASCII text, which
+	 * would count it against the size limit several times over.
+	 */
+	public function test_filtered_suggestion_payload_keeps_non_ascii_text_unescaped(): void {
+		wp_set_current_user( self::$contributor_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => self::$contributor_id ) );
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$payload    = '{"operations":[{"type":"attribute-set","attribute":"content","after":"' . str_repeat( 'я', 15000 ) . ' a/b"}]}';
+		$this->assertIsInt( $comment_id );
+
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$this->assertSame( $payload, get_comment_meta( $comment_id, '_wp_suggestion', true ) );
 	}
 
 	/**
