@@ -924,9 +924,69 @@ describe( 'summarizeOperations', () => {
 			summarizeOperations( [
 				{
 					type: 'attribute-set',
+					attribute: 'layout',
+					before: { type: 'constrained' },
+					after: { type: 'flex' },
+				},
+			] )
+		).toEqual( [ { label: 'Change:', value: 'layout' } ] );
+	} );
+
+	it( 'names the settings a style change holds', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'style',
+					before: null,
+					after: { typography: { textAlign: 'center' } },
+				},
+			] )
+		).toEqual( [
+			{ label: 'Change:', value: 'text alignment default → center' },
+		] );
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
 					attribute: 'style',
 					before: { color: { text: '#000' } },
-					after: { color: { text: '#f00' } },
+					after: {
+						color: { text: '#f00' },
+						elements: {
+							link: {
+								color: { text: 'var:preset|color|accent-1' },
+							},
+						},
+					},
+				},
+			] )
+		).toEqual( [
+			{
+				label: 'Change:',
+				value: 'text color #000 → #f00, link color default → accent-1',
+			},
+		] );
+	} );
+
+	it( 'falls back to "style" when a style change has no short form', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'attribute-set',
+					attribute: 'style',
+					before: null,
+					after: {
+						spacing: {
+							padding: {
+								top: '1px',
+								right: '1px',
+								bottom: '1px',
+								left: '1px',
+							},
+							margin: { top: '1px' },
+						},
+					},
 				},
 			] )
 		).toEqual( [ { label: 'Change:', value: 'style' } ] );
