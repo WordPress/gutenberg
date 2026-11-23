@@ -178,10 +178,14 @@ export default {
 	'--wpds-motion-easing-balanced': 'cubic-bezier(0.4, 0, 0.2, 1)',
 	'--wpds-motion-easing-expressive': 'cubic-bezier(0.25, 0, 0, 1)',
 	'--wpds-motion-easing-subtle': 'cubic-bezier(0.15, 0, 0.15, 1)',
-	'--wpds-shadow-lg': '0px 4px 10px #0000000d, 0px 20px 48px #0000000d',
-	'--wpds-shadow-md': '0px 2px 4px #0000000d, 0px 8px 20px #0000000d',
-	'--wpds-shadow-sm': '0px 1px 2px #0000000d, 0px 3px 8px #0000000d',
-	'--wpds-shadow-xs': '0px 1px 1px #0000000d, 0px 1px 3px #0000000d',
+	'--wpds-shadow-lg':
+		'0px 5px 15px #00000014, 0px 15px 27px #00000012, 0px 30px 36px #0000000a, 0px 50px 43px #00000005',
+	'--wpds-shadow-md':
+		'0px 2px 3px #0000000d, 0px 4px 5px #0000000a, 0px 12px 12px #00000008, 0px 16px 16px #00000005',
+	'--wpds-shadow-sm':
+		'0px 1px 2px #0000000d, 0px 2px 3px #0000000a, 0px 6px 6px #00000008, 0px 8px 8px #00000005',
+	'--wpds-shadow-xs':
+		'0px 1px 1px #00000008, 0px 1px 2px #00000005, 0px 3px 3px #00000005, 0px 4px 4px #00000003',
 	'--wpds-typography-font-family-body':
 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
 	'--wpds-typography-font-family-heading':

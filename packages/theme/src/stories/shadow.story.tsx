@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';
-import { getShadowOpacity } from '../shadow';
+import { getShadowScale } from '../shadow';
 
 const LEVELS = [
 	{ token: '--wpds-shadow-xs', usage: 'Switch thumb' },
@@ -79,9 +79,7 @@ const Levels = ( {
 );
 
 const describeSeed = ( background: string ) =>
-	`${ background } · shadow opacity ${ (
-		getShadowOpacity( background ) * 100
-	).toFixed( 1 ) }%`;
+	`${ background } · shadow scale ×${ getShadowScale( background ) }`;
 
 const meta: Meta< Args > = {
 	title: 'Design System/Theme/Shadow',
@@ -105,9 +103,9 @@ const meta: Meta< Args > = {
 export default meta;
 
 /**
- * The `--wpds-shadow-*` tokens are two black shadows per level. Their
- * opacity follows the `ThemeProvider` background seed, so the shadow darkens
- * every background by about the same perceived amount.
+ * The `--wpds-shadow-*` tokens are four black layers per level. Their
+ * opacity is scaled from the `ThemeProvider` background seed, so the shadow
+ * darkens every background by about the same perceived amount.
  */
 export const Default: StoryObj< Args > = {
 	render: ( { background, strokes } ) => (
