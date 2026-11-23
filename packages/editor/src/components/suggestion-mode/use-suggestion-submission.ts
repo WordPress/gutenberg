@@ -68,35 +68,38 @@ export function useSuggestionSubmission() {
 	 * The id usually comes from a marker, and a marker sits in content that
 	 * anyone who can edit the post can write, author attribute included. So
 	 * the note itself decides: it must be a note, on this post, that the
-	 * current user wrote. A note core-data does not hold yet is fetched, and
-	 * one that cannot be read is refused. While the current user is
-	 * unresolved there is nobody to compare with, and the write goes ahead.
+	 * current user wrote. A user or note core-data does not hold yet is
+	 * fetched, and whatever cannot be established is refused.
 	 *
 	 * @param commentId Comment id named by the caller.
 	 */
 	const assertOwnNote = useCallback(
 		async ( commentId: number | string ) => {
-			const currentUserId = getCurrentUser?.()?.id ?? null;
-			if ( currentUserId === null ) {
-				return;
-			}
+			const resolve = registry.resolveSelect( coreStore ) as any;
+			let currentUserId = getCurrentUser?.()?.id ?? null;
 			let note = store.getNote( commentId );
-			if ( ! note ) {
-				try {
-					note = await (
-						registry.resolveSelect( coreStore ) as any
-					 ).getEntityRecord( 'root', 'comment', commentId );
-				} catch {
-					note = null;
+			try {
+				if ( currentUserId === null ) {
+					currentUserId =
+						( await resolve.getCurrentUser() )?.id ?? null;
 				}
+				if ( ! note ) {
+					note = await resolve.getEntityRecord(
+						'root',
+						'comment',
+						commentId
+					);
+				}
+			} catch {
+				note = null;
 			}
 			if (
+				currentUserId === null ||
+				! postId ||
 				! note ||
 				note.type !== 'note' ||
 				Number( note.author ) !== Number( currentUserId ) ||
-				( postId &&
-					note.post !== undefined &&
-					Number( note.post ) !== Number( postId ) )
+				Number( note.post ) !== Number( postId )
 			) {
 				throw new Error(
 					__(
