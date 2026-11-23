@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Keep hiding empty badge fields in the `grid` and `pickerGrid` layouts with the updated `Badge` from `@wordpress/ui` ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 
 ### Internal
 
