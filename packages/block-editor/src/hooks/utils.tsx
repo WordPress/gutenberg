@@ -334,6 +334,7 @@ export function useBlockSettings(
 		customTextShadowPresets,
 		defaultTextShadowPresets,
 		themeTextShadowPresets,
+		rotate,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -403,7 +404,8 @@ export function useBlockSettings(
 		'typography.defaultTextShadowPresets',
 		'typography.textShadowPresets.custom',
 		'typography.textShadowPresets.default',
-		'typography.textShadowPresets.theme'
+		'typography.textShadowPresets.theme',
+		'transform.rotate'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -504,6 +506,9 @@ export function useBlockSettings(
 			layout,
 			parentLayout,
 			shadow,
+			transform: {
+				rotate,
+			},
 		};
 	}, [
 		backgroundImage,
@@ -576,6 +581,7 @@ export function useBlockSettings(
 		isHeadingEnabled,
 		isButtonEnabled,
 		shadow,
+		rotate,
 	] );
 
 	// Theme.json settings arrive untyped.
