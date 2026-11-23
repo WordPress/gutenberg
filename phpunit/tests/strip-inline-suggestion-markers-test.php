@@ -352,7 +352,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		);
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
 		if ( $status ) {
-			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
+			gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_status', $status );
 		}
 		return $note_id;
 	}
@@ -495,7 +495,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_rejected_note_is_not_used() {
 		list( $post_id, $note_id ) = $this->create_post_with_format_change();
-		update_comment_meta( $note_id, '_wp_suggestion_status', 'rejected' );
+		gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_status', 'rejected' );
 
 		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, '<p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p>' ) );
 	}
