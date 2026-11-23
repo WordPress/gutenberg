@@ -55,7 +55,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	describeAnchor,
 	getAnchorIndex,
-	inlineAttributesOf,
+	hasInlineAnchor,
 	isAnchorPresent,
 } from './anchor-index';
 import type { SuggestionAnchor } from './anchor-index';
@@ -198,7 +198,7 @@ export default function SuggestionNoteGC() {
 			}
 			const index = getAnchorIndex(
 				select( blockEditorStore ),
-				inlineAttributesOf(
+				hasInlineAnchor(
 					suggestionNotes,
 					trashedRef.current.values(),
 					resolvedNotes
@@ -250,7 +250,7 @@ export default function SuggestionNoteGC() {
 		const indexAnchors = () =>
 			getAnchorIndex(
 				blockEditor,
-				inlineAttributesOf(
+				hasInlineAnchor(
 					suggestionNotes,
 					trashedRef.current.values(),
 					resolvedNotesRef.current
