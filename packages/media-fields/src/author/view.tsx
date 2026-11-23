@@ -51,8 +51,7 @@ export default function AuthorView( {
 					<img
 						ref={ imgRef }
 						onLoad={ handleLoad }
-						// Decorative: the name of the author is next to it.
-						alt=""
+                                                alt=""
 						src={ imageUrl }
 					/>
 				</div>
