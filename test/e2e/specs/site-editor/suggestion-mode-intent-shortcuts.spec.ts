@@ -8,7 +8,7 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const SUGGEST_SHORTCUT = 'Switch to Suggest mode.';
+const SUGGEST_SHORTCUT = 'Switch to Suggesting.';
 
 async function openShortcutHelp( page: any, pageUtils: any ) {
 	await pageUtils.pressKeys( 'access+h' );
@@ -17,7 +17,7 @@ async function openShortcutHelp( page: any, pageUtils: any ) {
 	return dialog;
 }
 
-test.describe( 'Suggest mode intent shortcuts', () => {
+test.describe( 'Suggestion mode intent shortcuts', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfour' );
 		await requestUtils.setGutenbergExperiments( [
