@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Generate a local poster image from a video's first frame during upload and apply it to the Video block automatically ([#79406](https://github.com/WordPress/gutenberg/pull/79406)).
+
 ## 0.45.0 (2026-11-18)
 
 ### New Features
