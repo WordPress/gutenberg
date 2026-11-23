@@ -654,7 +654,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests that the template parts a child theme adds do not displace the ones
 	 * its parent declares.
 	 *
-	 * @ticket 39166
+	 * @ticket 66778
 	 *
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_theme_data
 	 */

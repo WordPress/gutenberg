@@ -3800,7 +3800,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests that template parts declared by the incoming data are matched to the
 	 * existing ones by name, instead of by their position in the list.
 	 *
-	 * @ticket 39166
+	 * @ticket 66778
 	 *
 	 * @covers WP_Theme_JSON_Gutenberg::merge
 	 */
@@ -3860,7 +3860,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests that a template part declared by the incoming data overrides the
 	 * existing one that shares its name, wherever either of them is listed.
 	 *
-	 * @ticket 39166
+	 * @ticket 66778
 	 *
 	 * @covers WP_Theme_JSON_Gutenberg::merge
 	 */
@@ -3916,7 +3916,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests that entries which declare no name, and so cannot be matched to
 	 * anything, survive the merge instead of being dropped.
 	 *
-	 * @ticket 39166
+	 * @ticket 66778
 	 *
 	 * @covers WP_Theme_JSON_Gutenberg::merge
 	 */
@@ -3970,7 +3970,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * Tests that custom templates declared by the incoming data are matched to
 	 * the existing ones by name, instead of by their position in the list.
 	 *
-	 * @ticket 39166
+	 * @ticket 66778
 	 *
 	 * @covers WP_Theme_JSON_Gutenberg::merge
 	 */
