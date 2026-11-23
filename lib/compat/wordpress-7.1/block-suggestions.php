@@ -2245,6 +2245,19 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	}
 
 	/*
+	 * Each note is read once per block, and only so many of them: a marker
+	 * can name any id, and every id that is not a note costs a query. Past
+	 * that a format marker counts as one whose original cannot be resolved.
+	 */
+	$resolved = array();
+	$resolve  = static function ( int $note_id ) use ( &$resolved, $post_id ): ?string {
+		if ( ! array_key_exists( $note_id, $resolved ) ) {
+			$resolved[ $note_id ] = count( $resolved ) < 100 ? gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) : null;
+		}
+		return $resolved[ $note_id ];
+	};
+
+	/*
 	 * Formatting suggestions come out character by character first, so
 	 * stacked ones and ones crossing an addition's edge render their
 	 * original. When that cannot be done, each format marker is handled
@@ -2254,7 +2267,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 		$originals = array();
 		foreach ( $markers as $marker ) {
 			if ( 'format' === $marker['kind'] && null === $marker['run'] && ! isset( $originals[ $marker['id'] ] ) ) {
-				$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
+				$original = $resolve( $marker['id'] );
 				if ( null === $original ) {
 					$originals = null;
 					break;
@@ -2280,7 +2293,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			 * an unresolved format change below, never as an addition, so a
 			 * marker does not silently drop content it is not sure about.
 			 */
-			$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
+			$original = $resolve( $marker['id'] );
 			if ( null !== $original ) {
 				$mode                          = 'format';
 				$markers[ $index ]['original'] = $original;

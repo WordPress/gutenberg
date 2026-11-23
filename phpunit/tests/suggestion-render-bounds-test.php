@@ -217,4 +217,26 @@ class Tests_Suggestion_Render_Bounds extends WP_UnitTestCase {
 
 		$this->assertSame( '<p><em>ab</em>' . $filler . '<em>cd</em></p>', str_replace( ' class="wp-block-paragraph"', '', trim( $rendered ) ) );
 	}
+
+	public function test_format_markers_naming_many_missing_notes_cost_a_bounded_number_of_queries(): void {
+		/** @var wpdb $wpdb */
+		global $wpdb;
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$html = '<p>';
+		for ( $i = 1; $i <= 400; $i++ ) {
+			$html .= self::format_marker( 900000 + $i, '<strong>x</strong>' );
+		}
+		$html           .= '</p>';
+		$GLOBALS['post'] = get_post( $post_id );
+		gutenberg_push_suggestion_content_owner( '' );
+
+		$before   = $wpdb->num_queries;
+		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
+		$queries  = $wpdb->num_queries - $before;
+		gutenberg_pop_suggestion_content_owner( '' );
+
+		$this->assertSame( '<p>' . str_repeat( '<strong>x</strong>', 400 ) . '</p>', $stripped );
+		$this->assertLessThan( 200, $queries );
+	}
 }
