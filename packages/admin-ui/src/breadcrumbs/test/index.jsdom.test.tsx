@@ -17,6 +17,18 @@ describe( 'Breadcrumbs', () => {
 					/>
 				)
 			).toThrow( /item "Home" is missing an `href` prop/ );
+
+			expect( () =>
+				render(
+					<Breadcrumbs
+						headingLevel={ 1 }
+						items={ [
+							{ label: 'Home', href: '' },
+							{ label: 'General' },
+						] }
+					/>
+				)
+			).toThrow( /item "Home" is missing an `href` prop/ );
 		} );
 
 		it( 'should throw for the first preceding item missing `href`', () => {

@@ -24,9 +24,7 @@ export const Breadcrumbs = ( {
 	const lastItem = items[ items.length - 1 ];
 
 	if ( process.env.NODE_ENV !== 'production' ) {
-		const invalidItem = precedingItems.find(
-			( item ) => typeof item.href !== 'string'
-		);
+		const invalidItem = precedingItems.find( ( item ) => ! item.href );
 		if ( invalidItem ) {
 			throw new Error(
 				`Breadcrumbs: item "${ invalidItem.label }" is missing an \`href\` prop. All items except the last one must have an \`href\` prop.`
