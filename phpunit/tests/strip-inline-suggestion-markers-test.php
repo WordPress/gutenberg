@@ -48,6 +48,26 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$this->assertSame( $html, $stripped );
 	}
 
+	public function test_marker_class_written_with_a_character_reference_is_stripped(): void {
+		// A browser and the tag processor both read this class decoded.
+		$html = '<p>a<mark class="wp&#45;suggestion-add" data-suggestion-id="5">PENDING</mark>b</p>';
+
+		$this->assertSame( '<p>ab</p>', gutenberg_strip_inline_suggestion_markers( $html ) );
+		$this->assertSame( '<p>ab</p>', gutenberg_get_inline_suggestion_view( $html, array() ) );
+	}
+
+	public function test_format_marker_class_written_with_a_character_reference_is_reverted(): void {
+		$html = '<p><mark class="wp&#x2d;suggestion-format" data-suggestion-id="1"><strong>ab</strong></mark></p>';
+
+		$this->assertSame( '<p>ab</p>', gutenberg_revert_inline_format_suggestions( $html, array( 1 => 'ab' ) ) );
+	}
+
+	public function test_content_with_a_reference_and_a_plain_mark_is_untouched(): void {
+		$html = '<p>Fish &amp; <mark class="has-inline-color">chips</mark></p>';
+
+		$this->assertSame( $html, gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
 	public function test_leaves_unrelated_marks_untouched() {
 		// A user highlight (`core/text-color`) serializes as a plain `<mark>`.
 		$html     = '<p><mark style="background-color:#ff0">keep me</mark></p>';
