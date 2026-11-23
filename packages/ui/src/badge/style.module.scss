@@ -16,8 +16,8 @@
 		.label {
 			display: inline-block;
 			max-width: 100%;
-			overflow: hidden;
-			text-overflow: ellipsis;
+			overflow: inherit;
+			text-overflow: inherit;
 			vertical-align: top;
 		}
 
