@@ -913,6 +913,67 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'saves a pending suggestion when the page is hidden', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		const visibility = vi
+			.spyOn( document, 'visibilityState', 'get' )
+			.mockReturnValue( 'hidden' );
+		act( () => {
+			document.dispatchEvent( new Event( 'visibilitychange' ) );
+		} );
+		visibility.mockRestore();
+		await flushPromises();
+
+		// No debounce elapsed: closing the tab would have dropped it.
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'retries a save that failed without waiting for another edit', async () => {
+		createSuggestion
+			.mockRejectedValueOnce( new Error( 'Network error' ) )
+			.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect(
+			markerOf( registry, block.clientId ).commentId
+		).toBeUndefined();
+
+		await act( async () => {
+			vi.advanceTimersByTime( 5000 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		expect( markerOf( registry, block.clientId ).commentId ).toBe( 42 );
+	} );
+
+	it( 'gives up on a save that keeps failing', async () => {
+		createSuggestion.mockRejectedValue( new Error( 'Too large' ) );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		for ( let round = 0; round < 6; round++ ) {
+			await act( async () => {
+				vi.advanceTimersByTime( 5000 );
+			} );
+			await flushPromises();
+			await flushPromises();
+		}
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 3 );
+	} );
+
 	it( 'saves the post title proposal with no block to link', async () => {
 		createSuggestion.mockResolvedValue( { id: 9 } );
 		const { registry } = renderWith( 'suggest', [] );
