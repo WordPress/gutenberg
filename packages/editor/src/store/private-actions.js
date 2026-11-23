@@ -1233,7 +1233,14 @@ export const setEditorIntent =
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const previousMode = select.getEditorMode();
 
-		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
+		// Suggesting is chosen for the post in the editor, and holds on it
+		// alone.
+		dispatch( {
+			type: 'SET_EDITOR_INTENT',
+			intent,
+			postType: select.getCurrentPostType(),
+			postId: select.getCurrentPostId(),
+		} );
 
 		/*
 		 * `editPost` refuses new status edits while suggesting, but a status
