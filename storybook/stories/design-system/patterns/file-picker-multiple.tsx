@@ -20,7 +20,7 @@ import styles from './file-picker.module.css';
 
 const ACCEPTED_EXTENSIONS = [ '.pdf', '.jpg', '.jpeg', '.png' ];
 const MAX_FILES = 5;
-const MAX_FILE_SIZE = 2_000_000;
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 type Entry = { id: string; file: File };
 

@@ -66,7 +66,7 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 	source={ { code: FilePickerMultipleSource, language: 'tsx', type: 'code' } }
 />
 
-- **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can be told apart.
+- **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can usually be told apart.
 - **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the picker button when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
 - **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". A file dropped on a full field gets the limit message.
@@ -117,7 +117,7 @@ The preview keeps its own snackbar list and a stand-in for the import request. A
 
 ## Choose, then submit
 
-When the file is one part of a form, keep the chosen `File` in state and pass it to the submit handler. Show it below the button with the same row as a list of several files.
+When people should check their choice before the work starts, or the file is one part of a larger form, keep the chosen `File` in state and pass it to the submit handler. The import form on the Manage Patterns screen works this way. Show it below the button with the same row as a list of several files.
 
 <Canvas
 	of={ FilePickerButtonStories.ChooseFile }

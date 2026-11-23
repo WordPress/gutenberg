@@ -119,6 +119,13 @@ export function FilePickerUpload() {
 		} ) );
 		setUploads( ( current ) => [ ...current, ...added ] );
 		added.forEach( ( { id, file } ) => start( id, file, 1 ) );
+		if ( added.length ) {
+			announce(
+				added.length === 1
+					? `Uploading ${ added[ 0 ].file.name }.`
+					: `Uploading ${ added.length } files.`
+			);
+		}
 	}
 
 	function retry( upload: Upload ) {

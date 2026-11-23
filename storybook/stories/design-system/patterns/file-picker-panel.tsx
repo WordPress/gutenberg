@@ -73,7 +73,7 @@ export function FilePickerPanel() {
 					justify="space-between"
 					gap="sm"
 				>
-					<Card.Title>Fonts</Card.Title>
+					<Card.Title render={ <h3 /> }>Fonts</Card.Title>
 					{ /*
 					 * The button stays in the header, so it keeps focus when
 					 * the empty state gives way to the list.
@@ -139,7 +139,9 @@ export function FilePickerPanel() {
 					) : (
 						<EmptyState.Root>
 							<EmptyState.Icon icon={ upload } />
-							<EmptyState.Title>Upload fonts</EmptyState.Title>
+							<EmptyState.Title render={ <h4 /> }>
+								Upload fonts
+							</EmptyState.Title>
 							<EmptyState.Description>
 								Drop font files anywhere in this panel, or
 								choose them. Supported formats: .ttf, .otf,

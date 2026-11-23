@@ -15,25 +15,25 @@ export function createId() {
 	return String( lastId );
 }
 
+const KB_IN_BYTES = 1024;
+const MB_IN_BYTES = 1024 * KB_IN_BYTES;
+
 /**
- * Formats a size in bytes, such as "812 kB" or "1.4 MB".
+ * Formats a size in bytes, such as "812 KB" or "1.4 MB". Like WordPress's
+ * `size_format()`, a kilobyte is 1,024 bytes.
  *
  * @param bytes The size of the file.
  */
 export function formatFileSize( bytes: number ) {
-	// Sizes that would round up to "1,000 kB" are shown in megabytes.
-	const [ value, unit ] =
-		bytes < 999_500
-			? [
-					bytes && Math.max( 1, Math.round( bytes / 1_000 ) ),
-					'kilobyte',
-				]
-			: [ bytes / 1_000_000, 'megabyte' ];
-	return new Intl.NumberFormat( undefined, {
-		style: 'unit',
-		unit,
+	let [ value, unit ] = [ bytes, 'B' ];
+	if ( bytes >= MB_IN_BYTES ) {
+		[ value, unit ] = [ bytes / MB_IN_BYTES, 'MB' ];
+	} else if ( bytes >= KB_IN_BYTES ) {
+		[ value, unit ] = [ bytes / KB_IN_BYTES, 'KB' ];
+	}
+	return `${ value.toLocaleString( undefined, {
 		maximumFractionDigits: 1,
-	} ).format( value );
+	} ) } ${ unit }`;
 }
 
 /**
