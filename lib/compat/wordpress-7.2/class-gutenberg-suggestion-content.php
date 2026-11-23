@@ -1045,7 +1045,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 						}
 					}
 				}
-				$is_astral = 4 === strlen( $character['html'] ) && ord( $character['html'] ) >= 0xF0;
+				$is_astral = 4 === strlen( $character['html'] ) && ord( $character['html'][0] ) >= 0xF0;
 				$offset   += $is_astral ? 2 : 1;
 			}
 			return true;
