@@ -119,7 +119,7 @@ export default function BlockLockMenuItems( {
 				) }
 				{ isEverySyncedPattern && (
 					<Menu.ItemDescription>
-						{ __( 'Disabled by Sync pattern' ) }
+						{ __( 'Disabled by Synced pattern' ) }
 					</Menu.ItemDescription>
 				) }
 			</Menu.CheckboxItem>
