@@ -19,13 +19,17 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 	private static $post_id;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
-		self::$contributor_id = $factory->user->create( array( 'role' => 'contributor' ) );
-		self::$post_id        = $factory->post->create(
+		$contributor_id = $factory->user->create( array( 'role' => 'contributor' ) );
+		$post_id        = $factory->post->create(
 			array(
-				'post_author' => self::$contributor_id,
+				'post_author' => $contributor_id,
 				'post_status' => 'draft',
 			)
 		);
+		self::assertIsInt( $contributor_id );
+		self::assertIsInt( $post_id );
+		self::$contributor_id = $contributor_id;
+		self::$post_id        = $post_id;
 	}
 
 	public function set_up(): void {
@@ -34,8 +38,11 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 		wp_set_current_user( self::$contributor_id );
 	}
 
+	/**
+	 * @return positive-int Note ID.
+	 */
 	private function create_note(): int {
-		return self::factory()->comment->create(
+		$note_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID'  => self::$post_id,
 				'comment_type'     => 'note',
@@ -43,6 +50,10 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 				'user_id'          => self::$contributor_id,
 			)
 		);
+		if ( ! is_int( $note_id ) || $note_id < 1 ) {
+			self::fail( 'The note was not created.' );
+		}
+		return $note_id;
 	}
 
 	/**
@@ -198,8 +209,22 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 			)
 		);
 
-		$payload = json_decode( get_comment_meta( $note_id, '_wp_suggestion', true ), true );
-		$this->assertSame( 'new-slug', $payload['operations'][0]['after'] );
+		$stored = get_comment_meta( $note_id, '_wp_suggestion', true );
+		$this->assertIsString( $stored );
+		$this->assertSame(
+			array(
+				'schemaVersion' => 2,
+				'operations'    => array(
+					array(
+						'type'      => 'post-attribute-set',
+						'attribute' => 'slug',
+						'before'    => 'old',
+						'after'     => 'new-slug',
+					),
+				),
+			),
+			json_decode( $stored, true )
+		);
 	}
 
 	public function test_a_block_suggestion_is_stored_outside_rest(): void {
@@ -208,6 +233,6 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( $payload ) );
 
-		$this->assertSame( json_decode( $payload, true ), json_decode( get_comment_meta( $note_id, '_wp_suggestion', true ), true ) );
+		$this->assertSame( $payload, get_comment_meta( $note_id, '_wp_suggestion', true ) );
 	}
 }
