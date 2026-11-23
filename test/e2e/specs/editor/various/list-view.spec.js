@@ -558,6 +558,125 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
+	for ( const key of [ 'Enter', 'Space' ] ) {
+		test( `returns focus to an already-selected paragraph with ${ key }`, async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			} );
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas
+							.getByRole( 'document', {
+								name: 'Block: Paragraph',
+								exact: true,
+							} )
+							.last()
+					)
+				)
+				.toBe( true );
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			const firstItem = listView
+				.getByRole( 'link', { name: 'Paragraph', exact: true } )
+				.first();
+			const firstParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					exact: true,
+				} )
+				.first();
+
+			// Establish that selecting a different block transfers focus.
+			await expect(
+				listView
+					.getByRole( 'link', { name: 'Paragraph', exact: true } )
+					.last()
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowUp' );
+			await expect( firstItem ).toBeFocused();
+			await page.keyboard.press( key );
+			await expect
+				.poll( () => editor.ownsSelection( firstParagraph ) )
+				.toBe( true );
+			await expect( firstItem ).not.toBeFocused();
+
+			// Reselecting the same block must transfer focus every time.
+			for ( let attempt = 0; attempt < 2; attempt++ ) {
+				await pageUtils.pressKeys( 'access+o' );
+				await expect( firstItem ).toBeFocused();
+				await page.keyboard.press( key );
+				await expect
+					.poll( () => editor.ownsSelection( firstParagraph ) )
+					.toBe( true );
+				await expect
+					.poll( () =>
+						firstParagraph.evaluate( ( element ) =>
+							element.ownerDocument.hasFocus()
+						)
+					)
+					.toBe( true );
+				await expect( firstItem ).not.toBeFocused();
+			}
+		} );
+	}
+
+	test( 'keeps focus in List View when clicking a block', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas
+						.getByRole( 'document', {
+							name: 'Block: Paragraph',
+							exact: true,
+						} )
+						.last()
+				)
+			)
+			.toBe( true );
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const firstItem = listView
+			.getByRole( 'link', { name: 'Paragraph', exact: true } )
+			.first();
+		await firstItem.click();
+		await expect( firstItem ).toBeFocused();
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+				selected: true,
+			} )
+		).toHaveCount( 1 );
+		await firstItem.click();
+		await expect( firstItem ).toBeFocused();
+	} );
+
 	test( 'should place focus on the first block when no block is selected', async ( {
 		editor,
 		page,
