@@ -436,7 +436,7 @@
 		background: $gray-100;
 		color: $gray-800;
 		font-size: var(--wpds-typography-font-size-sm);
-		line-height: $font-line-height-small;
+		line-height: var(--wpds-typography-line-height-sm);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
