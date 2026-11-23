@@ -48,12 +48,12 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 	 * Creates a root suggestion note.
 	 *
 	 * @param int    $post_id    Post ID.
-	 * @param array  $operations Payload operations.
+	 * @param array<array<string, mixed>> $operations Payload operations.
 	 * @param string $status     `_wp_suggestion_status`, or '' for none.
 	 * @param int    $author     Note author.
 	 * @return int Note ID.
 	 */
-	private function create_note( $post_id, $operations, $status = '', $author = 0 ) {
+	private function create_note( $post_id, $operations, $status = '', $author = 0 ): int {
 		$note_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID'  => $post_id,
@@ -63,15 +63,20 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 				'user_id'          => $author ? $author : self::$author_id,
 			)
 		);
+		$this->assertIsInt( $note_id );
 		update_comment_meta( $note_id, '_wp_suggestion', wp_json_encode( array( 'operations' => $operations ) ) );
 		if ( '' !== $status ) {
-			$this->assertIsInt( $note_id );
 			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 		}
 		return $note_id;
 	}
 
-	private function inline_op() {
+	/**
+	 * The operations of an inline addition.
+	 *
+	 * @return list<array<string, string>>
+	 */
+	private function inline_op(): array {
 		return array(
 			array(
 				'type'           => 'inline-suggestion',
@@ -81,11 +86,11 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		);
 	}
 
-	private function paragraph( $html ) {
+	private function paragraph( string $html ): string {
 		return "<!-- wp:paragraph -->\n<p>{$html}</p>\n<!-- /wp:paragraph -->";
 	}
 
-	private function mark( $note_id, $type, $text, $author = 0 ) {
+	private function mark( int $note_id, string $type, string $text, int $author = 0 ): string {
 		$author = $author ? $author : self::$author_id;
 		return '<mark class="wp-suggestion-' . $type . '" data-suggestion-id="' . $note_id . '" data-suggestion-type="' . $type . '" data-author="' . $author . '">' . $text . '</mark>';
 	}
@@ -558,6 +563,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	public function test_finalizing_sends_no_mail_when_the_saver_is_not_the_post_author(): void {
 		$post_id = self::factory()->post->create( array( 'post_author' => self::$other_editor_id ) );
+		$this->assertIsInt( $post_id );
 		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
 		$other   = $this->create_note( $post_id, $this->inline_op() );
 		$this->set_content( $post_id, $this->paragraph( $this->mark( $note_id, 'add', 'a' ) . $this->mark( $other, 'add', 'b' ) ) );

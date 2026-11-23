@@ -31,7 +31,12 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 		return $filled;
 	}
 
-	private function notes() {
+	/**
+	 * The post's suggestion notes, as the extraction takes them.
+	 *
+	 * @return array<int, true>
+	 */
+	private function notes(): array {
 		return array_fill_keys( $this->ids, true );
 	}
 
@@ -346,7 +351,7 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 	 *
 	 * @param string     $run       Marked run.
 	 * @param string     $original  Recorded original.
-	 * @param array|null $delta     Recorded delta, if any.
+	 * @param list<array<string, mixed>>|null $delta Recorded delta, if any.
 	 * @param bool       $extracted Whether the run is moved out.
 	 */
 	public function test_a_formatting_original_only_replaces_the_run_it_was_recorded_for( string $run, string $original, ?array $delta, bool $extracted ): void {
@@ -364,7 +369,7 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @return array<string, array{string, string, array|null, bool}>
+	 * @return array<string, array{string, string, list<array<string, mixed>>|null, bool}>
 	 */
 	public function data_formatting_runs(): array {
 		$bold   = array(
