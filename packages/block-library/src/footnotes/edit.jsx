@@ -4,6 +4,9 @@ import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
 import { formatListNumbered as icon } from '@wordpress/icons';
 
+const isFootnote = ( footnote ) =>
+	typeof footnote?.id === 'string' && footnote.id !== '';
+
 export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const [ meta, updateMeta ] = useEntityProp(
 		'postType',
@@ -22,7 +25,10 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		// Left undefined, which the check below treats as no footnotes, along
 		// with a value of the wrong shape.
 	}
-	const footnotes = Array.isArray( parsed ) ? parsed : [];
+	// Skip items that aren't footnotes, such as `null` or a string.
+	const footnotes = Array.isArray( parsed )
+		? parsed.filter( isFootnote )
+		: [];
 	const blockProps = useBlockProps();
 
 	if ( ! footnotesSupported ) {
