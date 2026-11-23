@@ -30,9 +30,35 @@ if ( ! defined( 'GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES' ) ) {
 }
 
 /**
+ * Maximum length, in characters, of the `excerpt` a structural suggestion
+ * operation names its block by. Mirrored on the client
+ * (`BLOCK_EXCERPT_MAX_CHARS` in suggestion-mode/operations/block-excerpt.ts).
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_EXCERPT_MAX_CHARS' ) ) {
+	define( 'GUTENBERG_SUGGESTION_EXCERPT_MAX_CHARS', 120 );
+}
+
+/**
+ * Sanitizes the `excerpt` of a structural suggestion operation: the start of
+ * the block's text, which the editor shows as text and never as markup.
+ *
+ * @param mixed $excerpt Excerpt from the payload.
+ * @return string|null Plain text on one line, cut to the limit, or null when
+ *                     there is none to keep.
+ */
+function gutenberg_sanitize_suggestion_excerpt( $excerpt ): ?string {
+	if ( ! is_string( $excerpt ) ) {
+		return null;
+	}
+	$excerpt = mb_substr( wp_strip_all_tags( $excerpt, true ), 0, GUTENBERG_SUGGESTION_EXCERPT_MAX_CHARS );
+	return '' === $excerpt ? null : $excerpt;
+}
+
+/**
  * Applies `wp_kses_post()` to the HTML-bearing string fields of a serialized
  * block snapshot carried inside a suggestion operation (`op.block` on
- * `block-remove` / `block-insert-after` ops), recursing into `innerBlocks`.
+ * `block-remove` / `block-insert-after` ops written before those carried an
+ * `excerpt` instead), recursing into `innerBlocks`.
  *
  * `innerHTML` and `originalContent` are the fields a consumer turns back
  * into markup when the block is re-inserted. `attributes` get the same
@@ -75,7 +101,9 @@ function gutenberg_kses_suggestion_block_snapshot( $block ) {
  *     freedom they already have in post content.
  *   - Everyone else has `wp_kses_post()` applied to every string leaf of
  *     the values that get APPLIED to content on accept/reject: `after`,
- *     `afterHTML`, `beforeHTML`, and the serialized block snapshot in `block`.
+ *     `afterHTML`, `beforeHTML`, and the serialized block snapshot in `block`
+ *     that older payloads carry. A structural operation's `excerpt` is
+ *     reduced to plain text.
  *
  * `before` is intentionally NOT filtered: it is only compared against live
  * content for conflict detection, never applied. Filtering it would produce
@@ -116,6 +144,14 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
 			}
 			if ( isset( $operation['block'] ) && is_array( $operation['block'] ) ) {
 				$operation['block'] = gutenberg_kses_suggestion_block_snapshot( $operation['block'] );
+			}
+			if ( array_key_exists( 'excerpt', $operation ) ) {
+				$excerpt = gutenberg_sanitize_suggestion_excerpt( $operation['excerpt'] );
+				if ( null === $excerpt ) {
+					unset( $operation['excerpt'] );
+				} else {
+					$operation['excerpt'] = $excerpt;
+				}
 			}
 			$decoded['operations'][ $index ] = $operation;
 		}
