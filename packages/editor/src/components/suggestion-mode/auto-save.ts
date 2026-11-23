@@ -160,11 +160,17 @@ export function operationsForBlock(
 		}
 	}
 	const { metadata: _meta, ...live } = attributes ?? {};
+	// A proposal grouped with other blocks' suggestions (a deletion across
+	// blocks) names the group; on a structural marker that op already does.
+	const groupId =
+		marker.type === 'pending-attributes' && marker.groupId
+			? { groupId: marker.groupId }
+			: {};
 	for ( const op of operationsFromMarker(
 		live,
 		proposedAttributes( marker )
 	) ) {
-		ops.push( op );
+		ops.push( { ...op, ...groupId } );
 	}
 	return ops;
 }
