@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
+-   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
 -   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#87087](https://github.com/WordPress/gutenberg/pull/87087)).
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
