@@ -1,11 +1,17 @@
-import type { ForwardedRef } from 'react';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	JSX,
+	Ref,
+	RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { cloneElement, forwardRef } from '@wordpress/element';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
 import type { WordPressComponentProps } from '../context';
-import type { MenuItemProps } from './types';
+import type { MenuItemAsLinkProps, MenuItemProps } from './types';
 
 function UnforwardedMenuItem(
 	props: WordPressComponentProps< MenuItemProps, 'button', false >,
@@ -89,6 +95,23 @@ function UnforwardedMenuItem(
 }
 
 /**
+ * The type of `MenuItem`. An item with a `string` `href` that is not disabled
+ * renders an `a`, so it gets the props and ref of a link. Any other item keeps
+ * the props and ref of a `button`. The `button` signature comes last, so
+ * `ComponentProps< typeof MenuItem >` is unchanged.
+ */
+type MenuItemComponent = {
+	(
+		props: WordPressComponentProps< MenuItemAsLinkProps, 'a', false > & {
+			ref?: Ref< HTMLAnchorElement >;
+		}
+	): JSX.Element | null;
+} & ForwardRefExoticComponent<
+	WordPressComponentProps< MenuItemProps, 'button', false > &
+		RefAttributes< HTMLButtonElement >
+>;
+
+/**
  * MenuItem is a component which renders a button intended to be used in combination with the `DropdownMenu` component.
  *
  * ```jsx
@@ -111,7 +134,7 @@ function UnforwardedMenuItem(
  * };
  * ```
  */
-export const MenuItem = forwardRef( UnforwardedMenuItem );
+export const MenuItem = forwardRef( UnforwardedMenuItem ) as MenuItemComponent;
 MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

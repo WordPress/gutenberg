@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { ComponentProps, MouseEvent } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef } from '@wordpress/element';
 import { more } from '@wordpress/icons';
 import MenuItem from '../';
 import { NavigableMenu } from '../../navigable-container';
@@ -218,4 +220,123 @@ describe( 'MenuItem', () => {
 			}
 		}
 	} );
+
+	describe( 'with href', () => {
+		it( 'should render a link with link props, ref and events', () => {
+			const ref = createRef< HTMLAnchorElement >();
+			let clickedHref: string | undefined;
+			const onClick = vi.fn(
+				( event: MouseEvent< HTMLAnchorElement > ) => {
+					event.preventDefault();
+					clickedHref = event.currentTarget.href;
+				}
+			);
+
+			render(
+				<MenuItem
+					href="https://wordpress.org/"
+					target="_blank"
+					ref={ ref }
+					onClick={ onClick }
+				>
+					Docs
+				</MenuItem>
+			);
+
+			const link = screen.getByRole( 'menuitem', { name: 'Docs' } );
+			expect( link.tagName ).toBe( 'A' );
+			expect( link ).toHaveAttribute( 'href', 'https://wordpress.org/' );
+			expect( link ).toHaveAttribute( 'target', '_blank' );
+			expect( ref.current ).toBe( link );
+
+			fireEvent.click( link );
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
+			expect( clickedHref ).toBe( 'https://wordpress.org/' );
+		} );
+
+		it( 'should render a button when disabled', () => {
+			const ref = createRef< HTMLButtonElement >();
+
+			render(
+				<MenuItem href="https://wordpress.org/" disabled ref={ ref }>
+					Docs
+				</MenuItem>
+			);
+
+			const button = screen.getByRole( 'menuitem', { name: 'Docs' } );
+			expect( button.tagName ).toBe( 'BUTTON' );
+			expect( ref.current ).toBe( button );
+		} );
+	} );
 } );
+
+// Static TypeScript checks
+/* eslint-disable vitest/expect-expect -- TypeScript checks these cases during typecheck. */
+describe( 'MenuItem types', () => {
+	it( 'should type a link item as an anchor', () => {
+		<MenuItem
+			href="/docs"
+			target="_blank"
+			ref={ createRef< HTMLAnchorElement >() }
+			onClick={ ( event ) => event.currentTarget.href }
+		/>;
+
+		<MenuItem
+			href="/docs"
+			disabled={ false }
+			onClick={ ( event: MouseEvent< HTMLAnchorElement > ) =>
+				event.currentTarget.href
+			}
+		/>;
+
+		<MenuItem
+			href="/docs"
+			// @ts-expect-error A link item renders an anchor, which has no `form`.
+			onClick={ ( event ) => event.currentTarget.form }
+		/>;
+	} );
+
+	it( 'should keep the button types on an item without href', () => {
+		<MenuItem
+			ref={ createRef< HTMLButtonElement >() }
+			onClick={ ( event ) => event.currentTarget.form }
+		/>;
+
+		// @ts-expect-error An item without href does not accept an anchor ref.
+		<MenuItem ref={ createRef< HTMLAnchorElement >() } />;
+
+		// @ts-expect-error An item without href does not accept `target`.
+		<MenuItem target="_blank" />;
+	} );
+
+	it( 'should keep the button types on a disabled or computed href item', () => {
+		const href = '/docs' as string | undefined;
+
+		<MenuItem
+			href="/docs"
+			disabled
+			ref={ createRef< HTMLButtonElement >() }
+			onClick={ ( event ) => event.currentTarget.form }
+		/>;
+
+		<MenuItem
+			href={ href }
+			onClick={ ( event: MouseEvent< HTMLElement > ) =>
+				event.currentTarget
+			}
+		/>;
+
+		// @ts-expect-error A computed href may render a button.
+		<MenuItem href={ href } ref={ createRef< HTMLAnchorElement >() } />;
+	} );
+
+	it( 'should keep the button props in ComponentProps', () => {
+		const props: ComponentProps< typeof MenuItem > = {
+			ref: createRef< HTMLButtonElement >(),
+			onClick: ( event ) => event.currentTarget.form,
+		};
+
+		<MenuItem { ...props } />;
+	} );
+} );
+/* eslint-enable vitest/expect-expect */

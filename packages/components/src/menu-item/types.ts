@@ -59,3 +59,23 @@ export type MenuItemProps = Pick<
 	 */
 	href?: string;
 };
+
+/**
+ * Props of a `MenuItem` that renders a link: it has an `href` and is not
+ * disabled. A disabled item always renders a `button`, even with an `href`.
+ */
+export type MenuItemAsLinkProps = Omit< MenuItemProps, 'href' > & {
+	/**
+	 * The URL to link to, which renders the item as a link.
+	 */
+	href: string;
+	/**
+	 * Sets the `target` attribute of the link.
+	 */
+	target?: string;
+	/**
+	 * Whether the item is disabled. A disabled item renders a `button`, even
+	 * when an `href` is given.
+	 */
+	disabled?: false;
+};
