@@ -16,24 +16,32 @@ function dbg( type: string, doc: Document, extra: Record< string, unknown > = {}
 		n
 			? ( n.nodeType === 3 ? '#text:' + ( n.textContent || '' ).slice( 0, 12 ) : ( n as Element ).tagName + '.' + String( ( n as Element ).className || '' ).split( ' ' )[ 0 ] + ( ( n as HTMLElement ).isContentEditable ? '[ce]' : '' ) )
 			: null;
-	try {
-		// The WordPress server's log, which CI uploads, records the query.
+	// Kept in memory, sent only after a key press, so no request runs while
+	// the caret moves.
+	DBG_BUFFER.push( {
+		t: Date.now() - DBG_T0,
+		type,
+		active: d( doc.activeElement ),
+		anchor: d( sel?.anchorNode ),
+		off: sel?.anchorOffset,
+		...extra,
+	} );
+	if ( type === 'forget:keydown' ) {
+		window.setTimeout( dbgFlush, 500 );
+	}
+}
+const DBG_BUFFER: Record< string, unknown >[] = [];
+function dbgFlush() {
+	// The WordPress server's log, which CI uploads, records the query.
+	while ( DBG_BUFFER.length ) {
 		window.fetch(
 			window.location.origin +
 				'/wp-includes/images/blank.gif?dbgcaret=' +
 				encodeURIComponent(
-					JSON.stringify( {
-						t: Date.now() - DBG_T0,
-						type,
-						active: d( doc.activeElement ),
-						anchor: d( sel?.anchorNode ),
-						off: sel?.anchorOffset,
-						...extra,
-					} )
-				),
-			{ keepalive: true }
+					JSON.stringify( DBG_BUFFER.splice( 0, 6 ) )
+				)
 		);
-	} catch ( e ) {}
+	}
 }
 
 export default function useRestoreTapCaret() {
