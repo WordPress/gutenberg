@@ -25,6 +25,7 @@ const Template: StoryFn< typeof ResponsiveWrapper > = ( args ) => (
 );
 
 export const Default = Template.bind( {} );
+Default.tags = [ 'external-requests' ];
 Default.args = {
 	naturalWidth: 2000,
 	naturalHeight: 680,

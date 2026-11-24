@@ -59,9 +59,9 @@
 		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
-		"@types/node": "^24.13.3",
+		"@types/node": "^24.19.2",
 		"@wordpress/theme": "file:../theme",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
 		"@wordpress/theme": "^3.0.0 || ^4.0.0 || ^5.0.0"
