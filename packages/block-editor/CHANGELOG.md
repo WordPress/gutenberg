@@ -12,7 +12,7 @@
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
--   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling.
+-   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
 
 ### Internal
 
