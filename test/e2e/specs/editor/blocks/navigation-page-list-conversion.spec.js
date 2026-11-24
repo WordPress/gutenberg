@@ -53,6 +53,43 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		await expect( pageList ).toBeVisible();
 	} );
 
+	test( 'the default menu converts on edit and turns auto add on', async ( {
+		admin,
+		editor,
+		page,
+		pageListMenu,
+		requestUtils,
+	} ) => {
+		for ( const title of [ 'Alpha', 'Bravo' ] ) {
+			await requestUtils.createPage( { title, status: 'publish' } );
+		}
+		await admin.createNewPost();
+		// No menus, so the block creates the default menu, a Page List.
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Page List' } )
+				.getByRole( 'document', { name: 'Block: Page Link' } )
+		).toHaveCount( 2, { timeout: 10000 } );
+		const menuId = await page.evaluate( () => {
+			const blockEditor = window.wp.data.select( 'core/block-editor' );
+			const [ clientId ] =
+				blockEditor.getBlocksByName( 'core/navigation' );
+			return blockEditor.getBlockAttributes( clientId ).ref;
+		} );
+
+		await pageListMenu.selectLink( 'Bravo' );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		await expect
+			.poll( () => pageListMenu.getState( menuId ) )
+			.toMatchObject( {
+				pageLists: 0,
+				autoAdd: true,
+				labels: [ 'Alpha' ],
+			} );
+	} );
+
 	test( 'outside a Navigation block, clicking a page selects the Page List', async ( {
 		admin,
 		editor,

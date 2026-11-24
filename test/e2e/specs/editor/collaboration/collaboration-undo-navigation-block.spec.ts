@@ -172,7 +172,7 @@ test.describe( 'Collaboration - Undo with a navigation block', () => {
 
 		// Wait for the navigation fallback to resolve on User A's
 		// client: the block gets a `ref` to the created wp_navigation
-		// entity and renders its controlled page-list inner blocks.
+		// entity and renders the page-list's pages as links.
 		await expect( async () => {
 			const blocks = await editor.getBlocks();
 			const navigation = blocks.find(
@@ -181,7 +181,7 @@ test.describe( 'Collaboration - Undo with a navigation block', () => {
 			expect( navigation?.attributes?.ref ).toBeTruthy();
 		} ).toPass( { timeout: 20000 } );
 		await expect(
-			editor.canvas.locator( '.wp-block-pages-list__item' ).first()
+			editor.canvas.locator( '.wp-block-navigation-link' ).first()
 		).toBeVisible( { timeout: 20000 } );
 
 		// Deselect the navigation block so User A sits idle without
@@ -198,13 +198,13 @@ test.describe( 'Collaboration - Undo with a navigation block', () => {
 		await installNavEditCounter( page2 );
 
 		// Wait for User B to render the document, including the
-		// navigation block's controlled page-list subtree.
+		// page-list's pages as links.
 		await expect( async () => {
 			const blocks = await editor2.getBlocks();
 			expect( JSON.stringify( blocks ) ).toContain( UNDO_TARGET );
 		} ).toPass( { timeout: 20000 } );
 		await expect(
-			editor2.canvas.locator( '.wp-block-pages-list__item' ).first()
+			editor2.canvas.locator( '.wp-block-navigation-link' ).first()
 		).toBeVisible( { timeout: 20000 } );
 
 		// User B appends a single character to the second paragraph.
