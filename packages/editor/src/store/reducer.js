@@ -374,6 +374,25 @@ export function listViewPanel( state = false, action ) {
 }
 
 /**
+ * Reducer tracking whether the list view was open when the inserter replaced
+ * it, so that it can be reopened once the inserter closes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Whether the list view is hidden behind the inserter.
+ */
+export function listViewHiddenByInserter( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return !! action.value && ( state || action.isListViewOpened );
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return false;
+	}
+	return state;
+}
+
+/**
  * This reducer does nothing aside initializing a ref to the list view toggle.
  * We will have a unique ref per "editor" instance.
  *
@@ -548,6 +567,7 @@ export default combineReducers( {
 	blockInserterPanel,
 	inserterSidebarToggleRef,
 	listViewPanel,
+	listViewHiddenByInserter,
 	listViewToggleRef,
 	publishSidebarActive,
 	stylesPath,

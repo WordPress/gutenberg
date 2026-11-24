@@ -999,14 +999,15 @@ export const setIsInserterOpened =
 		}
 
 		// With the showListViewByDefault preference, the list view returns
-		// once an open inserter closes.
+		// once the inserter closes, if it was open before the inserter opened.
 		const { get } = registry.select( preferencesStore );
 		dispatch( {
 			type: 'SET_IS_INSERTER_OPENED',
 			value,
+			isListViewOpened: select.isListViewOpened(),
 			restoreListView:
 				! value &&
-				select.isInserterOpened() &&
+				select.isListViewHiddenByInserter() &&
 				!! get( 'core', 'showListViewByDefault' ) &&
 				! get( 'core', 'distractionFree' ),
 		} );
