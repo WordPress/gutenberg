@@ -262,7 +262,8 @@ The settings section has the following structure:
 			"spacingSizes": []
 		},
 		"transform": {
-			"rotate": false
+			"rotate": false,
+			"translate": false
 		},
 		"typography": {
 			"customFontSize": true,
