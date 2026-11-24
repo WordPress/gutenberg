@@ -15,6 +15,7 @@ type Size = { width: number; height: number };
 
 type TransformedDrag = {
 	matrix: LinearTransform;
+	handleElement: Element;
 	gain: number;
 	grab?: Point;
 	last?: { size: Size; handle: Point };
@@ -64,6 +65,7 @@ export class TransformAwareResizable extends Resizable {
 		if ( ! isIdentity( matrix ) ) {
 			this.transformedDrag = {
 				matrix,
+				handleElement: event.currentTarget,
 				gain: 1,
 				settles: 0,
 				isSettling: false,
@@ -88,28 +90,17 @@ export class TransformAwareResizable extends Resizable {
 		this.transformedDrag = undefined;
 	}
 
-	getHandleCenter( direction: HandleDirection ): Point | undefined {
-		const className = this.props.handleClasses?.[ direction ];
-		if ( ! this.resizable || ! className ) {
-			return undefined;
-		}
-		const handle = this.resizable.querySelector(
-			`:scope > div > .${ className.trim().split( /\s+/ ).join( '.' ) }`
-		);
-		if ( ! handle ) {
-			return undefined;
-		}
-		const rect = handle.getBoundingClientRect();
-		return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-	}
-
 	calculateNewSizeFromDirection( clientX: number, clientY: number ) {
 		const drag = this.transformedDrag;
-		const { direction, original } = this.state;
-		const handle = this.getHandleCenter( direction );
-		if ( ! drag || ! this.resizable || ! handle ) {
+		if ( ! drag || ! this.resizable ) {
 			return super.calculateNewSizeFromDirection( clientX, clientY );
 		}
+		const { direction, original } = this.state;
+		const rect = drag.handleElement.getBoundingClientRect();
+		const handle = {
+			x: rect.x + rect.width / 2,
+			y: rect.y + rect.height / 2,
+		};
 		if ( ! drag.isSettling ) {
 			drag.settles = 0;
 		}
