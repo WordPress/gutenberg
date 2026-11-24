@@ -1,0 +1,31 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-intent-dropdown__popup {
+	max-width: var(--wpds-dimension-surface-width-xs);
+}
+
+// Filled, so the mode reads as a state of the editor and not one more tool.
+.editor-intent-dropdown__toggle.components-button {
+	background-color: $gray-100;
+	// A label that changes between modes must not wrap in a tight header.
+	white-space: nowrap;
+
+	&.has-icon.has-text {
+		padding-right: $grid-unit-10;
+		padding-left: $grid-unit-05;
+	}
+
+	// A phone has no room for it beside the inserter: the Options menu still
+	// offers the mode there.
+	@media (max-width: #{$break-mobile - 1}) {
+		display: none;
+	}
+
+	// The tint tells Suggesting apart at a glance, also when only the icon shows.
+	&.is-suggesting {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+		color: var(--wp-admin-theme-color);
+	}
+}
