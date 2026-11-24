@@ -200,6 +200,81 @@ final class SelectionTests: XCTestCase {
 		XCTAssertEqual( editor.getBlocks().count, 2 )
 	}
 
+	func testTapAfterSwipingKeyboardAwayPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:paragraph --><p>First here</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Second here</p><!-- /wp:paragraph -->"
+		) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		let second = editor.block( title: "Paragraph", content: "Second here" )
+		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+
+		// Unlike Done, this leaves the canvas focused, with the page blurred.
+		let window = app.windows.firstMatch
+		window.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.3 ) ).press( forDuration: 0.05, thenDragTo: window.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.98 ) ) )
+		XCTAssertTrue( keyboard.waitForNonExistence( timeout: 5 ), "The drag did not hide the keyboard" )
+
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard again" )
+		app.typeText( "X" )
+
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "XSecond here" ).waitForExistence( timeout: 5 ), "The paragraph did not get the X at its start" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "First here" ).exists )
+		XCTAssertEqual( editor.getBlocks().count, 2 )
+	}
+
+	/// Drags the canvas in small steps until the element's middle is between
+	/// these heights.
+	func scroll( to element: XCUIElement, between low: CGFloat, and high: CGFloat ) {
+		let start = app.windows.firstMatch.coordinate( withNormalizedOffset: CGVector( dx: 0.04, dy: 0.35 ) )
+		for _ in 0..<40 {
+			let y = element.frame.midY
+			if y > low && y < high { return }
+			start.press( forDuration: 0.05, thenDragTo: start.withOffset( CGVector( dx: 0, dy: y >= high ? -80 : 80 ) ), withVelocity: .slow, thenHoldForDuration: 0.5 )
+		}
+	}
+
+	func testTapIntoQuoteWithCaretOffScreenPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem( name: "content", value: "<!-- wp:quote --><blockquote class=\"wp-block-quote\"><!-- wp:paragraph --><p>Quote here</p><!-- /wp:paragraph --></blockquote><!-- /wp:quote --><!-- wp:paragraph --><p>Filler paragraph 1, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 2, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 3, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 4, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 5, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 6, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 7, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Filler paragraph 8, long enough to wrap onto a few lines on a phone screen so that the page scrolls.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Far below here</p><!-- /wp:paragraph -->" ) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		let quote = editor.block( title: "Paragraph", content: "Quote here" )
+		let below = editor.block( title: "Paragraph", content: "Far below here" )
+		XCTAssertTrue( quote.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		// The last paragraph has siblings, so it is edited through the
+		// canvas wrapper. The paragraph in the quote has none.
+		scroll( to: below, between: 150, and: 350 )
+		below.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+		app.typeText( "A" )
+
+		// Back up to the quote: the caret is now far below, out of view.
+		let caretBlock = editor.block( title: "Paragraph", content: "Far below hereA" )
+		scroll( to: quote, between: 150, and: 300 )
+		XCTAssertGreaterThan( stableFrame( of: caretBlock ).minY, app.windows.firstMatch.frame.maxY, "The caret's paragraph is still on screen" )
+
+		// The paragraph is wider than its text: the caret goes to the end,
+		// away from the start, where a misplaced caret also lands.
+		quote.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		app.typeText( "X" )
+
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "Quote hereX" ).waitForExistence( timeout: 5 ), "The quote did not get the X at its end" )
+		XCTAssertTrue( caretBlock.exists, "The paragraph far below changed" )
+	}
+
 	/// Opens the block editor that is not in an iframe, like GutenbergKit's,
 	/// with these blocks.
 	func openStandaloneEditor( content: String ) {
