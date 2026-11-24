@@ -40,7 +40,7 @@ class Gutenberg_REST_View_Config_Controller_7_3 extends Gutenberg_REST_View_Conf
 			);
 		}
 
-		$config = gutenberg_get_entity_view_config( $kind, $name );
+		$config = gutenberg_add_form_fields_to_quick_edit_form( gutenberg_get_entity_view_config( $kind, $name ), $kind, $name );
 
 		$response = array(
 			'kind'    => $kind,

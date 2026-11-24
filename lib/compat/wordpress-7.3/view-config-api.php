@@ -15,7 +15,7 @@
  *
  * @since 7.3.0
  *
- * @return array The default quick edit form configuration for post types.
+ * @return array<string, mixed> The default quick edit form configuration for post types.
  */
 function _gutenberg_get_default_posttype_quick_edit_form() {
 	$top_label = array(
@@ -119,6 +119,7 @@ function _gutenberg_add_default_quick_edit_form_to_posttype_view_config( $data )
  * @since 7.3.0
  *
  * @param string $post_type The post type being registered.
+ * @return void
  */
 function gutenberg_register_default_posttype_quick_edit_form_7_3( $post_type ) {
 	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
@@ -133,3 +134,91 @@ function gutenberg_register_default_posttype_quick_edit_form_7_3( $post_type ) {
 	);
 }
 add_action( 'registered_post_type', 'gutenberg_register_default_posttype_quick_edit_form_7_3' );
+
+/**
+ * Returns the ids of the fields of a form, including the children of combined
+ * fields.
+ *
+ * @since 7.3.0
+ *
+ * @param mixed $fields The `fields` of a form configuration.
+ * @return string[] The field ids.
+ */
+function _gutenberg_get_view_config_form_field_ids( $fields ) {
+	if ( ! is_array( $fields ) ) {
+		return array();
+	}
+
+	$ids = array();
+	foreach ( $fields as $field ) {
+		if ( is_string( $field ) ) {
+			$ids[] = $field;
+			continue;
+		}
+		if ( ! is_array( $field ) ) {
+			continue;
+		}
+		if ( isset( $field['id'] ) && is_string( $field['id'] ) ) {
+			$ids[] = $field['id'];
+		}
+		$ids = array_merge( $ids, _gutenberg_get_view_config_form_field_ids( $field['children'] ?? null ) );
+	}
+
+	return $ids;
+}
+
+/**
+ * Adds the fields that plugins add to the form of a post type to the end of
+ * its quick edit form.
+ *
+ * Before 7.3.0 the quick edit drawer used the form of the post type, so a
+ * plugin offered a field for quick editing by adding it to `form`. The drawer
+ * now has its own form, and a plugin that only knows about `form` would lose
+ * its field there. A field of `form` counts as added by a plugin when the
+ * default form of post types does not list it. Those the quick edit form
+ * lists already keep their place.
+ *
+ * Only post types using the default form are affected: the others have no
+ * default quick edit form, and the drawer uses their form when they have none.
+ *
+ * @since 7.3.0
+ *
+ * @param array<mixed> $config The view configuration of the entity.
+ * @param string       $kind   The entity kind.
+ * @param string       $name   The entity name.
+ * @return array<mixed> The view configuration, with the fields added to the quick edit form.
+ */
+function gutenberg_add_form_fields_to_quick_edit_form( array $config, $kind, $name ) {
+	if ( 'postType' !== $kind || in_array( $name, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return $config;
+	}
+
+	$quick_edit_form = $config['quick_edit_form'] ?? null;
+	$form            = $config['form'] ?? null;
+	if (
+		! is_array( $quick_edit_form ) || ! isset( $quick_edit_form['fields'] ) || ! is_array( $quick_edit_form['fields'] ) || array() === $quick_edit_form['fields'] ||
+		! is_array( $form ) || ! isset( $form['fields'] ) || ! is_array( $form['fields'] )
+	) {
+		return $config;
+	}
+
+	$listed_ids = array_merge(
+		_gutenberg_get_view_config_form_field_ids( _gutenberg_get_default_posttype_form()['fields'] ),
+		_gutenberg_get_view_config_form_field_ids( $quick_edit_form['fields'] )
+	);
+
+	$fields = $quick_edit_form['fields'];
+	foreach ( $form['fields'] as $field ) {
+		$ids = _gutenberg_get_view_config_form_field_ids( array( $field ) );
+		if ( array() === $ids || in_array( $ids[0], $listed_ids, true ) ) {
+			continue;
+		}
+		$fields[]   = $field;
+		$listed_ids = array_merge( $listed_ids, $ids );
+	}
+
+	$quick_edit_form['fields'] = $fields;
+	$config['quick_edit_form'] = $quick_edit_form;
+
+	return $config;
+}

@@ -207,11 +207,12 @@ add_action( 'wp_entity_fields_api_init', 'gutenberg_test_entity_fields_api_repla
  * - A declarative field like case 1. The field API reads the value from the
  *   record and, as the field is not read-only, the Quick Edit form saves the
  *   edits with the record, through the REST field.
- * - An entry in the Quick Edit form of Pages. The form lists its fields
- *   explicitly in the view configuration of the entity, so a new field is
- *   not offered for editing until it is added there. Merging appends the
- *   field to the end of the form. Filtered from the moment the plugin
- *   loads, whenever the view configuration is read.
+ * - An entry in the form of Pages. The form lists its fields explicitly in
+ *   the view configuration of the entity, so a new field is not offered for
+ *   editing until it is added there. Merging appends the field to the end of
+ *   the form, and the Quick Edit drawer adds it to the end of its own form.
+ *   Filtered from the moment the plugin loads, whenever the view
+ *   configuration is read.
  */
 function gutenberg_test_entity_fields_api_add_field_with_data() {
 	wp_register_entity_fields(

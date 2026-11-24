@@ -119,4 +119,67 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 
 		$this->assertEmpty( $data['quick_edit_form'] );
 	}
+
+	/**
+	 * A field a plugin adds to the form of a post type is added to the end of
+	 * its quick edit form, keeping its layout, as the drawer used the form
+	 * before it had its own.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_adds_the_fields_plugins_add_to_the_form_to_the_quick_edit_form() {
+		$add_fields = static function ( $data ) {
+			return $data->merge(
+				array(
+					'form' => array(
+						'fields' => array(
+							'subtitle',
+							array(
+								'id'     => 'rating',
+								'layout' => array( 'type' => 'regular' ),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_fields );
+
+		$data = $this->get_view_config( 'postType', 'page' );
+
+		remove_filter( 'get_entity_view_config_posttype_page', $add_fields );
+
+		$fields = $data['quick_edit_form']['fields'];
+		$this->assertSame( array( 'subtitle', 'rating' ), array_slice( $this->get_field_ids( $data['quick_edit_form'] ), -2 ) );
+		$this->assertSame( array( 'type' => 'regular' ), end( $fields )['layout'], 'The field should keep its layout.' );
+		$this->assertNotContains( 'scheduled_date', $this->get_field_ids( $data['quick_edit_form'] ), 'The fields of the default form should not be added.' );
+	}
+
+	/**
+	 * A field a plugin adds to both forms keeps the place the quick edit form
+	 * gives it, and is not added twice.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_does_not_add_a_field_the_quick_edit_form_lists() {
+		$add_fields = static function ( $data ) {
+			return $data->merge(
+				array(
+					'form'            => array( 'fields' => array( 'subtitle' ) ),
+					'quick_edit_form' => array( 'fields' => array( 'subtitle', 'date' ) ),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_fields );
+
+		$data = $this->get_view_config( 'postType', 'page' );
+
+		remove_filter( 'get_entity_view_config_posttype_page', $add_fields );
+
+		$ids = $this->get_field_ids( $data['quick_edit_form'] );
+		$this->assertCount( 1, array_keys( $ids, 'subtitle', true ) );
+		$this->assertSame( 'subtitle', end( $ids ) );
+	}
 }
