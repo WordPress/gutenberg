@@ -363,7 +363,10 @@ export function blockInserterPanel( state = false, action ) {
 export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
-			return action.value ? false : state;
+			if ( action.value ) {
+				return false;
+			}
+			return action.restoreListView || state;
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
 	}

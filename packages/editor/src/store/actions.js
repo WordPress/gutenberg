@@ -986,7 +986,7 @@ export function removeEditorPanel( panelName ) {
  */
 export const setIsInserterOpened =
 	( value ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, select, registry } ) => {
 		if (
 			typeof value === 'object' &&
 			value.hasOwnProperty( 'rootClientId' ) &&
@@ -998,9 +998,17 @@ export const setIsInserterOpened =
 			} );
 		}
 
+		// With the showListViewByDefault preference, the list view returns
+		// once an open inserter closes.
+		const { get } = registry.select( preferencesStore );
 		dispatch( {
 			type: 'SET_IS_INSERTER_OPENED',
 			value,
+			restoreListView:
+				! value &&
+				select.isInserterOpened() &&
+				!! get( 'core', 'showListViewByDefault' ) &&
+				! get( 'core', 'distractionFree' ),
 		} );
 	};
 

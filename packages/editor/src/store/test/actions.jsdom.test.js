@@ -1738,6 +1738,46 @@ describe( 'Editor actions', () => {
 				false
 			);
 		} );
+
+		it( 'should open the list view when the inserter closes if the list view is always open', () => {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'showListViewByDefault', true );
+
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				true
+			);
+		} );
+
+		it( 'should not open the list view when closing an inserter that is not open', () => {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'showListViewByDefault', true );
+
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+		} );
+
+		it( 'should keep the list view closed when the inserter closes without the preference', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+		} );
 	} );
 
 	describe( 'setIsListViewOpened', () => {
