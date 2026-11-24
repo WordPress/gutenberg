@@ -40,6 +40,7 @@ const meta: Meta< typeof Card > = {
 export default meta;
 
 export const Default: StoryObj< typeof Card > = {
+	tags: [ 'external-requests' ],
 	args: {
 		children: (
 			<>

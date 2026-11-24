@@ -103,6 +103,87 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * @dataProvider data_translate_styles
+	 *
+	 * @param array  $transform    Transform styles.
+	 * @param string $expected_css Expected inline CSS.
+	 */
+	public function test_translation_is_returned_as_a_wrapper_inline_style( $transform, $expected_css ) {
+		$block_type = $this->register_transform_block(
+			array(
+				'rotate'    => true,
+				'translate' => true,
+			)
+		);
+
+		$this->assertSame(
+			array( 'style' => $expected_css ),
+			gutenberg_apply_transform_support( $block_type, array( 'style' => array( 'transform' => $transform ) ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_translate_styles() {
+		return array(
+			'both axes'       => array(
+				array(
+					'translate' => array(
+						'x' => '10px',
+						'y' => '-50%',
+					),
+				),
+				'--wp--style--translate-x:10px;--wp--style--translate-y:-50%;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+			),
+			'one axis'        => array( array( 'translate' => array( 'y' => '2rem' ) ), '--wp--style--translate-y:2rem;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);' ),
+			'unknown z axis'  => array(
+				array(
+					'translate' => array(
+						'x' => '1px',
+						'z' => '5px',
+					),
+				),
+				'--wp--style--translate-x:1px;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+			),
+			'with a rotation' => array(
+				array(
+					'rotate'    => '15deg',
+					'translate' => array( 'x' => '1em' ),
+				),
+				'rotate:15deg;--wp--style--translate-x:1em;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+			),
+		);
+	}
+
+	public function test_translation_skip_serialization_keeps_the_rotation() {
+		$block_type = $this->register_transform_block(
+			array(
+				'rotate'                          => true,
+				'translate'                       => true,
+				'__experimentalSkipSerialization' => array( 'translate' ),
+			)
+		);
+
+		$this->assertSame(
+			array( 'style' => 'rotate:15deg;' ),
+			gutenberg_apply_transform_support(
+				$block_type,
+				array(
+					'style' => array(
+						'transform' => array(
+							'rotate'    => '15deg',
+							'translate' => array( 'x' => '1em' ),
+						),
+					),
+				)
+			)
+		);
+	}
+
 	public function test_classes_and_styles_ignore_block_support() {
 		$this->assertSame(
 			array( 'style' => 'rotate:-0.25turn;' ),

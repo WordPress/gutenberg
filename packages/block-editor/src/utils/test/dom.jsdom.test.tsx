@@ -6,8 +6,10 @@ import {
 } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import {
+	extendRectToTop,
 	getElementBounds,
 	isElementVisible,
+	isStyleRotated,
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
 } from '../dom';
 
@@ -261,6 +263,83 @@ describe( 'dom', () => {
 					y: 0,
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'isStyleRotated', () => {
+		it.each( [
+			[ 'none', 'none', 'none' ],
+			[ '0deg', 'none', 'none' ],
+			[ '90deg', 'none', 'none' ],
+			[ '180deg', 'none', 'none' ],
+			[ '270deg', 'none', 'none' ],
+			[ '360deg', 'none', 'none' ],
+			[ '-180deg', 'none', 'none' ],
+			[ '0.5turn', 'none', 'none' ],
+			[ '200grad', 'none', 'none' ],
+			[ '3.14159rad', 'none', 'none' ],
+			[ 'x 30deg', 'none', 'none' ],
+			[ 'none', '2 0.5', 'none' ],
+			[ 'none', 'none', 'matrix(1, 0, 0, 1, 40, 20)' ],
+			[ 'none', 'none', 'matrix(1.5, 0, 0, 0.5, 0, 0)' ],
+			[ 'none', 'none', 'matrix(0, 1, -1, 0, 0, 0)' ],
+			[
+				'45deg',
+				'none',
+				'matrix(0.7071, -0.7071, 0.7071, 0.7071, 0, 0)',
+			],
+		] )(
+			'returns false for rotate %s, scale %s and transform %s',
+			( rotate, scale, transform ) => {
+				expect( isStyleRotated( { rotate, scale, transform } ) ).toBe(
+					false
+				);
+			}
+		);
+
+		it.each( [
+			[ '12deg', 'none', 'none' ],
+			[ '45deg', 'none', 'none' ],
+			[ '-0.1rad', 'none', 'none' ],
+			[ 'z 45deg', 'none', 'none' ],
+			[ '45deg', '2 3', 'none' ],
+			[ 'none', 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
+			[ 'none', 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
+			[
+				'none',
+				'none',
+				'matrix3d(0.978, 0.208, 0, 0, -0.208, 0.978, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+			],
+		] )(
+			'returns true for rotate %s, scale %s and transform %s',
+			( rotate, scale, transform ) => {
+				expect( isStyleRotated( { rotate, scale, transform } ) ).toBe(
+					true
+				);
+			}
+		);
+	} );
+
+	describe( 'extendRectToTop', () => {
+		it( 'moves the top up and keeps the bottom and horizontal extent', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 120 ).toJSON() ).toEqual( {
+				left: 30,
+				top: 120,
+				right: 130,
+				bottom: 250,
+				width: 100,
+				height: 130,
+				x: 30,
+				y: 120,
+			} );
+		} );
+
+		it( 'returns the rectangle unchanged when the top is lower', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 220 ) ).toBe( rect );
 		} );
 	} );
 } );

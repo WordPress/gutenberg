@@ -8,6 +8,7 @@ import {
 import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
+	flushSync,
 	useCallback,
 	useMemo,
 	useState,
@@ -66,8 +67,12 @@ function ListViewBlock( {
 }: ListViewBlockProps ) {
 	const cellRef = useRef< HTMLTableCellElement >( null );
 	const rowRef = useRef< HTMLTableRowElement >( null );
-	const settingsRef = useRef< HTMLTableCellElement >( null );
+	const settingsToggleRef = useRef< HTMLButtonElement >( null );
 	const [ isHovered, setIsHovered ] = useState( false );
+	// The settings menu is costly to mount, so a row only gets one once it
+	// has been hovered or focused. It then stays mounted, so that focus can
+	// move to its button and return there when the menu closes.
+	const [ hasSettingsMenu, setHasSettingsMenu ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState< DOMRect >();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
@@ -434,6 +439,7 @@ function ListViewBlock( {
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
+		setHasSettingsMenu( true );
 		debouncedToggleBlockHighlight( clientId, true );
 	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
@@ -485,13 +491,14 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event: MouseEvent ) => {
-			const { ownerDocument } = settingsRef?.current || {};
+			const { ownerDocument } = rowRef.current || {};
 			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
 				return;
 			}
 
 			if ( showBlockActions && allowRightClickOverrides ) {
-				settingsRef.current?.click();
+				flushSync( () => setHasSettingsMenu( true ) );
+				settingsToggleRef.current?.click();
 				// Ensure the position of the settings dropdown is at the cursor.
 				setSettingsAnchorRect(
 					new window.DOMRect( event.clientX, event.clientY, 0, 0 )
@@ -499,7 +506,7 @@ function ListViewBlock( {
 				event.preventDefault();
 			}
 		},
-		[ allowRightClickOverrides, settingsRef, showBlockActions ]
+		[ allowRightClickOverrides, showBlockActions ]
 	);
 
 	const onMouseDown = useCallback(
@@ -538,8 +545,7 @@ function ListViewBlock( {
 	}, [ setSettingsAnchorRect ] );
 
 	// Pass in a ref to the row, so that it can be scrolled
-	// into view when selected. For long lists, the placeholder for the
-	// selected block is also observed, within ListViewLeafPlaceholder.
+	// into view when selected.
 	useListViewScrollIntoView( {
 		isSelected,
 		rowItemRef: rowRef,
@@ -742,40 +748,45 @@ function ListViewBlock( {
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
 					aria-selected={ !! isSelected }
-					ref={ settingsRef }
+					ref={ settingsToggleRef }
 				>
-					{ ( { ref, tabIndex, onFocus } ) => (
-						<BlockSettingsMenu
-							clientId={ clientId }
-							clientIds={ dropdownClientIds }
-							icon={ moreVertical }
-							label={ __( 'Options' ) }
-							popoverProps={ {
-								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
-							} }
-							toggleProps={ {
-								ref,
-								className: 'block-editor-list-view-block__menu',
-								tabIndex,
-								onClick: clearSettingsAnchorRect,
-								onFocus,
-								size: 'small',
-							} }
-							disableOpenOnArrowDown
-							updateExpansion={ updateExpansion }
-							setInsertedBlockClientId={
-								setInsertedBlockClientId
-							}
-							__experimentalSelectBlock={
-								updateFocusAndSelection
-							}
-							isContentOnlyListView={
-								!! rootClientId &&
-								getBlockEditingMode( rootClientId ) ===
-									'contentOnly'
-							}
-						/>
-					) }
+					{ ( { ref, tabIndex, onFocus } ) =>
+						hasSettingsMenu || isFirstSelectedBlock ? (
+							<BlockSettingsMenu
+								clientId={ clientId }
+								clientIds={ dropdownClientIds }
+								icon={ moreVertical }
+								label={ __( 'Options' ) }
+								popoverProps={ {
+									anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
+								} }
+								toggleProps={ {
+									ref,
+									className:
+										'block-editor-list-view-block__menu',
+									tabIndex,
+									onClick: clearSettingsAnchorRect,
+									onFocus,
+									size: 'small',
+								} }
+								disableOpenOnArrowDown
+								updateExpansion={ updateExpansion }
+								setInsertedBlockClientId={
+									setInsertedBlockClientId
+								}
+								__experimentalSelectBlock={
+									updateFocusAndSelection
+								}
+								isContentOnlyListView={
+									!! rootClientId &&
+									getBlockEditingMode( rootClientId ) ===
+										'contentOnly'
+								}
+							/>
+						) : (
+							<></>
+						)
+					}
 				</TreeGridCell>
 			) }
 			{ isRenameModalOpen && (

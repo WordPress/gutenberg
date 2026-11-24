@@ -1,0 +1,38 @@
+# Labels issues and pull requests opened by the reporters listed in the job condition with `[Priority] Highest (OMGBBQ)`.
+#
+# See https://wordpress.slack.com/archives/C02QB8GMM/p1795226330135979.
+
+name: Escalate reports
+
+on:
+    issues:
+        types: [opened]
+    # Escalated reporters can push to this repository, so their pull requests come from branches here.
+    # Adding a reporter without push access will require reworking this workflow, as fork pull requests get a read-only token.
+    pull_request:
+        types: [opened]
+
+permissions: {}
+
+jobs:
+    escalate:
+        name: Escalate the issue or pull request
+        if: |
+            github.repository == 'WordPress/gutenberg' &&
+            contains(
+                fromJSON( '["bazza"]' ),
+                github.event.issue.user.login || github.event.pull_request.user.login
+            )
+        runs-on: 'ubuntu-slim'
+        permissions:
+            issues: write
+            pull-requests: write
+        timeout-minutes: 5
+
+        steps:
+            - name: Add the highest priority label
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+                  REPO: ${{ github.repository }}
+              run: gh api --method POST "repos/${REPO}/issues/${NUMBER}/labels" -f 'labels[]=[Priority] Highest (OMGBBQ)' --silent

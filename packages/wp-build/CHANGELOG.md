@@ -4,11 +4,13 @@
 
 ### New Features
 
--   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them. The generated registration code loads the minified files even when `SCRIPT_DEBUG` is enabled if the build has no unminified files ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
-### Bug Fixes
+### Internal
 
--   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   The generated registration PHP now picks the `SCRIPT_DEBUG` file extension with an `if` that also checks the new `has_debug_assets` key of `build/constants.php`, in every build. Tools that post-process the generated PHP may need updating; read `has_debug_assets` instead of matching the template code ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 
 ## 0.28.0 (2026-11-18)
 

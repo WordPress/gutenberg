@@ -138,21 +138,21 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.4",
+		"colord": "^2.14.0",
 		"fast-average-color": "^9.1.1",
 		"html-react-parser": "^5.2.11",
 		"memize": "^2.1.1",
-		"uuid": "^14.0.0"
+		"uuid": "^14.0.3"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.8",
+		"@testing-library/user-event": "^14.6.13",
 		"@wordpress/integration-tests": "file:../../test/integration",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.1.0",
+		"vitest": "^5.1.1",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
