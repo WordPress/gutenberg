@@ -42,9 +42,13 @@
 	padding: 0 $grid-unit-20;
 	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
-	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
-	box-sizing: content-box;
-	height: $grid-unit-60 - $border-width;
+	// The header is $grid-unit-60 tall including its bottom border. State that
+	// as a border-box height rather than relying on `box-sizing: content-box`,
+	// which the `reset` mixin's descendant selector overrides at equal
+	// specificity wherever a consumer applies it (e.g. `.editor-sidebar`),
+	// leaving the header a pixel short.
+	box-sizing: border-box;
+	height: $grid-unit-60;
 
 	h2 {
 		margin: 0;
