@@ -1170,6 +1170,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$query  = "SELECT comment_parent, comment_content, COUNT(*) AS reaction_count FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
 		$query .= $parent_in;
 		$query .= ' GROUP BY comment_parent, comment_content';
+		/** @var list<object{comment_parent: numeric-string, comment_content: string, reaction_count: numeric-string}>|null $counts */
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$counts = $wpdb->get_results( $query );
 
@@ -1179,6 +1180,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$query  = "SELECT comment_ID, comment_parent, comment_content FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
 			$query .= $parent_in;
 			$query .= $wpdb->prepare( ' AND user_id = %d', $current_user_id );
+			/** @var list<object{comment_ID: numeric-string, comment_parent: numeric-string, comment_content: string}>|null $user_rows */
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			$user_rows = $wpdb->get_results( $query );
 
@@ -1202,7 +1204,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		foreach ( $counts as $row ) {
 			$slug = $row->comment_content;
 			// Rows written outside this controller may hold anything.
-			if ( ! is_string( $slug ) || ! self::is_reaction_key( $slug ) ) {
+			if ( ! self::is_reaction_key( $slug ) ) {
 				continue;
 			}
 
