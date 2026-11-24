@@ -95,7 +95,13 @@ export function FlatTermSelector( { slug } ) {
 	const pendingTermsRef = useRef( new Set() );
 	const registry = useRegistry();
 
-	const { editPost } = useDispatch( editorStore );
+	const {
+		editPost,
+		lockPostSaving,
+		unlockPostSaving,
+		lockPostAutosaving,
+		unlockPostAutosaving,
+	} = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
@@ -259,6 +265,10 @@ export function FlatTermSelector( { slug } ) {
 		}
 	}
 
+	function getTermLockName( pendingValue ) {
+		return `flat-term-selector-${ slug }-${ pendingValue }`;
+	}
+
 	async function createTerm( name ) {
 		const pendingTerm = {
 			// A term removed and created again shouldn't share a key with the
@@ -266,48 +276,56 @@ export function FlatTermSelector( { slug } ) {
 			value: PENDING_TERM_PREFIX + ++pendingTermId,
 			label: name,
 		};
+		const lockName = getTermLockName( pendingTerm.value );
 		// Show the term right away, it is assigned once it exists.
 		pendingTermsRef.current.add( pendingTerm.value );
 		setValues( ( currentValues ) => [ ...currentValues, pendingTerm ] );
+		lockPostSaving( lockName );
+		lockPostAutosaving( lockName );
 
-		let savedTerm;
 		try {
-			savedTerm = await findOrCreateTerm( name );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-			// Nothing was assigned, so only the shown term has to go.
+			let savedTerm;
+			try {
+				savedTerm = await findOrCreateTerm( name );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				// Nothing was assigned, so only the shown term has to go.
+				pendingTermsRef.current.delete( pendingTerm.value );
+				setValues( ( currentValues ) =>
+					currentValues.filter(
+						( item ) => ! isSameTerm( item, pendingTerm )
+					)
+				);
+				return false;
+			}
+
+			// The term was removed while it was being created.
+			if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
+				return false;
+			}
+
 			pendingTermsRef.current.delete( pendingTerm.value );
 			setValues( ( currentValues ) =>
-				currentValues.filter(
-					( item ) => ! isSameTerm( item, pendingTerm )
-				)
+				currentValues
+					// An existing term can come back for a name that only differs
+					// by case or accent, and it may already be shown.
+					.filter(
+						( item ) =>
+							isSameTerm( item, pendingTerm ) ||
+							! isSameTerm( item, savedTerm )
+					)
+					.map( ( item ) =>
+						isSameTerm( item, pendingTerm ) ? savedTerm : item
+					)
 			);
-			return false;
+			assignTerm( itemToTermId( savedTerm ) );
+			return true;
+		} finally {
+			unlockPostSaving( lockName );
+			unlockPostAutosaving( lockName );
 		}
-
-		// The term was removed while it was being created.
-		if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
-			return false;
-		}
-
-		pendingTermsRef.current.delete( pendingTerm.value );
-		setValues( ( currentValues ) =>
-			currentValues
-				// An existing term can come back for a name that only differs
-				// by case or accent, and it may already be shown.
-				.filter(
-					( item ) =>
-						isSameTerm( item, pendingTerm ) ||
-						! isSameTerm( item, savedTerm )
-				)
-				.map( ( item ) =>
-					isSameTerm( item, pendingTerm ) ? savedTerm : item
-				)
-		);
-		assignTerm( itemToTermId( savedTerm ) );
-		return true;
 	}
 
 	async function createTerms( names ) {
@@ -362,9 +380,17 @@ export function FlatTermSelector( { slug } ) {
 			);
 		}
 
-		pendingTermsRef.current = new Set(
+		const nextPendingTerms = new Set(
 			newValues.filter( isPendingTerm ).map( ( item ) => item.value )
 		);
+		for ( const pendingValue of pendingTermsRef.current ) {
+			if ( ! nextPendingTerms.has( pendingValue ) ) {
+				const lockName = getTermLockName( pendingValue );
+				unlockPostSaving( lockName );
+				unlockPostAutosaving( lockName );
+			}
+		}
+		pendingTermsRef.current = nextPendingTerms;
 
 		// Optimistically update term values.
 		// The selector will always re-fetch terms later.
