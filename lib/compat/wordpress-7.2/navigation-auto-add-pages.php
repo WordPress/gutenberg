@@ -2,14 +2,11 @@
 /**
  * Navigation menus: the "Auto add new pages" setting.
  *
- * Replaces the Page List block as the default content of a Navigation Menu.
- * The fallback menu a site creates for itself starts as individual link
- * blocks, one per published page, with the setting switched on. While it is
- * on, publishing a new page adds a link for it to the menu, the way classic
- * menus do with their "Automatically add new top-level pages" option. A
- * top-level page is appended to the menu; a child page is nested under its
- * parent's link when the menu has one, which turns that link into a submenu.
- * Existing items are never reordered, renamed or removed.
+ * While the setting is on, publishing a new page adds a link for it to the
+ * menu, the way classic menus do with their "Automatically add new top-level
+ * pages" option. A top-level page is appended to the menu; a child page is
+ * nested under its parent's link when the menu has one, which turns that link
+ * into a submenu. Existing items are never reordered, renamed or removed.
  *
  * @package gutenberg
  */
@@ -314,109 +311,3 @@ function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status
 	}
 }
 add_action( 'transition_post_status', 'gutenberg_navigation_auto_add_page_on_publish', 10, 3 );
-
-/**
- * Builds link blocks for the published pages under a parent, recursively.
- *
- * @param int       $parent_id Parent page ID, 0 for top-level pages.
- * @param WP_Post[] $children  Published pages grouped by `post_parent`.
- * @return array[] Parsed blocks.
- */
-function gutenberg_navigation_build_page_tree_blocks( $parent_id, $children ) {
-	$blocks = array();
-	if ( empty( $children[ $parent_id ] ) ) {
-		return $blocks;
-	}
-	foreach ( $children[ $parent_id ] as $page ) {
-		$inner_blocks = gutenberg_navigation_build_page_tree_blocks( $page->ID, $children );
-		$blocks[]     = gutenberg_navigation_build_page_link_block( $page, $inner_blocks );
-	}
-	return $blocks;
-}
-
-/**
- * Gets the link blocks for the site's published pages, nested like the Page
- * List block renders them and in the same order.
- *
- * @return array[] Parsed blocks.
- */
-function gutenberg_navigation_get_page_link_blocks() {
-	$pages = get_pages(
-		array(
-			'sort_column' => 'menu_order,post_title',
-			'order'       => 'asc',
-		)
-	);
-	if ( empty( $pages ) ) {
-		return array();
-	}
-
-	$children = array();
-	foreach ( $pages as $page ) {
-		$children[ $page->post_parent ][] = $page;
-	}
-
-	return gutenberg_navigation_build_page_tree_blocks( 0, $children );
-}
-
-/**
- * Creates the default fallback Navigation Menu from page links instead of a
- * Page List block.
- *
- * `WP_Navigation_Fallback::get_fallback()` applies this filter before it
- * looks for an existing menu, converts a classic menu, or creates its Page
- * List default. When no menu exists and there is no classic menu to convert,
- * the menu is created here with "Auto add new pages" switched on, and `false` is
- * returned so core does not create a second one: core then finds this menu as
- * the most recently published one and returns it. It runs last so that a
- * theme or plugin returning `false` stops it from creating the menu.
- *
- * In WordPress Core this would be a change to
- * `WP_Navigation_Fallback::create_default_fallback()` instead.
- *
- * @param bool $should_create Whether core should create a fallback menu.
- * @return bool Whether core should still create a fallback menu.
- */
-function gutenberg_navigation_create_fallback_with_pages( $should_create ) {
-	if ( ! $should_create ) {
-		return $should_create;
-	}
-
-	$existing = get_posts(
-		array(
-			'post_type'      => 'wp_navigation',
-			'post_status'    => 'publish',
-			'posts_per_page' => 1,
-			'fields'         => 'ids',
-			'no_found_rows'  => true,
-		)
-	);
-	if ( ! empty( $existing ) ) {
-		return $should_create;
-	}
-
-	// Core converts a classic menu before falling back to its default; leave that path to core.
-	$classic_menus = wp_get_nav_menus();
-	if ( ! empty( $classic_menus ) && ! is_wp_error( $classic_menus ) ) {
-		return $should_create;
-	}
-
-	$menu_id = wp_insert_post(
-		array(
-			'post_content' => wp_slash( serialize_blocks( gutenberg_navigation_get_page_link_blocks() ) ),
-			'post_title'   => _x( 'Navigation', 'Title of a Navigation menu', 'gutenberg' ),
-			'post_name'    => 'navigation',
-			'post_status'  => 'publish',
-			'post_type'    => 'wp_navigation',
-		),
-		true
-	);
-	if ( is_wp_error( $menu_id ) || empty( $menu_id ) ) {
-		return $should_create;
-	}
-
-	update_post_meta( $menu_id, 'wp_navigation_auto_add_pages', true );
-
-	return false;
-}
-add_filter( 'wp_navigation_should_create_fallback', 'gutenberg_navigation_create_fallback_with_pages', PHP_INT_MAX );
