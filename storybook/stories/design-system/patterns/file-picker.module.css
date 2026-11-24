@@ -134,11 +134,15 @@
 	flex: 1;
 	min-inline-size: 0;
 	overflow: hidden;
-	font-weight: var(--wpds-typography-font-weight-emphasis);
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
+/*
+ * Text in a picker button is emphasized, as on other buttons. A filename in a
+ * row isn't interactive, so it stays regular.
+ */
+.choose .name,
 .prompt {
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
