@@ -105,6 +105,22 @@
 	}
 }
 
+/*
+ * A hairline inside an image's edge, so a light image stays visible on a
+ * light row. It matches the media thumbnails in DataViews.
+ */
+.thumbnail:has(img) {
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+	}
+}
+
 .summary {
 	flex: 1;
 	min-inline-size: 0;
