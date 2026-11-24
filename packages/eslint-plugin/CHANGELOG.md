@@ -4,8 +4,23 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 28.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `use-recommended-components`: Recommend the WordPress UI select controls instead of legacy `SelectControl` and `CustomSelectControl` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui` ([#86352](https://github.com/WordPress/gutenberg/pull/86352)).
 -   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 28.1.0 (2026-11-04)
 

@@ -58,6 +58,7 @@ const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
+	useHasTransformPanel,
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasBackgroundPanel,
@@ -190,6 +191,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+	const hasTransformPanel = useHasTransformPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
 	const hasVariationsPanel = !! useBlockVariations( blockName )?.length;
 	const hasGlobalStyles =
@@ -197,6 +199,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 		hasColorPanel ||
 		hasBackgroundPanel ||
 		hasLayoutPanel ||
+		hasTransformPanel ||
 		hasVariationsPanel;
 	return hasGlobalStyles;
 }

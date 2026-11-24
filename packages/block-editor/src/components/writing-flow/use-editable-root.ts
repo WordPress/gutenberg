@@ -2,7 +2,11 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isBlockElementOutsideFields,
+} from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -35,9 +39,35 @@ export default function useEditableRoot() {
 				isMultiSelecting,
 			} = registry.select( blockEditorStore );
 
+			const { activeElement } = node.ownerDocument;
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
+			const isFieldFocused =
+				activeElement !== node &&
+				( activeElement as HTMLElement | null )?.isContentEditable &&
+				node.contains( activeElement ) &&
+				getBlockClientId( activeElement ) ===
+					getSelectedBlockClientId();
+			// A tap focused the field while the caret is still in another
+			// block. Drop that caret: with the wrapper as the editing host,
+			// iOS would keep it instead of placing one at the tap.
+			if (
+				isFieldFocused &&
+				selection.anchorNode &&
+				! activeElement!.contains( selection.anchorNode )
+			) {
+				selection.removeAllRanges();
+			}
+
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
-			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
+			if (
+				// Not while a block's own element outside its fields has
+				// focus, as after a press on a bullet: it is dragged from
+				// there. Still return the cleanup for editing that starts later.
+				! isBlockElementOutsideFields( activeElement ) &&
+				! setContentEditableWrapper( node, true, { focus: false } )
+			) {
 				return;
 			}
 
@@ -51,15 +81,8 @@ export default function useEditableRoot() {
 			// placed the caret yet; moving focus now would cancel the
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
-			const { activeElement } = node.ownerDocument;
-			// A mounted element's window has a selection.
-			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			if (
-				activeElement !== node &&
-				( activeElement as HTMLElement | null )?.isContentEditable &&
-				node.contains( activeElement ) &&
-				getBlockClientId( activeElement ) ===
-					getSelectedBlockClientId() &&
+				isFieldFocused &&
 				selection.anchorNode &&
 				activeElement!.contains( selection.anchorNode )
 			) {

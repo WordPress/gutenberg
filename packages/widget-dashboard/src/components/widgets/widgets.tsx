@@ -15,7 +15,7 @@ import { WidgetLayoutControls } from '../widget-layout-controls';
 import { WidgetToolbar } from '../widget-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import { WidgetTileControls } from './widget-tile-controls';
-import styles from './widgets.module.css';
+import styles from './widgets.module.scss';
 import type {
 	DashboardInstanceOperation,
 	DashboardWidget,

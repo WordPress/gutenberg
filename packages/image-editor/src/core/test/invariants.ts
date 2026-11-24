@@ -21,8 +21,9 @@ import type {
 import { DEFAULT_STATE } from '../constants';
 import { imageEditorReducer } from '../state';
 import { getRotatedBBox } from '../camera';
-import { mapEditToOriginal } from '../../map-edit-to-original';
+import { getImageEdit, type ImageEdit } from '../../get-image-edit';
 import { getOutputSize } from '../../get-output-size';
+import { applyImageEdit } from '../../apply-image-edit';
 
 const IMAGES = [
 	{ src: 'wide.jpg', naturalWidth: 1600, naturalHeight: 900 },
@@ -125,6 +126,27 @@ function viewShape( state: InternalImageEditorState ): Size | null {
 		state.image.naturalWidth,
 		state.image.naturalHeight,
 		Math.round( state.rotation / 90 ) * 90
+	);
+}
+
+// Whether two edits match to a thousandth. Kept apart from the check in
+// `applyImageEdit`, so the test does not reuse the code it tests.
+function isSameEdit( a: ImageEdit | null, b: ImageEdit | null ): boolean {
+	if ( ! a || ! b ) {
+		return a === b;
+	}
+	const difference =
+		( ( a.rotation ?? 0 ) - ( b.rotation ?? 0 ) + 540 ) % 360;
+	const whole = { x: 0, y: 0, width: 1, height: 1 };
+	const cropA = a.crop ?? whole;
+	const cropB = b.crop ?? whole;
+	return (
+		Boolean( a.flip?.horizontal ) === Boolean( b.flip?.horizontal ) &&
+		Boolean( a.flip?.vertical ) === Boolean( b.flip?.vertical ) &&
+		Math.abs( difference - 180 ) < 1e-6 &&
+		( [ 'x', 'y', 'width', 'height' ] as const ).every(
+			( key ) => Math.abs( cropA[ key ] - cropB[ key ] ) <= 1e-3
+		)
 	);
 }
 
@@ -327,30 +349,60 @@ describe( 'invariants across a run of edits', () => {
 					}
 				}
 
-				// The edits sent for saving have to be instructions a
-				// server can carry out.
-				for ( const edit of mapEditToOriginal( state ) ) {
-					if (
-						edit.type === 'crop' &&
-						! (
-							edit.x >= -RATIO_TOLERANCE &&
-							edit.y >= -RATIO_TOLERANCE &&
-							edit.width > 0 &&
-							edit.height > 0 &&
-							edit.x + edit.width <= 1 + RATIO_TOLERANCE &&
-							edit.y + edit.height <= 1 + RATIO_TOLERANCE
-						)
-					) {
+				// The edit sent for saving has to be something a server
+				// can carry out.
+				const edit = getImageEdit( state );
+				const crop = edit?.crop;
+				if (
+					crop &&
+					! (
+						crop.x >= -RATIO_TOLERANCE &&
+						crop.y >= -RATIO_TOLERANCE &&
+						crop.width > 0 &&
+						crop.height > 0 &&
+						crop.x + crop.width <= 1 + RATIO_TOLERANCE &&
+						crop.y + crop.height <= 1 + RATIO_TOLERANCE
+					)
+				) {
+					problems.push( `${ where }: crop edit is out of bounds` );
+				}
+				if (
+					edit?.rotation !== undefined &&
+					! ( edit.rotation >= 0 && edit.rotation < 360 )
+				) {
+					problems.push(
+						`${ where }: rotation is ${ edit.rotation }`
+					);
+				}
+
+				// Applied to a clean state, so nothing of the old view can
+				// carry over. A crop under a pixel cannot be exported, so
+				// it is rejected.
+				if ( edit ) {
+					const clean = imageEditorReducer( state, {
+						type: 'RESET',
+						payload: { aspectRatio: state.aspectRatio },
+					} );
+					const applied = applyImageEdit( clean, edit );
+					const size = getOutputSize( state );
+					if ( size && ( size.width < 1 || size.height < 1 ) ) {
+						if (
+							! ( 'rejected' in applied ) ||
+							applied.rejected !== 'invalid'
+						) {
+							problems.push(
+								`${ where }: a crop under a pixel is not rejected as invalid`
+							);
+						}
+					} else if ( 'rejected' in applied ) {
 						problems.push(
-							`${ where }: crop edit is out of bounds`
+							`${ where }: its own edit is rejected as ${ applied.rejected }`
 						);
-					}
-					if (
-						edit.type === 'rotate' &&
-						! ( edit.angle >= 0 && edit.angle < 360 )
+					} else if (
+						! isSameEdit( getImageEdit( applied.state ), edit )
 					) {
 						problems.push(
-							`${ where }: rotate edit is ${ edit.angle }`
+							`${ where }: its own edit reads back differently`
 						);
 					}
 				}
