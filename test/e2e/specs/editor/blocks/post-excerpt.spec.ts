@@ -114,17 +114,19 @@ test.describe( 'Post Excerpt', () => {
 		} );
 
 		/*
-		 * The second visit to 100 is the interesting one: the excerpt for that
-		 * length has already been requested once, so a cache that ignores the
-		 * requested length would keep showing the 30 word excerpt.
+		 * The excerpt the editor preloads is generated at the default length,
+		 * so 100 words can only be displayed from the excerpt the block
+		 * requests at the highest length it offers. Returning to 100 after 30
+		 * checks that a lower length does not shorten the excerpt displayed
+		 * afterwards.
 		 */
 		for ( const length of [ 100, 30, 100 ] ) {
 			await setExcerptLength( editor, page, length );
 
 			/*
 			 * The block trims what it has already loaded while it waits for the
-			 * server, so the excerpt is only conclusive once the requests the
-			 * length change triggers have come back.
+			 * server, so the excerpt is only conclusive once the request for
+			 * the generated excerpt has come back.
 			 */
 			await waitForRequestsToSettle( postRequests );
 
