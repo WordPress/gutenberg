@@ -65,6 +65,12 @@ function useGeneratedExcerpt( postType, postId, isEnabled, modified ) {
 	const key = isEnabled && baseURL ? `${ postId }|${ modified }` : undefined;
 	const isRequested = key !== undefined && key in generatedExcerpts;
 
+	/*
+	 * Blocks avoid effects, but this request cannot go through a store
+	 * resolver: as explained above, the core-data record cache ignores
+	 * `excerpt_length`. The request depends only on the post, not on any user
+	 * event, so an effect is the place to make it.
+	 */
 	useEffect( () => {
 		if ( key === undefined || isRequested ) {
 			return;
