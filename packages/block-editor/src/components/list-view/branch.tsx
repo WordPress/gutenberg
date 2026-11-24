@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
@@ -121,7 +121,6 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
 		showInnerBlockAppenders = false,
-		appenderLabel,
 	} = props;
 
 	const isTopLevel = level === 1;
@@ -365,12 +364,23 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 	pushPlaceholderRow();
 
+	// The appender's line passes every row of the list it adds to.
+	const appenderLineRows = nextPosition - listPosition;
+
 	return (
 		<>
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
 					className="block-editor-list-view-appender-row"
+					style={
+						// React styles take custom properties.
+						{
+							'--wp-admin--list-view-appender-line-height': `${
+								appenderLineRows * BLOCK_LIST_ITEM_HEIGHT
+							}px`,
+						} as CSSProperties
+					}
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
@@ -381,9 +391,6 @@ function ListViewBranch( props: ListViewBranchProps ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
-								// Nested branches get no label, so a nested
-								// appender names what it adds.
-								label={ appenderLabel }
 								{ ...treeGridCellProps }
 							/>
 						) }

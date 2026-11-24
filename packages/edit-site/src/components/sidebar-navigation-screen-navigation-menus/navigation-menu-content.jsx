@@ -109,7 +109,6 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					showInnerBlockAppenders
-					appenderLabel={ __( 'Add menu item' ) }
 					additionalBlockContent={ SidebarNavigationLinkUI }
 					showContentPopover
 					isExpanded

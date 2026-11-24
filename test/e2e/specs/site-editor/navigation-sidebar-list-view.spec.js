@@ -65,7 +65,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		// The appender button should be present to allow adding new items.
 		const appender = listView.getByRole( 'button', {
-			name: 'Add menu item',
+			name: 'Add page',
 		} );
 		await expect( appender ).toBeVisible();
 
@@ -183,7 +183,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Settings options' } )
 		).toBeFocused();
-		await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
 			listView.getByRole( 'link', { name: 'Test Page 2' } )
@@ -346,7 +346,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
 		await expect(
-			listView.getByRole( 'button', { name: 'Add menu item' } )
+			listView.getByRole( 'button', { name: 'Add page' } )
 		).toBeVisible();
 	} );
 
@@ -370,7 +370,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			name: 'Block navigation structure',
 		} );
 
-		await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 1' );
 
 		await expect(
@@ -568,11 +568,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 			await test.step( 'a submenu appender is a plain + that turns blue on hover, the menu appender is a filled +', async () => {
 				const transparent = 'rgba(0, 0, 0, 0)';
-				// The submenu's appender keeps "Add page" as its accessible
-				// name, but shows only its icon, with no fill.
-				const submenuAppender = listView.getByRole( 'button', {
-					name: 'Add page',
-				} );
+				// The submenu's appender is named "Add page", like the menu's,
+				// but shows only its icon, with no fill.
+				const submenuAppender = listView
+					.getByRole( 'row', { level: 2 } )
+					.getByRole( 'button', { name: 'Add page' } );
 				await expect( submenuAppender ).toHaveCount( 1 );
 				await expect( submenuAppender ).toHaveText( '' );
 				await expect( submenuAppender ).toHaveCSS(
@@ -601,42 +601,16 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					} )
 					.toBe( true );
 
-				// The menu's own appender is the filled + it is on trunk,
-				// named "Add menu item" but showing only its icon.
-				const menuAppender = listView.getByRole( 'button', {
-					name: 'Add menu item',
-				} );
+				// The menu's own appender, the last one, is the filled + it is
+				// on trunk, showing only its icon.
+				const menuAppender = listView
+					.getByRole( 'button', { name: 'Add page' } )
+					.last();
 				await expect( menuAppender ).toHaveText( '' );
 				await expect( menuAppender ).not.toHaveCSS(
 					'background-color',
 					transparent
 				);
-			} );
-
-			await test.step( 'each appender is inset with its level', async () => {
-				// Compare the + icons, since the top-level appender is as
-				// wide as a row.
-				const icons = listView.locator(
-					'.block-editor-list-view-appender-row .block-editor-inserter__toggle svg'
-				);
-				const left = async ( locator ) =>
-					( await locator.boundingBox() ).x;
-				const itemIcon = ( name ) =>
-					item( name ).locator( '.block-editor-block-icon' );
-				// Each + sits under the icons of the items it adds to, to
-				// within the cell's 1px.
-				expect(
-					Math.abs(
-						( await left( icons.nth( 0 ) ) ) -
-							( await left( itemIcon( 'Submenu Item' ) ) )
-					)
-				).toBeLessThanOrEqual( 1 );
-				expect(
-					Math.abs(
-						( await left( icons.nth( 1 ) ) ) -
-							( await left( itemIcon( 'Top Level Item 2' ) ) )
-					)
-				).toBeLessThanOrEqual( 1 );
 			} );
 
 			await test.step( 'the submenu appender adds a link inside the submenu', async () => {
@@ -655,6 +629,191 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					} )
 				).toBeVisible();
 			} );
+		} );
+
+		test( 'draws a line beside each appender up to the block it adds to', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+
+			// For each appender, top to bottom: the row its line starts
+			// under and the space between them, then how far the line and the
+			// + are from the column of that row's icon, and from the bottom
+			// of the + to the end of the line. The top-level line starts at
+			// the top of the list instead, in the column of the top-level
+			// chevrons.
+			const lines = () =>
+				listView.evaluate( ( tree ) => {
+					const { getComputedStyle } = tree.ownerDocument.defaultView;
+					const centerOf = ( element ) => {
+						const { left, width } = element.getBoundingClientRect();
+						return left + width / 2;
+					};
+					const blockRows = [
+						...tree.querySelectorAll( '[role="row"][data-block]' ),
+					];
+					const appenderRows = [
+						...tree.querySelectorAll(
+							'.block-editor-list-view-appender-row'
+						),
+					];
+					return appenderRows.map( ( row ) => {
+						const level = row.getAttribute( 'aria-level' );
+						const toggle = row.querySelector(
+							'.block-editor-inserter__toggle'
+						);
+						const toggleRect = toggle.getBoundingClientRect();
+						const line = getComputedStyle( toggle, '::before' );
+						const left = toggleRect.left + parseFloat( line.left );
+						const bottom =
+							toggleRect.bottom - parseFloat( line.bottom );
+						const top = bottom - parseFloat( line.height );
+						// A short line turns from the line to the + at its
+						// middle, and the line ends there.
+						const joint = getComputedStyle( toggle, '::after' );
+						const jointTop =
+							toggleRect.top + parseFloat( joint.top );
+						const jointMiddle =
+							jointTop + parseFloat( joint.height ) / 2;
+						const lineEnd = Math.round(
+							bottom - ( jointTop + parseFloat( joint.height ) )
+						);
+						const joins =
+							Math.round(
+								toggleRect.left +
+									parseFloat( joint.left ) -
+									left
+							) === 0 &&
+							Math.round(
+								toggleRect.right -
+									parseFloat( joint.right ) -
+									toggleRect.left
+							) === 0 &&
+							Math.abs(
+								jointMiddle -
+									( toggleRect.top + toggleRect.height / 2 )
+							) <= 1;
+						const fromRow = blockRows.find(
+							( blockRow ) =>
+								Math.abs(
+									blockRow.getBoundingClientRect().bottom -
+										top
+								) < 1
+						);
+						if ( ! fromRow ) {
+							const column = centerOf(
+								tree.querySelector(
+									'[aria-level="1"] .block-editor-list-view__expander svg'
+								)
+							);
+							return {
+								level,
+								startsAtListTop:
+									Math.round(
+										top -
+											blockRows[ 0 ].getBoundingClientRect()
+												.top
+									) === 0,
+								line: Math.round( left - column ),
+								plus: Math.round( centerOf( toggle ) - column ),
+								lineEnd,
+								joins,
+								color: line.backgroundColor,
+							};
+						}
+						const icon = fromRow.querySelector(
+							'.block-editor-block-icon'
+						);
+						const column = centerOf( icon );
+						return {
+							level,
+							from: fromRow
+								.querySelector(
+									'.block-editor-list-view-block-select-button__title'
+								)
+								.textContent.trim(),
+							spaceAbove: Math.round(
+								top - icon.getBoundingClientRect().bottom
+							),
+							line: Math.round( left - column ),
+							plus: Math.round( centerOf( toggle ) - column ),
+							lineEnd,
+							joins,
+							color: line.backgroundColor,
+						};
+					} );
+				} );
+
+			// Each + sits where the item it adds will show its icon, one
+			// column right of the line, which turns to reach it.
+			const before = await lines();
+			expect( before.map( ( { color, ...line } ) => line ) ).toEqual( [
+				{
+					level: '3',
+					from: 'Nested Submenu',
+					spaceAbove: 4,
+					line: 0,
+					plus: 24,
+					lineEnd: 0,
+					joins: true,
+				},
+				{
+					level: '2',
+					from: 'Top Level Item 1',
+					spaceAbove: 4,
+					line: 0,
+					plus: 24,
+					lineEnd: 0,
+					joins: true,
+				},
+				{
+					level: '1',
+					startsAtListTop: true,
+					line: 0,
+					plus: 24,
+					lineEnd: 0,
+					joins: true,
+				},
+			] );
+
+			// Hovering a + leaves the color of its line as it was.
+			await listView
+				.getByRole( 'row', { level: 2 } )
+				.getByRole( 'button', { name: 'Add page' } )
+				.hover();
+			expect( ( await lines() )[ 1 ].color ).toBe( before[ 1 ].color );
+
+			// A line passes behind the chevrons of the submenus it crosses,
+			// which have the background of the list, so the line looks cut.
+			const chevronBackgrounds = await listView.evaluate( ( tree ) => {
+				const { getComputedStyle } = tree.ownerDocument.defaultView;
+				let listBackground;
+				for (
+					let element = tree;
+					element && ! listBackground;
+					element = element.parentElement
+				) {
+					const { backgroundColor } = getComputedStyle( element );
+					if ( backgroundColor !== 'rgba(0, 0, 0, 0)' ) {
+						listBackground = backgroundColor;
+					}
+				}
+				return [
+					...tree.querySelectorAll(
+						'[data-expanded] .block-editor-list-view__expander svg'
+					),
+				].map(
+					( chevron ) =>
+						getComputedStyle( chevron ).backgroundColor ===
+						listBackground
+				);
+			} );
+			expect( chevronBackgrounds ).toEqual( [ true, true ] );
 		} );
 
 		test( 'adds a button from the appender of a Buttons block in the menu', async ( {

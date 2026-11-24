@@ -88,7 +88,6 @@ const expansion = (
  * @param props.isExpanded              Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param props.showAppender            Flag to show or hide the block appender. Defaults to `false`.
  * @param props.showInnerBlockAppenders Flag to also end every expanded nested list with an appender when `showAppender` is set. Defaults to `false`.
- * @param props.appenderLabel           Label of the appender at the end of the top-level list.
  * @param props.focusOnMount            Flag to move focus into the list when it mounts. Defaults to `false`.
  * @param props.blockSettingsMenu       Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param props.rootClientId            The client id of the root block from which we determine the blocks to show in the list.
@@ -107,7 +106,6 @@ function ListViewComponent(
 		isExpanded = false,
 		showAppender = false,
 		showInnerBlockAppenders = false,
-		appenderLabel,
 		focusOnMount = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
@@ -391,6 +389,8 @@ function ListViewComponent(
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,
+					'has-inner-block-appenders':
+						showAppender && showInnerBlockAppenders,
 				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
@@ -431,7 +431,6 @@ function ListViewComponent(
 								showInnerBlockAppenders={
 									showAppender && showInnerBlockAppenders
 								}
-								appenderLabel={ appenderLabel }
 							/>
 						</ListViewTreeStateContext.Provider>
 					</ListViewInsertedBlockContext.Provider>

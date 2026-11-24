@@ -183,8 +183,6 @@ export type PrivateListViewProps = ListViewProps & {
 	showAppender?: boolean;
 	/** Flag to also end every expanded nested list with an appender when `showAppender` is set. Defaults to `false`. */
 	showInnerBlockAppenders?: boolean;
-	/** Label of the appender at the end of the top-level list. */
-	appenderLabel?: string;
 	/** Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component. */
 	blockSettingsMenu?: ComponentType< ListViewBlockSettingsMenuProps >;
 	/** The client id of the root block from which we determine the blocks to show in the list. */
@@ -221,7 +219,6 @@ export type ListViewBranchProps = {
 	isSyncedBranch?: boolean;
 	showAppender?: boolean;
 	showInnerBlockAppenders?: boolean;
-	appenderLabel?: string;
 };
 
 export type ListViewBlockProps = {
@@ -295,8 +292,6 @@ export type ListViewExpanderProps = {
 export type ListViewAppenderProps = {
 	nestingLevel: number;
 	blockCount: number;
-	/** Replaces the appender's label, which otherwise names what it adds. */
-	label?: string;
 	clientId?: string | null;
 	tabIndex?: number;
 	onFocus?: FocusEventHandler;

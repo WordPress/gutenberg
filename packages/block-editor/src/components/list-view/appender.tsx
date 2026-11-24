@@ -13,7 +13,7 @@ import { unlock } from '../../lock-unlock';
 import type { ListViewAppenderProps } from './types';
 
 export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
-	( { nestingLevel, blockCount, clientId, label, ...props }, ref ) => {
+	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
 		const { setInsertedBlockClientId } = useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
@@ -91,10 +91,7 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
-					toggleProps={ {
-						label,
-						'aria-describedby': descriptionId,
-					} }
+					toggleProps={ { 'aria-describedby': descriptionId } }
 					onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
 						if ( maybeInsertedBlock?.clientId ) {
 							setInsertedBlockClientId(
