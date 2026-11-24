@@ -6410,12 +6410,23 @@ describe( 'state', () => {
 			} );
 
 			it( 'ignores editing mode actions on a removed block with a stale controlled client ID', () => {
-				const { derivedBlockEditingModes } = dispatchActions(
+				const stateAfterRemoval = dispatchActions(
 					[
 						{
 							type: 'REMOVE_BLOCKS',
 							clientIds: [ 'template-part' ],
 						},
+						{
+							type: 'SET_ZOOM_LEVEL',
+							zoom: 50,
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				const stateAfterStaleAction = dispatchActions(
+					[
 						{
 							type: 'SET_BLOCK_EDITING_MODE',
 							clientId: 'template-part',
@@ -6423,10 +6434,12 @@ describe( 'state', () => {
 						},
 					],
 					testReducer,
-					initialState
+					stateAfterRemoval
 				);
 
-				expect( derivedBlockEditingModes ).toEqual( new Map() );
+				expect( stateAfterStaleAction.derivedBlockEditingModes ).toBe(
+					stateAfterRemoval.derivedBlockEditingModes
+				);
 			} );
 
 			it( 'allows explicitly set blockEditingModes to override the template part editing modes', () => {
