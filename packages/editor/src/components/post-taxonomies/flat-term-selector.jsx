@@ -94,7 +94,8 @@ export function FlatTermSelector( { slug } ) {
 	const pendingTermsRef = useRef( new Set() );
 	const registry = useRegistry();
 
-	const { editPost } = useDispatch( editorStore );
+	const { editPost, lockPostSaving, unlockPostSaving } =
+		useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
@@ -310,9 +311,18 @@ export function FlatTermSelector( { slug } ) {
 	}
 
 	async function createTerms( names ) {
-		const results = await Promise.all(
-			names.map( ( name ) => createTerm( name ) )
-		);
+		// The post can't be saved until the new terms are assigned, or it
+		// would be saved without them.
+		const lockName = `term-create-${ ++pendingTermId }`;
+		lockPostSaving( lockName );
+		let results;
+		try {
+			results = await Promise.all(
+				names.map( ( name ) => createTerm( name ) )
+			);
+		} finally {
+			unlockPostSaving( lockName );
+		}
 		// A single announcement, so that the ones for terms added together
 		// don't cut each other off.
 		if ( results.includes( true ) ) {
