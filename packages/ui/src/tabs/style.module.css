@@ -162,9 +162,6 @@
 				position: absolute;
 				z-index: -1;
 				pointer-events: none;
-
-				/* Outline works for Windows high contrast mode as well. */
-				outline: var(--wpds-border-width-focus) solid transparent;
 				border-radius: var(--wpds-border-radius-sm);
 
 				/* Animation */
@@ -175,8 +172,10 @@
 				}
 			}
 
+			/* Only keyboard focus draws an outline, which forced colors mode
+			 * keeps, so a hovered tab does not look focused there. */
 			&:focus-visible::after {
-				outline-color: var(--wpds-color-stroke-focus);
+				outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 				opacity: 1;
 			}
 
@@ -218,7 +217,7 @@
 
 				&:focus-visible {
 					&::before {
-						outline-color: var(--wpds-color-stroke-focus);
+						outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 						opacity: 1;
 					}
 
