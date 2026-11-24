@@ -502,7 +502,9 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		await paragraph.click();
 		await page.keyboard.press( 'Home' );
 		// One of the presses crosses into the bold text without moving.
-		await pageUtils.pressKeys( 'ArrowRight', { times: 'Some b'.length + 1 } );
+		await pageUtils.pressKeys( 'ArrowRight', {
+			times: 'Some b'.length + 1,
+		} );
 		const saved = suggestionSavedPromise( page );
 		await page.keyboard.type( 'XY' );
 		await saved;
