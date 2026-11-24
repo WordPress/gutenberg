@@ -240,7 +240,7 @@ describe( 'Cover block', () => {
 
 			await userEvent.click(
 				within( screen.getByRole( 'grid' ) ).getByRole( 'gridcell', {
-					name: 'top left',
+					name: 'Top Left',
 				} )
 			);
 

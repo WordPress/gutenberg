@@ -28,11 +28,13 @@ export default meta;
 type Story = StoryObj< typeof Avatar >;
 
 export const Default: Story = {
+	tags: [ 'external-requests' ],
 	args: { src: IMAGE_SRC },
 };
 
 /** The assigned color sets the activity ring; the initials fill adapts to contrast with it. */
 export const WithColor: Story = {
+	tags: [ 'external-requests' ],
 	args: { color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
@@ -45,6 +47,7 @@ export const WithColor: Story = {
 
 /** Activity changes the ring without changing the avatar's footprint. */
 export const Activity: Story = {
+	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } active={ false } />
@@ -86,6 +89,7 @@ export const Sizes: Story = {
 
 /** Use a circle for a person's portrait and a square to preserve the corners of a site logo. */
 export const Shapes: Story = {
+	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } src={ IMAGE_SRC } shape="circle" />
