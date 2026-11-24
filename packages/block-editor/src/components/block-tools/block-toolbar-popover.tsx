@@ -3,6 +3,11 @@ import { useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { PrivateBlockPopover } from '../block-popover';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import {
+	getBlockClientId,
+	getOutermostRotatedAncestorBlock,
+} from '../../utils/dom';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import { store as blockEditorStore } from '../../store';
@@ -46,6 +51,16 @@ export default function BlockToolbarPopover( {
 	// the toolbar should be positioned over the topmost capturing parent.
 	const clientIdToPositionOver = capturingClientId || clientId;
 
+	// A child's toolbar would cut across a rotated container, so it is lifted
+	// above the container's top edge instead.
+	const selectedElement = useBlockElement( clientId );
+	const rotatedAncestorElement = selectedElement
+		? getOutermostRotatedAncestorBlock( selectedElement )
+		: undefined;
+	const topEdgeClientId = rotatedAncestorElement
+		? getBlockClientId( rotatedAncestorElement )
+		: undefined;
+
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
 		clientId: clientIdToPositionOver,
@@ -56,6 +71,7 @@ export default function BlockToolbarPopover( {
 			<PrivateBlockPopover
 				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
+				topEdgeClientId={ topEdgeClientId }
 				className={ clsx( 'block-editor-block-list__block-popover', {
 					'is-insertion-point-visible': isInsertionPointVisible,
 				} ) }
