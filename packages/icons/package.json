@@ -46,9 +46,9 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.6.6",
+		"@storybook/react-vite": "^10.6.8",
 		"@testing-library/react": "^16.3.3",
-		"vitest": "^5.1.0",
+		"vitest": "^5.1.1",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
