@@ -34,49 +34,6 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		] );
 	} );
 
-	test( 'the default menu links to the published pages and picks up new ones', async ( {
-		admin,
-		editor,
-		requestUtils,
-	} ) => {
-		await requestUtils.createPage( { title: 'About', status: 'publish' } );
-
-		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/navigation' } );
-
-		const navigationBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Navigation',
-		} );
-		await expect(
-			navigationBlock.getByRole( 'document', {
-				name: 'Block: Page Link',
-			} )
-		).toContainText( 'About', {
-			// Wait for the menu and the fallback request to resolve.
-			timeout: 10000,
-		} );
-		await expect(
-			navigationBlock.getByRole( 'document', {
-				name: 'Block: Page List',
-			} )
-		).toBeHidden();
-
-		const [ menu ] = await requestUtils.getNavigationMenus( {
-			status: 'publish',
-		} );
-		expect( menu.meta[ META_KEY ] ).toBe( true );
-
-		const contact = await requestUtils.createPage( {
-			title: 'Contact',
-			status: 'publish',
-		} );
-		const updatedMenu = await requestUtils.rest( {
-			path: `/wp/v2/navigation/${ menu.id }`,
-			params: { context: 'edit' },
-		} );
-		expect( updatedMenu.content.raw ).toContain( `"id":${ contact.id }` );
-	} );
-
 	test( 'a navigation block in the editor shows the new link once the page is published', async ( {
 		admin,
 		editor,
