@@ -151,6 +151,13 @@ describe( 'creating Navigation menus', () => {
 							menu.status === url.searchParams.get( 'status' )
 					);
 				}
+				const menu = menus.find(
+					( item ) =>
+						url.pathname === `/wp/v2/navigation/${ item.id }`
+				);
+				if ( menu ) {
+					return new Response( JSON.stringify( menu ) );
+				}
 				throw new Error( `Unexpected REST request: ${ path }` );
 			}
 		);
@@ -196,11 +203,13 @@ describe( 'creating Navigation menus', () => {
 				} ),
 			} ),
 		] );
-		expect(
-			registry
-				.select( coreStore )
-				.getEditedEntityRecord( 'postType', 'wp_navigation', 102 )
-		).toEqual( expect.objectContaining( { status: 'publish' } ) );
+		await act( async () => {
+			expect(
+				await registry
+					.resolveSelect( coreStore )
+					.getEditedEntityRecord( 'postType', 'wp_navigation', 102 )
+			).toEqual( expect.objectContaining( { status: 'publish' } ) );
+		} );
 		expect( result.current.creation.isSuccess ).toBe( true );
 		expect( result.current.conversion.status ).toBe( 'success' );
 	} );
