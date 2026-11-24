@@ -864,6 +864,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'emoji outside the curated set' => array( 'note', '1f525', true, 'rest_comment_invalid_reaction', 400 ),
 			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
 			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
+			'markup around a valid key'     => array( 'note', '<b>2764</b>', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
 			'raw content not a key'         => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
 			'content without raw'           => array( 'note', array( 'rendered' => '2764' ), true, 'rest_comment_invalid_reaction', 400 ),
@@ -962,7 +963,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			array_filter(
 				$remaining,
 				function ( $comment ) {
-					return '2764' === wp_strip_all_tags( $comment->comment_content );
+					return '2764' === $comment->comment_content;
 				}
 			)
 		);
@@ -1869,10 +1870,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Rows that strip to the same key are counted together rather than the
-	 * last one overwriting the others.
+	 * A row holding markup around a curated key is not that key, so it is
+	 * left out and does not add to the real key's count.
 	 */
-	public function test_reaction_summary_accumulates_rows_that_strip_to_the_same_key(): void {
+	public function test_reaction_summary_ignores_markup_around_a_curated_key(): void {
 		list( $post_id, $note_id ) = $this->create_editor_note();
 
 		$heart_id = self::factory()->comment->create(
@@ -1901,7 +1902,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$this->assertCount( 1, $summary );
 		$this->assertArrayHasKey( self::HEART_REACTION_KEY, $summary );
-		$this->assertSame( 2, $summary[ self::HEART_REACTION_KEY ]['count'] );
+		$this->assertSame( 1, $summary[ self::HEART_REACTION_KEY ]['count'] );
 		$this->assertSame( $heart_id, $summary[ self::HEART_REACTION_KEY ]['current_user_reaction'] );
 	}
 
