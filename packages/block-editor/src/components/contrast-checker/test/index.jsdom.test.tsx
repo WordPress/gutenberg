@@ -504,7 +504,7 @@ describe( 'ContrastChecker', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should render component and prioritize contrast warning when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {
+	test( 'should render both the contrast and transparency warnings when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {
 		render(
 			<ContrastChecker
 				backgroundColor={ sameShade }
@@ -518,16 +518,16 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( speak ).toHaveBeenCalledWith(
-			'This color combination may be hard for people to read.'
+			'This color combination may be hard for people to read. Transparent text may be hard for people to read.'
 		);
 		expect(
 			screen.getByText(
-				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color. Transparent text may be hard for people to read.'
 			)
 		).toBeVisible();
 	} );
 
-	test( 'should render contrast warning when the text color is both transparent and low contrast with alpha checker enabled.', () => {
+	test( 'should render both the contrast and transparency warnings when the text color is both transparent and low contrast with alpha checker enabled.', () => {
 		render(
 			<ContrastChecker
 				backgroundColor="#f7f7f7"
@@ -538,11 +538,34 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( speak ).toHaveBeenCalledWith(
-			'This color combination may be hard for people to read.'
+			'This color combination may be hard for people to read. Transparent text may be hard for people to read.'
 		);
 		expect(
 			screen.getByText(
-				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color. Transparent text may be hard for people to read.'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'should add the transparency warning to a caller-provided contrast message with the alpha checker enabled.', () => {
+		const messageOverride =
+			'This color has poor contrast against the background. Consider increasing contrast.';
+		render(
+			<ContrastChecker
+				backgroundColor="#f7f7f7"
+				textColor="rgba(247,247,247,0.36)"
+				isLargeText={ isLargeText }
+				messageOverride={ messageOverride }
+				enableAlphaChecker
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			`${ messageOverride } Transparent text may be hard for people to read.`
+		);
+		expect(
+			screen.getByText(
+				`${ messageOverride } Transparent text may be hard for people to read.`
 			)
 		).toBeVisible();
 	} );
