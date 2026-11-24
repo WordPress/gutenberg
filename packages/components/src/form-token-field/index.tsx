@@ -443,6 +443,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function handleEscapeKey( event: KeyboardEvent ) {
+		// Only consume the key while the suggestions list is open, so that
+		// a parent Modal or Popover can still be closed with it.
+		if ( ! isExpanded ) {
+			return false;
+		}
 		collapseSuggestionsList( event );
 		return true; // PreventDefault.
 	}
