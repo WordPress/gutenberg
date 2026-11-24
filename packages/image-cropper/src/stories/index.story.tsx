@@ -34,7 +34,7 @@ export const Default = {
 	render: DefaultComponent,
 	args: {
 		// Served from `storybook/static`.
-		src: 'image-editor-demo.jpeg',
+		src: 'landscape.svg',
 		minZoom: 1,
 		maxZoom: 5,
 	},
@@ -236,7 +236,7 @@ export const WithControls = {
 	render: WithControlsComponent,
 	args: {
 		// Served from `storybook/static`.
-		src: 'image-editor-demo.jpeg',
+		src: 'landscape.svg',
 		minZoom: 1,
 		maxZoom: 5,
 	},

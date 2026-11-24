@@ -24,7 +24,7 @@ export default {
 };
 
 // Served from `storybook/static`.
-const IMAGE_URL = 'image-editor-demo.jpeg';
+const IMAGE_URL = 'landscape.svg';
 
 // Sample data for media fields
 const sampleMediaItem: MediaItem = {
@@ -55,7 +55,7 @@ const sampleMediaItem: MediaItem = {
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
 	class_list: [ 'post-123', 'attachment' ],
-	alt_text: 'Illustrated Japanese-English vocabulary chart',
+	alt_text: 'Sun above green hills',
 	caption: {
 		raw: 'A caption for the image',
 		rendered: '<p>A caption for the image</p>\n',
@@ -65,15 +65,15 @@ const sampleMediaItem: MediaItem = {
 		rendered:
 			'<p>This is a detailed description of the sample image. It contains useful information about what the image depicts and its context.</p>',
 	},
-	mime_type: 'image/jpeg',
+	mime_type: 'image/svg+xml',
 	media_type: 'image',
 	post: null,
 	source_url: IMAGE_URL,
 	media_details: {
-		file: 'sample-image.jpg',
-		width: 1000,
-		height: 1464,
-		filesize: 146045,
+		file: 'landscape.svg',
+		width: 1200,
+		height: 600,
+		filesize: 273,
 		image_meta: {
 			aperture: '2.8',
 			credit: '',
@@ -88,24 +88,7 @@ const sampleMediaItem: MediaItem = {
 			orientation: '1',
 			keywords: [],
 		},
-		sizes: {
-			thumbnail: {
-				file: 'sample-image-150x150.jpg',
-				width: 150,
-				height: 150,
-				filesize: 8192,
-				mime_type: 'image/jpeg',
-				source_url: IMAGE_URL,
-			},
-			medium: {
-				file: 'sample-image-205x300.jpg',
-				width: 205,
-				height: 300,
-				filesize: 24576,
-				mime_type: 'image/jpeg',
-				source_url: IMAGE_URL,
-			},
-		},
+		sizes: {},
 	},
 	missing_image_sizes: [],
 	_embedded: {
