@@ -334,8 +334,25 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 				autoAdd: true,
 				labels: [ 'Home', 'Alpha', 'Bravo Team', 'Charlie' ],
 			} );
+	} );
 
-		// The typing and the conversion are one undo step.
+	// The Page List's inner block controller cleans up when it unmounts,
+	// between two keystrokes, which starts a new undo step. Fixed by #82706.
+	test.fixme( 'one undo reverts typing a label and the conversion', async ( {
+		page,
+		pageListMenu,
+	} ) => {
+		const menu = await pageListMenu.setUp();
+
+		await pageListMenu.selectLink( 'Bravo' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' Team' );
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( {
+				labels: [ 'Home', 'Alpha', 'Bravo Team', 'Charlie' ],
+			} );
+
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Undo', exact: true } )

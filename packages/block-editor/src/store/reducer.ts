@@ -3521,16 +3521,6 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 							},
 						]
 					: [];
-				// Let go of controlled inner blocks here, so the controller
-				// has nothing to clean up when it unmounts (see
-				// `useBlockSync`), which would split that undo step.
-				if ( nextState.blocks.controlledInnerBlocks.has( clientId ) ) {
-					steps.push( {
-						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-						clientId,
-						hasControlledInnerBlocks: false,
-					} );
-				}
 				steps.push( {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
