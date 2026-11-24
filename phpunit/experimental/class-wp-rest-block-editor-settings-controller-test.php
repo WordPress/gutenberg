@@ -25,6 +25,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		parent::set_up();
 		switch_theme( 'block-theme' );
 		remove_action( 'wp_print_styles', 'print_emoji_styles' );
+		wp_scripts();
 	}
 
 	/**
@@ -115,7 +116,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertNotTrue( $data['canUpdateBlockBindings'] ?? null );
+		$this->assertFalse( $data['canUpdateBlockBindings'] );
 	}
 
 	/**
