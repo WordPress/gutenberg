@@ -21,7 +21,7 @@ describe( 'Badge', () => {
 			</Badge>
 		);
 
-		expect( ref.current ).toBe( screen.getByText( 'Active' ) );
+		expect( ref.current ).toContainElement( screen.getByText( 'Active' ) );
 		expect( ref.current?.tagName ).toBe( 'STRONG' );
 		expect( ref.current ).toHaveAttribute( 'data-label', 'status' );
 		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();

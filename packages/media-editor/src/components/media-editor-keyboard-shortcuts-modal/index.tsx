@@ -1,21 +1,11 @@
+import type { ComponentProps } from 'react';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import type { WPKeycodeModifier } from '@wordpress/keycodes';
 import { KeyboardShortcut } from '@wordpress/ui';
 
-interface KeyCombination {
-	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
-	modifier?: WPKeycodeModifier;
-	/** The key character(s) to display. Pass an array to render each as its own key. */
-	character: string | string[];
-	/** Optional aria-label override (used when character is a symbol). */
-	ariaLabel?: string;
-}
-
-interface ShortcutEntry {
+type ShortcutEntry = {
 	description: string;
-	keyCombination: KeyCombination;
-}
+} & ComponentProps< typeof KeyboardShortcut >;
 
 const SHORTCUTS: ShortcutEntry[] = [
 	{
@@ -30,8 +20,8 @@ const SHORTCUTS: ShortcutEntry[] = [
 		description: __( 'Pan' ),
 		keyCombination: {
 			character: [ '↑', '↓', '←', '→' ],
-			ariaLabel: __( 'Arrow keys' ),
 		},
+		label: __( 'Arrow keys' ),
 	},
 	{
 		description: __( 'Zoom in' ),
@@ -62,8 +52,8 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: {
 			modifier: 'shift',
 			character: [ '↑', '↓', '←', '→' ],
-			ariaLabel: __( 'Shift + Arrow keys' ),
 		},
+		label: __( 'Shift + Arrow keys' ),
 	},
 ];
 
@@ -94,7 +84,7 @@ export default function MediaEditorKeyboardShortcutsModal( {
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map( ( { description, keyCombination }, index ) => (
+				{ SHORTCUTS.map( ( { description, ...shortcut }, index ) => (
 					<li
 						key={ index }
 						className="media-editor-keyboard-shortcuts-modal__shortcut"
@@ -103,8 +93,7 @@ export default function MediaEditorKeyboardShortcutsModal( {
 							{ description }
 						</span>
 						<KeyboardShortcut
-							keyCombination={ keyCombination }
-							label={ keyCombination.ariaLabel }
+							{ ...shortcut }
 							className="media-editor-keyboard-shortcuts-modal__shortcut-term"
 							keyClassName="media-editor-keyboard-shortcuts-modal__shortcut-key"
 						/>

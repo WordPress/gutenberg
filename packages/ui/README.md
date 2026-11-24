@@ -256,7 +256,7 @@ import { __ } from '@wordpress/i18n';
 />;
 ```
 
-For a group of keys, pass an array as `character` and a translated `label` describing the group. A single key uses the `@wordpress/keycodes` formatter even without a modifier. Readable key names come from the version of `keycodes` supplied at runtime; use its matching updated release for the translated Backslash, Plus, and Minus names.
+For a group of keys, pass an array as `character`; a translated `label` describing the group is required. The label is optional for a single key, which uses the `@wordpress/keycodes` formatter even without a modifier. Readable key names come from the version of `keycodes` supplied at runtime; use its matching updated release for the translated Backslash, Plus, and Minus names.
 
 This is a static display. For an interactive button or menu item with a shortcut, keep using its `shortcut` prop and the existing interactive shortcut utilities.
 

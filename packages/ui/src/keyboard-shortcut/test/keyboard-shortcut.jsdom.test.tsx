@@ -1,8 +1,27 @@
 import { isInaccessible, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { createRef } from '@wordpress/element';
 import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 import { KeyboardShortcut } from '../';
+
+// These assertions are checked by TypeScript; the cases below verify rendering.
+expectTypeOf( KeyboardShortcut ).toBeCallableWith( {
+	keyCombination: { character: 'H' },
+} );
+expectTypeOf( KeyboardShortcut ).toBeCallableWith( {
+	keyCombination: { modifier: 'shift', character: [ '↑', '↓' ] },
+	label: 'Shift + Arrow keys',
+} );
+const unlabeledGroup = {
+	keyCombination: { character: [ '↑', '↓' ] },
+};
+// @ts-expect-error Key groups require readable text instead of raw symbols.
+expectTypeOf( KeyboardShortcut ).toBeCallableWith( unlabeledGroup );
+const undefinedLabelGroup = { ...unlabeledGroup, label: undefined };
+expectTypeOf( KeyboardShortcut ).toBeCallableWith(
+	// @ts-expect-error An undefined label does not describe a key group.
+	undefinedLabelGroup
+);
 
 describe( 'KeyboardShortcut', () => {
 	it.each( [ ',', '.', '`', '\\', '+', '-' ] )(
