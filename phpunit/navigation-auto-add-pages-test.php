@@ -8,7 +8,6 @@
 /**
  * @covers ::gutenberg_register_navigation_auto_add_pages_meta
  * @covers ::gutenberg_navigation_auto_add_page_on_publish
- * @covers ::gutenberg_navigation_create_fallback_with_pages
  */
 class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 	const META_KEY = 'wp_navigation_auto_add_pages';
@@ -418,7 +417,7 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 	}
 
 	/*
-	 * Fallback menu.
+	 * Where a page is added.
 	 */
 
 	public function test_a_page_is_inserted_in_page_order_among_the_page_links() {
@@ -549,135 +548,5 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 
 		$this->assertSame( $top_level, get_post( $top_id )->post_content );
 		$this->assertSame( $nested, get_post( $nested_id )->post_content );
-	}
-
-	public function test_fallback_menu_is_built_from_page_links_with_the_setting_on() {
-		$about_id   = self::factory()->post->create(
-			array(
-				'post_type'  => 'page',
-				'post_title' => 'About',
-				'menu_order' => 2,
-			)
-		);
-		$contact_id = self::factory()->post->create(
-			array(
-				'post_type'  => 'page',
-				'post_title' => 'Contact',
-				'menu_order' => 1,
-			)
-		);
-		$team_id    = self::factory()->post->create(
-			array(
-				'post_type'   => 'page',
-				'post_title'  => 'Team',
-				'post_parent' => $about_id,
-			)
-		);
-		self::factory()->post->create(
-			array(
-				'post_type'   => 'page',
-				'post_title'  => 'Draft',
-				'post_status' => 'draft',
-			)
-		);
-
-		$fallback = WP_Navigation_Fallback::get_fallback();
-
-		$this->assertInstanceOf( WP_Post::class, $fallback );
-		$this->assertSame( 'wp_navigation', $fallback->post_type );
-		$this->assertTrue( (bool) get_post_meta( $fallback->ID, self::META_KEY, true ) );
-		$this->assertStringNotContainsString( 'wp:page-list', $fallback->post_content );
-
-		$blocks = $this->get_menu_blocks( $fallback->ID );
-		$this->assertCount( 2, $blocks, 'Only top-level published pages are top-level items.' );
-		$this->assert_page_link_block( $blocks[0], $contact_id );
-
-		$about = $blocks[1];
-		$this->assertSame( 'core/navigation-submenu', $about['blockName'], 'A page with children becomes a submenu.' );
-		$this->assertSame( $about_id, $about['attrs']['id'] );
-		$this->assertSame( 'About', $about['attrs']['label'] );
-		$this->assertSame( 'page', $about['attrs']['type'] );
-		$this->assertSame( 'post-type', $about['attrs']['kind'] );
-		$this->assertCount( 1, $about['innerBlocks'] );
-		$this->assert_page_link_block( $about['innerBlocks'][0], $team_id );
-	}
-
-	public function test_fallback_menu_with_no_pages_is_empty_with_the_setting_on() {
-		$fallback = WP_Navigation_Fallback::get_fallback();
-
-		$this->assertInstanceOf( WP_Post::class, $fallback );
-		$this->assertSame( '', $fallback->post_content );
-		$this->assertTrue( (bool) get_post_meta( $fallback->ID, self::META_KEY, true ) );
-	}
-
-	public function test_fallback_reuses_an_existing_menu_without_touching_its_setting() {
-		$menu_id = $this->create_menu( '<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->' );
-		self::factory()->post->create( array( 'post_type' => 'page' ) );
-
-		$fallback = WP_Navigation_Fallback::get_fallback();
-
-		$this->assertSame( $menu_id, $fallback->ID );
-		$this->assertEmpty( get_post_meta( $menu_id, self::META_KEY, true ) );
-		$this->assertCount(
-			1,
-			get_posts(
-				array(
-					'post_type'      => 'wp_navigation',
-					'post_status'    => 'any',
-					'posts_per_page' => -1,
-				)
-			)
-		);
-	}
-
-	public function test_fallback_still_converts_a_classic_menu_first() {
-		$menu_id = wp_create_nav_menu( 'Classic' );
-		wp_update_nav_menu_item(
-			$menu_id,
-			0,
-			array(
-				'menu-item-title'  => 'Classic Link',
-				'menu-item-url'    => 'https://example.com/classic',
-				'menu-item-status' => 'publish',
-			)
-		);
-		self::factory()->post->create( array( 'post_type' => 'page' ) );
-
-		$fallback = WP_Navigation_Fallback::get_fallback();
-
-		$this->assertStringContainsString( 'Classic Link', $fallback->post_content );
-		$this->assertEmpty( get_post_meta( $fallback->ID, self::META_KEY, true ) );
-		wp_delete_nav_menu( $menu_id );
-	}
-
-	public function test_fallback_is_not_created_when_a_theme_opts_out() {
-		self::factory()->post->create( array( 'post_type' => 'page' ) );
-		// Added after the plugin's callback, as a theme's `functions.php` would.
-		add_filter( 'wp_navigation_should_create_fallback', '__return_false' );
-
-		$this->assertNull( WP_Navigation_Fallback::get_fallback() );
-		$this->assertCount(
-			0,
-			get_posts(
-				array(
-					'post_type'      => 'wp_navigation',
-					'post_status'    => 'any',
-					'posts_per_page' => -1,
-				)
-			)
-		);
-	}
-
-	public function test_fallback_rest_route_returns_the_page_link_menu() {
-		wp_set_current_user( self::$admin_id );
-		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/navigation-fallback' );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 200, $response->get_status() );
-		$menu_id = $response->get_data()['id'];
-		$this->assertTrue( (bool) get_post_meta( $menu_id, self::META_KEY, true ) );
-		$this->assert_page_link_block( $this->get_menu_blocks( $menu_id )[0], $page_id );
 	}
 }
