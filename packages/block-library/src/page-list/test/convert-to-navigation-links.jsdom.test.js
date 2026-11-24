@@ -481,6 +481,20 @@ describe( 'page list convert to links', () => {
 			] );
 		} );
 
+		it( 'Returns no links when the parent page is missing', () => {
+			const pages = [
+				{
+					id: 5,
+					parent: 0,
+					title: { raw: 'Top', rendered: 'Top' },
+					link: 'http://example.com/5',
+					type: 'page',
+				},
+			];
+
+			expect( convertToNavigationLinks( pages, 99 ) ).toEqual( [] );
+		} );
+
 		it( 'Can use a different parent page', () => {
 			const pages = [
 				{

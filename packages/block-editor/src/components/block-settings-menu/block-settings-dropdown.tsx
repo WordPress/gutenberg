@@ -102,8 +102,7 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut,
 				canEditBlock,
 				canMoveBlocks,
-				getBlockIndex,
-				getBlockCount,
+				getBlockMoveDestination,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -130,10 +129,10 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),
-				isFirst: getBlockIndex( firstBlockClientId ) === 0,
-				isLast:
-					getBlockIndex( firstBlockClientId ) ===
-					getBlockCount( _firstParentClientId ) - 1,
+				// Whether the blocks can move at all each way, like the
+				// block movers (see `getBlockMoveDestination`).
+				isFirst: ! getBlockMoveDestination( clientIds, 'up' ),
+				isLast: ! getBlockMoveDestination( clientIds, 'down' ),
 			};
 		},
 		[ firstBlockClientId, clientIds ]

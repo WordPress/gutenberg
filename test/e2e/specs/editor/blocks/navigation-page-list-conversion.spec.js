@@ -197,6 +197,38 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		expect( allowed ).toEqual( { link: true, spacer: false } );
 	} );
 
+	test( 'page links use the menu colors, not the submenu colors', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPage( { title: 'Alpha', status: 'publish' } );
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Colored menu',
+			content: MENU_CONTENT,
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menu.id,
+				customTextColor: '#00ff00',
+				customOverlayTextColor: '#ff0000',
+			},
+		} );
+
+		const color = ( label ) =>
+			editor.canvas
+				.getByRole( 'textbox', { name: 'Navigation link text' } )
+				.filter( { hasText: label } )
+				.evaluate(
+					( element ) => window.getComputedStyle( element ).color
+				);
+		await expect
+			.poll( () => color( 'Alpha' ), { timeout: 10000 } )
+			.toBe( await color( 'Home' ) );
+	} );
+
 	test( 'moving a link within the list converts it', async ( {
 		editor,
 		pageListMenu,

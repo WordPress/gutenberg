@@ -60,10 +60,7 @@ export function convertToNavigationLinks( pages = [], parentPageID = null ) {
 	// Look it up by ID, since it may sit under a page that isn't among the
 	// pages (one that isn't published).
 	if ( parentPageID ) {
-		const parentPage = linkMap[ parentPageID ];
-		if ( parentPage && parentPage.innerBlocks ) {
-			navigationLinks = parentPage.innerBlocks;
-		}
+		navigationLinks = linkMap[ parentPageID ]?.innerBlocks ?? [];
 	}
 
 	// Transform all links with innerBlocks into Submenus. This can't be done

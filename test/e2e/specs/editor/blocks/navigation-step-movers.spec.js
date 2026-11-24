@@ -223,6 +223,64 @@ test.describe( 'Navigation: moving one step', () => {
 					],
 				} );
 		} );
+
+		test( 'one undo still brings the Page List back after its links appear later', async ( {
+			editor,
+			page,
+			menuUtils,
+		} ) => {
+			const menu = await menuUtils.setUpPageListMenu( CONTENT );
+			const ids = await page.evaluate( async () => {
+				const pages = await window.wp.apiFetch( {
+					path: '/wp/v2/pages?per_page=100&_fields=id,title',
+				} );
+				const byTitle = ( title ) =>
+					pages.find( ( p ) => p.title.rendered === title ).id;
+				return { alpha: byTitle( 'Alpha' ), bravo: byTitle( 'Bravo' ) };
+			} );
+			// Alpha has no children, so the list shows a warning first; then
+			// Bravo's child appears as its only link.
+			const setParent = ( parentPageID ) =>
+				page.evaluate( ( id ) => {
+					const blockEditor =
+						window.wp.data.select( 'core/block-editor' );
+					const [ pageList ] =
+						blockEditor.getBlocksByName( 'core/page-list' );
+					window.wp.data
+						.dispatch( 'core/block-editor' )
+						.updateBlockAttributes( pageList, {
+							parentPageID: id,
+						} );
+				}, parentPageID );
+			await setParent( ids.alpha );
+			await expect(
+				editor.canvas.getByText( 'page has no children' )
+			).toBeVisible();
+			await setParent( ids.bravo );
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( {
+					tree: [ 'Home', 'Page List(Bravo Team)', 'Contact' ],
+				} );
+
+			await menuUtils.selectInCanvas( 'Home' );
+			await editor.clickBlockToolbarButton( 'Move right' );
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( { pageLists: 0 } );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo', exact: true } )
+				.click();
+
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( {
+					pageLists: 1,
+					tree: [ 'Home', 'Page List(Bravo Team)', 'Contact' ],
+				} );
+		} );
 	} );
 
 	test.describe( 'List View movers', () => {

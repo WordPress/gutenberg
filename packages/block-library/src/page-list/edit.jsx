@@ -485,7 +485,9 @@ export default function PageListEdit( {
 	} );
 
 	// Subscribed after the list's own block sync (in `useInnerBlocksProps`),
-	// so the conversion still sees the value from before the change.
+	// so the conversion still sees the value from before the change. The
+	// links remount whenever they're rebuilt (or first appear after a notice),
+	// so subscribe again then to stay after them.
 	useEffect( () => {
 		if ( ! isLinkMode ) {
 			return;
@@ -495,7 +497,7 @@ export default function PageListEdit( {
 		return registry.subscribe( () => {
 			navigationBlocksRef.current = getBlocks( parentClientId );
 		}, blockEditorStore );
-	}, [ registry, isLinkMode, parentClientId ] );
+	}, [ registry, isLinkMode, parentClientId, navigationLinks ] );
 
 	useEffect( () => {
 		if ( isLinkMode ) {
