@@ -188,6 +188,14 @@ describe( 'applyImageEdit', () => {
 		],
 		[ 'invalid', clean, { rotation: Number.NaN } ],
 		[
+			// A string is truthy, so coercing it would flip the image.
+			'invalid',
+			clean,
+			{
+				flip: { horizontal: 'false', vertical: false },
+			} as unknown as ImageEdit,
+		],
+		[
 			'invalid',
 			clean,
 			{ crop: { x: Number.NaN, y: 0, width: 0.5, height: 0.5 } },

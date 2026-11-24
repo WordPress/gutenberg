@@ -12,8 +12,8 @@ import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
  * Why an edit was rejected.
  *
  * - `no-image`: no image with a usable size has loaded.
- * - `invalid`: a number is not finite, or the crop is under one pixel
- *   wide or high.
+ * - `invalid`: a number is not finite, a flip value is not a boolean, or
+ *   the crop is under one pixel wide or high.
  * - `locked-ratio`: strict mode only. The crop fits the image but not the
  *   locked ratio.
  * - `outside-image`: strict mode only. The crop reaches outside the image.
@@ -95,13 +95,19 @@ export function applyImageEdit(
 	if ( crop ) {
 		numbers.push( crop.x, crop.y, crop.width, crop.height );
 	}
-	if ( ! numbers.every( Number.isFinite ) ) {
+	const flips = [ edit.flip?.horizontal, edit.flip?.vertical ];
+	if (
+		! numbers.every( Number.isFinite ) ||
+		! flips.every(
+			( value ) => value === undefined || typeof value === 'boolean'
+		)
+	) {
 		return { rejected: 'invalid' };
 	}
 
 	const flip = {
-		horizontal: Boolean( edit.flip?.horizontal ),
-		vertical: Boolean( edit.flip?.vertical ),
+		horizontal: edit.flip?.horizontal ?? false,
+		vertical: edit.flip?.vertical ?? false,
 	};
 	// Undoes the sign rule in `getImageEdit`: one flipped axis reverses
 	// the angle.
