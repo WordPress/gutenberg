@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
@@ -33,7 +34,6 @@
 
 ### Bug Fixes
 
--   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
 -   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
