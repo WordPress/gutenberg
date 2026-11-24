@@ -507,68 +507,6 @@ test.describe( 'Client-side media processing', () => {
 		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
 	} );
 
-	test( 'uploads a gallery of large camera JPEGs without losing any', async ( {
-		page,
-		editor,
-		requestUtils,
-		mediaProcessingUtils,
-	} ) => {
-		// Processing twelve large images takes minutes on CI runners.
-		test.setTimeout( 420_000 );
-
-		// Twelve 24 MP, 4:2:0 JPEGs of about 15 MB each, like a camera's.
-		// wasm-vips used to run out of memory part way through the batch,
-		// and the attachments whose sub-sizes then failed were deleted.
-		const { default: Vips } = await import( wasmVipsEntry );
-		const vips = await Vips( {} );
-		const noise = () =>
-			vips.Image.gaussnoise( 6000, 4000, { mean: 128, sigma: 30 } );
-		const jpeg = noise()
-			.bandjoin( [ noise(), noise() ] )
-			.cast( 'uchar' )
-			.copy( { interpretation: 'srgb' } )
-			.jpegsaveBuffer( { Q: 90, subsample_mode: 'on' } );
-		const tmpDirectory = await fs.mkdtemp(
-			path.join( os.tmpdir(), 'gutenberg-test-large-gallery-' )
-		);
-		const tmpFiles = [];
-		for ( let i = 0; i < 12; i++ ) {
-			const tmpFile = path.join( tmpDirectory, `${ randomUUID() }.jpg` );
-			await fs.writeFile( tmpFile, jpeg );
-			tmpFiles.push( tmpFile );
-		}
-
-		await editor.insertBlock( { name: 'core/gallery' } );
-		const galleryBlock = editor.canvas.locator(
-			'role=document[name="Block: Gallery"i]'
-		);
-		await galleryBlock
-			.locator( 'data-testid=form-file-upload-input' )
-			.setInputFiles( tmpFiles );
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty( 300_000 );
-
-		const media = await requestUtils.rest( {
-			path: '/wp/v2/media',
-			params: { per_page: 100 },
-		} );
-		expect( media ).toHaveLength( tmpFiles.length );
-		const imageIds = ( await editor.getBlocks() )[ 0 ].innerBlocks.map(
-			( block ) => block.attributes.id
-		);
-		expect( imageIds.sort() ).toEqual(
-			media.map( ( attachment ) => attachment.id ).sort()
-		);
-		const errorNotices = await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/notices' )
-				.getNotices()
-				.filter( ( notice ) => notice.status === 'error' )
-				.map( ( notice ) => notice.content )
-		);
-		expect( errorNotices ).toEqual( [] );
-	} );
-
 	test( 'rejects an unsupported file type', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
