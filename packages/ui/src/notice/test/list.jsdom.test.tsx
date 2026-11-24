@@ -174,7 +174,7 @@ describe( 'Notice.List', () => {
 			<Notice.List>
 				<Notice.Root>
 					<Notice.Title>Changes not saved</Notice.Title>
-					<Notice.Description>
+					<Notice.Description render={ <div /> }>
 						Retry
 						<br />
 						later.
@@ -190,13 +190,19 @@ describe( 'Notice.List', () => {
 							<legend>Connection lost</legend>
 							Offline
 						</fieldset>
+						{ /* React warns about <search> in jsdom, so insert it as markup. */ }
+						<span
+							dangerouslySetInnerHTML={ {
+								__html: 'Search<search>help</search>',
+							} }
+						/>
 					</Notice.Description>
 				</Notice.Root>
 			</Notice.List>
 		);
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Changes not saved\. Retry later\. Check your connection\. Re-sync Reload Then try again Connection lost Offline$/,
+				/^Changes not saved\. Retry later\. Check your connection\. Re-sync Reload Then try again Connection lost Offline Search help$/,
 				{ normalizeWhitespace: false }
 			)
 		);
