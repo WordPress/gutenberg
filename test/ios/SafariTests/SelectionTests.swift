@@ -235,10 +235,12 @@ final class SelectionTests: XCTestCase {
 		scroll( to: quote, between: 150, and: 300 )
 		XCTAssertGreaterThan( stableFrame( of: caretBlock ).minY, app.windows.firstMatch.frame.maxY, "The caret's paragraph is still on screen" )
 
-		quote.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		// The paragraph is wider than its text: the caret goes to the end,
+		// away from the start, where a misplaced caret also lands.
+		quote.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
 		app.typeText( "X" )
 
-		XCTAssertTrue( editor.block( title: "Paragraph", content: "XQuote here" ).waitForExistence( timeout: 5 ), "The quote did not get the X" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "Quote hereX" ).waitForExistence( timeout: 5 ), "The quote did not get the X at its end" )
 		XCTAssertTrue( caretBlock.exists, "The paragraph far below changed" )
 	}
 
