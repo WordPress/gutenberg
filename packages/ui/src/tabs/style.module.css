@@ -45,8 +45,15 @@
 						linear-gradient(to left, var(--fade-gradient-composed));
 				}
 
+				/* Minimal tabs pad their labels so the interaction background
+				 * extends past them. The list pulls back by that padding so the
+				 * first label lines up with the container edge, and the gap
+				 * shrinks so the labels stay 1rem apart. */
 				&.is-minimal-variant {
-					gap: 1rem;
+					--_wp-ui-tabs-minimal-padding: var(--wpds-dimension-padding-xs);
+
+					margin-inline-start: calc(-1 * var(--_wp-ui-tabs-minimal-padding));
+					gap: calc(1rem - 2 * var(--_wp-ui-tabs-minimal-padding));
 				}
 			}
 
@@ -89,8 +96,13 @@
 				bottom: 0;
 				height: var(--wpds-border-width-focus);
 
-				width: var(--active-tab-width);
-				translate: var(--active-tab-left) 0;
+				/* Span the label only, without the padding of minimal tabs. */
+				width:
+					calc(var(--active-tab-width) - 2 *
+					var(--_wp-ui-tabs-minimal-padding, 0px));
+				translate:
+					calc(var(--active-tab-left) +
+					var(--_wp-ui-tabs-minimal-padding, 0px)) 0;
 			}
 
 			&[data-orientation="vertical"] {
@@ -155,15 +167,11 @@
 
 				&::after {
 					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-					box-shadow:
-						0 0 0 var(--_wp-ui-tabs-background-overhang, 0)
-						var(--wpds-color-background-interactive-neutral-weak-active);
 					opacity: 1;
 				}
 			}
 
 			/* Interaction background and focus indicator. */
-			&::before,
 			&::after {
 				position: absolute;
 				z-index: -1;
@@ -200,45 +208,11 @@
 				}
 			}
 
-			/* Minimal tabs are as wide as their labels, so the background
-			 * extends into the gap between them. A shadow paints that overhang
-			 * because, unlike a negative inset, it adds no scrollable overflow. */
 			.is-minimal-variant[data-orientation="horizontal"] & {
-				--_wp-ui-tabs-background-overhang: var(--wpds-dimension-padding-xs);
-
-				padding-inline: 0;
+				padding-inline: var(--_wp-ui-tabs-minimal-padding);
 
 				&::after {
-					inset-block:
-						calc((48px - var(--wpds-dimension-size-md)) / 2 +
-						var(--_wp-ui-tabs-background-overhang));
 					inset-inline: 0;
-					outline-offset:
-						calc(var(--_wp-ui-tabs-background-overhang) -
-						var(--wpds-border-width-focus));
-				}
-			}
-
-			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
-				/* Paint the ring inside the tab so only the background can be
-				 * clipped. */
-				&::before {
-					content: "";
-					z-index: 0;
-					inset-block: calc((48px - var(--wpds-dimension-size-md)) / 2);
-					inset-inline: 0;
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
-				}
-
-				&:focus-visible {
-					&::before {
-						outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-						opacity: 1;
-					}
-
-					&::after {
-						outline: none;
-					}
 				}
 			}
 
