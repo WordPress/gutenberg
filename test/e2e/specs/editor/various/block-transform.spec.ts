@@ -37,7 +37,7 @@ test.describe( 'Transform block support', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'saves the rotation inline on the block wrapper', async ( {
+	test( 'saves the rotation and fits the block to its content', async ( {
 		editor,
 		page,
 	} ) => {
@@ -56,7 +56,9 @@ test.describe( 'Transform block support', () => {
 
 		await expect
 			.poll( editor.getEditedPostContent )
-			.toContain( '<div class="wp-block-group" style="rotate:30deg">' );
+			.toContain(
+				'<div class="wp-block-group has-rotation" style="rotate:30deg">'
+			);
 
 		const editorGroup = editor.canvas.getByRole( 'document', {
 			name: 'Block: Group',
@@ -69,6 +71,12 @@ test.describe( 'Transform block support', () => {
 		const group = page.locator( '.wp-block-group' );
 		await expect( group ).toHaveAttribute( 'style', 'rotate:30deg' );
 		expect( await getRotate( group ) ).toBe( '30deg' );
+		expect(
+			await group.evaluate(
+				( element ) =>
+					element.offsetWidth < element.parentElement!.offsetWidth
+			)
+		).toBe( true );
 	} );
 
 	test( 'saves only the axis a user sets over a Global Styles axis', async ( {
