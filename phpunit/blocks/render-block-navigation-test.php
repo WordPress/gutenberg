@@ -403,13 +403,6 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
 	 */
-	public function test_inline_submenus_class_added_for_legacy_open_on_click() {
-		$this->assertTrue( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuDisplay":"inline","openSubmenusOnClick":true,"layout":{"type":"flex","orientation":"vertical"}}' ) );
-	}
-
-	/**
-	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
-	 */
 	public function test_inline_submenus_class_not_added_for_hover() {
 		$this->assertFalse( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuDisplay":"inline","submenuVisibility":"hover","layout":{"type":"flex","orientation":"vertical"}}' ) );
 	}

@@ -89,11 +89,6 @@ const v7 = {
 			type: 'boolean',
 			default: false,
 		},
-		submenuDisplay: {
-			type: 'string',
-			enum: [ 'dropdown', 'inline' ],
-			default: 'dropdown',
-		},
 		overlayMenu: {
 			type: 'string',
 			default: 'mobile',
