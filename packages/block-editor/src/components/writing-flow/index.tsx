@@ -14,6 +14,7 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useUndoKeyboardSlide from './use-undo-keyboard-slide';
 import useRestoreTapCaret from './use-restore-tap-caret';
 import usePreventFocusCapture from './use-prevent-focus-capture';
 import useEditableRootEventHandlers from './use-editable-root-event-handlers';
@@ -54,6 +55,7 @@ export function useWritingFlow(): [
 			// back.
 			useRestoreTapCaret(),
 			useSelectionObserver(),
+			useUndoKeyboardSlide(),
 			usePreventFocusCapture(),
 			useClickSelection(),
 			useMultiSelection(),
