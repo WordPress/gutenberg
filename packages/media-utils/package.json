@@ -63,10 +63,12 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
+		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/views": "file:../views",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@storybook/react-vite": "^10.6.8",
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",

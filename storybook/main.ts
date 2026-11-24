@@ -35,6 +35,7 @@ const stories = [
 	'../packages/image-editor/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/media-editor/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/media-fields/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/media-utils/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx|mts|cts)',

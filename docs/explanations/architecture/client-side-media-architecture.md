@@ -423,10 +423,10 @@ Additionally, sideload uploads to the same WordPress post are serialized to prev
 
 ## Upload progress
 
-While uploads are in flight, the editor shows a snackbar with batch progress (`UploadProgressSnackbar` in `@wordpress/editor`). The component is a controller that manages a notice through the notices store, so it positions and stacks with every other editor snackbar. It reads from two sources so progress is reported on both paths:
+While uploads are in flight, a snackbar shows batch progress (`UploadProgressSnackbar` in `@wordpress/media-utils`). The component is a controller that manages a notice through the notices store, so it positions and stacks with every other snackbar on the screen. It reads from two sources so progress is reported on both paths:
 
 -   The `core/upload-media` queue for client-side processing, counting only original user-uploaded files (generated sub-sizes and thumbnails are ignored).
--   An editor-local tracker populated by the editor's `mediaUpload` wrapper for the traditional server-side path.
+-   An in-memory tracker in `@wordpress/media-utils` populated by `uploadMedia()` for the traditional server-side path.
 
 A spinner accompanies the text while uploads run; when the last upload finishes it briefly becomes a checkmark before the snackbar dismisses. For accessibility, `wp.a11y.speak()` announces once when uploads start and once when they complete, avoiding per-tick chatter.
 

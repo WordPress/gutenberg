@@ -2,11 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { select, dispatch } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
 import mediaUpload from '../';
-import {
-	addFiles,
-	getState,
-	reset,
-} from '../../../components/upload-progress-snackbar/tracker';
 
 vi.mock( import( '@wordpress/media-utils' ), () => ( {
 	uploadMedia: vi.fn(),
@@ -28,7 +23,6 @@ function file( name ) {
 
 describe( 'mediaUpload', () => {
 	beforeEach( () => {
-		reset();
 		uploadMedia.mockClear();
 		select.mockReturnValue( {
 			getCurrentPost: () => ( { id: 1 } ),
@@ -44,26 +38,34 @@ describe( 'mediaUpload', () => {
 	} );
 
 	it( 'uploads a batch when the caller takes more than one file', () => {
+		const filesList = [ file( 'a.png' ), file( 'b.png' ) ];
 		mediaUpload( {
-			filesList: [ file( 'a.png' ), file( 'b.png' ) ],
+			filesList,
 			multiple: true,
 		} );
 
-		expect( uploadMedia ).toHaveBeenCalled();
-		expect( getState() ).toEqual(
-			expect.objectContaining( { total: 2, completed: 0 } )
+		expect( uploadMedia ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				filesList,
+				multiple: true,
+				isTransportOnly: false,
+			} )
 		);
 	} );
 
 	it( 'uploads a single file for a caller that only takes one', () => {
+		const filesList = [ file( 'a.png' ) ];
 		mediaUpload( {
-			filesList: [ file( 'a.png' ) ],
+			filesList,
 			multiple: false,
 		} );
 
-		expect( uploadMedia ).toHaveBeenCalled();
-		expect( getState() ).toEqual(
-			expect.objectContaining( { total: 1, completed: 0 } )
+		expect( uploadMedia ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				filesList,
+				multiple: false,
+				isTransportOnly: false,
+			} )
 		);
 	} );
 
@@ -81,24 +83,5 @@ describe( 'mediaUpload', () => {
 			'Only one file can be used here.'
 		);
 		expect( uploadMedia ).not.toHaveBeenCalled();
-	} );
-
-	it( 'keeps a refused batch out of the upload progress tracker', () => {
-		// `uploadMedia()` reports the refusal as a single error, so registering
-		// the batch here would strand the rest of it as "uploading" forever -
-		// and the tracker folds every later upload into that stuck session
-		// (see gutenberg#82041).
-		mediaUpload( {
-			filesList: [ file( 'a.png' ), file( 'b.png' ), file( 'c.png' ) ],
-			multiple: false,
-		} );
-
-		expect( getState() ).toBeNull();
-
-		// The next upload therefore starts a session of its own.
-		addFiles( [ 'later.png' ] );
-		expect( getState() ).toEqual(
-			expect.objectContaining( { total: 1, completed: 0 } )
-		);
 	} );
 } );

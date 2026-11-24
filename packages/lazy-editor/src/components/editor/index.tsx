@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner as WCSpinner } from '@wordpress/components';
@@ -15,8 +16,8 @@ const {
 	PreferencesModal,
 	ToolsMoreMenuGroup,
 	SiteExport,
-	UploadProgressSnackbar,
 } = unlock( editorPrivateApis );
+const { UploadProgressSnackbar } = unlock( mediaUtilsPrivateApis );
 
 interface EditorProps {
 	postType?: string;

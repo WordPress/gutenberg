@@ -22,6 +22,8 @@ import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline'
 import mediaEditorRtl from '../package-styles/media-editor-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+import mediaUtilsLtr from '../package-styles/media-utils-ltr.lazy.scss?inline';
+import mediaUtilsRtl from '../package-styles/media-utils-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
 
 /**
@@ -70,8 +72,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^editor-/,
-		ltr: [ componentsLtr, editorLtr ],
-		rtl: [ componentsRtl, editorRtl ],
+		ltr: [ componentsLtr, editorLtr, mediaUtilsLtr ],
+		rtl: [ componentsRtl, editorRtl, mediaUtilsRtl ],
 	},
 	{
 		componentIdMatcher: /^icons-/,

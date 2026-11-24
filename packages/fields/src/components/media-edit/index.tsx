@@ -51,7 +51,9 @@ import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';
 
-const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
+const { MediaUploadModal, UploadProgressSnackbar } = unlock(
+	mediaUtilsPrivateApis
+);
 
 function AnimatedMediaItem( {
 	children,
@@ -1062,6 +1064,7 @@ export function MediaEditControl< Item >( {
 					message={ customValidity.message }
 				/>
 			) }
+			<UploadProgressSnackbar />
 		</Stack>
 	);
 }

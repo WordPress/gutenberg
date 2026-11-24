@@ -53,6 +53,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {

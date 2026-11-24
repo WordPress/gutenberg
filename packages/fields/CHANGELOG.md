@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `MediaEdit`: Mount `UploadProgressSnackbar` inside `MediaEditControl` so upload progress snackbars display when uploading media outside the editor. ([#87257](https://github.com/WordPress/gutenberg/pull/87257))
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
