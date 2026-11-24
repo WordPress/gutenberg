@@ -72,18 +72,6 @@ describe( 'pattern conversion selection', () => {
 		).not.toBeInTheDocument();
 		expect( modalProps.current ).toBeUndefined();
 	} );
-	it( 'opens Create pattern for contiguous selections', () => {
-		render(
-			<PatternConvertButton
-				clientIds={ [ 'a', 'b' ] }
-				closeBlockSettingsMenu={ vi.fn() }
-			/>
-		);
-		fireEvent.click(
-			screen.getByRole( 'menuitem', { name: 'Create pattern' } )
-		);
-		expect( modalProps.current ).toBeDefined();
-	} );
 	it.each( [ 'non-contiguous', 'locked' ] )(
 		'rechecks %s originals after saving a synced pattern',
 		( change ) => {

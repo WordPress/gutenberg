@@ -100,18 +100,6 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 	} );
 
-	test( 'stores selected client IDs in collaborative selection history', () => {
-		const selection = {
-			selectionStart: { clientId: 'block-1' },
-			selectionEnd: { clientId: 'block-3' },
-			setSelectionClientIds: [ 'block-1', 'block-3' ],
-		};
-		history.updateSelection( selection );
-		expect( history.getSelectionHistory()[ 0 ] ).toMatchObject( {
-			setSelectionClientIds: [ 'block-1', 'block-3' ],
-		} );
-	} );
-
 	test( 'keeps separate history entries when selected client IDs change but selection start and end do not', () => {
 		const selection = {
 			selectionStart: { clientId: 'block-1' },
@@ -126,7 +114,15 @@ describe( 'BlockSelectionHistory', () => {
 			setSelectionClientIds: [ 'block-1', 'block-2', 'block-3' ],
 		} );
 		history.updateSelection( selection );
-		expect( history.getSelectionHistory() ).toHaveLength( 3 );
+		expect(
+			history
+				.getSelectionHistory()
+				.map( ( entry ) => entry.setSelectionClientIds )
+		).toEqual( [
+			undefined,
+			[ 'block-1', 'block-2', 'block-3' ],
+			[ 'block-1', 'block-3' ],
+		] );
 	} );
 
 	describe( 'updateSelection with relative positions', () => {

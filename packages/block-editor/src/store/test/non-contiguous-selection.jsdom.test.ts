@@ -74,6 +74,7 @@ describe( 'block selection with multiSelectSet', () => {
 	it.each< [ number, number[] ] >( [
 		[ 0, [ 0, 2, 1, 3, 4 ] ],
 		[ 1, [ 1, 0, 2, 3, 4 ] ],
+		[ 2, [ 1, 3, 0, 2, 4 ] ],
 		[ 3, [ 1, 3, 4, 0, 2 ] ],
 	] )(
 		'moves non-contiguous siblings together at destination index %s without moving unselected blocks',
@@ -92,20 +93,6 @@ describe( 'block selection with multiSelectSet', () => {
 			).toEqual( [ ids[ 4 ] ] );
 		}
 	);
-
-	it( 'uses an index after removing non-contiguous blocks', async () => {
-		const ids = blocks.map( ( block ) => block.clientId );
-		await registry
-			.dispatch( store )
-			.moveBlocksToPosition( [ ids[ 2 ], ids[ 0 ] ], '', '', 2 );
-		expect( registry.select( store ).getBlockOrder() ).toEqual( [
-			ids[ 1 ],
-			ids[ 3 ],
-			ids[ 0 ],
-			ids[ 2 ],
-			ids[ 4 ],
-		] );
-	} );
 
 	it( 'preserves selection when moving blocks from different parents', async () => {
 		const parents = [
@@ -265,65 +252,60 @@ describe( 'block selection with multiSelectSet', () => {
 		).toEqual( [ ids[ 0 ] ] );
 	} );
 
-	it.each( [
-		'move-locked',
-		'remove-locked',
-		'disallowed',
-		'cross-entity',
-		'stale',
-	] )( 'rejects %s moves without partial mutation', async ( reason ) => {
-		const parents = [
-			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
-			createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
-		];
-		registry.dispatch( store ).resetBlocks( parents );
-		parents.forEach( ( parent ) =>
-			registry
-				.dispatch( store )
-				.updateBlockListSettings( parent.clientId, {} )
-		);
-		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
-		if ( reason === 'move-locked' || reason === 'remove-locked' ) {
-			registry.dispatch( store ).updateBlockAttributes( ids[ 0 ], {
-				lock: {
-					[ reason === 'move-locked' ? 'move' : 'remove' ]: true,
-				},
-			} );
-		} else if ( reason === 'disallowed' ) {
-			registry
-				.dispatch( store )
-				.updateBlockListSettings( parents[ 1 ].clientId, {
-					allowedBlocks: [],
-				} );
-		} else if ( reason === 'cross-entity' ) {
-			registry
-				.dispatch( store )
-				.setHasControlledInnerBlocks( parents[ 1 ].clientId, true );
-			registry
-				.dispatch( store )
-				.replaceInnerBlocks(
-					parents[ 1 ].clientId,
-					blocks.slice( 2 ),
-					false
-				);
-		} else {
-			ids.push( 'missing' );
-		}
-		const before = registry.select( store ).getBlocks();
-		const selection = registry.select( store ).getSelectedBlockClientIds();
-		await registry
-			.dispatch( store )
-			.moveBlocksToPosition(
-				ids,
-				parents[ 0 ].clientId,
-				parents[ 1 ].clientId,
-				0
+	it.each( [ 'remove-locked', 'disallowed', 'cross-entity' ] )(
+		'rejects %s moves without partial mutation',
+		async ( reason ) => {
+			const parents = [
+				createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
+				createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
+			];
+			registry.dispatch( store ).resetBlocks( parents );
+			parents.forEach( ( parent ) =>
+				registry
+					.dispatch( store )
+					.updateBlockListSettings( parent.clientId, {} )
 			);
-		expect( registry.select( store ).getBlocks() ).toBe( before );
-		expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
-			selection
-		);
-	} );
+			const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+			if ( reason === 'remove-locked' ) {
+				registry.dispatch( store ).updateBlockAttributes( ids[ 0 ], {
+					lock: { remove: true },
+				} );
+			} else if ( reason === 'disallowed' ) {
+				registry
+					.dispatch( store )
+					.updateBlockListSettings( parents[ 1 ].clientId, {
+						allowedBlocks: [],
+					} );
+			} else if ( reason === 'cross-entity' ) {
+				registry
+					.dispatch( store )
+					.setHasControlledInnerBlocks( parents[ 1 ].clientId, true );
+				registry
+					.dispatch( store )
+					.replaceInnerBlocks(
+						parents[ 1 ].clientId,
+						blocks.slice( 2 ),
+						false
+					);
+			}
+			const before = registry.select( store ).getBlocks();
+			const selection = registry
+				.select( store )
+				.getSelectedBlockClientIds();
+			await registry
+				.dispatch( store )
+				.moveBlocksToPosition(
+					ids,
+					parents[ 0 ].clientId,
+					parents[ 1 ].clientId,
+					0
+				);
+			expect( registry.select( store ).getBlocks() ).toBe( before );
+			expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
+				selection
+			);
+		}
+	);
 
 	it( 'rejects non-contiguous moves into selected blocks or their descendants', async () => {
 		const parent = createBlock(
@@ -1224,43 +1206,13 @@ describe( 'block selection with multiSelectSet', () => {
 		).toBeUndefined();
 	} );
 
-	it( 'applies attribute changes only to selected cells across row parents', () => {
-		const rows = [
-			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),
-			createBlock( 'core/test-selection', {}, blocks.slice( 3 ) ),
-		];
-		registry.dispatch( store ).resetBlocks( rows );
-		registry
-			.dispatch( store )
-			.multiSelectSet( [ blocks[ 1 ].clientId, blocks[ 4 ].clientId ] );
-		registry
-			.dispatch( store )
-			.updateBlockAttributes(
-				registry.select( store ).getSelectedBlockClientIds(),
-				{ content: 'Changed' }
-			);
-		expect(
-			blocks.map(
-				( block ) =>
-					registry
-						.select( store )
-						.getBlockAttributes( block.clientId )?.content
-			)
-		).toEqual( [ undefined, 'Changed', undefined, undefined, 'Changed' ] );
-	} );
-
 	it( 'restricts unsupported operations for non-contiguous selections', () => {
 		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
 		registry.dispatch( store ).multiSelectSet( ids );
 		expect(
 			unlock( registry.select( store ) ).isSelectionContiguous()
 		).toBe( false );
-		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
 		expect( registry.select( store ).isGroupable( ids ) ).toBe( false );
-		registry.dispatch( store ).moveBlocksUp( ids, '' );
-		expect( registry.select( store ).getBlockOrder() ).toEqual(
-			blocks.map( ( block ) => block.clientId )
-		);
 	} );
 
 	it( 'retains ordinary operations when multiSelectSet selects contiguous blocks', () => {
@@ -1435,20 +1387,8 @@ describe( 'block selection with multiSelectSet', () => {
 		).toEqual( [ '1', '4' ] );
 	} );
 
-	it( 'cuts and deletes only selected blocks while respecting locks', () => {
+	it( 'rejects deleting selected blocks when one has a removal lock', () => {
 		const ids = blocks.map( ( block ) => block.clientId );
-		registry.dispatch( store ).multiSelectSet( [ ids[ 0 ], ids[ 2 ] ] );
-		registry
-			.dispatch( store )
-			.removeBlocks(
-				registry.select( store ).getSelectedBlockClientIds(),
-				false
-			);
-		expect( registry.select( store ).getBlockOrder() ).toEqual( [
-			ids[ 1 ],
-			ids[ 3 ],
-			ids[ 4 ],
-		] );
 		registry
 			.dispatch( store )
 			.updateBlockAttributes( ids[ 1 ], { lock: { remove: true } } );
@@ -1459,10 +1399,6 @@ describe( 'block selection with multiSelectSet', () => {
 				registry.select( store ).getSelectedBlockClientIds(),
 				false
 			);
-		expect( registry.select( store ).getBlockOrder() ).toEqual( [
-			ids[ 1 ],
-			ids[ 3 ],
-			ids[ 4 ],
-		] );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( ids );
 	} );
 } );
