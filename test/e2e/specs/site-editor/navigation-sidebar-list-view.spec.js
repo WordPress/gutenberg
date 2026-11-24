@@ -405,6 +405,57 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			listView.getByRole( 'row', { name: 'Test Page 2' } )
 		).toBeVisible();
 	} );
+
+	test( 'can add submenu links from the Options menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Add Submenu Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Existing Item' } );
+
+		await test.step( 'a link becomes a submenu holding the new link', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'a submenu gets the new link at its end', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 2' } )
+					.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+		} );
+	} );
 } );
 
 class LinkControl {
