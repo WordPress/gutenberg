@@ -399,7 +399,7 @@ export const PackageCard = ( {
 						>
 							Learn more about { title }
 						</Link>
-						<Link href={ docsHref } openInNewTab>
+						<Link href={ docsHref }>
 							Developer documentation
 						</Link>
 					</Stack>
