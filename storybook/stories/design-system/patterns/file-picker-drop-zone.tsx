@@ -69,7 +69,10 @@ export function FilePickerDropZone( { disabled = false } ) {
 
 	return (
 		<Fieldset.Root
-			className={ styles.field }
+			// The drop target covers the whole field, so the overlay has room for
+			// its icon and label, and a file dropped on the legend or description
+			// doesn't open in the browser tab.
+			className={ `${ styles.field } ${ styles[ 'drop-target' ] }` }
 			disabled={ disabled }
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }
@@ -131,15 +134,15 @@ export function FilePickerDropZone( { disabled = false } ) {
 								onClick={ removeFile }
 							/>
 						) }
-						{ ! disabled && (
-							<DropZone
-								label="Drop to use as the cover image"
-								onFilesDrop={ chooseFiles }
-							/>
-						) }
 					</Stack>
 				) }
 			/>
+			{ ! disabled && (
+				<DropZone
+					label="Drop to use as the cover image"
+					onFilesDrop={ chooseFiles }
+				/>
+			) }
 			<Fieldset.Description>
 				Drop one PNG here, or choose a file.
 			</Fieldset.Description>
