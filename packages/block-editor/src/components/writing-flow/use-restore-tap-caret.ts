@@ -13,6 +13,7 @@ export default function useRestoreTapCaret() {
 		// A mounted element's document has a window, with a selection.
 		const selection = ownerDocument.defaultView!.getSelection()!;
 		let caret: Range | undefined;
+		let field: Node | undefined;
 
 		function onFocusIn( event: FocusEvent ) {
 			caret =
@@ -21,6 +22,7 @@ export default function useRestoreTapCaret() {
 				( event.target as Node ).contains( selection.anchorNode )
 					? selection.getRangeAt( 0 ).cloneRange()
 					: undefined;
+			field = caret && ( event.target as Node );
 			// TEMPORARY (debugging a flaky iOS test).
 			( window as any ).__iosTestLog?.(
 				'restore:save',
@@ -39,13 +41,23 @@ export default function useRestoreTapCaret() {
 
 		function onSelectionChange() {
 			const { activeElement } = ownerDocument;
+			if ( ! caret ) {
+				return;
+			}
 			// iOS's repeated tap either moves the caret out of the field or
-			// clears the selection.
-			if (
-				caret &&
-				( ! selection.anchorNode ||
-					! activeElement?.contains( selection.anchorNode ) )
-			) {
+			// clears the selection while the field keeps focus. Something
+			// else that clears it, such as selecting a whole block, also
+			// moves focus away from the field.
+			const isMoved =
+				!! selection.anchorNode &&
+				! activeElement?.contains( selection.anchorNode );
+			const isCleared =
+				! selection.anchorNode && activeElement === field;
+			// TEMPORARY (debugging a flaky iOS test).
+			if ( ! selection.anchorNode && ! isCleared ) {
+				( window as any ).__iosTestLog?.( 'restore:skip-cleared' );
+			}
+			if ( isMoved || isCleared ) {
 				// TEMPORARY (debugging a flaky iOS test).
 				( window as any ).__iosTestLog?.( 'restore:before' );
 				selection.removeAllRanges();
