@@ -186,13 +186,17 @@ describe( 'Notice.List', () => {
 							<li>Reload</li>
 						</ul>
 						Then try <div>again</div>
+						<fieldset>
+							<legend>Connection lost</legend>
+							Offline
+						</fieldset>
 					</Notice.Description>
 				</Notice.Root>
 			</Notice.List>
 		);
 		await waitFor( () =>
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
-				/^Changes not saved\. Retry later\. Check your connection\. Re-sync Reload Then try again$/,
+				/^Changes not saved\. Retry later\. Check your connection\. Re-sync Reload Then try again Connection lost Offline$/,
 				{ normalizeWhitespace: false }
 			)
 		);

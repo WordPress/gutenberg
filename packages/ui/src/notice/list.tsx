@@ -11,7 +11,7 @@ const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
 // Elements that start a new line with default styles. Text alone would join
 // the words on either side, such as `Retry<br>later`.
 const LINE_BREAKING =
-	'address, article, aside, blockquote, br, dd, details, div, dl, dt, fieldset, figcaption, figure, footer, h1, h2, h3, h4, h5, h6, header, hr, li, main, nav, ol, p, pre, section, summary, table, td, th, tr, ul';
+	'address, article, aside, blockquote, br, caption, dd, details, div, dl, dt, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hr, legend, li, main, menu, nav, ol, p, pre, section, summary, table, td, th, tr, ul';
 
 type Announcement = {
 	id: number;
