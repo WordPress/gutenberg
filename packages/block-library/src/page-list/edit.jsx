@@ -347,9 +347,17 @@ export default function PageListEdit( {
 	// "Auto add new pages" setting is switched on so new pages keep arriving.
 	// The query stops at MAX_PAGE_COUNT, so the total decides: converting a
 	// longer list would drop the pages past the first MAX_PAGE_COUNT.
+	// Converting also drops the list's own attributes, such as its styles,
+	// so a list that has any keeps Detach and its warning.
+	const hasOwnAttributes = Object.entries( attributes ).some(
+		( [ key, value ] ) =>
+			value !== undefined &&
+			! [ 'parentPageID', 'lock', 'metadata' ].includes( key )
+	);
 	const isLinkMode =
 		isChildOfNavigation &&
 		canConvert &&
+		! hasOwnAttributes &&
 		allowConvertToLinks &&
 		totalItems !== null &&
 		totalItems <= MAX_PAGE_COUNT;

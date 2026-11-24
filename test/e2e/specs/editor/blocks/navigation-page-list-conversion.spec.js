@@ -118,6 +118,35 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'a Page List with its own styles stays a Page List', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPage( { title: 'Alpha', status: 'publish' } );
+		// Converting would drop the styles, so it keeps Detach and its warning.
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Styled menu',
+			content:
+				'<!-- wp:page-list {"style":{"color":{"text":"#ff0000"}}} /-->',
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+
+		const pageList = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		await expect( pageList.getByText( 'Alpha' ) ).toBeVisible( {
+			timeout: 10000,
+		} );
+		await expect(
+			pageList.getByRole( 'document', { name: 'Block: Page Link' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'a Page List in a Navigation block without a menu stays a Page List', async ( {
 		admin,
 		editor,
