@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/render-result-naming-convention */
 
 import type { ReactElement } from 'react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import {
 	createBlock,
 	getBlockTypes,
@@ -11,7 +11,18 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { renderToString } from '@wordpress/element';
-import InnerBlocks from '../';
+import { useRegistry } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
+import { render, waitFor } from '@testing-library/react';
+import InnerBlocks, { useInnerBlocksProps } from '../';
+import type { InnerBlocksOptions } from '../types';
+import { BlockEditorProvider } from '../../provider';
+import { BlockEditContextProvider } from '../../block-edit/context';
+import { store as blockEditorStore } from '../../../store';
+import {
+	detachesOnEditKey,
+	isMoveTransparentKey,
+} from '../../../store/private-keys';
 
 describe( 'InnerBlocks', () => {
 	afterEach( () => {
@@ -106,6 +117,74 @@ describe( 'InnerBlocks', () => {
 		block.originalContent = 'Original';
 
 		expect( serialize( block ) ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'useInnerBlocksProps', () => {
+	// Unregistered once the containers have unmounted.
+	beforeAll( () => {
+		registerBlockType( 'core/container', {
+			apiVersion: 3,
+			category: 'text',
+			title: 'Container',
+			attributes: {},
+			save: () => null,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'core/container' );
+	} );
+
+	// Renders a container with the options, and returns a getter for the
+	// block list settings they lead to.
+	function renderContainer( options: InnerBlocksOptions ) {
+		const block = createBlock( 'core/container' );
+		let registry: DataRegistry | undefined;
+		function Container() {
+			registry = useRegistry();
+			return <div { ...useInnerBlocksProps( {}, options ) } />;
+		}
+		render(
+			<BlockEditorProvider value={ [ block ] }>
+				<BlockEditContextProvider
+					value={ {
+						name: 'core/container',
+						clientId: block.clientId,
+					} }
+				>
+					<Container />
+				</BlockEditContextProvider>
+			</BlockEditorProvider>
+		);
+		return () =>
+			registry!
+				.select( blockEditorStore )
+				.getBlockListSettings( block.clientId );
+	}
+
+	it( 'keeps the private options in the block list settings', async () => {
+		const getSettings = renderContainer( {
+			[ isMoveTransparentKey ]: true,
+			[ detachesOnEditKey ]: true,
+		} );
+
+		// The settings land in a microtask.
+		await waitFor( () => {
+			expect( getSettings()?.[ isMoveTransparentKey ] ).toBe( true );
+			expect( getSettings()?.[ detachesOnEditKey ] ).toBe( true );
+		} );
+	} );
+
+	it( 'leaves out the private settings for options under their names', async () => {
+		const getSettings = renderContainer( {
+			isMoveTransparent: true,
+			detachesOnEdit: true,
+		} as InnerBlocksOptions );
+
+		await waitFor( () => expect( getSettings() ).toBeDefined() );
+		expect( getSettings()?.[ isMoveTransparentKey ] ).toBeUndefined();
+		expect( getSettings()?.[ detachesOnEditKey ] ).toBeUndefined();
 	} );
 } );
 

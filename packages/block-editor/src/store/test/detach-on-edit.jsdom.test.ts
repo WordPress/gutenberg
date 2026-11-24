@@ -8,6 +8,7 @@ import {
 import type { BlockConfiguration } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../index';
 import { unlock } from '../../lock-unlock';
+import { detachesOnEditKey } from '../private-keys';
 
 const blockSettings = {
 	apiVersion: 3,
@@ -44,8 +45,9 @@ function setUp() {
 	const select = unlock( registry.select( blockEditorStore ) );
 	dispatch.resetBlocks( blocks );
 	// Containers need list settings to accept blocks.
-	dispatch.updateBlockListSettings( ids.list, {} );
-	dispatch.setBlockDetachesOnEdit( ids.list, true );
+	dispatch.updateBlockListSettings( ids.list, {
+		[ detachesOnEditKey ]: true,
+	} );
 
 	// Whether the list was still there each time the store notified.
 	const listSeen: boolean[] = [];
@@ -89,6 +91,10 @@ describe( 'blocks that detach on edit', () => {
 			expect( t.select.isLastBlockChangePersistent() ).toBe( true );
 			// The inner blocks keep their client IDs, so selection survives.
 			expect( t.select.getSelectedBlockClientId() ).toBe( t.ids.y );
+			// The setting goes with the list.
+			expect(
+				t.select.getBlockListSettings( t.ids.list )
+			).toBeUndefined();
 		} );
 
 		it( 'a block moves in', () => {
@@ -247,7 +253,7 @@ describe( 'blocks that detach on edit', () => {
 		} );
 
 		it( 'they no longer detach on edit', () => {
-			t.dispatch.setBlockDetachesOnEdit( t.ids.list, false );
+			t.dispatch.updateBlockListSettings( t.ids.list, {} );
 
 			t.dispatch.updateBlockAttributes( t.ids.x, { label: 'X' } );
 
@@ -295,7 +301,9 @@ describe( 'blocks that detach on edit', () => {
 		control( menu.clientId, [ home, list ] );
 		control( list.clientId, [ x, y ] );
 		dispatch.updateBlockListSettings( menu.clientId, {} );
-		dispatch.setBlockDetachesOnEdit( list.clientId, true );
+		dispatch.updateBlockListSettings( list.clientId, {
+			[ detachesOnEditKey ]: true,
+		} );
 
 		dispatch.moveBlocksToPosition(
 			[ y.clientId ],

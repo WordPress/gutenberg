@@ -39,6 +39,7 @@ import {
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	isMoveTransparentKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
@@ -1480,7 +1481,7 @@ export function isSelectedBlockStyleStateShownOnCanvas(
 
 /**
  * Returns whether one-step moves treat a block as transparent. See
- * `setBlockMoveTransparent`.
+ * `isMoveTransparentKey`.
  *
  * @param state    Block editor state.
  * @param clientId The block's client ID.
@@ -1488,12 +1489,12 @@ export function isSelectedBlockStyleStateShownOnCanvas(
  * @return Whether the block is transparent to one-step moves.
  */
 export function isBlockMoveTransparent( state: State, clientId: string ) {
-	return !! state.moveTransparentBlocks[ clientId ];
+	return !! state.blockListSettings.get( clientId )?.[ isMoveTransparentKey ];
 }
 
 /**
  * Returns the blocks that the latest change to the blocks replaced with their
- * inner blocks, because they detach on edit. See `setBlockDetachesOnEdit`.
+ * inner blocks, because they detach on edit. See `detachesOnEditKey`.
  *
  * @param state Block editor state.
  *

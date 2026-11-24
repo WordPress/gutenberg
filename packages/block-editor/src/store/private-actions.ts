@@ -382,51 +382,6 @@ export function stopDragging() {
 }
 
 /**
- * Makes one-step moves (the block movers and their keyboard shortcuts) treat a
- * block as transparent: its children count as siblings of the blocks around
- * it, so a neighbor moves past one child at a time instead of past the whole
- * block, and an edge child can move out.
- *
- * @param clientId      The block's client ID.
- * @param isTransparent Whether the block is transparent.
- *
- * @return Action object.
- */
-export function setBlockMoveTransparent(
-	clientId: string,
-	isTransparent: boolean
-) {
-	return {
-		type: 'SET_BLOCK_MOVE_TRANSPARENT' as const,
-		clientId,
-		isTransparent,
-	};
-}
-
-/**
- * Makes a block stand in for its inner blocks until they're edited: the first
- * persistent change to them also replaces the block with them, as part of the
- * same change, so a single undo step reverts both. Changes that aren't
- * persistent, or are left out of the undo history (such as an inner block
- * controller resetting the inner blocks), leave the block in place.
- *
- * @param clientId       The block's client ID.
- * @param detachesOnEdit Whether the block detaches on edit.
- *
- * @return Action object.
- */
-export function setBlockDetachesOnEdit(
-	clientId: string,
-	detachesOnEdit: boolean
-) {
-	return {
-		type: 'SET_BLOCK_DETACHES_ON_EDIT' as const,
-		clientId,
-		detachesOnEdit,
-	};
-}
-
-/**
  * @param clientId The block's clientId, or `null` to clear.
  *
  * @return  Action object.

@@ -24,8 +24,10 @@ import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
+	detachesOnEditKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	isMoveTransparentKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
@@ -341,6 +343,8 @@ export type BlockListSettings = Record< string, unknown > & {
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	/** A function is deprecated. */
 	directInsert?: boolean | ( ( ...args: never[] ) => unknown );
+	[ isMoveTransparentKey ]?: true;
+	[ detachesOnEditKey ]?: true;
 };
 
 export interface ShowInsertionPointOptions {
@@ -565,7 +569,7 @@ export interface RemovalPromptData {
 }
 
 /**
- * A block a change replaced with its inner blocks. See `setBlockDetachesOnEdit`.
+ * A block a change replaced with its inner blocks. See `detachesOnEditKey`.
  */
 export interface DetachedBlock {
 	clientId: string;
@@ -602,8 +606,6 @@ export interface State {
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
-	moveTransparentBlocks: Record< string, true >;
-	detachOnEditBlocks: Record< string, true >;
 	lastDetachedBlocks: DetachedBlock[];
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
@@ -757,16 +759,6 @@ export type Action =
 			mode: BlockEditingMode;
 	  }
 	| { type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW'; clientId: string | null }
-	| {
-			type: 'SET_BLOCK_DETACHES_ON_EDIT';
-			clientId: string;
-			detachesOnEdit: boolean;
-	  }
-	| {
-			type: 'SET_BLOCK_MOVE_TRANSPARENT';
-			clientId: string;
-			isTransparent: boolean;
-	  }
 	| {
 			type: 'SET_BLOCK_REMOVAL_RULES';
 			rules: BlockRemovalRule[] | false;

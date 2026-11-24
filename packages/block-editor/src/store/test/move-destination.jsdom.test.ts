@@ -8,6 +8,7 @@ import {
 import type { BlockConfiguration } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../index';
 import { unlock } from '../../lock-unlock';
+import { isMoveTransparentKey } from '../private-keys';
 
 const blockSettings = {
 	apiVersion: 3,
@@ -93,7 +94,9 @@ describe( 'getBlockMoveDestination', () => {
 	} );
 
 	it( 'passes the children of a transparent block one at a time', () => {
-		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockListSettings( t.ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 
 		// Past x, into the list.
 		expect( t.destination( t.ids.a, 'down' ) ).toEqual( {
@@ -108,7 +111,9 @@ describe( 'getBlockMoveDestination', () => {
 	} );
 
 	it( 'steps an edge child out of a transparent block, past the block beyond', () => {
-		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockListSettings( t.ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 
 		// Before a.
 		expect( t.destination( t.ids.x, 'up' ) ).toEqual( {
@@ -123,7 +128,9 @@ describe( 'getBlockMoveDestination', () => {
 	} );
 
 	it( 'keeps an edge child in a transparent block with nothing beyond it', () => {
-		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockListSettings( t.ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 		// Make the list the last block, so nothing is beyond it.
 		t.dispatch.moveBlocksToPosition( [ t.ids.list ], '', '', 4 );
 
@@ -131,7 +138,9 @@ describe( 'getBlockMoveDestination', () => {
 	} );
 
 	it( 'passes a transparent block whole when it is shown collapsed', () => {
-		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockListSettings( t.ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 
 		expect(
 			t.destination( t.ids.a, 'down', { isExpanded: () => false } )
@@ -147,7 +156,9 @@ describe( 'getBlockMoveDestination', () => {
 	} );
 
 	it( 'keeps a block that cannot be removed in its parent', () => {
-		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockListSettings( t.ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 		t.dispatch.updateBlockAttributes( t.ids.a, {
 			lock: { remove: true },
 		} );
@@ -196,7 +207,9 @@ describe( 'moveBlocksDown', () => {
 
 	it( 'moves into a transparent block past its first child', () => {
 		const { ids, dispatch, select } = setUp();
-		dispatch.setBlockMoveTransparent( ids.list, true );
+		dispatch.updateBlockListSettings( ids.list, {
+			[ isMoveTransparentKey ]: true,
+		} );
 
 		dispatch.moveBlocksDown( [ ids.a ], '' );
 

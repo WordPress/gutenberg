@@ -50,7 +50,11 @@ import {
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	isMoveTransparentKey,
+} from '.././private-keys';
 import type {
 	Action,
 	BlocksState,
@@ -3747,6 +3751,34 @@ describe( 'state', () => {
 					],
 				] )
 			);
+		} );
+
+		it( 'should update private settings, which have symbol keys', () => {
+			const clientId = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+			const original = deepFreeze(
+				new Map( [ [ clientId, { allowedBlocks: true } ] ] )
+			);
+
+			const added = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				clientId,
+				settings: {
+					allowedBlocks: true,
+					[ isMoveTransparentKey ]: true,
+				},
+			} );
+			const removed = blockListSettings( added, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				clientId,
+				settings: { allowedBlocks: true },
+			} );
+
+			expect( added.get( clientId )?.[ isMoveTransparentKey ] ).toBe(
+				true
+			);
+			expect(
+				removed.get( clientId )?.[ isMoveTransparentKey ]
+			).toBeUndefined();
 		} );
 
 		it( 'should remove existing settings if updated settings not assigned', () => {

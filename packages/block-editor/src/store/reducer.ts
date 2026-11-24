@@ -9,7 +9,11 @@ import {
 import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	detachesOnEditKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	Action,
@@ -1930,6 +1934,29 @@ export function preferences(
 }
 
 /**
+ * Returns whether two block list settings are the same. `fastDeepEqual` skips
+ * symbol keys, so the private settings, which have them, are compared here.
+ *
+ * @param previous The current settings.
+ * @param next     The new settings.
+ *
+ * @return Whether the settings are the same.
+ */
+function areBlockListSettingsEqual(
+	previous: BlockListSettings | undefined,
+	next: BlockListSettings
+) {
+	const privateKeys = Object.getOwnPropertySymbols( {
+		...previous,
+		...next,
+	} ) as Array< keyof BlockListSettings & symbol >;
+	return (
+		fastDeepEqual( previous, next ) &&
+		privateKeys.every( ( key ) => previous?.[ key ] === next[ key ] )
+	);
+}
+
+/**
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
@@ -1981,7 +2008,10 @@ export const blockListSettings = (
 				( [ clientId, nextSettings ] ) =>
 					! nextSettings
 						? state.has( clientId )
-						: ! fastDeepEqual( state.get( clientId ), nextSettings )
+						: ! areBlockListSettingsEqual(
+								state.get( clientId ),
+								nextSettings
+							)
 			);
 
 			if ( ! relevantUpdates.length ) {
@@ -2096,58 +2126,6 @@ export function expandedBlock(
 	}
 
 	return state;
-}
-
-/**
- * Reducer returning the blocks that one-step moves treat as transparent: their
- * children count as siblings of the blocks around them.
- *
- * @param state  Current state.
- * @param action Dispatched action.
- *
- * @return Updated state.
- */
-export function moveTransparentBlocks(
-	state: State[ 'moveTransparentBlocks' ] = {},
-	action: Action
-) {
-	if ( action.type !== 'SET_BLOCK_MOVE_TRANSPARENT' ) {
-		return state;
-	}
-	if ( action.isTransparent === !! state[ action.clientId ] ) {
-		return state;
-	}
-	if ( action.isTransparent ) {
-		return { ...state, [ action.clientId ]: true as const };
-	}
-	const { [ action.clientId ]: _removed, ...rest } = state;
-	return rest;
-}
-
-/**
- * Reducer returning the blocks that detach on edit. See
- * `setBlockDetachesOnEdit`.
- *
- * @param state  Current state.
- * @param action Dispatched action.
- *
- * @return Updated state.
- */
-export function detachOnEditBlocks(
-	state: State[ 'detachOnEditBlocks' ] = {},
-	action: Action
-) {
-	if ( action.type !== 'SET_BLOCK_DETACHES_ON_EDIT' ) {
-		return state;
-	}
-	if ( action.detachesOnEdit === !! state[ action.clientId ] ) {
-		return state;
-	}
-	if ( action.detachesOnEdit ) {
-		return { ...state, [ action.clientId ]: true as const };
-	}
-	const { [ action.clientId ]: _removed, ...rest } = state;
-	return rest;
 }
 
 /**
@@ -2631,8 +2609,6 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	lastFocus,
 	expandedBlock,
-	moveTransparentBlocks,
-	detachOnEditBlocks,
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,
@@ -3476,7 +3452,7 @@ function getInnerBlocksInTree( blocksState: BlocksState, clientId: string ) {
 
 /**
  * Higher-order reducer that detaches the blocks marked to detach on edit (see
- * `setBlockDetachesOnEdit`). When a persistent change alters the inner blocks
+ * `detachesOnEditKey`). When a persistent change alters the inner blocks
  * of such a block, the same action replaces the block with them, so
  * subscribers (such as an inner block controller recording undo levels) see a
  * single change.
@@ -3498,9 +3474,13 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 		const detached: DetachedBlock[] = [];
 		const { isPersistentChange, isIgnoredChange } = nextState.blocks;
 		if ( state && isPersistentChange && ! isIgnoredChange ) {
-			for ( const clientId of Object.keys(
-				nextState.detachOnEditBlocks
-			) ) {
+			for ( const [
+				clientId,
+				listSettings,
+			] of nextState.blockListSettings ) {
+				if ( ! listSettings[ detachesOnEditKey ] ) {
+					continue;
+				}
 				const block = nextState.blocks.byClientId.get( clientId );
 				// The block's own changes, such as to its attributes or its
 				// position, leave its inner blocks as they are.

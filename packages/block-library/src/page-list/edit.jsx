@@ -8,6 +8,7 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -30,6 +31,10 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { DEFAULT_BLOCK } from '../navigation/constants';
 import { unlock } from '../lock-unlock';
+
+const { isMoveTransparentKey, detachesOnEditKey } = unlock(
+	blockEditorPrivateApis
+);
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -391,30 +396,7 @@ export default function PageListEdit( {
 	// "Auto add new pages" on, so there is no separate Detach.
 	const canDetach = allowConvertToLinks && ! isLinkMode;
 
-	const { selectBlock, setBlockMoveTransparent, setBlockDetachesOnEdit } =
-		unlock( useDispatch( blockEditorStore ) );
-
-	// The links sit in line with the menu's other items, so one-step moves
-	// (the block movers) pass them one at a time instead of jumping the
-	// whole list, and an edge link can move out. The first change to them
-	// replaces the list with them, in the same undo level, and the Navigation
-	// block switches the menu's "Auto add new pages" setting on.
-	useEffect( () => {
-		if ( ! isLinkMode ) {
-			return;
-		}
-		setBlockMoveTransparent( clientId, true );
-		setBlockDetachesOnEdit( clientId, true );
-		return () => {
-			setBlockMoveTransparent( clientId, false );
-			setBlockDetachesOnEdit( clientId, false );
-		};
-	}, [
-		isLinkMode,
-		clientId,
-		setBlockMoveTransparent,
-		setBlockDetachesOnEdit,
-	] );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
@@ -429,6 +411,14 @@ export default function PageListEdit( {
 		directInsert: isLinkMode,
 		// Laid out like the menu's own items, so the movers point the same way.
 		orientation: isLinkMode ? parentOrientation : undefined,
+		// In line with the menu's other items, so one-step moves (the block
+		// movers) pass the links one at a time instead of jumping the whole
+		// list, and an edge link can move out.
+		[ isMoveTransparentKey ]: isLinkMode,
+		// The first change to the links replaces the list with them, in the
+		// same undo level, and the Navigation block switches the menu's "Auto
+		// add new pages" setting on.
+		[ detachesOnEditKey ]: isLinkMode,
 		__experimentalCaptureToolbars: isLinkMode,
 		onInput: NOOP,
 		onChange: NOOP,
