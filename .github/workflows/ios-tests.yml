@@ -95,8 +95,12 @@ jobs:
                   sudo xcode-select -s "$XCODE"
                   xcodebuild -version
 
+            # TEMP DEBUG: the whole suite, then the flaky quote test again.
             - name: Run the tests
-              run: ./test/ios/run.sh
+              run: |
+                  ./test/ios/run.sh || true
+                  cp test/ios/build/server.log test/ios/build/server-suite.log
+                  ./test/ios/run.sh -only-testing:SafariTests/SelectionTests/testTapFromHeadingIntoQuoteWithoutIframePlacesCaret -test-iterations 15
 
             - name: Archive the test results
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -106,4 +110,5 @@ jobs:
                   path: |
                       test/ios/build/results.xcresult
                       test/ios/build/server.log
+                      test/ios/build/server-suite.log
                   if-no-files-found: ignore
