@@ -118,7 +118,6 @@ module.exports = {
 			},
 		],
 		'font-weight-notation': 'numeric',
-		'@stylistic/max-line-length': null,
 		'@stylistic/scss/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [

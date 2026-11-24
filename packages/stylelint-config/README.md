@@ -56,7 +56,7 @@ This preset extends `@wordpress/stylelint-config`, `@wordpress/stylelint-config/
 }
 ```
 
-`@stylistic/stylelint-plugin` checks SCSS only with the rules in its `@stylistic/scss/` namespace, so this preset configures each stylistic rule under that name, such as `@stylistic/scss/indentation`. Use these names to override a stylistic rule or to disable it in a comment. Each `@stylistic/*` rule yields to its `@stylistic/scss/*` copy, so overriding or disabling it does not change how SCSS is checked.
+`@stylistic/stylelint-plugin` checks SCSS only with the rules in its `@stylistic/scss/` namespace, so this preset configures each stylistic rule under that name, such as `@stylistic/scss/indentation`. The preset parses every file with `postcss-scss`, so these rules check plain CSS files too, and one config covers both: you don't need to combine it with the Stylistic preset. Use the `@stylistic/scss/*` names to override a stylistic rule or to disable it in a comment, in CSS and SCSS files alike. The preset turns the `@stylistic/*` rules off.
 
 ## Extending the config
 
@@ -107,7 +107,7 @@ This version requires Stylelint 18. To stay on Stylelint 17, keep using `@wordpr
 
 1. Use Node.js `^22.22.2`, `^24.15.0` or `>=26.0.0`.
 2. Update `stylelint` to `^18.0.0`, and `stylelint-scss` to `^7.5.0` if you use an SCSS preset. If you use `@wordpress/scripts`, update it instead: it brings both.
-3. If you use the SCSS Stylistic preset, rename `@stylistic/*` rules to `@stylistic/scss/*` in your config and in `stylelint-disable` comments in SCSS files, for example `@stylistic/indentation` to `@stylistic/scss/indentation`. The `@stylistic/*` names no longer affect how SCSS is checked.
+3. If you use the SCSS Stylistic preset, rename `@stylistic/*` rules to `@stylistic/scss/*` in your config and in `stylelint-disable` comments, for example `@stylistic/indentation` to `@stylistic/scss/indentation`. This applies to CSS files linted with this preset too: the preset turns the `@stylistic/*` rules off.
 4. Run `stylelint --fix` to apply the new `indentation` of multi-line selectors that continue inside a pseudo-class such as `:where(`. Only whitespace changes.
 5. Fix what the newly enabled rules report, or turn them off in your config: `at-charset-rule-no-invalid`, `selector-no-deprecated`, `selector-no-invalid`, `selector-no-unmatchable` and `value-no-invalid`. The SCSS presets enable only `selector-no-deprecated`.
 6. If you extend the config by an absolute path, install it locally and extend it by name instead, or include the filename: `/absolute/path/to/@wordpress/stylelint-config/index.js`.
