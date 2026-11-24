@@ -513,6 +513,9 @@ test.describe( 'Client-side media processing', () => {
 		requestUtils,
 		mediaProcessingUtils,
 	} ) => {
+		// Processing twelve large images takes minutes on CI runners.
+		test.setTimeout( 420_000 );
+
 		// Twelve 24 MP, 4:2:0 JPEGs of about 15 MB each, like a camera's.
 		// wasm-vips used to run out of memory part way through the batch,
 		// and the attachments whose sub-sizes then failed were deleted.
