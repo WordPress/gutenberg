@@ -12,7 +12,7 @@
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
--   Block tree reducer: Return `undefined` when retrieving a removed block with a stale controlled client ID, preventing blocks from being traversed without a client ID.
+-   Block tree reducer: Return `undefined` when retrieving a removed block with a stale controlled client ID, preventing blocks from being traversed without a client ID ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 
 ### Internal
 
