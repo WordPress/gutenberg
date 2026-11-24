@@ -50,7 +50,20 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 		$factory->post->create(
 			array(
 				'post_type'   => 'page',
+				'post_status' => 'private',
+			)
+		);
+		$factory->post->create(
+			array(
+				'post_type'   => 'page',
 				'post_status' => 'trash',
+			)
+		);
+		// A post, so that a count on the `post` view list would not be zero.
+		$factory->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
 			)
 		);
 	}
@@ -63,16 +76,17 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Returns the `page` view list from the view-config route, keyed by slug.
+	 * Returns a post type's view list from the view-config route, keyed by slug.
 	 *
+	 * @param string $post_type The post type whose view list to return.
 	 * @return array The view list entries, keyed by slug.
 	 */
-	private function get_page_view_list() {
+	private function get_view_list( $post_type = 'page' ) {
 		wp_set_current_user( self::$editor_id );
 
 		$request = new WP_REST_Request( 'GET', self::ROUTE );
 		$request->set_param( 'kind', 'postType' );
-		$request->set_param( 'name', 'page' );
+		$request->set_param( 'name', $post_type );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 200, $response->get_status() );
 
@@ -108,19 +122,19 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 
 	/**
 	 * Each status view of the `page` view list counts the pages in its status,
-	 * and the "All" view counts every status but trash.
+	 * and the "All" view counts every status but trash, private included.
 	 *
 	 * @covers ::get_items
 	 */
 	public function test_get_items_counts_page_status_views() {
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 
-		$this->assertSame( 4, $view_list['all']['count'] );
+		$this->assertSame( 5, $view_list['all']['count'] );
 		$this->assertSame( 1, $view_list['published']['count'] );
 		$this->assertSame( 0, $view_list['future']['count'] );
 		$this->assertSame( 2, $view_list['drafts']['count'] );
 		$this->assertSame( 1, $view_list['pending']['count'] );
-		$this->assertSame( 0, $view_list['private']['count'] );
+		$this->assertSame( 1, $view_list['private']['count'] );
 		$this->assertSame( 1, $view_list['trash']['count'] );
 	}
 
@@ -153,7 +167,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $narrow_drafts );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $narrow_drafts );
 
 		$this->assertArrayNotHasKey( 'count', $view_list['drafts'] );
@@ -189,7 +203,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $add_unpublished );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $add_unpublished );
 
 		$this->assertSame( 3, $view_list['unpublished']['count'] );
@@ -221,7 +235,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $filter_default_view );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $filter_default_view );
 
 		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
@@ -255,7 +269,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
 
 		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
@@ -289,7 +303,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
 
 		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
@@ -312,10 +326,10 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $search_default_view );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $search_default_view );
 
-		$this->assertSame( 4, $view_list['all']['count'] );
+		$this->assertSame( 5, $view_list['all']['count'] );
 		$this->assertSame( 2, $view_list['drafts']['count'] );
 	}
 
@@ -349,7 +363,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $add_repeated );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $add_repeated );
 
 		$this->assertSame( 3, $view_list['repeated']['count'] );
@@ -385,7 +399,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $add_comma_separated );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $add_comma_separated );
 
 		$this->assertSame( 3, $view_list['comma-separated']['count'] );
@@ -421,7 +435,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $add_space_separated );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $add_space_separated );
 
 		$this->assertSame( 3, $view_list['space-separated']['count'] );
@@ -429,7 +443,7 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 
 	/**
 	 * A view filtered on the `any` status counts every status the REST API
-	 * queries for it, which leaves out trash.
+	 * queries for it, which includes private and leaves out trash.
 	 *
 	 * @covers ::get_items
 	 */
@@ -457,10 +471,25 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 			);
 		};
 		add_filter( 'get_entity_view_config_posttype_page', $add_any );
-		$view_list = $this->get_page_view_list();
+		$view_list = $this->get_view_list();
 		remove_filter( 'get_entity_view_config_posttype_page', $add_any );
 
-		$this->assertSame( 4, $view_list['any']['count'] );
+		$this->assertSame( 5, $view_list['any']['count'] );
+	}
+
+	/**
+	 * Only the `page` view list gets counts: the view list of another post type,
+	 * such as `post`, has none, even on its unfiltered "All" view.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_omits_counts_for_other_post_types() {
+		$view_list = $this->get_view_list( 'post' );
+
+		$this->assertArrayHasKey( 'all', $view_list );
+		foreach ( $view_list as $slug => $entry ) {
+			$this->assertArrayNotHasKey( 'count', $entry, "The `$slug` view should have no count." );
+		}
 	}
 
 	/**
