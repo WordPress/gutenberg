@@ -721,6 +721,9 @@ export default function Image( {
 		);
 	};
 
+	// A width/height saved earlier (for example while the image sat in a
+	// regular Group) keeps applying inside flex and grid layouts, where the
+	// Width/Height fields are hidden.
 	const hasCustomSize =
 		( !! activeWidth && activeWidth !== 'auto' ) ||
 		( !! activeHeight && activeHeight !== 'auto' );
@@ -731,31 +734,15 @@ export default function Image( {
 			<DimensionsTool
 				key={ selectedStyleStateKey }
 				panelId={ clientId }
-				value={ {
-					width: activeWidth,
-					height: activeHeight,
-					aspectRatio: activeAspectRatio,
-					scale: activeScale,
-				} }
-				onChange={ ( {
-					width: newWidth,
-					height: newHeight,
-					aspectRatio: newAspectRatio,
-				} ) => {
+				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
+				onChange={ ( { aspectRatio: newAspectRatio } ) => {
 					setDimensionAttributes( {
-						width: ! newWidth && newHeight ? 'auto' : newWidth,
-						height: newHeight,
 						aspectRatio: newAspectRatio,
 						scale: 'cover',
 					} );
 				} }
 				defaultAspectRatio="auto"
-				unitsOptions={ dimensionsUnitsOptions }
-				tools={
-					hasCustomSize
-						? [ 'aspectRatio', 'widthHeight' ]
-						: [ 'aspectRatio' ]
-				}
+				tools={ [ 'aspectRatio' ] }
 			/>
 		) : (
 			<DimensionsTool
@@ -1098,6 +1085,26 @@ export default function Image( {
 				} }
 			>
 				{ dimensionsControl }
+				{ showDimensionsControls &&
+					SIZED_LAYOUTS.includes( parentLayoutType ) &&
+					hasCustomSize && (
+						<ToolsPanelItem
+							label={ __( 'Image size' ) }
+							isShownByDefault
+							hasValue={ () => hasCustomSize }
+							onDeselect={ () =>
+								setDimensionAttributes( {
+									width: undefined,
+									height: undefined,
+								} )
+							}
+							panelId={ clientId }
+						>
+							{ `${ activeWidth ?? 'auto' } × ${
+								activeHeight ?? 'auto'
+							}` }
+						</ToolsPanelItem>
+					) }
 				{ ! hasSelectedStyleState && url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
