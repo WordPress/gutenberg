@@ -1,4 +1,4 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 // The screen under test is the extensible site editor's navigation menu
 // screen, which lives at `admin.php?page=site-editor-v2`.

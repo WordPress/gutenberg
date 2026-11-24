@@ -1,8 +1,25 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import {
+	test,
+	expect,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
 
-async function enableShowTemplate( page ) {
+// `requestUtils.createNavigationMenu()` takes only a title and content.
+function createAutoAddMenu(
+	requestUtils: RequestUtils,
+	menu: { title: string; content: string }
+) {
+	return requestUtils.rest< { id: number } >( {
+		method: 'POST',
+		path: '/wp/v2/navigation',
+		data: { ...menu, status: 'publish', meta: { [ META_KEY ]: true } },
+	} );
+}
+
+async function enableShowTemplate( page: Page ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', { name: 'View', exact: true } )
@@ -39,11 +56,10 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		editor,
 		requestUtils,
 	} ) => {
-		const menu = await requestUtils.createNavigationMenu( {
+		const menu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.createNewPost( {
@@ -76,14 +92,16 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		editor,
 		requestUtils,
 	} ) => {
-		const parent = await requestUtils.createPage( {
-			title: 'Parent page',
-			status: 'publish',
-		} );
-		const menu = await requestUtils.createNavigationMenu( {
+		const parent = await requestUtils.rest< { id: number; link: string } >(
+			{
+				method: 'POST',
+				path: '/wp/v2/pages',
+				data: { title: 'Parent page', status: 'publish' },
+			}
+		);
+		const menu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: `<!-- wp:navigation-link {"label":"Parent page","type":"page","kind":"post-type","id":${ parent.id },"url":"${ parent.link }"} /-->`,
-			meta: { [ META_KEY ]: true },
 		} );
 		const child = await requestUtils.rest( {
 			method: 'POST',
@@ -124,7 +142,9 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		// The submenu only shows its items while it is being edited, so check
 		// the block tree for the child instead.
 		const menuBlocks = await editor.getBlocks( {
-			clientId: await navigationBlock.getAttribute( 'data-block' ),
+			clientId:
+				( await navigationBlock.getAttribute( 'data-block' ) ) ??
+				undefined,
 		} );
 		expect( menuBlocks ).toMatchObject( [
 			{
@@ -147,11 +167,10 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const menu = await requestUtils.createNavigationMenu( {
+		const menu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.createNewPost();
@@ -258,11 +277,10 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const menu = await requestUtils.createNavigationMenu( {
+		const menu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.createNewPost();
@@ -359,11 +377,10 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 			page,
 			requestUtils,
 		} ) => {
-			const menu = await requestUtils.createNavigationMenu( {
+			const menu = await createAutoAddMenu( requestUtils, {
 				title: 'Main menu',
 				content:
 					'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-				meta: { [ META_KEY ]: true },
 			} );
 			await requestUtils.createTemplate( 'wp_template_part', {
 				slug: 'header',
