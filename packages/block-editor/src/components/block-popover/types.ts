@@ -52,7 +52,13 @@ export interface PrivateBlockPopoverSlotProps {
  * Props of `PrivateBlockPopover`.
  */
 export interface PrivateBlockPopoverProps
-	extends BlockPopoverProps, PrivateBlockPopoverSlotProps {}
+	extends BlockPopoverProps, PrivateBlockPopoverSlotProps {
+	/**
+	 * The client ID of a block whose top edge the popover stays above, while
+	 * it still lines up with `clientId` horizontally.
+	 */
+	topEdgeClientId?: string | null;
+}
 
 /**
  * Props of `BlockPopoverCover`.
