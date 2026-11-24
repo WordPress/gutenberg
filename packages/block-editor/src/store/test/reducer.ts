@@ -2757,9 +2757,9 @@ describe( 'state', () => {
 					} );
 					expect( state.isPersistentChange ).toBe( true );
 
-					// An undo resets the blocks from the entity. The block
-					// keeps its client ID, but it is a different block now,
-					// so typing into it again starts a new undo level.
+					// An undo resets the blocks from the entity, bringing
+					// back the attributes from before the typing, so typing
+					// into the block again starts a new undo level.
 					state = blocks( state, {
 						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
 						history: 'ignore',
@@ -2821,6 +2821,48 @@ describe( 'state', () => {
 						attributes: { content: 'a' },
 					} );
 					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'keeps typing in one block a single undo level after typing in another', () => {
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'loquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'loquat' ],
+						attributes: { content: 'b' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// Typing on in the second block, which history does not
+					// ignore, joins the undo level its first keystroke
+					// opened.
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'loquat' ],
+						attributes: { content: 'bc' },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {

@@ -956,6 +956,52 @@ describe( 'useBlockSync hook', () => {
 			expect( onChangeB ).not.toHaveBeenCalled();
 		} );
 
+		// Copy B mirrors each keystroke in copy A. History ignores that,
+		// or every keystroke would start an undo level of its own.
+		it( 'keeps typing in one copy in a single undo level while another copy mirrors it', () => {
+			const { registry, update, select } = renderCanvas( [
+				'copy-a',
+				'copy-b',
+			] );
+			let entity = [ paragraph( 'p', 0 ) ];
+			const reports: string[] = [];
+			const controllers = () => [
+				{
+					clientId: 'copy-a',
+					value: entity,
+					onChange: ( blocks: TestBlock[] ) => {
+						reports.push( 'change' );
+						entity = blocks;
+					},
+					onInput: ( blocks: TestBlock[] ) => {
+						reports.push( 'input' );
+						entity = blocks;
+					},
+				},
+				{
+					clientId: 'copy-b',
+					value: entity,
+					onChange: vi.fn(),
+					onInput: vi.fn(),
+				},
+			];
+			update( controllers() );
+			const [ cloneA ] = select().getBlocks( 'copy-a' );
+
+			for ( const foo of [ 1, 2, 3 ] ) {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( cloneA.clientId, { foo } );
+				update( controllers() );
+			}
+
+			// The first keystroke opens an undo level and the rest join it.
+			expect( reports ).toEqual( [ 'change', 'input', 'input' ] );
+			expect( select().getBlocks( 'copy-b' )[ 0 ].attributes.foo ).toBe(
+				3
+			);
+		} );
+
 		// Moving a block in one copy hands the other copy the same blocks
 		// in another order. Updating its clones in place would leave each
 		// mapped to the block that used to be there, so that an edit to one
@@ -997,14 +1043,15 @@ describe( 'useBlockSync hook', () => {
 		// Content. Re-cloning replaces the nested host, and the block the
 		// caret was in with it, so the selection has to be repaired.
 		it.each( [
-			[ 'updates its clones in place', [] ],
+			[ 'updates its clones in place', [], true ],
 			[
 				're-clones, replacing the nested block',
 				[ paragraph( 'added', 0 ) ],
+				false,
 			],
 		] )(
 			'restores the selection when the caret is in a nested controller and the outer one %s',
-			( _, addedBlocks ) => {
+			( _, addedBlocks, keepsClones ) => {
 				const { update, select, selectBlock, selectionRef } =
 					renderCanvas( [ 'outer' ] );
 				const outerBlock = paragraph( 'outer-block', 1 );
@@ -1020,6 +1067,7 @@ describe( 'useBlockSync hook', () => {
 					value: [ paragraph( 'nested-block', 1 ) ],
 				};
 				update( [ outer, nested ] );
+				const [ outerBlockCloneBefore ] = select().getBlocks( 'outer' );
 				selectBlock(
 					select().getBlocks( nestedHostClone.clientId )[ 0 ].clientId
 				);
@@ -1044,6 +1092,9 @@ describe( 'useBlockSync hook', () => {
 
 				const [ outerBlockClone ] = select().getBlocks( 'outer' );
 				expect( outerBlockClone.attributes.foo ).toBe( 0 );
+				expect(
+					outerBlockClone.clientId === outerBlockCloneBefore.clientId
+				).toBe( keepsClones );
 				expect( select().getSelectionStart().clientId ).toBe(
 					outerBlockClone.clientId
 				);

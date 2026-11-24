@@ -138,15 +138,7 @@ test.describe( 'Post Content focus mode', () => {
 		} );
 		await postContentFocusMode.enableShowTemplate();
 
-		const postContentText = () =>
-			page.evaluate( () => {
-				const { getBlocksByName, getBlockOrder, getBlockAttributes } =
-					window.wp.data.select( 'core/block-editor' );
-				const [ postContent ] = getBlocksByName( 'core/post-content' );
-				return getBlockOrder( postContent ).map( ( clientId ) =>
-					getBlockAttributes( clientId )?.content?.toString?.()
-				);
-			} );
+		const postContentText = () => postContentFocusMode.getPostContentText();
 
 		// Edit the first block, then the second, leaving the caret in the
 		// second.
