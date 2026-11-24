@@ -34,8 +34,12 @@ export default function useUndoKeyboardSlide() {
 			if ( page.scrollHeight > page.clientHeight ) {
 				return;
 			}
-			getScrollContainer( node )!.scrollTop += slide;
-			view.scrollTo( 0, 0 );
+			const canvas = getScrollContainer( node )!;
+			const { scrollTop } = canvas;
+			canvas.scrollTop += slide;
+			// Near its end, the canvas can't take all of it: the page keeps the
+			// rest, so the caret stays above the keyboard.
+			view.scrollBy( 0, scrollTop - canvas.scrollTop );
 		}
 
 		// Not on scroll: iOS overrides a scroll of the canvas while it moves.
