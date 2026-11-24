@@ -237,7 +237,7 @@ final class SelectionTests: XCTestCase {
 	func testTapCaptionLowInLongPostKeepsToolbarOnScreen() throws {
 		// Small images, so one of the captions is low on any screen.
 		try tapLowAndExpectToolbarOnScreen(
-			content: ( 1...12 ).map { "<!-- wp:paragraph --><p>Paragraph \( $0 )</p><!-- /wp:paragraph --><!-- wp:image {\"width\":\"80px\"} --><figure class=\"wp-block-image is-resized\"><img src=\"https://cldup.com/cXyG__fTLN.jpg\" alt=\"\" style=\"width:80px\"/><figcaption class=\"wp-element-caption\">Caption \( $0 )</figcaption></figure><!-- /wp:image -->" }.joined(),
+			content: ( 1...12 ).map { "<!-- wp:paragraph --><p>Paragraph \( $0 )</p><!-- /wp:paragraph --><!-- wp:image {\"width\":\"80px\"} --><figure class=\"wp-block-image is-resized\"><img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNoAAAAggCBd81ytgAAAABJRU5ErkJggg==\" alt=\"\" style=\"width:80px\"/><figcaption class=\"wp-element-caption\">Caption \( $0 )</figcaption></figure><!-- /wp:image -->" }.joined(),
 			fields: ( 1...12 ).map { editor.canvas.descendants( matching: .any ).matching( NSPredicate( format: "label == %@ AND value == %@", "Image caption text", "Caption \( $0 )" ) ).firstMatch }
 		)
 	}
