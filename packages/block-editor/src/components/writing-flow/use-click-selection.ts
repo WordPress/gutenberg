@@ -2,7 +2,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isBlockElementOutsideFields,
+} from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
@@ -40,6 +44,13 @@ export default function useClickSelection() {
 				// on a page that lost focus, as when the keyboard is swiped
 				// away, focuses it again before mousedown.
 				isFocusedOnPointerDown = node.matches( ':focus' );
+
+				// A press on a block's own element outside its fields, such as
+				// a list item's bullet: stop editing so the browser drags the
+				// block instead of placing a caret.
+				if ( isBlockElementOutsideFields( event.target as Element ) ) {
+					setContentEditableWrapper( node, false );
+				}
 			}
 
 			function onMouseDown( event: MouseEvent ) {
