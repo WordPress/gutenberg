@@ -1,18 +1,35 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import {
+	test,
+	expect,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
+
+// `requestUtils.createNavigationMenu()` takes only a title and content.
+function createAutoAddMenu(
+	requestUtils: RequestUtils,
+	menu: { title: string; content: string }
+) {
+	return requestUtils.rest< { id: number } >( {
+		method: 'POST',
+		path: '/wp/v2/navigation',
+		data: { ...menu, status: 'publish', meta: { [ META_KEY ]: true } },
+	} );
+}
 
 // The menu links point at whichever site editor the site uses: the
 // extensible site editor when its experiment is on, else the current one.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
-function menuEditorPath( menuId ) {
+function menuEditorPath( menuId: number ) {
 	return isSiteEditorV2
 		? `admin.php?page=site-editor-v2&p=/navigation/edit/${ menuId }`
 		: `site-editor.php?p=/wp_navigation/${ menuId }`;
 }
 
-async function openPrePublishPanel( page ) {
+async function openPrePublishPanel( page: Page ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', { name: 'Publish', exact: true } )
@@ -44,11 +61,10 @@ test.describe( 'Pre-publish panel: menus a page appears in', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const mainMenu = await requestUtils.createNavigationMenu( {
+		const mainMenu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 		await requestUtils.createNavigationMenu( {
 			title: 'Other menu',
@@ -62,7 +78,9 @@ test.describe( 'Pre-publish panel: menus a page appears in', () => {
 		await panel.getByRole( 'button', { name: 'Menus: Main menu' } ).click();
 		const link = panel.getByRole( 'link', { name: 'Main menu' } );
 		await expect( link ).toBeVisible();
-		const href = decodeURIComponent( await link.getAttribute( 'href' ) );
+		const href = decodeURIComponent(
+			( await link.getAttribute( 'href' ) ) ?? ''
+		);
 		expect( href ).toContain( menuEditorPath( mainMenu.id ) );
 		await expect( panel.getByText( 'Other menu' ) ).toBeHidden();
 	} );
@@ -91,11 +109,10 @@ test.describe( 'Pre-publish panel: menus a page appears in', () => {
 		page,
 		requestUtils,
 	} ) => {
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.createNewPost( { title: 'Hello' } );
@@ -111,10 +128,13 @@ test.describe( 'Pre-publish panel: menus a page appears in', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const parent = await requestUtils.createPage( {
-			title: 'About',
-			status: 'publish',
-		} );
+		const parent = await requestUtils.rest< { id: number; link: string } >(
+			{
+				method: 'POST',
+				path: '/wp/v2/pages',
+				data: { title: 'About', status: 'publish' },
+			}
+		);
 		const child = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/pages',
@@ -127,17 +147,15 @@ test.describe( 'Pre-publish panel: menus a page appears in', () => {
 		const parentLink = `<!-- wp:navigation-link {"label":"About","type":"page","kind":"post-type","id":${ parent.id },"url":"${ parent.link }"} /-->`;
 
 		// Links the parent, so the child is nested under that link.
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: parentLink,
-			meta: { [ META_KEY ]: true },
 		} );
 		// Has no link to the parent, so the child is not added.
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Footer menu',
 			content:
 				'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
-			meta: { [ META_KEY ]: true },
 		} );
 		// Already links the child, so its link goes live on publish even
 		// though the menu does not add pages itself.
