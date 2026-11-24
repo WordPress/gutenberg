@@ -137,17 +137,21 @@ export function FilePickerPanel() {
 							</Text>
 						</>
 					) : (
-						<EmptyState.Root>
-							<EmptyState.Icon icon={ upload } />
-							<EmptyState.Title render={ <h4 /> }>
-								Upload fonts
-							</EmptyState.Title>
-							<EmptyState.Description>
-								Drop font files anywhere in this panel, or
-								choose them. Supported formats: .ttf, .otf,
-								.woff, and .woff2.
-							</EmptyState.Description>
-						</EmptyState.Root>
+						// `EmptyState` limits its own width, so center it in the
+						// panel.
+						<Stack direction="column" align="center">
+							<EmptyState.Root>
+								<EmptyState.Icon icon={ upload } />
+								<EmptyState.Title render={ <h4 /> }>
+									Upload fonts
+								</EmptyState.Title>
+								<EmptyState.Description>
+									Drop font files anywhere in this panel, or
+									choose them. Supported formats: .ttf, .otf,
+									.woff, and .woff2.
+								</EmptyState.Description>
+							</EmptyState.Root>
+						</Stack>
 					) }
 					<div aria-live="polite">
 						{ error && (
