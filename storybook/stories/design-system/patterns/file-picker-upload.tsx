@@ -3,6 +3,7 @@ import { DropZone, FormFileUpload } from '@wordpress/components';
 import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 import {
+	Badge,
 	Button,
 	Fieldset,
 	Icon,
@@ -165,8 +166,14 @@ export function FilePickerUpload() {
 
 	const status = {
 		uploading: undefined,
-		uploaded: <span className={ styles.success }>Uploaded</span>,
-		failed: <span className={ styles.error }>Couldn’t upload</span>,
+		// A finished upload is the normal state, so it doesn't draw the eye. A
+		// failed one needs action, so it does.
+		uploaded: 'Uploaded',
+		failed: (
+			<Badge intent="high" className={ styles[ 'status-badge' ] }>
+				Couldn’t upload
+			</Badge>
+		),
 	};
 
 	return (
@@ -201,6 +208,9 @@ export function FilePickerUpload() {
 									} }
 									file={ upload.file }
 									status={ status[ upload.status ] }
+									// A failed row shows only its status, so the
+									// name keeps room beside "Retry".
+									showDetails={ upload.status !== 'failed' }
 									removeLabel={
 										upload.status === 'uploading'
 											? `Cancel upload of ${ upload.file.name }`

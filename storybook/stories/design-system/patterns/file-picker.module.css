@@ -129,11 +129,12 @@
 
 /*
  * The type and size follow the name, so the name can be cut at the end
- * without hiding what kind of file it is.
+ * without hiding what kind of file it is. At least a few characters of the
+ * name always show, so a narrow row still says which file it is.
  */
 .name {
 	flex: 1;
-	min-inline-size: 0;
+	min-inline-size: 6ch;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -152,11 +153,17 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-/* The type and size sit at the end of the row and are never cut. */
+/*
+ * The type and size sit at the end of the row. They're cut only once the
+ * name is down to its smallest width.
+ */
 .meta {
-	flex: none;
+	flex: 0 1 auto;
+	min-inline-size: 0;
+	overflow: hidden;
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 /*
@@ -168,12 +175,22 @@
 	inline-size: calc(var(--wpds-dimension-size-lg) * 2);
 }
 
-.success {
-	color: var(--wpds-color-foreground-content-success);
+/*
+ * A status shown on its own, such as a `Badge`. Like the type and size, it's
+ * cut only once the name is down to its smallest width.
+ */
+.status {
+	display: flex;
+	flex: 0 1 auto;
+	min-inline-size: 0;
 }
 
-.error {
-	color: var(--wpds-color-foreground-content-error);
+/* `Badge` cuts its label when its own overflow is set. */
+.status-badge {
+	min-inline-size: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .list {

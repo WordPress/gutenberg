@@ -76,11 +76,17 @@ function usePreviewUrl( file: File ) {
 export function FileSummary( {
 	file,
 	status,
+	showDetails = true,
 	isPending = false,
 }: {
 	file: File;
 	/** Text after the type and size, such as "Uploaded". */
 	status?: React.ReactNode;
+	/**
+	 * Whether to show the type and size. Without them, only the status shows,
+	 * which leaves more room for the name. The status can then be a `Badge`.
+	 */
+	showDetails?: boolean;
 	/**
 	 * Whether the file is still on its way, such as during an upload. The name
 	 * is weaker, and the type and size are hidden to make room for progress.
@@ -112,7 +118,7 @@ export function FileSummary( {
 			>
 				{ file.name }
 			</Text>
-			{ ! isPending && (
+			{ ! isPending && showDetails && (
 				<Text variant="body-sm" className={ styles.meta }>
 					{ extension.slice( 1 ).toUpperCase() || 'File' }
 					<span aria-hidden="true"> ·</span>{ ' ' }
@@ -123,6 +129,9 @@ export function FileSummary( {
 						</>
 					) }
 				</Text>
+			) }
+			{ ! isPending && ! showDetails && status && (
+				<span className={ styles.status }>{ status }</span>
 			) }
 		</Stack>
 	);
@@ -143,6 +152,8 @@ export const SelectedFile = forwardRef<
 		removeLabel?: string;
 		/** Text after the type and size, such as "Uploaded". */
 		status?: React.ReactNode;
+		/** Whether to show the type and size. Defaults to `true`. */
+		showDetails?: boolean;
 		/**
 		 * A progress bar for a file that's still on its way. It takes the place
 		 * of the type and size, and the name is weaker until it's gone.
@@ -154,7 +165,16 @@ export const SelectedFile = forwardRef<
 		disabled?: boolean;
 	}
 >( function UnforwardedSelectedFile(
-	{ file, onRemove, removeLabel, status, progress, actions, disabled },
+	{
+		file,
+		onRemove,
+		removeLabel,
+		status,
+		showDetails,
+		progress,
+		actions,
+		disabled,
+	},
 	ref
 ) {
 	return (
@@ -168,6 +188,7 @@ export const SelectedFile = forwardRef<
 			<FileSummary
 				file={ file }
 				status={ status }
+				showDetails={ showDetails }
 				isPending={ !! progress }
 			/>
 			{ progress }
