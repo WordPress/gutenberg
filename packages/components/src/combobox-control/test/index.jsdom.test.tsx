@@ -545,4 +545,36 @@ describe.each( [
 		expect( input ).toHaveValue( '' );
 		expect( input ).toHaveFocus();
 	} );
+
+	it( 'should only consume the Escape key while the suggestions list is open', async () => {
+		const user = await userEvent.setup();
+		const onKeyDownSpy = vi.fn();
+
+		render(
+			<div onKeyDown={ onKeyDownSpy }>
+				<Component options={ timezones } label={ defaultLabelText } />
+			</div>
+		);
+
+		const input = getInput( defaultLabelText );
+
+		// Focusing the input expands the suggestions list.
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		// The first Escape closes the list and is consumed, so that a
+		// parent Modal or Popover stays open.
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			onKeyDownSpy.mock.calls.at( -1 )?.[ 0 ].defaultPrevented
+		).toBe( true );
+
+		// A second Escape with the list already closed is not consumed, so
+		// that it reaches a parent Modal or Popover, which can then close.
+		await user.keyboard( '[Escape]' );
+		expect(
+			onKeyDownSpy.mock.calls.at( -1 )?.[ 0 ].defaultPrevented
+		).toBe( false );
+	} );
 } );
