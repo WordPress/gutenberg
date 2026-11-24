@@ -29,9 +29,24 @@ export function useIsHovered( {
 
 			function listener( event: MouseEvent ) {
 				if ( event.defaultPrevented ) {
+					// An inner block handled it: that block is hovered now.
+					if ( event.type === 'mouseover' ) {
+						clearTimeout( timeoutId );
+						node.classList.remove(
+							'is-hovered',
+							'is-hovered-draggable'
+						);
+					}
 					return;
 				}
 				event.preventDefault();
+				// Moving to another element of this block keeps the outline.
+				if (
+					event.type === 'mouseout' &&
+					node.contains( event.relatedTarget as Node | null )
+				) {
+					return;
+				}
 				const isHovered = event.type === 'mouseover';
 				node.classList.toggle( 'is-hovered', isHovered );
 				clearTimeout( timeoutId );
