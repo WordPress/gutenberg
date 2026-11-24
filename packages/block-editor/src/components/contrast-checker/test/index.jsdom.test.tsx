@@ -135,8 +135,8 @@ describe( 'ContrastChecker', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
-	test( 'should render nothing if text color contains a transparency', () => {
-		const { container } = render(
+	test( 'should render component when a transparent text color blends into an opaque background it does not contrast with', () => {
+		render(
 			<ContrastChecker
 				backgroundColor={ sameShade }
 				textColor={ colorWithTransparency }
@@ -146,19 +146,65 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
-		expect( speak ).not.toHaveBeenCalled();
-		expect( container ).toBeEmptyDOMElement();
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect(
+			screen.getByText(
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+			)
+		).toBeVisible();
 	} );
 
-	test( 'should render nothing if link color contains a transparency', () => {
-		const { container } = render(
+	test( 'should render component when a transparent link color blends into an opaque background it does not contrast with', () => {
+		render(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
+				// Blends with white into #b3b3b3, about 2.1:1.
 				linkColor={ colorWithTransparency }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect(
+			screen.getByText(
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'should measure a transparent text color as the color it blends into, not as if it were opaque', () => {
+		render(
+			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				// Opaque black passes on white, but at 30% it reads as #b3b3b3.
+				textColor="rgba(0,0,0,0.3)"
+				isLargeText={ isLargeText }
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
+		expect(
+			screen.getByText(
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'should render nothing when a transparent text color still contrasts with the background once blended', () => {
+		const { container } = render(
+			<ContrastChecker
+				backgroundColor={ backgroundColor }
+				textColor="rgba(0,0,0,0.9)"
+				isLargeText={ isLargeText }
 			/>
 		);
 
@@ -458,7 +504,7 @@ describe( 'ContrastChecker', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should render component and prioritize contrast warning when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {
+	test( 'should render both the contrast and transparency warnings when the colors do no meet AA WCAG guidelines and text has alpha transparency with the alpha checker enabled.', () => {
 		render(
 			<ContrastChecker
 				backgroundColor={ sameShade }
@@ -472,11 +518,54 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( speak ).toHaveBeenCalledWith(
-			'This color combination may be hard for people to read.'
+			'This color combination may be hard for people to read. Transparent text may be hard for people to read.'
 		);
 		expect(
 			screen.getByText(
-				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color.'
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker link color. Transparent text may be hard for people to read.'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'should render both the contrast and transparency warnings when the text color is both transparent and low contrast with alpha checker enabled.', () => {
+		render(
+			<ContrastChecker
+				backgroundColor="#f7f7f7"
+				textColor="rgba(247,247,247,0.36)"
+				isLargeText={ isLargeText }
+				enableAlphaChecker
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read. Transparent text may be hard for people to read.'
+		);
+		expect(
+			screen.getByText(
+				'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color. Transparent text may be hard for people to read.'
+			)
+		).toBeVisible();
+	} );
+
+	test( 'should add the transparency warning to a caller-provided contrast message with the alpha checker enabled.', () => {
+		const messageOverride =
+			'This color has poor contrast against the background. Consider increasing contrast.';
+		render(
+			<ContrastChecker
+				backgroundColor="#f7f7f7"
+				textColor="rgba(247,247,247,0.36)"
+				isLargeText={ isLargeText }
+				messageOverride={ messageOverride }
+				enableAlphaChecker
+			/>
+		);
+
+		expect( speak ).toHaveBeenCalledWith(
+			`${ messageOverride } Transparent text may be hard for people to read.`
+		);
+		expect(
+			screen.getByText(
+				`${ messageOverride } Transparent text may be hard for people to read.`
 			)
 		).toBeVisible();
 	} );

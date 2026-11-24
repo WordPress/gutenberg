@@ -22,6 +22,7 @@
 -   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   `ContrastChecker`: Measure a transparent text or link color by the color it blends into over an opaque background, so a color that is both transparent and low-contrast shows a contrast warning instead of no warning at all. This applies whether or not `enableAlphaChecker` is set. With `enableAlphaChecker`, the transparency warning now always shows for transparent text, after any contrast warning ([#80612](https://github.com/WordPress/gutenberg/pull/80612)).
 
 ### Internal
 

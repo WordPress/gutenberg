@@ -1,12 +1,40 @@
 import a11yPlugin from 'colord/plugins/a11y';
 import namesPlugin from 'colord/plugins/names';
 import { colord, extend } from 'colord';
+import type { Colord } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice as WCNotice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import type { ContrastCheckerProps, ContrastWarning } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
+
+/**
+ * Returns the color a reader sees when a color is painted over an opaque
+ * backdrop. A transparent color blends with the backdrop in proportion to its
+ * alpha, so its contrast has to be measured on the blended color: `colord`
+ * ignores alpha when it computes contrast.
+ *
+ * @param color    Color painted over the backdrop.
+ * @param backdrop Opaque color behind it.
+ * @return The opaque color the reader sees.
+ */
+function getVisibleColor( color: Colord, backdrop: Colord ): Colord {
+	const alpha = color.alpha();
+	if ( alpha >= 1 ) {
+		return color;
+	}
+
+	const foreground = color.toRgb();
+	const background = backdrop.toRgb();
+	const blend = ( channel: 'r' | 'g' | 'b' ) =>
+		Math.round(
+			foreground[ channel ] * alpha +
+				background[ channel ] * ( 1 - alpha )
+		);
+
+	return colord( { r: blend( 'r' ), g: blend( 'g' ), b: blend( 'b' ) } );
+}
 
 /**
  * Computes a contrast warning for the given color combination, if any.
@@ -79,38 +107,49 @@ export function getContrastWarning( {
 				: 'small',
 	};
 
-	let message = '';
-	let speakMessage = '';
+	let contrastMessage = '';
+	let contrastSpeakMessage = '';
+	let hasTransparentText = false;
 	for ( const item of textColors ) {
 		// If there is no color, go no further.
 		if ( ! item.color ) {
 			continue;
 		}
 		const colordTextColor = colord( item.color );
-		const isColordTextReadable = colordTextColor.isReadable(
+		if ( colordTextColor.alpha() < 1 ) {
+			hasTransparentText = true;
+		}
+
+		// Only the first contrast warning is kept, but every color is still
+		// visited so that a transparent one is noted. Contrast can only be
+		// measured against an opaque background, as what shows through a
+		// transparent one is unknown.
+		if ( contrastMessage || backgroundColorHasTransparency ) {
+			continue;
+		}
+		const visibleTextColor = getVisibleColor(
+			colordTextColor,
+			colordBackgroundColor
+		);
+		const isColordTextReadable = visibleTextColor.isReadable(
 			colordBackgroundColor,
 			// `colord` reads any size but `large` as normal.
 			isReadableOptions as Parameters<
-				typeof colordTextColor.isReadable
+				typeof visibleTextColor.isReadable
 			>[ 1 ]
 		);
-		const textHasTransparency = colordTextColor.alpha() < 1;
 
 		// If the contrast is not readable.
 		if ( ! isColordTextReadable ) {
-			// Don't show the message if the background or text is transparent.
-			if ( backgroundColorHasTransparency || textHasTransparency ) {
-				continue;
-			}
 			// A caller can provide panel-specific copy that is clearer and
 			// more concise than the generic brighter/darker guidance.
 			if ( messageOverride ) {
-				message = messageOverride;
-				speakMessage = messageOverride;
-				break;
+				contrastMessage = messageOverride;
+				contrastSpeakMessage = messageOverride;
+				continue;
 			}
-			message =
-				backgroundColorBrightness < colordTextColor.brightness()
+			contrastMessage =
+				backgroundColorBrightness < visibleTextColor.brightness()
 					? sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
@@ -125,29 +164,32 @@ export function getContrastWarning( {
 							),
 							item.description
 						);
-			speakMessage = __(
+			contrastSpeakMessage = __(
 				'This color combination may be hard for people to read.'
-			);
-			// Break from the loop when we have a contrast warning.
-			// These messages take priority over the transparency warning.
-			break;
-		}
-
-		// If there is no contrast warning and the text is transparent,
-		// show the transparent warning if alpha check is enabled.
-		if ( textHasTransparency && enableAlphaChecker ) {
-			message = __( 'Transparent text may be hard for people to read.' );
-			speakMessage = __(
-				'Transparent text may be hard for people to read.'
 			);
 		}
 	}
 
-	if ( ! message ) {
+	// Transparency makes text harder to read whatever its contrast, so the
+	// transparency warning is added to any contrast warning, not replaced by
+	// it.
+	const transparencyMessage =
+		enableAlphaChecker && hasTransparentText
+			? __( 'Transparent text may be hard for people to read.' )
+			: '';
+
+	if ( ! contrastMessage && ! transparencyMessage ) {
 		return null;
 	}
 
-	return { message, speakMessage };
+	return {
+		message: [ contrastMessage, transparencyMessage ]
+			.filter( Boolean )
+			.join( ' ' ),
+		speakMessage: [ contrastSpeakMessage, transparencyMessage ]
+			.filter( Boolean )
+			.join( ' ' ),
+	};
 }
 
 function ContrastChecker( props: ContrastCheckerProps ) {
