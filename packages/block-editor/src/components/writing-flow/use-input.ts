@@ -84,7 +84,20 @@ export default function useInput() {
 			// A mounted element's window has a selection.
 			const selection = node.ownerDocument.defaultView!.getSelection()!;
 
-			if ( ! getSelectionEditableElement( selection, node ) ) {
+			const editable = getSelectionEditableElement( selection, node );
+
+			// A collapsed caret at the edge of the element can still delete
+			// into the next block: check the range the edit will change.
+			if (
+				! editable ||
+				event
+					.getTargetRanges()
+					.some(
+						( { startContainer, endContainer } ) =>
+							! editable.contains( startContainer ) ||
+							! editable.contains( endContainer )
+					)
+			) {
 				event.preventDefault();
 			}
 		}
