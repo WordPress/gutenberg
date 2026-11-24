@@ -148,6 +148,39 @@ The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order
 
 Use it to turn an edit into a list of instructions for something that applies them one at a time, such as the WordPress media REST endpoint. `handlers` has one function for each part, `flip`, `rotation` and `crop`; each is called only when the edit has that part, and the results come back in the order the parts apply. The order matters because `rotation` is measured after the flip and `crop` after both, so instructions applied in another order frame a different part of the image.
 
+### `applyImageEdit( state, edit, options? )`
+
+The reverse of `getImageEdit`: it turns an `ImageEdit` into an editor state, so code can set the edit.
+
+```ts
+const result = applyImageEdit( state, {
+	rotation: 90,
+	crop: { x: 0, y: 0, width: 0.5, height: 1 },
+} );
+if ( 'state' in result ) {
+	setState( result.state );
+}
+```
+
+The edit replaces the current one. It is not merged with it. Every part is optional, and a part you leave out is reset:
+
+-   No `flip`: the image is not flipped.
+-   No `rotation`: the image is not rotated.
+-   No `crop`: the editor picks one, as when the image is rotated by hand. At a quarter turn that is the whole image.
+
+Passing `{ rotation: 90 }` to an image you have cropped gives a rotated image with no crop. To keep the crop, pass it again along with the rotation: every call describes the whole result. The parts apply in order, flip, then rotation, then the crop on the flipped and rotated image, so a crop's numbers mean a different region once the rotation changes.
+
+From `state`, only the image and the locked ratio are kept. The pan and zoom are worked out again: the crop is centered and zoomed in, as after a resize.
+
+The image always covers the crop. A crop it does not cover is fitted the way the editor fits one: it shrinks around its center, keeping its shape, until the image can cover it, then moves the shortest way inside. Under a locked ratio, the crop keeps its center and width and takes the height the ratio needs. Pass `{ strict: true }` to reject such a crop instead of fitting it. Use it when code must know the crop was taken as given. A missing crop is still the editor's choice, so `{ rotation: 5 }` applies either way.
+
+The result is `{ state }`, which you store like any other change, or `{ rejected }` with the reason the edit could not be applied:
+
+-   `'no-image'`: no image with a usable size has loaded.
+-   `'invalid'`: a number is not finite, a flip value is not `true` or `false`, or the crop is under one pixel wide or high.
+-   `'locked-ratio'`, strict mode only: the crop is not the shape of the locked ratio. Without the lock, the edit would apply.
+-   `'outside-image'`, strict mode only: the crop reaches outside the image.
+
 ### `exportImage( state, options? )`
 
 Use it when the edited image is uploaded as a new file, rather than applied to the original by a server. It loads the image in `state.image`, draws the region the crop frames with the flip, rotation and zoom applied, and resolves with a `Blob` whose dimensions are the ones `getOutputSize( state )` reports. `options.type` is the MIME type, `image/png` by default, and `options.quality` is the quality for lossy types, from 0 to 1.

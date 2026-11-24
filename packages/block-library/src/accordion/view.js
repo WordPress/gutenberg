@@ -31,6 +31,10 @@ const { actions } = store(
 					( item ) => item.id === id
 				);
 
+				if ( ! accordionItem ) {
+					return;
+				}
+
 				if ( autoclose ) {
 					accordionItems.forEach( ( item ) => {
 						item.isOpen =
