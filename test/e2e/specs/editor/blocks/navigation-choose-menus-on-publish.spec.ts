@@ -1,12 +1,29 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Locator, Page } from '@playwright/test';
+import {
+	test,
+	expect,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
+
+// `requestUtils.createNavigationMenu()` takes only a title and content.
+function createAutoAddMenu(
+	requestUtils: RequestUtils,
+	menu: { title: string; content: string }
+) {
+	return requestUtils.rest< { id: number } >( {
+		method: 'POST',
+		path: '/wp/v2/navigation',
+		data: { ...menu, status: 'publish', meta: { [ META_KEY ]: true } },
+	} );
+}
 
 // The menu links point at whichever site editor the site uses: the
 // extensible site editor when its experiment is on, else the current one.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
-function menuEditorPath( menuId ) {
+function menuEditorPath( menuId: number ) {
 	return isSiteEditorV2
 		? `admin.php?page=site-editor-v2&p=/navigation/edit/${ menuId }`
 		: `site-editor.php?p=/wp_navigation/${ menuId }`;
@@ -14,7 +31,7 @@ function menuEditorPath( menuId ) {
 const HOME_LINK =
 	'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->';
 
-async function openPrePublishPanel( page ) {
+async function openPrePublishPanel( page: Page ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', { name: 'Publish', exact: true } )
@@ -26,7 +43,7 @@ async function openPrePublishPanel( page ) {
 	return panel;
 }
 
-async function publishFromPanel( page, panel ) {
+async function publishFromPanel( page: Page, panel: Locator ) {
 	await panel.getByRole( 'button', { name: 'Publish', exact: true } ).click();
 	await page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -34,8 +51,8 @@ async function publishFromPanel( page, panel ) {
 		.waitFor();
 }
 
-async function getMenuContent( requestUtils, menuId ) {
-	const menu = await requestUtils.rest( {
+async function getMenuContent( requestUtils: RequestUtils, menuId: number ) {
+	const menu = await requestUtils.rest< { content: { raw: string } } >( {
 		path: `/wp/v2/navigation/${ menuId }`,
 		params: { context: 'edit' },
 	} );
@@ -62,10 +79,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		page,
 		requestUtils,
 	} ) => {
-		const autoMenu = await requestUtils.createNavigationMenu( {
+		const autoMenu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: HOME_LINK,
-			meta: { [ META_KEY ]: true },
 		} );
 		const otherMenu = await requestUtils.createNavigationMenu( {
 			title: 'Other menu',
@@ -97,7 +113,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		// Each menu links to its editor, in a new tab.
 		const link = panel.getByRole( 'link', { name: /^View Main menu/ } );
 		await expect( link ).toHaveAttribute( 'target', '_blank' );
-		const href = decodeURIComponent( await link.getAttribute( 'href' ) );
+		const href = decodeURIComponent(
+			( await link.getAttribute( 'href' ) ) ?? ''
+		);
 		expect( href ).toContain( menuEditorPath( autoMenu.id ) );
 
 		await publishFromPanel( page, panel );
@@ -118,10 +136,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		page,
 		requestUtils,
 	} ) => {
-		const autoMenu = await requestUtils.createNavigationMenu( {
+		const autoMenu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: HOME_LINK,
-			meta: { [ META_KEY ]: true },
 		} );
 		const otherMenu = await requestUtils.createNavigationMenu( {
 			title: 'Other menu',
@@ -156,10 +173,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		page,
 		requestUtils,
 	} ) => {
-		const autoMenu = await requestUtils.createNavigationMenu( {
+		const autoMenu = await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: HOME_LINK,
-			meta: { [ META_KEY ]: true },
 		} );
 		const draft = await requestUtils.rest( {
 			method: 'POST',
@@ -231,10 +247,9 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		page,
 		requestUtils,
 	} ) => {
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: HOME_LINK,
-			meta: { [ META_KEY ]: true },
 		} );
 
 		await admin.createNewPost( { title: 'Hello' } );
@@ -250,10 +265,13 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		page,
 		requestUtils,
 	} ) => {
-		const parent = await requestUtils.createPage( {
-			title: 'About',
-			status: 'publish',
-		} );
+		const parent = await requestUtils.rest< { id: number; link: string } >(
+			{
+				method: 'POST',
+				path: '/wp/v2/pages',
+				data: { title: 'About', status: 'publish' },
+			}
+		);
 		const child = await requestUtils.rest( {
 			method: 'POST',
 			path: '/wp/v2/pages',
@@ -266,16 +284,14 @@ test.describe( 'Pre-publish panel: choosing the menus a page is added to', () =>
 		const parentLink = `<!-- wp:navigation-link {"label":"About","type":"page","kind":"post-type","id":${ parent.id },"url":"${ parent.link }"} /-->`;
 
 		// Links the parent, so the child is nested under that link.
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Main menu',
 			content: parentLink,
-			meta: { [ META_KEY ]: true },
 		} );
 		// Has no link to the parent, so the setting would not add the child.
-		await requestUtils.createNavigationMenu( {
+		await createAutoAddMenu( requestUtils, {
 			title: 'Footer menu',
 			content: HOME_LINK,
-			meta: { [ META_KEY ]: true },
 		} );
 		// Already links the child.
 		await requestUtils.createNavigationMenu( {
