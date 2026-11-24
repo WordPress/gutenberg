@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences-persistence",
-	"version": "3.1.0",
+	"version": "3.2.0",
 	"description": "Persistence utilities for `wordpress/preferences`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,8 +45,8 @@
 		"@wordpress/api-fetch": "file:../api-fetch"
 	},
 	"devDependencies": {
-		"@types/node": "^24.13.3",
-		"vitest": "^5.0.5"
+		"@types/node": "^24.19.2",
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -19,11 +19,11 @@ import {
 	MAX_ZOOM,
 } from '../../core/constants';
 import { getMinZoom } from '../../core/containment';
-import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
+	areImageEditorStatesEqual,
 	enforceContainment,
-	getLockedCropRect,
+	fitCropToLockedRatio,
 	isStateDirty,
 	withBaseValues,
 } from '../../core/state';
@@ -40,12 +40,8 @@ import {
 declare const imageEditorController: unique symbol;
 
 /**
- * The editor controller surface — the contract the ImageEditorCanvas component
- * and its interaction hooks consume.
- *
- * History (undo / redo) is not part of this interface. Keep the state
- * yourself (`useInternalImageEditor( { state, onChange } )`) to put it in
- * your own undo history.
+ * The controller the canvas and its interaction hooks use: what
+ * `ImageEditorController` has, plus the methods only the canvas calls.
  */
 export interface InternalImageEditorController extends ImageEditorSetters {
 	readonly [ imageEditorController ]: true;
@@ -69,11 +65,6 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	maxZoom: number;
 	/** How far fine rotation goes either way of a quarter turn, in degrees. */
 	maxRotationOffset: number;
-	/**
-	 * Export the cropped image as a Blob. Throws on failure — see
-	 * `exportCroppedImage` for error semantics.
-	 */
-	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
 	 * Called by `ImageEditorCanvas` when the viewport changes (window or canvas
 	 * resize); not for consumers to call. Like `setCropRect`, except that
@@ -119,15 +110,14 @@ export function createImageEditorState(
 	options: CreateImageEditorStateOptions = {}
 ): ImageEditorState {
 	const { image = null, aspectRatio } = options;
-	const start = {
-		...DEFAULT_STATE,
-		image,
-		aspectRatio: aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
-	};
-	// Start a locked crop at the largest box of that ratio, the same shape
-	// `setAspectRatio` gives.
-	const cropRect = getLockedCropRect( start );
-	return enforceContainment( cropRect ? { ...start, cropRect } : start );
+	return enforceContainment(
+		fitCropToLockedRatio( {
+			...DEFAULT_STATE,
+			image,
+			aspectRatio:
+				aspectRatio && aspectRatio > 0 ? aspectRatio : undefined,
+		} )
+	);
 }
 
 /**
@@ -155,9 +145,8 @@ export interface InternalImageEditorOptions {
 }
 
 /**
- * Controller for the image editor: the state, the named setters and the
- * export helpers. It keeps no undo history; keep the state yourself
- * (`state` and `onChange`) to add one.
+ * The hook behind `useImageEditor`. Leave out `state` and `onChange` and
+ * it keeps its own state, which the package's tests and debug story use.
  *
  * @param options Starting state, or the state and change handler when
  *                you keep the state yourself.
@@ -175,7 +164,16 @@ export function useInternalImageEditor(
 	// A state the consumer passes back is usually one the editor handed
 	// out, which carries the values the editor keeps for itself. One built
 	// by hand does not, so fill them in rather than read them as undefined.
-	const state = isControlled ? withBaseValues( controlledState ) : ownState;
+	const suppliedState = isControlled
+		? withBaseValues( controlledState )
+		: ownState;
+	const state =
+		isControlled && fitCropToLockedRatio( suppliedState ) !== suppliedState
+			? imageEditorReducer( suppliedState, {
+					type: 'SET_CROP_RECT',
+					payload: suppliedState.cropRect,
+				} )
+			: suppliedState;
 
 	// The clean state `isDirty` compares against and `reset` returns to.
 	// It starts as the consumer's starting state, and follows the changes
@@ -199,6 +197,19 @@ export function useInternalImageEditor(
 	useLayoutEffect( () => {
 		onChangeRef.current = onChange;
 	}, [ onChange ] );
+	// Correct a supplied crop before it can be read or edited. Send the
+	// correction back to the consumer without adding an undo entry.
+	useLayoutEffect( () => {
+		if ( ! isControlled || state === suppliedState ) {
+			return;
+		}
+		if ( ! hasEditedRef.current ) {
+			setBaseline( ( current ) =>
+				areImageEditorStatesEqual( current, state ) ? current : state
+			);
+		}
+		onChangeRef.current?.( state, { isEdit: false } );
+	}, [ isControlled, state, suppliedState ] );
 
 	const apply = useCallback(
 		( action: ImageEditorAction, isEdit = true ) => {
@@ -226,6 +237,15 @@ export function useInternalImageEditor(
 		( image: InternalImageEditorState[ 'image' ] ) => {
 			const current = latestRef.current;
 			if ( areImagesEqual( current.image, image ) ) {
+				// A state can arrive with its image already in it and a crop
+				// that does not match its locked ratio. Fit the crop now, as
+				// loading the image would have.
+				if ( fitCropToLockedRatio( current ) !== current ) {
+					apply(
+						{ type: 'SET_CROP_RECT', payload: current.cropRect },
+						false
+					);
+				}
 				return;
 			}
 			hasEditedRef.current = false;
@@ -278,23 +298,6 @@ export function useInternalImageEditor(
 
 	const isDirty = isStateDirty( state, baseline );
 
-	const getCroppedImage = useCallback(
-		( mimeType?: string, quality?: number ): Promise< Blob > => {
-			if ( ! state.image ) {
-				return Promise.reject(
-					new Error( 'No image loaded — call setImage first.' )
-				);
-			}
-			return exportCroppedImage(
-				state.image.src,
-				state,
-				mimeType,
-				quality
-			);
-		},
-		[ state ]
-	);
-
 	// A refit after a window resize is not something the person did.
 	const adjustCropRectForViewport = useCallback(
 		( rect: NormalizedRect ) => {
@@ -318,7 +321,6 @@ export function useInternalImageEditor(
 				minZoom,
 				maxZoom: MAX_ZOOM,
 				maxRotationOffset: MAX_ROTATION_OFFSET,
-				getCroppedImage,
 				adjustCropRectForViewport,
 			} ) as InternalImageEditorController,
 		[
@@ -328,7 +330,6 @@ export function useInternalImageEditor(
 			reset,
 			isDirty,
 			minZoom,
-			getCroppedImage,
 			adjustCropRectForViewport,
 		]
 	);
@@ -372,9 +373,9 @@ export interface ImageEditorController {
 	setRotation: ( rotation: number ) => void;
 	/** Rotate a quarter turn: `1` clockwise, `-1` counter-clockwise. */
 	snapRotate90: ( direction: 1 | -1 ) => void;
-	/** Mirror the image along each axis that is `true`. */
+	/** Flip the image along each axis that is `true`. */
 	setFlip: ( flip: Flip ) => void;
-	/** Mirror the image along one axis, or undo that. */
+	/** Flip the image along one axis, or undo that. */
 	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
 	/** Set the crop area, in fractions of the view the canvas shows. */
 	setCropRect: ( rect: NormalizedRect ) => void;

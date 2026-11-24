@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread, getAnchorClientId } from './utils';
+import { focusNoteThread } from './utils/dom';
 import {
 	NoteDraftsContext,
 	useFloatingBoard,
@@ -41,17 +41,19 @@ export function Notes( {
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
-	const { selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { selectedBlockClientIds, orderedBlockIds } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getClientIdsWithDescendants } =
+			const { getSelectedBlockClientIds, getClientIdsWithDescendants } =
 				select( blockEditorStore );
 			return {
-				selectedBlockClientId: getSelectedBlockClientId(),
+				selectedBlockClientIds: getSelectedBlockClientIds(),
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		},
 		[]
 	);
+	// A note added to several blocks shows at the first.
+	const [ selectedBlockClientId ] = selectedBlockClientIds;
 	const selectedNote = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
@@ -68,6 +70,7 @@ export function Notes( {
 		}
 		const newNoteThread = {
 			id: 'new',
+			blockClientIds: selectedBlockClientIds,
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
@@ -90,6 +93,7 @@ export function Notes( {
 		filters,
 		isFloating,
 		selectedNote,
+		selectedBlockClientIds,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -139,19 +143,13 @@ export function Notes( {
 			threads[ currentIndex + 1 ] ?? threads[ currentIndex - 1 ];
 		if ( ! adjacentThread ) {
 			selectNote( undefined );
-			toggleBlockHighlight(
-				getAnchorClientId( thread, selectedBlockClientId ),
-				false
-			);
+			toggleBlockHighlight( thread.blockClientId, false );
 			relatedBlockElement?.focus();
 			return;
 		}
 
 		if ( getSelectedNote() === thread.id ) {
-			pickNote(
-				adjacentThread.id,
-				getAnchorClientId( adjacentThread, selectedBlockClientId )
-			);
+			pickNote( adjacentThread.id, adjacentThread.blockClientId );
 		}
 		focusNoteThread( adjacentThread.id, sidebarRef.current );
 	}
@@ -163,10 +161,6 @@ export function Notes( {
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
 		const isSelfTarget = event.currentTarget === event.target;
-		const anchorClientId = getAnchorClientId(
-			thread,
-			selectedBlockClientId
-		);
 
 		if (
 			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
@@ -174,7 +168,7 @@ export function Notes( {
 			! isSelected
 		) {
 			// Expand thread.
-			pickNote( thread.id, anchorClientId );
+			pickNote( thread.id, thread.blockClientId );
 		} else if (
 			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
 				isSelfTarget &&
@@ -183,8 +177,8 @@ export function Notes( {
 		) {
 			// Collapse thread.
 			selectNote( undefined );
-			if ( anchorClientId ) {
-				toggleBlockHighlight( anchorClientId, false );
+			if ( thread.blockClientId ) {
+				toggleBlockHighlight( thread.blockClientId, false );
 			}
 			focusThreadOrAdjacent( thread, thread );
 		} else if ( isSelfTarget ) {
@@ -254,7 +248,7 @@ export function Notes( {
 				{ isAddingNote && (
 					<AddNote
 						key={ selectedBlockClientId }
-						clientId={ selectedBlockClientId }
+						clientIds={ selectedBlockClientIds }
 					/>
 				) }
 				{ threads.map( ( thread, index ) => (
@@ -274,10 +268,6 @@ export function Notes( {
 						) }
 						<NoteThread
 							note={ thread }
-							anchorClientId={ getAnchorClientId(
-								thread,
-								selectedBlockClientId
-							) }
 							focusThreadOrAdjacent={ focusThreadOrAdjacent }
 							isSelected={ selectedNote === thread.id }
 							expandReplies={ expandReplies }

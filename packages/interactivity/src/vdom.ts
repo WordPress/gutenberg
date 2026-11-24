@@ -1,9 +1,14 @@
 import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
+import { unsupportedHtmlElements } from './html';
 
 /** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
 const htmlFallbacks = new WeakMap< object, DocumentFragment >();
+/** Opaque HTML props whose snapshot holds an element's server-rendered content, not `<template>` content. */
+const htmlServerContents = new WeakSet< object >();
+/** Number of `<template>` element contents being converted around the current conversion. */
+let templateContentDepth = 0;
 
 const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
@@ -183,6 +188,25 @@ export function getHtmlFallback(
 }
 
 /**
+ * Reads the script-free snapshot of an element's server-rendered content: the
+ * snapshot that {@link getHtmlFallback} returns, when `toVdom()` built the
+ * vnode from markup outside every `<template>` element's content. Callers must
+ * leave it detached and unmodified; insert a clone.
+ *
+ * @param element The element vnode passed to a directive callback.
+ * @return The detached snapshot, or `undefined` for a vnode built from
+ *         `<template>` content or not built by `toVdom()`.
+ */
+export function getHtmlServerContent(
+	element: VNode< any >
+): DocumentFragment | undefined {
+	const htmlProps = element.props.dangerouslySetInnerHTML;
+	return htmlProps && htmlServerContents.has( htmlProps )
+		? htmlFallbacks.get( htmlProps )
+		: undefined;
+}
+
+/**
  * Parses the namespace and value from a directive attribute value.
  *
  * JSON is retained only when it produces a plain object. All other values use
@@ -260,6 +284,8 @@ export const getInteractiveNamespace = (
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
+ * Only supported `data-wp-html` entries on supported elements own opaque
+ * content; ignored HTML bindings leave descendants under ordinary conversion.
  *
  * Unprefixed directives get the namespace of the nearest `data-wp-interactive`
  * at or above their element within `root`. Where there is none, the namespace
@@ -451,12 +477,18 @@ function convertToVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		const hasDefaultHtmlDirective = props.__directives?.html?.some(
-			( { suffix }: DirectiveEntry ) => suffix === null
-		);
+		const hasSupportedHtmlDirective =
+			! unsupportedHtmlElements.has( localName ) &&
+			props.__directives?.html?.some(
+				( { suffix, uniqueId }: DirectiveEntry ) =>
+					suffix === null && uniqueId === null
+			);
 
-		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
-			// `data-wp-html` owns this element's content entirely — whether
+		if (
+			props.__directives?.[ 'each-child' ] ||
+			hasSupportedHtmlDirective
+		) {
+			// Supported `data-wp-html` owns this element's content entirely — whether
 			// that's still the server-rendered fallback or HTML the
 			// directive has since applied — so it's treated as opaque here,
 			// the same way `each-child` is: don't walk its children into
@@ -467,7 +499,7 @@ function convertToVdom( root: Node ): ComponentChild {
 				__html: elementNode.innerHTML,
 			};
 			props.dangerouslySetInnerHTML = htmlProps;
-			if ( hasDefaultHtmlDirective ) {
+			if ( hasSupportedHtmlDirective ) {
 				// Preserve a script-free snapshot in the live document's shared
 				// template-contents document. Importing directly there neither
 				// requests fallback resources nor keeps a parsed page alive.
@@ -475,11 +507,20 @@ function convertToVdom( root: Node ): ComponentChild {
 					getTemplateContentsOwnerDocument().createDocumentFragment();
 				copyFallbackChildren( elementNode, snapshot );
 				htmlFallbacks.set( htmlProps, snapshot );
+				if ( ! templateContentDepth ) {
+					htmlServerContents.add( htmlProps );
+				}
 			}
 		} else if ( localName === 'template' ) {
-			props.content = [
-				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			templateContentDepth++;
+			try {
+				props.content = [
+					...( elementNode as HTMLTemplateElement ).content
+						.childNodes,
+				].map( ( childNode ) => toVdom( childNode ) );
+			} finally {
+				templateContentDepth--;
+			}
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {

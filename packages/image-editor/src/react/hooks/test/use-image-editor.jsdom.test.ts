@@ -959,10 +959,8 @@ describe( 'useInternalImageEditor', () => {
 			// 'image' is intentionally excluded — it's set once on load
 			// and doesn't represent a user edit.
 			// 'image' is set once on load.
-			// 'basePan', 'baseZoom', 'baseRotation' mirror the user's
-			// committed pose and are redundant for dirty tracking — if
-			// any base field differs from initial, the corresponding
-			// live field (crop/zoom/rotation) will also differ.
+			// Base fields can affect a later rotation, but do not change
+			// the current image output, so they are not dirty fields.
 			const excludedFields = [
 				'image',
 				'basePan',
@@ -1112,6 +1110,59 @@ describe( 'useInternalImageEditor with the state kept by the caller', () => {
 		} as InternalImageEditorState;
 		// The square crop for the 2:1 image.
 		const FITTED = computeInscribedRect( 1, { width: 1200, height: 600 } );
+		const MISMATCHED = {
+			...createImageEditorState( { image: IMAGE } ),
+			aspectRatio: 1,
+		} as InternalImageEditorState;
+
+		it( 'fits a supplied locked crop without a canvas or an undo entry', () => {
+			const { result } = renderHook( () => useControlled( MISMATCHED ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+			expect( result.current.changes ).toEqual( [ { isEdit: false } ] );
+		} );
+
+		it( 'keeps a supplied locked crop fitted through the first edit', () => {
+			const { result } = renderHook( () => useControlled( MISMATCHED ) );
+
+			act( () => result.current.controller.setZoom( 2 ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( true );
+		} );
+
+		it( 'fits the crop to the lock when the image loads, and is clean', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+
+			act( () => result.current.controller.setImage( IMAGE ) );
+
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
+
+		it( 'returns to the fitted square, still locked, on reset', () => {
+			const { result } = renderHook( () => useControlled( LOCKED ) );
+			act( () => result.current.controller.setImage( IMAGE ) );
+
+			act( () => result.current.controller.snapRotate90( 1 ) );
+			expect( result.current.controller.isDirty ).toBe( true );
+
+			act( () => result.current.controller.reset() );
+
+			expect( result.current.controller.state.aspectRatio ).toBe( 1 );
+			expect( result.current.controller.state.rotation ).toBe( 0 );
+			expect( result.current.controller.state.cropRect ).toEqual(
+				FITTED
+			);
+			expect( result.current.controller.isDirty ).toBe( false );
+		} );
 
 		it( 'fits the crop when the state starts with its image and a lock', () => {
 			const { result } = renderHook( () =>
