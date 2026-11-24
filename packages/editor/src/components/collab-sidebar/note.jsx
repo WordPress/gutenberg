@@ -110,7 +110,10 @@ export function Note( {
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
+			// A suggestion's card says what it proposes; text added to its
+			// note would outlive the decision. Replies carry the discussion.
 			isEligible: ( { status } ) =>
+				! isReviewableSuggestion &&
 				( ! isResolutionNote || hasUserText ) &&
 				! hasResolved( status ),
 			onClick: () => setActionState( 'edit' ),
@@ -231,12 +234,14 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			{ isSelected && (
-				<NoteActionsMenu
-					items={ availableItems }
-					buttonRef={ actionButtonRef }
-				/>
-			) }
+			{ /* A pending suggestion has no menu actions of its own. */ }
+			{ isSelected &&
+				( ! isReviewableSuggestion || availableItems.length > 0 ) && (
+					<NoteActionsMenu
+						items={ availableItems }
+						buttonRef={ actionButtonRef }
+					/>
+				) }
 		</>
 	) : null;
 
