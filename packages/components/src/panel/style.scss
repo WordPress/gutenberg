@@ -15,6 +15,11 @@
 	> .components-panel__body:last-child {
 		border-bottom-width: 0;
 	}
+
+	// A last header has no bottom border, so it is one pixel shorter.
+	> .components-panel__header:last-child {
+		height: $grid-unit-60 - $border-width;
+	}
 }
 
 .components-panel + .components-panel {
@@ -42,11 +47,9 @@
 	padding: 0 $grid-unit-20;
 	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
-	// The header is $grid-unit-60 tall including its bottom border. State that
-	// as a border-box height rather than relying on `box-sizing: content-box`,
-	// which the `reset` mixin's descendant selector overrides at equal
-	// specificity wherever a consumer applies it (e.g. `.editor-sidebar`),
-	// leaving the header a pixel short.
+	// Include the bottom border in the height. The `reset` mixin sets
+	// `box-sizing` on descendants with the same specificity, so a content-box
+	// height would lose a pixel inside containers that apply it.
 	box-sizing: border-box;
 	height: $grid-unit-60;
 
