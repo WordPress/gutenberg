@@ -164,7 +164,7 @@ export function FilePickerUpload() {
 	}
 
 	const status = {
-		uploading: 'Uploading',
+		uploading: undefined,
 		uploaded: <span className={ styles.success }>Uploaded</span>,
 		failed: <span className={ styles.error }>Couldn’t upload</span>,
 	};
@@ -206,8 +206,8 @@ export function FilePickerUpload() {
 											? `Cancel upload of ${ upload.file.name }`
 											: undefined
 									}
-									footer={
-										upload.status === 'uploading' && (
+									actions={
+										( upload.status === 'uploading' && (
 											<Progress.Root
 												className={ styles.progress }
 												value={ upload.progress }
@@ -217,14 +217,12 @@ export function FilePickerUpload() {
 													<Progress.Indicator />
 												</Progress.Track>
 											</Progress.Root>
-										)
-									}
-									actions={
-										upload.status === 'failed' && (
+										) ) ||
+										( upload.status === 'failed' && (
 											<Button
 												variant="minimal"
 												tone="neutral"
-												size="compact"
+												size="small"
 												aria-label={ `Retry uploading ${ upload.file.name }` }
 												onClick={ () =>
 													retry( upload )
@@ -232,7 +230,7 @@ export function FilePickerUpload() {
 											>
 												Retry
 											</Button>
-										)
+										) )
 									}
 									onRemove={ () => remove( upload ) }
 								/>
@@ -260,7 +258,7 @@ export function FilePickerUpload() {
 									render={ <span /> }
 									direction="row"
 									align="center"
-									gap="md"
+									gap="sm"
 								>
 									<span className={ styles.thumbnail }>
 										<Icon icon={ plus } />

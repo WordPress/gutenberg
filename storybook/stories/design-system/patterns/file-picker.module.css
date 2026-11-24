@@ -8,10 +8,13 @@
 
 /*
  * The drop area and the selected-file rows share one surface, so a field
- * keeps its size and shape when a file is chosen.
+ * keeps its size and shape when a file is chosen. Each holds one line, so it
+ * is the same height as an input.
  */
 .surface {
 	position: relative;
+	box-sizing: border-box;
+	block-size: var(--wpds-dimension-size-lg);
 	min-inline-size: 0;
 	border:
 		var(--wpds-border-width-xs) dashed
@@ -21,23 +24,23 @@
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
-/* A row shows a file that is already chosen, so it isn't a drop target. */
+/*
+ * A row shows a file that is already chosen, so it isn't a drop target. Its
+ * padding matches the picker button's, so a row and a drop area line up.
+ */
 .row {
 	border-style: solid;
 	border-color: var(--wpds-color-stroke-surface-neutral);
 	background: var(--wpds-color-background-surface-neutral-strong);
-	padding: var(--wpds-dimension-padding-sm);
+	padding-inline-start: var(--wpds-dimension-padding-sm);
 }
 
-/*
- * The picker button fills the drop area, apart from the space the remove
- * button takes. The padding is the same on every side, so the thumbnail sits
- * in an even frame.
- */
+/* The picker button fills the drop area, apart from the space the remove button takes. */
 .choose {
 	flex: 1;
 	min-inline-size: 0;
-	padding: var(--wpds-dimension-padding-sm);
+	padding-block: 0;
+	padding-inline: var(--wpds-dimension-padding-sm);
 	color: inherit;
 	text-align: start;
 
@@ -66,30 +69,17 @@
 	outline-offset: var(--wpds-border-width-focus);
 }
 
-/*
- * A drop area holds one line, so it is the same height as an input. The
- * picker button fills that height, so the whole area stays clickable.
- */
-.surface:has(> .choose) {
-	box-sizing: border-box;
-	block-size: var(--wpds-dimension-size-lg);
-}
-
+/* The picker button fills the drop area's height, so all of it is clickable. */
 .surface > .choose {
 	align-self: stretch;
-	padding-block: 0;
-
-	& .thumbnail {
-		inline-size: var(--wpds-dimension-size-sm);
-		block-size: var(--wpds-dimension-size-sm);
-	}
 }
 
 /*
- * Leave room for a remove button beside the picker button, with the same
- * spacing as a button in an input's suffix.
+ * Leave room for the remove button at the end of a drop area or row, with the
+ * same spacing as a button in an input's suffix.
  */
-.surface:has(> .remove) {
+.surface:has(> .remove),
+.row {
 	padding-inline-end: calc(var(--wpds-dimension-padding-md) - var(--wpds-dimension-padding-xs));
 }
 
@@ -97,17 +87,14 @@
 	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
-/*
- * A box for the add icon or the thumbnail, so both states line up. It is 32px
- * in a list row and 24px in a drop area.
- */
+/* A 24px box for the add icon or the thumbnail, so both states line up. */
 .thumbnail {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex: none;
-	inline-size: var(--wpds-dimension-size-md);
-	block-size: var(--wpds-dimension-size-md);
+	inline-size: var(--wpds-dimension-size-sm);
+	block-size: var(--wpds-dimension-size-sm);
 	overflow: hidden;
 	border-radius: var(--wpds-border-radius-sm);
 
@@ -118,20 +105,18 @@
 	}
 }
 
-.details {
-	min-inline-size: 0;
-}
-
-.grow {
+.summary {
 	flex: 1;
 	min-inline-size: 0;
 }
 
 /*
- * The details line shows the file type, so the name can be cut at the end
+ * The type and size follow the name, so the name can be cut at the end
  * without hiding what kind of file it is.
  */
 .name {
+	flex: 1;
+	min-inline-size: 0;
 	overflow: hidden;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	white-space: nowrap;
@@ -146,9 +131,17 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-/* A progress bar spans its row. */
+/* The type and size sit at the end of the row and are never cut. */
+.meta {
+	flex: none;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	white-space: nowrap;
+}
+
+/* A short progress bar sits beside the remove button while a file uploads. */
 .progress {
-	inline-size: 100%;
+	flex: none;
+	inline-size: calc(var(--wpds-dimension-size-lg) * 2);
 }
 
 .success {

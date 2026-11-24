@@ -102,16 +102,13 @@ export function FilePickerDropZone( { disabled = false } ) {
 							onClick={ openFileDialog }
 						>
 							{ file ? (
-								<FileSummary
-									file={ file }
-									showDetails={ false }
-								/>
+								<FileSummary file={ file } />
 							) : (
 								<Stack
 									render={ <span /> }
 									direction="row"
 									align="center"
-									gap="md"
+									gap="sm"
 								>
 									<span className={ styles.thumbnail }>
 										<Icon icon={ plus } />

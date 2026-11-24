@@ -70,12 +70,12 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 - **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the picker button when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
 - **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". A file dropped on a full field gets the limit message.
-- **Show the file type next to the name.** Long filenames are cut at the end, so the details line shows the type, and people can tell `report.pdf` from `report.png`.
+- **Show the file type next to the name.** Long filenames are cut at the end, so the type and size sit at the end of the row, and people can tell `report.pdf` from `report.png`.
 - **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
 
 ## Upload status
 
-When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a `Progress` bar sits below its name. When it finishes, the details line says "Uploaded". When it fails, it says "Couldn't upload" and the row gets a "Retry" button.
+When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar sits beside its remove button, so the row stays one line. When it finishes, "Uploaded" follows the type and size. When it fails, "Couldn't upload" follows them and the row gets a "Retry" button.
 
 <Canvas
 	of={ FilePickerUploadStories.UploadStatus }

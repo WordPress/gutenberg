@@ -68,18 +68,16 @@ function usePreviewUrl( file: File ) {
 }
 
 /**
- * Shows a thumbnail or a file icon, the filename, and the file type and size.
+ * Shows a thumbnail or a file icon, the filename, and the file type and size,
+ * on one line. The name is cut at the end, so the type and size stay visible.
  *
  * It renders only `span` elements, so it can be the content of a button.
  */
 export function FileSummary( {
 	file,
-	showDetails = true,
 	status,
 }: {
 	file: File;
-	/** Whether to show the file type and size below the name. */
-	showDetails?: boolean;
 	/** Text after the type and size, such as "Uploaded". */
 	status?: React.ReactNode;
 } ) {
@@ -91,8 +89,8 @@ export function FileSummary( {
 			render={ <span /> }
 			direction="row"
 			align="center"
-			gap="md"
-			className={ styles.details }
+			gap="sm"
+			className={ styles.summary }
 		>
 			<span className={ styles.thumbnail }>
 				{ previewUrl ? (
@@ -101,25 +99,17 @@ export function FileSummary( {
 					<Icon icon={ fileIcon } />
 				) }
 			</span>
-			<Stack
-				render={ <span /> }
-				direction="column"
-				className={ styles.details }
-			>
-				<Text className={ styles.name }>{ file.name }</Text>
-				{ showDetails && (
-					<Text variant="body-sm" className={ styles.weak }>
-						{ extension.slice( 1 ).toUpperCase() || 'File' }
-						<span aria-hidden="true"> ·</span>{ ' ' }
-						{ formatFileSize( file.size ) }
-						{ status && (
-							<>
-								<span aria-hidden="true"> ·</span> { status }
-							</>
-						) }
-					</Text>
+			<Text className={ styles.name }>{ file.name }</Text>
+			<Text variant="body-sm" className={ styles.meta }>
+				{ extension.slice( 1 ).toUpperCase() || 'File' }
+				<span aria-hidden="true"> ·</span>{ ' ' }
+				{ formatFileSize( file.size ) }
+				{ status && (
+					<>
+						<span aria-hidden="true"> ·</span> { status }
+					</>
 				) }
-			</Stack>
+			</Text>
 		</Stack>
 	);
 }
@@ -139,15 +129,13 @@ export const SelectedFile = forwardRef<
 		removeLabel?: string;
 		/** Text after the type and size, such as "Uploaded". */
 		status?: React.ReactNode;
-		/** Content below the file details, such as a progress bar. */
-		footer?: React.ReactNode;
-		/** Buttons before the remove button, such as "Retry". */
+		/** Content before the remove button, such as a progress bar or "Retry". */
 		actions?: React.ReactNode;
 		/** Whether the remove button is disabled. */
 		disabled?: boolean;
 	}
 >( function UnforwardedSelectedFile(
-	{ file, onRemove, removeLabel, status, footer, actions, disabled },
+	{ file, onRemove, removeLabel, status, actions, disabled },
 	ref
 ) {
 	return (
@@ -158,10 +146,7 @@ export const SelectedFile = forwardRef<
 			gap="sm"
 			className={ `${ styles.surface } ${ styles.row }` }
 		>
-			<Stack direction="column" gap="sm" className={ styles.grow }>
-				<FileSummary file={ file } status={ status } />
-				{ footer }
-			</Stack>
+			<FileSummary file={ file } status={ status } />
 			{ actions }
 			<IconButton
 				ref={ ref }
@@ -169,7 +154,7 @@ export const SelectedFile = forwardRef<
 				label={ removeLabel ?? `Remove ${ file.name }` }
 				variant="minimal"
 				tone="neutral"
-				size="compact"
+				size="small"
 				disabled={ disabled }
 				onClick={ onRemove }
 			/>

@@ -171,7 +171,7 @@ export function FilePickerMultiple() {
 									render={ <span /> }
 									direction="row"
 									align="center"
-									gap="md"
+									gap="sm"
 								>
 									<span className={ styles.thumbnail }>
 										<Icon icon={ plus } />

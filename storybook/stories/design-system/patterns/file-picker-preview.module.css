@@ -26,11 +26,13 @@
 /* A Media Library item: the whole row picks the image. */
 .option {
 	display: flex;
+	box-sizing: border-box;
 	inline-size: 100%;
+	block-size: var(--wpds-dimension-size-lg);
 	border:
 		var(--wpds-border-width-xs) solid
 		var(--wpds-color-stroke-surface-neutral);
-	border-radius: var(--wpds-border-radius-md);
+	border-radius: var(--wpds-border-radius-sm);
 	background: var(--wpds-color-background-surface-neutral);
 
 	&:hover {
