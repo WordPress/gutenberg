@@ -92,6 +92,21 @@ export function getBlockClientId( node: Node | null ) {
 }
 
 /**
+ * Whether an element is a block's own element outside its fields, such as a
+ * list item's bullet. Fields keep their own `contentEditable`.
+ *
+ * @param element Element.
+ *
+ * @return Whether the element is a block's own element outside its fields.
+ */
+export function isBlockElementOutsideFields( element: Element | null ) {
+	return (
+		( element as HTMLElement | null )?.contentEditable === 'inherit' &&
+		element!.hasAttribute( 'data-block' )
+	);
+}
+
+/**
  * Calculates the union of two rectangles.
  *
  * @param rect1 First rectangle.

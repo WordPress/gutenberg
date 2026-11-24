@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { useSetting } from '../hooks';
 import { usePresets } from '../presets/use-presets';
 
@@ -19,17 +20,17 @@ describe( 'usePresets', () => {
 		{ name: 'Medium', slug: 'medium', size: '14px' },
 	];
 
-	let setPresets;
+	let setPresets: Mock< ( newValue: unknown ) => void >;
 
 	beforeEach( () => {
-		setPresets = vi.fn();
+		setPresets = vi.fn< ( newValue: unknown ) => void >();
 		vi.clearAllMocks();
 	} );
 
 	function mockSettings( value = presets, base = basePresets ) {
-		mockUseSetting.mockImplementation( ( path, blockName, readFrom ) => {
+		mockUseSetting.mockImplementation( ( _path, _blockName, readFrom ) => {
 			if ( readFrom === 'base' ) {
-				return [ base, vi.fn() ];
+				return [ base, vi.fn< ( newValue: unknown ) => void >() ];
 			}
 			return [ value, setPresets ];
 		} );

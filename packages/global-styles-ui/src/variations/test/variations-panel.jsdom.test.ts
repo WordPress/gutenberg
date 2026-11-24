@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockStyle } from '@wordpress/blocks';
 import { useStyle } from '../../hooks';
 import { useBlockVariations } from '../variations-panel';
 
@@ -13,7 +14,7 @@ vi.mock( import( '../../hooks' ), () => ( {
 
 describe( 'useBlockVariations', () => {
 	const mockUseStyle = vi.mocked( useStyle );
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		// Create a fresh registry for each test
@@ -23,13 +24,19 @@ describe( 'useBlockVariations', () => {
 		vi.clearAllMocks();
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result >(
+		hook: () => Result,
+		options = {}
+	) {
+		const Wrapper = ( { children }: { children: React.ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
 
-	function registerBlockStyles( blockName, styles ) {
+	function registerBlockStyles(
+		blockName: string,
+		styles: BlockStyle | BlockStyle[]
+	) {
 		registry.dispatch( blocksStore ).addBlockStyles( blockName, styles );
 	}
 
