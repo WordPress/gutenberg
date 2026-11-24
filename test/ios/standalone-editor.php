@@ -72,7 +72,7 @@ add_action(
 		lines.push( Math.round( performance.now() - start ) + 'ms ' + type + ( detail ? ' ' + detail : '' ) + ' ' + state() );
 		sink.setAttribute( 'aria-label', 'ioslog: ' + lines.join( ' || ' ) );
 	};
-	for ( const type of [ 'touchstart', 'touchend', 'pointerdown', 'pointerup', 'pointercancel', 'mousedown', 'mouseup', 'click', 'focusin', 'focusout', 'selectionchange', 'beforeinput', 'input' ] ) {
+	for ( const type of [ 'touchstart', 'touchend', 'pointerdown', 'pointerup', 'pointercancel', 'mousedown', 'mouseup', 'click', 'focusin', 'focusout', 'keydown', 'keyup', 'selectionchange', 'beforeinput', 'input' ] ) {
 		document.addEventListener(
 			type,
 			( event ) => {
