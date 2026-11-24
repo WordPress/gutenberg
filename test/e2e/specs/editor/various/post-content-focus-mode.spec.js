@@ -150,6 +150,7 @@ test.describe( 'Post Content focus mode', () => {
 
 		// Edit the first block, then the second, leaving the caret in the
 		// second.
+		await postContentFocusMode.waitForPostContentVisible();
 		await editor.selectBlocks( editor.canvas.getByText( 'First' ) );
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( '-a' );
@@ -162,22 +163,11 @@ test.describe( 'Post Content focus mode', () => {
 			.poll( postContentText )
 			.toEqual( [ 'First-a', 'Second-b' ] );
 
-		// Typing coalesces into undo levels on a timer, so the number of
-		// levels the two edits produce is not fixed. Undo until the first
-		// block's edit is gone rather than assuming a count.
-		let reverted = false;
-		for ( let i = 0; i < 8 && ! reverted; i++ ) {
-			await pageUtils.pressKeys( 'primary+z' );
-			try {
-				await expect
-					.poll( postContentText, { timeout: 1000 } )
-					.toEqual( [ 'First', 'Second' ] );
-				reverted = true;
-			} catch {
-				// Not there yet; undo again.
-			}
-		}
-		expect( reverted ).toBe( true );
+		// Each edit is an undo level of its own.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( postContentText ).toEqual( [ 'First-a', 'Second' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( postContentText ).toEqual( [ 'First', 'Second' ] );
 
 		// The caret was in the second block and has to follow the undo to
 		// the first one.
