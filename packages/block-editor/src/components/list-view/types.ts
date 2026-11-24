@@ -149,6 +149,7 @@ export type ListViewContextValue = {
 	BlockAppender?: ComponentType<
 		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
 	> | null;
+	hasBlockAppender?: ( blockName: string ) => boolean;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
 };
@@ -199,6 +200,8 @@ export type PrivateListViewProps = ListViewProps & {
 	blockAppender?: ComponentType<
 		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
 	> | null;
+	/** Whether a row that can take inner blocks gets the `blockAppender`, given its block's name. Every such row gets one when it is not set. */
+	hasBlockAppender?: ( blockName: string ) => boolean;
 };
 
 /**

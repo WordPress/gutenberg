@@ -11,9 +11,8 @@ import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { NavigationLinkUI, NavigationLeafAppender } = unlock(
-	blockLibraryPrivateApis
-);
+const { NavigationLinkUI, NavigationLeafAppender, hasNavigationBlockAppender } =
+	unlock( blockLibraryPrivateApis );
 
 // The sidebar's link search lists only these blocks, which work as menu items
 // without editing them from the sidebar, which is not available yet. The other
@@ -111,6 +110,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					blockAppender={ NavigationLeafAppender }
+					hasBlockAppender={ hasNavigationBlockAppender }
 					additionalBlockContent={ SidebarNavigationLinkUI }
 					showContentPopover
 					isExpanded

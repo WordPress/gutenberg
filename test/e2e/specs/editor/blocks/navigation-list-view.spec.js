@@ -1354,6 +1354,41 @@ test.describe( 'Navigation block - List view editing', () => {
 			}
 		} );
 
+		test( 'offers a + on an empty submenu, which adds a link to it', async ( {
+			editor,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			await requestUtils.createNavigationMenu( {
+				title: 'Empty Submenu Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"Top Level Link","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->' +
+					'<!-- wp:navigation-submenu {"label":"Empty Submenu","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+			} );
+			await editor.insertBlock( { name: 'core/navigation' } );
+			await editor.openDocumentSettingsSidebar();
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description:
+					'Structure for navigation menu: Empty Submenu Menu',
+			} );
+			const addButton = listView
+				.getByRole( 'row', { name: 'Empty Submenu' } )
+				.getByRole( 'button', { name: 'Add to Empty Submenu' } );
+
+			await expect( addButton ).toBeVisible();
+			await addButton.click();
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'wordpress.org' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
 		test( 'reaches the + with the arrow keys, and adds nothing on Escape', async ( {
 			editor,
 			page,

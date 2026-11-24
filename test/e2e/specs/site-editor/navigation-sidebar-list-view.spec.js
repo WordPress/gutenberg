@@ -557,6 +557,41 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toHaveCount( 0 );
 		}
 	} );
+
+	test( 'adds an item to an empty submenu from the + in its row', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Empty Submenu Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"Empty Submenu","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const addButton = listView
+			.getByRole( 'row', { name: 'Empty Submenu' } )
+			.getByRole( 'button', { name: 'Add to Empty Submenu' } );
+
+		await expect( addButton ).toBeVisible();
+		await addButton.click();
+		await linkControl.useLinkControlSearch( 'Test Page 1' );
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Test Page 1' } )
+				.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {

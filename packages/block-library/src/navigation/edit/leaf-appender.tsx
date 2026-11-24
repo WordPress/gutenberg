@@ -19,6 +19,18 @@ const { ListViewBlockAppender, useBlockDisplayTitle } = unlock(
 	blockEditorPrivateApis
 );
 
+/**
+ * Whether a Navigation List View row that can take inner blocks gets a +.
+ * A link takes inner blocks only so that it can become a submenu, which its
+ * "Add submenu link" option does, so it gets none. An empty submenu still
+ * gets one.
+ *
+ * @param blockName The row's block name.
+ */
+export function hasNavigationBlockAppender( blockName: string ) {
+	return blockName !== 'core/navigation-link';
+}
+
 type LeafAppenderProps = ListViewCallbacks & {
 	clientId: string;
 	tabIndex?: number;

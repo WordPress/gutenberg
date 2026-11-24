@@ -177,15 +177,15 @@ function ListViewBlock( {
 		updateExpansion,
 		setInsertedBlockClientId,
 		BlockAppender,
+		hasBlockAppender,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
 
 	// Whether the row gets a + that adds a block inside it. The block must
-	// take inner blocks, show an appender for them on the canvas, and allow
-	// inserting them, so a block such as a Navigation Link, which shows none,
-	// gets no +. Should be kept in sync with the List View appender's own
-	// check.
+	// take inner blocks and allow inserting them, and the List View can leave
+	// out blocks by name, as the Navigation block does for its links. Should
+	// be kept in sync with the List View appender's own check.
 	const canAppend = useSelect(
 		( select ) => {
 			if ( ! BlockAppender ) {
@@ -194,20 +194,22 @@ function ListViewBlock( {
 			const {
 				canEditBlock: _canEditBlock,
 				getBlockListSettings,
+				getBlockName,
 				getTemplateLock,
 				isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 			const templateLock = getTemplateLock( clientId );
-			const listSettings = getBlockListSettings( clientId );
+			const _blockName = getBlockName( clientId );
 			return (
 				_canEditBlock( clientId ) &&
-				!! listSettings &&
-				! listSettings.hidesAppender &&
+				!! getBlockListSettings( clientId ) &&
+				( ! hasBlockAppender ||
+					( !! _blockName && hasBlockAppender( _blockName ) ) ) &&
 				! ( !! templateLock && templateLock !== 'contentOnly' ) &&
 				! isZoomOut()
 			);
 		},
-		[ clientId, BlockAppender ]
+		[ clientId, BlockAppender, hasBlockAppender ]
 	);
 	const isMatch = useShortcutEventMatch();
 

@@ -94,6 +94,7 @@ const expansion = (
  * @param props.additionalBlockContent Component that renders additional block content UI.
  * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
  * @param props.blockAppender          Component that renders a + in each row that can take inner blocks, which adds one at the end of them. Rows get none when it is not set.
+ * @param props.hasBlockAppender       Whether a row that can take inner blocks gets the `blockAppender`, given its block's name. Every such row gets one when it is not set.
  * @param ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -112,6 +113,7 @@ function ListViewComponent(
 		additionalBlockContent: AdditionalBlockContent,
 		showContentPopover = false,
 		blockAppender: BlockAppender,
+		hasBlockAppender,
 	}: PrivateListViewProps,
 	ref: ForwardedRef< HTMLElement >
 ) {
@@ -320,6 +322,7 @@ function ListViewComponent(
 			rootClientId,
 			setInsertedBlockClientId,
 			BlockAppender,
+			hasBlockAppender,
 			treeGridElementRef: elementRef,
 			updateExpansion,
 		} ),
@@ -330,6 +333,7 @@ function ListViewComponent(
 			rootClientId,
 			setInsertedBlockClientId,
 			BlockAppender,
+			hasBlockAppender,
 			updateExpansion,
 		]
 	);
