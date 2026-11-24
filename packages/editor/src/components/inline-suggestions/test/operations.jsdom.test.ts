@@ -186,6 +186,18 @@ describe( 'inline addition operations', () => {
 		it( 'returns a non-rich-text value unchanged', () => {
 			expect( acceptInlineAddition( 'plain', 5 ) ).toBe( 'plain' );
 		} );
+
+		it( 'joins the text to the formatted run it was typed into', () => {
+			const value = RichTextData.fromHTMLString(
+				`<strong>b</strong>${ add(
+					5,
+					'<strong>XY</strong>'
+				) }<strong>old</strong>`
+			);
+			expect( acceptInlineAddition( value, 5 ).toHTMLString() ).toBe(
+				'<strong>bXYold</strong>'
+			);
+		} );
 	} );
 
 	describe( 'acceptInlineAddition with an interleaved marker', () => {
