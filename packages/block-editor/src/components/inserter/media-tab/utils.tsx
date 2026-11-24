@@ -1,4 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
+import { escapeEditableHTML } from '@wordpress/escape-html';
 import { _x } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
 import { getFilename } from '@wordpress/url';
@@ -20,17 +21,22 @@ const mediaTypeTag: Partial< Record< MediaType, 'img' | 'video' > > = {
  * @return The File block.
  */
 function createFileBlock( media: MediaItem ): Block {
-	const title =
-		typeof media.title === 'string'
-			? media.title
-			: media.title?.raw || media.title?.rendered;
+	// `fileName` is rich text, so a plain-text name is escaped to keep it as
+	// text, as the block's transforms do. `title.rendered` is already HTML.
+	const { title } = media;
+	const plainTitle = typeof title === 'string' ? title : title?.raw;
+	const renderedTitle =
+		typeof title === 'string' ? undefined : title?.rendered;
+	const fileName = plainTitle
+		? escapeEditableHTML( plainTitle )
+		: renderedTitle || escapeEditableHTML( getFilename( media.url ) ?? '' );
 	const isPdf =
 		media.mime_type === 'application/pdf' ||
 		getFilename( media.url )?.toLowerCase().endsWith( '.pdf' );
 	const block = createBlock( 'core/file', {
 		id: media.id || undefined,
 		href: media.url,
-		fileName: title || getFilename( media.url ),
+		fileName,
 		textLinkHref: media.url,
 		// `createBlock` bypasses the default variation, which is where the
 		// translated button text is set, so set it here as the transforms do.
