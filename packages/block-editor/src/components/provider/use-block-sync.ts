@@ -317,7 +317,7 @@ export default function useBlockSync( {
 	// already in the store: the same external IDs in the same order, all
 	// the way down, with nothing but attributes changed. A nested
 	// controller owns its own inner blocks, so those are left to it.
-	const hasSameStructure = ( blocks, clones ) =>
+	const hasSameStructure = ( blocks: Block[], clones: Block[] ): boolean =>
 		blocks.length === clones.length &&
 		blocks.every( ( block, index ) => {
 			const clone = clones[ index ];
@@ -333,10 +333,14 @@ export default function useBlockSync( {
 
 	// Collects, per clone, the attributes whose values differ from the
 	// controlled value. Only called once the structures are known to match.
-	const collectAttributeChanges = ( blocks, clones, changes = {} ) => {
+	const collectAttributeChanges = (
+		blocks: Block[],
+		clones: Block[],
+		changes: Record< string, Record< string, unknown > > = {}
+	) => {
 		blocks.forEach( ( block, index ) => {
 			const clone = clones[ index ];
-			const changed = {};
+			const changed: Record< string, unknown > = {};
 			let hasChanged = false;
 			for ( const key of new Set( [
 				...Object.keys( block.attributes ),

@@ -5,7 +5,12 @@ import { useState } from '@wordpress/element';
 import type { ComponentType } from 'react';
 import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
-import type { BlockEditorProviderProps, RegistryProvidedProps } from '../types';
+import type {
+	BlockEditorProviderProps,
+	BlockSelectionState,
+	RegistryProvidedProps,
+	UseBlockSyncProps,
+} from '../types';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import { SelectionContext } from '../selection-context';
@@ -688,7 +693,9 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	describe( 'controlled value with the same structure', () => {
-		const block = ( attributes ) => ( {
+		const block = (
+			attributes: Record< string, unknown >
+		): TestBlock => ( {
 			name: 'test/test-block',
 			clientId: 'external',
 			innerBlocks: [
@@ -703,13 +710,13 @@ describe( 'useBlockSync hook', () => {
 		} );
 
 		function renderController() {
-			let registry;
+			let registry!: DataRegistry;
 			const onChange = vi.fn();
 			const onInput = vi.fn();
 			const view = render(
 				<TestWrapper
 					clientId="controller"
-					setRegistry={ ( reg ) => {
+					setRegistry={ ( reg: DataRegistry ) => {
 						registry = reg;
 					} }
 					value={ [ block( { foo: 1 } ) ] }
@@ -809,7 +816,10 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	describe( 'selection after an incoming change', () => {
-		const paragraph = ( clientId, content ) => ( {
+		const paragraph = (
+			clientId: string,
+			content: number
+		): TestBlock => ( {
 			name: 'test/test-block',
 			clientId,
 			innerBlocks: [],
@@ -818,12 +828,23 @@ describe( 'useBlockSync hook', () => {
 
 		// Several controllers in one block-editor store, as on a canvas, all
 		// reading the recorded selection from the same context.
-		function Controller( props ) {
-			useBlockSync( props );
+		type ControllerProps = Omit< UseBlockSyncProps, 'value' > & {
+			clientId: string;
+			value: TestBlock[];
+		};
+		type CanvasProps = {
+			setRegistry: ( registry: DataRegistry ) => void;
+			selectionRef: { current?: BlockSelectionState };
+			controllers: ControllerProps[];
+		};
+		function Controller( props: ControllerProps ) {
+			useBlockSync( props as UseBlockSyncProps );
 			return null;
 		}
 		const Canvas = withRegistryProvider(
-			( { registry, setRegistry, selectionRef, controllers } ) => {
+			( props: RegistryProvidedProps ) => {
+				const { registry, setRegistry, selectionRef, controllers } =
+					props as RegistryProvidedProps & CanvasProps;
 				setRegistry( registry );
 				const [ context ] = useState( () => ( {
 					getSelection: () => selectionRef.current,
@@ -831,24 +852,27 @@ describe( 'useBlockSync hook', () => {
 				} ) );
 				return (
 					<SelectionContext.Provider value={ context }>
-						{ controllers.map( ( props ) => (
-							<Controller key={ props.clientId } { ...props } />
+						{ controllers.map( ( controller ) => (
+							<Controller
+								key={ controller.clientId }
+								{ ...controller }
+							/>
 						) ) }
 					</SelectionContext.Provider>
 				);
 			}
-		);
+		) as ComponentType< CanvasProps >;
 
-		function renderCanvas( hostClientIds ) {
-			let registry;
-			const selectionRef = { current: undefined };
-			const setRegistry = ( reg ) => {
+		function renderCanvas( hostClientIds: string[] ) {
+			let registry!: DataRegistry;
+			const selectionRef: CanvasProps[ 'selectionRef' ] = {};
+			const setRegistry = ( reg: DataRegistry ) => {
 				if ( ! registry ) {
 					registry = reg;
 					reg.dispatch( blockEditorStore ).resetBlocks(
 						hostClientIds.map( ( clientId ) =>
 							paragraph( clientId, 0 )
-						)
+						) as Block[]
 					);
 				}
 			};
@@ -859,7 +883,7 @@ describe( 'useBlockSync hook', () => {
 					controllers={ [] }
 				/>
 			);
-			const update = ( controllers ) =>
+			const update = ( controllers: ControllerProps[] ) =>
 				view.rerender(
 					<Canvas
 						setRegistry={ setRegistry }
@@ -868,7 +892,7 @@ describe( 'useBlockSync hook', () => {
 					/>
 				);
 			const select = () => registry.select( blockEditorStore );
-			const selectBlock = ( clientId ) =>
+			const selectBlock = ( clientId: string ) =>
 				registry.dispatch( blockEditorStore ).selectBlock( clientId );
 			return { registry, selectionRef, update, select, selectBlock };
 		}
@@ -877,7 +901,7 @@ describe( 'useBlockSync hook', () => {
 			const { registry, update, select, selectBlock, selectionRef } =
 				renderCanvas( [ 'copy-a', 'copy-b' ] );
 			let entity = [ paragraph( 'p', 1 ) ];
-			const onChangeA = ( blocks ) => ( entity = blocks );
+			const onChangeA = ( blocks: TestBlock[] ) => ( entity = blocks );
 			const onChangeB = vi.fn();
 			const controllers = () => [
 				{
