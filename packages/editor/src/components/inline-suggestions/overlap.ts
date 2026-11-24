@@ -115,9 +115,9 @@ export function classifyOverlap(
 	}
 
 	/*
-	 * A formatting change nests in someone's addition, stacks on someone's
-	 * formatting change, may cross the edge of either, and over the author's
-	 * own addition revises it; see `planFormatMarkers`.
+	 * A formatting change nests in an addition, the author's own included,
+	 * stacks on someone's formatting change and may cross the edge of
+	 * either; see `planFormatMarkers`.
 	 */
 	if ( gesture === 'format' ) {
 		return ALLOW;

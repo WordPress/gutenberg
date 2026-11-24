@@ -294,7 +294,7 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		).toBeHidden();
 	} );
 
-	test( 'formatting your own added text is named on its card', async ( {
+	test( 'formatting your own added text opens a suggestion of its own', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -338,21 +338,97 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft', {
 			times: ' New sentence.'.length,
 		} );
+		saved = suggestionSavedPromise( page );
 		await pageUtils.pressKeys( 'primary+b' );
+		await saved;
 
-		await expect(
-			paragraph.locator( 'mark.wp-suggestion-add strong' )
-		).toHaveText( ' New sentence.' );
+		// The formatting change sits inside the addition.
+		const formatted = paragraph.locator(
+			'mark.wp-suggestion-add mark.wp-suggestion-format'
+		);
+		await expect( formatted.locator( 'strong' ) ).toHaveText(
+			' New sentence.'
+		);
+
+		// A second format on the same words revises that one suggestion.
+		saved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+i' );
+		await saved;
+		await expect( formatted.locator( 'em' ) ).toHaveText(
+			' New sentence.'
+		);
 
 		const sidebar = await openNotesSidebar( page );
-		const summary = sidebar.locator( SUMMARY ).filter( {
-			hasText: 'New sentence.',
+		const summaries = sidebar.locator( SUMMARY );
+		await expect( summaries ).toHaveCount( 3 );
+		const addition = summaries.filter( {
+			hasText: 'Add: “ New sentence.”',
 		} );
-		await expect( summary ).toHaveCount( 1 );
-		await expect( summary ).toContainText( 'Add: “ New sentence.”' );
-		await expect( summary ).toContainText( 'Add formatting: bold' );
-		// The formatting is part of the addition, not a suggestion of its own.
-		await expect( sidebar.locator( SUMMARY ) ).toHaveCount( 2 );
+		await expect( addition ).toHaveCount( 1 );
+		await expect( addition ).not.toContainText( 'formatting' );
+		const formatting = sidebar
+			.locator( '.editor-collab-sidebar-panel__thread' )
+			.filter( { hasText: 'Add formatting: bold, italic' } );
+		await expect( formatting ).toHaveCount( 1 );
+
+		// Each is decided by itself: rejecting the formatting keeps the text.
+		await formatting.click();
+		await formatting
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.click();
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'Suggestion rejected.' )
+		).toBeVisible();
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-add' )
+		).toHaveText( ' New sentence.' );
+		await expect( paragraph.locator( 'strong, em' ) ).toHaveCount( 0 );
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-format' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'rejecting added text takes its formatting suggestion with it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph.' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		let saved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' New sentence.' );
+		await saved;
+		await pageUtils.pressKeys( 'shift+ArrowLeft', {
+			times: ' New sentence.'.length,
+		} );
+		saved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+b' );
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		const threads = sidebar.locator(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		await expect( threads ).toHaveCount( 2 );
+		const addition = threads.filter( { hasText: 'Add: “ New sentence.”' } );
+		await addition.click();
+		await addition
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.click();
+
+		await expect( paragraph ).toHaveText( 'First paragraph.' );
+		await expect(
+			threads.filter( { hasText: 'Add formatting: bold' } )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'opening the Template panel raises no refusal (F-68)', async ( {
