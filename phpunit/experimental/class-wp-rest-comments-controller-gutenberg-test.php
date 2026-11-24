@@ -1766,4 +1766,338 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertStringContainsString( 'type=note', $href );
 		$this->assertStringNotContainsString( 'type=reaction', $href );
 	}
+
+	/**
+	 * The curated reaction key for the heart emoji, as stored in a reaction's content.
+	 */
+	private const HEART_REACTION_KEY = '2764';
+
+	/**
+	 * Makes the editor the current user.
+	 */
+	private function act_as_editor(): void {
+		$this->assertIsInt( self::$editor_id );
+		wp_set_current_user( self::$editor_id );
+	}
+
+	/**
+	 * Creates an open note by the editor on a new post.
+	 *
+	 * @return array{int, int} The post ID and the note ID.
+	 */
+	private function create_editor_note(): array {
+		$post_id = self::factory()->post->create();
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 0,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'Test note',
+			)
+		);
+
+		$this->assertIsInt( $post_id );
+		$this->assertIsInt( $note_id );
+
+		return array( $post_id, $note_id );
+	}
+
+	/**
+	 * Reads a note's reaction summary as the editor.
+	 *
+	 * @param int $note_id The note ID.
+	 * @return array<array-key, array{count: int, current_user_reaction: int}>
+	 */
+	private function get_reaction_summary( int $note_id ): array {
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+
+		$data = rest_get_server()->dispatch( $request )->get_data();
+		$this->assertIsArray( $data );
+		$this->assertArrayHasKey( 'reaction_summary', $data );
+		$this->assertIsArray( $data['reaction_summary'] );
+
+		/** @var array<array-key, array{count: int, current_user_reaction: int}> $summary */
+		$summary = $data['reaction_summary'];
+
+		return $summary;
+	}
+
+	/**
+	 * A reaction stored against another post is not a reaction to this note,
+	 * whatever its parent says.
+	 */
+	public function test_reaction_summary_ignores_reactions_stored_on_another_post(): void {
+		list( , $note_id ) = $this->create_editor_note();
+		$other_post_id     = self::factory()->post->create();
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $other_post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$subscriber_id,
+				'comment_content'  => self::HEART_REACTION_KEY,
+			)
+		);
+
+		$this->assertSame( array(), $this->get_reaction_summary( $note_id ) );
+	}
+
+	/**
+	 * Only the curated emoji keys are summarized.
+	 */
+	public function test_reaction_summary_ignores_uncurated_keys(): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$subscriber_id,
+				'comment_content'  => 'not-an-emoji-key',
+			)
+		);
+
+		$this->assertSame( array(), $this->get_reaction_summary( $note_id ) );
+	}
+
+	/**
+	 * Rows that strip to the same key are counted together rather than the
+	 * last one overwriting the others.
+	 */
+	public function test_reaction_summary_accumulates_rows_that_strip_to_the_same_key(): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+
+		$heart_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => self::HEART_REACTION_KEY,
+			)
+		);
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$subscriber_id,
+				'comment_content'  => '<b>' . self::HEART_REACTION_KEY . '</b>',
+			)
+		);
+
+		$summary = $this->get_reaction_summary( $note_id );
+
+		$this->assertCount( 1, $summary );
+		$this->assertArrayHasKey( self::HEART_REACTION_KEY, $summary );
+		$this->assertSame( 2, $summary[ self::HEART_REACTION_KEY ]['count'] );
+		$this->assertSame( $heart_id, $summary[ self::HEART_REACTION_KEY ]['current_user_reaction'] );
+	}
+
+	/**
+	 * A note reply has to sit on the same post as the note it answers, or a
+	 * user could thread their own note under one on a post they cannot read.
+	 */
+	public function test_cannot_create_note_reply_under_note_on_another_post(): void {
+		list( , $note_id ) = $this->create_editor_note();
+		$post_b_id         = self::factory()->post->create();
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'post', $post_b_id );
+		$request->set_param( 'parent', $note_id );
+		$request->set_param( 'content', 'Reply from another post' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * The same-post rule for note replies holds on update too.
+	 */
+	public function test_cannot_update_note_parent_to_note_on_another_post(): void {
+		list( , $note_a_id ) = $this->create_editor_note();
+		list( , $note_b_id ) = $this->create_editor_note();
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_b_id );
+		$request->set_param( 'parent', $note_a_id );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+
+		$note_b = get_comment( $note_b_id );
+		$this->assertInstanceOf( WP_Comment::class, $note_b );
+		$this->assertSame( '0', $note_b->comment_parent );
+	}
+
+	/**
+	 * A note cannot be threaded under a regular comment by an update.
+	 */
+	public function test_cannot_update_note_parent_to_a_comment(): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+		$comment_id                = self::factory()->comment->create( array( 'comment_post_ID' => $post_id ) );
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'parent', $comment_id );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Moving a note reply to another post would leave it under a note on the
+	 * post it left.
+	 */
+	public function test_cannot_move_note_reply_away_from_its_parent(): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+		$other_post_id             = self::factory()->post->create();
+		$reply_id                  = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 0,
+				'user_id'          => self::$editor_id,
+			)
+		);
+		$this->assertIsInt( $reply_id );
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $reply_id );
+		$request->set_param( 'post', $other_post_id );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+
+		$reply = get_comment( $reply_id );
+		$this->assertInstanceOf( WP_Comment::class, $reply );
+		$this->assertSame( (string) $post_id, $reply->comment_post_ID );
+	}
+
+	/**
+	 * A note's replies and reactions stay on its post, so moving the note
+	 * would separate them and empty its reaction summary.
+	 *
+	 * @dataProvider data_note_child_types
+	 *
+	 * @param string $child_type Comment type of the note's child.
+	 */
+	public function test_cannot_move_note_that_has_children( string $child_type ): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+		$other_post_id             = self::factory()->post->create();
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => $child_type,
+				'comment_parent'   => $note_id,
+				'comment_approved' => 'reaction' === $child_type ? 1 : 0,
+				'user_id'          => self::$subscriber_id,
+				'comment_content'  => 'reaction' === $child_type ? self::HEART_REACTION_KEY : 'Reply',
+			)
+		);
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'post', $other_post_id );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_has_children', $response, 400 );
+
+		$note = get_comment( $note_id );
+		$this->assertInstanceOf( WP_Comment::class, $note );
+		$this->assertSame( (string) $post_id, $note->comment_post_ID );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array<string, array{string}>
+	 */
+	public function data_note_child_types(): array {
+		return array(
+			'a reaction' => array( 'reaction' ),
+			'a reply'    => array( 'note' ),
+		);
+	}
+
+	/**
+	 * A note with no replies or reactions can still move.
+	 */
+	public function test_can_move_note_without_children(): void {
+		list( , $note_id ) = $this->create_editor_note();
+		$other_post_id     = self::factory()->post->create();
+		$this->assertIsInt( $other_post_id );
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'post', $other_post_id );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$note = get_comment( $note_id );
+		$this->assertInstanceOf( WP_Comment::class, $note );
+		$this->assertSame( (string) $other_post_id, $note->comment_post_ID );
+	}
+
+	/**
+	 * The reaction summary ignores a reaction stored on another post, so the
+	 * uniqueness check has to as well, or the user is refused a reaction they
+	 * cannot see.
+	 */
+	public function test_reaction_stored_on_another_post_does_not_block_a_new_reaction(): void {
+		list( $post_id, $note_id ) = $this->create_editor_note();
+		$other_post_id             = self::factory()->post->create();
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $other_post_id,
+				'comment_type'     => 'reaction',
+				'comment_parent'   => $note_id,
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => self::HEART_REACTION_KEY,
+			)
+		);
+
+		$this->act_as_editor();
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'type', 'reaction' );
+		$request->set_param( 'post', $post_id );
+		$request->set_param( 'parent', $note_id );
+		$request->set_param( 'content', self::HEART_REACTION_KEY );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( self::HEART_REACTION_KEY, $this->get_reaction_summary( $note_id ) );
+	}
 }

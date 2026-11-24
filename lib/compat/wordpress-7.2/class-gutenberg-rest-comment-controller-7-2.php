@@ -73,8 +73,35 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		);
 		// END CHANGE.
 
+		// START CHANGE: Reject a negative `parent` or `post`.
+		foreach ( array( 'parent', 'post' ) as $property ) {
+			if ( is_array( $schema['properties'] ) && is_array( $schema['properties'][ $property ] ?? null ) ) {
+				$schema['properties'][ $property ]['minimum'] = 0;
+			}
+		}
+		// END CHANGE.
+
 		return $schema;
 	}
+
+	// START CHANGE: Reject a negative ID in the `parent` collection param.
+	/**
+	 * Retrieves the query params for collections.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return array<mixed> Comments collection parameters.
+	 */
+	public function get_collection_params() {
+		$query_params = parent::get_collection_params();
+
+		if ( is_array( $query_params['parent'] ?? null ) && is_array( $query_params['parent']['items'] ?? null ) ) {
+			$query_params['parent']['items']['minimum'] = 0;
+		}
+
+		return $query_params;
+	}
+	// END CHANGE.
 
 	// START CHANGE: New Gutenberg-only helper, not in core.
 	/**
@@ -87,6 +114,35 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 */
 	protected function is_note_or_reaction( $type ): bool {
 		return in_array( $type, array( 'note', 'reaction' ), true );
+	}
+	// END CHANGE.
+
+	// START CHANGE: New method, added in 7.2.
+	/**
+	 * Checks that a note's parent is a note on the same post.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param int $parent_id ID of the parent comment.
+	 * @param int $post_id   ID of the post the note is, or will be, on.
+	 * @return true|WP_Error True if the parent is valid, error object otherwise.
+	 */
+	private function check_note_parent( int $parent_id, int $post_id ) {
+		$parent = get_comment( $parent_id );
+
+		if (
+			! $parent ||
+			'note' !== $parent->comment_type ||
+			( $post_id && $post_id !== (int) $parent->comment_post_ID )
+		) {
+			return new WP_Error(
+				'rest_comment_invalid_parent',
+				__( 'A note reply must be attached to a note on the same post.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		return true;
 	}
 	// END CHANGE.
 
@@ -662,6 +718,16 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 		// END CHANGE.
 
+		// START CHANGE: A note reply must sit under a note on the same post.
+		if ( 'note' === $request['type'] && $request['parent'] ) {
+			$parent_check = $this->check_note_parent( absint( $request['parent'] ), absint( $request['post'] ) );
+
+			if ( is_wp_error( $parent_check ) ) {
+				return $parent_check;
+			}
+		}
+		// END CHANGE.
+
 		// START CHANGE: Validate reactions.
 		/*
 		 * The canonical reaction key, populated once validated below so the
@@ -767,10 +833,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			/*
 			 * Enforce uniqueness: prevent duplicate emoji per user per note.
 			 * Limit to active reactions - trashed reactions are invisible and
-			 * must not block the user from re-adding the same emoji.
+			 * must not block the user from re-adding the same emoji. The same
+			 * goes for a reaction stored on another post, which the reaction
+			 * summary leaves out.
 			 */
 			$existing = get_comments(
 				array(
+					'post_id' => absint( $request['post'] ),
 					'parent'  => $request['parent'],
 					'user_id' => get_current_user_id(),
 					'type'    => 'reaction',
@@ -957,6 +1026,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		if ( null !== $reaction_key ) {
 			$matching   = get_comments(
 				array(
+					'post_id' => absint( $request['post'] ),
 					'parent'  => $request['parent'],
 					'user_id' => get_current_user_id(),
 					'type'    => 'reaction',
@@ -1033,6 +1103,59 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $comment_id ) ) );
 
 		return $response;
+	}
+
+	/**
+	 * Updates a comment.
+	 *
+	 * @since 4.7.0
+	 * @since 7.2.0 A note keeps a note on its own post as its parent, and stays
+	 *              on its post while it has replies or reactions.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
+	 */
+	public function update_item( $request ) {
+		// START CHANGE: Keep a note's parent, replies and reactions on its post.
+		$comment = $this->get_comment( absint( $request['id'] ) );
+
+		if ( ! is_wp_error( $comment ) && 'note' === $comment->comment_type ) {
+			$id        = (int) $comment->comment_ID;
+			$post_id   = isset( $request['post'] ) ? absint( $request['post'] ) : (int) $comment->comment_post_ID;
+			$parent_id = isset( $request['parent'] ) ? absint( $request['parent'] ) : (int) $comment->comment_parent;
+			$is_moving = $post_id !== (int) $comment->comment_post_ID;
+
+			if ( $parent_id && ( $is_moving || $parent_id !== (int) $comment->comment_parent ) ) {
+				$parent_check = $this->check_note_parent( $parent_id, $post_id );
+
+				if ( is_wp_error( $parent_check ) ) {
+					return $parent_check;
+				}
+			}
+
+			// Replies and reactions stay on the note's post, so a move would separate them.
+			if ( $is_moving ) {
+				$children = get_comments(
+					array(
+						'parent' => $id,
+						'type'   => array( 'note', 'reaction' ),
+						'status' => 'any',
+						'count'  => true,
+					)
+				);
+
+				if ( $children ) {
+					return new WP_Error(
+						'rest_comment_has_children',
+						__( 'A note with replies or reactions cannot be moved to another post.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+		}
+		// END CHANGE.
+
+		return parent::update_item( $request );
 	}
 
 	// START CHANGE: New property, added in 7.2.
@@ -1117,6 +1240,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @param int[] $note_ids Array of note comment IDs.
 	 */
 	protected function prefetch_reaction_summaries( $note_ids ) {
+		/** @var wpdb $wpdb */
 		global $wpdb;
 
 		$this->reaction_summaries = array();
@@ -1127,25 +1251,28 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		$current_user_id = get_current_user_id();
 
-		$parent_in = $wpdb->prepare(
-			'comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')',
+		// Only reactions stored on their note's post count, which is what create_item() writes.
+		$from   = "FROM $wpdb->comments AS r INNER JOIN $wpdb->comments AS n";
+		$from  .= " ON n.comment_ID = r.comment_parent AND n.comment_post_ID = r.comment_post_ID AND n.comment_type = 'note'";
+		$where  = "WHERE r.comment_type = 'reaction' AND r.comment_approved = '1' AND ";
+		$where .= $wpdb->prepare(
+			'r.comment_parent IN (' . implode( ',', array_fill( 0, count( $note_ids ), '%d' ) ) . ')',
 			...$note_ids
 		);
 
 		// Query 1: Get aggregated counts per emoji per note.
-		$query  = "SELECT comment_parent, comment_content, COUNT(*) AS reaction_count FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
-		$query .= $parent_in;
-		$query .= ' GROUP BY comment_parent, comment_content';
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		$query = "SELECT r.comment_parent, r.comment_content, COUNT(*) AS reaction_count $from $where GROUP BY r.comment_parent, r.comment_content";
+		/** @var list<object{ comment_parent: decimal-int-string, comment_content: string, reaction_count: decimal-int-string }&stdClass>|null $counts */
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- It is prepared above.
 		$counts = $wpdb->get_results( $query );
 
 		// Query 2: Get the current user's own reaction IDs (if logged in).
 		$my_reactions = array();
 		if ( $current_user_id ) {
-			$query  = "SELECT comment_ID, comment_parent, comment_content FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
-			$query .= $parent_in;
-			$query .= $wpdb->prepare( ' AND user_id = %d', $current_user_id );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+			$query  = "SELECT r.comment_ID, r.comment_parent, r.comment_content $from $where";
+			$query .= $wpdb->prepare( ' AND r.user_id = %d', $current_user_id );
+			/** @var list<object{ comment_ID: decimal-int-string, comment_parent: decimal-int-string, comment_content: string }&stdClass>|null $user_rows */
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- It is prepared above.
 			$user_rows = $wpdb->get_results( $query );
 
 			if ( $user_rows ) {
@@ -1165,15 +1292,27 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			return;
 		}
 
+		$allowed_keys = self::get_note_reaction_keys();
+
 		foreach ( $counts as $row ) {
 			$note_id = (int) $row->comment_parent;
 			$slug    = wp_strip_all_tags( $row->comment_content );
 			$key     = $note_id . ':' . $slug;
 
-			$this->reaction_summaries[ $note_id ][ $slug ] = array(
-				'count'                 => (int) $row->reaction_count,
-				'current_user_reaction' => $my_reactions[ $key ] ?? 0,
-			);
+			// Only curated emoji keys are summarized.
+			if ( ! in_array( $slug, $allowed_keys, true ) ) {
+				continue;
+			}
+
+			// Rows are grouped on the raw content, so several groups can strip to one key.
+			if ( ! isset( $this->reaction_summaries[ $note_id ][ $slug ] ) ) {
+				$this->reaction_summaries[ $note_id ][ $slug ] = array(
+					'count'                 => 0,
+					'current_user_reaction' => $my_reactions[ $key ] ?? 0,
+				);
+			}
+
+			$this->reaction_summaries[ $note_id ][ $slug ]['count'] += (int) $row->reaction_count;
 		}
 	}
 	// END CHANGE.
