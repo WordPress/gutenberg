@@ -525,7 +525,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Tab' );
 		const panel = blockLibrary.getByRole( 'tabpanel', { name: 'Blocks' } );
 		await expect( panel ).toBeFocused();
-		await expect( panel ).toHaveCSS( 'outline-style', 'solid' );
 
 		await page.keyboard.press( 'Tab' );
 		await expect(

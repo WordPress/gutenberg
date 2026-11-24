@@ -91,17 +91,19 @@ function TabbedSidebar(
 						) ) }
 					</WCTabs.TabList>
 				</div>
-				{ tabs.map( ( tab ) => (
-					<WCTabs.TabPanel
-						key={ tab.name }
-						tabId={ tab.name }
-						focusable={ false }
-						className="block-editor-tabbed-sidebar__tabpanel"
-						ref={ tab.panelRef }
-					>
-						{ tab.panel }
-					</WCTabs.TabPanel>
-				) ) }
+				<div className="block-editor-tabbed-sidebar__tabpanels">
+					{ tabs.map( ( tab ) => (
+						<WCTabs.TabPanel
+							key={ tab.name }
+							tabId={ tab.name }
+							focusable={ false }
+							className="block-editor-tabbed-sidebar__tabpanel"
+							ref={ tab.panelRef }
+						>
+							{ tab.panel }
+						</WCTabs.TabPanel>
+					) ) }
+				</div>
 			</WCTabs>
 		</div>
 	);
