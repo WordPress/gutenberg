@@ -31,7 +31,7 @@ function createFileBlock( media: MediaItem ): Block {
 		? escapeEditableHTML( plainTitle )
 		: renderedTitle || escapeEditableHTML( getFilename( media.url ) ?? '' );
 	const isPdf =
-		media.mime_type === 'application/pdf' ||
+		( media.mime || media.mime_type ) === 'application/pdf' ||
 		getFilename( media.url )?.toLowerCase().endsWith( '.pdf' );
 	const block = createBlock( 'core/file', {
 		id: media.id || undefined,

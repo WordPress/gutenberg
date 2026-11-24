@@ -29,6 +29,8 @@ export type MediaItem = {
 	title?: string | { raw?: string; rendered?: string };
 	url: string;
 	mime_type?: string;
+	// The MIME type as the classic media modal names it.
+	mime?: string;
 	previewUrl?: string;
 	alt?: string;
 	caption?: string;
