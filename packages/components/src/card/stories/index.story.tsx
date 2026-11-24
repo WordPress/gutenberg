@@ -58,7 +58,7 @@ export const Default: StoryObj< typeof Card > = {
 				</CardBody>
 				<CardMedia>
 					{ /* Served from `storybook/static`. */ }
-					<img alt="Card Media" src="landscape.svg" />
+					<img alt="Sun above green hills" src="landscape.svg" />
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
