@@ -419,6 +419,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -428,6 +429,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -460,6 +462,7 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ clientId ]
@@ -550,7 +553,9 @@ function GridTools( {
 			{ isManualPlacement &&
 				window.__experimentalEnableGridInteractivity && (
 					<GridItemMovers
-						layout={ style?.layout }
+						style={ style }
+						selectedState={ selectedState }
+						isResponsiveEditing={ isResponsiveEditing }
 						parentLayout={ parentLayout }
 						onChange={ updateLayout }
 						gridClientId={ rootClientId }
