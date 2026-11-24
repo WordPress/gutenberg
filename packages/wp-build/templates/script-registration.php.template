@@ -6,6 +6,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Registers a script according to `wp_register_script`. Honors this request by
  * reassigning internal dependency properties of any script handle already
@@ -52,7 +56,7 @@ function {{PREFIX}}_override_script( $scripts, $handle, $src, $deps = array(), $
 function {{PREFIX}}_register_package_scripts( $scripts ) {
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
-	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
+	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
 	$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 	$scripts_dir  = __DIR__ . '/scripts';

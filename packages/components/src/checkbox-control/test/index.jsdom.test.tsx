@@ -65,18 +65,24 @@ describe( 'CheckboxControl', () => {
 		} );
 
 		it( 'should render the indeterminate icon when in the indeterminate state', () => {
-			const { container: containerDefault } = render(
-				<CheckboxControl />
+			const id = 'checkbox-control';
+			const { rerender } = render(
+				<BaseCheckboxControl id={ id } onChange={ noop } />
 			);
+			expect(
+				screen.queryByRole( 'presentation', { hidden: true } )
+			).not.toBeInTheDocument();
 
-			const { container: containerIndeterminate } = render(
-				<CheckboxControl indeterminate />
+			rerender(
+				<BaseCheckboxControl
+					id={ id }
+					onChange={ noop }
+					indeterminate
+				/>
 			);
-
-			// Expect the diff snapshot to be mostly about the indeterminate icon
-			expect( containerDefault ).toMatchDiffSnapshot(
-				containerIndeterminate
-			);
+			expect(
+				screen.getByRole( 'presentation', { hidden: true } )
+			).toHaveClass( 'components-checkbox-control__indeterminate' );
 		} );
 
 		it( 'should associate the `help` text accessibly', () => {

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -20,10 +20,6 @@ const DEPRECATION_MESSAGE =
 
 beforeEach( () => {
 	logged[ DEPRECATION_MESSAGE ] = true;
-} );
-
-afterEach( () => {
-	delete logged[ DEPRECATION_MESSAGE ];
 } );
 
 describe( 'GradientPicker', () => {
@@ -234,5 +230,29 @@ describe( 'GradientPicker', () => {
 			// multiple-origin behavior.
 			expect( onChange ).toHaveBeenCalledWith( GRADIENT_B, 0, 'blush' );
 		} );
+	} );
+
+	it( 'should render only the custom gradient editor without presets or a Clear button', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			<GradientPicker
+				clearable={ false }
+				value={ GRADIENT_B }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Clear' } )
+		).not.toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Type' } ) );
+		await user.click( screen.getByRole( 'option', { name: 'Radial' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			'radial-gradient(rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
+		);
 	} );
 } );

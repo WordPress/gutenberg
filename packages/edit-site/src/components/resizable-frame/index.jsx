@@ -110,7 +110,7 @@ function ResizableFrame( {
 	};
 
 	// Calculate the frame size based on the window width as its resized.
-	const handleResize = ( _event, _direction, _ref, delta ) => {
+	const handleResize = ( _event, _direction, ref, delta ) => {
 		const normalizedDelta = delta.width / resizeRatio;
 		const deltaAbs = Math.abs( normalizedDelta );
 		const maxDoubledDelta =
@@ -127,9 +127,10 @@ function ResizableFrame( {
 
 		setIsOversized( updatedWidth > defaultSize.width );
 
-		// Width will be controlled by the library (via `resizeRatio`),
-		// so we only need to update the height.
+		// `re-resizable` resets a dimension missing from `size` to `auto` when
+		// the resize ends.
 		setFrameSize( {
+			width: ref.style.width,
 			height: isOversized
 				? '100%'
 				: calculateNewHeight( updatedWidth, defaultAspectRatio ),

@@ -2,17 +2,17 @@ import { useEffect, useId, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 // The dashboard is still experimental.
-/* eslint-disable @wordpress/use-recommended-components */
 import {
 	Autocomplete,
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	IconButton,
 	Input,
 	InputLayout,
 	Stack,
 } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 import styles from './location-picker.module.css';
 
 type LocationOption = {
@@ -286,7 +286,9 @@ export function LocationPicker( {
 												key={ item.id }
 												value={ item }
 											>
-												{ item.value }
+												<Autocomplete.ItemLabel>
+													{ item.value }
+												</Autocomplete.ItemLabel>
 											</Autocomplete.Item>
 										) }
 									</Autocomplete.Collection>

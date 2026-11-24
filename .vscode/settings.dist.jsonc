@@ -1,0 +1,24 @@
+{
+	// Use the repository's native TypeScript language server.
+	"js/ts.tsdk.path": "tools/build-scripts/node_modules/@typescript/native/lib",
+	"js/ts.experimental.useTsgo": true,
+	// Show grandfathered ESLint violations as hints.
+	"eslint.bulkSuppression.enable": true,
+	"eslint.bulkSuppression.location": "tools/eslint/suppressions.json",
+	"eslint.bulkSuppression.severity": "hint",
+	// Use the repository's formatting tools.
+	"[javascript][javascriptreact][typescript][typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+	},
+	"[css][scss]": {
+		"editor.defaultFormatter": "stylelint.vscode-stylelint",
+	},
+	"stylelint.validate": [ "css", "postcss", "scss" ],
+	"[php]": {
+		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer",
+	},
+	"phpCodeSniffer.autoExecutable": true,
+	"phpCodeSniffer.standard": "Automatic",
+	// Match the repository's minimum supported PHP version.
+	"intelephense.environment.phpVersion": "7.4.0",
+}

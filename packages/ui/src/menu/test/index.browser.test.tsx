@@ -19,6 +19,9 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { copy } from '@wordpress/icons';
+import '@wordpress/theme/design-tokens.css';
+import { Icon } from '../../icon';
 import * as Menu from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -35,130 +38,42 @@ afterEach( () => {
 } );
 
 describe( 'Menu', () => {
-	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
-		const user = userEvent;
-		const onCanvasClick = vi.fn();
+	it( 'keeps the popup open when clicking inside an iframe contained by it', async () => {
+		const onFrameClick = vi.fn();
+		await render(
+			<Menu.Root modal={ false }>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<iframe title="Popup frame" />
+				</Menu.Popup>
+			</Menu.Root>
+		);
 
-		function ControlledMenuWithIframes() {
-			const [ open, setOpen ] = useState( false );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Actions' } )
+		);
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
 
-			return (
-				<>
-					<Menu.Root
-						modal={ false }
-						onOpenChange={ setOpen }
-						open={ open }
-					>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<iframe title="Secondary canvas" />
-					<iframe
-						title="Editor canvas"
-						style={ { display: 'block', marginTop: 200 } }
-					/>
-				</>
-			);
-		}
-
-		await render( <ControlledMenuWithIframes /> );
-
-		const iframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
 		const iframeDocument = iframe.contentDocument;
 		if ( ! iframeDocument ) {
 			throw new Error( 'Expected a same-origin iframe document.' );
 		}
-		const canvasTarget = iframeDocument.createElement( 'button' );
-		canvasTarget.textContent = 'Edit block';
-		canvasTarget.addEventListener( 'click', onCanvasClick );
-		iframeDocument.body.appendChild( canvasTarget );
+		const button = iframeDocument.createElement( 'button' );
+		button.textContent = 'Inside popup';
+		button.addEventListener( 'click', onFrameClick );
+		iframeDocument.body.appendChild( button );
 
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
-
-		const frame = page.frameLocator( page.getByTitle( 'Editor canvas' ) );
-		await frame.getByRole( 'button', { name: 'Edit block' } ).click();
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'closes a non-modal menu on a nested same-origin iframe pointer interaction', async () => {
-		const user = userEvent;
-
-		await render(
-			<>
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-				<iframe
-					title="Editor canvas"
-					style={ { display: 'block', marginTop: 200 } }
-				/>
-			</>
-		);
-
-		const editorIframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
-		const editorDocument = editorIframe.contentDocument;
-
-		if ( ! editorDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
-
-		const nestedIframe = editorDocument.createElement( 'iframe' );
-		nestedIframe.title = 'Nested canvas';
-		editorDocument.body.appendChild( nestedIframe );
-		const nestedDocument = nestedIframe.contentDocument;
-
-		if ( ! nestedDocument ) {
-			throw new Error( 'Expected a nested same-origin iframe document.' );
-		}
-
-		const canvasTarget = nestedDocument.createElement( 'button' );
-		canvasTarget.textContent = 'Edit nested block';
-		nestedDocument.body.appendChild( canvasTarget );
-
-		const nestedAddEventListener = vi.spyOn(
-			nestedDocument,
-			'addEventListener'
-		);
-		await waitFor( () => {
-			expect( nestedAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-
-		const editorFrame = page.frameLocator(
-			page.getByTitle( 'Editor canvas' )
-		);
-		const nestedFrame = page.frameLocator(
-			editorFrame.getByTitle( 'Nested canvas' )
-		);
-		await nestedFrame
-			.getByRole( 'button', { name: 'Edit nested block' } )
+		await page
+			.frameLocator( page.getByTitle( 'Popup frame' ) )
+			.getByRole( 'button', { name: 'Inside popup' } )
 			.click();
 
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
+		expect( onFrameClick ).toHaveBeenCalledTimes( 1 );
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
 	} );
 
 	it( 'keeps prefix icons hidden from assistive technology', async () => {
@@ -190,6 +105,254 @@ describe( 'Menu', () => {
 			.element( within( item ).getByRole( 'img', { hidden: true } ) )
 			.toBeVisible();
 		expect( within( item ).queryByRole( 'img' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'keeps a submenu trigger as tall as a plain item', async () => {
+		const prefix = (
+			<Menu.PrefixIcon
+				icon={ copy }
+				role="img"
+				aria-label="Prefix icon"
+			/>
+		);
+
+		await render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item prefix={ prefix }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.SubmenuRoot>
+						<Menu.SubmenuTrigger prefix={ prefix }>
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
+						</Menu.SubmenuTrigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Folder</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.SubmenuRoot>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Actions' } )
+		);
+		const plainItem = await screen.findByRole( 'menuitem', {
+			name: 'Archive',
+		} );
+		const submenuTrigger = screen.getByRole( 'menuitem', {
+			name: 'Move to',
+		} );
+
+		// The chevron is taller than the label line. It must not grow the row.
+		expect( submenuTrigger.getBoundingClientRect().height ).toBe(
+			plainItem.getBoundingClientRect().height
+		);
+	} );
+
+	describe( 'slot alignment', () => {
+		const SHORTCUT = {
+			displayShortcut: '⌘M',
+			ariaKeyShortcut: 'Meta+M',
+			label: 'Command M',
+		};
+		const WRAPPING_LABEL =
+			'Move this item to another folder in the library, then archive it for later review by the team';
+
+		type AlignmentCase = {
+			content: string;
+			variant?: 'item' | 'submenu' | 'radio';
+			prefixSize?: number;
+			// A string is the suffix text, a number is the size of a suffix icon.
+			suffix?: 'text' | number;
+			shortcut?: boolean;
+			description?: boolean;
+			wrapped?: boolean;
+		};
+
+		// The prefix, suffix, shortcut, chevron and selection indicator all
+		// share the vertical center of the label's first line.
+		it.each< AlignmentCase >( [
+			{
+				content: 'a prefix, a suffix, a shortcut and a chevron',
+				variant: 'submenu',
+				suffix: 'text',
+				shortcut: true,
+			},
+			{
+				content: 'a 32px prefix and a 32px suffix icon',
+				prefixSize: 32,
+				suffix: 32,
+			},
+			{
+				content:
+					'a wrapped label, a 24px suffix icon, a shortcut and a chevron',
+				variant: 'submenu',
+				suffix: 24,
+				shortcut: true,
+				wrapped: true,
+			},
+			{
+				content: 'a radio indicator and a 24px prefix',
+				variant: 'radio',
+				prefixSize: 24,
+				suffix: 'text',
+			},
+			{
+				content: 'a description',
+				variant: 'submenu',
+				description: true,
+			},
+		] )(
+			'centers the slots of an item with $content on the first line of its label',
+			async ( {
+				variant = 'item',
+				prefixSize = 16,
+				suffix,
+				shortcut,
+				description,
+				wrapped,
+			} ) => {
+				const labelText = wrapped ? WRAPPING_LABEL : 'Move to';
+				const slotProps = {
+					prefix: (
+						<Menu.PrefixIcon
+							icon={ copy }
+							size={ prefixSize }
+							role="img"
+							aria-label="Prefix icon"
+						/>
+					),
+					suffix:
+						typeof suffix === 'number' ? (
+							<Icon
+								icon={ copy }
+								size={ suffix }
+								role="img"
+								aria-label="Suffix icon"
+							/>
+						) : (
+							suffix && 'Draft'
+						),
+					shortcut: shortcut ? SHORTCUT : undefined,
+				};
+				const label = <Menu.ItemLabel>{ labelText }</Menu.ItemLabel>;
+				const details = description ? (
+					<Menu.ItemDescription>
+						Move the item to another folder.
+					</Menu.ItemDescription>
+				) : null;
+
+				let element = (
+					<Menu.Item { ...slotProps }>
+						{ label }
+						{ details }
+					</Menu.Item>
+				);
+				if ( variant === 'submenu' ) {
+					element = (
+						<Menu.SubmenuRoot>
+							<Menu.SubmenuTrigger { ...slotProps }>
+								{ label }
+								{ details }
+							</Menu.SubmenuTrigger>
+							<Menu.Popup>
+								<Menu.Item>
+									<Menu.ItemLabel>Folder</Menu.ItemLabel>
+								</Menu.Item>
+							</Menu.Popup>
+						</Menu.SubmenuRoot>
+					);
+				} else if ( variant === 'radio' ) {
+					element = (
+						<Menu.RadioGroup value="move">
+							<Menu.RadioItem value="move" { ...slotProps }>
+								{ label }
+								{ details }
+							</Menu.RadioItem>
+						</Menu.RadioGroup>
+					);
+				}
+
+				await render(
+					<Menu.Root>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>{ element }</Menu.Popup>
+					</Menu.Root>
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Actions' } )
+				);
+				const item = await screen.findByRole(
+					variant === 'radio' ? 'menuitemradio' : 'menuitem'
+				);
+				const labelElement = within( item ).getByText( labelText );
+				const labelBox = labelElement.getBoundingClientRect();
+				const lineHeight = parseFloat(
+					getComputedStyle( labelElement ).lineHeight
+				);
+				// The long label must really wrap, or this case would only
+				// cover a single line.
+				expect( labelBox.height > lineHeight * 1.5 ).toBe(
+					Boolean( wrapped )
+				);
+				const firstLineCenter = labelBox.top + lineHeight / 2;
+
+				// The prefix is hidden from assistive technology, so it has no
+				// accessible name to query by.
+				const slots: Record< string, Element > = {
+					prefix: within( item ).getByLabelText( 'Prefix icon' ),
+				};
+				if ( typeof suffix === 'number' ) {
+					slots.suffix =
+						within( item ).getByLabelText( 'Suffix icon' );
+				} else if ( suffix ) {
+					slots.suffix = within( item ).getByText( 'Draft' );
+				}
+				if ( shortcut ) {
+					slots.shortcut = within( item ).getByText( '⌘M' );
+				}
+				// The chevron and selection indicator are decorative icons with
+				// no role or text to query.
+				// eslint-disable-next-line testing-library/no-node-access
+				const decoration = item.querySelector( 'svg:not([role])' );
+				expect( decoration !== null ).toBe( variant !== 'item' );
+				if ( decoration ) {
+					slots[ variant === 'radio' ? 'indicator' : 'chevron' ] =
+						decoration;
+				}
+
+				const itemBox = item.getBoundingClientRect();
+				const offsets: Record< string, number > = {};
+				const overflowing: string[] = [];
+				for ( const [ name, slot ] of Object.entries( slots ) ) {
+					const box = slot.getBoundingClientRect();
+					offsets[ name ] =
+						box.top + box.height / 2 - firstLineCenter;
+					if (
+						box.top < itemBox.top ||
+						box.bottom > itemBox.bottom
+					) {
+						overflowing.push( name );
+					}
+				}
+
+				expect( offsets ).toEqual(
+					Object.fromEntries(
+						Object.keys( offsets ).map( ( name ) => [
+							name,
+							expect.closeTo( 0, 0 ),
+						] )
+					)
+				);
+				// A slot taller than the label line grows the row instead.
+				expect( overflowing ).toEqual( [] );
+			}
+		);
 	} );
 
 	it( 'opens from the trigger and exposes menu semantics', async () => {

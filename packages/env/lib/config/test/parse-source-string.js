@@ -26,16 +26,11 @@ describe( 'parseSourceString', () => {
 	} );
 
 	it( 'should throw when source not parseable', () => {
-		expect.assertions( 1 );
-		try {
-			parseSourceString( 'test://test', options );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					'Invalid or unrecognized source: "test://test".'
-				)
-			);
-		}
+		expect( () => parseSourceString( 'test://test', options ) ).toThrow(
+			new ValidationError(
+				'Invalid or unrecognized source: "test://test".'
+			)
+		);
 	} );
 
 	describe( 'local sources', () => {

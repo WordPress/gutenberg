@@ -47,7 +47,7 @@ test.describe( 'Parent selector inserter', () => {
 		] );
 	} );
 
-	test( 'hides the parent selector inserter only inside text flow wrappers', async ( {
+	test( 'hides the parent selector inserter where Enter adds a sibling', async ( {
 		admin,
 		editor,
 		page,
@@ -62,14 +62,15 @@ test.describe( 'Parent selector inserter', () => {
 		} );
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 
+		// A group allows any block, including ones that split on Enter.
 		await editor.showBlockToolbar();
 		const toolbar = page.locator( 'role=toolbar[name="Block tools"i]' );
 		await expect(
 			toolbar.locator( 'role=button[name="Select parent block: Group"]' )
 		).toBeVisible();
 		await expect(
-			toolbar.locator( 'role=button[name="Add block"]' )
-		).toBeVisible();
+			toolbar.locator( 'role=button[name^="Add "]' )
+		).toBeHidden();
 
 		// A list merges with the text flow: Enter continues it, so its
 		// items get no inserter.

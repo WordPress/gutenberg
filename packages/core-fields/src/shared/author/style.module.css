@@ -1,0 +1,24 @@
+/*
+ * The avatar, icon and name of the author views of posts, media and
+ * templates.
+ */
+.avatar,
+.icon {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	inline-size: var(--wpds-dimension-size-2xs);
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
+}
+
+.icon svg {
+	/* Crop the empty edges of the 24px icon, so the gap sits next to the glyph. */
+	margin-inline: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+	fill: currentColor;
+}
+
+.name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

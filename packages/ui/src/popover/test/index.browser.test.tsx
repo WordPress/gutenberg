@@ -2,12 +2,46 @@ import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { userEvent } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { createRef, useState } from '@wordpress/element';
 import * as Popover from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
 describe( 'Popover', () => {
+	it( 'keeps the popup open when clicking inside an iframe contained by it', async () => {
+		const onFrameClick = vi.fn();
+		await render(
+			<Popover.Root>
+				<Popover.Trigger>Open</Popover.Trigger>
+				<Popover.Popup>
+					<Popover.Title>Title</Popover.Title>
+					<iframe title="Popup frame" />
+				</Popover.Popup>
+			</Popover.Root>
+		);
+
+		await userEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
+		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+		const button = iframeDocument.createElement( 'button' );
+		button.textContent = 'Inside popup';
+		button.addEventListener( 'click', onFrameClick );
+		iframeDocument.body.appendChild( button );
+
+		await page
+			.frameLocator( page.getByTitle( 'Popup frame' ) )
+			.getByRole( 'button', { name: 'Inside popup' } )
+			.click();
+
+		expect( onFrameClick ).toHaveBeenCalledTimes( 1 );
+		await expect.element( page.getByRole( 'dialog' ) ).toBeVisible();
+	} );
+
 	describe( 'forwards ref', () => {
 		it( 'should forward ref on Popup', async () => {
 			const user = userEvent;

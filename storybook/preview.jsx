@@ -83,6 +83,7 @@ export const parameters = {
 		test: 'error',
 	},
 	controls: {
+		expanded: true,
 		sort: 'requiredFirst',
 	},
 	backgrounds: {
@@ -116,6 +117,8 @@ export const parameters = {
 				'Design System',
 				[
 					'Introduction',
+					'Contributing',
+					'Using with AI',
 					'Foundations',
 					'Tokens',
 					'Theme',
@@ -198,8 +201,12 @@ export const parameters = {
 			};
 
 			// Check if an entry is an MDX doc page ending at a specific path depth
+			// Named attached MDX pages share their component's title. Giving them
+			// standalone MDX priority can move them ahead of that component's Docs.
 			const isMdxAtDepth = ( entry, path, depth ) =>
 				entry.type === 'docs' &&
+				( entry.name === 'Docs' ||
+					! entry.tags?.includes( 'attached-mdx' ) ) &&
 				path.length === depth + 1 &&
 				entry.importPath?.endsWith( '.mdx' );
 
@@ -262,8 +269,7 @@ export const parameters = {
 					if ( aIndex !== bIndex ) {
 						return aIndex - bIndex;
 					}
-					// Same index (both not in order list), preserve export order
-					return 0;
+					return aSegment.localeCompare( bSegment );
 				}
 
 				// Same segment, descend into nested order

@@ -1,5 +1,5 @@
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl as WCTextareaControl,
@@ -9,13 +9,31 @@ import { Link, Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { insertObject, useAnchor } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-import type { EditImageProps, InlineImageUIProps } from '../types';
+import type { FormatEditProps } from '../types';
+
+/**
+ * The attributes the `core/image` format registers.
+ */
+interface ImageFormatAttributes {
+	className?: string;
+	style?: string;
+	url?: string;
+	alt?: string;
+}
+
+interface InlineImageUIProps {
+	value: RichTextValue;
+	onChange: ( value: RichTextValue ) => void;
+	activeObjectAttributes: ImageFormatAttributes;
+	contentRef: React.RefObject< HTMLElement >;
+}
+
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
@@ -28,9 +46,9 @@ const title = __( 'Inline image' );
  * @return The extracted image ID or undefined if not found.
  */
 function getCurrentImageId(
-	activeObjectAttributes: EditImageProps[ 'activeObjectAttributes' ]
+	activeObjectAttributes: ImageFormatAttributes
 ): number | undefined {
-	if ( ! activeObjectAttributes?.className ) {
+	if ( ! activeObjectAttributes.className ) {
 		return undefined;
 	}
 
@@ -62,8 +80,8 @@ function InlineUI( {
 	activeObjectAttributes,
 	contentRef,
 }: InlineImageUIProps ) {
-	const style = activeObjectAttributes?.style;
-	const alt = activeObjectAttributes?.alt;
+	const style = activeObjectAttributes.style;
+	const alt = activeObjectAttributes.alt;
 
 	const width = style?.replace( /\D/g, '' );
 	const [ editedWidth, setEditedWidth ] = useState( width );
@@ -76,7 +94,7 @@ function InlineUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -84,9 +102,17 @@ function InlineUI( {
 			<form
 				className="block-editor-format-toolbar__image-container-content"
 				onSubmit={ ( event ) => {
+					event.preventDefault();
+
+					if ( value.start === undefined ) {
+						return;
+					}
+
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
+						// Keep attributes the format doesn't register, like `loading`.
+						...value.replacements[ value.start ],
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
@@ -101,8 +127,6 @@ function InlineUI( {
 						...value,
 						replacements: newReplacements,
 					} );
-
-					event.preventDefault();
 				} }
 			>
 				<Stack direction="column" gap="lg">
@@ -153,7 +177,7 @@ function InlineUI( {
 					</Stack>
 				</Stack>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 
@@ -164,7 +188,7 @@ function Edit( {
 	isObjectActive,
 	activeObjectAttributes,
 	contentRef,
-}: EditImageProps ) {
+}: FormatEditProps ) {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
@@ -199,6 +223,7 @@ function Edit( {
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
+						name="image"
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

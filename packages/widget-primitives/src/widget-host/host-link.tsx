@@ -24,7 +24,7 @@ interface HostLinkProps extends Omit<
  * @param {HostLinkProps} props Component props.
  */
 export const HostLink = forwardRef< HTMLAnchorElement, HostLinkProps >(
-	function HostLink( { href, children, ...props }, ref ) {
+	function UnforwardedHostLink( { href, children, ...props }, ref ) {
 		const { links } = useWidgetHost();
 		const { download, target } = props;
 		const opensNewDocument =

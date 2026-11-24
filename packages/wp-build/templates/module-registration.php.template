@@ -6,6 +6,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register all script modules.
  */

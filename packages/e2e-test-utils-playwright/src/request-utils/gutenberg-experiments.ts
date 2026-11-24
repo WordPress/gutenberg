@@ -4,19 +4,21 @@ import type { RequestUtils } from './index';
  * Sets the Gutenberg experiments.
  *
  * @param this
- * @param experiments Array of experimental flags to enable. Pass in an empty array to disable all experiments.
+ * @param experiments Array of experimental flags to switch on,
+ *                    or a map of flags to the state to put them in.
+ *                    Every other experiment returns to its default.
  */
 async function setGutenbergExperiments(
 	this: RequestUtils,
-	experiments: string[]
+	experiments: string[] | Record< string, boolean >
 ) {
-	// Build the experiments object with boolean values.
-	// When empty array is passed, we send an empty object to disable all experiments.
-	const experimentsData: Record< string, boolean > = {};
-
-	for ( const experiment of experiments ) {
-		experimentsData[ experiment ] = true;
-	}
+	const experimentsData: Record< string, boolean > = Array.isArray(
+		experiments
+	)
+		? Object.fromEntries(
+				experiments.map( ( experiment ) => [ experiment, true ] )
+			)
+		: { ...experiments };
 
 	// When the run targets the extensible site editor, its experiment must
 	// survive specs that toggle experiments for their own feature under test

@@ -10,6 +10,7 @@ import {
 	type Mock,
 } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import type { Field } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -29,7 +30,10 @@ const POST_TYPES: Record< string, unknown > = {
 	page: { labels: { uploaded_to_this_item: 'Uploaded to this page' } },
 	// A post type that never set the label.
 	cpt: { labels: {} },
+	attachment: { labels: {}, taxonomies: [ 'genre' ] },
 };
+
+const TAXONOMIES = [ { slug: 'genre', rest_base: 'genres' } ];
 
 vi.mock( import( '@wordpress/core-data' ), async () => {
 	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
@@ -88,10 +92,17 @@ type ModalProps = {
 	value?: number | number[];
 	postId?: number;
 	postType?: string;
+	fields?: Field< any >[];
 };
 
 function renderModal(
-	{ isOpen = true, value, postId, postType }: Partial< ModalProps > = {},
+	{
+		isOpen = true,
+		value,
+		postId,
+		postType,
+		fields,
+	}: Partial< ModalProps > = {},
 	persistedView?: Record< string, unknown >
 ) {
 	const registry = createRegistry();
@@ -101,6 +112,7 @@ function renderModal(
 		reducer: ( state = {} ) => state,
 		selectors: {
 			getPostType: ( state: unknown, slug: string ) => POST_TYPES[ slug ],
+			getTaxonomies: () => TAXONOMIES,
 		},
 	} );
 
@@ -120,6 +132,7 @@ function renderModal(
 				value={ value }
 				postId={ postId }
 				postType={ postType }
+				fields={ fields }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
@@ -205,9 +218,9 @@ describe( 'MediaUploadModal', () => {
 
 		const { rerender } = renderModal();
 
-		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
-			'option'
-		);
+		const options = within(
+			await screen.findByRole( 'listbox' )
+		).getAllByRole( 'option' );
 		await user.click( options[ 0 ] );
 		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
 
@@ -217,11 +230,15 @@ describe( 'MediaUploadModal', () => {
 		rerender( { isOpen: true } );
 
 		const reopenedOptions = within(
-			screen.getByRole( 'listbox' )
+			await screen.findByRole( 'listbox' )
 		).getAllByRole( 'option' );
 		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
 			'aria-selected',
 			'false'
+		);
+		// Ariakit checks layout to validate virtual focus. jsdom has no layout.
+		expect( console ).toHaveWarnedWith(
+			'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
 		);
 	} );
 
@@ -231,9 +248,9 @@ describe( 'MediaUploadModal', () => {
 		// Opens with item 1 pre-selected via `value`.
 		const { rerender } = renderModal( { value: 1 } );
 
-		const options = within( screen.getByRole( 'listbox' ) ).getAllByRole(
-			'option'
-		);
+		const options = within(
+			await screen.findByRole( 'listbox' )
+		).getAllByRole( 'option' );
 		expect( options[ 0 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'false' );
 
@@ -246,7 +263,7 @@ describe( 'MediaUploadModal', () => {
 		rerender( { isOpen: true, value: 2 } );
 
 		const reopenedOptions = within(
-			screen.getByRole( 'listbox' )
+			await screen.findByRole( 'listbox' )
 		).getAllByRole( 'option' );
 		expect( reopenedOptions[ 0 ] ).toHaveAttribute(
 			'aria-selected',
@@ -256,6 +273,19 @@ describe( 'MediaUploadModal', () => {
 			'aria-selected',
 			'true'
 		);
+	} );
+
+	it( 'renders while the media total is still unknown', async () => {
+		mockUseEntityRecordsWithPermissions.mockReturnValue( {
+			records: [],
+			isResolving: true,
+			totalItems: null,
+			totalPages: null,
+		} );
+
+		renderModal();
+
+		expect( await screen.findByText( '0 items' ) ).toBeInTheDocument();
 	} );
 
 	it( 'updates the media query when the picker changes page', async () => {
@@ -431,6 +461,9 @@ describe( 'MediaUploadModal', () => {
 					expect.not.objectContaining( { parent: expect.anything() } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'queries both options together as a single `parent` list', async () => {
@@ -461,6 +494,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 42, 0 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'queries media uploaded to the post as its `parent`', async () => {
@@ -488,6 +524,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 42 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'does not persist the filter', async () => {
@@ -525,6 +564,9 @@ describe( 'MediaUploadModal', () => {
 					.select( preferencesStore )
 					.get( 'core/views', preferenceKey )
 			).toBeUndefined();
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'keeps the filter while the picker stays on screen', async () => {
@@ -557,6 +599,9 @@ describe( 'MediaUploadModal', () => {
 					expect.objectContaining( { parent: [ 0 ] } )
 				);
 			} );
+			expect( console ).toHaveWarnedWith(
+				'A composite widget with `virtualFocus` enabled requires a focusable composite element. Set the `focusable` prop to `true` or the `virtualFocus` option to `false`.'
+			);
 		} );
 
 		it( 'ignores an `attached_to` filter left in the persisted view', async () => {
@@ -587,6 +632,98 @@ describe( 'MediaUploadModal', () => {
 			);
 			expect(
 				screen.queryByRole( 'button', { name: /Attached to/ } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'queries a filter on a taxonomy field by the taxonomy', async () => {
+		renderModal(
+			{},
+			{
+				filters: [
+					{ field: 'genres', operator: 'isNone', value: [ 3 ] },
+				],
+			}
+		);
+
+		await waitFor( () => {
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.objectContaining( { genres_exclude: [ 3 ] } )
+			);
+		} );
+	} );
+
+	describe( 'registered fields', () => {
+		const genreField = {
+			id: 'genre',
+			type: 'array',
+			label: 'Genre',
+			elements: [
+				{ value: 3, label: 'Portrait' },
+				{ value: 4, label: 'Landscape' },
+			],
+			filterBy: { operators: [ 'isAny' ] },
+		} as Field< any >;
+
+		it( 'shows a registered field as a column', async () => {
+			mockRecords( IMAGE_RECORDS );
+			renderModal(
+				{ fields: [ genreField ] },
+				{ type: 'pickerTable', fields: [ 'genre' ] }
+			);
+
+			expect(
+				await screen.findByRole( 'columnheader', { name: /Genre/ } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'offers a registered field as a filter', async () => {
+			const user = userEvent.setup();
+			renderModal( { fields: [ genreField ] } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Genre' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'Portrait' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', { name: 'Landscape' } )
+			).toBeVisible();
+		} );
+
+		it( "keeps the modal's own field when one is registered with its ID", async () => {
+			mockRecords( IMAGE_RECORDS );
+			renderModal(
+				{
+					fields: [
+						{
+							id: 'filename',
+							type: 'text',
+							label: 'Registered file name',
+						} as Field< any >,
+					],
+				},
+				{ type: 'pickerTable', fields: [ 'filename' ] }
+			);
+
+			expect(
+				await screen.findByRole( 'columnheader', {
+					name: /^File name/,
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'columnheader', {
+					name: /Registered file name/,
+				} )
 			).not.toBeInTheDocument();
 		} );
 	} );

@@ -16,6 +16,7 @@ import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
 	deserializeBlockAttributes,
+	shouldReparseBlocks,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
@@ -83,34 +84,44 @@ const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
+// Read-only REST fields can differ between requests without a term edit,
+// such as the count after publishing a post or links after a URL change.
+// Ignore them when writing and reading, including in existing documents.
+const unsyncedTaxonomyProperties = new Set( [
+	'id',
+	'count',
+	'link',
+	'taxonomy',
+	'_links',
+	'_embedded',
+] );
+
 /**
- * Given a set of local changes to a generic entity record, apply those changes
+ * Given a set of local changes to a taxonomy term, apply those changes
  * to the local Y.Doc.
  *
  * @param {CRDTDoc}               ydoc
  * @param {Partial< ObjectData >} changes
  * @return {void}
  */
-function defaultApplyChangesToCRDTDoc(
+function applyTaxonomyChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: ObjectData
 ): void {
 	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
+		if ( unsyncedTaxonomyProperties.has( key ) ) {
+			return;
+		}
+
 		// Cannot serialize function values, so cannot sync them.
 		if ( 'function' === typeof newValue ) {
 			return;
 		}
 
-		switch ( key ) {
-			// Add support for additional data types here.
-
-			default: {
-				const currentValue = ymap.get( key );
-				updateMapValue( ymap, key, currentValue, newValue );
-			}
-		}
+		const currentValue = ymap.get( key );
+		updateMapValue( ymap, key, currentValue, newValue );
 	} );
 }
 
@@ -334,7 +345,7 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 		: null;
 }
 
-function defaultGetChangesFromCRDTDoc(
+function getTaxonomyChangesFromCRDTDoc(
 	crdtDoc: CRDTDoc,
 	editedRecord: ObjectData
 ): ObjectData {
@@ -348,8 +359,10 @@ function defaultGetChangesFromCRDTDoc(
 	 * See https://github.com/WordPress/gutenberg/issues/79907.
 	 */
 	return Object.fromEntries(
-		Object.entries( docRecord ).filter( ( [ key, newValue ] ) =>
-			haveValuesChanged( editedRecord?.[ key ], newValue )
+		Object.entries( docRecord ).filter(
+			( [ key, newValue ] ) =>
+				! unsyncedTaxonomyProperties.has( key ) &&
+				haveValuesChanged( editedRecord?.[ key ], newValue )
 		)
 	);
 }
@@ -405,6 +418,16 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
+						// Missing and invalid blocks serialize back to the markup
+						// they were loaded from, so the content comparison below
+						// cannot tell that the parser would now build a different
+						// block from that markup (for example, after a plugin is
+						// reactivated or updated). Check for those blocks first so
+						// the blocks are re-parsed from the content in that case.
+						if ( shouldReparseBlocks( blocksJson ) ) {
+							return true;
+						}
 
 						return (
 							__unstableSerializeAndClean( blocksJson ).trim() !==
@@ -537,13 +560,12 @@ export function getPostChangesFromCRDTDoc(
 }
 
 /**
- * This default sync config can be used for entities that are flat maps of
- * primitive values and do not require custom logic to merge changes.
+ * Syncs editable taxonomy term fields while leaving read-only REST data local.
  */
-export const defaultSyncConfig: SyncConfig = {
-	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+export const taxonomySyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: applyTaxonomyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
-	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+	getChangesFromCRDTDoc: getTaxonomyChangesFromCRDTDoc,
 };
 
 /**

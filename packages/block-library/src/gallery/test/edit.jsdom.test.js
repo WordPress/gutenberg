@@ -26,6 +26,15 @@ const IMAGE_ATTRIBUTES = {
 
 const VIEWPORT_STATE_INITIALIZER = 'test/viewport-state-initializer';
 
+const createGallery = ( attributes = {} ) =>
+	createBlock( 'core/gallery', attributes, [
+		createBlock( 'core/image', IMAGE_ATTRIBUTES ),
+		createBlock( 'core/image', {
+			...IMAGE_ATTRIBUTES,
+			id: 2,
+		} ),
+	] );
+
 // The Gallery only offers its aspect ratio control when the theme or the
 // defaults provide ratios to choose from.
 const ASPECT_RATIO_SETTINGS = {
@@ -37,6 +46,7 @@ const ASPECT_RATIO_SETTINGS = {
 					{ name: 'Square - 1:1', slug: 'square', ratio: '1' },
 					{ name: 'Wide - 16:9', slug: '16-9', ratio: '16/9' },
 				],
+				theme: [ { name: 'Avatar', slug: 'avatar', ratio: '1' } ],
 			},
 		},
 	},
@@ -110,16 +120,100 @@ describe( 'Gallery block', () => {
 		} );
 	} );
 
-	describe( 'Layout', () => {
-		const createGallery = ( attributes = {} ) =>
-			createBlock( 'core/gallery', attributes, [
-				createBlock( 'core/image', IMAGE_ATTRIBUTES ),
-				createBlock( 'core/image', {
-					...IMAGE_ATTRIBUTES,
-					id: 2,
-				} ),
-			] );
+	describe( 'Order by', () => {
+		test( 'offers a sort control in Settings for a static gallery that reads as a custom order until the media resolves', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
 
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
+			// The attachment records never resolve in this environment, so
+			// there's nothing to sort by yet; Random doesn't need them. Custom
+			// is only choosable while Random is on, since that's all it does.
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Newest to oldest',
+				} )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			).not.toHaveAttribute( 'aria-disabled' );
+		} );
+
+		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
+			await setup( createGallery() );
+			await selectBlock( 'Block: Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
+			await userEvent.click( orderBy );
+			expect(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).not.toHaveAttribute( 'aria-disabled' );
+
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
+			expect(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
+			await setup(
+				createBlock( 'core/gallery', {
+					dynamicContent: { source: 'core/attached-media' },
+				} )
+			);
+			await selectBlock( 'Block: Dynamic Gallery' );
+
+			const orderBy = await screen.findByRole( 'combobox', {
+				name: 'Order by',
+			} );
+			expect( orderBy ).toHaveTextContent( 'Newest to oldest' );
+			await userEvent.click( orderBy );
+			expect(
+				screen.queryByRole( 'option', { name: 'Custom' } )
+			).not.toBeInTheDocument();
+			await userEvent.keyboard( '{Escape}' );
+			// The order lives in Settings; the Source panel is a plain
+			// PanelBody with no resettable items, hence no options menu.
+			expect(
+				screen.getByRole( 'button', { name: 'Settings options' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Source options' } )
+			).not.toBeInTheDocument();
+
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
+
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'A → Z' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'A → Z' );
+		} );
+	} );
+
+	describe( 'Layout', () => {
 		test( 'keeps the custom Gallery controls for the default Flex layout', async () => {
 			await setup( createGallery() );
 			await selectBlock( 'Block: Gallery' );
@@ -149,7 +243,7 @@ describe( 'Gallery block', () => {
 				screen.getByLabelText( 'Crop images to fit' )
 			).toBeInTheDocument();
 			expect(
-				screen.queryByLabelText( 'Randomize order' )
+				screen.queryByRole( 'combobox', { name: 'Order by' } )
 			).not.toBeInTheDocument();
 		} );
 
@@ -196,9 +290,14 @@ describe( 'Gallery block', () => {
 			);
 			await selectBlock( 'Block: Gallery' );
 
-			await userEvent.selectOptions(
-				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'16/9'
+			await userEvent.click(
+				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			expect(
+				await screen.findByRole( 'option', { name: 'Avatar' } )
+			).toBeInTheDocument();
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Wide - 16:9' } )
 			);
 
 			// The ratio is rendered from the Gallery's own responsive CSS for

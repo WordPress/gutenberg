@@ -16,6 +16,7 @@ import {
 	ItemDescription,
 } from './item-description';
 import { ItemLabel } from './item-label';
+import { Text } from '../text';
 import type { ItemProps } from './types';
 
 type ItemAriaProps = Pick<
@@ -98,6 +99,7 @@ function ItemContent( {
 	const hasTrailing = Children.toArray( trailing ).some(
 		( child ) => child !== ''
 	);
+	const [ label, ...descriptions ] = Children.toArray( children );
 
 	/*
 	 * Content comes first in the DOM because Base UI falls back to the item's
@@ -106,29 +108,51 @@ function ItemContent( {
 	 */
 	return (
 		<>
-			<span className={ styles[ 'item-content' ] }>
-				<span className={ styles[ 'item-children' ] }>
-					{ children }
-				</span>
+			<span
+				className={ clsx(
+					styles[ 'item-content' ],
+					hasPrefix && styles[ 'has-prefix' ]
+				) }
+			>
+				{ label }
 				{ hasSuffix && (
-					<span className={ styles[ 'item-suffix' ] }>
-						{ suffix }
-					</span>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-suffix' ] }
+					>
+						<span className={ styles[ 'accessory-content' ] }>
+							{ suffix }
+						</span>
+					</Text>
 				) }
 				{ shortcut && (
-					<span className={ styles[ 'item-shortcut' ] }>
-						<KeyboardShortcutDisplay shortcut={ shortcut } />
-					</span>
+					<Text
+						variant="body-sm"
+						className={ styles[ 'item-shortcut' ] }
+					>
+						<span className={ styles[ 'accessory-content' ] }>
+							<KeyboardShortcutDisplay shortcut={ shortcut } />
+						</span>
+					</Text>
 				) }
 				{ hasTrailing && (
 					<span className={ styles[ 'item-trailing' ] }>
-						{ trailing }
+						<span className={ styles[ 'accessory-content' ] }>
+							{ trailing }
+						</span>
 					</span>
 				) }
 			</span>
+			{ descriptions.length > 0 && (
+				<span className={ styles[ 'item-descriptions' ] }>
+					{ descriptions }
+				</span>
+			) }
 			{ hasPrefix && (
 				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
-					{ prefix }
+					<span className={ styles[ 'accessory-content' ] }>
+						{ prefix }
+					</span>
 				</span>
 			) }
 			{ shortcut && shortcutDescriptionId && (

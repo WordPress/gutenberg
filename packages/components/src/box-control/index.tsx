@@ -9,12 +9,12 @@ import LinkedButton from './linked-button';
 import Button from '../button';
 import { Grid } from '../grid';
 import { HStack } from '../h-stack';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
 	isValueMixed,
 	isValuesDefined,
 	getAllowedSides,
+	getSelectedUnits,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
@@ -85,12 +85,9 @@ function BoxControl( {
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
-	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
-		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
-		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
-		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
-		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
-	} );
+	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >(
+		getSelectedUnits( valuesProp )
+	);
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
@@ -108,7 +105,7 @@ function BoxControl( {
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
-		setSelectedUnits( resetValues );
+		setSelectedUnits( getSelectedUnits( resetValues ) );
 		setIsDirty( false );
 	};
 

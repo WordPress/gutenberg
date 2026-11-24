@@ -4,6 +4,35 @@
 
 ### Enhancements
 
+-   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#84029](https://github.com/WordPress/gutenberg/pull/84029)).
+
+### Bug Fixes
+
+-   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
+
+## 8.1.0 (2026-11-04)
+
+## 8.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   The pages, templates, and patterns lists and the Quick Edit form read their fields from the server, through the Entity fields API. Fields registered with `registerEntityField` from `@wordpress/editor` no longer show: register them on the server ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+
+### Bug Fixes
+
+-   Keep Quick edit popovers accessible after opening View options ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+-   Label the quick edit action as Bulk edit when multiple pages are selected ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
+## 7.6.0 (2026-10-07)
+
+## 7.5.0 (2026-09-23)
+
+### Enhancements
+
 -   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ## 7.4.0 (2026-09-10)

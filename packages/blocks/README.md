@@ -205,7 +205,7 @@ Returns the block support value for a feature, if defined.
 _Parameters_
 
 - _nameOrType_ `string | BlockType`: Block name or type object
-- _feature_ `string`: Feature to retrieve
+- _feature_ `string | string[]`: Feature to retrieve, as a dot-separated path or an array of path segments
 - _defaultSupports_ `unknown`: Default value to return if not explicitly defined
 
 _Returns_
@@ -319,7 +319,7 @@ _Parameters_
 
 - _blockTypeOrName_ `string | BlockType`: Block type or name.
 - _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[]`: Nested blocks.
+- _innerBlocks_ `Block[] | ReactElement`: Nested blocks, or an element to render in their place.
 
 _Returns_
 
@@ -340,7 +340,7 @@ Returns true if the block defines support for a feature, or false otherwise.
 _Parameters_
 
 - _nameOrType_ `string | BlockType`: Block name or type object.
-- _feature_ `string`: Feature to test.
+- _feature_ `string | string[]`: Feature to test, as a dot-separated path or an array of path segments.
 - _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
@@ -377,7 +377,7 @@ Determines whether or not the given block is a reusable block. This is a special
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
@@ -389,7 +389,7 @@ Determines whether or not the given block is a template part. This is a special 
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 

@@ -8,6 +8,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 return array(
 	'version' => '{{VERSION}}',
 	'build_url' => {{BASE_URL}},

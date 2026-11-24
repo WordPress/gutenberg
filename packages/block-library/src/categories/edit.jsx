@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 import {
 	Placeholder,
-	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -18,7 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/ui';
+import { SelectControl, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -46,6 +45,10 @@ export default function CategoriesEdit( {
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
+	const taxonomyItems = ( taxonomies ?? [] ).map( ( t ) => ( {
+		label: t.name,
+		value: t.slug,
+	} ) );
 
 	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
 
@@ -213,7 +216,7 @@ export default function CategoriesEdit( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ Array.isArray( taxonomies ) && (
+					{ taxonomyItems.length > 0 && (
 						<ToolsPanelItem
 							hasValue={ () => {
 								return taxonomySlug !== 'category';
@@ -224,16 +227,18 @@ export default function CategoriesEdit( {
 							} }
 							isShownByDefault
 						>
-							<WCSelectControl
+							<SelectControl
 								label={ __( 'Taxonomy' ) }
-								options={ taxonomies.map( ( t ) => ( {
-									label: t.name,
-									value: t.slug,
-								} ) ) }
-								value={ taxonomySlug }
-								onChange={ ( selectedTaxonomy ) =>
+								items={ taxonomyItems }
+								value={
+									taxonomyItems.find(
+										( item ) => item.value === taxonomySlug
+									) ?? taxonomyItems[ 0 ]
+								}
+								onValueChange={ ( item ) =>
+									item &&
 									setAttributes( {
-										taxonomy: selectedTaxonomy,
+										taxonomy: item.value,
 									} )
 								}
 							/>
@@ -336,7 +341,7 @@ export default function CategoriesEdit( {
 			</InspectorControls>
 			{ isResolving && (
 				<Placeholder icon={ pin } label={ __( 'Terms' ) }>
-					<Spinner />
+					<WCSpinner />
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (

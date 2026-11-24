@@ -1,6 +1,9 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';
-import { ControlWithError } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type FormTokenFieldProps = React.ComponentProps< typeof FormTokenField >;
@@ -17,6 +20,10 @@ const UnforwardedValidatedFormTokenField = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector< HTMLInputElement >(
+			'input[type="text"]'
+		);
 
 	return (
 		<div
@@ -29,6 +36,7 @@ const UnforwardedValidatedFormTokenField = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<FormTokenField { ...restProps } />
 			</ControlWithError>
@@ -43,14 +51,9 @@ const UnforwardedValidatedFormTokenField = (
 						: ''
 				}
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
-				onFocus={ ( e ) => {
-					e.target.previousElementSibling
-						?.querySelector< HTMLInputElement >(
-							'input[type="text"]'
-						)
-						?.focus();
-				} }
+				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>
 		</div>
 	);

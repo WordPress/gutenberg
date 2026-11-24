@@ -80,7 +80,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 }
 
 .components-resizable-box__corner-handle {
-	z-index: 2;
+	z-index: 3;
 }
 
 // Make horizontal side-handles full width

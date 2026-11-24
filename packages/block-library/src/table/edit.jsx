@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBackgroundProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
@@ -100,8 +101,14 @@ function TableEdit( {
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
-	const colorProps = useColorProps( attributes );
+	// Mirror of save: `has-link-color` belongs on the figure only.
+	const colorProps = useColorProps( {
+		...attributes,
+		style: { ...attributes.style, elements: undefined },
+	} );
 	const borderProps = useBorderProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
+	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
@@ -343,11 +350,17 @@ function TableEdit( {
 		);
 	}
 
-	useEffect( () => {
+	// Clear the selected cell when the block is deselected. Only react to the
+	// block going from selected to deselected: a cell receives focus (and is
+	// set as the selected cell) before the block itself becomes selected.
+	const [ prevIsSingleSelected, setPrevIsSingleSelected ] =
+		useState( isSingleSelected );
+	if ( isSingleSelected !== prevIsSingleSelected ) {
+		setPrevIsSingleSelected( isSingleSelected );
 		if ( ! isSingleSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSingleSelected ] );
+	}
 
 	useEffect( () => {
 		if ( hasTableCreated ) {
@@ -526,8 +539,10 @@ function TableEdit( {
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
+						backgroundProps.className,
 						{
 							'has-fixed-layout': hasFixedLayout,
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// This is required in the editor only to overcome
 							// the fact the editor rewrites individual border
 							// widths into a shorthand format.
@@ -536,7 +551,11 @@ function TableEdit( {
 							),
 						}
 					) }
-					style={ { ...colorProps.style, ...borderProps.style } }
+					style={ {
+						...colorProps.style,
+						...borderProps.style,
+						...backgroundProps.style,
+					} }
 				>
 					{ renderedSections }
 				</table>

@@ -4,6 +4,33 @@
 
 ### Bug Fixes
 
+-   Use matching theme-aware colors for pressed header buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   Use semantic colors for the header background and toolbar dividers ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+-   Show the Settings button as text instead of a check icon when "Show button text labels" is on ([#86827](https://github.com/WordPress/gutenberg/pull/86827)).
+
+## 7.1.0 (2026-11-04)
+
+## 7.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+
+## 6.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 6.56.0 (2026-09-23)
+
+### Bug Fixes
+
 -   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
 
 ## 6.55.0 (2026-09-10)

@@ -46,10 +46,31 @@ function generatePHPArray( manifest ) {
 			.map( ( collection ) => `'${ escapePHPString( collection ) }'` )
 			.join( ', ' );
 
+		// Keywords are optional, and are localized like labels since they are
+		// matched against user-entered search terms.
+		const keywords = item.keywords?.length
+			? `\n\t\t'keywords'    => array( ${ item.keywords
+					.map(
+						( keyword ) =>
+							`_x( '${ escapePHPString(
+								keyword
+							) }', 'icon keyword', 'gutenberg' )`
+					)
+					.join( ', ' ) } ),`
+			: '';
+
+		// Dashicons are optional, and list the Dashicon class names the admin
+		// interface replaces with the icon.
+		const dashicons = item.dashicons?.length
+			? `\n\t\t'dashicons'   => array( ${ item.dashicons
+					.map( ( dashicon ) => `'${ escapePHPString( dashicon ) }'` )
+					.join( ', ' ) } ),`
+			: '';
+
 		return `${ key } => array(
 		'label'       => _x( '${ label }', 'icon label', 'gutenberg' ),
 		'filePath'    => '${ filePath }',
-		'collections' => array( ${ collections } ),
+		'collections' => array( ${ collections } ),${ keywords }${ dashicons }
 	),`;
 	} );
 

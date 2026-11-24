@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
@@ -10,12 +8,17 @@ import {
 	type FixtureGroup,
 	type FixtureItem,
 } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Combobox',
 	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
+		'Combobox.LoadingIndicator': Combobox.LoadingIndicator,
 		'Combobox.Trigger': Combobox.Trigger,
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
@@ -29,12 +32,18 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Group': Combobox.Group,
 		'Combobox.GroupLabel': Combobox.GroupLabel,
 		'Combobox.Item': Combobox.Item,
+		'Combobox.ItemLabel': Combobox.ItemLabel,
+		'Combobox.ItemDescription': Combobox.ItemDescription,
+		'Combobox.Separator': Combobox.Separator,
 		'Combobox.Value': Combobox.Value,
 		'Combobox.Chips': Combobox.Chips,
 		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
 		'Combobox.Empty': Combobox.Empty,
 		'Combobox.Status': Combobox.Status,
 		'Combobox.Clear': Combobox.Clear,
+	},
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
 	},
 	parameters: {
 		componentStatus: {
@@ -58,7 +67,7 @@ export const Default: Story = {
 		items: ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -71,7 +80,9 @@ export const Default: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -92,7 +103,7 @@ export const Compact: Story = {
 				aria-label="Fruit"
 				key="trigger"
 			/>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -105,7 +116,9 @@ export const Compact: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -122,6 +135,10 @@ export const Compact: Story = {
  * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
  *
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
+ *
+ * To keep the items clear of a classic scrollbar, give `Combobox.ListBody` an
+ * inline-end padding. Also set `scrollbar-gutter: stable` on it, so that the
+ * items keep their width when the scrollbar appears or disappears.
  */
 export const DetachedInline: Story = {
 	parameters: {
@@ -131,6 +148,9 @@ export const DetachedInline: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The listbox still owns its options.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},
@@ -148,24 +168,30 @@ export const DetachedInline: Story = {
 				placeholder="Search items"
 				key="input"
 			/>,
-			<div
-				style={ {
-					minHeight: '200px',
-					maxHeight: '200px',
-					marginTop: 8,
-					overflow: 'auto',
-				} }
-				key="div"
-			>
+			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.Collection>
-						{ ( item: FixtureItem ) => (
-							<Combobox.Item key={ item.value } value={ item }>
-								{ item.label }
-							</Combobox.Item>
-						) }
-					</Combobox.Collection>
+					<Combobox.ListBody
+						style={ {
+							maxHeight: 200,
+							scrollbarGutter: 'stable',
+							paddingInlineEnd:
+								'var(--wpds-dimension-padding-xs)',
+						} }
+					>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
 				</Combobox.List>
 			</div>,
 		],
@@ -208,7 +234,7 @@ export const Creatable: Story = {
 				}
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -225,7 +251,9 @@ export const Creatable: Story = {
 											key={ item.value }
 											value={ item }
 										>
-											{ item.label }
+											<Combobox.ItemLabel>
+												{ item.label }
+											</Combobox.ItemLabel>
 										</Combobox.Item>
 									)
 								}
@@ -237,7 +265,9 @@ export const Creatable: Story = {
 								value={ creatableItem }
 								key={ creatableItem.value }
 							>
-								{ creatableItem.label }
+								<Combobox.ItemLabel>
+									{ creatableItem.label }
+								</Combobox.ItemLabel>
 							</Combobox.Item>
 						</Combobox.ListFooter>
 					</Combobox.List>
@@ -262,8 +292,10 @@ function HiddenResultCount() {
 }
 
 /**
- * Loads the item list asynchronously. `Status` shows loading, then a
- * visually hidden result count. Use `Empty` for no results.
+ * Render `Combobox.LoadingIndicator` inside `Combobox.Status` while fetching
+ * items. Pass `children` to customize its message. After loading, render a
+ * visually hidden result count inside `Status` to announce it. Use `Empty`
+ * for no results.
  */
 export const AsyncItems: Story = {
 	render: function Template( args ) {
@@ -271,7 +303,7 @@ export const AsyncItems: Story = {
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
 		const [ value, setValue ] = useState< FixtureItem | undefined >();
 		const [ open, setOpen ] = useState( false );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Combobox.Root
@@ -279,29 +311,31 @@ export const AsyncItems: Story = {
 				items={ items }
 				value={ value }
 				open={ open }
-				onValueChange={ ( newValue ) => {
+				onValueChange={ ( newValue, ...changeArgs ) => {
 					setValue(
 						( newValue ?? undefined ) as FixtureItem | undefined
 					);
+					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					setOpen( nextOpen );
 					if ( ! nextOpen ) {
-						clearTimeout( timeoutRef.current );
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
 						setLoading( false );
-					}, 500 );
+					}, 2000 );
 				} }
 			>
 				<Combobox.Trigger aria-label="Fruit" />
-				<Combobox.Popup>
+				<Combobox.Popup aria-label="Fruit">
 					<div style={ inputWrapperStyle }>
 						<Combobox.Input
 							aria-label="Search"
@@ -310,10 +344,7 @@ export const AsyncItems: Story = {
 					</div>
 					<Combobox.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Combobox.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
@@ -329,7 +360,9 @@ export const AsyncItems: Story = {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
 									</Combobox.Item>
 								) }
 							</Combobox.Collection>
@@ -344,6 +377,7 @@ export const AsyncItems: Story = {
 /**
  * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
  * while `Combobox.Item` can take arbitrary content as children.
+ * Wrap that content in `Combobox.ItemLabel`, followed by optional `Combobox.ItemDescription` components.
  *
  * In this example, some extra information is added to each list item as an ARIA description.
  */
@@ -374,7 +408,7 @@ export const WithCustomTriggerAndItem: Story = {
 					</span>
 				) }
 			</Combobox.Trigger>,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -385,24 +419,13 @@ export const WithCustomTriggerAndItem: Story = {
 								<Combobox.Item
 									key={ item.value }
 									value={ item }
-									aria-describedby={ `description-${ item.value }` }
 								>
-									<div
-										style={ {
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-											flexGrow: 1,
-										} }
-									>
-										<span>{ item.label }</span>
-										<span
-											id={ `description-${ item.value }` }
-											aria-hidden="true"
-										>
-											99 in stock
-										</span>
-									</div>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+									<Combobox.ItemDescription>
+										99 in stock
+									</Combobox.ItemDescription>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -422,7 +445,7 @@ export const Grouped: Story = {
 		items: GROUPED_ITEMS,
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
-			<Combobox.Popup key="popup">
+			<Combobox.Popup aria-label="Fruit" key="popup">
 				<div style={ inputWrapperStyle }>
 					<Combobox.Input aria-label="Search" placeholder="Search" />
 				</div>
@@ -444,11 +467,48 @@ export const Grouped: Story = {
 												key={ item.value }
 												value={ item }
 											>
-												{ item.label }
+												<Combobox.ItemLabel>
+													{ item.label }
+												</Combobox.ItemLabel>
 											</Combobox.Item>
 										) }
 									</Combobox.Collection>
 								</Combobox.Group>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>,
+		],
+	},
+};
+
+/**
+ * Use `Combobox.Separator` to set choices apart from each other.
+ */
+export const WithSeparator: Story = {
+	args: {
+		items: [ ...ITEMS.slice( 0, 3 ), { value: 'other', label: 'Other' } ],
+		children: [
+			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
+			<Combobox.Popup aria-label="Fruit" key="popup">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ ( item: FixtureItem, index: number ) => (
+								<Fragment key={ item.value }>
+									{ item.value === 'other' && index > 0 && (
+										<Combobox.Separator />
+									) }
+									<Combobox.Item value={ item }>
+										<Combobox.ItemLabel>
+											{ item.label }
+										</Combobox.ItemLabel>
+									</Combobox.Item>
+								</Fragment>
 							) }
 						</Combobox.Collection>
 					</Combobox.ListBody>
@@ -480,6 +540,7 @@ export const WithCustomZIndex: Story = {
 		children: [
 			<Combobox.Trigger aria-label="Fruit" key="trigger" />,
 			<Combobox.Popup
+				aria-label="Fruit"
 				positioner={
 					<Combobox.Positioner
 						style={ {
@@ -500,7 +561,9 @@ export const WithCustomZIndex: Story = {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
 								</Combobox.Item>
 							) }
 						</Combobox.Collection>
@@ -509,4 +572,42 @@ export const WithCustomZIndex: Story = {
 			</Combobox.Popup>,
 		],
 	},
+};
+
+/**
+ * Use `width` on `Combobox.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems,
+	},
+	render: ( args ) => (
+		<Combobox.Root { ...args }>
+			<Combobox.Trigger aria-label="Label" />
+			<Combobox.Popup aria-label="Label" width="sm">
+				<div style={ inputWrapperStyle }>
+					<Combobox.Input aria-label="Search" placeholder="Search" />
+				</div>
+				<Combobox.List>
+					<Combobox.ListBody>
+						<Combobox.Collection>
+							{ (
+								item: ( typeof longLabelPopupItems )[ number ]
+							) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
+				</Combobox.List>
+			</Combobox.Popup>
+		</Combobox.Root>
+	),
 };

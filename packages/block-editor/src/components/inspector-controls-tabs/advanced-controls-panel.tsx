@@ -1,0 +1,37 @@
+import {
+	PanelBody,
+	__experimentalUseSlotFills as useSlotFills,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import {
+	default as InspectorControls,
+	InspectorAdvancedControls,
+} from '../inspector-controls';
+import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
+import type { AdvancedControlsProps } from './types';
+
+const AdvancedControls = ( { initialOpen = false }: AdvancedControlsProps ) => {
+	const fills = useSlotFills( InspectorAdvancedControls.slotName );
+	const privateFills = useSlotFills(
+		PrivateInspectorControlsAllowedBlocks.name
+	);
+	const hasFills = Boolean( fills && fills.length );
+	const hasPrivateFills = Boolean( privateFills && privateFills.length );
+
+	if ( ! hasFills && ! hasPrivateFills ) {
+		return null;
+	}
+
+	return (
+		<PanelBody
+			className="block-editor-block-inspector__advanced"
+			title={ __( 'Advanced' ) }
+			initialOpen={ initialOpen }
+		>
+			<InspectorControls.Slot group="advanced" />
+			<PrivateInspectorControlsAllowedBlocks.Slot />
+		</PanelBody>
+	);
+};
+
+export default AdvancedControls;

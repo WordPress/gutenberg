@@ -1,0 +1,135 @@
+# PHPStan configuration for Gutenberg
+#
+# To override this configuration, create a phpstan.neon which includes this file and adjusts its parameters as
+# needed, rather than copying it, so that the copy does not go stale. See docs/contributors/code/coding-guidelines.md
+# for examples.
+#
+# https://phpstan.org/config-reference
+
+includes:
+	# The base configuration file for using PHPStan with the Gutenberg codebase.
+	- tools/phpstan/base.neon
+
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`, or remove the entries
+	# for fixed errors with `composer phpstan:fix`.
+	# https://phpstan.org/user-guide/baseline
+	- tools/phpstan/baseline.neon
+
+# Rules from phpstan-strict-rules which Gutenberg already complies with. The others are not enabled until the code
+# complies with them, but they can be enabled in a local phpstan.neon to work toward that. See
+# docs/contributors/code/coding-guidelines.md.
+#
+# These are registered individually, rather than by including phpstan-strict-rules' rules.neon with only these
+# enabled, because that file also makes several PHPStan parameters stricter even when its rules are disabled. That is
+# also why composer.json tells phpstan/extension-installer to ignore the package, since it would otherwise include
+# rules.neon automatically.
+# https://github.com/phpstan/phpstan-strict-rules
+rules:
+	# strictRules.disallowedLooseComparison is registered under `services` below, since it takes an argument.
+	# strictRules.disallowedBacktick
+	- PHPStan\Rules\DisallowedConstructs\DisallowedBacktickRule
+	# strictRules.disallowedImplicitArrayCreation
+	- PHPStan\Rules\DisallowedConstructs\DisallowedImplicitArrayCreationRule
+	# strictRules.disallowedShortTernary
+	- PHPStan\Rules\DisallowedConstructs\DisallowedShortTernaryRule
+	# strictRules.closureUsesThis
+	- PHPStan\Rules\Functions\ClosureUsesThisRule
+	# strictRules.matchingInheritedMethodNames
+	- PHPStan\Rules\Methods\WrongCaseOfInheritedMethodRule
+	# strictRules.switchConditionsMatchingType
+	- PHPStan\Rules\SwitchConditions\MatchingTypeInSwitchCaseConditionRule
+	# strictRules.strictFunctionCalls, which for in_array(), array_search(), and array_keys() is also enforced by the
+	# WordPress.PHP.StrictInArray sniff.
+	- PHPStan\Rules\StrictCalls\StrictFunctionCallsRule
+	# strictRules.illegalConstructorMethodCall
+	- PHPStan\Rules\Methods\IllegalConstructorMethodCallRule
+	- PHPStan\Rules\Methods\IllegalConstructorStaticCallRule
+
+services:
+	# strictRules.disallowedLooseComparison, with the argument rules.neon passes it.
+	-
+		class: PHPStan\Rules\DisallowedConstructs\DisallowedLooseComparisonRule
+		arguments:
+			includeOperandTypesInErrorMessage: %featureToggles.bleedingEdge%
+		tags:
+			- phpstan.rules.rule
+
+	# strictRules.numericOperandsInArithmeticOperators is not enabled, although the code complies with it, because its
+	# rules need a PHPStan\Rules\Operators\OperatorRuleHelper service. Registering one here would leave two once a local
+	# phpstan.neon includes rules.neon, which also registers one, and PHPStan would then fail to load the configuration.
+
+parameters:
+	# https://phpstan.org/user-guide/rule-levels
+	level: 5
+	reportUnmatchedIgnoredErrors: true
+
+	# Errors that are intentionally ignored, as opposed to the baseline, which records errors still to be fixed.
+	ignoreErrors:
+		# Level 0:
+		# Return values from action callbacks are discarded by do_action(), but returning one is harmless and lets
+		# callers and tests know whether the callback did anything. Core has many such callbacks, like _wp_cron() and
+		# wp_set_up_cross_origin_isolation().
+		-
+			message: '#^Action callback returns .+ but should not return anything\.$#'
+			identifier: return.void
+		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_shadow_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_spacing_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_background_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_border_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
+		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+
+		# Level 3:
+		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
+		# template (`@template TOffset of key-of<T>`, `@param T[TOffset] $value`). PHPStan does not resolve that
+		# template for an offset write like `$request['context'] = 'edit'`, so every such write is rejected, valid
+		# ones included, while the equivalent `$request->set_param( 'context', 'edit' )` call is accepted.
+		#
+		# This is a false positive which should be fixed in PHPStan: https://github.com/phpstan/phpstan-src/pull/6903
+		# Once a PHPStan release with that fix is required, remove these entries.
+		-
+			message: '#^Cannot assign offset .+ to WP_REST_Request(?:<.+>)?\.$#'
+			identifier: offsetAssign.dimType
+			reportUnmatched: false
+		-
+			message: '#^WP_REST_Request(?:<.+>)? does not accept .+\.$#'
+			identifier: offsetAssign.valueType
+			reportUnmatched: false
+
+		# Level 4:
+		# The Navigation block checks for WP_Theme_JSON_Gutenberg::get_viewport_media_queries() before falling back to
+		# WP_Theme_JSON. PHPStan sees the Gutenberg class as always defined, but the block library also runs in
+		# WordPress Core, where it is not, so the check is needed there.
+		-
+			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			path: packages/block-library/src/navigation/index.php

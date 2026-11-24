@@ -1,8 +1,14 @@
 import { createInterpolateElement, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, Link, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+import { help } from '@wordpress/icons';
+import {
+	Icon,
+	Link,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Popover,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import styles from './widget-header.module.css';
 
 export interface WidgetInfotipProps {
@@ -37,7 +43,7 @@ export interface WidgetInfotipProps {
 export const WidgetInfotip = forwardRef<
 	HTMLButtonElement,
 	WidgetInfotipProps
->( function WidgetInfotip(
+>( function UnforwardedWidgetInfotip(
 	{ title, showTitle = false, content, links },
 	ref
 ): React.ReactNode {
@@ -51,7 +57,7 @@ export const WidgetInfotip = forwardRef<
 				aria-label={ __( 'More information' ) }
 				className={ styles.help }
 			>
-				<Icon icon={ info } size={ 20 } />
+				<Icon icon={ help } size={ 20 } />
 			</Popover.Trigger>
 
 			<Popover.Popup

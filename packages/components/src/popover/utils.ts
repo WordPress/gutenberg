@@ -1,6 +1,5 @@
 import { cubicBezier, type MotionProps } from 'framer-motion';
 import type { Placement, ReferenceType } from '@floating-ui/react-dom';
-import { DROPDOWN_MOTION } from '../utils';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
@@ -123,19 +122,21 @@ export const placementToMotionAnimationProps = (
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
 		initial: {
 			opacity: 0,
-			[ translateProp ]: `${
-				DROPDOWN_MOTION.SLIDE_DISTANCE * translateDirection
-			}px`,
+			// Keep the slide distance in sync with Menu and UI dropdown motion.
+			[ translateProp ]: `${ 4 * translateDirection }px`,
 		},
 		animate: { opacity: 1, [ translateProp ]: 0 },
 		transition: {
 			opacity: {
-				duration: DROPDOWN_MOTION.FADE_DURATION / 1000,
-				ease: DROPDOWN_MOTION.FADE_EASING.function,
+				// Numeric equivalent of --wpds-motion-duration-sm, in seconds.
+				duration: 0.1,
+				ease: 'linear',
 			},
 			[ translateProp ]: {
-				duration: DROPDOWN_MOTION.SLIDE_DURATION / 1000,
-				ease: cubicBezier( ...DROPDOWN_MOTION.SLIDE_EASING.args ),
+				// Numeric equivalents of --wpds-motion-duration-md and
+				// --wpds-motion-easing-expressive for Framer Motion.
+				duration: 0.2,
+				ease: cubicBezier( 0.25, 0, 0, 1 ),
 			},
 		},
 	};

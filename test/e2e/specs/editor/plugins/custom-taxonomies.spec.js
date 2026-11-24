@@ -50,7 +50,9 @@ test.describe( 'Custom Taxonomies labels are used', () => {
 
 		await expect(
 			editorSettings.getByRole( 'button', {
-				name: `Remove ${ modelName }`,
+				name: 'Remove',
+				description: modelName,
+				exact: true,
 			} )
 		).toBeVisible();
 	} );

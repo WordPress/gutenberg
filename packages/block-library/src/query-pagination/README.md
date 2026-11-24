@@ -40,6 +40,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `padding`: `true`
+  - `margin`: `true`
+  - `blockGap`: `true`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
   - [`allowInheriting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`

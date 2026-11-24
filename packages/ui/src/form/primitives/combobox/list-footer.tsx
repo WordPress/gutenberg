@@ -8,7 +8,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * for holding a single `Item` that triggers the creation of a new item.
  */
 export const ListFooter = forwardRef< HTMLDivElement, ComboboxListFooterProps >(
-	function ListFooter( { render, ...props }, ref ) {
+	function UnforwardedListFooter( { render, ...props }, ref ) {
 		const element = useRender( {
 			defaultTagName: 'div',
 			render,

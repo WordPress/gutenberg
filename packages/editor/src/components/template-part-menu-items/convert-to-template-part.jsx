@@ -7,23 +7,37 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { CreateTemplatePartModal } from '@wordpress/fields';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { unlock } from '../../lock-unlock';
+
+const { CreateTemplatePartModal } = unlock( patternsPrivateApis );
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { isBlockBasedTheme, canCreate } = useSelect( ( select ) => {
-		return {
-			isBlockBasedTheme:
-				select( coreStore ).getCurrentTheme()?.is_block_theme,
-			canCreate:
-				select( blockEditorStore ).canInsertBlockType(
-					'core/template-part'
+	const clientId = clientIds?.[ 0 ];
+	const { isBlockBasedTheme, canCreate } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+
+			const rootClientId = clientId
+				? getBlockRootClientId( clientId )
+				: undefined;
+
+			return {
+				isBlockBasedTheme:
+					select( coreStore ).getCurrentTheme()?.is_block_theme,
+				canCreate: canInsertBlockType(
+					'core/template-part',
+					rootClientId
 				),
-		};
-	}, [] );
+			};
+		},
+		[ clientId ]
+	);
 
 	if ( ! isBlockBasedTheme || ! canCreate ) {
 		return null;

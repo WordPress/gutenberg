@@ -1,3 +1,4 @@
+import { useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
@@ -5,6 +6,7 @@ import * as Combobox from '../combobox';
 import type { ComboboxCollectionProps } from '../combobox/types';
 import { SearchableResults } from '../searchable-results';
 import styles from './style.module.css';
+import { Trigger } from './trigger';
 import {
 	findCreatableItems,
 	hasGroupedItems,
@@ -14,6 +16,8 @@ import {
 	type ItemGroup,
 	type SearchableSelectProps,
 } from './types';
+
+const DEFAULT_TRIGGER = <Trigger />;
 
 function warnSearchableSelectProps(
 	items: Item[] | ItemGroup[] | undefined,
@@ -59,18 +63,20 @@ function warnSearchableSelectProps(
 /**
  * A searchable single-selection component, with support for
  * a creatable footer action.
+ *
+ * Prefer `SearchableSelectControl` when using with a standard label and description.
  */
 export const SearchableSelect = forwardRef<
 	HTMLButtonElement,
 	SearchableSelectProps
->( function SearchableSelect(
+>( function UnforwardedSearchableSelect(
 	{
 		children,
 		emptyContent = __( 'No results found.' ),
 		statusContent,
 		items,
 		placeholder,
-		triggerContent,
+		trigger,
 		searchPlaceholder = __( 'Search' ),
 		popupWidth,
 		'aria-label': ariaLabel,
@@ -82,17 +88,24 @@ export const SearchableSelect = forwardRef<
 ) {
 	warnSearchableSelectProps( items, children );
 
+	const triggerElement = useRender( {
+		render: trigger ?? DEFAULT_TRIGGER,
+		ref,
+		props: {
+			placeholder,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledby,
+			'aria-describedby': ariaDescribedby,
+		},
+	} );
+
 	return (
-		<Combobox.Root< Item, false > items={ items } { ...restProps }>
-			<Combobox.Trigger
-				ref={ ref }
-				placeholder={ placeholder }
-				aria-label={ ariaLabel }
-				aria-labelledby={ ariaLabelledby }
-				aria-describedby={ ariaDescribedby }
-			>
-				{ triggerContent }
-			</Combobox.Trigger>
+		<Combobox.Root< Item, false >
+			items={ items }
+			{ ...restProps }
+			grid={ undefined }
+		>
+			{ triggerElement }
 
 			<Combobox.Popup
 				width={ popupWidth }

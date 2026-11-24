@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary, setPublishDate } = require( './post-summary/utils' );
 
 test.describe( 'Post visibility', () => {
 	[ 'large', 'small' ].forEach( ( viewport ) => {
@@ -12,10 +13,10 @@ test.describe( 'Post visibility', () => {
 
 			await admin.createNewPost();
 
-			await editor.openDocumentSettingsSidebar();
+			const summary = await openPostSummary( { editor, page } );
 
-			await page
-				.getByRole( 'button', { name: 'Change status:' } )
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
 				.click();
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
@@ -38,28 +39,24 @@ test.describe( 'Post visibility', () => {
 
 		// Enter a title for this post.
 		await editor.canvas
-			.locator( 'role=textbox[name="Add title"i]' )
-			.type( 'Title' );
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Title' );
 
-		await editor.openDocumentSettingsSidebar();
+		const summary = await openPostSummary( { editor, page } );
 
-		// Set a publish date for the next month.
-		await page
-			.getByRole( 'button', { name: 'Change date: Immediately' } )
-			.click();
+		// Set a publish date for the next year.
+		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
+		const nextYear = new Date().getFullYear() + 1;
+		await setPublishDate( page, {
+			year: nextYear,
+			month: 3,
+			day: 15,
+			hours: 10,
+			minutes: 0,
+		} );
+		await page.keyboard.press( 'Escape' );
 
-		await page.getByRole( 'button', { name: 'View next month' } ).click();
-		await page
-			.getByRole( 'application', { name: 'Calendar', exact: true } )
-			.getByText( '15' )
-			.click();
-		await page
-			.locator( '.block-editor-publish-date-time-picker' )
-			.getByRole( 'button', {
-				name: 'Close',
-			} )
-			.click();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await summary.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Private' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -76,122 +73,5 @@ test.describe( 'Post visibility', () => {
 		} );
 
 		expect( currentStatus ).toBe( 'private' );
-	} );
-
-	test( 'can set, edit, and remove a password', async ( {
-		page,
-		admin,
-		editor,
-	} ) => {
-		await admin.createNewPost();
-		await editor.canvas
-			.locator( 'role=textbox[name="Add title"i]' )
-			.type( 'Password Protected Post' );
-
-		await editor.openDocumentSettingsSidebar();
-
-		const changeStatusButton = page.getByRole( 'button', {
-			name: /^Change status:/,
-		} );
-		await changeStatusButton.click();
-
-		await page.getByRole( 'button', { name: 'Set password' } ).click();
-
-		const modal = page.getByRole( 'dialog', { name: 'Set password' } );
-		await expect( modal ).toBeVisible();
-
-		await modal
-			.getByRole( 'textbox', { name: 'Password' } )
-			.fill( 'secret123' );
-		await modal.getByRole( 'button', { name: 'Save password' } ).click();
-
-		await expect( modal ).toBeHidden();
-
-		await changeStatusButton.click();
-		await expect(
-			page.getByRole( 'button', { name: 'Edit password' } )
-		).toBeVisible();
-		await page.keyboard.press( 'Escape' );
-
-		await editor.saveDraft();
-		await page.reload();
-		await editor.openDocumentSettingsSidebar();
-
-		await changeStatusButton.click();
-		await expect(
-			page.getByRole( 'button', { name: 'Edit password' } )
-		).toBeVisible();
-
-		await page.getByRole( 'button', { name: 'Edit password' } ).click();
-		const editModal = page.getByRole( 'dialog', { name: 'Edit password' } );
-		await expect( editModal ).toBeVisible();
-		await expect(
-			editModal.getByRole( 'textbox', { name: 'Password' } )
-		).toHaveValue( 'secret123' );
-
-		await editModal
-			.getByRole( 'button', { name: 'Remove password' } )
-			.click();
-		await expect( editModal ).toBeHidden();
-
-		await changeStatusButton.click();
-		await expect(
-			page.getByRole( 'button', { name: 'Set password' } )
-		).toBeVisible();
-	} );
-
-	test( 'validates password length and restores focus on cancel and esc', async ( {
-		page,
-		admin,
-		editor,
-	} ) => {
-		await admin.createNewPost();
-		await editor.openDocumentSettingsSidebar();
-
-		const changeStatusButton = page.getByRole( 'button', {
-			name: /^Change status:/,
-		} );
-		await changeStatusButton.click();
-
-		await page.getByRole( 'button', { name: 'Set password' } ).click();
-		const modal = page.getByRole( 'dialog', { name: 'Set password' } );
-		await expect( modal ).toBeVisible();
-
-		// Test Cancel focus restoration
-		await modal.getByRole( 'button', { name: 'Cancel' } ).click();
-		await expect( modal ).toBeHidden();
-		await expect( changeStatusButton ).toBeFocused();
-
-		// Open again and test Esc focus restoration
-		await changeStatusButton.click();
-		await page.getByRole( 'button', { name: 'Set password' } ).click();
-		await expect( modal ).toBeVisible();
-		await page.keyboard.press( 'Escape' );
-		await expect( modal ).toBeHidden();
-		await expect( changeStatusButton ).toBeFocused();
-
-		// Open again and test 256 char validation
-		await changeStatusButton.click();
-		await page.getByRole( 'button', { name: 'Set password' } ).click();
-		await expect( modal ).toBeVisible();
-
-		await modal
-			.getByRole( 'textbox', { name: 'Password' } )
-			.fill( 'a'.repeat( 256 ) );
-		await modal.getByRole( 'button', { name: 'Save password' } ).click();
-
-		await expect(
-			modal.getByText( "Password can't exceed 255 characters." )
-		).toBeVisible();
-		await expect( modal ).toBeVisible();
-
-		await modal.getByRole( 'button', { name: 'Cancel' } ).click();
-		await expect( modal ).toBeHidden();
-		await expect( changeStatusButton ).toBeFocused();
-
-		await changeStatusButton.click();
-		await expect(
-			page.getByRole( 'button', { name: 'Set password' } )
-		).toBeVisible();
 	} );
 } );

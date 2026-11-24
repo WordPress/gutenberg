@@ -19,9 +19,17 @@
 		"process-timeout": 0,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"composer/installers": true
+			"composer/installers": true,
+			"phpstan/extension-installer": true
 		},
 		"lock": false
+	},
+	"extra": {
+		"phpstan/extension-installer": {
+			"ignore": [
+				"phpstan/phpstan-strict-rules"
+			]
+		}
 	},
 	"require-dev": {
 		"phpcompatibility/phpcompatibility-wp": "^2.1.3",
@@ -30,7 +38,19 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"spatie/phpunit-watcher": "^1.23",
 		"yoast/phpunit-polyfills": "^1.1.0",
-		"gutenberg/gutenberg-coding-standards": "@dev"
+		"gutenberg/gutenberg-coding-standards": "@dev",
+		"phpstan/extension-installer": "1.4.3",
+		"phpstan/phpstan": "2.3.5",
+		"phpstan/phpstan-phpunit": "2.1.1",
+		"phpstan/phpstan-strict-rules": "2.1.1",
+		"php-stubs/wordpress-stubs": "@dev",
+		"php-stubs/wordpress-tests-stubs": "7.1.0",
+		"szepeviktor/phpstan-wordpress": "2.0.4"
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Gutenberg\\PHPStan\\": "tools/phpstan/src/"
+		}
 	},
 	"repositories": [
 		{
@@ -38,6 +58,13 @@
 			"url": "./test/php/gutenberg-coding-standards",
 			"options": {
 				"symlink": false
+			}
+		},
+		{
+			"type": "path",
+			"url": "./tools/phpstan/wordpress-stubs",
+			"options": {
+				"symlink": true
 			}
 		}
 	],
@@ -48,6 +75,13 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
+		"phpstan": "@php tools/phpstan/generate-wordpress-stubs.php --quiet && phpstan analyse --memory-limit=2G",
+		"phpstan:baselines": "@phpstan --configuration=phpstan.neon.dist --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
+		"phpstan:fix": [
+			"@phpstan --configuration=phpstan.neon.dist --fix",
+			"@phpstan --configuration=phpstan.neon.dist"
+		],
+		"phpstan:generate-wordpress-stubs": "@php tools/phpstan/generate-wordpress-stubs.php",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}

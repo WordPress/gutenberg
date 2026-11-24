@@ -7,9 +7,13 @@ async function enableFullscreenMode( page ) {
 		.getByRole( 'button', { name: 'Options' } )
 		.click();
 
-	// Select Full Screen Mode
+	// Fullscreen mode sits in the Appearance submenu.
 	await page
-		.locator( 'role=menuitemcheckbox', { hasText: 'Fullscreen mode' } )
+		.getByRole( 'menu', { name: 'Options' } )
+		.getByRole( 'menuitem', { name: 'Appearance', exact: true } )
+		.click();
+	await page
+		.getByRole( 'menuitemcheckbox', { name: 'Fullscreen mode' } )
 		.click();
 }
 

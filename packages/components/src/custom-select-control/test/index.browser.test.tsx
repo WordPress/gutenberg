@@ -755,6 +755,7 @@ describe( 'Legacy size support', () => {
 } );
 
 describe( 'Type checking', () => {
+	// eslint-disable-next-line vitest/expect-expect -- TypeScript checks this case during typecheck.
 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
 		const options = [
 			{

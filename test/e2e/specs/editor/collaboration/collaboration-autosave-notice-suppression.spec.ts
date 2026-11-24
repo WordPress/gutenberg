@@ -155,7 +155,7 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		await page.waitForTimeout( 3_500 );
 
 		await expect(
-			page.locator( '.components-notice__content' ).filter( {
+			page.locator( '.notices-inline-notices__notice' ).filter( {
 				hasText: NOTICE_TEXT,
 			} )
 		).toHaveCount( 0 );
@@ -197,7 +197,7 @@ test.describe( 'Collaboration - autosave notice suppression', () => {
 		} );
 
 		await expect(
-			page.locator( '.components-notice__content' ).filter( {
+			page.locator( '.notices-inline-notices__notice' ).filter( {
 				hasText: NOTICE_TEXT,
 			} )
 		).toBeVisible( { timeout: 30_000 } );

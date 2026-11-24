@@ -12,7 +12,7 @@ import styles from './style.module.css';
  * `style` and `className`.
  */
 export const Skeleton = forwardRef< HTMLDivElement, SkeletonProps >(
-	function Skeleton( { render, ...props }, ref ) {
+	function UnforwardedSkeleton( { render, ...props }, ref ) {
 		return useRender( {
 			render,
 			ref,

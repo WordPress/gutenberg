@@ -9,7 +9,7 @@ import {
 	Button,
 	BaseControl,
 	DropZone,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -60,7 +60,7 @@ function PosterImage( { poster, onChange } ) {
 
 	const getPosterButtonContent = () => {
 		if ( ! poster && isLoading ) {
-			return <Spinner />;
+			return <WCSpinner />;
 		}
 
 		return ! poster ? __( 'Set poster image' ) : __( 'Replace' );
@@ -100,7 +100,7 @@ function PosterImage( { poster, onChange } ) {
 										alt={ __( 'Poster image preview' ) }
 										className="block-library-poster-image__preview-image"
 									/>
-									{ isLoading && <Spinner /> }
+									{ isLoading && <WCSpinner /> }
 								</Button>
 							) }
 							<HStack

@@ -2,10 +2,10 @@
  * Hook for tracking media upload status with batch-scoped callbacks.
  *
  * This is a transitional layer that manually tracks upload progress using
- * local state. The @wordpress/upload-media package provides a Redux-based
+ * local state. The `@wordpress/upload-media` package provides a Redux-based
  * store with richer capabilities (per-file progress, pause/resume, retry,
  * concurrency control, client-side processing). When the media upload modal
- * adopts @wordpress/upload-media, this hook can be replaced by selectors
+ * adopts `@wordpress/upload-media`, this hook can be replaced by selectors
  * from that store (getItems, isBatchUploaded, getItemProgress, etc.) while
  * keeping the same return interface.
  */

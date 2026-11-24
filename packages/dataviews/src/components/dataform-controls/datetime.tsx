@@ -4,7 +4,12 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Calendar, Stack, ValidatedInputControl } from '@wordpress/ui';
+import {
+	Calendar,
+	Stack,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ValidatedInputControl,
+} from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';

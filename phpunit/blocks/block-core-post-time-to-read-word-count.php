@@ -19,9 +19,9 @@ class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 	 * @param int    $characters_including_spaces Expected value if the count type is based on single character including spaces.
 	 */
 	public function test_word_count( $input_string, $words, $characters_excluding_spaces, $characters_including_spaces ) {
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'words' ), $words );
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_excluding_spaces' ), $characters_excluding_spaces );
-		$this->assertEquals( gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_including_spaces' ), $characters_including_spaces );
+		$this->assertSame( $words, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'words' ) );
+		$this->assertSame( $characters_excluding_spaces, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_excluding_spaces' ) );
+		$this->assertSame( $characters_including_spaces, gutenberg_block_core_post_time_to_read_word_count( $input_string, 'characters_including_spaces' ) );
 	}
 
 	/**
@@ -57,9 +57,21 @@ class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 			),
 			'Punctuation'    => array(
 				'string'                      => "It's two three " . json_decode( '"\u2026"' ) . ' 4?',
-				'words'                       => 3,
+				'words'                       => 4,
 				'characters_excluding_spaces' => 15,
 				'characters_including_spaces' => 19,
+			),
+			'Numbers'        => array(
+				'string'                      => 'Should be 4 words',
+				'words'                       => 4,
+				'characters_excluding_spaces' => 14,
+				'characters_including_spaces' => 17,
+			),
+			'Number formats' => array(
+				'string'                      => 'In 2026 we sold 1,500 units for $5 each',
+				'words'                       => 9,
+				'characters_excluding_spaces' => 31,
+				'characters_including_spaces' => 39,
 			),
 			'Em dash'        => array(
 				'string'                      => 'one' . json_decode( '"\u2014"' ) . 'two--three',

@@ -54,17 +54,21 @@ describe( 'SearchableSelect', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
 	} );
 
-	it( 'does not throw when triggerContent receives a null value', () => {
+	it( 'does not throw when trigger children receive a null value', () => {
 		render(
 			<SearchableSelect
 				aria-label="Fruit"
 				items={ ITEMS }
-				triggerContent={ ( value: Item | null ) =>
-					value ? (
-						<span>{ value.label }</span>
-					) : (
-						<span>Choose fruit</span>
-					)
+				trigger={
+					<SearchableSelect.Trigger>
+						{ ( value ) =>
+							value ? (
+								<span>{ value.label }</span>
+							) : (
+								<span>Choose fruit</span>
+							)
+						}
+					</SearchableSelect.Trigger>
 				}
 			/>
 		);
@@ -135,7 +139,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>

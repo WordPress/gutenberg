@@ -28,7 +28,23 @@ describe( 'ValidatedCustomSelectControl', () => {
 		} );
 	} );
 
-	it( 'should preserve the built-in description when validation is active', async () => {
+	it( 'should expose only the combobox to assistive technology', async () => {
+		render(
+			<ValidatedCustomSelectControl
+				label="Font Size"
+				options={ options }
+				value={ options[ 0 ] }
+				onChange={ () => {} }
+				required
+			/>
+		);
+
+		await waitFor( () => {
+			expect( screen.getAllByRole( 'combobox' ) ).toHaveLength( 1 );
+		} );
+	} );
+
+	it( 'should append the validation error alongside the built-in description', async () => {
 		const user = userEvent.setup();
 		render(
 			<form onSubmit={ ( e ) => e.preventDefault() }>
@@ -37,7 +53,10 @@ describe( 'ValidatedCustomSelectControl', () => {
 					options={ options }
 					value={ options[ 0 ] }
 					onChange={ () => {} }
-					required
+					customValidity={ {
+						type: 'invalid',
+						message: 'Choose a larger size.',
+					} }
 				/>
 				<button type="submit">Submit</button>
 			</form>
@@ -51,13 +70,13 @@ describe( 'ValidatedCustomSelectControl', () => {
 
 		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
 
-		// The validation error targets the hidden delegate <select>, not
-		// the interactive combobox. The combobox's built-in description
-		// should be unaffected.
 		await waitFor( () => {
 			expect( combobox ).toHaveAccessibleDescription(
-				'Currently selected: Small'
+				expect.stringContaining( 'Choose a larger size.' )
 			);
 		} );
+		expect( combobox ).toHaveAccessibleDescription(
+			expect.stringContaining( 'Currently selected: Small' )
+		);
 	} );
 } );

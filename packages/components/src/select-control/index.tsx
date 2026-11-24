@@ -1,8 +1,11 @@
 import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import BaseControl from '../base-control';
-import { Select, StyledInputBase } from './styles/select-control-styles';
+import InputBase from '../input-control/input-base';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
@@ -85,7 +88,7 @@ function UnforwardedSelectControl< V extends string >(
 
 	return (
 		<BaseControl help={ help } id={ id } className={ classes }>
-			<StyledInputBase
+			<InputBase
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
@@ -100,24 +103,36 @@ function UnforwardedSelectControl< V extends string >(
 				__unstableInputWidth={
 					variant === 'minimal' ? 'auto' : undefined
 				}
-				variant={ variant }
+				className={ clsx( styles.root, {
+					[ styles[ 'is-disabled' ] ]: disabled,
+					[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+				} ) }
 			>
-				<Select
+				<PolymorphicElement
+					as="select"
 					{ ...restProps }
 					aria-describedby={ helpId }
-					className="components-select-control__input"
+					className={ clsx(
+						'components-select-control__input',
+						styles.input,
+						{
+							[ styles[ 'is-small' ] ]: size === 'small',
+							[ styles[ 'is-compact' ] ]: size === 'compact',
+							[ styles[ 'is-multiple' ] ]: multiple,
+							[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+							[ styles[ 'is-rtl' ] ]: isRTL(),
+						}
+					) }
 					disabled={ disabled }
 					id={ id }
 					multiple={ multiple }
 					onChange={ handleOnChange }
 					ref={ ref }
-					selectSize={ size }
 					value={ valueProp }
-					variant={ variant }
 				>
 					{ children || <SelectOptions options={ options } /> }
-				</Select>
-			</StyledInputBase>
+				</PolymorphicElement>
+			</InputBase>
 		</BaseControl>
 	);
 }

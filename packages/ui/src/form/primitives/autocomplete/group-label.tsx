@@ -12,7 +12,10 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 export const GroupLabel = forwardRef<
 	HTMLDivElement,
 	AutocompleteGroupLabelProps
->( function GroupLabel( { className, children, ...restProps }, ref ) {
+>( function UnforwardedGroupLabel(
+	{ className, children, ...restProps },
+	ref
+) {
 	return (
 		<Text
 			variant="heading-sm"

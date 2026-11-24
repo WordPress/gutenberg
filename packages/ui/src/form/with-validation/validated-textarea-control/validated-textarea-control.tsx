@@ -10,13 +10,15 @@ import type { ValidatedControlProps } from '../types';
  *
  * Native constraint violations (e.g. `required`, `minLength`) and custom
  * validity messages passed through the `customValidity` prop are reported
- * inline once the control has been touched (blurred at least once) or the
- * enclosing form is submitted.
+ * inline once focus leaves the control, or when the enclosing form is
+ * submitted or `reportValidity()` is called. Focus leaving an empty required
+ * control doesn't reveal its messages, unless the user has left it with a
+ * value before.
  */
 export const ValidatedTextareaControl = forwardRef<
 	HTMLTextAreaElement,
 	React.ComponentProps< typeof TextareaControl > & ValidatedControlProps
->( function ValidatedTextareaControl(
+>( function UnforwardedValidatedTextareaControl(
 	{ required, markWhenOptional, customValidity, ...restProps },
 	forwardedRef
 ) {

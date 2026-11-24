@@ -41,9 +41,7 @@ control in `@wordpress/dataviews` for the canonical assembly).
  - Required: No
  - Default: `false`
 
-Whether the field is non-editable. A disabled field is not
-`contentEditable` (so it is neither focusable nor editable) and exposes
-`aria-disabled` to assistive technology.
+Whether the field is non-editable.
 
 ### `hideLabelFromVision`
 

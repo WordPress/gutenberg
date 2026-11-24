@@ -2,9 +2,9 @@ import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import CustomSelect from '../custom-select-control-v2/custom-select';
-import CustomSelectItem from '../custom-select-control-v2/item';
-import * as Styled from '../custom-select-control-v2/styles';
+import CustomSelect from './custom-select';
+import CustomSelectItem from './item';
+import styles from './style.module.scss';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -42,8 +42,7 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 
 /**
  * `CustomSelectControl` is a dropdown for selecting a single option from a
- * list, with support for custom styling. Use it instead of the `SelectControl`
- * when options need richer markup (e.g. per-option styles or hints).
+ * list, with support for custom styling.
  */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
@@ -66,7 +65,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		'custom-select-control__description'
 	);
 
-	// Forward props + store from v2 implementation
+	// Keep the legacy callback contract while using the internal select store.
 	const store = Ariakit.useSelectStore< string >( {
 		async setValue( nextValue ) {
 			const nextOption = options.find(
@@ -106,15 +105,18 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		.map( applyOptionDeprecations )
 		.map( ( { name, key, hint, style, className } ) => {
 			const withHint = (
-				<Styled.WithHintItemWrapper>
+				<div className={ styles[ 'hint-wrapper' ] }>
 					<span>{ name }</span>
-					<Styled.WithHintItemHint
+					<span
 						// Keeping the classname for legacy reasons
-						className="components-custom-select-control__item-hint"
+						className={ clsx(
+							styles[ 'item-hint' ],
+							'components-custom-select-control__item-hint'
+						) }
 					>
 						{ hint }
-					</Styled.WithHintItemHint>
-				</Styled.WithHintItemWrapper>
+					</span>
+				</div>
 			);
 
 			return (
@@ -148,15 +150,18 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		}
 
 		return (
-			<Styled.SelectedExperimentalHintWrapper>
+			<div className={ styles[ 'selected-hint-wrapper' ] }>
 				{ selectedOption?.name }
-				<Styled.SelectedExperimentalHintItem
+				<span
 					// Keeping the classname for legacy reasons
-					className="components-custom-select-control__hint"
+					className={ clsx(
+						styles[ 'selected-hint' ],
+						'components-custom-select-control__hint'
+					) }
 				>
 					{ selectedOption?.hint }
-				</Styled.SelectedExperimentalHintItem>
-			</Styled.SelectedExperimentalHintWrapper>
+				</span>
+			</div>
 		);
 	};
 
@@ -172,7 +177,6 @@ function CustomSelectControl< T extends CustomSelectOption >(
 					'components-custom-select-control',
 					classNameProp
 				) }
-				isLegacy
 				{ ...restProps }
 			>
 				{ children }

@@ -84,9 +84,6 @@ const UnconnectedConfirmDialog = (
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
 					title={ title }
-					contentLabel={
-						__experimentalHideHeader ? title : undefined
-					}
 					__experimentalHideHeader={ __experimentalHideHeader }
 					{ ...otherProps }
 				>

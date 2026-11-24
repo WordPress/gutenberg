@@ -10,7 +10,6 @@ describe( 'Fieldset', () => {
 		).toThrow(
 			'Fieldset.Description: Missing parent <Fieldset.Root>. Render <Fieldset.Description> inside <Fieldset.Root>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when Fieldset.Details is outside Fieldset.Root', () => {
@@ -19,7 +18,6 @@ describe( 'Fieldset', () => {
 		).toThrow(
 			'Fieldset.Details: Missing parent <Fieldset.Root>. Render <Fieldset.Details> inside <Fieldset.Root>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'forwards ref', () => {

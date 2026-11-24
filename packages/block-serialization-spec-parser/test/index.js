@@ -6,7 +6,9 @@ const require = createRequire( import.meta.url );
 const { parse } = require( '../parser.js' );
 const testRunner = { describe, expect, test };
 
-describe( 'block-serialization-spec-parser-js', jsTester( parse, testRunner ) );
+describe( 'block-serialization-spec-parser-js', () => {
+	jsTester( parse, testRunner )();
+} );
 
 phpTester(
 	'block-serialization-spec-parser-php',

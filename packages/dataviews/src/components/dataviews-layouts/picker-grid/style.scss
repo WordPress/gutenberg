@@ -64,11 +64,8 @@
 		// Always show the checkbox in picker mode.
 		top: var(--wpds-dimension-padding-sm) !important;
 
-		input {
-			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
-			// Only the item card itself is clickable.
-			pointer-events: none;
-		}
+		// The card owns selection in picker mode.
+		pointer-events: none;
 	}
 
 	.dataviews-view-picker-grid__media {

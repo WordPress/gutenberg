@@ -148,6 +148,10 @@
 		&[aria-disabled="true"] {
 			background-color: transparent;
 		}
+		&.editor-collapsible-block-toolbar__toggle {
+			min-width: auto;
+			padding-left: $grid-unit-05;
+		}
 	}
 	.is-tertiary {
 		&:active {

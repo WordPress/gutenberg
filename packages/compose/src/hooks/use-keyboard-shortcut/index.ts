@@ -21,7 +21,7 @@ type KeyboardShortcutConfig = {
 	/**
 	 * React reference to the DOM element used to catch the keyboard event.
 	 */
-	target: RefObject< HTMLElement >;
+	target: RefObject< HTMLElement | null >;
 };
 
 /**

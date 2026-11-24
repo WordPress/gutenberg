@@ -57,7 +57,7 @@ function getListPathForPostType( postType ) {
 	throw 'Unknown post type';
 }
 
-function getNavigationPath( location, postType ) {
+function getNavigationPath( location, postType, showStylebook ) {
 	const { path, name } = location;
 	if (
 		[
@@ -71,7 +71,12 @@ function getNavigationPath( location, postType ) {
 	) {
 		return getListPathForPostType( postType );
 	}
-	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
+	// Keep the style book open when leaving the editor on the styles route.
+	return addQueryArgs( path, {
+		canvas: undefined,
+		revision: undefined,
+		preview: name === 'styles' && showStylebook ? 'stylebook' : undefined,
+	} );
 }
 
 export default function EditSiteEditor( {
@@ -117,6 +122,7 @@ export default function EditSiteEditor( {
 	const { setCurrentRevisionId, resetStylesNavigation } = unlock(
 		useDispatch( editorStore )
 	);
+	const { getShowStylebook } = unlock( useSelect( editorStore ) );
 
 	// Revisions and the style book render in place of the block editor, and
 	// belong to the styles route in edit mode. Anywhere else they would show
@@ -138,6 +144,7 @@ export default function EditSiteEditor( {
 		( actionId, items ) => {
 			switch ( actionId ) {
 				case 'move-to-trash':
+				case 'permanently-delete':
 				case 'delete-post':
 					{
 						history.navigate(
@@ -242,7 +249,8 @@ export default function EditSiteEditor( {
 													location,
 													postWithTemplate
 														? context.postType
-														: postType
+														: postType,
+													getShowStylebook()
 												),
 												{
 													transition:

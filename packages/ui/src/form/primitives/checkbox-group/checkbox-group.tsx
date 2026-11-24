@@ -17,7 +17,10 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
  * accessible name.
  */
 export const CheckboxGroup = forwardRef< HTMLDivElement, CheckboxGroupProps >(
-	function CheckboxGroup( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedCheckboxGroup(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return (
 			<_CheckboxGroup ref={ ref } render={ render } { ...restProps } />
 		);

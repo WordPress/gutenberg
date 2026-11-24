@@ -13,21 +13,25 @@
 	// Ensure the sidebar is always at least as tall as the viewport.
 	// This allows the footer section to be sticky at the bottom of the viewport.
 	flex-grow: 1;
-	margin-bottom: $grid-unit-20;
+	margin-bottom: var(--wpds-dimension-gap-lg);
 	&.has-footer {
 		margin-bottom: 0;
 	}
 }
 
 .edit-site-sidebar-navigation-screen__content {
-	padding: 0 $grid-unit-20;
+	padding: 0 var(--wpds-dimension-gap-lg);
 
 	.components-text {
 		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	.components-heading {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: var(--wpds-dimension-gap-sm);
+	}
+
+	.edit-site-sidebar-navigation-screen__preview-badge {
+		margin-bottom: var(--wpds-dimension-gap-md);
 	}
 }
 
@@ -36,8 +40,8 @@
 	top: 0;
 	background: var(--wpds-color-background-surface-neutral-weak);
 	padding-top: $grid-unit-40;
-	margin-bottom: $grid-unit-10;
-	padding-bottom: $grid-unit-10;
+	margin-bottom: var(--wpds-dimension-gap-sm);
+	padding-bottom: var(--wpds-dimension-gap-sm);
 	// Title needs to appear above other UI in the section content.
 	z-index: 1;
 }
@@ -97,13 +101,13 @@
 	bottom: 0;
 	background-color: var(--wpds-color-background-surface-neutral-weak);
 	gap: 0;
-	padding: $grid-unit-10 $grid-unit-20;
-	margin: $grid-unit-20 0 0;
+	padding: var(--wpds-dimension-gap-sm) var(--wpds-dimension-gap-lg);
+	margin: var(--wpds-dimension-gap-lg) 0 0;
 	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.edit-site-sidebar-navigation-screen-details-footer {
-		margin-left: -$grid-unit-20;
-		margin-right: -$grid-unit-20;
+		margin-left: -var(--wpds-dimension-gap-lg);
+		margin-right: -var(--wpds-dimension-gap-lg);
 	}
 }
 
