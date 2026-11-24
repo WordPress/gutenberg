@@ -163,25 +163,41 @@ export default function UploadProgressSnackbar() {
 			const isOutOfStorage = added.every(
 				( { code } ) => code === ErrorCode.STORAGE_LIMIT_REACHED
 			);
-			message = isOutOfStorage
-				? sprintf(
-						/* translators: %d: number of images */
-						_n(
-							'%d image was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
-							'%d images were uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
-							count
-						),
+			const isAboveUploadLimit = added.every(
+				( { code } ) => code === ErrorCode.SIZE_ABOVE_LIMIT
+			);
+
+			if ( isOutOfStorage ) {
+				message = sprintf(
+					/* translators: %d: number of images */
+					_n(
+						'%d image was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+						'%d images were uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
 						count
-					)
-				: sprintf(
-						/* translators: %d: number of images */
-						_n(
-							'%d image was uploaded, but some of the image sizes could not be saved.',
-							'%d images were uploaded, but some of the image sizes could not be saved.',
-							count
-						),
+					),
+					count
+				);
+			} else if ( isAboveUploadLimit ) {
+				message = sprintf(
+					/* translators: %d: number of images */
+					_n(
+						'%d image was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+						'%d images were uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
 						count
-					);
+					),
+					count
+				);
+			} else {
+				message = sprintf(
+					/* translators: %d: number of images */
+					_n(
+						'%d image was uploaded, but some of the image sizes could not be saved.',
+						'%d images were uploaded, but some of the image sizes could not be saved.',
+						count
+					),
+					count
+				);
+			}
 		}
 
 		createNotice( 'warning', message, {

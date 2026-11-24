@@ -367,6 +367,47 @@ describe( 'UploadProgressSnackbar', () => {
 		);
 	} );
 
+	it( 'blames the upload limit when it caused every missing file', () => {
+		const warnings = [ 'a', 'b' ].map( ( id ) => ( {
+			id,
+			code: 'SIZE_ABOVE_LIMIT',
+			message: `Warning ${ id }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'2 images were uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'falls back to a generic message when the files failed for different reasons', () => {
+		const warnings = [
+			{ id: 'a', code: 'STORAGE_LIMIT_REACHED', message: 'Warning a' },
+			{ id: 'b', code: 'SIZE_ABOVE_LIMIT', message: 'Warning b' },
+		];
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'2 images were uploaded, but some of the image sizes could not be saved.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
 	it( 'starts the count again once the warning is dismissed', () => {
 		const warnings = [ 'a', 'b', 'c' ].map( ( id ) => ( {
 			id,
