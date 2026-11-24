@@ -139,19 +139,16 @@ describe( 'planFormatMarkers', () => {
 		).toEqual( { kind: 'none' } );
 	} );
 
-	it( 'merges a change inside the author own pending addition into it', () => {
-		// An unauthored marker and an unknown editor count as the same
-		// author: their own addition carries its formatting, so there is no
-		// suggestion to open.
+	it( 'plans a change inside an unauthored addition as a suggestion', () => {
 		const prev = rtd(
 			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">world</mark>'
 		);
 		const next = rtd(
 			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add"><strong>world</strong></mark>'
 		);
-		expect( planFormatMarkers( prev, next ) ).toEqual( {
-			kind: 'merge-own',
-			range: { start: 6, end: 11 },
+		expect( planFormatMarkers( prev, next ) ).toMatchObject( {
+			kind: 'format',
+			indices: [ 6, 7, 8, 9, 10 ],
 		} );
 	} );
 
@@ -211,13 +208,11 @@ describe( 'planFormatMarkers', () => {
 		expect( plan.indices ).toHaveLength( 11 );
 	} );
 
-	it( 'does not extend over a marker nested inside the run', () => {
+	it( 'does not extend over text the author added to the run since', () => {
 		/*
-		 * An `add` marker inside the run (merged or older markup) is not
-		 * part of this suggestion: extending only revises a run that holds no
-		 * other marker. The toggle opens a second suggestion instead, over
-		 * everything but the author's own added text, which takes the
-		 * formatting directly.
+		 * The addition is newer than the formatting suggestion, so the
+		 * original its note recorded lacks that text. The toggle opens a
+		 * second suggestion over the whole run.
 		 */
 		const nested =
 			'<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add" data-author="7">XX</mark>';
@@ -233,7 +228,43 @@ describe( 'planFormatMarkers', () => {
 		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
 		expect( plan.kind ).toBe( 'format' );
 		expect( plan.extendsId ).toBeUndefined();
-		expect( plan.indices ).toEqual( [ 6, 7, 8, 11, 12 ] );
+		expect( plan.indices ).toEqual( [ 6, 7, 8, 9, 10, 11, 12 ] );
+	} );
+
+	it( 'extends a format marker that sits in the author own addition', () => {
+		const added = ( inner: string ) =>
+			`<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="7">${ inner }</mark>`;
+		const prev = rtd(
+			`Hello ${ added( formatMark( 2, '<strong>world</strong>' ) ) }`
+		);
+		const next = rtd(
+			`Hello ${ added(
+				formatMark( 2, '<strong><em>world</em></strong>' )
+			) }`
+		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		expect( plan ).toMatchObject( {
+			kind: 'format',
+			extendsId: '2',
+			range: { start: 6, end: 11 },
+			runText: 'world',
+		} );
+	} );
+
+	it( "does not extend a format marker inside someone else's addition", () => {
+		const added = ( inner: string ) =>
+			`<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="9">${ inner }</mark>`;
+		const prev = rtd(
+			`Hello ${ added( formatMark( 2, '<strong>world</strong>' ) ) }`
+		);
+		const next = rtd(
+			`Hello ${ added(
+				formatMark( 2, '<strong><em>world</em></strong>' )
+			) }`
+		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		expect( plan.kind ).toBe( 'format' );
+		expect( plan.extendsId ).toBeUndefined();
 	} );
 
 	it( 'reports the run text so the caller can check it against the note', () => {
@@ -250,16 +281,28 @@ describe( 'planFormatMarkers', () => {
 		expect( plan.runText ).toBe( 'world' );
 	} );
 
-	it( 'merges formatting of the author own addition into it', () => {
+	it( 'plans formatting of the author own addition as its own suggestion', () => {
 		const prev = rtd(
 			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="7">world</mark>'
 		);
 		const next = rtd(
 			'Hello <mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="7"><strong>world</strong></mark>'
 		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		expect( plan ).toMatchObject( {
+			kind: 'format',
+			range: { start: 6, end: 11 },
+			indices: [ 6, 7, 8, 9, 10 ],
+			beforeHTML: 'world',
+			afterHTML: '<strong>world</strong>',
+		} );
+		expect( plan.extendsId ).toBeUndefined();
+		// The marker nests in the addition, which stays one run.
 		expect(
-			planFormatMarkers( prev, next, { authorId: 7 } )
-		).toMatchObject( { kind: 'merge-own' } );
+			applyFormatPlan( next, plan, { id: 2, authorId: 7 } ).toHTMLString()
+		).toMatch(
+			/^Hello <mark [^>]*wp-suggestion-add[^>]*><mark [^>]*wp-suggestion-format[^>]*><strong>world<\/strong><\/mark><\/mark>$/
+		);
 	} );
 } );
 
@@ -395,6 +438,20 @@ describe( 'findAdditionFormatting', () => {
 			beforeHTML: '<strong> world</strong>',
 			afterHTML: '<strong> world</strong>',
 		} );
+	} );
+
+	it( 'leaves out text under a pending formatting suggestion', () => {
+		expect(
+			findAdditionFormatting(
+				rtd(
+					`Hello${ addMark(
+						5,
+						formatMark( 6, '<strong> world</strong>' )
+					) }`
+				),
+				5
+			)
+		).toBeNull();
 	} );
 
 	it( 'reports nothing once the marker is gone', () => {

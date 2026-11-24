@@ -341,12 +341,8 @@ export default function SuggestionFormatKeyboard() {
 		async ( request: any ) => {
 			const { clientId, blockName, prevContent, nextContent, plan } =
 				request;
-			/*
-			 * Formatting only the author's own proposed text revises that
-			 * proposal in place: the addition carries the formatting, so no
-			 * note is opened.
-			 */
-			if ( plan.kind === 'merge-own' ) {
+			// A change no suggestion records is written as it is.
+			if ( plan.kind === 'unrecorded' ) {
 				if (
 					contentKey( getBlockAttributes( clientId )?.content ) !==
 					contentKey( prevContent )
@@ -448,7 +444,7 @@ export default function SuggestionFormatKeyboard() {
 				! isBlockOwnedByCurrentPost( registry, request.clientId ) ||
 				! request?.plan ||
 				( request.plan.kind !== 'format' &&
-					request.plan.kind !== 'merge-own' ) ||
+					request.plan.kind !== 'unrecorded' ) ||
 				contentKey( request.prevContent ) === null
 			) {
 				return false;
