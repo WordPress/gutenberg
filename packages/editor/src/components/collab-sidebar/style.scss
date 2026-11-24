@@ -129,6 +129,11 @@
 	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
 }
 
+// Clicking anywhere on a collapsed thread expands it.
+.editor-collab-sidebar-panel__thread:not(.is-selected) {
+	cursor: var(--wpds-cursor-control);
+}
+
 .editor-collab-sidebar-panel__user-info {
 	flex: 1;
 }

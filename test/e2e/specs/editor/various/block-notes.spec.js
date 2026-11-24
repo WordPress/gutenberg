@@ -527,18 +527,15 @@ test.describe( 'Block Notes', () => {
 			note: 'Pressed note',
 		} );
 		const thread = blockNoteUtils.getThread( 'Pressed note' );
-		await expect( thread ).toHaveClass( /is-selected/ );
+		const toggle = getThreadToggle( thread );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		// A real click holds the button down long enough for a focus loss
-		// to be handled before the click arrives.
+		// Pressing the text keeps focus in the thread, so it isn't deselected.
 		await thread.getByText( 'Pressed note' ).hover();
 		await page.mouse.down();
-		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-		await page.waitForTimeout( 300 );
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( thread ).toBeFocused();
 		await page.mouse.up();
-		await expect( thread ).toHaveClass( /is-selected/ );
-		await expect( thread ).toContainText( 'Pressed note' );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
 	} );
 
 	test( 'exposes the note threads as a list rather than a tree', async ( {
@@ -556,30 +553,17 @@ test.describe( 'Block Notes', () => {
 			comment: 'Second note',
 		} );
 
-		const sidebar = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-
-		// The panel is a plain list, so a screen reader stays in browse mode
-		// and its reading keys are free to read the note text.
-		const list = sidebar.getByRole( 'list' );
-		await expect( list ).toBeVisible();
-		await expect( list ).toHaveAccessibleName( 'All notes' );
-		await expect( sidebar.getByRole( 'tree' ) ).toHaveCount( 0 );
-		await expect( sidebar.getByRole( 'treeitem' ) ).toHaveCount( 0 );
-
-		// Each thread is one item of that list.
-		await expect(
-			list.getByRole( 'listitem' ).filter( { hasText: 'First note' } )
-		).toBeVisible();
-		await expect(
-			list.getByRole( 'listitem' ).filter( { hasText: 'Second note' } )
-		).toBeVisible();
-
-		// A reply is prose inside its thread, not a nested item of its own.
+		const list = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'list', { name: 'All notes' } );
+		const firstThread = list
+			.getByRole( 'listitem' )
+			.filter( { hasText: 'First note' } );
 		const secondThread = list
 			.getByRole( 'listitem' )
 			.filter( { hasText: 'Second note' } );
+
+		// A reply is prose inside its thread, not a nested item of its own.
 		const replyForm = secondThread.getByRole( 'textbox', {
 			name: 'Reply to',
 		} );
@@ -591,21 +575,13 @@ test.describe( 'Block Notes', () => {
 		await expect( secondThread ).toContainText( 'A reply' );
 		await expect( secondThread.getByRole( 'listitem' ) ).toHaveCount( 0 );
 
-		// VoiceOver repeats `aria-current` on every element in the thread.
-		await expect( secondThread ).toHaveClass( /is-selected/ );
-		await expect( secondThread ).not.toHaveAttribute( 'aria-current' );
-
-		// Only the selected thread has a reply field for the skip link to
-		// reach; elsewhere it would open every thread's announcement.
+		// Only the selected thread has a reply field for the skip link to reach.
 		const skipLinkName = { name: 'Add new reply' };
 		await expect(
 			secondThread.getByRole( 'button', skipLinkName )
 		).toHaveCount( 1 );
 		await expect(
-			list
-				.getByRole( 'listitem' )
-				.filter( { hasText: 'First note' } )
-				.getByRole( 'button', skipLinkName )
+			firstThread.getByRole( 'button', skipLinkName )
 		).toHaveCount( 0 );
 	} );
 
@@ -650,9 +626,7 @@ test.describe( 'Block Notes', () => {
 		await expect( anotherBlock ).not.toHaveClass( /is-selected/ );
 
 		await expect(
-			sidebar.locator(
-				'.editor-collab-sidebar-panel__thread.is-selected'
-			)
+			sidebar.getByRole( 'button', { name: /^admin /, expanded: true } )
 		).toHaveCount( 0 );
 	} );
 
@@ -683,9 +657,12 @@ test.describe( 'Block Notes', () => {
 			} )
 			.getByRole( 'list' );
 		const threads = threadsContainer.getByRole( 'listitem' );
-		const activeThread = threadsContainer.locator(
-			'.editor-collab-sidebar-panel__thread.is-selected'
-		);
+		const activeThread = threads.filter( {
+			has: page.getByRole( 'button', {
+				name: /^admin /,
+				expanded: true,
+			} ),
+		} );
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Reply to',
 		} );
