@@ -1,9 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
 	createBlock,
+	getFreeformContentHandlerName,
 	parse,
 	registerBlockType,
 	serialize,
+	setFreeformContentHandlerName,
 	unregisterBlockType,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
@@ -22,6 +24,7 @@ const bindings = {
 	content: { source: 'core/post-meta', args: { key: 'movie_field' } },
 };
 const registry = { select };
+const originalFreeformHandler = getFreeformContentHandlerName();
 
 function createBoundParagraph( content = '' ) {
 	return createBlock( 'core/paragraph', {
@@ -110,15 +113,27 @@ describe( 'block clipboard content', () => {
 					),
 			} );
 		}
+		registerBlockType< { content: string } >( 'core/freeform', {
+			apiVersion: 3,
+			title: 'Classic',
+			category: 'text',
+			attributes: { content: { type: 'string', source: 'html' } },
+			save: ( { attributes } ) =>
+				createElement( RawHTML, null, attributes.content ),
+		} );
+		setFreeformContentHandlerName( 'core/freeform' );
 	} );
 
 	afterAll( () => {
+		// The block-name reducer treats an empty name as its initial null state.
+		setFreeformContentHandlerName( originalFreeformHandler ?? '' );
 		for ( const name of [
 			'core/paragraph',
 			'core/heading',
 			'core/group',
 			'core/list',
 			'core/list-item',
+			'core/freeform',
 		] ) {
 			unregisterBlockType( name );
 		}
@@ -280,7 +295,7 @@ describe( 'block clipboard content', () => {
 		).toBe( 'core/list-item' );
 	} );
 
-	it( 'keeps the ordered list wrapper around a bound item copied from the menu', () => {
+	it( 'keeps a valid ordered List for editors that do not recognize the clipboard marker', () => {
 		const item = createBlock( 'core/list-item', {
 			metadata: { bindings },
 		} );
@@ -296,7 +311,10 @@ describe( 'block clipboard content', () => {
 			{ addWrapper: 'bound' }
 		);
 		expect( html ).toContain( '<ol>' );
-		expect( parse( stripBlockClipboardWrapper( html ) ) ).toMatchObject( [
+		// Older editors pass the markup directly to their block parser.
+		const pasted = parse( html );
+		expect( pasted ).toHaveLength( 1 );
+		expect( pasted ).toMatchObject( [
 			{
 				name: 'core/list',
 				isValid: true,

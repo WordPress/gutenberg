@@ -7,7 +7,7 @@ import * as privateSelectors from './private-selectors';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
-export const storeConfig = {
+const storeConfig = {
 	reducer,
 	actions,
 	selectors,

@@ -6,6 +6,15 @@
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Enhancements
+
+-   Block Bindings: Add the optional `isForCopy` argument to `getValues` so sources can omit display placeholders from copied blocks ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
 ## 17.2.0 (2026-11-18)
 
 ### Enhancements

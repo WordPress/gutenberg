@@ -224,6 +224,137 @@ describe( 'copying a rendered bound block', () => {
 		);
 	} );
 
+	it.each( [
+		[ 'omitted', {}, 'fallback content' ],
+		[ 'undefined', { content: undefined }, 'fallback content' ],
+		[
+			'a genuine field key',
+			{ content: 'unaccessible_field' },
+			'unaccessible_field',
+		],
+		[ 'a genuine label', { content: 'Field label' }, 'Field label' ],
+		[ 'an empty string', { content: '' }, '' ],
+	] )(
+		'copies %s from the mounted source only when copying',
+		( _, copyValues, expectedContent ) => {
+			unregisterBlockBindingsSource( sourceName );
+			const getValues = vi.fn(
+				( {
+					isForCopy,
+					select,
+				}: {
+					isForCopy?: boolean;
+					select: ReturnType< typeof createRegistry >[ 'select' ];
+				} ) =>
+					isForCopy
+						? select( blockEditorStore ).getSettings()
+								.clipboardCopyValues
+						: { content: 'unaccessible_field' }
+			);
+			source = {
+				...source,
+				usesContext: [ 'postId', 'postType' ],
+				getValues,
+				canUserEditValue: () => false,
+				getFieldsList: () => [],
+			};
+			registerBlockBindingsSource( source );
+			const registry = createRegistry();
+			registry.register( blocksStore );
+			registry.register( blockEditorStore );
+			registry.register( noticesStore );
+			registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+			unlock( registry.dispatch( blocksStore ) ).addBlockBindingsSource(
+				source
+			);
+			const actions = registry.dispatch( blockEditorStore );
+			const boundBindings = {
+				content: {
+					source: sourceName,
+					args: { key: 'unaccessible_field' },
+				},
+			};
+			const boundBlock = createBlock( blockName, {
+				content: 'fallback content',
+				metadata: { bindings: boundBindings },
+			} );
+			const normalBlock = createBlock( blockName, {
+				content: 'Normal paragraph',
+			} );
+			actions.resetBlocks( [ boundBlock, normalBlock ] );
+			actions.multiSelect( boundBlock.clientId, normalBlock.clientId );
+			actions.updateSettings( {
+				clipboardCopyValues: { content: 'Old value' },
+			} );
+			render(
+				createElement(
+					RegistryProvider,
+					{ value: registry },
+					createElement(
+						BlockRefsProvider,
+						null,
+						createElement( BlockContextProvider, {
+							value: { postId: 41, postType: 'post' },
+							children: createElement( Canvas, {
+								clientId: boundBlock.clientId,
+							} ),
+						} )
+					)
+				)
+			);
+			const paragraph = screen.getByRole( 'textbox', {
+				name: 'Bound paragraph',
+			} );
+			expect( paragraph ).toHaveTextContent( 'unaccessible_field' );
+			expect( getValues ).toHaveBeenCalled();
+			expect(
+				getValues.mock.calls.some(
+					( [ options ] ) => options.isForCopy
+				)
+			).toBe( false );
+			act( () => {
+				actions.updateSettings( { clipboardCopyValues: copyValues } );
+			} );
+			expect(
+				getValues.mock.calls.some(
+					( [ options ] ) => options.isForCopy
+				)
+			).toBe( false );
+
+			const copied = copyFrom( paragraph );
+			expect( parse( copied.html )[ 0 ] ).toMatchObject( {
+				isValid: true,
+				attributes: {
+					content: expectedContent,
+					metadata: { bindings: boundBindings },
+				},
+			} );
+			const copyCalls = getValues.mock.calls.filter(
+				( [ options ] ) => options.isForCopy
+			);
+			expect( copyCalls ).toHaveLength( 1 );
+			expect( copyCalls[ 0 ][ 0 ] ).toEqual(
+				expect.objectContaining( {
+					isForCopy: true,
+					clientId: boundBlock.clientId,
+					context: { postId: 41, postType: 'post' },
+					bindings: {
+						content: { args: { key: 'unaccessible_field' } },
+					},
+				} )
+			);
+			expect(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( boundBlock.clientId )
+			).toMatchObject( {
+				content: 'fallback content',
+				metadata: { bindings: boundBindings },
+			} );
+			expect( source.setValues ).not.toHaveBeenCalled();
+		}
+	);
+
 	it.each( [ 'canvas', 'list view', 'canvas with RichText endpoints' ] )(
 		'copies current resolved content from the %s without changing the source',
 		async ( mode ) => {

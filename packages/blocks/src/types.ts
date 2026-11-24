@@ -858,6 +858,9 @@ export interface BlockBindingsSource {
 	usesContext?: string[];
 	/**
 	 * Optional function to get the values from the source.
+	 * Receives `isForCopy: true` when resolving values for the clipboard.
+	 * In copy requests, omit unavailable attributes or return `undefined` for
+	 * them instead of display placeholders to preserve their saved fallback.
 	 */
 	getValues?: Function;
 	/**

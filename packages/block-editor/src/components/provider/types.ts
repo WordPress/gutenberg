@@ -33,6 +33,7 @@ export interface BoundAttributesForCopy {
 	attributes: Block[ 'attributes' ];
 	computedAttributes: Record< string, unknown >;
 	boundAttributeNames: string[];
+	getAttributesForCopy?: () => Record< string, unknown >;
 }
 
 export type AttributesForCopy = Map<

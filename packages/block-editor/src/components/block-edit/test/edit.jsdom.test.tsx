@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import {
 	getBlockBindingsSource,
+	createBlock,
 	registerBlockBindingsSource,
 	registerBlockType,
 	unregisterBlockBindingsSource,
@@ -21,6 +22,7 @@ import {
 } from '../../provider/block-refs-provider';
 import { BlockEditContextProvider, isPreviewModeKey } from '../context';
 import { unlock } from '../../../lock-unlock';
+import { getBoundPartialBlockForCopy } from '../../writing-flow/utils';
 
 const noop = () => null;
 
@@ -300,8 +302,20 @@ describe( 'Edit', () => {
 					)
 				).toEqual( {
 					text: 'Visible label',
-					...( url ? { url } : {} ),
 				} );
+				const block = {
+					...createBlock( 'core/test-block' ),
+					clientId: 'bound-block',
+					attributes,
+				};
+				expect(
+					getBoundPartialBlockForCopy(
+						block,
+						block,
+						attributesForCopy,
+						{}
+					).attributes
+				).toEqual( { ...attributes, text: 'Visible label' } );
 				expect( attributes ).not.toHaveProperty( 'text' );
 			}
 		);

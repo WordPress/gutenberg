@@ -114,7 +114,49 @@ class Render_Block_Site_Logo_Test extends WP_UnitTestCase {
 		$this->assertSame( 'border-top-width:2px;border-top-color:#ff0000;border-top-style:solid;', $actual['image']['style'] );
 	}
 
-	public function test_no_border_leaves_the_image_unchanged() {
+	public function test_shadow_is_on_the_image_not_the_wrapper() {
+		$actual = $this->render_logo(
+			array(
+				'style' => array(
+					'shadow' => '6px 6px 9px rgba(0, 0, 0, 0.2)',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'class' => 'is-default-size wp-block-site-logo',
+				'style' => null,
+			),
+			$actual['wrapper']
+		);
+		$this->assertSame(
+			array(
+				'class' => 'custom-logo',
+				'style' => 'box-shadow:6px 6px 9px rgba(0, 0, 0, 0.2);',
+			),
+			$actual['image']
+		);
+	}
+
+	public function test_border_and_shadow_share_the_image_style() {
+		$actual = $this->render_logo(
+			array(
+				'style' => array(
+					'border' => array(
+						'radius' => '24px',
+					),
+					'shadow' => 'var:preset|shadow|natural',
+				),
+			)
+		);
+
+		$this->assertNull( $actual['wrapper']['style'] );
+		$this->assertSame( 'custom-logo', $actual['image']['class'] );
+		$this->assertSame( 'border-radius:24px;box-shadow:var(--wp--preset--shadow--natural);', $actual['image']['style'] );
+	}
+
+	public function test_no_border_or_shadow_leaves_the_image_unchanged() {
 		$actual = $this->render_logo( array() );
 
 		$this->assertSame( 'custom-logo', $actual['image']['class'] );

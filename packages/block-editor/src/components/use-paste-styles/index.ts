@@ -27,11 +27,13 @@ import {
  * Parse a clipboard representation that contains serialized blocks.
  *
  * @param text The copied text.
+ * @param type The clipboard representation's MIME type.
  * @return The serialized blocks, or an empty array for other content.
  */
-function getSerializedBlocks( text: string ): Block[] {
+function getSerializedBlocks( text: string, type = 'text/plain' ): Block[] {
 	try {
-		const normalizedText = normalizeClipboardHTML( text );
+		const normalizedText =
+			type === 'text/html' ? normalizeClipboardHTML( text ) : text;
 		const content = stripBlockClipboardWrapper( normalizedText );
 		const blocks = parse( content, {
 			__unstableSkipMigrationLogs: true,
@@ -63,7 +65,8 @@ async function readCopiedBlocks( clipboard: Clipboard ): Promise< Block[] > {
 					}
 					try {
 						const blocks = getSerializedBlocks(
-							await ( await item.getType( type ) ).text()
+							await ( await item.getType( type ) ).text(),
+							type
 						);
 						if ( blocks.length ) {
 							return blocks;

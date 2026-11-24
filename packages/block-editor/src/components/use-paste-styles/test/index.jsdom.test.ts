@@ -45,6 +45,17 @@ function copiedMarkup() {
 	] );
 }
 
+function copiedGroupMarkup() {
+	return serialize( [
+		createBlock( 'core/group', { style }, [
+			createBlock( 'core/html', {
+				content:
+					'<p><!--StartFragment-->Child text<!--EndFragment--></p>',
+			} ),
+		] ),
+	] );
+}
+
 function clipboardItem( representations: Record< string, string | Error > ) {
 	return {
 		types: Object.keys( representations ),
@@ -189,14 +200,59 @@ describe( 'usePasteStyles clipboard representations', () => {
 							),
 			} );
 		}
+		registerBlockType< { style: Record< string, unknown > } >(
+			'core/group',
+			{
+				apiVersion: 3,
+				title: 'Group',
+				category: 'design',
+				attributes: { style: { type: 'object' } },
+				supports: { typography: { fontSize: true } },
+				save: () => createElement( 'div', getInnerBlocksProps() ),
+			}
+		);
+		registerBlockType< { content: string } >( 'core/html', {
+			apiVersion: 3,
+			title: 'Custom HTML',
+			category: 'text',
+			attributes: { content: { type: 'string', source: 'html' } },
+			save: ( { attributes } ) =>
+				createElement( RawHTML, null, attributes.content ),
+		} );
 	} );
 
 	afterAll( () => {
-		for ( const name of [ blockName, 'core/list', 'core/list-item' ] ) {
+		for ( const name of [
+			blockName,
+			'core/list',
+			'core/list-item',
+			'core/group',
+			'core/html',
+		] ) {
 			unregisterBlockType( name );
 		}
 	} );
 	afterEach( () => vi.unstubAllGlobals() );
+
+	it.each( [ 'ClipboardItem', 'readText' ] )(
+		'keeps Group styles when plain text contains literal fragment comments (%s)',
+		async ( transport ) => {
+			const text = copiedGroupMarkup();
+			const result = await pasteStyles(
+				transport === 'ClipboardItem'
+					? {
+							read: vi
+								.fn()
+								.mockResolvedValue( [
+									clipboardItem( { 'text/plain': text } ),
+								] ),
+						}
+					: { readText: vi.fn().mockResolvedValue( text ) }
+			);
+			expect( result.attributes.style ).toEqual( style );
+			expect( result.attributes.content ).toBe( 'Target text' );
+		}
+	);
 
 	it.each( [
 		[ 'html', '', '' ],

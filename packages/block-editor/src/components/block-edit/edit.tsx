@@ -99,12 +99,8 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		registeredSources,
 	] );
 
-	const computedAttributes = useSelect(
-		( select ) => {
-			if ( ! blockBindings ) {
-				return attributes;
-			}
-
+	const getBoundAttributes = useCallback(
+		( select: typeof registry.select, isForCopy = false ) => {
 			const attributesFromSources: Record< string, unknown > = {};
 			const blockBindingsBySource = new Map<
 				Omit< BlockBindingsSource, 'name' >,
@@ -112,7 +108,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			>();
 
 			for ( const [ attributeName, binding ] of Object.entries(
-				blockBindings
+				blockBindings ?? {}
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				// An absent source looks up nothing.
@@ -137,6 +133,9 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 					// Get values in batch if the source supports it.
 					let values: Record< string, unknown > = {};
 					if ( ! source.getValues ) {
+						if ( isForCopy ) {
+							continue;
+						}
 						Object.keys( bindings ).forEach( ( attr ) => {
 							// Default to the source label when `getValues` doesn't exist.
 							values[ attr ] = source.label;
@@ -147,11 +146,15 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 							context,
 							clientId,
 							bindings,
+							...( isForCopy ? { isForCopy: true } : {} ),
 						} );
 					}
 					for ( const [ attributeName, value ] of Object.entries(
 						values
 					) ) {
+						if ( isForCopy && value === undefined ) {
+							continue;
+						}
 						if (
 							attributeName === 'url' &&
 							// Sources return URLs as strings.
@@ -166,19 +169,26 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				}
 			}
 
-			return {
-				...attributes,
-				...attributesFromSources,
-			};
+			return attributesFromSources;
 		},
 		[
-			attributes,
 			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
 			registeredSources,
 		]
+	);
+	const computedAttributes = useSelect(
+		( select ) =>
+			blockBindings
+				? { ...attributes, ...getBoundAttributes( select ) }
+				: attributes,
+		[ attributes, blockBindings, getBoundAttributes ]
+	);
+	const getAttributesForCopy = useCallback(
+		() => getBoundAttributes( registry.select, true ),
+		[ getBoundAttributes, registry ]
 	);
 
 	const boundAttributeNames = useMemo(
@@ -209,6 +219,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			attributes,
 			computedAttributes,
 			boundAttributeNames,
+			getAttributesForCopy,
 		} );
 		attributesForCopy.set( clientId, instances );
 		return () => {
@@ -228,6 +239,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		boundAttributeNames,
 		clientId,
 		computedAttributes,
+		getAttributesForCopy,
 		instanceToken,
 		isPreviewMode,
 	] );

@@ -13,7 +13,7 @@ import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import type { ClipboardEvent as ReactClipboardEvent } from 'react';
 import { getPasteEventData } from '../../utils/pasting';
-import { BLOCK_CLIPBOARD_WRAPPER } from '../../utils/block-clipboard';
+import { addBlockClipboardWrapper } from '../../utils/block-clipboard';
 import { store as blockEditorStore } from '../../store';
 import { getBoundAttributesForCopy } from '../provider/block-refs-provider';
 import type { AttributesForCopy } from '../provider/types';
@@ -118,9 +118,10 @@ export function getClipboardBlocksContent(
 		}
 	}
 
-	const html =
-		( hasWrapper ? BLOCK_CLIPBOARD_WRAPPER : '' ) +
-		serialize( blocksForCopy );
+	const serialized = serialize( blocksForCopy );
+	const html = hasWrapper
+		? addBlockClipboardWrapper( serialized )
+		: serialized;
 
 	return { html, plainText: toPlainText( html ), hasBoundAttributes };
 }

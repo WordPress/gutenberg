@@ -430,15 +430,18 @@ registerBlockBindingsSource( {
 
 #### getValues
 
-The `getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties:
+The `getValues` function retrieves values from the source when rendering a block and when copying its bound attributes to the clipboard. It receives an `object` as an argument with the following properties:
 
 -   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
 -   `clientId` returns a `string` with the current block client ID.
 -   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `isForCopy` is an optional `boolean` set to `true` when resolving clipboard values. It is omitted for display requests.
 -   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
+
+For copy requests, return the actual source values. Omit an attribute, or return `undefined` for it, when its value is unavailable and the editor displays a placeholder instead. This preserves the attribute's saved fallback in the copied block. Return genuine values even when they are empty, read-only, or equal to a field's key or label.
 
 #### setValues
 

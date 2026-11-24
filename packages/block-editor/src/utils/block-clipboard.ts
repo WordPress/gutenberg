@@ -1,14 +1,36 @@
 // This clipboard-only marker distinguishes a copied selection's synthetic
 // parent wrapper from a parent block that was itself selected.
-export const BLOCK_CLIPBOARD_WRAPPER = '<!-- wp-blocks-copy-wrapper -->';
+// Keep it inside the delimiter so parsers unaware of this marker ignore the
+// unknown attribute instead of creating a Classic block before the wrapper.
+export const BLOCK_CLIPBOARD_WRAPPER = '"__wpClipboardWrapper":true';
+
+export function addBlockClipboardWrapper( content: string ): string {
+	return content.replace(
+		/^(\s*<!-- wp:[^\s>]+) (?:(\{\})|(\{))?/,
+		(
+			_,
+			opening: string,
+			emptyAttributes?: string,
+			attributes?: string
+		) => {
+			if ( attributes ) {
+				return `${ opening } {${ BLOCK_CLIPBOARD_WRAPPER },`;
+			}
+			return `${ opening } {${ BLOCK_CLIPBOARD_WRAPPER }}${
+				emptyAttributes ? '' : ' '
+			}`;
+		}
+	);
+}
 
 export function stripBlockClipboardWrapper( content: string ): string {
-	const leadingWhitespace = content.match( /^\s*/ )![ 0 ].length;
-	return content
-		.slice( leadingWhitespace )
-		.startsWith( BLOCK_CLIPBOARD_WRAPPER )
-		? content.slice( leadingWhitespace + BLOCK_CLIPBOARD_WRAPPER.length )
-		: content;
+	// Only consume our first attribute. Preserve serialized JSON escapes rather
+	// than parsing and re-encoding values containing HTML-comment delimiters.
+	return content.replace(
+		/^(\s*<!-- wp:[^\s>]+) \{"__wpClipboardWrapper":true(,|\} )/,
+		( _, opening: string, separator: string ) =>
+			`${ opening } ${ separator === ',' ? '{' : '' }`
+	);
 }
 
 /**

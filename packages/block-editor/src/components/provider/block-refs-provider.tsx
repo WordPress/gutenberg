@@ -26,14 +26,23 @@ export function getBoundAttributesForCopy(
 	if ( instances?.size !== 1 ) {
 		return;
 	}
-	const { attributes, computedAttributes, boundAttributeNames } = instances
-		.values()
-		.next().value!;
+	const {
+		attributes,
+		computedAttributes,
+		boundAttributeNames,
+		getAttributesForCopy,
+	} = instances.values().next().value!;
 	if ( attributes !== block.attributes ) {
 		return;
 	}
+	// A copy request can omit attributes that only have display placeholders.
+	const boundAttributes = getAttributesForCopy
+		? getAttributesForCopy()
+		: computedAttributes;
 	const availableAttributeNames = boundAttributeNames.filter(
-		( attributeName ) => Object.hasOwn( computedAttributes, attributeName )
+		( attributeName ) =>
+			Object.hasOwn( boundAttributes, attributeName ) &&
+			boundAttributes[ attributeName ] !== undefined
 	);
 	if ( ! availableAttributeNames.length ) {
 		return;
@@ -41,7 +50,7 @@ export function getBoundAttributesForCopy(
 	return Object.fromEntries(
 		availableAttributeNames.map( ( attributeName ) => [
 			attributeName,
-			computedAttributes[ attributeName ],
+			boundAttributes[ attributeName ],
 		] )
 	);
 }
