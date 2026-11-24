@@ -393,7 +393,7 @@ test.describe( 'Details', () => {
 		).toHaveCount( 0 );
 	} );
 
-	test( 'selecting text inside summary does not toggle details while clicking marker or pressing Enter does', async ( {
+	test( 'selecting text inside summary does not toggle details while single click or Enter toggles', async ( {
 		editor,
 		page,
 	} ) => {
@@ -408,6 +408,9 @@ test.describe( 'Details', () => {
 			],
 		} );
 
+		const details = editor.canvas.getByRole( 'document', {
+			name: 'Block: Details',
+		} );
 		const summary = editor.canvas.getByRole( 'textbox', {
 			name: 'Write summary. Press Enter to expand or collapse the details.',
 		} );
@@ -417,27 +420,59 @@ test.describe( 'Details', () => {
 
 		// Initially hidden.
 		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
 
-		// Clicking / selecting text inside summary RichText should NOT toggle details open.
+		// Single clicking the summary text toggles <details> open.
 		await summary.click();
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+
+		// Single clicking the summary text again toggles <details> closed.
+		await summary.click();
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Double clicking a word in the summary leaves <details> in its original state (closed).
 		await summary.dblclick();
 		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
 
-		// Pressing Enter inside summary toggles details open.
-		await page.keyboard.press( 'Enter' );
+		// Double clicking a word in an open summary leaves <details> in its original state (open).
+		await summary.click();
 		await expect( paragraph ).toBeVisible();
-
-		// Pressing Enter again toggles details closed.
-		await page.keyboard.press( 'Enter' );
+		await expect( details ).toHaveAttribute( 'open' );
+		await summary.dblclick();
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+		await summary.click();
 		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
 
-		// Clicking the summary marker (the summary element itself, outside the RichText div) toggles it open.
-		const summaryElement = editor.canvas.locator( 'summary' );
-		const summaryBox = await summaryElement.boundingBox();
-		await page.mouse.click(
+		// Click-and-dragging across the summary text to select it does not toggle <details>.
+		const summaryBox = await summary.boundingBox();
+		await page.mouse.move(
 			summaryBox.x + 5,
 			summaryBox.y + summaryBox.height / 2
 		);
+		await page.mouse.down();
+		await page.mouse.move(
+			summaryBox.x + summaryBox.width - 5,
+			summaryBox.y + summaryBox.height / 2
+		);
+		await page.mouse.up();
+
+		// Should remain closed after drag selection.
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Pressing Enter inside summary toggles <details> open.
+		await page.keyboard.press( 'Enter' );
 		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+
+		// Pressing Enter again toggles <details> closed.
+		await page.keyboard.press( 'Enter' );
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
 	} );
 } );

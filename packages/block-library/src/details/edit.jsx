@@ -12,7 +12,8 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
@@ -90,6 +91,19 @@ function DetailsEdit( { attributes, setAttributes, clientId, onReplace } ) {
 		renderAppender: hasInnerBlocks ? undefined : DetailsAppender,
 	} );
 	const [ isOpen, setIsOpen ] = useState( showContent );
+	const clickTimeoutRef = useRef( null );
+	const dragStartPosRef = useRef( null );
+	const isDragRef = useRef( false );
+
+	const summaryRef = useRefEffect(
+		() => () => {
+			if ( clickTimeoutRef.current ) {
+				clearTimeout( clickTimeoutRef.current );
+			}
+		},
+		[]
+	);
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Check if the inner blocks are selected.
@@ -99,12 +113,42 @@ function DetailsEdit( { attributes, setAttributes, clientId, onReplace } ) {
 		[ clientId ]
 	);
 
-	const handleSummaryClick = ( event ) => {
-		// Prevent native <details> toggle when clicking or selecting text inside RichText,
-		// still allow clicking the <summary> disclosure marker itself to toggle.
-		if ( event.target !== event.currentTarget ) {
-			event.preventDefault();
+	const handleSummaryMouseDown = ( event ) => {
+		dragStartPosRef.current = { x: event.clientX, y: event.clientY };
+		isDragRef.current = false;
+		if ( event.detail > 1 && clickTimeoutRef.current ) {
+			clearTimeout( clickTimeoutRef.current );
+			clickTimeoutRef.current = null;
 		}
+	};
+
+	const handleSummaryMouseMove = ( event ) => {
+		if ( dragStartPosRef.current && ! isDragRef.current ) {
+			const dx = event.clientX - dragStartPosRef.current.x;
+			const dy = event.clientY - dragStartPosRef.current.y;
+			if ( Math.hypot( dx, dy ) > 5 ) {
+				isDragRef.current = true;
+			}
+		}
+	};
+
+	const handleSummaryClick = ( event ) => {
+		if ( event.target !== event.currentTarget ) {
+			// Click is inside RichText (summary text). Prevent native <details> toggle.
+			event.preventDefault();
+
+			if ( event.detail === 1 && ! isDragRef.current ) {
+				clickTimeoutRef.current = setTimeout( () => {
+					setIsOpen( ( prevIsOpen ) => ! prevIsOpen );
+					clickTimeoutRef.current = null;
+				}, 200 );
+			} else if ( clickTimeoutRef.current ) {
+				clearTimeout( clickTimeoutRef.current );
+				clickTimeoutRef.current = null;
+			}
+		}
+		dragStartPosRef.current = null;
+		isDragRef.current = false;
 	};
 
 	const handleSummaryKeyDown = ( event ) => {
@@ -174,7 +218,10 @@ function DetailsEdit( { attributes, setAttributes, clientId, onReplace } ) {
 				name={ name || '' }
 			>
 				<summary
+					ref={ summaryRef }
 					onClick={ handleSummaryClick }
+					onMouseDown={ handleSummaryMouseDown }
+					onMouseMove={ handleSummaryMouseMove }
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
 					onKeyUp={ handleSummaryKeyUp }
 				>
