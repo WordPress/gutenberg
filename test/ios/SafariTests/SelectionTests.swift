@@ -310,6 +310,8 @@ final class SelectionTests: XCTestCase {
 		// the events of the taps, whether the test passes or fails.
 		let gotX = editor.block( title: "Paragraph", content: "XQuote here" ).waitForExistence( timeout: 5 )
 		print( "IOSDEBUG result=\( gotX ? "PASS" : "FAIL" ) tapDelay=\( String( format: "%.2f", tapDelay ) )s blocks=\( editor.getBlocks() )" )
+		// The page writes the log 1.5 seconds after the last event.
+		sleep( 3 )
 		let log = web.descendants( matching: .any ).matching( NSPredicate( format: "label BEGINSWITH 'ioslog: '" ) ).firstMatch
 		print( "IOSDEBUG log=\( log.exists ? log.label : "missing" )" )
 

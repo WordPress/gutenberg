@@ -47,6 +47,7 @@ add_action(
 	sink.style.cssText = 'position: fixed; right: 0; bottom: 0; width: 2px; height: 2px; overflow: hidden; z-index: 100001; pointer-events: none;';
 	sink.textContent = '.';
 	const lines = [];
+	let flushTimer;
 	const start = performance.now();
 	function describe( node ) {
 		if ( ! node ) {
@@ -70,7 +71,13 @@ add_action(
 	}
 	window.__iosTestLog = ( type, detail ) => {
 		lines.push( Math.round( performance.now() - start ) + 'ms ' + type + ( detail ? ' ' + detail : '' ) + ' ' + state() );
-		sink.setAttribute( 'aria-label', 'ioslog: ' + lines.join( ' || ' ) );
+		// Only write the label once the events settle: updating the
+		// accessibility tree on every event changes the timing enough
+		// that the test no longer fails.
+		clearTimeout( flushTimer );
+		flushTimer = setTimeout( () => {
+			sink.setAttribute( 'aria-label', 'ioslog: ' + lines.join( ' || ' ) );
+		}, 1500 );
 	};
 	for ( const type of [ 'touchstart', 'touchend', 'pointerdown', 'pointerup', 'pointercancel', 'mousedown', 'mouseup', 'click', 'focusin', 'focusout', 'keydown', 'keyup', 'selectionchange', 'beforeinput', 'input' ] ) {
 		document.addEventListener(
