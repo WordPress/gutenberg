@@ -84,6 +84,22 @@ function getTransform( value: string ): LinearTransform {
 }
 
 /**
+ * Returns how a single element's own computed style rotates and scales it.
+ *
+ * @param style The element's computed style.
+ *
+ * @return The linear transform from the element's axes to its parent's.
+ */
+export function getStyleTransform(
+	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
+): LinearTransform {
+	// CSS applies `rotate`, then `scale`, then `transform`.
+	let matrix = getRotate( style.rotate || 'none' );
+	matrix = multiply( matrix, getScale( style.scale || 'none' ) );
+	return multiply( matrix, getTransform( style.transform || 'none' ) );
+}
+
+/**
  * Returns how an element and its ancestors rotate and scale it on screen.
  * Translation is left out, since it moves the element without changing
  * which way its edges face.
@@ -103,12 +119,10 @@ export function getScreenTransform( element: Element ): LinearTransform {
 		node;
 		node = node.parentElement
 	) {
-		const style = view.getComputedStyle( node );
-		// CSS applies `rotate`, then `scale`, then `transform`.
-		let own = getRotate( style.rotate || 'none' );
-		own = multiply( own, getScale( style.scale || 'none' ) );
-		own = multiply( own, getTransform( style.transform || 'none' ) );
-		matrix = multiply( own, matrix );
+		matrix = multiply(
+			getStyleTransform( view.getComputedStyle( node ) ),
+			matrix
+		);
 	}
 	return matrix;
 }
