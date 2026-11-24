@@ -25,6 +25,13 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >(
 				{ ...otherProps }
 			>
 				<span className={ styles[ 'tab-children' ] }>{ children }</span>
+				<svg
+					aria-hidden="true"
+					focusable="false"
+					className={ styles[ 'focus-ring' ] }
+				>
+					<rect />
+				</svg>
 			</_Tabs.Tab>
 		);
 	}

@@ -110,7 +110,7 @@
 			background: transparent;
 			border: none;
 			box-shadow: none;
-			outline: none; /* Focus ring applied to pseudo-elements */
+			outline: none; /* The focus indicator is drawn inside the tab. */
 			padding: 0;
 
 			/* Positioning */
@@ -209,9 +209,8 @@
 				padding-inline: 0;
 
 				&::after {
-					/* The shadow and outline grow outward. Reduce their starting
-					 * radius, then clip the paint to the final corner radius. */
-					border-radius: max(0px, var(--wpds-border-radius-sm) - var(--_wp-ui-tabs-background-overhang));
+					/* Let the clip alone shape the outer corners. */
+					border-radius: 0;
 					clip-path: inset(calc(-1 * var(--_wp-ui-tabs-background-overhang)) round var(--wpds-border-radius-sm));
 					inset-block:
 						calc((48px - var(--wpds-dimension-size-md)) / 2 +
@@ -221,6 +220,16 @@
 						calc(var(--_wp-ui-tabs-background-overhang) -
 						var(--wpds-border-width-focus));
 				}
+			}
+
+			/* An SVG can paint past its viewport without making the list scroll.
+			 * Use the native outline when a custom render wraps or omits the SVG. */
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:has(> .focus-ring)::after {
+				outline: none;
+			}
+
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:not(:has(> .focus-ring))::after {
+				border-radius: max(0px, var(--wpds-border-radius-sm) - var(--_wp-ui-tabs-background-overhang));
 			}
 
 			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
@@ -254,6 +263,38 @@
 					content: "";
 					inset: 0;
 					outline-offset: calc(-1 * var(--wpds-border-width-focus));
+				}
+			}
+		}
+
+		.focus-ring {
+			display: none;
+			pointer-events: none;
+
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] .tab:focus-visible > & {
+				display: block;
+				position: absolute;
+				inset-inline-start: 0;
+				top: calc((48px - var(--wpds-dimension-size-md)) / 2);
+				width: 100%;
+				height: var(--wpds-dimension-size-md);
+				overflow: visible;
+			}
+
+			rect {
+				/* Clip the outer half of the stroke to draw it inside the background. */
+				x: calc(-1 * var(--wpds-dimension-padding-xs));
+				width: calc(100% + 2 * var(--wpds-dimension-padding-xs));
+				height: 100%;
+				/* SVG clamps the two axes independently. Keep the corners circular. */
+				rx: min(var(--wpds-border-radius-sm), var(--wpds-dimension-size-md) / 2, 50% + var(--wpds-dimension-padding-xs));
+				fill: none;
+				stroke: var(--wpds-color-stroke-focus);
+				stroke-width: calc(2 * var(--wpds-border-width-focus));
+				clip-path: inset(0 round var(--wpds-border-radius-sm)) fill-box;
+
+				@media (forced-colors: active) {
+					stroke: CanvasText;
 				}
 			}
 		}
