@@ -218,25 +218,25 @@ test.describe( 'Post Content focus mode', () => {
 		for ( let i = 0; i < ' world'.length; i++ ) {
 			await page.keyboard.press( 'ArrowLeft' );
 		}
-		// The first typing after the editor loads does not always get an
-		// undo level of its own: an undo can turn out empty, or take back
-		// more than the typing. Typing a second after the last change starts
-		// a new level, and nothing on the page shows when that second is up,
-		// so wait it out.
-		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-		await page.waitForTimeout( 1100 );
+		await postContentFocusMode.waitForPostContentVisible();
 		await page.keyboard.type( '-a' );
 		await expect
 			.poll( () => postContentFocusMode.getPostContentText() )
 			.toEqual( [ 'Hello-a world' ] );
-		await postContentFocusMode.undoUntil( pageUtils, [ 'Hello world' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello world' ] );
 
 		// Type again at the caret the undo restored, then undo again.
 		await page.keyboard.type( '-b' );
 		await expect
 			.poll( () => postContentFocusMode.getPostContentText() )
 			.toEqual( [ 'Hello-b world' ] );
-		await postContentFocusMode.undoUntil( pageUtils, [ 'Hello world' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello world' ] );
 
 		// The caret is back after "Hello", not after the undone text.
 		await page.keyboard.type( '-c' );
@@ -374,10 +374,7 @@ test.describe( 'Post Content focus mode', () => {
 
 			await editor.canvas.getByText( 'Initial content' ).click();
 			await page.keyboard.press( 'End' );
-			// See the settle wait in "undo moves the caret back on undo,
-			// type, undo".
-			// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
-			await page.waitForTimeout( 1100 );
+			await postContentFocusMode.waitForPostContentVisible();
 			await page.keyboard.type( '-a' );
 			await expect
 				.poll( () => postContentFocusMode.getPostContentText() )
@@ -391,9 +388,10 @@ test.describe( 'Post Content focus mode', () => {
 				.poll( () => postContentFocusMode.getSelectedBlockName() )
 				.toBe( 'core/post-title' );
 
-			await postContentFocusMode.undoUntil( pageUtils, [
-				'Initial content',
-			] );
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect
+				.poll( () => postContentFocusMode.getPostContentText() )
+				.toEqual( [ 'Initial content' ] );
 
 			expect( await postContentFocusMode.getSelectedBlockName() ).toBe(
 				'core/paragraph'
@@ -751,28 +749,23 @@ class PostContentFocusMode {
 	}
 
 	/**
-	 * Undoes until Post Content's blocks have the given content. Typing
-	 * coalesces into undo levels on a timer, so the number of levels an edit
-	 * produces is not fixed.
-	 *
-	 * @param {Object}   pageUtils Page utils fixture.
-	 * @param {string[]} expected  The content of each block to undo back to.
+	 * Waits until the canvas counts Post Content as visible, which it reports
+	 * a moment after rendering. Until then, Post Content is neither selected
+	 * nor visible, so it reads the post asynchronously. When typing is
+	 * quickly undone, it then misses both edits: its blocks keep the typing
+	 * while the post no longer has it.
 	 */
-	async undoUntil( pageUtils, expected ) {
-		for ( let i = 0; i < 8; i++ ) {
-			await pageUtils.pressKeys( 'primary+z' );
-			try {
-				await expect
-					.poll( () => this.getPostContentText(), { timeout: 1000 } )
-					.toEqual( expected );
-				return;
-			} catch {
-				// Not there yet; undo again.
-			}
-		}
+	async waitForPostContentVisible() {
 		await expect
-			.poll( () => this.getPostContentText() )
-			.toEqual( expected );
+			.poll( () =>
+				this.page.evaluate( () => {
+					const { getBlocksByName, __unstableGetVisibleBlocks } =
+						window.wp.data.select( 'core/block-editor' );
+					const [ clientId ] = getBlocksByName( 'core/post-content' );
+					return __unstableGetVisibleBlocks().has( clientId );
+				} )
+			)
+			.toBe( true );
 	}
 
 	/**
