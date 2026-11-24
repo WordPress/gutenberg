@@ -12,7 +12,7 @@
 -   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
--   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
+-   Post Excerpt: Generate the excerpt in the editor with the REST API's `excerpt_length` parameter, the same way the block is rendered on the front end, instead of filtering `excerpt_length` for every admin request ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 
 ### Internal
 

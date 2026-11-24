@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useDebounce } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -26,15 +25,21 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const ELLIPSIS = '…';
 
+/*
+ * One more than the highest length the block offers, matching
+ * `block_core_post_excerpt_excerpt_length()`. The server generates the excerpt
+ * at this length and the block trims it to its own length, the same way the
+ * block is rendered on the front end.
+ */
+const GENERATED_EXCERPT_LENGTH = 101;
+
 /**
- * Requests the excerpt the server generates for a given length.
+ * Requests the excerpt the server generates at `GENERATED_EXCERPT_LENGTH`.
  *
  * `getEntityRecord` is deliberately not used here. It caches a single record by
- * ID and context and ignores the rest of the query, so every requested length
- * would share one cache entry: the response for one length would be displayed
- * for another, and a length that had already been resolved once would never be
- * requested again, leaving the block showing whichever length was fetched last.
- * Generated excerpts are therefore kept in state keyed by their request.
+ * ID and context and ignores the rest of the query, so the response would
+ * overwrite the record the editor has loaded. Generated excerpts are therefore
+ * kept in state keyed by their request.
  *
  * Only `excerpt.rendered` is read, so the request asks for the least
  * privileged context. In that context the REST API returns an empty excerpt
@@ -42,14 +47,13 @@ const ELLIPSIS = '…';
  *
  * @param {string}           postType  Post type of the post to request.
  * @param {number|string}    postId    ID of the post to request.
- * @param {number}           length    Excerpt length to request.
  * @param {boolean}          isEnabled Whether an excerpt has to be generated.
  * @param {string|undefined} modified  Changes whenever the stored post changes.
  *
  * @return {string|undefined} The generated excerpt, or `undefined` while the
- *                            request for the current length is in flight.
+ *                            request is in flight.
  */
-function useGeneratedExcerpt( postType, postId, length, isEnabled, modified ) {
+function useGeneratedExcerpt( postType, postId, isEnabled, modified ) {
 	const baseURL = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityConfig( 'postType', postType )
@@ -58,10 +62,7 @@ function useGeneratedExcerpt( postType, postId, length, isEnabled, modified ) {
 	);
 	const [ generatedExcerpts, setGeneratedExcerpts ] = useState( {} );
 
-	const key =
-		isEnabled && baseURL
-			? `${ postId }|${ modified }|${ length }`
-			: undefined;
+	const key = isEnabled && baseURL ? `${ postId }|${ modified }` : undefined;
 	const isRequested = key !== undefined && key in generatedExcerpts;
 
 	useEffect( () => {
@@ -75,7 +76,7 @@ function useGeneratedExcerpt( postType, postId, length, isEnabled, modified ) {
 			path: addQueryArgs( `${ baseURL }/${ postId }`, {
 				context: 'view',
 				_fields: 'excerpt',
-				excerpt_length: length,
+				excerpt_length: GENERATED_EXCERPT_LENGTH,
 			} ),
 		} )
 			.then( ( post ) => {
@@ -93,7 +94,7 @@ function useGeneratedExcerpt( postType, postId, length, isEnabled, modified ) {
 		return () => {
 			isStale = true;
 		};
-	}, [ key, isRequested, baseURL, postId, length ] );
+	}, [ key, isRequested, baseURL, postId ] );
 
 	return key === undefined ? undefined : generatedExcerpts[ key ];
 }
@@ -133,9 +134,9 @@ export default function PostExcerptEditor( props ) {
 	 * excerpt: `wp_trim_excerpt()` returns a stored excerpt untouched and
 	 * applies the filter only while generating one from the post content.
 	 * Posts that have an excerpt therefore reuse the record the editor has
-	 * already loaded instead of spending a request per length on a response
-	 * that cannot differ. An excerpt that has been edited but not yet stored
-	 * is displayed as typed, so it does not need a generated excerpt either.
+	 * already loaded instead of spending a request on a response that cannot
+	 * differ. An excerpt that has been edited but not yet stored is displayed
+	 * as typed, so it does not need a generated excerpt either.
 	 * Password protected posts keep the excerpt loaded in the edit context,
 	 * since a request in the view context returns it empty.
 	 */
@@ -146,38 +147,16 @@ export default function PostExcerptEditor( props ) {
 		! fullExcerpt?.raw?.trim() &&
 		! rawExcerpt?.trim();
 
-	/*
-	 * The excerpt length is sent to the REST API so that the excerpt is
-	 * trimmed on the server, using the same filters that run on the front end.
-	 * Dragging the range control would otherwise trigger a request for every
-	 * intermediate value, so the length used for the request is debounced.
-	 * It is updated from the events that change the length, since blocks
-	 * avoid effects. The control itself and the client-side trimming below
-	 * keep using the attribute directly, so the UI stays responsive while
-	 * dragging.
-	 */
-	const [ requestedExcerptLength, setRequestedExcerptLength ] =
-		useState( excerptLength );
-	const debouncedSetRequestedExcerptLength = useDebounce(
-		setRequestedExcerptLength,
-		300
-	);
-	const setExcerptLength = ( value ) => {
-		setAttributes( { excerptLength: value } );
-		debouncedSetRequestedExcerptLength( value );
-	};
-
 	const generatedExcerpt = useGeneratedExcerpt(
 		postType,
 		postId,
-		requestedExcerptLength,
 		needsGeneratedExcerpt,
 		record?.modified_gmt
 	);
 
 	/*
-	 * While a request is in flight the excerpt already loaded for the post is
-	 * displayed, so that changing the length never blanks the block.
+	 * While the request is in flight the excerpt already loaded for the post
+	 * is displayed, so that the block is never blank.
 	 */
 	const renderedExcerpt = needsGeneratedExcerpt
 		? ( generatedExcerpt ?? fullExcerpt?.rendered )
@@ -351,7 +330,6 @@ export default function PostExcerptEditor( props ) {
 							showMoreOnNewLine: true,
 							excerptLength: 55,
 						} );
-						debouncedSetRequestedExcerptLength( 55 );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -376,13 +354,17 @@ export default function PostExcerptEditor( props ) {
 					<ToolsPanelItem
 						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
-						onDeselect={ () => setExcerptLength( 55 ) }
+						onDeselect={ () =>
+							setAttributes( { excerptLength: 55 } )
+						}
 						isShownByDefault
 					>
 						<RangeControl
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
-							onChange={ setExcerptLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptLength: value } );
+							} }
 							min="10"
 							max="100"
 						/>
