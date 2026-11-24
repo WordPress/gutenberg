@@ -29,6 +29,7 @@ import {
 	store as blockEditorStore,
 	useBlockEditingMode,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -49,6 +50,7 @@ const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
 	borderProps,
+	shadowProps,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -122,7 +124,10 @@ const SiteLogo = ( {
 		<>
 			<img
 				className={ clsx( 'custom-logo', borderProps.className ) }
-				style={ borderProps.style }
+				style={ {
+					...borderProps.style,
+					...shadowProps.style,
+				} }
 				src={ logoUrl }
 				alt={ alt }
 				onLoad={ ( event ) => {
@@ -388,6 +393,7 @@ export default function LogoEdit( {
 } ) {
 	const { width, shouldSyncIcon } = attributes;
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -557,6 +563,7 @@ export default function LogoEdit( {
 					alt={ alt }
 					attributes={ attributes }
 					borderProps={ borderProps }
+					shadowProps={ shadowProps }
 					className={ className }
 					isSelected={ isSelected }
 					setAttributes={ setAttributes }
@@ -590,6 +597,7 @@ export default function LogoEdit( {
 				style={ {
 					width,
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ content }
@@ -667,7 +675,10 @@ export default function LogoEdit( {
 						'site-logo_placeholder',
 						borderProps.className
 					) }
-					style={ borderProps.style }
+					style={ {
+						...borderProps.style,
+						...shadowProps.style,
+					} }
 					withIllustration
 				>
 					{ isLoading && (

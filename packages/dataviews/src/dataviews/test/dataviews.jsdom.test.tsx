@@ -798,16 +798,22 @@ describe( 'DataViews component', () => {
 
 			// First item should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			await user.click( thirdItemElement );
 
 			// Both items should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Don't keep the modifier pressed down, that's just mean.
@@ -832,7 +838,9 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 0 ].title ) );
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click selects everything between the anchor and the
@@ -841,7 +849,9 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 2 ].title ) );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 
@@ -864,10 +874,14 @@ describe( 'DataViews component', () => {
 			// Checkbox clicks select the first and third items; the third
 			// becomes the anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift+Click applies the anchor's state to the range without
@@ -878,7 +892,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -901,7 +917,9 @@ describe( 'DataViews component', () => {
 			);
 			// Unchecking the third item makes it the anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the selected second item selects the range
@@ -911,7 +929,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -932,10 +952,14 @@ describe( 'DataViews component', () => {
 			// Selecting and deselecting the first item leaves it as the
 			// anchor with nothing selected.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the unselected third item selects the whole
@@ -945,7 +969,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -966,7 +992,9 @@ describe( 'DataViews component', () => {
 			// The checkbox click selects the third item and makes it the
 			// anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the first item's checkbox selects the whole
@@ -975,12 +1003,16 @@ describe( 'DataViews component', () => {
 			// toggle after React re-renders, leaving it visually unchecked.
 			await user.keyboard( '{Shift>}' );
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -1015,14 +1047,18 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 1 ].title ) );
 			expect( onClickItem ).not.toHaveBeenCalled();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			).not.toBeChecked();
 
 			// Selectable items still respond and become the anchor.
 			await user.click( screen.getByText( data[ 0 ].title ) );
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click ranges skip the non-selectable item.
@@ -1030,13 +1066,19 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 2 ].title ) );
 			await user.keyboard( '{/Shift}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			).not.toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			).toBeChecked();
 			expect( onClickItem ).not.toHaveBeenCalled();
 		} );
@@ -1073,10 +1115,14 @@ describe( 'DataViews component', () => {
 			);
 			const user = userEvent.setup();
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			);
 
 			await user.click(
@@ -1241,7 +1287,7 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			const firstCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 0 ].title,
+				name: `Select ${ data[ 0 ].title }`,
 			} );
 			const user = userEvent.setup();
 			await user.click( firstCheckbox );
@@ -1249,7 +1295,7 @@ describe( 'DataViews component', () => {
 			// First item should be selected.
 			expect( firstCheckbox ).toBeChecked();
 			const thirdCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 2 ].title,
+				name: `Select ${ data[ 2 ].title }`,
 			} );
 			await user.click( thirdCheckbox );
 
@@ -1283,7 +1329,9 @@ describe( 'DataViews component', () => {
 
 			// First item should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			await user.keyboard( '{/Control}' );
@@ -1312,7 +1360,9 @@ describe( 'DataViews component', () => {
 			);
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click selects everything between the anchor and the
@@ -1324,7 +1374,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -1366,7 +1418,9 @@ describe( 'DataViews component', () => {
 			await user.tab();
 
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toHaveFocus();
 
 			await user.tab();
@@ -1415,7 +1469,9 @@ describe( 'DataViews component', () => {
 			await user.tab();
 
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toHaveFocus();
 
 			await user.tab();

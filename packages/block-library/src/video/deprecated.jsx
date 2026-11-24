@@ -1,8 +1,15 @@
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+} from '@wordpress/block-editor';
 import metadata from './block.json';
 import Tracks from './tracks';
 
-const { attributes: blockAttributes } = metadata;
+const { attributes: blockAttributes, supports: blockSupports } = metadata;
 
 // In #41140 support was added to global styles for caption elements which added a `wp-element-caption` classname
 // to the video figcaption element.
@@ -45,6 +52,73 @@ const v1 = {
 	},
 };
 
-const deprecated = [ v1 ];
+// The inline aspect ratio gained the `auto` keyword so it sizes the content box
+// and a border no longer shrinks the picture.
+const v2 = {
+	attributes: blockAttributes,
+	supports: blockSupports,
+	save( { attributes } ) {
+		const {
+			autoplay,
+			caption,
+			controls,
+			loop,
+			muted,
+			poster,
+			preload,
+			src,
+			playsInline,
+			tracks,
+			width,
+			height,
+		} = attributes;
+		const aspectRatio =
+			width && height ? `${ width } / ${ height }` : undefined;
+		const borderProps = getBorderClassesAndStyles( attributes );
+		const videoStyle = {
+			...( aspectRatio && { aspectRatio } ),
+			...getDimensionsClassesAndStyles( attributes ).style,
+			...getShadowClassesAndStyles( attributes ).style,
+			...borderProps.style,
+		};
+		return (
+			<figure { ...useBlockProps.save() }>
+				{ src && (
+					<video
+						autoPlay={ autoplay }
+						controls={ controls }
+						loop={ loop }
+						muted={ muted }
+						poster={ poster }
+						preload={ preload !== 'metadata' ? preload : undefined }
+						src={ src }
+						className={ borderProps.className }
+						playsInline={ playsInline }
+						width={ width }
+						height={ height }
+						style={
+							Object.keys( videoStyle ).length
+								? videoStyle
+								: undefined
+						}
+					>
+						<Tracks tracks={ tracks } />
+					</video>
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</figure>
+		);
+	},
+};
+
+const deprecated = [ v2, v1 ];
 
 export default deprecated;
