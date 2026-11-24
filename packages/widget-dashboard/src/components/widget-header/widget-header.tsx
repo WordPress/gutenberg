@@ -7,7 +7,6 @@ import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
-import { measureTextOverflow } from './measure-text-overflow';
 import {
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -69,27 +68,18 @@ export function WidgetHeader( {
 		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
 	);
 
-	// Natural footprint of the identity cluster plus the gap before the
-	// toolbar. Measured, so whatever identity holds (a help tip, a future
-	// badge) is reserved without a per-element constant. The title's clipped
-	// overflow is added back, so the inline controls give way before the
-	// title truncates and return at the same width.
-	const [ identityReserve, setIdentityReserve ] = useState( 0 );
+	// Actual footprint of the identity cluster plus the gap before the toolbar.
+	// Measured, so whatever identity holds (a help tip, a future badge) is
+	// reserved without a per-element constant.
+	const [ identityWidth, setIdentityWidth ] = useState( 0 );
 	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
 		( [ entry ] ) => {
 			const { columnGap } = getComputedStyle(
 				entry.target.parentElement as HTMLElement
 			);
 
-			const title = entry.target.querySelector( 'h2' );
-			const titleOverflow = title
-				? Math.max( 0, measureTextOverflow( title ) )
-				: 0;
-
-			setIdentityReserve(
-				entry.contentRect.width +
-					titleOverflow +
-					( parseFloat( columnGap ) || 0 )
+			setIdentityWidth(
+				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
 			);
 		}
 	);
@@ -136,10 +126,19 @@ export function WidgetHeader( {
 			);
 		}
 	);
-	const [ titleMeasureRef, isTitleTruncated ] =
+	const [ titleMeasureRef, isTitleTruncated, titleOverflow ] =
 		useIsTruncated< HTMLHeadingElement >(
 			widgetType?.help ? 0 : infotipReserve
 		);
+
+	// The clipped part of the title is added back, so the inline controls give
+	// way before the title truncates. It comes from the title's own observer:
+	// an infotip that appears or leaves resizes the title, not the identity.
+	const identityReserve = identityWidth + titleOverflow;
+
+	// An infotip shown only for a clipped title leaves once the title fits.
+	// While it holds focus it stays, so focus does not drop to the document.
+	const [ infotipHasFocus, setInfotipHasFocus ] = useState( false );
 
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
@@ -170,6 +169,16 @@ export function WidgetHeader( {
 					gap="sm"
 					className={ styles.identity }
 					inert={ inertValue( editMode ) }
+					onFocus={ () => setInfotipHasFocus( true ) }
+					onBlur={ ( event ) => {
+						if (
+							! event.currentTarget.contains(
+								event.relatedTarget as Node | null
+							)
+						) {
+							setInfotipHasFocus( false );
+						}
+					} }
 				>
 					{ widgetType.icon && (
 						<span className={ styles.icon } aria-hidden="true">
@@ -186,7 +195,9 @@ export function WidgetHeader( {
 						{ widgetType.title }
 					</Card.Title>
 
-					{ ( widgetType.help || isTitleTruncated ) && (
+					{ ( widgetType.help ||
+						isTitleTruncated ||
+						infotipHasFocus ) && (
 						<WidgetInfotip
 							ref={ infotipMeasureRef }
 							title={ widgetType.title }

@@ -175,6 +175,7 @@ describe( 'header fit budget', () => {
 				measurement === 'fractional' ? 160 : 120
 			);
 			titleRect.mockReturnValue( { width: 159.75 } as DOMRect );
+			notifyResize( title, measurement === 'fractional' ? 159.75 : 120 );
 			notifyResize(
 				identity,
 				measurement === 'fractional' ? 199.5 : 160
@@ -187,6 +188,7 @@ describe( 'header fit budget', () => {
 			// Collapsing restores the identity's full width, but not its budget.
 			clientWidth.mockReturnValue( 160 );
 			titleRect.mockReturnValue( { width: 160.25 } as DOMRect );
+			notifyResize( title, 160 );
 			notifyResize( identity, 200 );
 			notifyResize( header, 425 );
 			expect(
@@ -196,6 +198,36 @@ describe( 'header fit budget', () => {
 			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
 		}
 	);
+
+	it( 'follows the title when an infotip leaves without resizing the identity', async () => {
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		/* eslint-disable testing-library/no-node-access */
+		const header = document.querySelector( '.style-widget-header' )!;
+		const identity = document.querySelector( '.style-identity' )!;
+		const inline = document.querySelector( '.style-inline-controls' )!;
+		/* eslint-enable testing-library/no-node-access */
+		const title = screen.getByRole( 'heading', { name: 'Snapshot' } );
+		const clientWidth = vi.spyOn( title, 'clientWidth', 'get' );
+		vi.spyOn( title, 'scrollWidth', 'get' ).mockReturnValue( 160 );
+
+		// A 28px infotip beside the clipped title fills a 200px identity.
+		clientWidth.mockReturnValue( 132 );
+		notifyResize( title, 132 );
+		notifyResize( identity, 200 );
+		notifyResize( inline, 226 );
+		notifyResize( header, 442 );
+		expect(
+			screen.getByRole( 'button', { name: 'Widget controls' } )
+		).toBeInTheDocument();
+
+		// The infotip leaves and the title takes its room; the identity keeps
+		// its 200px, so only the title reports the change.
+		clientWidth.mockReturnValue( 160 );
+		notifyResize( title, 160 );
+		expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
+	} );
 
 	it( "counts the toolbar chip's own padding and border", async () => {
 		render( <Harness /> );
