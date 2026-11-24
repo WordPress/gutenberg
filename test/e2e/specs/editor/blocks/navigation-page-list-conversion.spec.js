@@ -334,6 +334,19 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 				autoAdd: true,
 				labels: [ 'Home', 'Alpha', 'Bravo Team', 'Charlie' ],
 			} );
+
+		// The typing and the conversion are one undo step.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo', exact: true } )
+			.click();
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( {
+				pageLists: 1,
+				autoAdd: false,
+				labels: [ 'Home', 'Alpha', 'Bravo', 'Charlie' ],
+			} );
 	} );
 
 	test( 'one undo brings the Page List back and turns auto add off', async ( {

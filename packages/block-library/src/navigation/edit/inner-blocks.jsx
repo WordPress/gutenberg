@@ -66,7 +66,8 @@ export default function NavigationInnerBlocks( {
 	// added, so one undo reverts the edit, the replacement and the setting.
 	const onChangeWithAutoAddPages = useCallback(
 		( newBlocks, options ) => {
-			onChange( newBlocks, options );
+			// Read before `onChange`: the signal covers only the latest
+			// change to the blocks.
 			const { getLastDetachedBlocks, getBlockParents } = unlock(
 				registry.select( blockEditorStore )
 			);
@@ -76,6 +77,7 @@ export default function NavigationInnerBlocks( {
 					( rootClientId === clientId ||
 						getBlockParents( rootClientId ).includes( clientId ) )
 			);
+			onChange( newBlocks, options );
 			if ( hasDetachedPageList ) {
 				editEntityRecord(
 					'postType',

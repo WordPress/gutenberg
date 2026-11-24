@@ -264,6 +264,17 @@ describe( 'blocks that detach on edit', () => {
 		} );
 	} );
 
+	it( 'keeps typing after the detaching keystroke in the same undo step', () => {
+		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'a' } );
+		expect( t.select.getBlock( t.ids.list ) ).toBeNull();
+		expect( t.select.isLastBlockChangePersistent() ).toBe( true );
+
+		// The next keystroke updates the same attribute, as without the
+		// detach, so it doesn't start a new undo step.
+		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'ab' } );
+		expect( t.select.isLastBlockChangePersistent() ).toBe( false );
+	} );
+
 	it( 'reports the blocks the last change detached, until the next change', () => {
 		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'X' } );
 

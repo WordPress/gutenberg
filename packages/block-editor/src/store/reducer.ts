@@ -432,6 +432,13 @@ const withBlockTree =
 	};
 
 /**
+ * The actions `withDetachOnEdit` dispatches to carry out a detach. They're part
+ * of the change that caused it, so `withPersistentBlockChange` doesn't compare
+ * the next action against them.
+ */
+const detachActions = new WeakSet< Action >();
+
+/**
  * Higher-order reducer intended to augment the blocks reducer, assigning an
  * `isPersistentChange` property value corresponding to whether a change in
  * state can be considered as persistent. All changes are considered persistent
@@ -473,8 +480,15 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
-		// have resulted in a changed state.
-		lastAction = action;
+		// have resulted in a changed state. Leave out changes outside the
+		// history and a detach's own steps, so they don't split an undo step
+		// (such as typing) in two.
+		if (
+			pendingHistoryMode !== 'ignore' &&
+			! detachActions.has( action )
+		) {
+			lastAction = action;
+		}
 
 		if ( pendingHistoryMode === 'ignore' ) {
 			return {
@@ -3498,21 +3512,27 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 					nextState.blocks.order.get( clientId ) ?? [];
 				// Moved rather than recreated, so they keep their client IDs
 				// (and the selection).
-				if ( innerClientIds.length ) {
-					nextState = reducer( nextState, {
-						type: 'MOVE_BLOCKS_TO_POSITION',
-						clientIds: innerClientIds,
-						fromRootClientId: clientId,
-						toRootClientId: rootClientId,
-						index: nextState.blocks.order
-							.get( rootClientId )!
-							.indexOf( clientId ),
-					} );
-				}
-				nextState = reducer( nextState, {
+				const steps: Action[] = innerClientIds.length
+					? [
+							{
+								type: 'MOVE_BLOCKS_TO_POSITION',
+								clientIds: innerClientIds,
+								fromRootClientId: clientId,
+								toRootClientId: rootClientId,
+								index: nextState.blocks.order
+									.get( rootClientId )!
+									.indexOf( clientId ),
+							},
+						]
+					: [];
+				steps.push( {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				} );
+				for ( const step of steps ) {
+					detachActions.add( step );
+					nextState = reducer( nextState, step );
+				}
 				detached.push( { clientId, name: block.name, rootClientId } );
 			}
 		}

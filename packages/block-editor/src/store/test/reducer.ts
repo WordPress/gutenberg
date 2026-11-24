@@ -2239,6 +2239,52 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( false );
 				} );
 
+				it( 'should keep updates to the same block attribute exempt across a change outside the history', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'loquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: false,
+						},
+					} );
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					original = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'loquat',
+						hasControlledInnerBlocks: true,
+					} );
+
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( false );
+				} );
+
 				it( 'should flag an explicitly marked persistent change', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
