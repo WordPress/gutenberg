@@ -38,6 +38,7 @@
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   Block toolbar: Return focus to the block with Tab or Escape after a toolbar action replaces the block's element, such as changing a heading's level ([#87360](https://github.com/WordPress/gutenberg/pull/87360)).
 
 ### Internal
 
