@@ -38,6 +38,10 @@ function Page( {
 	 * A `Breadcrumbs` element from `@wordpress/admin-ui`, shown in place of
 	 * `title` on a page that is nested under another page. The last breadcrumb
 	 * is the page heading.
+	 *
+	 * `Breadcrumbs` links come from `@wordpress/route`, so the page must render
+	 * inside its router, such as in a `@wordpress/boot` route. The page region
+	 * does not take its name from the breadcrumbs, so also set `ariaLabel`.
 	 */
 	breadcrumbs?: React.ReactNode;
 	/**

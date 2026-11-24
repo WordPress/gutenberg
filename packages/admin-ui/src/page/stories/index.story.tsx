@@ -56,6 +56,7 @@ export const WithBreadcrumbs: Story = {
 	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
+		ariaLabel: 'Level 1 breadcrumb',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
@@ -84,6 +85,7 @@ export const WithVisualAndBreadcrumbs: Story = {
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
+		ariaLabel: 'Level 1 breadcrumb',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
@@ -124,6 +126,7 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 	args: {
 		showSidebarToggle: false,
 		subTitle: 'All of the subtitle text you need goes here.',
+		ariaLabel: 'Level 1 breadcrumb',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
@@ -139,6 +142,7 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 
 export const WithoutHeader: Story = {
 	args: {
+		ariaLabel: 'Page title',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -159,6 +163,7 @@ export const WithBreadcrumbsAndBadges: Story = {
 	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
+		ariaLabel: 'Level 1 breadcrumb',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
@@ -274,6 +279,7 @@ export const FullHeader: Story = {
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
+		ariaLabel: 'Level 1 breadcrumb',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
