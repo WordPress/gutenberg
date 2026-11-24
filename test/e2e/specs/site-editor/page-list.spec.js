@@ -467,7 +467,7 @@ test.describe( 'Page List', () => {
 				return { editButton, row };
 			};
 			const getDatetimeInput = ( page ) =>
-				page.locator( 'input[type="datetime-local"]' );
+				page.getByRole( 'spinbutton', { name: 'Year' } );
 
 			test( 'opens the flyout when clicking anywhere on the row', async ( {
 				page,

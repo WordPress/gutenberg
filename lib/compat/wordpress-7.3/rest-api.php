@@ -9,6 +9,8 @@
  * Registers the View Config REST API routes.
  *
  * Replaces the 7.2 registration so the route is served by the 7.3 controller.
+ *
+ * @return void
  */
 function gutenberg_register_view_config_controller_endpoints_7_3() {
 	$view_config_controller = new Gutenberg_REST_View_Config_Controller_7_3();
