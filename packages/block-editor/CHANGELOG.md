@@ -89,7 +89,13 @@
 
 ### Bug Fixes
 
--   Inserter, Document Overview: Show a focus ring when the scrolling tab panel receives keyboard focus, so its tab stop is no longer invisible ([#85738](https://github.com/WordPress/gutenberg/pull/85738)).
+-   Contrast checker: Check the color readers see when a block's background is clipped to its text, including text gradients ([#86148](https://github.com/WordPress/gutenberg/pull/86148)).
+-   Block style variations: Show a variation's text color over a text gradient set for its block type in Global Styles ([#86164](https://github.com/WordPress/gutenberg/pull/86164)).
+-   `RichTextToolbarButton`: Show a button whose `name` is not one of the formats with a place in the toolbar in the "More" dropdown, instead of silently dropping it ([#85843](https://github.com/WordPress/gutenberg/pull/85843)).
+-   `LinkControl`: Keep focus in the link preview after a post or page is chosen whose record has not loaded yet, so the popover still closes when focus leaves it ([#85945](https://github.com/WordPress/gutenberg/pull/85945)).
+-   `URLInput`: Keep pointer and keyboard highlights in sync and selected suggestions readable on hover ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Global Styles: Preserve the untouched sides of padding and margin shorthand when editing one side ([#85437](https://github.com/WordPress/gutenberg/pull/85437)).
+-   `BlockStyles`: Clamp variation labels to two lines, center every line of wrapped labels, and show the full label in a tooltip ([#85721](https://github.com/WordPress/gutenberg/pull/85721)).
 -   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   `ColorPanel`: Fix inconsistent heading level and all-caps styling on the Elements panel by defaulting to heading level 2 ([#85247](https://github.com/WordPress/gutenberg/pull/85247)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
