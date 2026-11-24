@@ -5,16 +5,16 @@ import {
 	useReducer,
 } from '@wordpress/element';
 import type { RefObject } from 'react';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { create, RichTextData } from '../create';
 import { apply, getDomPosition } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
-import { useDefaultStyle } from './use-default-style';
+import { setDefaultStyle } from './default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { useEventListeners } from './event-listeners';
+import { addField, useEventListenerProps } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
 import type {
 	ApplyRecordOptions,
@@ -215,34 +215,43 @@ function useRichTextBase( {
 			hasFocus( ref.current! )
 		) {
 			applyRecord( recordRef.current! );
+		} else if (
+			recordRef.current!.start === undefined &&
+			ref.current!.querySelector( '[data-rich-text-format-boundary]' )
+		) {
+			// The editing host may be an ancestor that keeps focus, so the
+			// boundary would remain visible.
+			applyRecord( recordRef.current! );
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	const mergedRefs = useMergeRefs( [
+	useBoundaryStyle( {
+		record: recordRef as RefObject< RichTextRecord >,
 		ref,
-		useDefaultStyle(),
-		useBoundaryStyle( {
-			record: recordRef as RefObject< RichTextRecord >,
-		} ),
-		useEventListeners( {
-			record: recordRef as RefObject< RichTextRecord >,
-			handleChange,
-			applyRecord,
-			createRecord,
-			isSelected,
-			onSelectionChange: sendSelection,
-			forceRender,
-		} ),
-		useRefEffect(
-			( element: HTMLElement ) => {
-				setRecordFromProps();
-				applyRecord( recordRef.current!, {
-					domOnly: ! hasFocus( element ),
-				} );
-			},
-			[ placeholder, ...__unstableDependencies ]
-		),
-	] );
+	} );
+	const eventListenerProps = useEventListenerProps( {
+		record: recordRef as RefObject< RichTextRecord >,
+		handleChange,
+		applyRecord,
+		createRecord,
+		isSelected,
+		onSelectionChange: sendSelection,
+		forceRender,
+	} );
+	// One ref for all a field needs on mount: each hook costs every field.
+	const richTextRef = useRefEffect(
+		( element: HTMLElement ) => {
+			ref.current = element;
+			setDefaultStyle( element );
+			const removeField = addField( element, eventListenerProps );
+			setRecordFromProps();
+			applyRecord( recordRef.current!, {
+				domOnly: ! hasFocus( element ),
+			} );
+			return removeField;
+		},
+		[ placeholder, ...__unstableDependencies ]
+	);
 
 	return {
 		value: recordRef.current!,
@@ -253,7 +262,7 @@ function useRichTextBase( {
 		// may re-render asynchronously.
 		getValue: () => recordRef.current!,
 		onChange: handleChange,
-		ref: mergedRefs,
+		ref: richTextRef,
 		// The DOM position of an offset in the value, for a selection set
 		// from outside the element.
 		[ getDomPositionKey ]: useCallback(

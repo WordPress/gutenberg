@@ -385,6 +385,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			// The ID is passed on purpose, since subclasses that override prepare_links() may expect an ID rather than a post object.
 			$links = $this->prepare_links( $post->ID );
 			// Only return resolved URIs for get requests to user theme JSON.
 			if ( $theme_json ) {
@@ -411,11 +412,19 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 *
 	 * @since 5.9.0
 	 * @since 6.3.0 Adds revisions count and rest URL href to version-history.
+	 * @since 7.2.0 Accepts a post object, matching the parent method.
 	 *
-	 * @param integer $id ID.
-	 * @return array Links for the given post.
+	 * @param WP_Post|int $post Post object or ID.
+	 * @return array<string, array<string, string|int>> Links for the given post.
+	 *
+	 * @phpstan-return array{
+	 *     self: array{ href: non-falsy-string },
+	 *     about: array{ href: non-falsy-string },
+	 *     version-history?: array{ href: non-falsy-string, count: int<0, max> },
+	 * }
 	 */
-	protected function prepare_links( $id ) {
+	protected function prepare_links( $post ) {
+		$id   = $post instanceof WP_Post ? $post->ID : $post;
 		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
 
 		$links = array(
@@ -428,7 +437,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		);
 
 		if ( post_type_supports( $this->post_type, 'revisions' ) ) {
-			$revisions                = wp_get_latest_revision_id_and_total_count( $id );
+			$revisions                = wp_get_latest_revision_id_and_total_count( $post );
 			$revisions_count          = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
 			$revisions_base           = sprintf( '/%s/%d/revisions', $base, $id );
 			$links['version-history'] = array(

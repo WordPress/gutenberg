@@ -81,6 +81,10 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef< number >( undefined );
 
+	useEffect( () => {
+		return () => window.clearTimeout( moveTimeoutRef.current );
+	}, [] );
+
 	const debounceUnsetMoveXY = useCallback( () => {
 		const unsetMoveXY = () => {
 			/*

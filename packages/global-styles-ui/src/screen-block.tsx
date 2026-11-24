@@ -119,12 +119,14 @@ const {
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useHasBackgroundPanel,
+	useHasTransformPanel,
 	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	TransformPanel: StylesTransformPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
@@ -258,6 +260,7 @@ function ScreenBlock( {
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasTransformPanel = useHasTransformPanel( settings );
 	const shouldShowFiltersPanel =
 		hasFiltersPanel && effectiveSelectedViewport === 'default';
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
@@ -400,7 +403,6 @@ function ScreenBlock( {
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
@@ -411,7 +413,6 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -421,7 +422,6 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -431,7 +431,6 @@ function ScreenBlock( {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -440,7 +439,15 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
+				/>
+			) }
+			{ hasTransformPanel && (
+				<StylesTransformPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					baseValue={ baseValue }
+					onChange={ setStyle }
+					settings={ settings }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -449,7 +456,6 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

@@ -655,6 +655,59 @@ describe( 'rawHandler', () => {
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
+	it( 'should convert a shortcode that is the whole content', () => {
+		const HTML = '[gallery ids="1,2"]';
+		expect( rawHandler( { HTML } ) ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{ name: 'core/image', attributes: { id: 1 } },
+					{ name: 'core/image', attributes: { id: 2 } },
+				],
+			},
+		] );
+	} );
+
+	it( 'should keep a caption shortcode in the middle of text', () => {
+		const HTML =
+			'<p>Look: [caption align="alignright"]<img src="a.png" /> A cat[/caption] nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: [caption align="alignright"]<img src="a.png"> A cat[/caption] nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignright"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->\n\n<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should move an aligned caption shortcode out of the end of a paragraph', () => {
+		const HTML =
+			'<p>Look: nice.[caption align="alignright"]<img src="a.png" /> A cat[/caption]</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>Look: nice.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:image {"align":"right"} -->\n<figure class="wp-block-image alignright"><img src="a.png" alt=""/><figcaption class="wp-element-caption">A cat</figcaption></figure>\n<!-- /wp:image -->'
+		);
+	} );
+
+	it( 'should keep an unaligned caption shortcode at the start of a paragraph', () => {
+		const HTML =
+			'<p>[caption align="alignnone"]<img src="a.png" /> A cat[/caption]Look: nice.</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:paragraph -->\n<p>[caption align="alignnone"]<img src="a.png"> A cat[/caption]Look: nice.</p>\n<!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'should keep a shortcode with HTML in a list item', () => {
+		const HTML =
+			'<ul><li>First[note]A <a href="https://example.com">link</a>.[/note]</li><li>Second</li></ul>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toBe(
+			'<!-- wp:list -->\n<ul class="wp-block-list"><!-- wp:list-item -->\n<li>First[note]A <a href="https://example.com">link</a>.[/note]</li>\n<!-- /wp:list-item -->\n\n<!-- wp:list-item -->\n<li>Second</li>\n<!-- /wp:list-item --></ul>\n<!-- /wp:list -->'
+		);
+	} );
+
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
 			path.join(

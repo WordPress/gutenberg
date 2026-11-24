@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 17.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).
+-   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+
+## 17.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
@@ -13,6 +32,7 @@
 -   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor, and pasting one keeps it again, as before WordPress 7.0 ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion no longer copies the classes a block adds itself into `className`. `<ul class="wp-block-list fancy">` now converts to a List block with `className: "fancy"`, where before it got `"wp-block-list fancy"` ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   `rawHandler`, `pasteHandler`: Keep shortcodes in text inline unless they're on their own line, or aligned at the start or end of a line ([#85795](https://github.com/WordPress/gutenberg/pull/85795)).
 
 ### Internal
 

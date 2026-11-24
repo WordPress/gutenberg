@@ -6,16 +6,16 @@ import {
 	__experimentalVStack as VStack,
 	ColorPalette,
 	GradientPicker,
-	Notice,
+	Notice as WCNotice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 import type { ColorGradientControlProps, ColorGradientOptions } from './types';
 
-export type NoticeProps = ComponentProps< typeof Notice >;
+export type NoticeProps = ComponentProps< typeof WCNotice >;
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',
@@ -80,6 +80,10 @@ function ColorGradientControlInner( {
 		/>
 	);
 
+	const notice = noticeProps && (
+		<WCNotice isDismissible={ false } { ...noticeProps } />
+	);
+
 	const tabPanels = {
 		// The `ColorPalette` must stay at a stable position in the tree whether
 		// or not a notice is present. Wrapping it in a `VStack` only when a
@@ -90,31 +94,33 @@ function ColorGradientControlInner( {
 		[ TAB_IDS.color ]: (
 			<>
 				{ colorPalette }
-				{ noticeProps && (
-					<Notice isDismissible={ false } { ...noticeProps } />
-				) }
+				{ notice }
 			</>
 		),
+		// Same ordering as the color tab, for the same reason.
 		[ TAB_IDS.gradient ]: (
-			<GradientPicker
-				value={ gradientValue }
-				selectedSlug={ gradientSlug }
-				onChange={
-					canChooseAColor
-						? ( newGradient, _index, newSlug ) => {
-								onGradientChange!( newGradient, newSlug );
-								onColorChange!();
-							}
-						: ( newGradient, _index, newSlug ) =>
-								onGradientChange!( newGradient, newSlug )
-				}
-				{ ...{ gradients, disableCustomGradients } }
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				headingLevel={ headingLevel }
-			/>
+			<>
+				<GradientPicker
+					value={ gradientValue }
+					selectedSlug={ gradientSlug }
+					onChange={
+						canChooseAColor
+							? ( newGradient, _index, newSlug ) => {
+									onGradientChange!( newGradient, newSlug );
+									onColorChange!();
+								}
+							: ( newGradient, _index, newSlug ) =>
+									onGradientChange!( newGradient, newSlug )
+					}
+					{ ...{ gradients, disableCustomGradients } }
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ clearable }
+					headingLevel={ headingLevel }
+				/>
+				{ notice }
+			</>
 		),
 	};
 
@@ -144,36 +150,36 @@ function ColorGradientControlInner( {
 					) }
 					{ canChooseAColor && canChooseAGradient && (
 						<div>
-							<Tabs
+							<WCTabs
 								defaultTabId={
 									gradientValue
 										? TAB_IDS.gradient
 										: !! canChooseAColor && TAB_IDS.color
 								}
 							>
-								<Tabs.TabList>
-									<Tabs.Tab tabId={ TAB_IDS.color }>
+								<WCTabs.TabList>
+									<WCTabs.Tab tabId={ TAB_IDS.color }>
 										{ __( 'Color' ) }
-									</Tabs.Tab>
-									<Tabs.Tab tabId={ TAB_IDS.gradient }>
+									</WCTabs.Tab>
+									<WCTabs.Tab tabId={ TAB_IDS.gradient }>
 										{ __( 'Gradient' ) }
-									</Tabs.Tab>
-								</Tabs.TabList>
-								<Tabs.TabPanel
+									</WCTabs.Tab>
+								</WCTabs.TabList>
+								<WCTabs.TabPanel
 									tabId={ TAB_IDS.color }
 									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.color }
-								</Tabs.TabPanel>
-								<Tabs.TabPanel
+								</WCTabs.TabPanel>
+								<WCTabs.TabPanel
 									tabId={ TAB_IDS.gradient }
 									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.gradient }
-								</Tabs.TabPanel>
-							</Tabs>
+								</WCTabs.TabPanel>
+							</WCTabs>
 						</div>
 					) }
 

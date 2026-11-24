@@ -304,7 +304,7 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
 		const newColumnIndex = columnIndex + delta;
 
 		setAttributes(
@@ -312,9 +312,10 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column.
+		// Select the cell in the new column.
 		setSelectedCell( {
-			rowIndex: 0,
+			sectionName,
+			rowIndex,
 			columnIndex: newColumnIndex,
 			type: 'cell',
 		} );
@@ -350,11 +351,17 @@ function TableEdit( {
 		);
 	}
 
-	useEffect( () => {
+	// Clear the selected cell when the block is deselected. Only react to the
+	// block going from selected to deselected: a cell receives focus (and is
+	// set as the selected cell) before the block itself becomes selected.
+	const [ prevIsSingleSelected, setPrevIsSingleSelected ] =
+		useState( isSingleSelected );
+	if ( isSingleSelected !== prevIsSingleSelected ) {
+		setPrevIsSingleSelected( isSingleSelected );
 		if ( ! isSingleSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSingleSelected ] );
+	}
 
 	useEffect( () => {
 		if ( hasTableCreated ) {

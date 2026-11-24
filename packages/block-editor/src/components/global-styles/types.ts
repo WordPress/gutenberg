@@ -1,5 +1,5 @@
 import type { ComponentProps, ComponentType, ReactNode } from 'react';
-import type { Dropdown, DropdownMenu } from '@wordpress/components';
+import type { Dropdown } from '@wordpress/components';
 import type {
 	Color,
 	Duotone,
@@ -13,15 +13,7 @@ import type { ColorGradientOptions } from '../colors-gradients/types';
 import type { Layout, LayoutBlockSupport } from '../../layouts/types';
 import type { BlockStyleState } from '../../hooks/types';
 import type { DimensionSizes } from '../dimension-control/types';
-
-declare global {
-	interface Window {
-		/**
-		 * Whether the global styles inheritance indicator experiment is enabled.
-		 */
-		__experimentalGlobalStylesInheritanceUI?: boolean;
-	}
-}
+import type { ChildLayout } from '../child-layout-control/types';
 
 export type ToolsPanelPopoverProps = Pick<
 	NonNullable< ComponentProps< typeof Dropdown >[ 'popoverProps' ] >,
@@ -108,6 +100,10 @@ export interface StyleSettings {
 		units?: string[];
 		spacingSizes?: Record< string, SpacingSizePreset[] >;
 		defaultSpacingSizes?: boolean;
+	};
+	transform?: Record< string, unknown > & {
+		rotate?: boolean;
+		translate?: boolean;
 	};
 	typography?: TypographyStyleSettings;
 }
@@ -214,6 +210,10 @@ export interface PanelStyle {
 	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
+	transform?: {
+		rotate?: StyleValue;
+		translate?: { x?: string; y?: string };
+	};
 	elements?: Record< string, PanelStyle >;
 	css?: string;
 	[ state: `:${ string }` ]: PanelStyle | undefined;
@@ -246,7 +246,7 @@ export interface StateControlProps {
 	/** Whether to show text label on the toggle. Default true. */
 	showText?: boolean;
 	/** Popover props for the dropdown menu. */
-	popoverProps?: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ];
+	popoverProps?: ToolsPanelPopoverProps;
 	/** Optional menu content rendered after the state groups. */
 	children?: ReactNode;
 }
@@ -306,8 +306,6 @@ export interface TypographyPanelProps {
 	defaultControls?: Record< string, boolean | undefined >;
 	/** Whether the panel edits global styles. */
 	isGlobalStyles?: boolean;
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 	/** Warning about the contrast of the text color. */
 	contrastWarning?: ReactNode;
 }
@@ -357,12 +355,6 @@ export interface ColorGradientDropdownItemProps {
 	contrastWarning?: ReactNode;
 	/** Class name of the item. */
 	className?: string;
-	/** Whether the item shows the inherited value at rest. */
-	isPlaceholder?: boolean;
-	/** Whether a value is inherited. */
-	hasInheritedValue?: boolean;
-	/** Whether the item shows where its value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }
 
 /**
@@ -395,8 +387,6 @@ export interface ColorPanelProps {
 	contrastWarning?: ReactNode;
 	/** Elements to edit besides the built in ones. */
 	additionalElements?: ColorPanelElement[];
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }
 
 export interface BackgroundPanelProps {
@@ -422,8 +412,6 @@ export interface BackgroundPanelProps {
 	headerLabel?: string;
 	/** Warning about the contrast of the background color. */
 	contrastWarning?: ReactNode;
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }
 
 export interface AdvancedPanelProps {
@@ -501,8 +489,6 @@ export interface ShadowPopoverProps extends ShadowPopoverContainerProps {
 	className?: string;
 	/** Whether the block sets its own shadow. */
 	hasLocalValue?: boolean;
-	/** Whether the block's shadow overrides an inherited one. */
-	hasLocalOverride?: boolean;
 	/** Resets the shadow. */
 	onReset?: () => void;
 }
@@ -522,8 +508,25 @@ export interface FiltersPanelProps {
 	panelId?: string | null;
 	/** Which controls are shown by default. */
 	defaultControls?: Record< string, boolean | undefined >;
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
+}
+
+export interface TransformPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The default state styles, set only while another state is selected. */
+	baseValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
 }
 
 /**
@@ -550,8 +553,6 @@ export interface BorderPanelProps {
 	panelId?: string | null;
 	/** Which controls are shown by default. */
 	defaultControls?: Record< string, boolean | undefined >;
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }
 
 /**
@@ -582,6 +583,8 @@ export interface DimensionsPanelProps {
 	onChange: ( value: PanelStyle ) => void;
 	/** The styles inherited from global styles. */
 	inheritedValue?: PanelStyle;
+	/** The block's default child layout, inherited by viewport states. */
+	inheritedChildLayout?: ChildLayout;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
 	/** ID of the panel. */
@@ -596,6 +599,4 @@ export interface DimensionsPanelProps {
 	allowAxialBlockGap?: boolean;
 	/** The selected style state. */
 	styleState?: BlockStyleState;
-	/** Whether controls show where their value is inherited from. */
-	showInheritanceLabelIndicators?: boolean;
 }

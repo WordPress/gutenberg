@@ -17,6 +17,7 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 	return (
 		<kbd
 			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
+			dir="ltr"
 			aria-label={ forceAriaLabel || ariaLabel }
 		>
 			{ shortcuts.map( ( character, index ) => {

@@ -16,16 +16,24 @@ const tokens = {
 
 const { state } = store( 'router-html', {
 	state: {
+		/** The server's token representation used by the fallback-media fixture. */
+		media: { wpServerHtml: true },
+		/** Indicates that the fixture's router prefetch action is in progress. */
+		prefetching: false,
 		/** Always empty, including on a kept node. */
 		never: null,
-		/** Returns the destination token, null, or a pending derived value. */
+		/** Returns the destination token, representation, null, or pending value. */
 		get html() {
-			if ( getServerContext().value === 'pending' ) {
+			const value = getServerContext().value;
+			if ( value === 'pending' ) {
 				return state.late;
+			}
+			if ( value === 'representation' ) {
+				return { wpServerHtml: true };
 			}
 			return getContext().resolved
 				? tokens.U
-				: ( tokens[ getServerContext().value ] ?? null );
+				: ( tokens[ value ] ?? null );
 		},
 		/** Reports the destination's own serialized value selection. */
 		get value() {
@@ -39,6 +47,20 @@ const { state } = store( 'router-html', {
 			const { actions } =
 				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( event.target.href );
+		} ),
+		/** Prefetches the destination URL selected by the test fixture. */
+		prefetch: withSyncEvent( function* ( event ) {
+			event.preventDefault();
+			state.prefetching = true;
+			try {
+				const { actions } =
+					yield import( '@wordpress/interactivity-router' );
+				yield actions.prefetch(
+					event.target.getAttribute( 'data-prefetch-url' )
+				);
+			} finally {
+				state.prefetching = false;
+			}
 		} ),
 		/** Resolves null HTML or registers the pending derived getter. */
 		resolve() {

@@ -82,6 +82,9 @@ class RequestUtils {
 
 		const requestContext = await request.newContext( {
 			baseURL,
+			// Playwright keeps idle keep-alive sockets with no timeout, so a
+			// request sent as the server closes one fails with "socket hang up".
+			extraHTTPHeaders: { Connection: 'close' },
 			storageState: storageState && {
 				cookies: storageState.cookies,
 				origins: [],

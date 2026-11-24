@@ -61,6 +61,15 @@ export function useEventHandlers( {
 				return;
 			}
 
+			// Ends the block drag in progress, if any. The drag styles the
+			// node for its length, marks the document and the store as
+			// dragging, and listens on the document for the drag to end.
+			// `dragend` is dispatched at the dragged node, so it does not
+			// reach the document once the node has been removed from it, as
+			// when the drop moved the block to another parent: the hook ends
+			// the drag when it is cleaned up so that none of that outlives it.
+			let endDrag: ( () => void ) | undefined;
+
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
 			 * key event occurs on wrapper node. This can occur when the block has
@@ -502,10 +511,28 @@ export function useEventHandlers( {
 					pile?.move( lastClientX, lastClientY );
 				}
 
+				// Mouse events are suppressed for the length of a drag, so
+				// one means the drag is over: it ends the drag when neither
+				// `drop` nor `dragend` reached the document, the same way
+				// `useDropZone` covers a missed `dragend`. Unlike there,
+				// ending is not reversible (the node is restored and the
+				// store told), so a move with a button still held, which
+				// only a drag still in progress could produce, is left alone.
+				function endOnMouseMove( e: MouseEvent ) {
+					if ( ! e.buttons ) {
+						end();
+					}
+				}
+
 				function end() {
+					endDrag = undefined;
 					ownerDocument.removeEventListener( 'dragover', dragOver );
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
+					ownerDocument.removeEventListener(
+						'mousemove',
+						endOnMouseMove
+					);
 					ownerDocument.removeEventListener( 'scroll', over );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
@@ -531,7 +558,11 @@ export function useEventHandlers( {
 				ownerDocument.addEventListener( 'dragover', dragOver );
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
+				// The mouse moves that start a drag are dispatched before
+				// `dragstart`, so none reaches this listener mid-drag.
+				ownerDocument.addEventListener( 'mousemove', endOnMouseMove );
 				ownerDocument.addEventListener( 'scroll', over );
+				endDrag = end;
 
 				startDraggingBlocks( clientIds );
 				// Important because it hides the block toolbar.
@@ -548,6 +579,7 @@ export function useEventHandlers( {
 			// key and double click handling is for the selected block.
 			if ( ! isSelected ) {
 				return () => {
+					endDrag?.();
 					node.removeEventListener( 'dragstart', onDragStart );
 					node.removeEventListener( 'mousedown', onMouseDown );
 				};
@@ -583,6 +615,7 @@ export function useEventHandlers( {
 			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
+				endDrag?.();
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'mousedown', onMouseDown );

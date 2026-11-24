@@ -1,35 +1,14 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { usePostCommentsCount } from '../utils/hooks';
 
 function PostCommentsLinkEdit( { context } ) {
 	const { postType, postId } = context;
-	const [ commentsCount, setCommentsCount ] = useState();
+	const { totalItems: commentsCount } = usePostCommentsCount( postId );
 
 	const blockProps = useBlockProps();
-
-	useEffect( () => {
-		if ( ! postId ) {
-			return;
-		}
-
-		const currentPostId = postId;
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				post: postId,
-			} ),
-			parse: false,
-		} ).then( ( res ) => {
-			// Stale requests will have the `currentPostId` of an older closure.
-			if ( currentPostId === postId ) {
-				setCommentsCount( res.headers.get( 'X-WP-Total' ) );
-			}
-		} );
-	}, [ postId ] );
 
 	const post = useSelect(
 		( select ) =>
@@ -42,7 +21,7 @@ function PostCommentsLinkEdit( { context } ) {
 	);
 
 	let commentsText;
-	if ( commentsCount !== undefined ) {
+	if ( commentsCount !== null ) {
 		const commentsNumber = parseInt( commentsCount );
 
 		if ( commentsNumber === 0 ) {

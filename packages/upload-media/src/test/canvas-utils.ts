@@ -14,7 +14,7 @@ import { getHeicUnsupportedMessage } from '../heic-support';
  * told apart from a browser without a codec.
  */
 const validHeic = readFileSync(
-	join( __dirname, 'fixtures', 'exif-rotated-90cw.heic' )
+	join( import.meta.dirname, 'fixtures', 'exif-rotated-90cw.heic' )
 );
 
 function heicFile( bytes: Uint8Array ) {

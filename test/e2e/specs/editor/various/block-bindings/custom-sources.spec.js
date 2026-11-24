@@ -80,7 +80,7 @@ test.describe( 'Registered sources', () => {
 				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
 			const idAttribute = page.getByRole( 'button', {
-				name: 'id',
+				name: /^id\b/,
 			} );
 			await expect( idAttribute ).toBeVisible();
 			await expect( idAttribute ).toBeDisabled();
@@ -1606,7 +1606,7 @@ test.describe( 'Registered sources', () => {
 			await page
 				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
-			await page.getByRole( 'button', { name: 'id' } ).click();
+			await page.getByRole( 'button', { name: /^id\b/ } ).click();
 
 			const idMenuItem = page.getByRole( 'menuitem', {
 				name: 'Complete Source',

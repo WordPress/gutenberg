@@ -1,5 +1,9 @@
 export { useSettingsForBlockElement } from './hooks';
 export {
+	getBlockElementLayers,
+	getBlockTypesForElement,
+} from './inherited-value-context';
+export {
 	ToolsPanelPopoverPropsContext,
 	useToolsPanelItemPopoverProps,
 } from './utils';
@@ -27,5 +31,9 @@ export {
 	default as BackgroundPanel,
 	useHasBackgroundPanel,
 } from './background-panel';
+export {
+	default as TransformPanel,
+	useHasTransformPanel,
+} from './transform-panel';
 export { default as StateControl } from './state-control';
 export { default as StateControlBadges } from './state-control-badges';

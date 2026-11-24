@@ -2,9 +2,22 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 0.45.0 (2026-11-18)
+
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
+## 0.44.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Preserve EXIF metadata when converting HEIC images to JPEG with client-side media processing ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
+-   Finish uploading an image that wasm-vips can process but the browser cannot decode. The big image size threshold check let the `createImageBitmap()` rejection escape, leaving the upload stuck in thumbnail generation ([#83530](https://github.com/WordPress/gutenberg/pull/83530)).
 
 ## 0.43.0 (2026-10-20)
 

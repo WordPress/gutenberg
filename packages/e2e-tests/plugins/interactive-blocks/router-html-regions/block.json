@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/router-html-regions",
+	"title": "E2E Interactivity tests - HTML router regions",
+	"category": "text",
+	"supports": { "interactivity": true },
+	"attributes": {
+		"letter": { "type": "string", "default": "A" },
+		"next": { "type": "string", "default": "" },
+		"mode": { "type": "string", "default": "fallback" },
+		"before": { "type": "boolean", "default": false },
+		"copy": { "type": "boolean", "default": true }
+	},
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}
