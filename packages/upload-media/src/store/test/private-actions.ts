@@ -382,6 +382,12 @@ describe( 'private actions', () => {
 				'"photo.jpg" was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
 			],
 			[
+				'the upload limit',
+				{ code: ErrorCode.SIZE_ABOVE_LIMIT },
+				ErrorCode.SIZE_ABOVE_LIMIT,
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+			],
+			[
 				'another failure',
 				new Error( 'Network request failed' ),
 				ErrorCode.GENERAL,

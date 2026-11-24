@@ -25,7 +25,12 @@ import {
 import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { ErrorCode, UploadError, isStorageLimitError } from '../upload-error';
+import {
+	ErrorCode,
+	UploadError,
+	isSizeAboveLimitError,
+	isStorageLimitError,
+} from '../upload-error';
 import { getIncompleteUploadMessage } from '../error-messages';
 import { debug, measure } from './utils/debug-logger';
 import {
@@ -2065,9 +2070,12 @@ export function finalizeItem( id: QueueItemId ) {
 		// The attachment is kept, but a file it should have is missing.
 		// Nothing else reports that: the item's own callbacks see a success.
 		if ( item.subSizeError ) {
-			const code = isStorageLimitError( item.subSizeError )
-				? ErrorCode.STORAGE_LIMIT_REACHED
-				: ErrorCode.GENERAL;
+			let code: string = ErrorCode.GENERAL;
+			if ( isStorageLimitError( item.subSizeError ) ) {
+				code = ErrorCode.STORAGE_LIMIT_REACHED;
+			} else if ( isSizeAboveLimitError( item.subSizeError ) ) {
+				code = ErrorCode.SIZE_ABOVE_LIMIT;
+			}
 			dispatch< AddWarningAction >( {
 				type: Type.AddWarning,
 				warning: {

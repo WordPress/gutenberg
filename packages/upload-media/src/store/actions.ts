@@ -31,7 +31,12 @@ import type {
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
 import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
-import { ErrorCode, UploadError, isStorageLimitError } from '../upload-error';
+import {
+	ErrorCode,
+	UploadError,
+	isSizeAboveLimitError,
+	isStorageLimitError,
+} from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -303,14 +308,17 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				}
 
 				/*
-				 * The site's storage limit rejected the sub-sizes. The
-				 * original fit and is already stored, so the attachment is
-				 * kept even when no sub-size made it, as it is when the
-				 * server generates the sub-sizes itself.
+				 * A limit rejected the sub-sizes: the site's storage limit,
+				 * or its upload limit for a sub-size larger than the
+				 * original. The original fit and is already stored, so the
+				 * attachment is kept even when no sub-size made it, as it is
+				 * when the server generates the sub-sizes itself.
 				 */
-				const isOutOfStorage =
+				const isLimitFailure =
 					isStorageLimitError( error ) ||
-					isStorageLimitError( parentItem.subSizeError );
+					isStorageLimitError( parentItem.subSizeError ) ||
+					isSizeAboveLimitError( error ) ||
+					isSizeAboveLimitError( parentItem.subSizeError );
 
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so
@@ -324,16 +332,16 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 				} else if (
 					( parentItem.subSizes && parentItem.subSizes.length > 0 ) ||
 					isOptionalCompanion ||
-					isOutOfStorage
+					isLimitFailure
 				) {
 					/*
 					 * Partial success: at least one child sideload succeeded
 					 * (its sub-size is already accumulated on the parent), the
-					 * failed child was an optional companion, or the site ran
-					 * out of storage space. Keep the parent attachment and
-					 * finalize with whichever sub-sizes did succeed — matching
-					 * WordPress core's best-effort behavior when individual
-					 * sub-size generations fail.
+					 * failed child was an optional companion, or a limit
+					 * rejected it (storage space or the upload size). Keep the
+					 * parent attachment and finalize with whichever sub-sizes
+					 * did succeed — matching WordPress core's best-effort
+					 * behavior when individual sub-size generations fail.
 					 */
 					if (
 						parentItem.operations &&

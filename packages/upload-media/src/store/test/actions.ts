@@ -1153,6 +1153,61 @@ describe( 'actions', () => {
 				).toBe( 0 );
 			} );
 
+			it( 'keeps the parent attachment when the upload limit rejects every sub-size', async () => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+					mediaFinalize,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					parentOperations: [
+						OperationType.Upload,
+						OperationType.Finalize,
+					],
+				} );
+
+				await registry.dispatch( uploadStore ).cancelItem(
+					child!.id,
+					new UploadError( {
+						code: ErrorCode.SIZE_ABOVE_LIMIT,
+						message:
+							'image-1536x1536.jpg: This file exceeds the maximum upload size for this site.',
+						file: jpegFile,
+					} )
+				);
+				await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+				await vi.waitFor( () =>
+					expect(
+						unlock( registry.select( uploadStore ) ).getItem(
+							parent.id
+						)
+					).toBeUndefined()
+				);
+
+				// The original fit under the limit, so it stays even though
+				// every sub-size was skipped.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getWarnings()
+				).toEqual( [
+					{
+						id: parent.id,
+						code: ErrorCode.SIZE_ABOVE_LIMIT,
+						message:
+							'"example.jpg" was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+					},
+				] );
+				expect(
+					unlock( registry.select( uploadStore ) ).getFailureCount()
+				).toBe( 0 );
+			} );
+
 			it( 'records the failure on the parent when only some sub-sizes fail', async () => {
 				const { parent, child } = setUpParentAndChild( {
 					parentSubSizes: [ { name: 'medium', id: 99 } ],

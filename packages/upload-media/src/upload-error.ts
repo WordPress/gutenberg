@@ -68,3 +68,19 @@ export function isStorageLimitError( error: unknown ): boolean {
 		ErrorCode.STORAGE_LIMIT_REACHED
 	);
 }
+
+/**
+ * Tells whether an error is the site's upload limit rejecting a file.
+ *
+ * The limit covers the sizes a file may be uploaded at: `upload_max_filesize`,
+ * `post_max_size`, and the multisite `fileupload_maxk` setting.
+ *
+ * @param error The error to check.
+ * @return Whether the site's upload limit caused the error.
+ */
+export function isSizeAboveLimitError( error: unknown ): boolean {
+	return (
+		( error as { code?: unknown } | null | undefined )?.code ===
+		ErrorCode.SIZE_ABOVE_LIMIT
+	);
+}

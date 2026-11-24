@@ -169,6 +169,16 @@ export function getIncompleteUploadMessage(
 		);
 	}
 
+	if ( code === ErrorCode.SIZE_ABOVE_LIMIT ) {
+		return sprintf(
+			/* translators: %s: file name */
+			__(
+				'"%s" was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.'
+			),
+			fileName
+		);
+	}
+
 	return sprintf(
 		/* translators: %s: file name */
 		__(
