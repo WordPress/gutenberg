@@ -1036,8 +1036,8 @@ export function summarizeOperations(
 				continue;
 			}
 			/*
-			 * Formatting the author gave their own proposed text is part
-			 * of that proposal, so it is named beside the text.
+			 * Formatting an addition arrived with is part of that
+			 * proposal, so it is named beside the text.
 			 */
 			if ( isTextLike( op.text ) && op.textAfterHTML ) {
 				const { added } = diffInlineFormats(
