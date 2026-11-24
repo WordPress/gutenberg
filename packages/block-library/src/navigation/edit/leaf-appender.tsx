@@ -19,16 +19,25 @@ const { ListViewBlockAppender, useBlockDisplayTitle } = unlock(
 	blockEditorPrivateApis
 );
 
+// Blocks that take inner blocks but get no + in a Navigation List View. A link
+// takes inner blocks only so that it can become a submenu, which its "Add
+// submenu link" option does. A Page List and its items show the site's pages,
+// and save nothing added to them.
+const BLOCKS_WITHOUT_APPENDER = [
+	'core/navigation-link',
+	'core/page-list',
+	'core/page-list-item',
+];
+
 /**
- * Whether a Navigation List View row that can take inner blocks gets a +.
- * A link takes inner blocks only so that it can become a submenu, which its
- * "Add submenu link" option does, so it gets none. An empty submenu still
- * gets one.
+ * Whether a Navigation List View row that can take inner blocks gets a +. An
+ * empty submenu gets one, though its canvas shows no appender until it is
+ * selected.
  *
  * @param blockName The row's block name.
  */
 export function hasNavigationBlockAppender( blockName: string ) {
-	return blockName !== 'core/navigation-link';
+	return ! BLOCKS_WITHOUT_APPENDER.includes( blockName );
 }
 
 type LeafAppenderProps = ListViewCallbacks & {

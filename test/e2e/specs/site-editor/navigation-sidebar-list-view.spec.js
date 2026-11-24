@@ -592,6 +592,43 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				.filter( { hasText: 'Block 1 of 1, Level 2.' } )
 		).toBeVisible();
 	} );
+
+	test( 'offers no + inside a Page List, whose pages cannot be added to', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const parentPage = await requestUtils.createPage( {
+			title: 'Parent Page',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Child Page',
+			status: 'publish',
+			parent: parentPage.id,
+		} );
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Page List Menu',
+			content:
+				'<!-- wp:page-list /-->' +
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await expect(
+			listView.getByRole( 'row', { name: 'Child Page' } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'button', { name: /^Add to / } )
+		).toHaveCount( 0 );
+	} );
 } );
 
 class LinkControl {
