@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget frame: keep the card padding below a framed body when a footer follows, so the widget's last line no longer sits on the footer divider ([#87238](https://github.com/WordPress/gutenberg/pull/87238)).
+
 ### Internal
 
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
