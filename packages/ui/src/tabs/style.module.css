@@ -44,6 +44,10 @@
 						linear-gradient(to right, var(--fade-gradient-composed)),
 						linear-gradient(to left, var(--fade-gradient-composed));
 				}
+
+				&.is-minimal-variant {
+					gap: 1rem;
+				}
 			}
 
 			&[data-orientation="vertical"] {
@@ -153,6 +157,7 @@
 			}
 
 			/* Interaction background and focus indicator. */
+			&::before,
 			&::after {
 				position: absolute;
 				z-index: -1;
@@ -190,21 +195,36 @@
 				}
 			}
 
-			/* The minimal variant is the same tab one size down, for a bar
-			 * nested inside a panel rather than heading one. Its inline padding
-			 * replaces the list gap this variant used to carry, which keeps the
-			 * same distance between labels while letting the hit areas meet.
-			 *
-			 * Where a default tab is 47px around a background one control tall,
-			 * this one is a control tall around a background one compact control
-			 * tall, so both bars sit on the same scale as the fields and buttons
-			 * beside them. */
+			/* Minimal tabs are as wide as their labels, so the background
+			 * extends into the gap between them. */
 			.is-minimal-variant[data-orientation="horizontal"] & {
-				padding-inline: var(--wpds-dimension-padding-sm);
-				height: var(--wpds-dimension-size-lg);
+				padding-inline: 0;
 
 				&::after {
-					inset: 4px;
+					inset-inline: calc(-1 * var(--wpds-dimension-padding-xs));
+				}
+			}
+
+			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
+				/* Paint the ring inside the tab so only the background can be
+				 * clipped. */
+				&::before {
+					content: "";
+					z-index: 0;
+					inset-block: calc((48px - var(--wpds-dimension-size-md)) / 2);
+					inset-inline: 0;
+					outline-offset: calc(-1 * var(--wpds-border-width-focus));
+				}
+
+				&:focus-visible {
+					&::before {
+						outline-color: var(--wpds-color-stroke-focus);
+						opacity: 1;
+					}
+
+					&::after {
+						outline: none;
+					}
 				}
 			}
 
