@@ -18,7 +18,10 @@ export default function LeafMoreMenu( {
 	...props
 }: {
 	clientId: string;
-	updateExpansion: ( update: object ) => void;
+	updateExpansion: ( action: {
+		type: 'expand' | 'collapse';
+		clientIds: string[];
+	} ) => void;
 	setInsertedBlockClientId: ( clientId: string ) => void;
 } ) {
 	// Read from the global rather than imported, for the reason given in

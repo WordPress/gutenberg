@@ -392,6 +392,7 @@ const customOptions = [
  * children. Put custom item content inside `Select.ItemLabel`.
  */
 export const WithCustomTriggerAndItem: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		items: customOptions,
 		children: [

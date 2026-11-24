@@ -1200,6 +1200,105 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				.toEqual( [ 3, 2, 1 ] );
 		} );
 	} );
+
+	test( 'can add submenu links from the Options menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Add Submenu Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Existing Item' } );
+
+		await test.step( 'a link becomes a submenu holding the new link', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'a submenu gets the new link at its end', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 2' } )
+					.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( "returns focus to the item's Options after adding a submenu link", async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Focus Return Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Existing Item' } );
+		const optionsButton = row.getByRole( 'button', { name: 'Options' } );
+		const addSubmenuLink = page.getByRole( 'menuitem', {
+			name: 'Add submenu link',
+		} );
+
+		await test.step( 'when the link search is dismissed', async () => {
+			await row.hover();
+			await optionsButton.click();
+			await addSubmenuLink.click();
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( optionsButton ).toBeFocused();
+		} );
+
+		await test.step( 'when a link is chosen', async () => {
+			await page.keyboard.press( 'Enter' );
+			await addSubmenuLink.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect( optionsButton ).toBeFocused();
+		} );
+	} );
 } );
 
 class LinkControl {

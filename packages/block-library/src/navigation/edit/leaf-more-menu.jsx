@@ -73,11 +73,17 @@ export function AddSubmenuItem( {
 					);
 				} else {
 					// Convert to a submenu if the block currently isn't one.
-					const newSubmenu = createBlock(
-						'core/navigation-submenu',
-						block.attributes,
-						block.innerBlocks
-					);
+					// The submenu keeps the link's client ID, so List View
+					// keeps the item's row, and focus can return to its
+					// Options button once the link UI closes.
+					const newSubmenu = {
+						...createBlock(
+							'core/navigation-submenu',
+							block.attributes,
+							block.innerBlocks
+						),
+						clientId,
+					};
 
 					// The following must happen as two independent actions.
 					// Why? Because the offcanvas editor relies on the getLastInsertedBlocksClientIds
