@@ -25,17 +25,6 @@
 
 				width: fit-content;
 
-				/* The indicator and the separator beneath the tab bar mark the
-				 * same boundary, so the indicator has to span that hairline
-				 * rather than stack on top of it. Reserve the hairline as padding
-				 * and pull it back with a margin: the tabs keep their own box, the
-				 * chrome keeps its height, and the indicator reaches the hairline
-				 * from inside the scroll container, so a scrolling list cannot
-				 * clip it. Consumers used to pull the whole list down instead,
-				 * which moved the tabs with it. */
-				padding-block-end: var(--wpds-border-width-xs);
-				margin-block-end: calc(-1 * var(--wpds-border-width-xs));
-
 				/* Paint outside the list when the tabs fit. Shadows and outlines
 				 * do not contribute to the measured scrollable width. */
 				&:not(.is-scrolling) {
@@ -188,25 +177,15 @@
 
 			[data-orientation="horizontal"] & {
 				padding-inline: var(--wpds-dimension-padding-lg);
-				/* A horizontal tab bar occupies 48px including the 1px rule
-				 * beneath it, which the containing chrome draws, so the tab
-				 * itself is 47px. Sizing it to the full 48px makes the tab
-				 * overlap that rule, and consumers then shift the list to
-				 * compensate, which throws off the interaction clearance. */
-				height: 47px;
+				height: 48px; /* TODO: use semantic size/height tokens when available */
 				scroll-margin: 24px;
 
-				/* An even inset on all four sides, so the background keeps the
-				 * tab's silhouette and reads as the tab lighting up rather than
-				 * as a shape of its own. The value is what leaves a background
-				 * 32px tall (--wpds-dimension-size-md) inside the 47px tab: the
-				 * size of a button in this chrome, which already shares this
-				 * background color and corner radius with a neutral minimal
-				 * button. Vertical tabs are a row in a column of controls rather
-				 * than a control themselves, so they take no inset. */
+				/* Center a background one control tall in the tab, with the same
+				 * clearance on every side, so it stays clear of the selection
+				 * indicator. */
 				&::after {
 					content: "";
-					inset: 7.5px;
+					inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
 					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 			}

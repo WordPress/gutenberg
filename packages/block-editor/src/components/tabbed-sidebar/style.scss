@@ -25,6 +25,10 @@
 	align-self: center;
 }
 
+.block-editor-tabbed-sidebar__tablist {
+	margin-bottom: -$border-width;
+}
+
 .block-editor-tabbed-sidebar__tabpanel {
 	display: flex;
 	flex-grow: 1;
