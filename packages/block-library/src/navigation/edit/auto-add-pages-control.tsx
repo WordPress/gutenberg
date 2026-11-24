@@ -39,6 +39,11 @@ function menuHasPageList( record?: NavigationMenuRecord ) {
 type Props = {
 	/** The `wp_navigation` post the block displays. */
 	menuId: number;
+	/**
+	 * Class for the wrapper, in place of the default one that sets the
+	 * setting apart below a menu's list of links.
+	 */
+	className?: string;
 };
 
 /**
@@ -46,12 +51,17 @@ type Props = {
  *
  * It belongs to the Navigation Menu rather than to the block, so a change is
  * an edit to the menu record and is saved along with the block's other menu
- * edits. It renders nothing for a user who cannot update the menu.
+ * edits. It renders nothing, wrapper included, for a user who cannot update
+ * the menu or while the menu has a Page List.
  *
  * @param props
  * @param props.menuId
+ * @param props.className
  */
-export default function AutoAddPagesControl( { menuId }: Props ) {
+export default function AutoAddPagesControl( {
+	menuId,
+	className = 'wp-block-navigation__auto-add-pages',
+}: Props ) {
 	const { canUpdate, isEnabled, isBlockedByPageList } = useSelect(
 		( select ) => {
 			const { canUser, getEditedEntityRecord } = select( coreStore );
@@ -87,7 +97,7 @@ export default function AutoAddPagesControl( { menuId }: Props ) {
 	};
 
 	return (
-		<div className="wp-block-navigation__auto-add-pages">
+		<div className={ className }>
 			<SwitchControl
 				label={ __( 'Auto add new pages' ) }
 				description={ __(
