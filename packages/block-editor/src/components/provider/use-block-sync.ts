@@ -524,8 +524,6 @@ export default function useBlockSync( {
 			// arrives here as an external change too, but that one must not
 			// move the selection: the caret is in the block being edited,
 			// and restoring would drag it — and the canvas — into this copy.
-			// Checked after the blocks are set, so that a selection this
-			// controller just destroyed by re-cloning still gets repaired.
 			// See https://github.com/WordPress/gutenberg/issues/79096.
 			if ( ! isSelectionHeldByAnotherController() ) {
 				// Restore selection from context if it targets our scope.

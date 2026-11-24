@@ -815,7 +815,7 @@ describe( 'useBlockSync hook', () => {
 		} );
 	} );
 
-	describe( 'selection after an incoming change', () => {
+	describe( 'controllers on one canvas', () => {
 		const paragraph = (
 			clientId: string,
 			content: number
@@ -943,12 +943,52 @@ describe( 'useBlockSync hook', () => {
 			expect( onChangeB ).not.toHaveBeenCalled();
 		} );
 
+		// Moving a block in one copy hands the other copy the same blocks
+		// in another order. Updating its clones in place would leave each
+		// mapped to the block that used to be there, so that an edit to one
+		// would be reported as an edit to another.
+		it( 're-clones when the blocks are reordered', () => {
+			const { registry, update, select } = renderCanvas( [ 'copy' ] );
+			const onChange = vi.fn();
+			const first = paragraph( 'first', 1 );
+			const second = paragraph( 'second', 1 );
+			update( [
+				{ clientId: 'copy', value: [ first, second ], onChange },
+			] );
+
+			update( [
+				{ clientId: 'copy', value: [ second, first ], onChange },
+			] );
+			const [ clone ] = select().getBlocks( 'copy' );
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clone.clientId, { foo: 2 } );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						clientId: 'second',
+						attributes: { foo: 2 },
+					} ),
+					expect.objectContaining( {
+						clientId: 'first',
+						attributes: { foo: 1 },
+					} ),
+				],
+				expect.anything()
+			);
+		} );
+
 		// An undo in the outer controller, while the caret sits in a
 		// controller nested inside it, such as a synced pattern inside Post
-		// Content.
+		// Content. Re-cloning replaces the nested host, and the block the
+		// caret was in with it, so the selection has to be repaired.
 		it.each( [
-			[ 'updates the clones in place', [] ],
-			[ 're-clones', [ paragraph( 'added', 0 ) ] ],
+			[ 'updates its clones in place', [] ],
+			[
+				're-clones, replacing the nested block',
+				[ paragraph( 'added', 0 ) ],
+			],
 		] )(
 			'restores the selection when the caret is in a nested controller and the outer one %s',
 			( _, addedBlocks ) => {

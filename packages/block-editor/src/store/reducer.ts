@@ -484,10 +484,11 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 		//
 		// A change that history ignores and that leaves the blocks of the
 		// previous action untouched is invisible to the undo stack, so it
-		// must not split a typing run into separate undo levels either. A
-		// container re-cloning its blocks while the same entity is typed
-		// into elsewhere is such a change. One that does replace those
-		// blocks, like a reset after an undo, still starts a new level.
+		// must not split a typing run into separate undo levels either.
+		// Another copy of the same entity updating its own clones while the
+		// entity is typed into elsewhere is such a change. One that does
+		// change those blocks, like an undo resetting them or updating them
+		// in place, still starts a new level.
 		if (
 			pendingHistoryMode !== 'ignore' ||
 			! leavesBlocksUntouched( state, nextState, lastAction )
