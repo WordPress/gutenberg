@@ -1164,6 +1164,41 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should only consume the Escape key while the suggestion list is open', async () => {
+			const user = userEvent.setup();
+
+			const onKeyDownSpy = vi.fn();
+
+			render(
+				<div onKeyDown={ onKeyDownSpy }>
+					<FormTokenFieldWithState
+						suggestions={ [ 'One', 'Two', 'Three' ] }
+					/>
+				</div>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Typing opens the suggestion list.
+			await user.type( input, 'on' );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// The first Escape closes the list and is consumed, so that a
+			// parent Modal or Popover stays open.
+			await user.keyboard( '[Escape]' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect(
+				onKeyDownSpy.mock.calls.at( -1 )?.[ 0 ].defaultPrevented
+			).toBe( true );
+
+			// A second Escape with the list already closed is not consumed, so
+			// that it reaches a parent Modal or Popover, which can then close.
+			await user.keyboard( '[Escape]' );
+			expect(
+				onKeyDownSpy.mock.calls.at( -1 )?.[ 0 ].defaultPrevented
+			).toBe( false );
+		} );
+
 		it( 'should hide the suggestion list on an empty input', async () => {
 			const user = userEvent.setup();
 
