@@ -54,7 +54,7 @@ jobs:
         # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
-        timeout-minutes: 40
+        timeout-minutes: 100
         if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
@@ -95,12 +95,14 @@ jobs:
                   sudo xcode-select -s "$XCODE"
                   xcodebuild -version
 
-            # TEMP DEBUG: the whole suite, then the flaky quote test again.
+            # TEMP DEBUG: the whole suite four times, keeping each run's logs.
             - name: Run the tests
               run: |
-                  ./test/ios/run.sh || true
-                  cp test/ios/build/server.log test/ios/build/server-suite.log
-                  ./test/ios/run.sh -only-testing:SafariTests/SelectionTests/testTapFromHeadingIntoQuoteWithoutIframePlacesCaret -test-iterations 15
+                  for i in 1 2 3 4; do
+                      ./test/ios/run.sh || true
+                      cp test/ios/build/server.log test/ios/build/server-$i.log
+                      mv test/ios/build/results.xcresult test/ios/build/results-$i.xcresult || true
+                  done
 
             - name: Archive the test results
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -108,7 +110,6 @@ jobs:
               with:
                   name: ios-test-results
                   path: |
-                      test/ios/build/results.xcresult
-                      test/ios/build/server.log
-                      test/ios/build/server-suite.log
+                      test/ios/build/results-*.xcresult
+                      test/ios/build/server-*.log
                   if-no-files-found: ignore
