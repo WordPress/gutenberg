@@ -59,6 +59,9 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 				'class'      => $image_classes,
 			)
 		);
+		if ( ! $avatar_block ) {
+			return '';
+		}
 		if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 			$label = '';
 			if ( '_blank' === $attributes['linkTarget'] ) {
@@ -86,6 +89,9 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			'class'      => $image_classes,
 		)
 	);
+	if ( ! $avatar_block ) {
+		return '';
+	}
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && '' !== $comment->comment_author_url ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
