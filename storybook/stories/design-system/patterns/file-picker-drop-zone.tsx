@@ -129,7 +129,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 								label={ `Remove ${ file.name }` }
 								variant="minimal"
 								tone="neutral"
-								size="compact"
+								size="small"
 								disabled={ disabled }
 								onClick={ removeFile }
 							/>

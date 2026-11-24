@@ -16,7 +16,7 @@
 	border:
 		var(--wpds-border-width-xs) dashed
 		var(--wpds-color-stroke-surface-neutral-strong);
-	border-radius: var(--wpds-border-radius-md);
+	border-radius: var(--wpds-border-radius-sm);
 	background: var(--wpds-color-background-surface-neutral);
 	color: var(--wpds-color-foreground-content-neutral);
 }
@@ -66,16 +66,41 @@
 	outline-offset: var(--wpds-border-width-focus);
 }
 
-/* Leave room for a remove button beside the picker button. */
+/*
+ * A drop area holds one line, so it is the same height as an input. The
+ * picker button fills that height, so the whole area stays clickable.
+ */
+.surface:has(> .choose) {
+	box-sizing: border-box;
+	block-size: var(--wpds-dimension-size-lg);
+}
+
+.surface > .choose {
+	align-self: stretch;
+	padding-block: 0;
+
+	& .thumbnail {
+		inline-size: var(--wpds-dimension-size-sm);
+		block-size: var(--wpds-dimension-size-sm);
+	}
+}
+
+/*
+ * Leave room for a remove button beside the picker button, with the same
+ * spacing as a button in an input's suffix.
+ */
 .surface:has(> .remove) {
-	padding-inline-end: var(--wpds-dimension-padding-sm);
+	padding-inline-end: calc(var(--wpds-dimension-padding-md) - var(--wpds-dimension-padding-xs));
 }
 
 .surface:has(> .choose:not([data-disabled]):hover) {
 	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
-/* A 32px box for the add icon or the thumbnail, so both states line up. */
+/*
+ * A box for the add icon or the thumbnail, so both states line up. It is 32px
+ * in a list row and 24px in a drop area.
+ */
 .thumbnail {
 	display: flex;
 	align-items: center;
