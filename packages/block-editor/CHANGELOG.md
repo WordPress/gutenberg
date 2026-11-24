@@ -4,22 +4,22 @@
 
 ### New Features
 
+-   Selection: Add non-contiguous block selection in the canvas and List View, including keyboard selection and the `multiSelectSet` action.
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add an Offset control with X and Y axes to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ### Enhancements
 
+-   Support dragging, duplicating, and pasting with non-contiguous block selections across different parents.
+-   `moveBlocksToPosition` and `canMoveBlocks`: Support non-contiguous blocks and blocks from different parents, including requests containing parents and their descendants.
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 
 ### Bug Fixes
 
--   Selection: Restore surviving selected controlled blocks when a remote change deletes the selection start block.
--   Selection: Preserve form-control activation when modifier-clicking associated labels or their contents.
--   Drag and drop: Calculate insertion-only moves using document indices and the destination's horizontal, vertical, or RTL layout.
--   Block actions: Check Add before and Add after against their own insertion destinations, including configured default blocks.
--   Selection: Expand Select All through the nearest common parent when selected blocks have different parents.
--   Visibility: Check every selected block's editing mode and permission before offering or applying visibility changes.
+-   `canMoveBlock`: Prevent moving blocks with a disabled editing mode.
+-   Block actions: Match Add before and Add after availability to the destination's configured default block.
+-   Visibility: Only offer and apply visibility changes when every selected block can be edited.
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
@@ -35,11 +35,6 @@
 
 ### Enhancements
 
--   Movement: Ignore descendant client IDs when an ancestor's ID is also supplied to movement selectors or actions.
--   `moveBlocksToPosition`: Support moving non-contiguous blocks and blocks from different parents together in document order.
--   `canMoveBlocks`: Check movement permission for non-contiguous and cross-parent blocks independently of mover restrictions.
--   Drag and drop: Move non-contiguous selected blocks together at the destination in the canvas and List View, preserving block IDs and supporting one-step undo across source parents.
--   Selection: Add Cmd/Ctrl-click selection in the canvas and List View, Space-key toggling in List View, and the `multiSelectSet` action for selecting blocks across different parents. Duplicate each group of adjacent selected siblings after the originals, and paste after non-contiguous selections without replacing selected blocks.
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
@@ -50,9 +45,6 @@
 
 ### Bug Fixes
 
--   `canMoveBlock`: Return false for blocks with a disabled editing mode, even when movement is explicitly unlocked.
--   Selection: Preserve nested disclosure and focusable custom controls when modifier-clicking in the canvas.
--   Selection: Select parents instead of their descendants before checking that selected blocks belong to the same entity. After blocks change, keep selected blocks in the entity containing the selection start block, or the first selected block in document order if that block is no longer selected.
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
 -   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).

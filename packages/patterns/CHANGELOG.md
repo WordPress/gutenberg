@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Handle non-contiguous selections when creating patterns.
+
 ### Bug Fixes
 
--   Hide Create pattern for non-contiguous selections and recheck the original blocks before replacing them after a synced pattern is saved.
 -   Keep the block bindings that don't come from pattern overrides, such as bindings to post meta, when detaching a synced pattern ([#87214](https://github.com/WordPress/gutenberg/pull/87214)).
 
 ## 3.2.0 (2026-11-18)

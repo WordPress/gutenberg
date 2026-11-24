@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: Highlight each selected block, or its nearest visible parent when hidden inside collapsed content.
+
 ### Bug Fixes
 
--   Collaboration: Show whole-block set selections on the nearest visible ancestor when their contents are collapsed.
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 
@@ -25,7 +28,6 @@
 
 ### Enhancements
 
--   Real-time collaboration: Outline each block selected by another user without highlighting unselected blocks between them.
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).

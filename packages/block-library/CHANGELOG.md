@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List: Disable indent and outdent for non-contiguous selections or selections spanning different lists.
+
 ### Bug Fixes
 
--   List: Preserve content when an indent or outdent request targets non-contiguous items or items in different lists.
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
 -   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
 -   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#87087](https://github.com/WordPress/gutenberg/pull/87087)).
