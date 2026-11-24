@@ -106,7 +106,16 @@
 
 .editor-post-publish-panel__menus {
 	margin: 0;
-	padding-left: $grid-unit-20;
+	padding: 0;
+	list-style: none;
+
+	li {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .editor-post-publish-panel__prepublish {
