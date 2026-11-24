@@ -116,193 +116,184 @@ export default function BlockTools( {
 		hideViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	const onKeyDown = withIgnoreIMEEvents(
-		( event: KeyboardEvent< HTMLDivElement > ) => {
-			if ( event.defaultPrevented ) {
+	function onKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		if (
+			isMatch( 'core/block-editor/move-up', event ) ||
+			isMatch( 'core/block-editor/move-down', event )
+		) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const firstClientId = clientIds[ 0 ];
+				const rootClientId = getBlockRootClientId( firstClientId );
+				const previousIndex = getBlockIndex( firstClientId );
+				const direction = isMatch( 'core/block-editor/move-up', event )
+					? 'up'
+					: 'down';
+				if ( direction === 'up' ) {
+					moveBlocksUp( clientIds, rootClientId );
+				} else {
+					moveBlocksDown( clientIds, rootClientId );
+				}
+				if ( getBlockIndex( firstClientId ) === previousIndex ) {
+					return;
+				}
+				const message = sprintf(
+					// translators: %d: Number of blocks moved.
+					_n(
+						'%d block moved.',
+						'%d blocks moved.',
+						clientIds.length
+					),
+					clientIds.length
+				);
+				speak( message );
+			}
+		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				duplicateBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/remove', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				removeBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				pasteStyles( blocks );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertAfterBlock( clientIds[ clientIds.length - 1 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				insertBeforeBlock( clientIds[ 0 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
+			// Key events target elements.
+			if ( ( event.target as Element ).closest( '[role=toolbar]' ) ) {
+				// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
+				// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
+				// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
+				// - This bubbles via the React tree, which hits this `unselect` escape keypress before the block toolbar DOM event listener has access to it.
+				// An alternative would be to remove the addEventListener on the navigableToolbar and use this event to handle it directly right here. That feels hacky too though.
 				return;
 			}
 
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 ) {
+				event.preventDefault();
+				// If there is more than one block selected, select the first
+				// block so that focus is directed back to the beginning of the selection.
+				// In effect, to the user this feels like deselecting the multi-selection.
+				selectBlock( clientIds[ 0 ] );
+			}
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			// If focus is currently within a text field, such as a rich text block or other editable field,
+			// skip collapsing the list view, and allow the keyboard shortcut to be handled by the text field.
+			// This condition checks for both the active element and the active element within an iframed editor.
 			if (
-				isMatch( 'core/block-editor/move-up', event ) ||
-				isMatch( 'core/block-editor/move-down', event )
-			) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					const firstClientId = clientIds[ 0 ];
-					const rootClientId = getBlockRootClientId( firstClientId );
-					const previousIndex = getBlockIndex( firstClientId );
-					const direction = isMatch(
-						'core/block-editor/move-up',
-						event
-					)
-						? 'up'
-						: 'down';
-					if ( direction === 'up' ) {
-						moveBlocksUp( clientIds, rootClientId );
-					} else {
-						moveBlocksDown( clientIds, rootClientId );
-					}
-					if ( getBlockIndex( firstClientId ) === previousIndex ) {
-						return;
-					}
-					const message = sprintf(
-						// translators: %d: Number of blocks moved.
-						_n(
-							'%d block moved.',
-							'%d blocks moved.',
-							clientIds.length
-						),
-						clientIds.length
-					);
-					speak( message );
-				}
-			} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					duplicateBlocks( clientIds );
-				}
-			} else if ( isMatch( 'core/block-editor/remove', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					removeBlocks( clientIds );
-				}
-			} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					const blocks = getBlocksByClientId( clientIds );
-					pasteStyles( blocks );
-				}
-			} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					insertAfterBlock( clientIds[ clientIds.length - 1 ] );
-				}
-			} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					insertBeforeBlock( clientIds[ 0 ] );
-				}
-			} else if ( isMatch( 'core/block-editor/unselect', event ) ) {
 				// Key events target elements.
-				if ( ( event.target as Element ).closest( '[role=toolbar]' ) ) {
-					// This shouldn't be necessary, but we have a combination of a few things all combining to create a situation where:
-					// - Because the block toolbar uses createPortal to populate the block toolbar fills, we can't rely on the React event bubbling to hit the onKeyDown listener for the block toolbar
-					// - Since we can't use the React tree, we use the DOM tree which _should_ handle the event bubbling correctly from a `createPortal` element.
-					// - This bubbles via the React tree, which hits this `unselect` escape keypress before the block toolbar DOM event listener has access to it.
-					// An alternative would be to remove the addEventListener on the navigableToolbar and use this event to handle it directly right here. That feels hacky too though.
+				isTextField( event.target as Element ) ||
+				isTextField(
+					// An iframe target has a window with a document, whose active
+					// element `isTextField` reads.
+					( event.target as HTMLIFrameElement )?.contentWindow
+						?.document?.activeElement as Element
+				)
+			) {
+				return;
+			}
+			event.preventDefault();
+			expandBlock( clientId );
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = groupBlocks(
+					blocks,
+					// `isGroupable` requires a grouping block.
+					groupingBlockName!
+				);
+				replaceBlocks( clientIds, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
+			}
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length === 1 ) {
+				const isContentOnly =
+					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
+				const canRenameBlock =
+					canRename &&
+					! isContentOnly &&
+					canEditBlock( clientIds[ 0 ] );
+				if ( canRenameBlock ) {
+					event.preventDefault();
+					setRenamingBlockClientId( clientIds[ 0 ] );
+				}
+			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			if ( blockVisibilitySetting === false ) {
+				return;
+			}
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const supportsBlockVisibility = blocks.every(
+					( block: TreeBlock ) =>
+						hasBlockSupport( block.name, 'visibility', true )
+				);
+
+				if ( ! supportsBlockVisibility ) {
 					return;
 				}
 
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length > 1 ) {
-					event.preventDefault();
-					// If there is more than one block selected, select the first
-					// block so that focus is directed back to the beginning of the selection.
-					// In effect, to the user this feels like deselecting the multi-selection.
-					selectBlock( clientIds[ 0 ] );
-				}
-			} else if (
-				isMatch( 'core/block-editor/collapse-list-view', event )
-			) {
-				// If focus is currently within a text field, such as a rich text block or other editable field,
-				// skip collapsing the list view, and allow the keyboard shortcut to be handled by the text field.
-				// This condition checks for both the active element and the active element within an iframed editor.
+				// Don't allow visibility toggle for blocks that are not in the
+				// default editing mode or when block editing is disabled
+				// (e.g. Revisions UI with isPreviewMode).
 				if (
-					// Key events target elements.
-					isTextField( event.target as Element ) ||
-					isTextField(
-						// An iframe target has a window with a document, whose active
-						// element `isTextField` reads.
-						( event.target as HTMLIFrameElement )?.contentWindow
-							?.document?.activeElement as Element
+					clientIds.some(
+						( id: string ) =>
+							getBlockEditingMode( id ) !== 'default' ||
+							! canEditBlock( id )
 					)
 				) {
 					return;
 				}
-				event.preventDefault();
-				expandBlock( clientId );
-			} else if ( isMatch( 'core/block-editor/group', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
-					event.preventDefault();
-					const blocks = getBlocksByClientId( clientIds );
-					const groupingBlockName = getGroupingBlockName();
-					const newBlocks = groupBlocks(
-						blocks,
-						// `isGroupable` requires a grouping block.
-						groupingBlockName!
-					);
-					replaceBlocks( clientIds, newBlocks );
-					speak( __( 'Selected blocks are grouped.' ) );
-				}
-			} else if ( isMatch( 'core/block-editor/rename', event ) ) {
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length === 1 ) {
-					const isContentOnly =
-						getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
-					const canRenameBlock =
-						canRename &&
-						! isContentOnly &&
-						canEditBlock( clientIds[ 0 ] );
-					if ( canRenameBlock ) {
-						event.preventDefault();
-						setRenamingBlockClientId( clientIds[ 0 ] );
-					}
-				}
-			} else if (
-				isMatch( 'core/block-editor/toggle-block-visibility', event )
-			) {
-				if ( blockVisibilitySetting === false ) {
-					return;
-				}
-				const clientIds = getSelectedBlockClientIds();
-				if ( clientIds.length ) {
-					event.preventDefault();
-					const blocks = getBlocksByClientId( clientIds );
-					const supportsBlockVisibility = blocks.every(
-						( block: TreeBlock ) =>
-							hasBlockSupport( block.name, 'visibility', true )
-					);
 
-					if ( ! supportsBlockVisibility ) {
-						return;
-					}
-
-					// Don't allow visibility toggle for blocks that are not in the
-					// default editing mode or when block editing is disabled
-					// (e.g. Revisions UI with isPreviewMode).
-					if (
-						clientIds.some(
-							( id: string ) =>
-								getBlockEditingMode( id ) !== 'default' ||
-								! canEditBlock( id )
-						)
-					) {
-						return;
-					}
-
-					// Open the visibility breakpoints modal.
-					showViewportModal( clientIds );
-				}
-			}
-
-			// Has the same keyboard shortcut as 'unselect', so can't be within the
-			// if/else chain above.
-			if (
-				isMatch( 'core/block-editor/stop-editing-as-blocks', event )
-			) {
-				if ( getEditedContentOnlySection() ) {
-					stopEditingContentOnlySection();
-				}
+				// Open the visibility breakpoints modal.
+				showViewportModal( clientIds );
 			}
 		}
-	);
+
+		// Has the same keyboard shortcut as 'unselect', so can't be within the
+		// if/else chain above.
+		if ( isMatch( 'core/block-editor/stop-editing-as-blocks', event ) ) {
+			if ( getEditedContentOnlySection() ) {
+				stopEditingContentOnlySection();
+			}
+		}
+	}
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
@@ -310,7 +301,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{ ...props }
-			onKeyDown={ onKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
 			// Popover slots cannot be unmounted during dragging because the
 			// will just be rendered in a fallback popover slot instead.
 			className={ clsx( props.className, {
