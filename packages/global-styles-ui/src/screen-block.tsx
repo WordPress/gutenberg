@@ -445,6 +445,7 @@ function ScreenBlock( {
 				<StylesTransformPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
+					baseValue={ baseValue }
 					onChange={ setStyle }
 					settings={ settings }
 				/>
