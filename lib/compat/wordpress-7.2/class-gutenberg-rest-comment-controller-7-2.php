@@ -34,40 +34,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	private static function get_note_reaction_keys(): array {
 		return array( '1f44d', '2795', '2764', '1f389', '1f604', '1f440', '1f680' );
 	}
-
-	/**
-	 * Determines if a given value represents a valid reaction key.
-	 *
-	 * Reaction keys are described by a sequence of one or more Unicode
-	 * Scalar Values joined by a hyphen (U+2D). Each is written one way
-	 * only: lowercase hex, zero-padded to four digits.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param string $value Potentially contains a valid reaction key.
-	 * @return bool Whether the given value comprises a well-formed reaction key.
-	 */
-	private static function is_reaction_key( string $value ): bool {
-		if ( strlen( $value ) !== strspn( $value, '-0123456789abcdef' ) ) {
-			return false;
-		}
-
-		foreach ( explode( '-', $value ) as $hex ) {
-			$length = strlen( $hex );
-			// Too short (or an empty span), too long, or zero-padded past four digits.
-			if ( $length < 4 || $length > 6 || ( $length > 4 && '0' === $hex[0] ) ) {
-				return false;
-			}
-
-			$code_point = hexdec( $hex );
-			// Beyond the last code point, or a surrogate.
-			if ( $code_point > 0x10FFFF || ( $code_point >= 0xD800 && $code_point <= 0xDFFF ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 	// END CHANGE.
 
 	/**
@@ -774,7 +740,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				$raw_content = $request['content']['raw'];
 			}
 
-			$emoji_key = trim( $raw_content );
+			$emoji_key = trim( wp_strip_all_tags( $raw_content ) );
 
 			if ( ! in_array( $emoji_key, self::get_note_reaction_keys(), true ) ) {
 				return new WP_Error(
@@ -813,7 +779,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 
 			foreach ( $existing as $existing_reaction ) {
-				if ( $existing_reaction->comment_content === $emoji_key ) {
+				if ( wp_strip_all_tags( $existing_reaction->comment_content ) === $emoji_key ) {
 					return new WP_Error(
 						'rest_comment_duplicate_reaction',
 						__( 'You have already reacted with this emoji.', 'gutenberg' ),
@@ -837,7 +803,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		/*
 		 * Persist the validated, canonical reaction key rather than the raw
 		 * request content, so stored values stay consistent for grouping and
-		 * counting (e.g. " 2764" is stored as "2764").
+		 * counting (e.g. "<b>2764</b>" is stored as "2764").
 		 */
 		if ( null !== $reaction_key ) {
 			$prepared_comment['comment_content'] = $reaction_key;
@@ -1001,7 +967,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 			$duplicates = array();
 			foreach ( $matching as $candidate ) {
-				if ( $candidate->comment_content === $reaction_key ) {
+				if ( wp_strip_all_tags( $candidate->comment_content ) === $reaction_key ) {
 					$duplicates[] = (int) $candidate->comment_ID;
 				}
 			}
@@ -1170,7 +1136,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$query  = "SELECT comment_parent, comment_content, COUNT(*) AS reaction_count FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
 		$query .= $parent_in;
 		$query .= ' GROUP BY comment_parent, comment_content';
-		/** @var list<object{ comment_parent: decimal-int-string, comment_content: string, reaction_count: decimal-int-string }&stdClass>|null $counts */
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 		$counts = $wpdb->get_results( $query );
 
@@ -1180,13 +1145,12 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$query  = "SELECT comment_ID, comment_parent, comment_content FROM $wpdb->comments WHERE comment_type = 'reaction' AND comment_approved = '1' AND ";
 			$query .= $parent_in;
 			$query .= $wpdb->prepare( ' AND user_id = %d', $current_user_id );
-			/** @var list<object{ comment_ID: decimal-int-string, comment_parent: decimal-int-string, comment_content: string }&stdClass>|null $user_rows */
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			$user_rows = $wpdb->get_results( $query );
 
 			if ( $user_rows ) {
 				foreach ( $user_rows as $row ) {
-					$key                  = (int) $row->comment_parent . ':' . $row->comment_content;
+					$key                  = (int) $row->comment_parent . ':' . wp_strip_all_tags( $row->comment_content );
 					$my_reactions[ $key ] = (int) $row->comment_ID;
 				}
 			}
@@ -1202,13 +1166,8 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		foreach ( $counts as $row ) {
-			$slug = $row->comment_content;
-			// Rows written outside this controller may hold anything.
-			if ( ! self::is_reaction_key( $slug ) ) {
-				continue;
-			}
-
 			$note_id = (int) $row->comment_parent;
+			$slug    = wp_strip_all_tags( $row->comment_content );
 			$key     = $note_id . ':' . $slug;
 
 			$this->reaction_summaries[ $note_id ][ $slug ] = array(
