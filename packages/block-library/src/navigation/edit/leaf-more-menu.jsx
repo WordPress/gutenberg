@@ -14,6 +14,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { DEFAULT_BLOCK } from '../constants';
+import CreateSubmenuMenuGroup from '../menu-list-view/create-submenu';
+import isNavigationMenuEditingEnabled from '../menu-list-view/is-enabled';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -163,6 +165,10 @@ export default function LeafMoreMenu( {
 
 	const isSubmenuDisabled =
 		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( blockName );
+	// With menu editing on, a link becomes a submenu from "Create submenu".
+	const showsAddSubmenuItem =
+		! isNavigationMenuEditingEnabled() ||
+		blockName !== 'core/navigation-link';
 
 	return (
 		<DropdownMenu
@@ -198,15 +204,17 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						<AddSubmenuItem
-							clientId={ clientId }
-							onClose={ onClose }
-							isDisabled={ isSubmenuDisabled }
-							updateExpansion={ updateExpansion }
-							setInsertedBlockClientId={
-								setInsertedBlockClientId
-							}
-						/>
+						{ showsAddSubmenuItem && (
+							<AddSubmenuItem
+								clientId={ clientId }
+								onClose={ onClose }
+								isDisabled={ isSubmenuDisabled }
+								updateExpansion={ updateExpansion }
+								setInsertedBlockClientId={
+									setInsertedBlockClientId
+								}
+							/>
+						) }
 						{ canDuplicate && (
 							<MenuItem
 								onClick={ () => {
@@ -238,6 +246,12 @@ export default function LeafMoreMenu( {
 							</>
 						) }
 					</MenuGroup>
+					<CreateSubmenuMenuGroup
+						clientId={ clientId }
+						onClose={ onClose }
+						updateExpansion={ updateExpansion }
+						setInsertedBlockClientId={ setInsertedBlockClientId }
+					/>
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {

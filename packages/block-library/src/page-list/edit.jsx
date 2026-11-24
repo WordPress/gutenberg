@@ -7,6 +7,7 @@ import {
 	useInnerBlocksProps,
 	getColorClassName,
 	store as blockEditorStore,
+	useBlockEditingMode,
 	Warning,
 } from '@wordpress/block-editor';
 import {
@@ -25,6 +26,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import isNavigationMenuEditingEnabled from '../navigation/menu-list-view/is-enabled';
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -264,19 +266,29 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		isAutoMenu,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getBlockRootClientId,
+				getBlockOrder,
 			} = select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
 				true
 			);
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
+				// The menu's only item, so the menu is an Auto menu (#86934).
+				isAutoMenu:
+					isNavigationMenuEditingEnabled() &&
+					!! rootClientId &&
+					rootClientId === navigationBlockParents[ 0 ] &&
+					getBlockOrder( rootClientId ).length === 1,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
@@ -285,6 +297,12 @@ export default function PageListEdit( {
 		},
 		[ clientId ]
 	);
+
+	// In an Auto menu the pages are the menu itself: people change it by
+	// customizing the menu, not by editing this block, so it can't be
+	// selected and is hidden from List View and breadcrumbs. Clicking it
+	// selects the Navigation block.
+	useBlockEditingMode( isAutoMenu ? 'disabled' : undefined );
 
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,

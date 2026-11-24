@@ -110,6 +110,22 @@ export type UseListViewDropZoneOptions = {
 	dropZoneElement?: HTMLElement | null;
 	/** Dispatch to update the expansion state of a list of block clientIds. */
 	updateExpansion: UpdateListViewExpansion;
+	/** Whether dropping over the middle of a row nests the dragged blocks inside it. */
+	dropOnRowToNest?: boolean;
+};
+
+/**
+ * Props passed to a custom `renderAppender` function.
+ */
+export type ListViewRenderAppenderProps = {
+	clientId?: string | null;
+	nestingLevel: number;
+	blockCount: number;
+	descriptionId: string;
+	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	tabIndex?: number;
+	onFocus?: FocusEventHandler;
+	ref: ForwardedRef< HTMLElement >;
 };
 
 /**
@@ -147,6 +163,8 @@ export type ListViewContextValue = {
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
+	renderAppender?: ( props: ListViewRenderAppenderProps ) => ReactNode;
+	appenderParentClientIds?: string[];
 };
 
 /**
@@ -191,6 +209,12 @@ export type PrivateListViewProps = ListViewProps & {
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
+	/** Replaces the generic block Inserter in appender rows. Rendering it also bypasses the template lock check, so the callback handles its own insertion rules. */
+	renderAppender?: ( props: ListViewRenderAppenderProps ) => ReactNode;
+	/** Client ids of nested blocks that get their own appender row, even when they have no inner blocks. */
+	appenderParentClientIds?: string[];
+	/** Flag to nest the dragged blocks inside a row when they are dropped over the middle of it, even when it has no children yet. The top and bottom of each row still drop before and after it. Defaults to `false`. */
+	dropOnRowToNest?: boolean;
 };
 
 /**

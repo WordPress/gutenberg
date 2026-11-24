@@ -42,7 +42,10 @@ function NavigationEditStage() {
 				<Breadcrumbs
 					items={ [
 						{
-							label: __( 'Navigation' ),
+							label: ( window as any )
+								.__experimentalNavigationMenuEditing
+								? __( 'Menus' )
+								: __( 'Navigation' ),
 							to: '/navigation/list',
 						},
 						{

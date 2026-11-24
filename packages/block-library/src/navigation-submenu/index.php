@@ -112,6 +112,33 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$open_on_hover           = 'hover' === $computed_visibility;
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
+	/*
+	 * A sub menu with no link of its own (or a `#` link) is "label only": it
+	 * only opens and closes its items, so it renders as a disclosure button
+	 * with `aria-expanded` and `aria-controls`, whatever the Navigation
+	 * block's submenu setting. Behind the "Navigation menu editing
+	 * prototypes" experiment.
+	 */
+	$item_url      = isset( $attributes['url'] ) ? trim( $attributes['url'] ) : '';
+	$is_label_only = function_exists( 'gutenberg_is_experiment_enabled' )
+		&& gutenberg_is_experiment_enabled( 'gutenberg-navigation-menu-editing' )
+		&& ( '' === $item_url || '#' === $item_url );
+	$submenu_id    = null;
+
+	// An empty label-only sub menu is a placeholder still being filled in.
+	// It has nothing to open, so a toggle button would mislead visitors.
+	if ( $is_label_only && ! $has_submenu ) {
+		return '';
+	}
+
+	if ( $is_label_only ) {
+		$open_on_click           = true;
+		$open_on_hover_and_click = false;
+		if ( $has_submenu ) {
+			$submenu_id = wp_unique_id( 'wp-block-navigation-submenu-' );
+		}
+	}
+
 	$classes = array(
 		'wp-block-navigation-item',
 	);
@@ -215,7 +242,11 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$html .= '</button>';
 		}
 	} else {
-		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
+		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false"';
+		if ( $submenu_id ) {
+			$html .= ' aria-controls="' . esc_attr( $submenu_id ) . '"';
+		}
+		$html .= '>';
 
 		// Wrap title with span to isolate it from submenu icon.
 		$html .= '<span class="wp-block-navigation-item__label">';
@@ -290,12 +321,14 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$html = $tag_processor->get_updated_html();
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => $css_classes,
-				'style' => $style_attribute,
-			)
+		$submenu_attributes = array(
+			'class' => $css_classes,
+			'style' => $style_attribute,
 		);
+		if ( $submenu_id ) {
+			$submenu_attributes['id'] = $submenu_id;
+		}
+		$wrapper_attributes = get_block_wrapper_attributes( $submenu_attributes );
 
 		$html .= sprintf(
 			'<ul %s>%s</ul>',

@@ -14,15 +14,12 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import NavigationMenuListView from '../menu-list-view';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
-const {
-	PrivateListView,
-	PrivateBlockContext,
-	useListViewPanelState,
-	useBlockDisplayTitle,
-} = unlock( blockEditorPrivateApis );
+const { PrivateBlockContext, useListViewPanelState, useBlockDisplayTitle } =
+	unlock( blockEditorPrivateApis );
 
 const MainContent = ( {
 	clientId,
@@ -72,7 +69,7 @@ const MainContent = ( {
 					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
-			<PrivateListView
+			<NavigationMenuListView
 				key={ `${ clientId }-${ expandRevision }` }
 				rootClientId={ clientId }
 				isExpanded

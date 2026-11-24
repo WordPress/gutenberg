@@ -14,7 +14,8 @@ import type { ListViewAppenderProps } from './types';
 
 export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { setInsertedBlockClientId } = useListViewContext();
+		const { setInsertedBlockClientId, renderAppender } =
+			useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
 		const instanceId = useInstanceId( Appender );
@@ -66,7 +67,8 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 			);
 		}, [ insertedBlockTitle ] );
 
-		if ( hideInserter ) {
+		// A custom appender handles its own insertion rules.
+		if ( hideInserter && ! renderAppender ) {
 			return null;
 		}
 
@@ -82,24 +84,36 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 
 		return (
 			<div className="list-view-appender">
-				<Inserter
-					ref={ ref }
-					rootClientId={ clientId }
-					position="bottom right"
-					isAppender
-					selectBlockOnInsert={ false }
-					shouldDirectInsert={ directInsert }
-					__experimentalIsQuick
-					{ ...props }
-					toggleProps={ { 'aria-describedby': descriptionId } }
-					onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
-						if ( maybeInsertedBlock?.clientId ) {
-							setInsertedBlockClientId(
-								maybeInsertedBlock.clientId
-							);
-						}
-					} }
-				/>
+				{ renderAppender ? (
+					renderAppender( {
+						clientId,
+						nestingLevel,
+						blockCount,
+						descriptionId,
+						setInsertedBlockClientId,
+						ref,
+						...props,
+					} )
+				) : (
+					<Inserter
+						ref={ ref }
+						rootClientId={ clientId }
+						position="bottom right"
+						isAppender
+						selectBlockOnInsert={ false }
+						shouldDirectInsert={ directInsert }
+						__experimentalIsQuick
+						{ ...props }
+						toggleProps={ { 'aria-describedby': descriptionId } }
+						onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
+							if ( maybeInsertedBlock?.clientId ) {
+								setInsertedBlockClientId(
+									maybeInsertedBlock.clientId
+								);
+							}
+						} }
+					/>
+				) }
 				<AriaReferencedText id={ descriptionId }>
 					{ description }
 				</AriaReferencedText>

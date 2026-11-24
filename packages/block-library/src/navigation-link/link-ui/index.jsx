@@ -27,6 +27,9 @@ import {
 	useEntityBinding,
 } from '../shared';
 import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
+import isNavigationMenuEditingEnabled from '../../navigation/menu-list-view/is-enabled';
+
+const NO_SUGGESTIONS = () => [];
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
@@ -43,6 +46,10 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const { clientId } = props;
 	const postType = type || 'page';
+	// A custom link (#86177) is for typing an address, usually somewhere
+	// else on the web, so it doesn't search the site's content or offer to
+	// add pages or blocks.
+	const isCustomLink = isNavigationMenuEditingEnabled() && kind === 'custom';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
@@ -161,7 +168,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const { transformSuggestions, insertBlockFromSuggestion } =
 		useBlockSuggestions( {
 			clientId,
-			isEnabled: canAddBlock && ! link?.url?.length,
+			isEnabled: canAddBlock && ! isCustomLink && ! link?.url?.length,
 			allowedBlockNames: props.allowedBlockNames,
 			onBlockInsert: props.onBlockInsert,
 			onClose: props.onClose,
@@ -186,21 +193,30 @@ function UnforwardedLinkUI( props, ref ) {
 						<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
 
 						<p id={ dialogDescriptionId }>
-							{ __(
-								'Search for and add a link to your Navigation.'
-							) }
+							{ isCustomLink
+								? __( 'Enter the URL to link to.' )
+								: __(
+										'Search for and add a link to your Navigation.'
+									) }
 						</p>
 					</VisuallyHidden>
 					<LinkControl
 						hasTextControl
 						hasRichPreviews
 						value={ link }
-						showInitialSuggestions
+						showInitialSuggestions={ ! isCustomLink }
+						searchInputPlaceholder={
+							isCustomLink ? __( 'Enter URL' ) : undefined
+						}
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						transformSuggestions={ transformSuggestions }
+						transformSuggestions={
+							// Only the typed address is offered, not the
+							// site's pages.
+							isCustomLink ? NO_SUGGESTIONS : transformSuggestions
+						}
 						onChange={ ( updatedValue ) => {
 							if ( isBlockSuggestion( updatedValue ) ) {
 								insertBlockFromSuggestion(
@@ -223,7 +239,7 @@ function UnforwardedLinkUI( props, ref ) {
 						forceIsEditingLink={ link?.url ? false : undefined }
 						renderControlBottom={ () => {
 							// Don't show the tools when there is submitted link (preview state).
-							if ( link?.url?.length ) {
+							if ( link?.url?.length || isCustomLink ) {
 								return null;
 							}
 
