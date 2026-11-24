@@ -24,6 +24,7 @@ import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
 } from '../../stories/shared';
+import styles from './style.module.css';
 
 const meta: Meta< typeof InputControl > = {
 	tags: [ 'manifest' ],
@@ -249,7 +250,7 @@ export const Search: Story = {
 		defaultValue: 'Pizza',
 		prefix: (
 			<InputLayout.Slot padding="minimal">
-				<Icon icon={ search } />
+				<Icon icon={ search } className={ styles[ 'search-icon' ] } />
 			</InputLayout.Slot>
 		),
 	},
