@@ -171,17 +171,12 @@ const cloneRouterRegionContent = ( vdom: any ) => {
 };
 
 /**
- * IDs of router regions with an `attachTo` property pointing to the same parent
- * element.
+ * Map of root fragments by parent element and region ID, used to render router
+ * regions with the `attachTo` property. Each attached region gets its own root
+ * element and fragment so regions sharing the same parent never interfere with
+ * each other when a page includes only a subset of them.
  */
-const regionsToAttachByParent = new WeakMap< Element, string[] >();
-
-/**
- * Map of root fragments by parent element, used to render router regions with
- * the `attachTo` property. Those elements with the same parent are rendered
- * together in the corresponding root fragment.
- */
-const rootFragmentsByParent = new WeakMap< Element, any >();
+const rootFragmentsByParent = new WeakMap< Element, Map< string, any > >();
 
 /**
  * Set of router regions using the `attachTo` property that are present in the
@@ -387,20 +382,20 @@ const renderPage = ( page: Page ) => {
 		} );
 
 		// Inits regions with attachTo that don't exist yet.
-		const parentsToUpdate = new Set< Element >();
+		const regionsToRender: Array< [ Element, string ] > = [];
 		for ( const id in page.regionsToAttach ) {
 			const parent = resolveAttachTarget( page.regionsToAttach[ id ] );
 			if ( ! parent ) {
 				delete regions[ id ];
 				continue;
 			}
-			if ( ! regionsToAttachByParent.has( parent ) ) {
-				regionsToAttachByParent.set( parent, [] );
+			let fragments = rootFragmentsByParent.get( parent );
+			if ( ! fragments ) {
+				fragments = new Map();
+				rootFragmentsByParent.set( parent, fragments );
 			}
-			const ids = regionsToAttachByParent.get( parent );
-			if ( ! ids.includes( id ) ) {
-				ids.push( id );
-				parentsToUpdate.add( parent );
+			if ( ! fragments.has( id ) ) {
+				regionsToRender.push( [ parent, id ] );
 			}
 		}
 
@@ -413,32 +408,21 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
-		// Renders regions attached to the same parent in the same fragment.
-		parentsToUpdate.forEach( ( parent ) => {
-			const ids = regionsToAttachByParent.get( parent );
-			const vdoms = ids.map( ( id ) => regions[ id ] );
+		// Renders newly attached regions, each into its own root fragment.
+		for ( const [ parent, id ] of regionsToRender ) {
+			const vdom = regions[ id ];
+			const { props, type } = vdom;
+			const elementType = typeof type === 'function' ? props.type : type;
 
-			if ( ! rootFragmentsByParent.has( parent ) ) {
-				// Root elements sharing this parent's attachment fragment.
-				const roots = vdoms.map( ( { props, type } ) => {
-					const elementType =
-						typeof type === 'function' ? props.type : type;
+			// Creates an element with the obtained type where the region will
+			// be rendered. The type should match the one of the root vnode.
+			const region = document.createElement( elementType );
+			parent.appendChild( region );
 
-					// Creates an element with the obtained type where the
-					// region will be rendered. The type should match the one of
-					// the root vnode.
-					const region = document.createElement( elementType );
-					parent.appendChild( region );
-					return region;
-				} );
-				rootFragmentsByParent.set(
-					parent,
-					getRegionRootFragment( roots )
-				);
-			}
-			const fragment = rootFragmentsByParent.get( parent );
-			render( vdoms, fragment );
-		} );
+			const fragment = getRegionRootFragment( region );
+			rootFragmentsByParent.get( parent )!.set( id, fragment );
+			render( vdom, fragment );
+		}
 	} );
 
 	if ( page.title ) {

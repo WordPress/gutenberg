@@ -315,4 +315,69 @@ describe( 'attachment targets', () => {
 			expect( target ).toBeEmptyDOMElement();
 		} );
 	}
+
+	for ( const [ first, second ] of [
+		[ 'a', 'b' ],
+		[ 'b', 'a' ],
+	] ) {
+		test( `preserves independent regions sharing the same attachTo parent across single-region navigations (${ first } -> ${ second } -> both)`, async () => {
+			const dialogRegion = ( id: string, label: string ) =>
+				`<dialog data-wp-interactive="${ namespace }" data-wp-router-region='${ JSON.stringify(
+					{
+						id: `${ namespace }/dialog-${ id }`,
+						attachTo: 'body',
+					}
+				) }'>${ label }</dialog>`;
+
+			const pageWithDialogs = ( letter: string, ids: string[] ) =>
+				pageHtml(
+					regionHtml( 's', `<p>${ letter }</p>` ) +
+						ids
+							.map( ( id ) =>
+								dialogRegion(
+									id,
+									`Region ${ id.toUpperCase() }`
+								)
+							)
+							.join( '' )
+				).replace( '<title>t</title>', `<title>${ letter }</title>` );
+
+			const nav = async ( letter: string, ids: string[] ) => {
+				await expect(
+					actions.navigate( pageUrl( letter ), {
+						...quiet,
+						html: pageWithDialogs( letter, ids ),
+					} )
+				).resolves.toBeUndefined();
+				await nextFrames();
+			};
+
+			const dialogTexts = () =>
+				[ ...document.querySelectorAll( 'body > dialog' ) ].map(
+					( el ) => el.textContent
+				);
+
+			await nav( 'first', [ first ] );
+			expectPage( 'first' );
+			expect( dialogTexts() ).toEqual( [
+				`Region ${ first.toUpperCase() }`,
+			] );
+			const firstElement = document.querySelector( 'body > dialog' );
+
+			await nav( 'second', [ second ] );
+			expectPage( 'second' );
+			expect( dialogTexts() ).toEqual( [
+				`Region ${ second.toUpperCase() }`,
+			] );
+			const secondElement = document.querySelector( 'body > dialog' );
+			expect( secondElement ).not.toBe( firstElement );
+
+			await nav( 'both', [ 'a', 'b' ] );
+			expectPage( 'both' );
+			expect( dialogTexts().sort() ).toEqual( [
+				'Region A',
+				'Region B',
+			] );
+		} );
+	}
 } );
