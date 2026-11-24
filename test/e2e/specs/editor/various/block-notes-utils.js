@@ -212,7 +212,10 @@ class BlockNoteUtils {
 		// The caret entered the block before the notes list had the note.
 		const thread = this.getThread( note );
 		await thread.click();
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 	}
 
 	async addNote( content ) {

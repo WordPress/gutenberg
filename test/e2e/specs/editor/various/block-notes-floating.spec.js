@@ -177,7 +177,10 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		// Expand the top thread, so the one below stays within the viewport.
 		await editor.selectBlocks( getParagraph( editor, 'First noted' ) );
-		await expect( firstThread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( firstThread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 
 		await expectAligned(
 			firstThread,
@@ -209,14 +212,20 @@ test.describe( 'Block Notes: floating notes', () => {
 		const bravoThread = getThread( page, 'Bravo note' );
 
 		// The last added note is selected; the one above moves up.
-		await expect( bravoThread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( bravoThread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		await expectAligned( bravoThread, getParagraph( editor, 'Bravo' ) );
 		await expectStacked( alphaThread, bravoThread );
 
 		// Selecting the other note anchors it instead; the one below moves
 		// down.
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( alphaThread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( alphaThread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		await expectAligned( alphaThread, getParagraph( editor, 'Alpha' ) );
 		await expectStacked( alphaThread, bravoThread );
 
@@ -257,7 +266,10 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		await blockNoteUtils.deselect();
 		await last.click();
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		await expectAligned( thread, first );
 	} );
 
@@ -282,7 +294,10 @@ test.describe( 'Block Notes: floating notes', () => {
 		await page.evaluate(
 			() => new Promise( ( resolve ) => setTimeout( resolve ) )
 		);
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 
 		// The canvas keeps its caret in the block once focus leaves it.
 		await thread.click();
@@ -290,7 +305,10 @@ test.describe( 'Block Notes: floating notes', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Options' } )
 			.focus();
-		await expect( thread ).not.toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 	} );
 
 	test( 'follows its block when blocks are reordered', async ( {
@@ -392,7 +410,10 @@ test.describe( 'Block Notes: floating notes', () => {
 			// Focus the title first: deselecting the block collapses the
 			// thread, which re-measures on its own.
 			await title.click();
-			await expect( thread ).not.toHaveClass( /is-selected/ );
+			await expect( getThreadToggle( thread ) ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
 			await expectAligned( thread, noted );
 			const initialTop = await getNotedTop();
 
@@ -527,7 +548,10 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 
 		const thread = getThread( page, 'Low note' );
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		await expectAligned( thread, getParagraph( editor, 'Noted' ) );
 	} );
 
@@ -589,7 +613,10 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		const threads = labels.map( ( label ) => getThread( page, label ) );
 		const selected = threads.at( -1 );
-		await expect( selected ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( selected ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		await expectAligned( selected, getParagraph( editor, 'Four' ) );
 		for ( let i = 1; i < threads.length; i++ ) {
 			await expectStacked( threads[ i - 1 ], threads[ i ] );
@@ -623,7 +650,10 @@ test.describe( 'Block Notes: floating notes', () => {
 		// Deselect the note, collapsing the tall thread.
 		const tallThread = getThread( page, 'Tall note' );
 		await blockNoteUtils.deselect();
-		await expect( tallThread ).not.toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( tallThread ) ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 
 		await expectAligned(
 			getThread( page, 'Alpha note' ),
@@ -649,11 +679,17 @@ test.describe( 'Block Notes: floating notes', () => {
 				.evaluate( ( root ) => root.scrollHeight );
 		const thread = getThread( page, 'Alpha note' );
 		await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
-		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'true'
+		);
 		const expandedHeight = await getScrollHeight();
 
 		await blockNoteUtils.deselect();
-		await expect( thread ).not.toHaveClass( /is-selected/ );
+		await expect( getThreadToggle( thread ) ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
 
 		expect( await getScrollHeight() ).toBe( expandedHeight );
 	} );
@@ -687,9 +723,9 @@ test.describe( 'Block Notes: floating notes', () => {
 				} );
 			}
 			await blockNoteUtils.deselect();
-			await expect( getThread( page, 'Hotel note' ) ).not.toHaveClass(
-				/is-selected/
-			);
+			await expect(
+				getThreadToggle( getThread( page, 'Hotel note' ) )
+			).toHaveAttribute( 'aria-expanded', 'false' );
 			await scrollCanvasTo( editor, 0 );
 			lastOffset = await getOffset(
 				getThread( page, 'Hotel note' ),
@@ -798,10 +834,16 @@ test.describe( 'Block Notes: floating notes', () => {
 			await test.step( 'Scrolls the selected thread into view', async () => {
 				// Deselect, then select the note again through its block.
 				await blockNoteUtils.deselect();
-				await expect( thread ).not.toHaveClass( /is-selected/ );
+				await expect( getThreadToggle( thread ) ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
 				await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
-				await expect( thread ).toHaveClass( /is-selected/ );
+				await expect( getThreadToggle( thread ) ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
 				await expect( thread ).toBeInViewport( {
 					ratio: FULLY_VISIBLE,
 				} );
@@ -826,7 +868,10 @@ test.describe( 'Block Notes: floating notes', () => {
 			await editor.selectBlocks( getParagraph( editor, 'Alpha' ) );
 
 			const thread = getThread( page, 'Tall note' );
-			await expect( thread ).toHaveClass( /is-selected/ );
+			await expect( getThreadToggle( thread ) ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
 			await thread.evaluate( ( element ) => {
 				element.scrollTop = 0;
 			} );
@@ -1243,7 +1288,10 @@ test.describe( 'Block Notes: floating notes', () => {
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.click();
-			await expect( thread ).toHaveClass( /is-selected/ );
+			await expect( getThreadToggle( thread ) ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
 			await expect( content ).toBeHidden();
 			// The hidden note text still reaches screen readers.
 			await expect(
