@@ -155,7 +155,9 @@ test.describe( 'undo in a container duplicated from one entity', () => {
 // on the root record, which an undo of its own entity never changes. This is
 // unrelated to duplicated containers and predates
 // https://github.com/WordPress/gutenberg/pull/82706, which documents it as out
-// of scope.
+// of scope. Once that is fixed, the guard that pull request adds would still
+// stop the restore: it counts two Template Parts as copies of each other
+// whatever their slugs, so it would also need to tell them apart.
 test.describe( 'undo across containers of different entities', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );

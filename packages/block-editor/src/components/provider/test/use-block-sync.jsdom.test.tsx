@@ -1042,9 +1042,9 @@ describe( 'useBlockSync hook', () => {
 			);
 		} );
 
-		// Typing between two undos without moving the caret records the
-		// selection the first undo restored, so the second undo hands back
-		// that same selection object.
+		// The undo level that typing opens starts from the selection the
+		// last undo restored, so undoing it hands back that same selection
+		// object.
 		it( 'restores a selection again when an undo returns to it', () => {
 			const { registry, update, select, selectionRef } = renderCanvas( [
 				'outer',

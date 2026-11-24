@@ -271,7 +271,7 @@ export default function useBlockSync( {
 	};
 
 	// Whether the block-editor's current selection sits inside a *different*
-	// inner block controller.
+	// inner block controller of the same block type.
 	//
 	// Several controllers can render one entity — two Navigation blocks using
 	// the same menu, two Post Content blocks showing the same post. Each keeps
@@ -306,7 +306,10 @@ export default function useBlockSync( {
 		// inside Post Content. Outside it, another copy is a controller of
 		// the same block type, such as a second Navigation block. One of
 		// another type, such as a Template Part around Post Title, renders
-		// another entity, and neither does the root block list.
+		// another entity, and the root block list belongs to no controller.
+		// Two controllers of one type that render different entities, such
+		// as Template Parts on different slugs, count as copies too: telling
+		// them apart would need each controller to record its entity.
 		const parents = getBlockParents( currentStartClientId );
 		const blockName = getBlockName( clientId );
 		return (
