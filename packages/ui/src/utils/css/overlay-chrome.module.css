@@ -93,12 +93,13 @@
 			overflow-inline: hidden;
 			padding: var(--wpds-dimension-padding-2xl);
 			/*
-			 * Follow the popup's corners where the scroll container meets them.
-			 * The popup clips to its rounded border, which would otherwise cut
-			 * the square corners off the inset focus ring below. Edges that end
-			 * above pinned chrome stay square, see the rules below.
+			 * Match the popup's inner corners so the popup doesn't clip the
+			 * inset focus ring: it clips inside its border, so the radius is
+			 * the popup radius minus the border width. Corners next to pinned
+			 * chrome stay square (see below), and Drawer squares its anchored
+			 * edge.
 			 */
-			border-radius: inherit;
+			border-radius: calc(var(--wpds-border-radius-lg) - var(--wpds-border-width-xs));
 
 			/*
 			 * The shared `outset-ring--focus-visible` utility (composed by
