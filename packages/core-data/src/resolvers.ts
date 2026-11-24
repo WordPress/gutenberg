@@ -1282,6 +1282,23 @@ export const getRegisteredPostMeta =
 		}
 	};
 
+getRegisteredPostMeta.shouldInvalidate = (
+	action: { type: string; selectorName?: string; args?: unknown[] },
+	postType: string
+) => {
+	if ( action.type !== 'INVALIDATE_RESOLUTION' ) {
+		return false;
+	}
+	const args = action.args ?? [];
+	return (
+		( action.selectorName === 'getPostType' && args[ 0 ] === postType ) ||
+		( action.selectorName === 'getEntityRecord' &&
+			args[ 0 ] === 'root' &&
+			args[ 1 ] === 'postType' &&
+			args[ 2 ] === postType )
+	);
+};
+
 /**
  * Requests entity configs for the given kind from the REST API.
  *
