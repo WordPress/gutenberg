@@ -888,6 +888,40 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( appender ).toBeFocused();
 		} );
 
+		test( 'adds the first link to an empty submenu that is not selected', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Empty Submenu Menu',
+					content: `<!-- wp:navigation-submenu {"label":"Empty Submenu","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+				}
+			);
+
+			// The empty submenu gets an appender one level in, though its
+			// canvas shows none until it is selected.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 2, 1 ] );
+
+			await listView
+				.getByRole( 'row', { level: 2 } )
+				.getByRole( 'button', { name: /^Add / } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
 		test( 'moves from a nested appender to its parent with the Left arrow key', async ( {
 			admin,
 			page,

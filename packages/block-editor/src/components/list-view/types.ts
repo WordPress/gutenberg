@@ -145,6 +145,7 @@ export type ListViewContextValue = {
 	listViewInstanceId?: number | string;
 	rootClientId?: string | null;
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	hasInnerBlockAppender?: ( blockName: string ) => boolean;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
 };
@@ -183,6 +184,8 @@ export type PrivateListViewProps = ListViewProps & {
 	showAppender?: boolean;
 	/** Flag to also end every expanded nested list with an appender when `showAppender` is set. Defaults to `false`. */
 	showInnerBlockAppenders?: boolean;
+	/** Whether a block that takes inner blocks gets an appender for them when `showInnerBlockAppenders` is set, given its name. Every such block gets one when it is not set. */
+	hasInnerBlockAppender?: ( blockName: string ) => boolean;
 	/** Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component. */
 	blockSettingsMenu?: ComponentType< ListViewBlockSettingsMenuProps >;
 	/** The client id of the root block from which we determine the blocks to show in the list. */

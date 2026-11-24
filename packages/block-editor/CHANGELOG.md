@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   List View: The Navigation block's List Views end every expanded nested list with an appender, so items can be added to a submenu or a Buttons block from the List View. `getBlockListSettings()` now includes `hidesAppender`, which is `true` when a block passes `renderAppender: false` to its inner blocks ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
+-   List View: The Navigation block's List Views end every expanded nested list with an appender, so items can be added to a submenu or a Buttons block from the List View ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
 
 ### Bug Fixes
 

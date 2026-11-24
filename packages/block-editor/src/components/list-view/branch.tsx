@@ -8,7 +8,11 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import type { SelectFunction } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useInsertedBlockClientId, useListViewTreeState } from './context';
+import {
+	useInsertedBlockClientId,
+	useListViewContext,
+	useListViewTreeState,
+} from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -22,25 +26,35 @@ import type { ListViewBranchProps, ListViewExpansionState } from './types';
 /**
  * Whether the List View offers an appender for the inner blocks of a block,
  * as the end of its expanded list or as the first item of an empty one. The
- * block must hold inner blocks, show an appender for them on the canvas, and
- * allow editing and inserting. Otherwise the row would hold nothing to focus,
- * and the arrow keys would stop at it, or it would add blocks the List View
- * hides.
+ * block must hold inner blocks and allow editing and inserting, and the List
+ * View can leave out blocks by name, as the Navigation block does for its
+ * links. Otherwise the row would hold nothing to focus, and the arrow keys
+ * would stop at it, or it would add blocks the List View hides.
  *
- * @param select   The registry's select function.
- * @param clientId The block.
+ * @param select                The registry's select function.
+ * @param clientId              The block.
+ * @param hasInnerBlockAppender Whether a block gets an appender, given its name.
  */
 function canAppendInListView(
 	select: SelectFunction,
-	clientId: string
+	clientId: string,
+	hasInnerBlockAppender?: ( blockName: string ) => boolean
 ): boolean {
-	const { canEditBlock, getBlockListSettings, getTemplateLock, isZoomOut } =
-		unlock( select( blockEditorStore ) );
-	if ( ! canEditBlock( clientId ) ) {
+	const {
+		canEditBlock,
+		getBlockListSettings,
+		getBlockName,
+		getTemplateLock,
+		isZoomOut,
+	} = unlock( select( blockEditorStore ) );
+	if ( ! canEditBlock( clientId ) || ! getBlockListSettings( clientId ) ) {
 		return false;
 	}
-	const listSettings = getBlockListSettings( clientId );
-	if ( ! listSettings || listSettings.hidesAppender ) {
+	const blockName = getBlockName( clientId );
+	if (
+		hasInnerBlockAppender &&
+		( ! blockName || ! hasInnerBlockAppender( blockName ) )
+	) {
 		return false;
 	}
 	// Should be kept in sync with the appender's own check.
@@ -125,6 +139,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 	} = props;
 
 	const isTopLevel = level === 1;
+	const { hasInnerBlockAppender } = useListViewContext();
 
 	const { canParentExpand, isParentSynced, canParentAppend } = useSelect(
 		( select ) => {
@@ -144,10 +159,14 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				canParentAppend:
 					! isTopLevel &&
 					showInnerBlockAppenders &&
-					canAppendInListView( select, parentId ),
+					canAppendInListView(
+						select,
+						parentId,
+						hasInnerBlockAppender
+					),
 			};
 		},
-		[ parentId, isTopLevel, showInnerBlockAppenders ]
+		[ parentId, isTopLevel, showInnerBlockAppenders, hasInnerBlockAppender ]
 	);
 
 	const syncedBranch = isSyncedBranch || isParentSynced;
@@ -187,7 +206,11 @@ function ListViewBranch( props: ListViewBranchProps ) {
 								draggedClientIds,
 								isExpanded,
 								( clientId ) =>
-									canAppendInListView( select, clientId )
+									canAppendInListView(
+										select,
+										clientId,
+										hasInnerBlockAppender
+									)
 							)
 						)
 				: undefined,
@@ -197,6 +220,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			draggedClientIds,
 			isExpanded,
 			showDescendantAppenders,
+			hasInnerBlockAppender,
 		]
 	);
 
