@@ -19,11 +19,13 @@ import {
 import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
- * Available editor intent options surfaced in the more-menu mode picker.
+ * Available editor intent options surfaced in the more-menu mode picker and
+ * the header dropdown.
  *
- * Each option is mirrored across three files; keep them in sync when adding
+ * Each option is mirrored across four files; keep them in sync when adding
  * or renaming an intent:
  *   - This file: UI label, description, and shortcut hint.
+ *   - `./dropdown.tsx`: label and icon of the header button.
  *   - `../global-keyboard-shortcuts/register-shortcuts.js`: registers the
  *     keyboard binding with `@wordpress/keyboard-shortcuts`.
  *   - `../global-keyboard-shortcuts/index.js`: wires `useShortcut` so the
@@ -72,11 +74,16 @@ const INTENTS: Array< {
 ];
 
 /**
- * Editor intent switcher. Lets the user pick between direct editing and
- * suggesting changes. Only rendered for post types that declare the
- * `editor.notes` support.
+ * The intent choices as a labelled radio group, for use inside a `Menu.Popup`.
+ *
+ * @param props
+ * @param props.closeOnClick Whether choosing an intent closes the menu.
  */
-function IntentSwitcher() {
+export function IntentRadioGroup( {
+	closeOnClick = false,
+}: {
+	closeOnClick?: boolean;
+} ) {
 	// The intent API is private while Suggest mode is experimental.
 	const { intent, isRichEditingEnabled } = useSelect(
 		( select ) => ( {
@@ -124,26 +131,36 @@ function IntentSwitcher() {
 	} );
 
 	return (
+		<Menu.RadioGroup
+			value={ intent }
+			onValueChange={ ( value ) => setEditorIntent( value ) }
+		>
+			<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
+			{ choices.map( ( choice ) => (
+				<Menu.RadioItem
+					key={ choice.value }
+					value={ choice.value }
+					disabled={ choice.disabled }
+					shortcut={ choice.shortcut ?? undefined }
+					closeOnClick={ closeOnClick }
+				>
+					<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
+					<Menu.ItemDescription>{ choice.info }</Menu.ItemDescription>
+				</Menu.RadioItem>
+			) ) }
+		</Menu.RadioGroup>
+	);
+}
+
+/**
+ * Editor intent switcher. Lets the user pick between direct editing and
+ * suggesting changes. Only rendered for post types that declare the
+ * `editor.notes` support.
+ */
+function IntentSwitcher() {
+	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<Menu.RadioGroup
-				value={ intent }
-				onValueChange={ ( value ) => setEditorIntent( value ) }
-			>
-				<Menu.GroupLabel>{ __( 'Mode' ) }</Menu.GroupLabel>
-				{ choices.map( ( choice ) => (
-					<Menu.RadioItem
-						key={ choice.value }
-						value={ choice.value }
-						disabled={ choice.disabled }
-						shortcut={ choice.shortcut ?? undefined }
-					>
-						<Menu.ItemLabel>{ choice.label }</Menu.ItemLabel>
-						<Menu.ItemDescription>
-							{ choice.info }
-						</Menu.ItemDescription>
-					</Menu.RadioItem>
-				) ) }
-			</Menu.RadioGroup>
+			<IntentRadioGroup />
 			<Menu.Separator />
 		</PostTypeSupportCheck>
 	);

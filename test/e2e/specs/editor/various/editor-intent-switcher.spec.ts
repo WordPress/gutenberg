@@ -7,6 +7,12 @@ function optionsButton( page: Page ) {
 		.getByRole( 'button', { name: 'Options' } );
 }
 
+function modeButton( page: Page ) {
+	return page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: /^Mode:/ } );
+}
+
 /*
  * A radio item keeps the Options menu open after a selection. Since Options
  * is a toggle, clicking it while the menu is still mounted closes the menu
@@ -134,5 +140,53 @@ test.describe( 'Editor intent switcher', () => {
 				exact: true,
 			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
+	} );
+
+	test( 'the top bar button names the mode and switches it', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		const button = modeButton( page );
+		const suggestChoice = page.getByRole( 'menuitemradio', {
+			name: /^Suggesting/,
+		} );
+		await expect( button ).toHaveText( 'Editing' );
+
+		await button.click();
+		await suggestChoice.click();
+
+		// Unlike the Options menu, this one closes on a choice.
+		await expect( suggestChoice ).toBeHidden();
+		await expect( button ).toHaveText( 'Suggesting' );
+		await expect( button ).toHaveAccessibleName( 'Mode: Suggesting' );
+
+		// The button follows a switch made elsewhere.
+		await pageUtils.pressKeys( 'secondary+Z' );
+		await expect( button ).toHaveText( 'Editing' );
+	} );
+
+	test( 'the top bar button collapses to its icon, then hides, as the viewport narrows', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.setBrowserViewport( { width: 800, height: 700 } );
+
+		const button = modeButton( page );
+		await expect( button ).toBeVisible();
+		await expect( button ).toHaveText( '' );
+		await expect( button ).toHaveAccessibleName( 'Mode: Editing' );
+
+		await button.click();
+		await page
+			.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
+			.click();
+		await expect( button ).toHaveAccessibleName( 'Mode: Suggesting' );
+
+		// A phone leaves the mode to the Options menu.
+		await pageUtils.setBrowserViewport( { width: 400, height: 700 } );
+		await expect( button ).toBeHidden();
+		await openIntentSwitcher( page );
+
+		await pageUtils.setBrowserViewport( 'large' );
 	} );
 } );

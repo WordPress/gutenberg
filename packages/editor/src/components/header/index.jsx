@@ -8,6 +8,7 @@ import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import HeaderSkeleton from './header-skeleton';
+import IntentDropdown from '../intent-switcher/dropdown';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
@@ -18,6 +19,7 @@ import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
 import { unlock } from '../../lock-unlock';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 
 function Header( {
 	customSaveButton,
@@ -146,6 +148,8 @@ function Header( {
 					{ ( isWideViewport || ! showIconLabels ) && (
 						<PinnedItems.Slot scope="core" />
 					) }
+
+					{ isSuggestionModeEnabled() && <IntentDropdown /> }
 
 					{ ! customSaveButton && (
 						<PostPublishButtonOrToggle
