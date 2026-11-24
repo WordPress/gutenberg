@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 0.12.0 (2026-11-18)
 
 ### Internal

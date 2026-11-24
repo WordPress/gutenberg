@@ -46,7 +46,7 @@
 	},
 	"devDependencies": {
 		"@types/requestidlecallback": "^0.3.4",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
