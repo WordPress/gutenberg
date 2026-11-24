@@ -354,6 +354,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			} );
 
 		// Open the actions menu.
+		await subMenuItem.hover();
 		await subMenuItemActions.click();
 
 		// usage of `page` is required because the options menu is rendered into a slot
@@ -498,6 +499,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			} );
 
 		// Open the actions menu.
+		await firstMenuItem.hover();
 		await firstItemActions.click();
 
 		// Add the submenu.
