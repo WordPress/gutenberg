@@ -276,6 +276,10 @@
 				"unit": "rem"
 			}
 		},
+		"transform": {
+			"rotate": false,
+			"translate": false
+		},
 		"typography": {
 			"customFontSize": true,
 			"defaultFontSizes": true,
