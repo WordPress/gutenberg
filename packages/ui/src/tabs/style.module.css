@@ -152,6 +152,9 @@
 
 				&::after {
 					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+					box-shadow:
+						0 0 0 var(--_wp-ui-tabs-background-overhang, 0)
+						var(--wpds-color-background-interactive-neutral-weak-active);
 					opacity: 1;
 				}
 			}
@@ -198,26 +201,18 @@
 			 * extends into the gap between them. A shadow paints that overhang
 			 * because, unlike a negative inset, it adds no scrollable overflow. */
 			.is-minimal-variant[data-orientation="horizontal"] & {
+				--_wp-ui-tabs-background-overhang: var(--wpds-dimension-padding-xs);
+
 				padding-inline: 0;
 
 				&::after {
 					inset-block:
 						calc((48px - var(--wpds-dimension-size-md)) / 2 +
-						var(--wpds-dimension-padding-xs));
+						var(--_wp-ui-tabs-background-overhang));
 					inset-inline: 0;
 					outline-offset:
-						calc(var(--wpds-dimension-padding-xs) -
+						calc(var(--_wp-ui-tabs-background-overhang) -
 						var(--wpds-border-width-focus));
-				}
-
-				&:not([data-disabled]):is(
-					:not([aria-selected="true"]):hover,
-					:not([aria-selected="true"]):active,
-					:focus-visible
-				)::after {
-					box-shadow:
-						0 0 0 var(--wpds-dimension-padding-xs)
-						var(--wpds-color-background-interactive-neutral-weak-active);
 				}
 			}
 

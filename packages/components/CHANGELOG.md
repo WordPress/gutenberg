@@ -24,7 +24,7 @@
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 -   `ToggleGroupControl`: Show option tooltips above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86804](https://github.com/WordPress/gutenberg/pull/86804)).
 -   `ColorPicker`: Show the typed alpha value in the RGB and HSL Alpha fields. Before, some values such as `29` showed one less ([#87291](https://github.com/WordPress/gutenberg/pull/87291)).
--   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab. Use the design system focus color for the focus ring, which keeps its contrast in the dark theme ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab. In both orientations, use the design system focus color, which keeps its contrast in the dark theme, and the design system corner radius ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Internal
 
