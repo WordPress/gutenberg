@@ -86,12 +86,13 @@ describe( 'UltraHDR helpers', () => {
 			// Mark as having a gain map so the helper recognizes it.
 			image.gainmap = new MockImage();
 			mockGetDouble.mockReturnValueOnce( 8 ); // linear capacity 8 → 3 stops
-			mockUhdrLoadBuffer.mockReturnValueOnce( image );
+			mockNewFromBuffer.mockReturnValueOnce( image );
 
 			const buffer = new ArrayBuffer( 16 );
 			const result = await getUltraHdrInfo( buffer );
 
-			expect( mockUhdrLoadBuffer ).toHaveBeenCalledWith( buffer );
+			expect( mockNewFromBuffer ).toHaveBeenCalledWith( buffer );
+			expect( mockUhdrLoadBuffer ).not.toHaveBeenCalled();
 			expect( mockGetDouble ).toHaveBeenCalledWith(
 				'gainmap-hdr-capacity-max'
 			);
@@ -105,7 +106,7 @@ describe( 'UltraHDR helpers', () => {
 		it( 'returns null when image has no gain map', async () => {
 			const image = new MockImage();
 			// gainmap stays undefined.
-			mockUhdrLoadBuffer.mockReturnValueOnce( image );
+			mockNewFromBuffer.mockReturnValueOnce( image );
 
 			const result = await getUltraHdrInfo( new ArrayBuffer( 16 ) );
 
@@ -113,9 +114,9 @@ describe( 'UltraHDR helpers', () => {
 			expect( mockGetDouble ).not.toHaveBeenCalled();
 		} );
 
-		it( 'returns null when uhdrloadBuffer throws', async () => {
-			mockUhdrLoadBuffer.mockImplementationOnce( () => {
-				throw new Error( 'not an UltraHDR jpeg' );
+		it( 'returns null when the buffer cannot be loaded', async () => {
+			mockNewFromBuffer.mockImplementationOnce( () => {
+				throw new Error( 'not a known file format' );
 			} );
 
 			const result = await getUltraHdrInfo( new ArrayBuffer( 16 ) );
@@ -131,7 +132,7 @@ describe( 'UltraHDR helpers', () => {
 			mockGetDouble.mockImplementationOnce( () => {
 				throw new Error( 'no such field' );
 			} );
-			mockUhdrLoadBuffer.mockReturnValueOnce( image );
+			mockNewFromBuffer.mockReturnValueOnce( image );
 
 			const result = await getUltraHdrInfo( new ArrayBuffer( 16 ) );
 

@@ -1032,7 +1032,10 @@ export async function getUltraHdrInfo(
 ): Promise< UltraHdrInfo | null > {
 	try {
 		const vips = await getVips();
-		const image = vips.Image.uhdrloadBuffer( buffer );
+		// libvips picks uhdrload only for a JPEG with a gain map. Calling
+		// uhdrloadBuffer directly throws for every other JPEG, and wasm-vips
+		// leaks its copy of the buffer on every throw.
+		const image = vips.Image.newFromBuffer( buffer );
 		if ( ! image.gainmap ) {
 			cleanup?.();
 			return null;
