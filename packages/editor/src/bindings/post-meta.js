@@ -86,6 +86,7 @@ function getValue( { select, context, args, isForCopy } ) {
  */
 export default {
 	name: 'core/post-meta',
+	supportsCopy: true,
 	getValues( { select, context, bindings, isForCopy } ) {
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {

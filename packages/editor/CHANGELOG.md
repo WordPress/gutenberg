@@ -6,7 +6,7 @@
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
--   Block Bindings: Preserve saved fallbacks for unavailable post meta and post data, and retain explicitly empty pattern overrides when copying blocks ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+-   Block Bindings: Preserve saved fallbacks for unavailable post meta, post data, and term data, and retain explicitly empty pattern overrides when copying blocks ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
 
 ### Internal
 

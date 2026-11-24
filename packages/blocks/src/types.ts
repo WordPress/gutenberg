@@ -857,8 +857,13 @@ export interface BlockBindingsSource {
 	 */
 	usesContext?: string[];
 	/**
+	 * Opt in to resolving source values for copied blocks. Defaults to false.
+	 */
+	supportsCopy?: boolean;
+	/**
 	 * Optional function to get the values from the source.
-	 * Receives `isForCopy: true` when resolving values for the clipboard.
+	 * Sources with `supportsCopy: true` receive `isForCopy: true` when resolving
+	 * values for the clipboard. Other sources keep their saved fallback.
 	 * In copy requests, omit unavailable attributes or return `undefined` for
 	 * them instead of display placeholders to preserve their saved fallback.
 	 */

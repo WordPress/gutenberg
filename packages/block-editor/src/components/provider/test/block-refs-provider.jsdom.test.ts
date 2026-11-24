@@ -14,7 +14,6 @@ describe( 'bound attributes for copying', () => {
 	) {
 		return {
 			attributes: block.attributes,
-			computedAttributes: { content: 'Display placeholder' },
 			boundAttributeNames: [ 'content' ],
 			getAttributesForCopy: vi.fn( () => copyAttributes ),
 		};

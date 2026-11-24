@@ -115,6 +115,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				const source = registeredSources[ sourceName as string ];
 				if (
 					! source ||
+					( isForCopy && source.supportsCopy !== true ) ||
 					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
@@ -177,6 +178,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			clientId,
 			context,
 			registeredSources,
+			registry,
 		]
 	);
 	const computedAttributes = useSelect(
@@ -194,12 +196,15 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	const boundAttributeNames = useMemo(
 		() =>
 			Object.entries( blockBindings ?? {} )
-				.filter(
-					( [ attributeName, binding ] ) =>
+				.filter( ( [ attributeName, binding ] ) => {
+					const source =
+						registeredSources[ binding?.source as string ];
+					return (
 						bindableAttributes?.includes( attributeName ) &&
-						registeredSources[ binding?.source as string ]
-							?.getValues
-				)
+						source?.supportsCopy === true &&
+						source.getValues
+					);
+				} )
 				.map( ( [ attributeName ] ) => attributeName ),
 		[ bindableAttributes, blockBindings, registeredSources ]
 	);
@@ -210,14 +215,14 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			! boundAttributeNames.length ||
 			isPreviewMode ||
 			blockContext.query !== undefined ||
-			blockContext.queryId !== undefined
+			blockContext.queryId !== undefined ||
+			blockContext.termQuery !== undefined
 		) {
 			return;
 		}
 		const instances = attributesForCopy.get( clientId ) ?? new Map();
 		instances.set( instanceToken, {
 			attributes,
-			computedAttributes,
 			boundAttributeNames,
 			getAttributesForCopy,
 		} );
@@ -236,9 +241,9 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		attributesForCopy,
 		blockContext.query,
 		blockContext.queryId,
+		blockContext.termQuery,
 		boundAttributeNames,
 		clientId,
-		computedAttributes,
 		getAttributesForCopy,
 		instanceToken,
 		isPreviewMode,

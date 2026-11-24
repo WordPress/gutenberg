@@ -48,11 +48,11 @@ function registerResolvedAttributes(
 				{},
 				{
 					attributes: block.attributes,
-					computedAttributes: {
+					getAttributesForCopy: () => ( {
 						...block.attributes,
 						content,
 						metadata: { name: 'Resolved metadata' },
-					},
+					} ),
 					boundAttributeNames: [ 'content' ],
 				},
 			],
@@ -308,7 +308,7 @@ describe( 'block clipboard content', () => {
 			[ item ],
 			registry,
 			attributesForCopy,
-			{ addWrapper: 'bound' }
+			{ addWrapper: true }
 		);
 		expect( html ).toContain( '<ol>' );
 		// Older editors pass the markup directly to their block parser.
@@ -334,10 +334,10 @@ describe( 'block clipboard content', () => {
 		expect(
 			parse(
 				getClipboardBlocksContent( [ item ], registry, new Map(), {
-					addWrapper: 'bound',
+					addWrapper: true,
 				} ).html
 			)[ 0 ].name
-		).toBe( 'core/list-item' );
+		).toBe( 'core/list' );
 	} );
 
 	it( 'sets both clipboard formats from the same resolved block content', () => {

@@ -145,7 +145,10 @@ function registerResolvedContent(
 				{},
 				{
 					attributes: block.attributes,
-					computedAttributes: { ...block.attributes, content },
+					getAttributesForCopy: () => ( {
+						...block.attributes,
+						content,
+					} ),
 					boundAttributeNames: [ 'content' ],
 				},
 			],

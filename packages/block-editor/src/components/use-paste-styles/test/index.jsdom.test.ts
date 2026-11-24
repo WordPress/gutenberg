@@ -96,10 +96,10 @@ function copiedListMarkup( copyWholeList = false ) {
 					{},
 					{
 						attributes: item.attributes,
-						computedAttributes: {
+						getAttributesForCopy: () => ( {
 							...item.attributes,
 							content: 'Bound item',
-						},
+						} ),
 						boundAttributeNames: [ 'content' ],
 					},
 				],
@@ -110,7 +110,7 @@ function copiedListMarkup( copyWholeList = false ) {
 		[ copyWholeList ? list : item ],
 		registry,
 		attributesForCopy,
-		{ addWrapper: 'bound' }
+		{ addWrapper: true }
 	);
 }
 

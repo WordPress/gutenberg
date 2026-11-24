@@ -31,9 +31,8 @@ export interface BlockRefsContextValue {
 /** Resolved bound attributes registered by each mounted block instance. */
 export interface BoundAttributesForCopy {
 	attributes: Block[ 'attributes' ];
-	computedAttributes: Record< string, unknown >;
 	boundAttributeNames: string[];
-	getAttributesForCopy?: () => Record< string, unknown >;
+	getAttributesForCopy: () => Record< string, unknown >;
 }
 
 export type AttributesForCopy = Map<

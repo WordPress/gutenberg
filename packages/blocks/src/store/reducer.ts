@@ -384,6 +384,9 @@ export function blockBindingsSources(
 						state[ action.name ]?.usesContext,
 						action.usesContext
 					),
+					...( action.supportsCopy === undefined
+						? {}
+						: { supportsCopy: action.supportsCopy } ),
 					getValues: action.getValues,
 					setValues: action.setValues,
 					// Only set `canUserEditValue` if `setValues` is also defined.

@@ -7,6 +7,7 @@ const CONTENT = 'content';
  */
 export default {
 	name: 'core/pattern-overrides',
+	supportsCopy: true,
 	getValues( { select, clientId, context, bindings, isForCopy } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = select( blockEditorStore );

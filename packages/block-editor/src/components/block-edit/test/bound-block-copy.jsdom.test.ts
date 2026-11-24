@@ -43,6 +43,7 @@ describe( 'copying a rendered bound block', () => {
 					select( blockEditorStore ).getSettings().clipboardTestValue,
 			} ),
 			setValues: vi.fn(),
+			supportsCopy: true,
 		};
 		registerBlockBindingsSource( source );
 		registerBlockType< {

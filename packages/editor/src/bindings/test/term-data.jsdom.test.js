@@ -58,6 +58,99 @@ describe( 'term-data bindings', () => {
 	};
 
 	describe( 'getValues', () => {
+		describe( 'clipboard values', () => {
+			function options( blockName, record, fields = bindings ) {
+				return {
+					select: ( store ) =>
+						store === coreDataStore
+							? { getEntityRecord: () => record }
+							: {
+									getBlockName: () => blockName,
+									getBlockAttributes: () => ( {
+										id: 123,
+										type: 'category',
+									} ),
+									getSelectedBlockClientId: () =>
+										'term-block',
+								},
+					context: { taxonomy: 'category', termId: 123 },
+					clientId: 'term-block',
+					bindings: fields,
+				};
+			}
+
+			it.each( [ 'core/paragraph', 'core/navigation-link' ] )(
+				'omits unavailable field labels and unknown keys when copying %s',
+				( blockName ) => {
+					const request = options( blockName, undefined );
+					expect(
+						termDataBindings.getValues( request )
+					).toMatchObject( {
+						name: 'Name',
+						link: 'Link',
+						content: 'unknown',
+					} );
+					expect(
+						termDataBindings.getValues( {
+							...request,
+							isForCopy: true,
+						} )
+					).toEqual( {} );
+				}
+			);
+
+			it.each( [ 'name', 'Name', '' ] )(
+				'preserves a genuine read-only term name equal to %j',
+				( name ) => {
+					const request = options(
+						'core/navigation-link',
+						{ name },
+						{
+							label: { args: { field: 'name' } },
+							url: { args: { field: 'link' } },
+						}
+					);
+					expect( termDataBindings.canUserEditValue( request ) ).toBe(
+						false
+					);
+					expect(
+						termDataBindings.getValues( {
+							...request,
+							isForCopy: true,
+						} )
+					).toEqual( { label: name } );
+				}
+			);
+
+			it( 'preserves available zero, empty and formatted count values while omitting a missing field', () => {
+				const request = options( 'core/paragraph', {
+					id: 0,
+					name: '',
+					parent: 0,
+					count: 0,
+				} );
+				expect(
+					termDataBindings.getValues( {
+						...request,
+						isForCopy: true,
+					} )
+				).toEqual( { id: 0, name: '', parent: 0, count: '(0)' } );
+			} );
+
+			it( 'copies genuine context term data when the entity record is unavailable', () => {
+				const request = options( 'core/paragraph', undefined, {
+					content: { args: { field: 'name' } },
+				} );
+				expect(
+					termDataBindings.getValues( {
+						...request,
+						context: { termData: { name: 'Context name' } },
+						isForCopy: true,
+					} )
+				).toEqual( { content: 'Context name' } );
+			} );
+		} );
+
 		describe( 'for regular blocks using block context', () => {
 			describe( 'when termId and taxonomy are provided in context', () => {
 				const select = ( store ) => {

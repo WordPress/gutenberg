@@ -5,10 +5,11 @@
 ### New Features
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ### Enhancements
 
--   Block Bindings: Add the optional `isForCopy` argument to `getValues` so sources can omit display placeholders from copied blocks ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+-   Block Bindings: Add the optional `supportsCopy` capability and `isForCopy` argument to `getValues` so sources can opt in to resolving copied values without saving display placeholders ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
 
 ### Internal
 

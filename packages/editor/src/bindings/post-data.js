@@ -31,6 +31,7 @@ const postDataFields = [
  */
 export default {
 	name: 'core/post-data',
+	supportsCopy: true,
 	getValues( { select, context, bindings, clientId, isForCopy } ) {
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.

@@ -53,7 +53,7 @@ export function CopyMenuItem( {
 						blocks,
 						registry,
 						attributesForCopy,
-						{ addWrapper: 'bound' }
+						{ addWrapper: true }
 					);
 		},
 		() => {

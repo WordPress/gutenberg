@@ -5,9 +5,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import {
 	createBlock,
 	getBlockType,
+	parse,
 	registerBlockType,
 	serialize,
 	unregisterBlockType,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { observableMap } from '@wordpress/compose';
@@ -15,13 +17,26 @@ import type { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { CopyMenuItem } from '../block-settings-dropdown';
 import { BlockRefs } from '../../provider/block-refs-provider';
-import { getPasteBlocks } from '../../writing-flow/utils';
+import {
+	getPasteBlocks,
+	requiresWrapperOnCopy,
+} from '../../writing-flow/utils';
 import type { BlockAttributes } from '../../../store/types';
 
-const { getBlocksByClientId, removeBlocks, notifyCopy } = vi.hoisted( () => ( {
+const {
+	getBlocksByClientId,
+	removeBlocks,
+	notifyCopy,
+	getBlockRootClientId,
+	getBlockName,
+	getBlockAttributes,
+} = vi.hoisted( () => ( {
 	getBlocksByClientId: vi.fn(),
 	removeBlocks: vi.fn(),
 	notifyCopy: vi.fn(),
+	getBlockRootClientId: vi.fn(),
+	getBlockName: vi.fn(),
+	getBlockAttributes: vi.fn(),
 } ) );
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
@@ -31,7 +46,12 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 		removeBlocks,
 	} ) ) as unknown as typeof useDispatch,
 	useRegistry: ( () => ( {
-		select: () => ( { getBlockType } ),
+		select: () => ( {
+			getBlockType,
+			getBlockRootClientId,
+			getBlockName,
+			getBlockAttributes,
+		} ),
 	} ) ) as unknown as typeof useRegistry,
 } ) );
 
@@ -99,10 +119,10 @@ describe( 'CopyMenuItem', () => {
 						{},
 						{
 							attributes: block.attributes,
-							computedAttributes: {
+							getAttributesForCopy: () => ( {
 								...block.attributes,
 								content: 'Bound text',
-							},
+							} ),
 							boundAttributeNames: [ 'content' ],
 						},
 					],
@@ -156,6 +176,11 @@ describe( 'CopyMenuItem', () => {
 
 	afterEach( () => {
 		unregisterBlockType( 'core/copy-menu-test' );
+		for ( const name of [ 'core/list', 'core/list-item' ] ) {
+			if ( getBlockType( name ) ) {
+				unregisterBlockType( name );
+			}
+		}
 		if ( clipboardDescriptor ) {
 			Object.defineProperty(
 				navigator,
@@ -341,4 +366,91 @@ describe( 'CopyMenuItem', () => {
 		expect( clipboard.writeText ).toHaveBeenCalledWith( markup );
 		expect( clipboard.write ).not.toHaveBeenCalled();
 	} );
+
+	it.each( [ 'unbound', 'unresolved', 'resolved' ] )(
+		'copies a List Item with its ordered List wrapper when its binding is %s',
+		async ( state ) => {
+			const wrapperSettings = { [ requiresWrapperOnCopy ]: true };
+			registerBlockType< {
+				content: string;
+				metadata?: BlockAttributes[ 'metadata' ];
+			} >( 'core/list-item', {
+				apiVersion: 3,
+				title: 'List Item',
+				category: 'text',
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'li' },
+					metadata: { type: 'object' },
+				},
+				...wrapperSettings,
+				save: ( { attributes } ) =>
+					createElement( 'li', null, attributes.content ),
+			} );
+			registerBlockType< { ordered: boolean } >( 'core/list', {
+				apiVersion: 3,
+				title: 'List',
+				category: 'text',
+				attributes: { ordered: { type: 'boolean' } },
+				save: ( { attributes } ) =>
+					createElement(
+						attributes.ordered ? 'ol' : 'ul',
+						getInnerBlocksProps()
+					),
+			} );
+			block = createBlock( 'core/list-item', {
+				content: 'Saved item',
+				...( state === 'unbound'
+					? {}
+					: {
+							metadata: {
+								bindings: {
+									content: { source: 'testing/copy' },
+								},
+							},
+						} ),
+			} );
+			getBlocksByClientId.mockReturnValue( [ block ] );
+			getBlockRootClientId.mockReturnValue( 'parent-list' );
+			getBlockName.mockReturnValue( 'core/list' );
+			getBlockAttributes.mockReturnValue( { ordered: true } );
+			attributesForCopy.clear();
+			if ( state !== 'unbound' ) {
+				attributesForCopy.set(
+					block.clientId,
+					new Map( [
+						[
+							{},
+							{
+								attributes: block.attributes,
+								boundAttributeNames: [ 'content' ],
+								getAttributesForCopy: () =>
+									state === 'resolved'
+										? { content: 'Resolved item' }
+										: {},
+							},
+						],
+					] )
+				);
+			}
+			const { onCopy } = renderMenuItem();
+			await waitFor( () => expect( onCopy ).toHaveBeenCalledTimes( 1 ) );
+			const pasted = parse( clipboard.writeText.mock.calls[ 0 ][ 0 ] );
+			expect( pasted ).toHaveLength( 1 );
+			expect( pasted[ 0 ] ).toMatchObject( {
+				name: 'core/list',
+				isValid: true,
+				attributes: { ordered: true },
+			} );
+			expect( pasted[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( pasted[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/list-item',
+				isValid: true,
+				attributes: {
+					content:
+						state === 'resolved' ? 'Resolved item' : 'Saved item',
+				},
+			} );
+			expect( block.attributes.content ).toBe( 'Saved item' );
+		}
+	);
 } );

@@ -52,7 +52,8 @@ export const termDataFields = [
 export default {
 	name: 'core/term-data',
 	usesContext: [ 'taxonomy', 'termId', 'termData' ],
-	getValues( { select, context, bindings, clientId } ) {
+	supportsCopy: true,
+	getValues( { select, context, bindings, clientId, isForCopy } ) {
 		const { getEntityRecord } = select( coreDataStore );
 
 		/*
@@ -95,6 +96,13 @@ export default {
 			const termDataField = termDataFields.find(
 				( field ) => field.args.field === binding.args.field
 			);
+			if (
+				isForCopy &&
+				( ! termDataField ||
+					termDataValues?.[ binding.args.field ] === undefined )
+			) {
+				continue;
+			}
 
 			if ( ! termDataField ) {
 				// If the field is unknown, return the field name.

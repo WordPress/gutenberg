@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import {
 	getBlockBindingsSource,
@@ -32,6 +32,9 @@ describe( 'Edit', () => {
 			if ( getBlockBindingsSource( 'testing/copy' ) ) {
 				unregisterBlockBindingsSource( 'testing/copy' );
 			}
+			if ( getBlockBindingsSource( 'testing/legacy' ) ) {
+				unregisterBlockBindingsSource( 'testing/legacy' );
+			}
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
@@ -48,14 +51,18 @@ describe( 'Edit', () => {
 		const bindings = { content: { source: 'testing/copy' } };
 
 		function registerBoundBlock(
-			getValues: () => Record< string, unknown > = () => ( {
+			getValues: ( options?: {
+				isForCopy?: boolean;
+			} ) => Record< string, unknown > = () => ( {
 				content: 'Resolved text',
-			} )
+			} ),
+			copySupport: { supportsCopy?: boolean } = { supportsCopy: true }
 		) {
 			registerBlockBindingsSource( {
 				name: 'testing/copy',
 				label: 'Copy test',
 				getValues,
+				...copySupport,
 			} );
 			registerBlockType( 'core/test-block', {
 				attributes: {},
@@ -147,6 +154,91 @@ describe( 'Edit', () => {
 			expect( attributesForCopy.size ).toBe( 0 );
 		} );
 
+		it.each( [ {}, { supportsCopy: false } ] )(
+			'keeps an unaware source display value out of copied attributes (%j)',
+			( copySupport ) => {
+				const getValues = vi.fn( () => ( {
+					content: 'Display placeholder',
+				} ) );
+				registerBoundBlock( getValues, copySupport );
+				const attributesForCopy = new Map();
+				const attributes = {
+					content: 'Saved fallback',
+					metadata: { bindings },
+				};
+				render(
+					<BoundEdit
+						attributesForCopy={ attributesForCopy }
+						attributes={ attributes }
+					/>
+				);
+				expect(
+					screen.getByText( 'Display placeholder' )
+				).toBeVisible();
+				const callsBeforeCopy = getValues.mock.calls.length;
+				expect(
+					getBoundAttributesForCopy(
+						{ clientId: 'bound-block', attributes },
+						attributesForCopy
+					)
+				).toBeUndefined();
+				expect( getValues ).toHaveBeenCalledTimes( callsBeforeCopy );
+				expect( attributesForCopy.size ).toBe( 0 );
+				expect( attributes.content ).toBe( 'Saved fallback' );
+			}
+		);
+
+		it( 'resolves only opted-in attributes when a block also has an unaware source', () => {
+			const getValues = vi.fn(
+				( { isForCopy }: { isForCopy?: boolean } = {} ) => ( {
+					content: isForCopy ? 'Copy value' : 'Display value',
+				} )
+			);
+			const legacyGetValues = vi.fn( () => ( {
+				text: 'Legacy placeholder',
+			} ) );
+			registerBoundBlock( getValues );
+			registerBlockBindingsSource( {
+				name: 'testing/legacy',
+				label: 'Legacy source',
+				getValues: legacyGetValues,
+			} );
+			const attributesForCopy = new Map();
+			const attributes = {
+				content: 'Saved content',
+				text: 'Saved text',
+				metadata: {
+					bindings: {
+						...bindings,
+						text: { source: 'testing/legacy' },
+					},
+				},
+			};
+			render(
+				<BoundEdit
+					attributesForCopy={ attributesForCopy }
+					attributes={ attributes }
+					bindableAttributes={ [ 'content', 'text' ] }
+				/>
+			);
+			const legacyCallsBeforeCopy = legacyGetValues.mock.calls.length;
+			expect(
+				getValues.mock.calls.some(
+					( [ options ] ) => options?.isForCopy
+				)
+			).toBe( false );
+			expect(
+				getBoundAttributesForCopy(
+					{ clientId: 'bound-block', attributes },
+					attributesForCopy
+				)
+			).toEqual( { content: 'Copy value' } );
+			expect( legacyGetValues ).toHaveBeenCalledTimes(
+				legacyCallsBeforeCopy
+			);
+			expect( attributes.text ).toBe( 'Saved text' );
+		} );
+
 		it( 'refreshes the snapshot when the block attributes change', () => {
 			registerBoundBlock();
 			const attributesForCopy = new Map();
@@ -235,6 +327,7 @@ describe( 'Edit', () => {
 			{ bindableAttributes: [] },
 			{ blockContext: { queryId: 0 } },
 			{ blockContext: { query: {} } },
+			{ blockContext: { termQuery: {} } },
 		] )(
 			'does not register an ineligible edit instance (%j)',
 			( props ) => {
