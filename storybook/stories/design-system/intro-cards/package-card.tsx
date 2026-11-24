@@ -50,7 +50,12 @@ export const PackageCard = ( {
 					<Text variant="body-md" render={ <p /> }>
 						{ children }
 					</Text>
-					<Stack direction="row" gap="lg" wrap="wrap">
+					<Text
+						variant="body-md"
+						render={
+							<Stack direction="row" gap="lg" wrap="wrap" />
+						}
+					>
 						<Link
 							href={ `./?path=/docs/${ storybookId }` }
 							target="_top"
@@ -60,7 +65,7 @@ export const PackageCard = ( {
 						<Link href={ docsHref }>
 							Read the { title } package documentation
 						</Link>
-					</Stack>
+					</Text>
 				</Stack>
 			</Card.Content>
 		</Card.Root>
