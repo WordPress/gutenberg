@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
 -   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86450](https://github.com/WordPress/gutenberg/pull/86450)).
