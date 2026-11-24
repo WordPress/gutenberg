@@ -2,7 +2,11 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isBlockElementOutsideFields,
+} from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -57,7 +61,13 @@ export default function useEditableRoot() {
 
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
-			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
+			if (
+				// Not while a block's own element outside its fields has
+				// focus, as after a press on a bullet: it is dragged from
+				// there. Still return the cleanup for editing that starts later.
+				! isBlockElementOutsideFields( activeElement ) &&
+				! setContentEditableWrapper( node, true, { focus: false } )
+			) {
 				return;
 			}
 

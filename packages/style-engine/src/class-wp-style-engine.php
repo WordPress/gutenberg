@@ -747,6 +747,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					// Set a CSS var if there is a valid preset value.
 					if ( str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 						$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
+
+						if ( ! static::is_valid_style_value( $value ) ) {
+							continue;
+						}
 					}
 					$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
 					$css_declarations[ $individual_css_property ] = $value;
