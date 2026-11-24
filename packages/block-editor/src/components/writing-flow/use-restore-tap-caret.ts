@@ -41,23 +41,11 @@ export default function useRestoreTapCaret() {
 
 		function onSelectionChange() {
 			const { activeElement } = ownerDocument;
-			if ( ! caret ) {
-				return;
-			}
-			// iOS's repeated tap either moves the caret out of the field or
-			// clears the selection while the field keeps focus. Something
-			// else that clears it, such as selecting a whole block, also
-			// moves focus away from the field.
-			const isMoved =
-				!! selection.anchorNode &&
-				! activeElement?.contains( selection.anchorNode );
-			const isCleared =
-				! selection.anchorNode && activeElement === field;
-			// TEMPORARY (debugging a flaky iOS test).
-			if ( ! selection.anchorNode && ! isCleared ) {
-				( window as any ).__iosTestLog?.( 'restore:skip-cleared' );
-			}
-			if ( isMoved || isCleared ) {
+			if (
+				caret &&
+				selection.anchorNode &&
+				! activeElement?.contains( selection.anchorNode )
+			) {
 				// TEMPORARY (debugging a flaky iOS test).
 				( window as any ).__iosTestLog?.( 'restore:before' );
 				selection.removeAllRanges();
@@ -67,14 +55,29 @@ export default function useRestoreTapCaret() {
 			}
 		}
 
+		// The repeat can also clear the selection, leaving focus in the field.
+		// Nothing else then puts the caret back, so a key would do nothing.
+		function onKeyDown() {
+			if (
+				caret &&
+				! selection.rangeCount &&
+				ownerDocument.activeElement === field
+			) {
+				// TEMPORARY (debugging a flaky iOS test).
+				( window as any ).__iosTestLog?.( 'restore:keydown' );
+				selection.addRange( caret );
+			}
+			forget();
+		}
+
 		node.addEventListener( 'focusin', onFocusIn );
 		ownerDocument.addEventListener( 'pointerdown', forget, true );
-		ownerDocument.addEventListener( 'keydown', forget, true );
+		ownerDocument.addEventListener( 'keydown', onKeyDown, true );
 		ownerDocument.addEventListener( 'selectionchange', onSelectionChange );
 		return () => {
 			node.removeEventListener( 'focusin', onFocusIn );
 			ownerDocument.removeEventListener( 'pointerdown', forget, true );
-			ownerDocument.removeEventListener( 'keydown', forget, true );
+			ownerDocument.removeEventListener( 'keydown', onKeyDown, true );
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				onSelectionChange
