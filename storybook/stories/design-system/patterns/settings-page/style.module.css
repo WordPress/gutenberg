@@ -1,10 +1,14 @@
 /*
  * Layout containment makes the frame the containing block for the fixed
  * overlays portalled into it, and clipping hides a drawer while it slides in.
+ * A fixed height makes `Page` scroll its own content, as it does in the admin,
+ * so navigating between pages of different lengths doesn't reflow the docs.
+ * Capping it at the viewport height keeps the whole example in view on short
+ * screens.
  */
 .example {
 	position: relative;
-	min-block-size: 640px;
+	block-size: min(720px, 100dvh);
 	display: flex;
 	flex-direction: column;
 	contain: layout;
