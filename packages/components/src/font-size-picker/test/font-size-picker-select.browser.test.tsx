@@ -191,13 +191,38 @@ describe( 'FontSizePickerSelect', () => {
 			expect( onChange ).toHaveBeenCalledWith( undefined, undefined );
 		} );
 
-		it( 'should call onChange when selecting the already selected preset', async () => {
+		it( 'should not call onChange when selecting the already selected preset by default', async () => {
 			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePickerSelect
 					fontSizes={ fontSizes }
 					value="16px"
+					onChange={ onChange }
+					onSelectCustom={ vi.fn() }
+					disableCustomFontSizes={ false }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Font size' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', {
+					name: 'Medium',
+					description: '16px',
+				} )
+			);
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call onChange when selecting the already selected preset with emitChangeOnReselect', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerSelect
+					fontSizes={ fontSizes }
+					value="16px"
+					emitChangeOnReselect
 					onChange={ onChange }
 					onSelectCustom={ vi.fn() }
 					disableCustomFontSizes={ false }

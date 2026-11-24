@@ -12,10 +12,12 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { PrivateFontSizePicker } from './font-size-picker';
 
 export const privateApis = {};
 lock( privateApis, {
 	ContentEditableControl,
+	FontSizePicker: PrivateFontSizePicker,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,

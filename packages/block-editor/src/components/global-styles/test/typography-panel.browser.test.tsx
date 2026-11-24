@@ -626,7 +626,7 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			} );
 		} );
 
-		it( 'activating a locally set preset again keeps the local value', async () => {
+		it( 'activating a locally set preset again does not call onChange', async () => {
 			const user = userEvent;
 			const onChange = vi.fn();
 			const value = {
@@ -642,7 +642,162 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 				screen.getByRole( 'radio', { name: 'Huge', checked: true } )
 			);
 
-			expect( onChange ).toHaveBeenCalledWith( value );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'keeps a committed inherited preset when the inherited size later changes', async () => {
+			// E.g. Tablet inherits Large from Desktop, the user selects Large
+			// on Tablet, then Desktop changes to Huge.
+			const user = userEvent;
+			const onChange = vi.fn();
+
+			const { rerender } = await renderPanel( {
+				inheritedValue: {
+					typography: { fontSize: 'var:preset|font-size|large' },
+				},
+				onChange,
+			} );
+
+			await user.click(
+				screen.getByRole( 'radio', { name: 'Large', checked: true } )
+			);
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			const committedValue = onChange.mock.calls[ 0 ][ 0 ];
+			expect( committedValue ).toEqual( {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			} );
+
+			await rerender(
+				<TypographyPanel
+					value={ committedValue }
+					inheritedValue={ {
+						typography: { fontSize: 'var:preset|font-size|huge' },
+					} }
+					settings={ baseSettings }
+					onChange={ onChange }
+					panelId="test-panel"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'radio', { checked: true } )
+			).toHaveAccessibleName( 'Large' );
+		} );
+
+		it( 'does not convert a local fixed size to the preset with the same size', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+
+			// Large is `24px`.
+			await renderPanel( {
+				value: { typography: { fontSize: '24px' } },
+				inheritedValue: {
+					typography: { fontSize: 'var:preset|font-size|huge' },
+				},
+				onChange,
+			} );
+
+			await user.click(
+				screen.getByRole( 'radio', { name: 'Large', checked: true } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'commits an inherited fixed size as the fixed size, not as the preset with the same size', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+
+			// Large is `24px`.
+			await renderPanel( {
+				inheritedValue: { typography: { fontSize: '24px' } },
+				onChange,
+			} );
+
+			await user.click(
+				screen.getByRole( 'radio', { name: 'Large', checked: true } )
+			);
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( {
+				typography: { fontSize: '24px' },
+			} );
+		} );
+
+		describe( 'with more than five presets (select)', () => {
+			const settingsWithManySizes: StyleSettings = {
+				typography: {
+					...baseSettings.typography,
+					fontSizes: {
+						theme: [
+							{ slug: 'x-small', size: '12px', name: 'X-Small' },
+							{ slug: 'small', size: '14px', name: 'Small' },
+							{ slug: 'medium', size: '18px', name: 'Medium' },
+							{ slug: 'large', size: '24px', name: 'Large' },
+							{ slug: 'x-large', size: '32px', name: 'X-Large' },
+							{ slug: 'huge', size: '42px', name: 'Huge' },
+						],
+					},
+				},
+			};
+
+			async function chooseOption( name: string ) {
+				await userEvent.click(
+					screen.getByRole( 'combobox', { name: 'Font size' } )
+				);
+				await userEvent.click(
+					await screen.findByRole( 'option', { name } )
+				);
+			}
+
+			it( 'commits the inherited preset when it is chosen again', async () => {
+				const onChange = vi.fn();
+				await renderPanel( {
+					settings: settingsWithManySizes,
+					inheritedValue: {
+						typography: { fontSize: 'var:preset|font-size|large' },
+					},
+					onChange,
+				} );
+
+				await chooseOption( 'Large' );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect( onChange ).toHaveBeenCalledWith( {
+					typography: { fontSize: 'var:preset|font-size|large' },
+				} );
+			} );
+
+			it( 'does not convert a local fixed size to the preset with the same size', async () => {
+				const onChange = vi.fn();
+				await renderPanel( {
+					settings: settingsWithManySizes,
+					value: { typography: { fontSize: '24px' } },
+					onChange,
+				} );
+
+				await chooseOption( 'Large' );
+
+				expect( onChange ).not.toHaveBeenCalled();
+			} );
+
+			it( 'keeps inheriting when Default is chosen over an inherited preset', async () => {
+				const onChange = vi.fn();
+				await renderPanel( {
+					settings: settingsWithManySizes,
+					inheritedValue: {
+						typography: { fontSize: 'var:preset|font-size|large' },
+					},
+					onChange,
+				} );
+
+				await chooseOption( 'Default' );
+
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+				expect(
+					onChange.mock.calls[ 0 ][ 0 ]?.typography?.fontSize
+				).toBeUndefined();
+			} );
 		} );
 	} );
 

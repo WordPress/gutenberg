@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import {
 	ToggleGroupControl,
@@ -7,7 +8,13 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
 import type { FontSizePickerToggleGroupProps } from './types';
 
 const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
-	const { fontSizes, value, valueMode = 'literal', onChange } = props;
+	const {
+		fontSizes,
+		value,
+		valueMode = 'literal',
+		emitChangeOnReselect = false,
+		onChange,
+	} = props;
 
 	// Find the current value based on valueMode
 	const currentValue = ( () => {
@@ -71,16 +78,23 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
 					showTooltip
 					// The group is a radio group, so activating the option
-					// that is already checked doesn't emit a change. Emit it
-					// anyway: consumers can use it to commit a value that is
-					// only displayed as selected (e.g. an inherited size).
+					// that is already checked doesn't emit a change. When the
+					// consumer opts in, emit it anyway. Read the checked state
+					// at activation time: it can differ from `value`.
 					onClick={
-						fontSize.slug === currentValue
-							? () =>
-									onChange(
-										fontSize.size as number | string,
-										fontSize
-									)
+						emitChangeOnReselect
+							? ( event: MouseEvent< HTMLButtonElement > ) => {
+									if (
+										event.currentTarget.getAttribute(
+											'aria-checked'
+										) === 'true'
+									) {
+										onChange(
+											fontSize.size as number | string,
+											fontSize
+										);
+									}
+								}
 							: undefined
 					}
 				/>

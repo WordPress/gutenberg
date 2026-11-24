@@ -1,16 +1,17 @@
 import {
 	__experimentalToolsPanelContext as ToolsPanelContext,
-	FontSizePicker,
+	type FontSizePicker,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	ToggleControl,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Notice } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, ComponentType, ReactNode } from 'react';
 import type { FontSize } from '@wordpress/global-styles-engine';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
@@ -32,6 +33,7 @@ import {
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
@@ -49,6 +51,18 @@ import type {
 	StyleValue,
 	TypographyPanelProps,
 } from './types';
+
+// The private picker can emit a change when the selected preset is
+// activated again, which commits an inherited font size.
+const { FontSizePicker: PrivateFontSizePicker } = unlock(
+	componentsPrivateApis
+) as {
+	FontSizePicker: ComponentType<
+		ComponentProps< typeof FontSizePicker > & {
+			emitChangeOnReselect?: boolean;
+		}
+	>;
+};
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -536,25 +550,21 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	// Display-without-commit interceptor: at-rest, the inner
-	// `FontSizePickerToggleGroup` fires `onChange( undefined )` when the
-	// user activates the already-preselected (inherited) chip. Treat
-	// that as the user's "accept this inherited value" affordance and
-	// commit the inherited value to local. Once committed (no longer
-	// at-rest), the same `undefined` payload represents a normal
-	// deselect, so we let it pass through unchanged. The custom-size
-	// input does not emit `undefined` on focus or activation, so this
-	// hook is correctly scoped to the ToggleGroup activation path.
-	const setFontSizeWithInheritedCommit = (
+	// While the size is inherited, the picker emits a change when the
+	// preset shown as selected is activated again, which commits it. An
+	// inherited fixed size that only matches a preset's size is committed
+	// as the fixed size, not converted to the preset.
+	const setFontSizeFromPicker = (
 		newValue?: string | number,
 		metadata?: { slug?: string }
 	) => {
-		if ( isFontSizePlaceholder && newValue === undefined && ! metadata ) {
-			if ( inheritedFontSizeSlug ) {
-				setFontSize( undefined, { slug: inheritedFontSizeSlug } );
-			} else {
-				setFontSize( inheritedFontSizeDecoded );
-			}
+		const isReselectingInheritedFixedSize =
+			isFontSizePlaceholder &&
+			! inheritedFontSizeSlug &&
+			!! metadata?.slug &&
+			String( newValue ) === String( inheritedFontSizeDecoded );
+		if ( isReselectingInheritedFixedSize ) {
+			setFontSize( inheritedFontSizeDecoded );
 			return;
 		}
 		setFontSize( newValue, metadata );
@@ -1063,10 +1073,11 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontSize }
 					panelId={ panelId }
 				>
-					<FontSizePicker
+					<PrivateFontSizePicker
 						value={ currentFontSizeSlug || fontSize }
 						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
-						onChange={ setFontSizeWithInheritedCommit }
+						emitChangeOnReselect={ isFontSizePlaceholder }
+						onChange={ setFontSizeFromPicker }
 						// The picker reads the slug, name and size of each preset.
 						fontSizes={
 							mergedFontSizes as ComponentProps<

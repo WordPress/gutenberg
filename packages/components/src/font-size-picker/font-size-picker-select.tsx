@@ -15,7 +15,13 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 };
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
-	const { fontSizes, value, valueMode = 'literal', onChange } = props;
+	const {
+		fontSizes,
+		value,
+		valueMode = 'literal',
+		emitChangeOnReselect = false,
+		onChange,
+	} = props;
 
 	useEnableWpCompatOverlaySlot();
 	const descriptionId = useInstanceId(
@@ -84,10 +90,15 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				onValueChange={ ( item ) => {
 					// Re-selecting Default is a no-op unless it stands in for a
 					// custom value that still needs clearing. Re-selecting a
-					// preset emits it again, so consumers can commit a value
-					// that is only displayed as selected (e.g. an inherited size).
-					if ( item?.value === null && value === undefined ) {
-						return;
+					// preset is a no-op unless the consumer opted in.
+					if ( item?.value === selectedOption.value ) {
+						const isNoop =
+							item?.value === null
+								? value === undefined
+								: ! emitChangeOnReselect;
+						if ( isNoop ) {
+							return;
+						}
 					}
 					const matchingFontSize = fontSizes.find(
 						( fontSize ) => fontSize.slug === item?.value

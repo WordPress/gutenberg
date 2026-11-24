@@ -118,7 +118,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		} );
 
-		it( 'should call onChange when clicking the already selected option', async () => {
+		it( 'should not call onChange when clicking the already selected option by default', async () => {
 			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
@@ -130,17 +130,34 @@ describe( 'FontSizePickerToggleGroup', () => {
 				/>
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call onChange when clicking the already selected option with emitChangeOnReselect', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					value="large"
+					valueMode="slug"
+					emitChangeOnReselect
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( '20px', fontSizes[ 2 ] );
 		} );
 
-		it( 'should call onChange when activating the already selected option with the keyboard', async () => {
+		it( 'should call onChange when activating the already selected option with the keyboard with emitChangeOnReselect', async () => {
 			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
 					value="20px"
+					emitChangeOnReselect
 					onChange={ onChange }
 				/>
 			);
@@ -153,7 +170,7 @@ describe( 'FontSizePickerToggleGroup', () => {
 			expect( onChange ).toHaveBeenCalledWith( '20px', fontSizes[ 2 ] );
 		} );
 
-		it( 'should call onChange only once when selecting a different option', async () => {
+		it( 'should call onChange only once when selecting a different option with emitChangeOnReselect', async () => {
 			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
@@ -161,11 +178,54 @@ describe( 'FontSizePickerToggleGroup', () => {
 					fontSizes={ fontSizes }
 					value="medium"
 					valueMode="slug"
+					emitChangeOnReselect
 					onChange={ onChange }
 				/>
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should call onChange once per click when value is not updated, with emitChangeOnReselect', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					value="small"
+					valueMode="slug"
+					emitChangeOnReselect
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			expect( onChange ).toHaveBeenLastCalledWith(
+				'12px',
+				fontSizes[ 0 ]
+			);
+		} );
+
+		it( 'should call onChange for each click on the same option without a value, with emitChangeOnReselect', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					emitChangeOnReselect
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
+			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 2 );
+			expect( onChange ).toHaveBeenNthCalledWith(
+				2,
+				'20px',
+				fontSizes[ 2 ]
+			);
 		} );
 	} );
 

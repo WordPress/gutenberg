@@ -1,5 +1,9 @@
 import clsx from 'clsx';
-import type { ForwardedRef } from 'react';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	RefAttributes,
+} from 'react';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef } from '@wordpress/element';
@@ -12,7 +16,7 @@ import {
 	parseQuantityAndUnitFromRawValue,
 	useCustomUnits,
 } from '../unit-control';
-import type { FontSizePickerProps } from './types';
+import type { FontSizePickerProps, PrivateFontSizePickerProps } from './types';
 import BaseControl from '../base-control';
 import { HStack } from '../h-stack';
 import styles from './style.module.scss';
@@ -25,13 +29,14 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 const MAX_TOGGLE_GROUP_SIZES = 5;
 
 const UnforwardedFontSizePicker = (
-	props: FontSizePickerProps,
+	props: PrivateFontSizePickerProps,
 	ref: ForwardedRef< any >
 ) => {
 	const {
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
+		emitChangeOnReselect = false,
 		onChange,
 		units: unitsProp = DEFAULT_UNITS,
 		value,
@@ -153,6 +158,7 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
+						emitChangeOnReselect={ emitChangeOnReselect }
 						disableCustomFontSizes={ disableCustomFontSizes }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
@@ -172,6 +178,7 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
+						emitChangeOnReselect={ emitChangeOnReselect }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined, selectedItem );
@@ -274,7 +281,15 @@ const UnforwardedFontSizePicker = (
 	);
 };
 
-export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
-FontSizePicker.displayName = 'FontSizePicker';
+/**
+ * Same component as `FontSizePicker`, typed with props that aren't public
+ * yet. Exported through `privateApis`.
+ */
+export const PrivateFontSizePicker = forwardRef( UnforwardedFontSizePicker );
+PrivateFontSizePicker.displayName = 'FontSizePicker';
+
+export const FontSizePicker: ForwardRefExoticComponent<
+	FontSizePickerProps & RefAttributes< any >
+> = PrivateFontSizePicker;
 
 export default FontSizePicker;

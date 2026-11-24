@@ -81,6 +81,21 @@ export type FontSizePickerProps = Pick<
 	__nextHasNoMarginBottom?: boolean;
 };
 
+/**
+ * Props of the private `FontSizePicker`, exported through `privateApis`.
+ */
+export type PrivateFontSizePickerProps = FontSizePickerProps & {
+	/**
+	 * If `true`, activating the preset that is already selected calls
+	 * `onChange` again with that preset. Useful when `value` is only a
+	 * fallback the consumer displays (e.g. an inherited size), so the user
+	 * can commit it by activating it.
+	 *
+	 * @default false
+	 */
+	emitChangeOnReselect?: boolean;
+};
+
 export type FontSize = {
 	/**
 	 * The property `size` contains a number with the font size value, in `px` or
@@ -106,8 +121,8 @@ export type FontSize = {
 };
 
 export type FontSizePickerSelectProps = Pick<
-	FontSizePickerProps,
-	'value' | 'valueMode'
+	PrivateFontSizePickerProps,
+	'value' | 'valueMode' | 'emitChangeOnReselect'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	disableCustomFontSizes: NonNullable<
@@ -128,8 +143,8 @@ export type FontSizePickerSelectOption = {
 };
 
 export type FontSizePickerToggleGroupProps = Pick<
-	FontSizePickerProps,
-	'value' | 'valueMode'
+	PrivateFontSizePickerProps,
+	'value' | 'valueMode' | 'emitChangeOnReselect'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: (
