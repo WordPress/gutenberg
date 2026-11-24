@@ -4,7 +4,7 @@
  *
  * While the setting is on, publishing a new page adds a link for it to the
  * menu, the way classic menus do with their "Automatically add new top-level
- * pages" option. A top-level page is appended to the menu; a child page is
+ * pages" option. A top-level page is added to the menu; a child page is
  * nested under its parent's link when the menu has one, which turns that link
  * into a submenu. Existing items are never reordered, renamed or removed.
  *
