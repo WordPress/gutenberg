@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
 -   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
 -   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#87087](https://github.com/WordPress/gutenberg/pull/87087)).
