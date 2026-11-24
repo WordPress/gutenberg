@@ -47,6 +47,9 @@ const { actions } = store(
 				ctx.isSearchInputVisible = false;
 			},
 			handleSearchKeydown: withSyncEvent( ( event ) => {
+				if ( event?.isComposing || event?.keyCode === 229 ) {
+					return;
+				}
 				const { ref } = getElement();
 				// If Escape close the menu.
 				if ( event?.key === 'Escape' ) {
