@@ -42,14 +42,7 @@
 	"dependencies": {
 		"@tanstack/history": "^1.162.5",
 		"@tanstack/react-router": "^1.170.46",
-		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis"
-	},
-	"devDependencies": {
-		"@testing-library/dom": "^10.4.2",
-		"@testing-library/jest-dom": "^7.0.1",
-		"@testing-library/react": "^16.3.3",
-		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -37,8 +37,6 @@ function MyRoute() {
 }
 ```
 
-Unlike TanStack Router's default, `Link` is active only when its path and query string match the current URL exactly.
-
 ### Private API
 
 The boot package uses private APIs for router setup. These should not be used by individual routes.

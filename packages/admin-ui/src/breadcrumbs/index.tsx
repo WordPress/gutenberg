@@ -58,7 +58,12 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 							render={
 								<Link
 									tone="neutral"
-									render={ <RouterLink to={ item.to } /> }
+									render={
+										<RouterLink
+											to={ item.to }
+											activeOptions={ { exact: true } }
+										/>
+									}
 								/>
 							}
 						>
@@ -84,7 +89,12 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 									// when the URL matches it exactly, but the
 									// last item is always the current page.
 									aria-current="page"
-									render={ <RouterLink to={ lastItem.to } /> }
+									render={
+										<RouterLink
+											to={ lastItem.to }
+											activeOptions={ { exact: true } }
+										/>
+									}
 								/>
 							}
 						>

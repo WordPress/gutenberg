@@ -255,13 +255,20 @@ function RouterNavigationLink( {
 	href,
 	...props
 }: ComponentProps< 'a' > & { href: string } ) {
-	return <RouterLink to={ href } { ...props } />;
+	return (
+		<RouterLink
+			to={ href }
+			// By default, the router also marks links to parent paths, like
+			// Overview, with `aria-current="page"`.
+			activeOptions={ { exact: true } }
+			{ ...props }
+		/>
+	);
 }
 
 /**
  * Demonstrates `components.link` with the router link from
- * `@wordpress/route`. The sections are nested pages, and only the current one
- * is marked as current.
+ * `@wordpress/route`.
  */
 export const WithRouterNavigation: Story = {
 	decorators: [ withRouter ],

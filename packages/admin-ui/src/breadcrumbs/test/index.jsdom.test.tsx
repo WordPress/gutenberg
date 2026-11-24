@@ -10,9 +10,13 @@ vi.mock( import( '@wordpress/route' ), async ( importOriginal ) => {
 		...original,
 		Link: ( ( {
 			to,
+			activeOptions,
 			children,
 			...props
-		}: ComponentProps< 'a' > & { to: string } ) => (
+		}: ComponentProps< 'a' > & {
+			to: string;
+			activeOptions?: unknown;
+		} ) => (
 			<a href={ to } { ...props }>
 				{ children }
 			</a>

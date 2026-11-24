@@ -1,5 +1,6 @@
 import { useRouter } from '@tanstack/react-router';
 export {
+	Link,
 	notFound,
 	redirect,
 	useLinkProps,
@@ -18,7 +19,6 @@ export type {
 	ToOptions,
 	UseNavigateResult,
 } from '@tanstack/react-router';
-export { Link } from './link';
 export { privateApis } from './private-apis';
 
 /**

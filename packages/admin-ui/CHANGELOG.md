@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Breadcrumbs`: A last item with a `to` link now has `aria-current="page"` ([#87050](https://github.com/WordPress/gutenberg/pull/87050)).
+-   `Breadcrumbs`: Only the current page has `aria-current="page"`. Before, links to parent pages had it too, and a last item with a `to` link did not have it ([#87050](https://github.com/WordPress/gutenberg/pull/87050)).
 
 ### Internal
 
