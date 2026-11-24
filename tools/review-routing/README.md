@@ -23,7 +23,7 @@ Ask about one kind of change in each file. A question that combines several cond
 
 ### Reference data
 
-The model knows only what the question and the pull request tell it. To give it reference data, such as a list of names that changes as the project grows, add a TypeScript module with the same name and the `.mts` extension next to the routing file. Its default export takes no arguments and returns an object:
+The model knows only what the question and the pull request tell it. To give it reference data, such as a list of names that changes as the project grows, add a TypeScript script file with the same name and the `.mts` extension next to the routing file. Its default export takes no arguments and returns a JSON-serializable object:
 
 ```ts
 export default async function () {
