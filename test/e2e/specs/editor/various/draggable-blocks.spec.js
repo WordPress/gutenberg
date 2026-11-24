@@ -684,6 +684,63 @@ test.describe( 'Draggable block', () => {
 		await expect( editorCanvas ).toHaveCount( 0 );
 	} );
 
+	test( 'can drag a block from outside its fields while editing text (@webkit)', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Text' },
+		} );
+		await editor.insertBlock( { name: 'core/table' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph', exact: true } )
+			.click();
+		await expect(
+			editor.canvas.getByRole( 'textbox', {
+				name: 'Editor canvas',
+				exact: true,
+			} )
+		).toHaveCount( 1 );
+
+		const table = editor.canvas.getByRole( 'document', {
+			name: 'Block: Table',
+			exact: true,
+		} );
+		const tableBox = await table.boundingBox();
+		const paragraphBox = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph', exact: true } )
+			.boundingBox();
+
+		// The table's placeholder, outside its inputs.
+		await page.mouse.move( tableBox.x + 4, tableBox.y + 4 );
+		await expect
+			.poll( () =>
+				table.evaluate(
+					( element ) =>
+						element.ownerDocument.defaultView.getComputedStyle(
+							element,
+							'::after'
+						).outlineStyle
+				)
+			)
+			.toBe( 'solid' );
+		await page.mouse.down();
+		await dragTo(
+			page,
+			paragraphBox.x + paragraphBox.width / 2,
+			paragraphBox.y + 2
+		);
+		await page.mouse.up();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/table' },
+				{ name: 'core/paragraph', attributes: { content: 'Text' } },
+			] );
+	} );
+
 	test( 'can drag a multi-selection by dragging inside a selected block', async ( {
 		editor,
 		page,
