@@ -16,7 +16,7 @@ if ( class_exists( 'WP_Theme_JSON_Sanitizer_Gutenberg' ) ) {
  *
  * This class is for internal core usage and is not supposed to be used by extenders (plugins and/or themes).
  * This is a low-level API that may need to do breaking changes. Please,
- * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
+ * use gutenberg_validate_theme_json() instead.
  *
  * @since 7.3.0
  * @access private

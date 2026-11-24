@@ -5,7 +5,7 @@
  *
  * @package gutenberg
  *
- * @since 7.2.0
+ * @since 7.3.0
  */
 class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 
