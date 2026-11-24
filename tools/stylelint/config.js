@@ -23,6 +23,18 @@ const FONT_SIZE_VARIABLE_REPLACEMENTS = {
 	'2x-large': 'var(--wpds-typography-font-size-2xl)',
 };
 
+const FONT_LINE_HEIGHT_VARIABLE =
+	/\$font[-_]line[-_]height[-_](x[-_]small|small|medium|large|x[-_]large|2x[-_]large)(?![\w-])/;
+
+const FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS = {
+	'x-small': 'var(--wpds-typography-line-height-xs)',
+	small: 'var(--wpds-typography-line-height-sm)',
+	medium: 'var(--wpds-typography-line-height-md)',
+	large: 'var(--wpds-typography-line-height-lg)',
+	'x-large': 'var(--wpds-typography-line-height-xl)',
+	'2x-large': 'var(--wpds-typography-line-height-2xl)',
+};
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -42,6 +54,7 @@ module.exports = {
 					'/\\$font-weight-medium/',
 					`/${ FONT_FAMILY_VARIABLE.source }/`,
 					`/${ FONT_SIZE_VARIABLE.source }/`,
+					`/${ FONT_LINE_HEIGHT_VARIABLE.source }/`,
 				],
 				cursor: [ 'pointer' ],
 				'flex-direction': [ '/^(row|column)-reverse/' ],
@@ -78,6 +91,12 @@ module.exports = {
 							? `$font-size-${ size }`
 							: '$default-font-size';
 						return `Avoid using the \`${ variable }\` Sass variable. Use \`${ FONT_SIZE_VARIABLE_REPLACEMENTS[ size ?? 'medium' ] }\` instead.`;
+					}
+					const [ , lineHeight ] =
+						value.match( FONT_LINE_HEIGHT_VARIABLE ) ?? [];
+					if ( lineHeight ) {
+						const size = lineHeight.replace( /_/g, '-' );
+						return `Avoid using the \`$font-line-height-${ size }\` Sass variable. Use \`${ FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS[ size ] }\` instead.`;
 					}
 					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are being removed from the components package.`;
 				},

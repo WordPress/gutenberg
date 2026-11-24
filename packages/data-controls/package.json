@@ -46,7 +46,7 @@
 		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"devDependencies": {
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

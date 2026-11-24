@@ -216,6 +216,7 @@ export type ListViewBranchProps = {
 	parentId?: string | null;
 	isSyncedBranch?: boolean;
 	showAppender?: boolean;
+	isLastBranch?: boolean;
 };
 
 export type ListViewBlockProps = {

@@ -32,7 +32,7 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
 	$settings = array(
 		'html_regexp'                        => '/<\/?[a-z][^>]*?>/i',
 		'html_comment_regexp'                => '/<!--[\s\S]*?-->/',
-		'space_regexp'                       => '/&nbsp;|&#160;/i',
+		'space_regexp'                       => "/&nbsp;|&#160;|[\x{00A0}\x{2000}-\x{200A}\x{202F}\x{205F}]/iu",
 		'html_entity_regexp'                 => '/&\S+?;/',
 		'connector_regexp'                   => "/--|\x{2014}/u",
 		'remove_regexp'                      => "/[\x{0021}-\x{002F}\x{003A}-\x{0040}\x{005B}-\x{0060}\x{007B}-\x{007E}\x{0080}-\x{00BF}\x{00D7}\x{00F7}\x{2000}-\x{2BFF}\x{2E00}-\x{2E7F}]/u",
