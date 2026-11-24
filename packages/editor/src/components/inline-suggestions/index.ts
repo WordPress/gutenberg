@@ -119,6 +119,7 @@ export {
 export type { EditRefusal } from './reconcile-edit';
 export {
 	analyzeFormatEdit,
+	findAdditionFormatting,
 	planFormatMarkers,
 	applyFormatPlan,
 } from './reconcile-format';
