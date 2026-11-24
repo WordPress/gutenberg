@@ -119,6 +119,7 @@ body.is-dragging-metaboxes {
 	.order-lower-indicator::before,
 	.toggle-indicator::before {
 		display: inline-block;
+		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
 		font: 400 20px/1 dashicons;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
