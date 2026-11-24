@@ -26,7 +26,7 @@ function createNavigationLinks( pages = [] ) {
 				id,
 				label:
 					// translators: displayed when a page has an empty title.
-					title.rendered.trim() !== ''
+					title?.rendered?.trim() !== ''
 						? title.rendered
 						: __( '(no title)' ),
 				url,

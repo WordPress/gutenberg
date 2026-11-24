@@ -307,6 +307,14 @@ describe( 'blocks that detach on edit', () => {
 		} );
 	} );
 
+	it( 'leave a multi-selection that starts on them off the block before them', () => {
+		t.dispatch.multiSelect( t.ids.list, t.ids.c );
+		t.dispatch.moveBlocksToPosition( [ t.ids.y ], t.ids.list, '', 0 );
+
+		expect( t.select.getBlock( t.ids.list ) ).toBeNull();
+		expect( t.select.getSelectionStart().clientId ).not.toBe( t.ids.a );
+	} );
+
 	it( 'reports the blocks the last change detached, until the next change', () => {
 		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'X' } );
 

@@ -3529,10 +3529,12 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 				// Removing an inner block selects the block itself when no
 				// block is before it. Select what removing the block would,
 				// as `selectPreviousBlock` does.
+				const { selectionStart, selectionEnd } = nextState.selection;
 				const blockToSelect =
 					siblingClientIds[ index - 1 ] ?? rootClientId;
 				if (
-					nextState.selection.selectionStart.clientId === clientId &&
+					selectionStart.clientId === clientId &&
+					selectionEnd.clientId === clientId &&
 					blockToSelect
 				) {
 					steps.push( {
