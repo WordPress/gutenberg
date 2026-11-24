@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
 ## 0.45.0 (2026-11-18)
 
 ### New Features
