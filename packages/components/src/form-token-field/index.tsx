@@ -446,8 +446,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		collapseSuggestionsList( event );
 		// Only prevent the default behavior while the suggestions list is
 		// shown, so that a parent dialog (e.g. `Modal`, `Popover`) can close
-		// when the list is already collapsed. `isExpanded` still holds the
-		// value from before the collapse.
+		// when the list is already collapsed. Also stop propagation then,
+		// because some dialogs (e.g. the `@wordpress/ui` `Dialog`) do not
+		// check `defaultPrevented`. `isExpanded` still holds the value from
+		// before the collapse.
+		if ( isExpanded ) {
+			event.stopPropagation();
+		}
 		return isExpanded;
 	}
 

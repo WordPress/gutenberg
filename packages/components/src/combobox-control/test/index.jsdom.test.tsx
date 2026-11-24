@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
+import { Dialog } from '@wordpress/ui';
 import _ComboboxControl from '..';
 import Dropdown from '../../dropdown';
 import Modal from '../../modal';
@@ -158,6 +159,93 @@ describe( 'ComboboxControl Escape key', () => {
 
 		await user.keyboard( '[Escape]' );
 		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes the suggestions list first, and then a parent `@wordpress/ui` Dialog', async () => {
+		const user = userEvent.setup();
+		const onOpenChange = vi.fn();
+		render(
+			<Dialog.Root open onOpenChange={ onOpenChange }>
+				<Dialog.Popup>
+					<Dialog.Title>Dialog</Dialog.Title>
+					<ComboboxControl
+						options={ timezones }
+						label={ defaultLabelText }
+					/>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+		const input = await screen.findByRole( 'combobox', {
+			name: defaultLabelText,
+		} );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( onOpenChange ).not.toHaveBeenCalled();
+
+		await user.keyboard( '[Escape]' );
+		expect( onOpenChange ).toHaveBeenCalledTimes( 1 );
+		expect( onOpenChange ).toHaveBeenCalledWith( false, expect.anything() );
+	} );
+
+	it( 'closes a parent Modal when Escape is pressed on the Reset button', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+					allowReset
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		await user.keyboard( '[Enter]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+		// `Modal` constrains tabbing, which finds no tabbable elements in
+		// jsdom, so move focus to the Reset button directly.
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		act( () => resetButton.focus() );
+		expect( resetButton ).toHaveFocus();
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'resets the value when Enter is pressed on the Reset button in a Modal', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		const onChange = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+					onChange={ onChange }
+					allowReset
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		await user.keyboard( '[Enter]' );
+		expect( onChange ).toHaveBeenLastCalledWith( timezones[ 0 ].value );
+
+		// `Modal` constrains tabbing, which finds no tabbable elements in
+		// jsdom, so move focus to the Reset button directly.
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		act( () => resetButton.focus() );
+		await user.keyboard( '[Enter]' );
+		expect( onChange ).toHaveBeenLastCalledWith( null );
+		expect( onRequestClose ).not.toHaveBeenCalled();
 	} );
 
 	it( 'closes the suggestions list first, and then a parent Dropdown', async () => {
