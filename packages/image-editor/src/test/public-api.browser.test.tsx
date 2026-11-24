@@ -5,6 +5,7 @@ import { useEffect, useState } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
 import {
 	ImageEditorCanvas,
+	applyImageEdit,
 	createImageEditorState,
 	exportImage,
 	getOutputSize,
@@ -153,6 +154,55 @@ describe( 'the public API', () => {
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
 		expect( getImageEdit( controller.state ) ).toEqual( {} );
+	} );
+
+	it( 'shows an edit applied from code', async () => {
+		// The left half of the turned image: 300 by 1200 pixels.
+		const edit = {
+			rotation: 90,
+			crop: { x: 0, y: 0, width: 0.5, height: 1 },
+		};
+		const applied = applyImageEdit(
+			createImageEditorState( { image: IMAGE } ),
+			edit
+		);
+		if ( ! ( 'state' in applied ) ) {
+			throw new Error( `Rejected as ${ applied.rejected }` );
+		}
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		await render(
+			<ConsumerEditor
+				onController={ onController }
+				initialState={ applied.state }
+			/>
+		);
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+
+		expect( getImageEdit( controller.state ) ).toEqual( {
+			rotation: 90,
+			crop: {
+				x: expect.closeTo( 0 ),
+				y: expect.closeTo( 0 ),
+				width: expect.closeTo( 0.5 ),
+				height: expect.closeTo( 1 ),
+			},
+		} );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		const tooltip = await screen.findByTestId(
+			'image-editor-dimensions-tooltip'
+		);
+		expect( tooltip ).toHaveTextContent( 'W: 300px H: 1200px' );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
 	} );
 
 	it( 'starts with the crop locked to a ratio', async () => {
