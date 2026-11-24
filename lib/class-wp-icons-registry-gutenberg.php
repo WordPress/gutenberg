@@ -45,6 +45,7 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'clip-rule',
 				'd',
 				'opacity',
+				'fill-opacity',
 				'transform',
 			),
 			$stroke_attributes
@@ -55,6 +56,8 @@ function gutenberg_get_allowed_icon_svg_tags(): array {
 				'fill-rule',
 				'clip-rule',
 				'points',
+				'opacity',
+				'fill-opacity',
 				'transform',
 				'focusable',
 			),

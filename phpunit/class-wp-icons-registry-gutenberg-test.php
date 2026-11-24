@@ -483,9 +483,17 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'input'    => '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
 				'expected' => '<svg><path d="M0 0" fill-rule="evenodd" clip-rule="evenodd" opacity="0.4" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
 			),
+			'allows fill opacity on path'                  => array(
+				'input'    => '<svg><path d="M0 0" fill-opacity="0.4" /></svg>',
+				'expected' => '<svg><path d="M0 0" fill-opacity="0.4" /></svg>',
+			),
 			'allows clip rule and stroke on polygon'       => array(
 				'input'    => '<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
 				'expected' => '<svg><polygon points="0,0 1,1" clip-rule="evenodd" stroke="currentColor" vector-effect="non-scaling-stroke" /></svg>',
+			),
+			'allows opacity and fill opacity on polygon'   => array(
+				'input'    => '<svg><polygon points="0,0 1,1" opacity="0.4" fill-opacity="0.4" /></svg>',
+				'expected' => '<svg><polygon points="0,0 1,1" opacity="0.4" fill-opacity="0.4" /></svg>',
 			),
 			'allows rect'                                  => array(
 				'input'    => '<svg><rect x="4" y="5" width="16" height="14" rx="2" ry="2" fill="currentColor" stroke="currentColor" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
@@ -495,7 +503,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'input'    => '<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
 				'expected' => '<svg><circle cx="12" cy="12" r="3" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" transform="rotate(45)" vector-effect="non-scaling-stroke" /></svg>',
 			),
-			'strips opacity on elements other than path'   => array(
+			'strips opacity on svg and rect'               => array(
 				'input'    => '<svg opacity="0.4"><rect width="1" height="1" opacity="0.4" /></svg>',
 				'expected' => '<svg><rect width="1" height="1" /></svg>',
 			),
