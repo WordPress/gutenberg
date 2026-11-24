@@ -1813,7 +1813,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 								),
 								':hover'    => array(
 									'transform' => array(
-										'rotate' => '20deg',
+										'rotate'    => '20deg',
+										'translate' => array( 'x' => '10px' ),
 									),
 								),
 							),
@@ -1828,6 +1829,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'color:#00ff00 !important;', $actual_stylesheet );
 		$this->assertStringNotContainsString( 'rotate', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'translate', $actual_stylesheet );
 	}
 
 	/**
@@ -2021,6 +2023,154 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'<div class="wp-block-group"><p>Text</p></div>',
 				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
 				'@media (width <= 480px){.%s{rotate:0 !important;}}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that an offset in a state outputs a custom property for each axis it
+	 * sets and the `translate` property, combined with a rotation, under the
+	 * block's transform feature selector or its root selector.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 *
+	 * @dataProvider data_translation_states
+	 *
+	 * @param string $block_name    Block name.
+	 * @param string $block_content Rendered block content.
+	 * @param array  $style         Block style attribute.
+	 * @param string $expected_css  Expected CSS, with `%s` for the state class.
+	 */
+	public function test_translation_state_generates_translate_css( $block_name, $block_content, $style, $expected_css ) {
+		$actual = gutenberg_render_block_states_support(
+			$block_content,
+			array(
+				'blockName' => $block_name,
+				'attrs'     => array( 'style' => $style ),
+			)
+		);
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( sprintf( $expected_css, $matches[0] ?? '' ), $actual_stylesheet );
+		$this->assertStringNotContainsString( 'transform', $actual_stylesheet );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_translation_states() {
+		$button = '<div class="wp-block-button"><a class="wp-block-button__link">Click</a></div>';
+
+		return array(
+			'hover'          => array(
+				'core/button',
+				$button,
+				array( ':hover' => array( 'transform' => array( 'translate' => array( 'y' => '-4px' ) ) ) ),
+				'.%s .wp-block-button__link:hover{--wp--style--translate-y:-4px !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}',
+			),
+			'hover viewport' => array(
+				'core/button',
+				$button,
+				array(
+					'@mobile' => array(
+						':hover' => array(
+							'transform' => array(
+								'rotate'    => '2deg',
+								'translate' => array( 'x' => '1rem' ),
+							),
+						),
+					),
+				),
+				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:2deg !important;--wp--style--translate-x:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
+			),
+			'viewport'       => array(
+				'core/group',
+				'<div class="wp-block-group"><p>Text</p></div>',
+				array(
+					'@mobile' => array(
+						'transform' => array(
+							'translate' => array(
+								'x' => '0',
+								'y' => '10%',
+							),
+						),
+					),
+				),
+				'@media (width <= 480px){.%s{--wp--style--translate-x:0 !important;--wp--style--translate-y:10%% !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a viewport offset sets only its own axis, so the other axis
+	 * still comes from the block's default offset or Global Styles.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 *
+	 * @dataProvider data_translation_state_sets_only_its_axis
+	 *
+	 * @param array  $style        Block style attribute.
+	 * @param string $expected_css Expected CSS, with `%s` for the state class.
+	 */
+	public function test_translation_state_sets_only_its_axis( $style, $expected_css ) {
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/group' => array(
+								'transform' => array( 'translate' => array( 'x' => '3rem' ) ),
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$actual = gutenberg_render_block_states_support(
+				'<div class="wp-block-group"><p>Text</p></div>',
+				array(
+					'blockName' => 'core/group',
+					'attrs'     => array( 'style' => $style ),
+				)
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertSame(
+			sprintf( $expected_css, $matches[0] ?? '' ),
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_translation_state_sets_only_its_axis() {
+		return array(
+			'over the block default' => array(
+				array(
+					'transform' => array( 'translate' => array( 'x' => '1px' ) ),
+					'@mobile'   => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ),
+				),
+				'@media (width <= 480px){.%s{--wp--style--translate-y:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
+			),
+			'over Global Styles'     => array(
+				array( '@mobile' => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ) ),
+				'@media (width <= 480px){.%s{--wp--style--translate-y:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 		);
 	}
