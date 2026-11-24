@@ -27,7 +27,7 @@ function createFileBlock( media: MediaItem ): Block {
 	const isPdf =
 		media.mime_type === 'application/pdf' ||
 		getFilename( media.url )?.toLowerCase().endsWith( '.pdf' );
-	return createBlock( 'core/file', {
+	const block = createBlock( 'core/file', {
 		id: media.id || undefined,
 		href: media.url,
 		fileName: title || getFilename( media.url ),
@@ -37,6 +37,11 @@ function createFileBlock( media: MediaItem ): Block {
 		downloadButtonText: _x( 'Download', 'button label' ),
 		displayPreview: isPdf || undefined,
 	} );
+	// Links the download button to the file name through `aria-describedby`.
+	// It is built from the block's `clientId`, which only exists once the
+	// block is created.
+	block.attributes.fileId = `wp-block-file--media-${ block.clientId }`;
+	return block;
 }
 
 /**

@@ -1093,6 +1093,7 @@ test.describe( 'insert a file from inserter', () => {
 					id: uploadedFile.id,
 					href: uploadedFile.source_url,
 					fileName: uploadedFile.title.raw,
+					fileId: expect.stringMatching( /^wp-block-file--media-/ ),
 					displayPreview: true,
 				},
 			},
