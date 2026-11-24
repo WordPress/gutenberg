@@ -19,7 +19,7 @@ function AuthorLabel( { item }: { item: AuthorItem } ) {
 	return (
 		<Stack direction="row" gap="xs" align="center">
 			{ item.avatar ? (
-				<AuthorAvatar src={ item.avatar } />
+				<AuthorAvatar src={ item.avatar } name={ item.label } />
 			) : (
 				<div className={ styles.icon }>
 					<Icon icon={ authorIcon } />
