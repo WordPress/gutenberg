@@ -1,6 +1,4 @@
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
-@use "../utils/theme-variables" as *;
 
 .tab-list {
 	display: flex;
@@ -152,7 +150,7 @@
 		position: absolute;
 		z-index: -1;
 		pointer-events: none;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 
 		// Animation
 		opacity: 0;
@@ -165,7 +163,7 @@
 	// Only keyboard focus draws an outline, which forced colors mode keeps,
 	// so a hovered tab does not look focused there.
 	&[data-focus-visible]::after {
-		outline: var(--wp-admin-border-width-focus) solid $components-color-accent;
+		outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus);
 		opacity: 1;
 	}
 
