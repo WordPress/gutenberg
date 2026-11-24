@@ -57,7 +57,9 @@ export const PackageCard = ( {
 						>
 							Learn more about { title }
 						</Link>
-						<Link href={ docsHref }>Developer documentation</Link>
+						<Link href={ docsHref }>
+							Read the { title } package documentation
+						</Link>
 					</Stack>
 				</Stack>
 			</Card.Content>
