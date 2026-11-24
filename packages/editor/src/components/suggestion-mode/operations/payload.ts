@@ -24,6 +24,10 @@
  *                      (`inline-suggestion`), for the summary once the
  *                      marker is gone. The second is a replacement's
  *                      replaced text.
+ *   - `textBeforeHTML` /
+ *     `textAfterHTML`  Never stored: the proposed text of an addition in its
+ *                      neighbor's formatting and in its own, resolved from
+ *                      the marker so the summary can name the difference.
  *   - `before`/`after` The baseline and proposed values (`attribute-set`).
  *   - `excerpt`        The start of the block's text, plain and at most
  *                      `BLOCK_EXCERPT_MAX_CHARS` long (`block-remove`,
