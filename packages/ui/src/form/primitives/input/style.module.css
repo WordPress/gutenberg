@@ -3,30 +3,24 @@
 
 	@layer components {
 		.input {
-			--_gcd-input-padding-start: var(--wp-ui-input-layout-padding-inline, 0px);
-			--_gcd-input-padding-end: var(--wp-ui-input-layout-padding-inline, 0px);
+			/*
+			 * Padding on the prefix side is one step tighter when a prefix is
+			 * present. Sides are physical and follow the layout's direction,
+			 * not the input's: `tel`, `email` and `url` fields stay LTR in RTL
+			 * layouts, where the prefix sits on the right.
+			 */
+			--_input-padding-prefix-side: var(--wp-ui-input-layout-padding-inline, 0px);
+			--_input-padding-suffix-side: var(--wp-ui-input-layout-padding-inline, 0px);
+			--_input-padding-left: var(--_input-padding-prefix-side);
+			--_input-padding-right: var(--_input-padding-suffix-side);
 			--_gcd-input-padding:
 				var(--wp-ui-input-padding-block, 0px)
-				var(--_gcd-input-padding-end)
+				var(--_input-padding-right)
 				var(--wp-ui-input-padding-block, 0px)
-				var(--_gcd-input-padding-start);
+				var(--_input-padding-left);
 			--_gcd-input-font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
 
-			padding-block: var(--wp-ui-input-padding-block, 0);
-			padding-inline: var(--_gcd-input-padding-start) var(--_gcd-input-padding-end);
-
-			/* The defense `padding` shorthand is physical, so swap sides in RTL. */
-			&:dir(rtl) {
-				--_gcd-input-padding:
-					var(--wp-ui-input-padding-block, 0px)
-					var(--_gcd-input-padding-start)
-					var(--wp-ui-input-padding-block, 0px)
-					var(--_gcd-input-padding-end);
-			}
-
-			[data-slot-type="prefix"] + & {
-				--_gcd-input-padding-start: var(--wp-ui-input-layout-prefix-gap, var(--wp-ui-input-layout-padding-inline, 0px));
-			}
+			padding: var(--_gcd-input-padding);
 			width: 100%;
 			background: transparent;
 			border: none;
@@ -57,6 +51,15 @@
 					--_gcd-input-color-disabled: GrayText;
 					color: GrayText;
 				}
+			}
+
+			:dir(rtl) > & {
+				--_input-padding-left: var(--_input-padding-suffix-side);
+				--_input-padding-right: var(--_input-padding-prefix-side);
+			}
+
+			[data-slot-type="prefix"]:not(:empty) + & {
+				--_input-padding-prefix-side: max(0px, calc(var(--wp-ui-input-layout-padding-inline, 0px) - var(--wpds-dimension-padding-xs)));
 			}
 
 			&[type="email"],

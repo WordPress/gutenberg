@@ -4,8 +4,6 @@
 	@layer components {
 		.input-layout {
 			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
-			/* Space between a prefix and the content, one step tighter than the inline padding. */
-			--wp-ui-input-layout-prefix-gap: var(--wpds-dimension-padding-sm);
 
 			display: flex;
 			height: var(--wpds-dimension-size-lg);
@@ -22,13 +20,11 @@
 
 			&.is-size-compact {
 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
-				--wp-ui-input-layout-prefix-gap: var(--wpds-dimension-padding-xs);
 				height: var(--wpds-dimension-size-md);
 			}
 
 			&.is-size-small {
 				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
-				--wp-ui-input-layout-prefix-gap: var(--wpds-dimension-padding-xs);
 				height: var(--wpds-dimension-size-sm);
 			}
 

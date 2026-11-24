@@ -183,67 +183,70 @@ export const NumberWithSteppers: Story = {
 };
 
 /**
- * Common field types like this one can show an icon in the prefix. The icon
- * is decorative: the label already names the field, so `Icon` is hidden from
- * assistive technologies. Pair the `type` with a matching `autoComplete`
- * value where one exists.
+ * Common field types can show an icon in the prefix. The icon is decorative:
+ * the label already names the field, so `Icon` is hidden from assistive
+ * technologies.
+ *
+ * Set `type` by the kind of value, and choose `autoComplete` by the field's
+ * purpose. For example, an email address used to sign in can use
+ * `type="email"` with `autoComplete="username"`.
  */
-export const Email: Story = {
-	args: {
-		...Default.args,
-		label: 'Email',
-		description: undefined,
-		placeholder: 'name@example.com',
-		type: 'email',
-		autoComplete: 'email',
-		prefix: (
-			<InputLayout.Slot padding="minimal">
-				<Icon icon={ envelope } />
-			</InputLayout.Slot>
-		),
+export const WithPrefixIcon: Story = {
+	render: function Template( args ) {
+		return (
+			<Stack direction="column" gap="lg">
+				<InputControl
+					{ ...args }
+					label="Email"
+					placeholder="name@example.com"
+					type="email"
+					autoComplete="email"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ envelope } />
+						</InputLayout.Slot>
+					}
+				/>
+				<InputControl
+					{ ...args }
+					label="Phone number"
+					placeholder="+1 555 0100"
+					type="tel"
+					autoComplete="tel"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ mobile } />
+						</InputLayout.Slot>
+					}
+				/>
+				<InputControl
+					{ ...args }
+					label="Website"
+					placeholder="https://example.com"
+					type="url"
+					autoComplete="url"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ link } />
+						</InputLayout.Slot>
+					}
+				/>
+			</Stack>
+		);
 	},
 };
 
-export const Tel: Story = {
-	args: {
-		...Default.args,
-		label: 'Phone number',
-		description: undefined,
-		placeholder: '+1 555 0100',
-		type: 'tel',
-		autoComplete: 'tel',
-		prefix: (
-			<InputLayout.Slot padding="minimal">
-				<Icon icon={ mobile } />
-			</InputLayout.Slot>
-		),
-	},
-};
-
-export const Url: Story = {
-	args: {
-		...Default.args,
-		label: 'Website',
-		description: undefined,
-		placeholder: 'https://example.com',
-		type: 'url',
-		autoComplete: 'url',
-		prefix: (
-			<InputLayout.Slot padding="minimal">
-				<Icon icon={ link } />
-			</InputLayout.Slot>
-		),
-	},
-};
-
+/**
+ * A search field uses `type="search"`. Some browsers show a native button to
+ * clear the query, and clear it on Escape.
+ */
 export const Search: Story = {
 	args: {
-		...Default.args,
 		label: 'Search',
 		hideLabelFromVision: true,
-		description: undefined,
 		placeholder: 'Search',
 		type: 'search',
+		defaultValue: 'Pizza',
 		prefix: (
 			<InputLayout.Slot padding="minimal">
 				<Icon icon={ search } />
