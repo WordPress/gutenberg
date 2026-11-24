@@ -101,9 +101,8 @@ try {
 }
 
 /**
- * Renders a story with requests to other hosts blocked, so a third-party
- * outage or rate limit cannot fail the smoke test. A story fails when it makes
- * such a request, unless `allowExternalRequests` is set.
+ * Renders a story. A story fails when it requests another host, unless
+ * `allowExternalRequests` is set.
  *
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
@@ -117,27 +116,27 @@ async function renderStory( context, storyId, allowExternalRequests ) {
 	const pageErrors = [];
 
 	page.on( 'pageerror', ( error ) => pageErrors.push( error.message ) );
+	page.on( 'request', ( request ) => {
+		const url = new URL( request.url() );
+		if (
+			! allowExternalRequests &&
+			[ 'http:', 'https:' ].includes( url.protocol ) &&
+			url.origin !== storybookUrl
+		) {
+			failedResponses.push( `External request: ${ request.url() }` );
+		}
+	} );
 	page.on( 'response', ( response ) => {
-		if ( response.status() >= 400 ) {
+		// A third-party outage or rate limit must not fail the smoke test.
+		if (
+			response.status() >= 400 &&
+			new URL( response.url() ).origin === storybookUrl
+		) {
 			failedResponses.push(
 				`${ response.status() } ${ response.url() }`
 			);
 		}
 	} );
-
-	await page.route(
-		( url ) =>
-			[ 'http:', 'https:' ].includes( url.protocol ) &&
-			url.origin !== storybookUrl,
-		( route ) => {
-			if ( ! allowExternalRequests ) {
-				failedResponses.push(
-					`External request: ${ route.request().url() }`
-				);
-			}
-			return route.abort( 'blockedbyclient' );
-		}
-	);
 
 	try {
 		const response = await page.goto(

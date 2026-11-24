@@ -38,6 +38,6 @@ npm run storybook:manifest-snapshot
 
 ## External requests
 
-The static smoke test (`npm run --workspace @wordpress/storybook test:smoke:build`) blocks every request to a host other than the Storybook server, so a third-party outage or rate limit cannot fail it. A story that makes such a request fails the test. Serve story assets from Storybook, or generate them in code, such as an SVG data URI.
+The static smoke test (`npm run --workspace @wordpress/storybook test:smoke:build`) fails a story that requests a host other than the Storybook server, so a third-party outage or rate limit cannot affect the result. Serve story assets from Storybook, or generate them in code, such as an SVG data URI.
 
-Some stories still request other hosts. They carry the `external-requests` tag, which keeps the requests blocked but does not fail the story. Do not add the tag to new stories.
+Some stories still request other hosts. They carry the `external-requests` tag, which lets the requests through and ignores their error responses. Do not add the tag to new stories.
