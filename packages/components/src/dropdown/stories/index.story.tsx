@@ -115,3 +115,20 @@ export const WithMenuItems: StoryObj< typeof Dropdown > = {
 		),
 	},
 };
+
+// TODO: Remove this temporary story before merging #87329. It exists only
+// to test IME Escape handling in `useDialog` with a plain text input.
+export const IMEEscapeTest: StoryObj< typeof Dropdown > = {
+	name: 'IME Escape test (temporary)',
+	args: {
+		...Default.args,
+		renderContent: () => (
+			<>
+				<label htmlFor="ime-escape-test-input">
+					Type with an IME, then press Escape
+				</label>{ ' ' }
+				<input id="ime-escape-test-input" type="text" />
+			</>
+		),
+	},
+};

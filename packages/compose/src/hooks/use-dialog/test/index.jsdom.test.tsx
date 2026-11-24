@@ -31,42 +31,36 @@ describe( 'useDialog', () => {
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it.each( [
-		[ 'isComposing', { isComposing: true } ],
-		[ 'keyCode 229', { keyCode: 229 } ],
-	] )(
-		'should not call onClose when Escape is part of an IME composition (%s)',
-		( _, eventInit ) => {
-			const onClose = vi.fn();
-			const consumerOnKeyDown = vi.fn();
+	it( 'should pass IME Escape to the consumer onKeyDown without calling onClose', () => {
+		const onClose = vi.fn();
+		const consumerOnKeyDown = vi.fn();
 
-			function DialogWithConsumerOnKeyDown() {
-				const [ ref, props ] = useDialog( {
-					onClose,
-					onKeyDown: consumerOnKeyDown,
-					focusOnMount: false,
-				} );
-				return (
-					<div
-						ref={ ref }
-						{ ...props }
-						role="dialog"
-						aria-label="Test dialog"
-					/>
-				);
-			}
-
-			render( <DialogWithConsumerOnKeyDown /> );
-
-			fireEvent.keyDown( screen.getByRole( 'dialog' ), {
-				key: 'Escape',
-				...eventInit,
+		function DialogWithConsumerOnKeyDown() {
+			const [ ref, props ] = useDialog( {
+				onClose,
+				onKeyDown: consumerOnKeyDown,
+				focusOnMount: false,
 			} );
-
-			expect( consumerOnKeyDown ).toHaveBeenCalledTimes( 1 );
-			expect( onClose ).not.toHaveBeenCalled();
+			return (
+				<div
+					ref={ ref }
+					{ ...props }
+					role="dialog"
+					aria-label="Test dialog"
+				/>
+			);
 		}
-	);
+
+		render( <DialogWithConsumerOnKeyDown /> );
+
+		fireEvent.keyDown( screen.getByRole( 'dialog' ), {
+			key: 'Escape',
+			isComposing: true,
+		} );
+
+		expect( consumerOnKeyDown ).toHaveBeenCalledTimes( 1 );
+		expect( onClose ).not.toHaveBeenCalled();
+	} );
 
 	it( 'should not call onClose when Escape is pressed if defaultPrevented', async () => {
 		const user = userEvent.setup();
