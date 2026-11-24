@@ -103,6 +103,33 @@ function restoreSelectionIds(
 }
 
 /**
+ * Returns whether two blocks are equal in every field other than their client
+ * ID, attributes and inner blocks. Only attributes are updated in place, so a
+ * change to any other field, such as the `innerContent` that the Custom HTML
+ * block edits, needs the blocks to be cloned again.
+ *
+ * @param block The block from the controlled value.
+ * @param clone Its clone in the block-editor store.
+ * @return Whether the blocks have the same fields.
+ */
+function hasSameFields( block: Block, clone: Block ): boolean {
+	for ( const key of new Set( [
+		...Object.keys( block ),
+		...Object.keys( clone ),
+	] ) as Set< keyof Block > ) {
+		if (
+			key !== 'clientId' &&
+			key !== 'attributes' &&
+			key !== 'innerBlocks' &&
+			block[ key ] !== clone[ key ]
+		) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * useBlockSync is a side effect which handles bidirectional sync between the
  * block-editor store and a controlling data source which provides blocks. This
  * is most commonly used by the BlockEditorProvider to synchronize the contents
@@ -274,19 +301,22 @@ export default function useBlockSync( {
 			return false;
 		}
 
-		// Otherwise the nearest controller above the selected block holds
-		// it. No controller means the selection is in the root block list,
-		// which belongs to no controller.
-		const holder = getBlockParents( currentStartClientId, true ).find(
-			areInnerBlocksControlled
+		// A selection anywhere inside this controller is in this copy, even
+		// one inside a controller nested in it, such as a synced pattern
+		// inside Post Content. Outside it, any controller above the selected
+		// block is another one. No controller means the selection is in the
+		// root block list, which belongs to no controller.
+		const parents = getBlockParents( currentStartClientId );
+		return (
+			! parents.includes( clientId ) &&
+			parents.some( ( parentId ) => areInnerBlocksControlled( parentId ) )
 		);
-		return holder !== undefined && holder !== clientId;
 	};
 
 	// Whether the controlled value has the same structure as the clones
 	// already in the store: the same external IDs in the same order, all
-	// the way down. A nested controller owns its own inner blocks, so those
-	// are left to it.
+	// the way down, with nothing but attributes changed. A nested
+	// controller owns its own inner blocks, so those are left to it.
 	const hasSameStructure = ( blocks, clones ) =>
 		blocks.length === clones.length &&
 		blocks.every( ( block, index ) => {
@@ -295,7 +325,7 @@ export default function useBlockSync( {
 				idMappingRef.current.internalToExternal.get(
 					clone.clientId
 				) === block.clientId &&
-				block.name === clone.name &&
+				hasSameFields( block, clone ) &&
 				( areInnerBlocksControlled( clone.clientId ) ||
 					hasSameStructure( block.innerBlocks, clone.innerBlocks ) )
 			);

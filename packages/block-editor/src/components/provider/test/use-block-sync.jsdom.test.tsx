@@ -1,12 +1,14 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
+import { useState } from '@wordpress/element';
 import type { ComponentType } from 'react';
 import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import type { BlockEditorProviderProps, RegistryProvidedProps } from '../types';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
+import { SelectionContext } from '../selection-context';
 import * as blockEditorActions from '../../../store/actions';
 import { store as blockEditorStore } from '../../../store';
 vi.mock( import( '../../../store/actions' ), async ( importOriginal ) => {
@@ -776,5 +778,199 @@ describe( 'useBlockSync hook', () => {
 
 			expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		// Some blocks change more than their attributes. The Custom HTML
+		// block keeps its markup in `innerContent`, edited with `updateBlock`.
+		it( 'still re-clones when a block field other than attributes changes', () => {
+			const replaceInnerBlocks = vi.spyOn(
+				blockEditorActions,
+				'replaceInnerBlocks'
+			);
+			const { view, getClones, onChange, onInput } = renderController();
+			replaceInnerBlocks.mockClear();
+
+			view.rerender(
+				<TestWrapper
+					clientId="controller"
+					value={ [
+						{
+							...block( { foo: 1 } ),
+							innerContent: [ '<p>new</p>' ],
+						},
+					] }
+					onChange={ onChange }
+					onInput={ onInput }
+				/>
+			);
+
+			expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( getClones()[ 0 ].innerContent ).toEqual( [ '<p>new</p>' ] );
+		} );
+	} );
+
+	describe( 'selection after an incoming change', () => {
+		const paragraph = ( clientId, content ) => ( {
+			name: 'test/test-block',
+			clientId,
+			innerBlocks: [],
+			attributes: { foo: content },
+		} );
+
+		// Several controllers in one block-editor store, as on a canvas, all
+		// reading the recorded selection from the same context.
+		function Controller( props ) {
+			useBlockSync( props );
+			return null;
+		}
+		const Canvas = withRegistryProvider(
+			( { registry, setRegistry, selectionRef, controllers } ) => {
+				setRegistry( registry );
+				const [ context ] = useState( () => ( {
+					getSelection: () => selectionRef.current,
+					onChangeSelection: () => {},
+				} ) );
+				return (
+					<SelectionContext.Provider value={ context }>
+						{ controllers.map( ( props ) => (
+							<Controller key={ props.clientId } { ...props } />
+						) ) }
+					</SelectionContext.Provider>
+				);
+			}
+		);
+
+		function renderCanvas( hostClientIds ) {
+			let registry;
+			const selectionRef = { current: undefined };
+			const setRegistry = ( reg ) => {
+				if ( ! registry ) {
+					registry = reg;
+					reg.dispatch( blockEditorStore ).resetBlocks(
+						hostClientIds.map( ( clientId ) =>
+							paragraph( clientId, 0 )
+						)
+					);
+				}
+			};
+			const view = render(
+				<Canvas
+					setRegistry={ setRegistry }
+					selectionRef={ selectionRef }
+					controllers={ [] }
+				/>
+			);
+			const update = ( controllers ) =>
+				view.rerender(
+					<Canvas
+						setRegistry={ setRegistry }
+						selectionRef={ selectionRef }
+						controllers={ controllers }
+					/>
+				);
+			const select = () => registry.select( blockEditorStore );
+			const selectBlock = ( clientId ) =>
+				registry.dispatch( blockEditorStore ).selectBlock( clientId );
+			return { registry, selectionRef, update, select, selectBlock };
+		}
+
+		it( 'does not take the selection from another controller of the same entity', () => {
+			const { registry, update, select, selectBlock, selectionRef } =
+				renderCanvas( [ 'copy-a', 'copy-b' ] );
+			let entity = [ paragraph( 'p', 1 ) ];
+			const onChangeA = ( blocks ) => ( entity = blocks );
+			const onChangeB = vi.fn();
+			const controllers = () => [
+				{
+					clientId: 'copy-a',
+					value: entity,
+					onChange: onChangeA,
+					onInput: onChangeA,
+				},
+				{
+					clientId: 'copy-b',
+					value: entity,
+					onChange: onChangeB,
+					onInput: onChangeB,
+				},
+			];
+			update( controllers() );
+			const [ cloneA ] = select().getBlocks( 'copy-a' );
+			const [ cloneB ] = select().getBlocks( 'copy-b' );
+			selectBlock( cloneA.clientId );
+			selectionRef.current = {
+				selectionStart: { clientId: 'p' },
+				selectionEnd: { clientId: 'p' },
+			};
+
+			// Edit copy A, and hand the edited entity to both copies.
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( cloneA.clientId, { foo: 2 } );
+			update( controllers() );
+
+			// Copy B mirrors the edit onto the clone it already has.
+			const [ mirrored ] = select().getBlocks( 'copy-b' );
+			expect( mirrored.clientId ).toBe( cloneB.clientId );
+			expect( mirrored.attributes.foo ).toBe( 2 );
+			expect( select().getSelectionStart().clientId ).toBe(
+				cloneA.clientId
+			);
+			// Copy B only mirrored the edit, so it reports nothing back.
+			expect( onChangeB ).not.toHaveBeenCalled();
+		} );
+
+		// An undo in the outer controller, while the caret sits in a
+		// controller nested inside it, such as a synced pattern inside Post
+		// Content.
+		it.each( [
+			[ 'updates the clones in place', [] ],
+			[ 're-clones', [ paragraph( 'added', 0 ) ] ],
+		] )(
+			'restores the selection when the caret is in a nested controller and the outer one %s',
+			( _, addedBlocks ) => {
+				const { update, select, selectBlock, selectionRef } =
+					renderCanvas( [ 'outer' ] );
+				const outerBlock = paragraph( 'outer-block', 1 );
+				const nestedHost = paragraph( 'nested-host', 0 );
+				const outer = {
+					clientId: 'outer',
+					value: [ outerBlock, nestedHost ],
+				};
+				update( [ outer ] );
+				const [ , nestedHostClone ] = select().getBlocks( 'outer' );
+				const nested = {
+					clientId: nestedHostClone.clientId,
+					value: [ paragraph( 'nested-block', 1 ) ],
+				};
+				update( [ outer, nested ] );
+				selectBlock(
+					select().getBlocks( nestedHostClone.clientId )[ 0 ].clientId
+				);
+
+				// The undo reverts the outer block and records the
+				// selection in it.
+				selectionRef.current = {
+					selectionStart: { clientId: 'outer-block' },
+					selectionEnd: { clientId: 'outer-block' },
+				};
+				update( [
+					{
+						...outer,
+						value: [
+							paragraph( 'outer-block', 0 ),
+							nestedHost,
+							...addedBlocks,
+						],
+					},
+					nested,
+				] );
+
+				const [ outerBlockClone ] = select().getBlocks( 'outer' );
+				expect( outerBlockClone.attributes.foo ).toBe( 0 );
+				expect( select().getSelectionStart().clientId ).toBe(
+					outerBlockClone.clientId
+				);
+			}
+		);
 	} );
 } );
