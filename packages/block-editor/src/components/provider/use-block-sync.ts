@@ -303,13 +303,19 @@ export default function useBlockSync( {
 
 		// A selection anywhere inside this controller is in this copy, even
 		// one inside a controller nested in it, such as a synced pattern
-		// inside Post Content. Outside it, any controller above the selected
-		// block is another one. No controller means the selection is in the
-		// root block list, which belongs to no controller.
+		// inside Post Content. Outside it, another copy is a controller of
+		// the same block type, such as a second Navigation block. One of
+		// another type, such as a Template Part around Post Title, renders
+		// another entity, and neither does the root block list.
 		const parents = getBlockParents( currentStartClientId );
+		const blockName = getBlockName( clientId );
 		return (
 			! parents.includes( clientId ) &&
-			parents.some( ( parentId ) => areInnerBlocksControlled( parentId ) )
+			parents.some(
+				( parentId ) =>
+					areInnerBlocksControlled( parentId ) &&
+					getBlockName( parentId ) === blockName
+			)
 		);
 	};
 
@@ -399,6 +405,9 @@ export default function useBlockSync( {
 					updateBlockAttributes( changedClientIds, changes, {
 						uniqueByBlock: true,
 					} );
+					// As after re-cloning, let an undo restore its recorded
+					// selection even if it is the one restored last time.
+					appliedSelectionRef.current = null;
 				}
 				return;
 			}

@@ -996,5 +996,110 @@ describe( 'useBlockSync hook', () => {
 				);
 			}
 		);
+
+		// Post Content inside a Template Part, with the caret on Post Title
+		// next to it in the same Template Part. Only another block of the
+		// same type renders the same entity.
+		it( 'restores the selection when the caret is in a controller of another type', () => {
+			const { update, select, selectBlock, selectionRef } = renderCanvas(
+				[ 'part' ]
+			);
+			const contentHost = {
+				...paragraph( 'content-host', 0 ),
+				name: 'test/other-block',
+			};
+			const part = {
+				clientId: 'part',
+				value: [ paragraph( 'title', 0 ), contentHost ],
+			};
+			update( [ part ] );
+			const [ titleClone, contentHostClone ] =
+				select().getBlocks( 'part' );
+			const content = {
+				clientId: contentHostClone.clientId,
+				value: [ paragraph( 'content-block', 1 ) ],
+			};
+			update( [ part, content ] );
+			selectBlock( titleClone.clientId );
+
+			// The undo reverts the content block and records the selection
+			// in it.
+			selectionRef.current = {
+				selectionStart: { clientId: 'content-block' },
+				selectionEnd: { clientId: 'content-block' },
+			};
+			update( [
+				part,
+				{ ...content, value: [ paragraph( 'content-block', 0 ) ] },
+			] );
+
+			const [ contentBlockClone ] = select().getBlocks(
+				contentHostClone.clientId
+			);
+			expect( contentBlockClone.attributes.foo ).toBe( 0 );
+			expect( select().getSelectionStart().clientId ).toBe(
+				contentBlockClone.clientId
+			);
+		} );
+
+		// Typing between two undos without moving the caret records the
+		// selection the first undo restored, so the second undo hands back
+		// that same selection object.
+		it( 'restores a selection again when an undo returns to it', () => {
+			const { registry, update, select, selectionRef } = renderCanvas( [
+				'outer',
+			] );
+			let entity = [ paragraph( 'p', 1 ) ];
+			const onChange = ( blocks: TestBlock[] ) => ( entity = blocks );
+			const controllers = () => [
+				{
+					clientId: 'outer',
+					value: entity,
+					onChange,
+					onInput: onChange,
+				},
+			];
+			update( controllers() );
+			const clone = () => select().getBlocks( 'outer' )[ 0 ];
+			const caret = ( clientId: string, offset: number ) => ( {
+				clientId,
+				attributeKey: 'foo',
+				offset,
+			} );
+
+			// The first undo.
+			const restored = {
+				selectionStart: caret( 'p', 5 ),
+				selectionEnd: caret( 'p', 5 ),
+			};
+			selectionRef.current = restored;
+			entity = [ paragraph( 'p', 2 ) ];
+			update( controllers() );
+			expect( select().getSelectionStart() ).toEqual(
+				caret( clone().clientId, 5 )
+			);
+
+			// Typing moves the caret on.
+			registry
+				.dispatch( blockEditorStore )
+				.selectionChange( clone().clientId, 'foo', 8, 8 );
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clone().clientId, { foo: 3 } );
+			selectionRef.current = {
+				selectionStart: caret( 'p', 8 ),
+				selectionEnd: caret( 'p', 8 ),
+			};
+			update( controllers() );
+
+			// The second undo.
+			selectionRef.current = restored;
+			entity = [ paragraph( 'p', 2 ) ];
+			update( controllers() );
+			expect( clone().attributes.foo ).toBe( 2 );
+			expect( select().getSelectionStart() ).toEqual(
+				caret( clone().clientId, 5 )
+			);
+		} );
 	} );
 } );
