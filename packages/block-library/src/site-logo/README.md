@@ -33,6 +33,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 - [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
@@ -51,6 +52,8 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **border**: `.wp-block-site-logo img, .wp-block-site-logo .components-placeholder`
+- **shadow**: `.wp-block-site-logo img, .wp-block-site-logo .components-placeholder`
 - **filter**:
   - duotone: `.wp-block-site-logo img, .wp-block-site-logo .components-placeholder__illustration, .wp-block-site-logo .components-placeholder::before`
 

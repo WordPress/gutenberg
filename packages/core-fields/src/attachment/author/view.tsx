@@ -21,7 +21,7 @@ export default function AuthorView( { item }: { item: MediaItem } ) {
 
 	return (
 		<Stack direction="row" gap="xs" align="flex-start" justify="flex-start">
-			{ !! imageUrl && <AuthorAvatar src={ imageUrl } /> }
+			{ !! imageUrl && <AuthorAvatar src={ imageUrl } name={ text } /> }
 			<span className={ styles.name }>{ text }</span>
 		</Stack>
 	);

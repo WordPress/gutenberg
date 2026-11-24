@@ -37,6 +37,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		const VALID_BACKGROUND_CLIP_VALUES = array( 'border-box', 'padding-box', 'content-box', 'text' );
 
 		/**
+		 * Matches a single CSS angle: a number with a `deg`, `grad`, `rad` or `turn` unit, or `0`.
+		 *
+		 * @var string
+		 */
+		const VALID_ANGLE_PATTERN = '/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:deg|grad|rad|turn)|0)$/iD';
+
+		/**
 		 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
 		 *
 		 * For every style definition, the following properties are valid:
@@ -290,6 +297,15 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					'css_vars'      => array(
 						'spacing' => '--wp--preset--spacing--$slug',
 					),
+				),
+			),
+			'transform'  => array(
+				'rotate' => array(
+					'property_keys' => array(
+						'default' => 'rotate',
+					),
+					'value_func'    => array( self::class, 'get_angle_css_declarations' ),
+					'path'          => array( 'transform', 'rotate' ),
 				),
 			),
 			'typography' => array(
@@ -731,6 +747,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					// Set a CSS var if there is a valid preset value.
 					if ( str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 						$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
+
+						if ( ! static::is_valid_style_value( $value ) ) {
+							continue;
+						}
 					}
 					$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
 					$css_declarations[ $individual_css_property ] = $value;
@@ -816,6 +836,24 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return $css_declarations;
+		}
+
+		/**
+		 * Style value parser that returns a CSS definition array for a property that takes a single angle.
+		 *
+		 * Lists, functions such as `calc()` or `var()`, and bare numbers are rejected.
+		 *
+		 * @param string $style_value      A single raw style value from $block_styles array.
+		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 *
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 */
+		protected static function get_angle_css_declarations( $style_value, $style_definition ) {
+			if ( ! is_string( $style_value ) || ! preg_match( static::VALID_ANGLE_PATTERN, $style_value ) ) {
+				return array();
+			}
+
+			return array( $style_definition['property_keys']['default'] => $style_value );
 		}
 
 		/**
