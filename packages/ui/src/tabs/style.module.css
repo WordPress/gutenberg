@@ -205,12 +205,19 @@
 						calc((48px - var(--wpds-dimension-size-md)) / 2 +
 						var(--wpds-dimension-padding-xs));
 					inset-inline: 0;
-					box-shadow:
-						0 0 0 var(--wpds-dimension-padding-xs)
-						var(--wpds-color-background-interactive-neutral-weak-active);
 					outline-offset:
 						calc(var(--wpds-dimension-padding-xs) -
 						var(--wpds-border-width-focus));
+				}
+
+				&:not([data-disabled]):is(
+					:not([aria-selected="true"]):hover,
+					:not([aria-selected="true"]):active,
+					:focus-visible
+				)::after {
+					box-shadow:
+						0 0 0 var(--wpds-dimension-padding-xs)
+						var(--wpds-color-background-interactive-neutral-weak-active);
 				}
 			}
 
