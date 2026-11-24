@@ -98,7 +98,7 @@ export function getBlockAndPreviewFromMedia(
 		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
 	);
 	const block =
-		mediaType === 'application'
+		mediaType === 'file'
 			? createFileBlock( media )
 			: createBlock( `core/${ mediaType }`, attributes );
 	return [ block, preview ];

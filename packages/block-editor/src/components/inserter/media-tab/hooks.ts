@@ -254,7 +254,7 @@ export function useMediaCategories( rootClientId?: string | null ): {
 				image: canInsertImage,
 				video: canInsertVideo,
 				audio: canInsertAudio,
-				application: canInsertFile,
+				file: canInsertFile,
 			};
 			inserterMediaCategories.forEach(
 				( category: InserterMediaCategory ) => {

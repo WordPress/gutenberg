@@ -355,7 +355,7 @@ const inserterMediaCategories = [
 			name: __( 'Files' ),
 			search_items: __( 'Search files' ),
 		},
-		mediaType: 'application',
+		mediaType: 'file',
 		getQuery: ( query ) => ( {
 			...query,
 			media_type: [ 'application', 'text' ],

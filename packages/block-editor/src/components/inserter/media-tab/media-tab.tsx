@@ -77,7 +77,7 @@ function MediaTab( {
 				return;
 			}
 			const mediaType = (
-				BLOCK_MEDIA_TYPES.includes( type ) ? type : 'application'
+				BLOCK_MEDIA_TYPES.includes( type ) ? type : 'file'
 			) as MediaType;
 			const [ block ] = getBlockAndPreviewFromMedia(
 				{ ...item, url: item.url },
