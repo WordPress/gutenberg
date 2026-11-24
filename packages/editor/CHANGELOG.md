@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `PostPublishPanel`: The pre-publish panel of a page lists the Navigation Menus the page appears in once it is published, the ones that already link to it and the ones that add a link to it, with a link to each menu.
+
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
