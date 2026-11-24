@@ -1,12 +1,40 @@
 import a11yPlugin from 'colord/plugins/a11y';
 import namesPlugin from 'colord/plugins/names';
 import { colord, extend } from 'colord';
+import type { Colord } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice as WCNotice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import type { ContrastCheckerProps, ContrastWarning } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
+
+/**
+ * Returns the color a reader sees when a color is painted over an opaque
+ * backdrop. A transparent color blends with the backdrop in proportion to its
+ * alpha, so its contrast has to be measured on the blended color: `colord`
+ * ignores alpha when it computes contrast.
+ *
+ * @param color    Color painted over the backdrop.
+ * @param backdrop Opaque color behind it.
+ * @return The opaque color the reader sees.
+ */
+function getVisibleColor( color: Colord, backdrop: Colord ): Colord {
+	const alpha = color.alpha();
+	if ( alpha >= 1 ) {
+		return color;
+	}
+
+	const foreground = color.toRgb();
+	const background = backdrop.toRgb();
+	const blend = ( channel: 'r' | 'g' | 'b' ) =>
+		Math.round(
+			foreground[ channel ] * alpha +
+				background[ channel ] * ( 1 - alpha )
+		);
+
+	return colord( { r: blend( 'r' ), g: blend( 'g' ), b: blend( 'b' ) } );
+}
 
 /**
  * Computes a contrast warning for the given color combination, if any.
@@ -87,25 +115,25 @@ export function getContrastWarning( {
 			continue;
 		}
 		const colordTextColor = colord( item.color );
-		const isColordTextReadable = colordTextColor.isReadable(
-			colordBackgroundColor,
-			// `colord` reads any size but `large` as normal.
-			isReadableOptions as Parameters<
-				typeof colordTextColor.isReadable
-			>[ 1 ]
-		);
 		const textHasTransparency = colordTextColor.alpha() < 1;
 
-		// The contrast check above ignores alpha, so a "not readable" result
-		// isn't trustworthy when either color is transparent. Only show the
-		// contrast message when both colors are opaque, and let transparent
-		// colors fall through to the transparency warning below instead of
-		// being silently skipped.
-		const canCheckContrast =
-			! backgroundColorHasTransparency && ! textHasTransparency;
+		// Contrast can only be measured against an opaque background, as
+		// what shows through a transparent one is unknown.
+		const visibleTextColor = backgroundColorHasTransparency
+			? undefined
+			: getVisibleColor( colordTextColor, colordBackgroundColor );
+		const isColordTextReadable =
+			! visibleTextColor ||
+			visibleTextColor.isReadable(
+				colordBackgroundColor,
+				// `colord` reads any size but `large` as normal.
+				isReadableOptions as Parameters<
+					typeof visibleTextColor.isReadable
+				>[ 1 ]
+			);
 
 		// If the contrast is not readable.
-		if ( canCheckContrast && ! isColordTextReadable ) {
+		if ( visibleTextColor && ! isColordTextReadable ) {
 			// A caller can provide panel-specific copy that is clearer and
 			// more concise than the generic brighter/darker guidance.
 			if ( messageOverride ) {
@@ -114,7 +142,7 @@ export function getContrastWarning( {
 				break;
 			}
 			message =
-				backgroundColorBrightness < colordTextColor.brightness()
+				backgroundColorBrightness < visibleTextColor.brightness()
 					? sprintf(
 							// translators: %s is a type of text color, e.g., "text color" or "link color".
 							__(
