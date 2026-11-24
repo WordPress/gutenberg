@@ -6,6 +6,10 @@
 
 -   `toHTMLString`: Close non-void inline objects, preserve their children, and omit comments that would close prematurely ([#85895](https://github.com/WordPress/gutenberg/pull/85895)).
 
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
 ## 8.2.0 (2026-11-18)
 
 ## 8.1.0 (2026-11-04)

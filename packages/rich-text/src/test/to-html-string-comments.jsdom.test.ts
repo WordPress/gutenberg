@@ -3,10 +3,10 @@ import '../store';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 
-function createValueWithComment( comment: string ) {
+function createElementWithComment( comment: string ) {
 	const element = document.createElement( 'div' );
 	element.append( 'before ', document.createComment( comment ), 'after' );
-	return create( { element } );
+	return element;
 }
 
 describe( 'toHTMLString comments', () => {
@@ -17,20 +17,28 @@ describe( 'toHTMLString comments', () => {
 		'--!><em data-breakout="yes">outside</em>',
 		'comment --><em data-breakout="yes">outside</em>',
 		'comment --!><em data-breakout="yes">outside</em>',
-	] )( 'omits comment data that terminates the comment: %s', ( comment ) => {
-		const value = createValueWithComment( comment );
+	] )( 'omits the entire prematurely terminated comment: %s', ( comment ) => {
+		const input = createElementWithComment( comment );
+		const inputComment = input.childNodes[ 1 ];
+		expect( inputComment.nodeType ).toBe( Node.COMMENT_NODE );
+		expect( inputComment.nodeValue ).toBe( comment );
+
+		const value = create( { element: input } );
 		const originalValue = structuredClone( value );
 		const html = toHTMLString( { value } );
-		const element = document.createElement( 'div' );
-		element.innerHTML = html;
+		const output = document.createElement( 'div' );
+		output.innerHTML = html;
 
-		expect( element.querySelector( '[data-breakout]' ) ).toBeNull();
-		expect( element ).toHaveTextContent( /^before after$/ );
+		expect(
+			document
+				.createTreeWalker( output, NodeFilter.SHOW_COMMENT )
+				.nextNode()
+		).toBeNull();
+		expect( output.querySelector( '[data-breakout]' ) ).toBeNull();
+		expect( output ).toHaveTextContent( /^before after$/ );
 		expect( html ).toBe( 'before after' );
 		expect( value ).toEqual( originalValue );
-		expect( value.replacements[ 7 ]?.attributes ).toEqual( {
-			'data-rich-text-comment': comment,
-		} );
+		expect( inputComment.nodeValue ).toBe( comment );
 	} );
 
 	it.each( [
@@ -44,17 +52,25 @@ describe( 'toHTMLString comments', () => {
 		'ends with <!',
 		' wp:paragraph {"foo":"bar"} ',
 	] )( 'preserves comment data and adjacent text: %s', ( comment ) => {
-		const value = createValueWithComment( comment );
+		const input = createElementWithComment( comment );
+		const inputComment = input.childNodes[ 1 ];
+		expect( inputComment.nodeType ).toBe( Node.COMMENT_NODE );
+		expect( inputComment.nodeValue ).toBe( comment );
+
+		const value = create( { element: input } );
+		const originalValue = structuredClone( value );
 		const html = toHTMLString( { value } );
-		const element = document.createElement( 'div' );
-		element.innerHTML = html;
+		const output = document.createElement( 'div' );
+		output.innerHTML = html;
 
 		expect( html ).toBe( `before <!--${ comment }-->after` );
-		expect( element.childNodes ).toHaveLength( 3 );
-		expect( element.childNodes[ 1 ].nodeType ).toBe( Node.COMMENT_NODE );
-		expect( element.childNodes[ 1 ].nodeValue ).toBe( comment );
-		expect( element.firstChild?.textContent ).toBe( 'before ' );
-		expect( element.lastChild?.textContent ).toBe( 'after' );
-		expect( create( { element } ) ).toEqual( value );
+		expect( output.childNodes ).toHaveLength( 3 );
+		expect( output.childNodes[ 1 ].nodeType ).toBe( Node.COMMENT_NODE );
+		expect( output.childNodes[ 1 ].nodeValue ).toBe( comment );
+		expect( output.firstChild?.textContent ).toBe( 'before ' );
+		expect( output.lastChild?.textContent ).toBe( 'after' );
+		expect( create( { element: output } ) ).toEqual( value );
+		expect( value ).toEqual( originalValue );
+		expect( inputComment.nodeValue ).toBe( comment );
 	} );
 } );

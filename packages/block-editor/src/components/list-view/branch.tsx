@@ -158,8 +158,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
-		const { itemInView } = fixedListWindow;
-		const blockInView = itemInView( blockListPosition );
+		const { start, end, focusedClientId } = fixedListWindow;
+		const blockInView =
+			blockListPosition >= start && blockListPosition < end;
 
 		const position = index + 1;
 		const updatedPath =
@@ -186,10 +187,12 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		// selected, or a user selects all blocks, while still enabling scroll
 		// into view behavior when selecting a block or opening the list view.
 		// The first and last blocks of the list are always rendered, to ensure
-		// that Home and End keys work as expected.
+		// that Home and End keys work as expected. The focused block is
+		// rendered so that scrolling it out of view does not drop focus.
 		const showBlock =
 			isDragged ||
 			blockInView ||
+			clientId === focusedClientId ||
 			( isSelected && clientId === selectedClientIds[ 0 ] ) ||
 			index === 0 ||
 			index === blockCount - 1;

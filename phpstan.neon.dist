@@ -45,8 +45,20 @@ rules:
 	# strictRules.illegalConstructorMethodCall
 	- PHPStan\Rules\Methods\IllegalConstructorMethodCallRule
 	- PHPStan\Rules\Methods\IllegalConstructorStaticCallRule
+	# strictRules.dynamicCallOnStaticMethod
+	- PHPStan\Rules\StrictCalls\DynamicCallOnStaticMethodsRule
+	- PHPStan\Rules\StrictCalls\DynamicCallOnStaticMethodsCallableRule
 
 services:
+	# Ignores strictRules.dynamicCallOnStaticMethod errors for $this->assert*() calls in tests, since PHPUnit's
+	# assertions are static but conventionally called on $this, as in WordPress core's tests. The phpstan-phpunit
+	# extension registers this only with bleedingEdge. It matters only to a local phpstan.neon analyzing phpunit/.
+	-
+		class: PHPStan\Type\PHPUnit\DynamicCallToAssertionIgnoreExtension
+		autowired: false
+		tags:
+			- phpstan.ignoreErrorExtension
+
 	# strictRules.disallowedLooseComparison, with the argument rules.neon passes it.
 	-
 		class: PHPStan\Rules\DisallowedConstructs\DisallowedLooseComparisonRule
@@ -154,6 +166,13 @@ parameters:
 	reportUnmatchedIgnoredErrors: true
 
 	# Errors that are intentionally ignored, as opposed to the baseline, which records errors still to be fixed.
+	#
+	# Each entry names the file its error occurs in with `path`, unless it is a rule for every file, which is marked
+	# `reportUnmatched: false` instead, so that it is not reported when no file breaks it. An entry
+	# that names no file applies to every file, so phpstan-strict.neon.dist, which analyzes only some of them, would
+	# report it as unmatched when its error occurs only in the others. An error occurring in several files gets an entry
+	# for each, since PHPStan reports an entry naming several files with `paths` as unmatched even when it analyzes none
+	# of them.
 	ignoreErrors:
 		# Level 0:
 		# Return values from action callbacks are discarded by do_action(), but returning one is harmless and lets
@@ -162,41 +181,89 @@ parameters:
 		-
 			message: '#^Action callback returns .+ but should not return anything\.$#'
 			identifier: return.void
+			reportUnmatched: false
+
 		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/calendar/index.php
 
 		# wp_get_shadow_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/navigation-submenu/index.php
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-featured-image/index.php
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/search/index.php
 
 		# wp_get_spacing_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/comment-author-avatar/index.php
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-navigation-link/index.php
 
 		# wp_get_background_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/button/index.php
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/search/index.php
 
 		# wp_get_border_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/avatar/index.php
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-featured-image/index.php
 
 		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/avatar/index.php
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-navigation-link/index.php
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/site-logo/index.php
 
 		# Level 3:
 		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
@@ -223,3 +290,13 @@ parameters:
 			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			path: packages/block-library/src/navigation/index.php
+
+		# strictRules.dynamicCallOnStaticMethod:
+		# PHPUnit's markTestSkipped() is static, but like its assertions, which DynamicCallToAssertionIgnoreExtension
+		# covers above, it is conventionally called on $this, as in WordPress core's tests. The tests are analyzed only
+		# by a local phpstan.neon, so this entry goes unmatched otherwise.
+		-
+			message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert::markTestSkipped\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			path: phpunit/*
+			reportUnmatched: false
