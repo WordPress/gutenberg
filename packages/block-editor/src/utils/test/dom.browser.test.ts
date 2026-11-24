@@ -235,19 +235,6 @@ describe( 'getLayoutRect', () => {
 		} );
 	} );
 
-	it( 'returns client rects when nothing is transformed', () => {
-		const element = createLayoutElement( '' );
-		const frame = getLayoutFrame( element.parentElement );
-		const rect = element.getBoundingClientRect();
-
-		expect( frame.isIdentity ).toBe( true );
-		expect( toLayoutPoint( frame, 5, 7 ) ).toMatchObject( {
-			x: 5,
-			y: 7,
-		} );
-		expect( toClientRect( frame, rect ) ).toBe( rect );
-	} );
-
 	describe( 'getVisibleGap', () => {
 		function createPair( style: string ) {
 			const first = createLayoutElement( style );

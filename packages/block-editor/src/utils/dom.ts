@@ -293,9 +293,9 @@ function getElementTransform( element: Element ) {
  * moved, turned or resized on screen.
  *
  * @param element Element to start from, usually a block's parent.
- * @return The matrix, or the identity matrix when nothing is transformed.
+ * @return The matrix, or null when nothing is transformed.
  */
-export function getLayoutFrame( element: Element | null ): DOMMatrix {
+export function getLayoutFrame( element: Element | null ): DOMMatrix | null {
 	for ( let current = element; current; current = current.parentElement ) {
 		const transform = getElementTransform( current );
 
@@ -305,14 +305,15 @@ export function getLayoutFrame( element: Element | null ): DOMMatrix {
 
 		const frame = getLayoutFrame( current.parentElement );
 		const { left, top } = getLayoutRect( current, frame );
-		const matrix = frame.translate( left, top ).multiply( transform );
+		const matrix = ( frame ?? new window.DOMMatrix() )
+			.translate( left, top )
+			.multiply( transform );
 
-		return matrix.a * matrix.d - matrix.b * matrix.c
-			? matrix
-			: new window.DOMMatrix();
+		return matrix.a * matrix.d - matrix.b * matrix.c ? matrix : null;
 	}
 
-	return new window.DOMMatrix();
+	// No `DOMMatrix` here: jsdom, which runs the unit tests, has none.
+	return null;
 }
 
 /**
@@ -333,16 +334,18 @@ export function getLayoutRect(
 	const rect = element.getBoundingClientRect();
 	const transform = getElementTransform( element );
 
-	if ( ! transform && frame.isIdentity ) {
+	if ( ! transform && ! frame ) {
 		return rect;
 	}
 
 	const { offsetWidth: width, offsetHeight: height } = element as HTMLElement;
 	// An affine map takes a box's centre to the centre of its bounding rect.
-	const center = frame.inverse().transformPoint( {
-		x: rect.left + rect.width / 2,
-		y: rect.top + rect.height / 2,
-	} );
+	const center = ( frame ?? new window.DOMMatrix() )
+		.inverse()
+		.transformPoint( {
+			x: rect.left + rect.width / 2,
+			y: rect.top + rect.height / 2,
+		} );
 	const painted = ( transform ?? new window.DOMMatrix() ).transformPoint( {
 		x: width / 2,
 		y: height / 2,
@@ -364,10 +367,8 @@ export function getLayoutRect(
  * @param y     Client y coordinate.
  * @return The point in the frame's coordinates.
  */
-export function toLayoutPoint( frame: DOMMatrix, x: number, y: number ) {
-	return frame.isIdentity
-		? new window.DOMPoint( x, y )
-		: frame.inverse().transformPoint( { x, y } );
+export function toLayoutPoint( frame: DOMMatrix | null, x: number, y: number ) {
+	return frame ? frame.inverse().transformPoint( { x, y } ) : { x, y };
 }
 
 /**
@@ -379,8 +380,8 @@ export function toLayoutPoint( frame: DOMMatrix, x: number, y: number ) {
  * @param rect  Rect in the frame's coordinates.
  * @return The rect in client coordinates.
  */
-export function toClientRect( frame: DOMMatrix, rect: DOMRect ) {
-	if ( frame.isIdentity ) {
+export function toClientRect( frame: DOMMatrix | null, rect: DOMRect ) {
+	if ( ! frame ) {
 		return rect;
 	}
 
@@ -427,17 +428,27 @@ export function extendRectToTop( rect: DOMRect, top: number ) {
  * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
  * @return The four corners.
  */
-function getPaintedCorners( element: Element, frame: DOMMatrix ) {
+function getPaintedCorners( element: Element, frame: DOMMatrix | null ) {
 	const { x, y, width, height } = getLayoutRect( element, frame );
-	const matrix = frame
-		.translate( x, y )
-		.multiply( getElementTransform( element ) ?? new window.DOMMatrix() );
-	return [
+	const transform = getElementTransform( element );
+	const corners = [
 		[ 0, 0 ],
 		[ width, 0 ],
 		[ width, height ],
 		[ 0, height ],
-	].map( ( [ cornerX, cornerY ] ) =>
+	];
+
+	if ( ! frame && ! transform ) {
+		return corners.map( ( [ cornerX, cornerY ] ) => ( {
+			x: x + cornerX,
+			y: y + cornerY,
+		} ) );
+	}
+
+	const matrix = ( frame ?? new window.DOMMatrix() )
+		.translate( x, y )
+		.multiply( transform ?? new window.DOMMatrix() );
+	return corners.map( ( [ cornerX, cornerY ] ) =>
 		matrix.transformPoint( { x: cornerX, y: cornerY } )
 	);
 }
@@ -454,7 +465,7 @@ function getPaintedCorners( element: Element, frame: DOMMatrix ) {
  */
 function getPaintedSpan(
 	element: Element,
-	frame: DOMMatrix,
+	frame: DOMMatrix | null,
 	left: number,
 	right: number
 ) {
@@ -499,7 +510,7 @@ function getPaintedSpan(
 export function getVisibleGap(
 	previous: Element,
 	next: Element,
-	frame: DOMMatrix,
+	frame: DOMMatrix | null,
 	line: DOMRect
 ) {
 	const above = getPaintedSpan( previous, frame, line.left, line.right );
@@ -531,7 +542,7 @@ export function getVisibleGap(
 export function getClearLine(
 	previous: Element,
 	next: Element,
-	frame: DOMMatrix,
+	frame: DOMMatrix | null,
 	line: DOMRect
 ) {
 	// The line is drawn across the middle of its rect.
