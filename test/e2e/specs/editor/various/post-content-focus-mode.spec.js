@@ -22,6 +22,7 @@ test.describe( 'Post Content focus mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.resetPreferences();
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'inserts blocks into Post Content from different selection states', async ( {
@@ -191,6 +192,59 @@ test.describe( 'Post Content focus mode', () => {
 		expect( selected ).toBe( 'First' );
 	} );
 
+	// The undo level that typing opens starts from the selection the last
+	// undo restored, so the next undo hands back that same selection, and
+	// has to restore it again.
+	// See https://github.com/WordPress/gutenberg/pull/82706.
+	test( 'undo moves the caret back on undo, type, undo', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		postContentFocusMode,
+		requestUtils,
+	} ) => {
+		// A saved paragraph, so no undo level can remove it.
+		const { id } = await requestUtils.createPost( {
+			content:
+				'<!-- wp:paragraph --><p>Hello world</p><!-- /wp:paragraph -->',
+		} );
+		await admin.editPost( id );
+		await postContentFocusMode.enableShowTemplate();
+
+		// Type after "Hello", then undo.
+		await editor.canvas.getByText( 'Hello world' ).click();
+		await page.keyboard.press( 'End' );
+		for ( let i = 0; i < ' world'.length; i++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+		// The first typing after the editor loads does not always get an
+		// undo level of its own: an undo can turn out empty, or take back
+		// more than the typing. Typing a second after the last change starts
+		// a new level, and nothing on the page shows when that second is up,
+		// so wait it out.
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 1100 );
+		await page.keyboard.type( '-a' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-a world' ] );
+		await postContentFocusMode.undoUntil( pageUtils, [ 'Hello world' ] );
+
+		// Type again at the caret the undo restored, then undo again.
+		await page.keyboard.type( '-b' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-b world' ] );
+		await postContentFocusMode.undoUntil( pageUtils, [ 'Hello world' ] );
+
+		// The caret is back after "Hello", not after the undone text.
+		await page.keyboard.type( '-c' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-c world' ] );
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
 	test.describe( 'post content inside a template part', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
@@ -296,6 +350,54 @@ test.describe( 'Post Content focus mode', () => {
 					} )
 					.click();
 			} );
+		} );
+
+		// The template part is an inner block controller too, but it renders
+		// another entity, so a caret in it must not stop an undo in Post
+		// Content from moving the caret back.
+		// See https://github.com/WordPress/gutenberg/pull/82706.
+		test( 'undo moves the caret back into Post Content from Post Title', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			postContentFocusMode,
+			requestUtils,
+		} ) => {
+			// A saved paragraph, so no undo level can remove it.
+			const { id } = await requestUtils.createPost( {
+				content:
+					'<!-- wp:paragraph --><p>Initial content</p><!-- /wp:paragraph -->',
+			} );
+			await admin.editPost( id );
+			await postContentFocusMode.enableShowTemplate();
+
+			await editor.canvas.getByText( 'Initial content' ).click();
+			await page.keyboard.press( 'End' );
+			// See the settle wait in "undo moves the caret back on undo,
+			// type, undo".
+			// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+			await page.waitForTimeout( 1100 );
+			await page.keyboard.type( '-a' );
+			await expect
+				.poll( () => postContentFocusMode.getPostContentText() )
+				.toEqual( [ 'Initial content-a' ] );
+
+			// Move the caret to Post Title, in the same template part.
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', { name: 'Block: Title' } )
+			);
+			await expect
+				.poll( () => postContentFocusMode.getSelectedBlockName() )
+				.toBe( 'core/post-title' );
+
+			await postContentFocusMode.undoUntil( pageUtils, [
+				'Initial content',
+			] );
+
+			expect( await postContentFocusMode.getSelectedBlockName() ).toBe(
+				'core/paragraph'
+			);
 		} );
 
 		test( 'template part blocks outside post content are not editable', async ( {
@@ -616,6 +718,61 @@ class PostContentFocusMode {
 				getBlockName( id )
 			);
 		} );
+	}
+
+	/**
+	 * Returns the content of Post Content's inner blocks.
+	 *
+	 * @return {string[]} The content of each block inside Post Content.
+	 */
+	async getPostContentText() {
+		return await this.page.evaluate( () => {
+			const { getBlocksByName, getBlockOrder, getBlockAttributes } =
+				window.wp.data.select( 'core/block-editor' );
+			const [ postContentId ] = getBlocksByName( 'core/post-content' );
+			return getBlockOrder( postContentId ).map( ( id ) =>
+				getBlockAttributes( id )?.content?.toString?.()
+			);
+		} );
+	}
+
+	/**
+	 * Returns the name of the selected block.
+	 *
+	 * @return {string|null} The selected block's name, or null.
+	 */
+	async getSelectedBlockName() {
+		return await this.page.evaluate( () => {
+			const { getSelectedBlockClientId, getBlockName } =
+				window.wp.data.select( 'core/block-editor' );
+			const clientId = getSelectedBlockClientId();
+			return clientId ? getBlockName( clientId ) : null;
+		} );
+	}
+
+	/**
+	 * Undoes until Post Content's blocks have the given content. Typing
+	 * coalesces into undo levels on a timer, so the number of levels an edit
+	 * produces is not fixed.
+	 *
+	 * @param {Object}   pageUtils Page utils fixture.
+	 * @param {string[]} expected  The content of each block to undo back to.
+	 */
+	async undoUntil( pageUtils, expected ) {
+		for ( let i = 0; i < 8; i++ ) {
+			await pageUtils.pressKeys( 'primary+z' );
+			try {
+				await expect
+					.poll( () => this.getPostContentText(), { timeout: 1000 } )
+					.toEqual( expected );
+				return;
+			} catch {
+				// Not there yet; undo again.
+			}
+		}
+		await expect
+			.poll( () => this.getPostContentText() )
+			.toEqual( expected );
 	}
 
 	/**
