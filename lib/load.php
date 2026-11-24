@@ -155,6 +155,9 @@ require __DIR__ . '/compat/wordpress-7.2/post.php';
 require __DIR__ . '/compat/wordpress-7.2/navigation-auto-add-pages.php';
 require __DIR__ . '/compat/wordpress-7.2/navigation-remove-deleted-links.php';
 
+// WordPress 7.3 compat.
+require __DIR__ . '/compat/wordpress-7.3/kses.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
@@ -201,7 +204,6 @@ require __DIR__ . '/class-wp-duotone-gutenberg.php';
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
-require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/block-template-utils.php';
@@ -247,11 +249,13 @@ require __DIR__ . '/block-supports/dimensions.php';
 require __DIR__ . '/block-supports/duotone.php';
 require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
+require __DIR__ . '/block-supports/utils.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
+require __DIR__ . '/block-supports/transform.php';
 require __DIR__ . '/block-supports/states.php';
 
 // Client-side media processing.

@@ -148,6 +148,10 @@ function useDuplicateNavigationMenu() {
 					),
 					content: navigationMenu?.content?.raw,
 					status: 'publish',
+					meta: {
+						wp_navigation_auto_add_pages:
+							navigationMenu?.meta?.wp_navigation_auto_add_pages,
+					},
 				},
 				{
 					throwOnError: true,

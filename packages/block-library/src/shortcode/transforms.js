@@ -11,11 +11,16 @@ const getShortcodeFromTransforms = () =>
 
 // Single-shortcode only: keeps the transform menu honest (one block in, one
 // block out) and avoids unmatched shortcodes silently falling back to freeform.
-const isSingleShortcode = ( text, tag ) => {
+// The target's own `isMatch` must pass too (e.g. Gallery needs `ids`), as it
+// does on paste; otherwise the transform falls back to a Shortcode block.
+const isSingleShortcode = ( text, tag, isMatch ) => {
 	const trimmed = text.trim();
 	const match = next( tag, trimmed );
 	return (
-		!! match && match.index === 0 && match.content.length === trimmed.length
+		!! match &&
+		match.index === 0 &&
+		match.content.length === trimmed.length &&
+		( ! isMatch || isMatch( match.shortcode.attrs ) )
 	);
 };
 
@@ -53,7 +58,9 @@ const transforms = {
 			isMatch: ( { text = '' } ) => {
 				return []
 					.concat( fromTransform.tag )
-					.some( ( tag ) => isSingleShortcode( text, tag ) );
+					.some( ( tag ) =>
+						isSingleShortcode( text, tag, fromTransform.isMatch )
+					);
 			},
 			transform: ( { text = '' } ) => {
 				return rawHandler( { HTML: `<p>${ text.trim() }</p>` } );

@@ -93,8 +93,6 @@ const MainContent = ( {
 const MenuInspectorControls = ( props ) => {
 	const {
 		clientId,
-		createNavigationMenuIsSuccess,
-		createNavigationMenuIsError,
 		currentMenuId = null,
 		onCreateNew,
 		onSelectClassicMenu,
@@ -128,12 +126,6 @@ const MenuInspectorControls = ( props ) => {
 						onSelectClassicMenu={ onSelectClassicMenu }
 						onSelectNavigationMenu={ onSelectNavigationMenu }
 						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
 						isManageMenusButtonDisabled={
 							isManageMenusButtonDisabled
 						}
@@ -161,12 +153,6 @@ const MenuInspectorControls = ( props ) => {
 						onSelectClassicMenu={ onSelectClassicMenu }
 						onSelectNavigationMenu={ onSelectNavigationMenu }
 						onCreateNew={ onCreateNew }
-						createNavigationMenuIsSuccess={
-							createNavigationMenuIsSuccess
-						}
-						createNavigationMenuIsError={
-							createNavigationMenuIsError
-						}
 						actionLabel={ actionLabel }
 						isManageMenusButtonDisabled={
 							isManageMenusButtonDisabled

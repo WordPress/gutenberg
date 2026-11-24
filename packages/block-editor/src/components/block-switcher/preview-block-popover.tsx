@@ -1,4 +1,4 @@
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
 import type { PreviewBlockPopoverProps } from './types';
@@ -17,7 +17,7 @@ export default function PreviewBlockPopover( {
 
 	return (
 		<div className="block-editor-block-switcher__popover-preview-container">
-			<Popover
+			<WCPopover
 				className="block-editor-block-switcher__popover-preview"
 				placement={ placement }
 				focusOnMount={ false }
@@ -30,7 +30,7 @@ export default function PreviewBlockPopover( {
 						block which uses this breakpoint has the correct padding. */ }
 					<BlockPreview viewportWidth={ 601 } blocks={ blocks } />
 				</div>
-			</Popover>
+			</WCPopover>
 		</div>
 	);
 }

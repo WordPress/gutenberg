@@ -15,6 +15,8 @@ Start from the consumer's need. For a bug fix, reproduce the failure and identif
 
 When choosing a component or token, use the Design System MCP server's `get_components`, `get_component_details`, and `get_design_tokens` as appropriate when available. Without MCP, use the guide's [recommendation sources](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component) and the [token reference](../../../packages/theme/docs/tokens.md). Check the current source before adding an API that appears to be missing.
 
+Before choosing color tokens, read [Keep color roles aligned](../../../packages/theme/docs/tokens.md#keep-color-roles-aligned). Preserve the target, tone, and emphasis across interaction states. Change only the state segment unless a documented component-specific pattern requires otherwise. For example, brand-toned secondary, tertiary, and link Button text should use `--wpds-color-foreground-interactive-brand-disabled` when disabled. Equal current values do not make brand and neutral tokens interchangeable.
+
 Keep product-specific behavior in the consuming package and use [design-system-ui-composition](../design-system-ui-composition/SKILL.md) for that work. For unresolved public design decisions, follow [Contributing to the Design System](../../../storybook/stories/design-system/contributing.md#fix-it-at-the-source) before implementation; continue work that does not depend on that decision.
 
 ## Preserve the affected contracts
@@ -28,6 +30,6 @@ Keep product-specific behavior in the consuming package and use [design-system-u
 
 Start with existing tests and stories. Add coverage only for a concrete regression risk introduced by our code or integration that existing coverage does not address. Rely on dependency tests for behavior the dependency owns; avoid speculative edge cases and exhaustive combinations. Use the guide's [verification choices](../../../docs/contributors/design/design-system-packages.md#verify-the-affected-behavior) for checks that need a browser.
 
-When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together.
+When changing component recommendations, follow the [component status guidance](../../../packages/ui/CONTRIBUTING.md#component-status) to update Storybook status, curated `manifest` tags, ESLint recommendation lists, migration guidance, and generated manifest snapshots together. When a `@wordpress/ui` component replaces a `@wordpress/components` component, follow the stages in [Replace a legacy component](../../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component).
 
 Follow the [completion checks](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for affected exports, documentation, generated files, and changelogs, along with the repository's required checks. State any material verification gap without claiming visual parity from snapshots or class assertions.

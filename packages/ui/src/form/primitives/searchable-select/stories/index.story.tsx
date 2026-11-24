@@ -19,6 +19,7 @@ const meta: Meta< typeof SearchableSelect > = {
 	id: 'design-system-components-form-primitives-searchableselect',
 	component: SearchableSelect,
 	subcomponents: {
+		'SearchableSelect.LoadingIndicator': SearchableSelect.LoadingIndicator,
 		'SearchableSelect.Trigger': SearchableSelect.Trigger,
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
@@ -122,6 +123,7 @@ export const WithCustomItems: Story = {
  * props and content independently of the popup items.
  */
 export const WithCustomTrigger: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 0 ],

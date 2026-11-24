@@ -1,11 +1,11 @@
 import { __ } from '@wordpress/i18n';
-import { applyFormat, insert, useAnchor } from '@wordpress/rich-text';
+import { applyFormat, insert, remove, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
 	RichTextToolbarButton,
 } from '@wordpress/block-editor';
-import { Popover, SVG, Path } from '@wordpress/components';
+import { Popover as WCPopover, SVG, Path } from '@wordpress/components';
 import type { FormatEditProps } from '../types';
 
 const name = 'core/non-breaking-space';
@@ -40,11 +40,11 @@ function PopoverAnchor( {
 	} );
 
 	return (
-		<Popover anchor={ popoverAnchor }>
+		<WCPopover anchor={ popoverAnchor }>
 			<div style={ { whiteSpace: 'nowrap', padding: '4px' } }>
 				{ __( 'Non-breaking space' ) }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }
 
@@ -59,6 +59,10 @@ export const nonBreakingSpace = {
 		}
 
 		const range = getNonBreakingSpaceRange( value );
+		const rangeText = range
+			? value.text.slice( range[ 0 ], range[ 1 ] )
+			: '';
+		const nonBreakingSpaceCount = rangeText.split( NBSP ).length - 1;
 
 		function replaceNonBreakingSpaces() {
 			if ( ! range ) {
@@ -67,13 +71,29 @@ export const nonBreakingSpace = {
 
 			const [ from, to ] = range;
 			const { text } = value;
-			onChange( {
+			let newValue: RichTextValue = {
 				...value,
 				text:
 					text.slice( 0, from ) +
 					text.slice( from, to ).replaceAll( NBSP, ' ' ) +
 					text.slice( to ),
-			} );
+			};
+
+			// HTML collapses a space next to another space or at the start or
+			// end of a line, so remove the non-breaking space there instead.
+			for ( let index = to - 1; index >= from; index-- ) {
+				const isCollapsed = [
+					newValue.text[ index - 1 ],
+					newValue.text[ index + 1 ],
+				].some( ( character ) =>
+					[ undefined, ' ', '\n' ].includes( character )
+				);
+				if ( text[ index ] === NBSP && isCollapsed ) {
+					newValue = remove( newValue, index, index + 1 );
+				}
+			}
+
+			onChange( newValue );
 			onFocus();
 		}
 
@@ -93,7 +113,11 @@ export const nonBreakingSpace = {
 					<RichTextToolbarButton
 						name="non-breaking-space"
 						icon={ icon }
-						title={ __( 'Replace non-breaking spaces' ) }
+						title={
+							nonBreakingSpaceCount === 1
+								? __( 'Replace non-breaking space' )
+								: __( 'Replace non-breaking spaces' )
+						}
 						onClick={ replaceNonBreakingSpaces }
 						isActive
 					/>

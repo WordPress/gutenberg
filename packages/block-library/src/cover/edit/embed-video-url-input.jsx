@@ -2,7 +2,7 @@ import { useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	TextControl,
-	Notice,
+	Notice as WCNotice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
@@ -46,9 +46,9 @@ export default function EmbedVideoUrlInput( {
 		>
 			<Stack direction="column" gap="lg">
 				{ error && (
-					<Notice status="error" isDismissible={ false }>
+					<WCNotice status="error" isDismissible={ false }>
 						{ error }
-					</Notice>
+					</WCNotice>
 				) }
 				<TextControl
 					type="url"

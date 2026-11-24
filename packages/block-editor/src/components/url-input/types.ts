@@ -23,6 +23,10 @@ export interface SuggestionItemProps {
 	id: string;
 	ref: ( node: HTMLElement | null ) => void;
 	'aria-selected'?: boolean;
+	/**
+	 * Updates the active suggestion when the pointer moves over the item.
+	 */
+	onMouseMove?: () => void;
 }
 
 /**
@@ -207,6 +211,7 @@ export interface URLInputSuggestionsListProps {
 	renderSuggestions: URLInputProps[ '__experimentalRenderSuggestions' ];
 	selectedSuggestion: number | null;
 	suggestionNodesRef: MutableRefObject< ( HTMLElement | null )[] >;
+	onSuggestionHover: ( index: number ) => void;
 	suggestionOptionIdPrefix: string;
 	suggestions: LinkControlSuggestion[];
 	suggestionsListboxId: string;

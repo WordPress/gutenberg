@@ -32,10 +32,6 @@ export default meta;
 
 type Story = StoryObj< typeof ValidatedInputControl >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
- */
 export const Default: Story = {
 	args: {
 		label: 'Text',

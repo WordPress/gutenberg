@@ -328,4 +328,4 @@ Block_Attributes
   }
 
 __
-  = [ \t\r\n]+
+  = [ \t\f\r\n]+

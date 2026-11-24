@@ -4,6 +4,7 @@ import type { BlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
+	getGlobalBlockBaseStyle,
 	getInlineStyles,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
@@ -368,6 +369,36 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'outputs a hover rotation as the individual rotate property', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { rotate: '8deg' } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { rotate: 8deg !important; }'
+		);
+	} );
+
+	it( 'outputs a hover translation as the axis it sets', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { translate: { y: '-4px' } } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { --wp--style--translate-y: -4px !important; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important; }'
+		);
+	} );
+
 	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
 		expect(
 			getBlockStateStylesCSS(
@@ -579,6 +610,83 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'does not output viewport element transforms', () => {
+		const rules = getResponsiveStateCSSRules(
+			{
+				'@mobile': {
+					elements: {
+						link: {
+							color: { text: 'red' },
+							transform: {
+								rotate: '10deg',
+								translate: { x: '10px' },
+							},
+							':hover': { transform: { rotate: '20deg' } },
+						},
+						heading: { transform: { rotate: '10deg' } },
+						h1: { transform: { rotate: '10deg' } },
+					},
+				},
+			},
+			'core/group',
+			'.wp-elements-1'
+		);
+
+		expect( rules.join( '' ) ).toContain( 'color: red' );
+		expect( rules.join( '' ) ).not.toContain( 'rotate' );
+		expect( rules.join( '' ) ).not.toContain( 'translate' );
+	} );
+
+	it( 'routes a viewport rotation through the transform feature selector', () => {
+		registerBlockType( 'test/state-rotate', {
+			apiVersion: 3,
+			title: 'State Rotate',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: { transform: '.wp-block-test-state-rotate img' },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { transform: { rotate: '0' } } },
+			'test/state-rotate',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-rotate' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 0 !important; }}',
+		] );
+	} );
+
+	it( 'routes a viewport translation through the transform feature selector', () => {
+		registerBlockType( 'test/state-translate', {
+			apiVersion: 3,
+			title: 'State Translate',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: { transform: '.wp-block-test-state-translate img' },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				'@mobile': {
+					transform: { rotate: '5deg', translate: { x: '10%' } },
+				},
+			},
+			'test/state-translate',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-translate' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 5deg !important; --wp--style--translate-x: 10% !important; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important; }}',
+		] );
+	} );
+
 	it( 'paints a viewport text color for a block that supports the clip', () => {
 		registerBlockType( 'test/state-text', {
 			apiVersion: 3,
@@ -669,6 +777,156 @@ describe( 'getResponsiveStateCSSRules', () => {
 		] );
 	} );
 
+	it( 'escapes a Global Styles text clip for a viewport box clip', () => {
+		registerBlockType( 'test/state-text', {
+			apiVersion: 3,
+			title: 'State Text',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { background: { backgroundClip: 'border-box' } } },
+			'test/state-text',
+			'.wp-elements-1',
+			undefined,
+			() => ( { background: { backgroundClip: 'text' } } )
+		);
+		unregisterBlockType( 'test/state-text' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }\n.wp-elements-1 { background-image: unset !important; }}',
+		] );
+	} );
+
+	it( 'escapes the default pseudo state text clip for a viewport pseudo state', () => {
+		registerBlockType( 'core/button', {
+			apiVersion: 3,
+			title: 'Button',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				':hover': {
+					background: {
+						gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+						backgroundClip: 'text',
+					},
+				},
+				'@mobile': {
+					':hover': { background: { backgroundClip: 'border-box' } },
+				},
+			},
+			'core/button',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'core/button' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1:hover { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }\n.wp-elements-1:hover { background-image: unset !important; }}',
+		] );
+	} );
+
+	it( 'keeps a Global Styles gradient set for the same viewport', () => {
+		registerBlockType( 'test/state-text', {
+			apiVersion: 3,
+			title: 'State Text',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+		const globalBlockStyles = {
+			background: {
+				gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+				backgroundClip: 'text',
+			},
+			'@mobile': {
+				background: {
+					gradient: 'linear-gradient(135deg,#11998e,#38ef7d)',
+					backgroundClip: 'border-box',
+				},
+			},
+		} as unknown as Parameters< typeof getGlobalBlockBaseStyle >[ 0 ];
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { background: { backgroundClip: 'border-box' } } },
+			'test/state-text',
+			'.wp-elements-1',
+			undefined,
+			( statePath ) =>
+				getGlobalBlockBaseStyle(
+					globalBlockStyles,
+					undefined,
+					[ '@mobile' ],
+					statePath
+				)
+		);
+		unregisterBlockType( 'test/state-text' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }}',
+		] );
+	} );
+
+	it( 'keeps a Global Styles gradient set for the same viewport pseudo state', () => {
+		registerBlockType( 'core/button', {
+			apiVersion: 3,
+			title: 'Button',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+		const globalBlockStyles = {
+			background: {
+				gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+				backgroundClip: 'text',
+			},
+			'@mobile': {
+				':hover': {
+					background: {
+						gradient: 'linear-gradient(135deg,#11998e,#38ef7d)',
+						backgroundClip: 'border-box',
+					},
+				},
+			},
+		} as unknown as Parameters< typeof getGlobalBlockBaseStyle >[ 0 ];
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				'@mobile': {
+					':hover': { background: { backgroundClip: 'border-box' } },
+				},
+			},
+			'core/button',
+			'.wp-elements-1',
+			undefined,
+			( statePath ) =>
+				getGlobalBlockBaseStyle(
+					globalBlockStyles,
+					undefined,
+					[ ':hover', '@mobile' ],
+					statePath
+				)
+		);
+		unregisterBlockType( 'core/button' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1:hover { background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; }}',
+		] );
+	} );
+
 	it( 'generates media-query scoped element styles for viewport states', () => {
 		expect(
 			getResponsiveStateCSSRules(
@@ -687,6 +945,75 @@ describe( 'getResponsiveStateCSSRules', () => {
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
 		] );
+	} );
+} );
+
+describe( 'getGlobalBlockBaseStyle', () => {
+	it( 'layers the first applied variation with styles over the block type', () => {
+		expect(
+			getGlobalBlockBaseStyle(
+				{
+					background: { backgroundClip: 'border-box' },
+					color: { text: 'red' },
+					'@mobile': { color: { text: 'blue' } },
+					variations: {
+						empty: {},
+						flashy: {
+							background: { backgroundClip: 'text' },
+							':hover': { color: { text: 'green' } },
+						},
+					},
+				} as unknown as Parameters<
+					typeof getGlobalBlockBaseStyle
+				>[ 0 ],
+				'wp-block-paragraph is-style-empty is-style-flashy',
+				[ ':hover', '@mobile' ]
+			)
+		).toEqual( {
+			background: { backgroundClip: 'text' },
+			color: { text: 'red' },
+		} );
+	} );
+	it( 'adds the Global Styles for the state, in output order', () => {
+		const globalBlockStyles = {
+			background: { backgroundClip: 'text' },
+			color: { text: 'red' },
+			':hover': {
+				background: { backgroundClip: 'border-box' },
+				color: { text: 'green' },
+			},
+			'@mobile': {
+				color: { text: 'blue' },
+				':hover': { color: { text: 'purple' } },
+			},
+		} as unknown as Parameters< typeof getGlobalBlockBaseStyle >[ 0 ];
+		const stateKeys = [ ':hover', '@mobile' ];
+
+		expect(
+			getGlobalBlockBaseStyle( globalBlockStyles, undefined, stateKeys, [
+				'@mobile',
+			] )
+		).toEqual( {
+			background: { backgroundClip: 'text' },
+			color: { text: 'blue' },
+		} );
+		expect(
+			getGlobalBlockBaseStyle( globalBlockStyles, undefined, stateKeys, [
+				':hover',
+			] )
+		).toEqual( {
+			background: { backgroundClip: 'border-box' },
+			color: { text: 'green' },
+		} );
+		expect(
+			getGlobalBlockBaseStyle( globalBlockStyles, undefined, stateKeys, [
+				'@mobile',
+				':hover',
+			] )
+		).toEqual( {
+			background: { backgroundClip: 'border-box' },
+			color: { text: 'purple' },
+		} );
 	} );
 } );
 

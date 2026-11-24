@@ -2,9 +2,32 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 0.12.0 (2026-11-18)
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.11.0 (2026-11-04)
+
+### New Features
+
+-   `useWidgetIdentity()`: a mounted widget reads its type's translated `title` from context. `WidgetRender` provides it from the `widgetType` it already holds; absent a provider, the hook returns `{}` ([#85729](https://github.com/WordPress/gutenberg/pull/85729)).
+
 ### Enhancements
 
 -   `WidgetModuleRecord.example`: a record carries the `example` `widget.json` declares, in the shape of the runtime field; `useWidgetTypes` reads it for a record without a metadata module, and when the module declares no `example` of its own ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ## 0.10.0 (2026-10-20)
 

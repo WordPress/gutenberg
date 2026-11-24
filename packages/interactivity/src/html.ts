@@ -26,6 +26,36 @@ export const emptyHTML =
 	( globalThis as { trustedTypes?: TrustedTypePolicyFactory } ).trustedTypes
 		?.emptyHTML ?? '';
 
+/** Void and text-only elements on which `data-wp-html` cannot own content. */
+export const unsupportedHtmlElements = new Set( [
+	'area',
+	'base',
+	'basefont',
+	'bgsound',
+	'br',
+	'col',
+	'embed',
+	'frame',
+	'hr',
+	'img',
+	'input',
+	'keygen',
+	'link',
+	'meta',
+	'param',
+	'source',
+	'track',
+	'wbr',
+	'textarea',
+	'title',
+	'script',
+	'style',
+	'iframe',
+	'xmp',
+	'noembed',
+	'noframes',
+] );
+
 declare const dangerousHTMLBrand: unique symbol;
 
 /**

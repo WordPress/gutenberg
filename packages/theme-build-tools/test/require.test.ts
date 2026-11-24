@@ -7,7 +7,7 @@ it( 'loads the plugins with require() from CommonJS', () => {
 	// `require()`, which rejects ES modules that use top-level `await`.
 	const output = execFileSync(
 		process.execPath,
-		[ join( __dirname, 'fixtures/require/require-plugins.cjs' ) ],
+		[ join( import.meta.dirname, 'fixtures/require/require-plugins.cjs' ) ],
 		{ encoding: 'utf8' }
 	);
 	const result = JSON.parse( output );

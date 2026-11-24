@@ -52,30 +52,41 @@ function BlockQuickNavigationItem( {
 	hasListViewTab,
 }: BlockQuickNavigationItemProps ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { isSelected, childBlocks, shouldRenderListView, blockName } =
-		useSelect(
-			( select ) => {
-				const {
-					isBlockSelected,
-					hasSelectedInnerBlock,
-					getBlockOrder,
-					getBlockName,
-					shouldRenderBlockListView,
-				} = unlock( select( blockEditorStore ) );
+	const {
+		isSelected,
+		childBlocks,
+		shouldRenderListView,
+		isNestedListView,
+		blockName,
+	} = useSelect(
+		( select ) => {
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockOrder,
+				getBlockName,
+				getBlockParents,
+				shouldRenderBlockListView,
+			} = unlock( select( blockEditorStore ) );
 
-				const _blockName = getBlockName( clientId );
+			const _blockName = getBlockName( clientId );
 
-				return {
-					isSelected:
-						isBlockSelected( clientId ) ||
-						hasSelectedInnerBlock( clientId, /* deep: */ true ),
-					childBlocks: getBlockOrder( clientId ),
-					shouldRenderListView: shouldRenderBlockListView( clientId ),
-					blockName: _blockName,
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				isSelected:
+					isBlockSelected( clientId ) ||
+					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				childBlocks: getBlockOrder( clientId ),
+				shouldRenderListView: shouldRenderBlockListView( clientId ),
+				// An ancestor's List View already includes this block.
+				isNestedListView: getBlockParents( clientId, false ).some(
+					( parentId: string ) =>
+						shouldRenderBlockListView( parentId )
+				),
+				blockName: _blockName,
+			};
+		},
+		[ clientId ]
+	);
 
 	const blockType = getBlockType( blockName );
 	const displayTitle = useBlockDisplayTitle( {
@@ -113,7 +124,10 @@ function BlockQuickNavigationItem( {
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
 	const canNavigateToListView =
-		hasChildren && hasListViewTab && shouldRenderListView;
+		hasChildren &&
+		hasListViewTab &&
+		shouldRenderListView &&
+		! isNestedListView;
 
 	return (
 		<Button

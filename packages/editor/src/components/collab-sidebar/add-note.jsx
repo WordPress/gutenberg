@@ -9,16 +9,17 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread, hasFocusWithin } from './utils';
+import { isFocusInBlocks } from './utils/dom';
 import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { clientId, sidebarRef, floating } ) {
+export function AddNote( { clientIds, floating } ) {
+	const [ clientId ] = clientIds;
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { onCreate, onDiscard } = useNoteActions();
@@ -44,8 +45,8 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 		if ( isSubmittingRef.current ) {
 			return;
 		}
-		// In the block, the caret events decide; dismissing here too would race them.
-		if ( hasFocusWithin( blockElement ) ) {
+		// In the form's blocks, the caret events decide; dismissing here too would race them.
+		if ( isFocusInBlocks( blockElement?.ownerDocument, clientIds ) ) {
 			return;
 		}
 
@@ -55,7 +56,7 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 		 * newly selected note.
 		 */
 		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
-			onDiscard( clientId );
+			onDiscard( clientIds );
 			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
@@ -63,7 +64,7 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 
 	const unselectNote = () => {
 		setDraft( '' );
-		onDiscard( clientId );
+		onDiscard( clientIds );
 		selectNote( undefined );
 		blockElement?.focus();
 		toggleBlockHighlight( clientId, false );
@@ -93,11 +94,7 @@ export function AddNote( { clientId, sidebarRef, floating } ) {
 								content: inputComment,
 							} );
 							if ( savedRecord ) {
-								selectNote( savedRecord.id );
-								focusNoteThread(
-									savedRecord.id,
-									sidebarRef.current
-								);
+								selectNote( savedRecord.id, { focus: true } );
 							}
 							return savedRecord;
 						} finally {

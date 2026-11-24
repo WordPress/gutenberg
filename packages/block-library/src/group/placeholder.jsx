@@ -96,25 +96,17 @@ export function useShouldShowPlaceHolder( {
 			usedLayoutType !== 'grid'
 	);
 
-	useEffect( () => {
-		if (
-			!! hasInnerBlocks ||
+	if (
+		showPlaceholder &&
+		( !! hasInnerBlocks ||
 			!! backgroundColor ||
 			!! fontSize ||
 			!! textColor ||
 			!! style ||
-			usedLayoutType === 'flex'
-		) {
-			setShowPlaceholder( false );
-		}
-	}, [
-		backgroundColor,
-		fontSize,
-		textColor,
-		style,
-		usedLayoutType,
-		hasInnerBlocks,
-	] );
+			usedLayoutType === 'flex' )
+	) {
+		setShowPlaceholder( false );
+	}
 
 	return [ showPlaceholder, setShowPlaceholder ];
 }

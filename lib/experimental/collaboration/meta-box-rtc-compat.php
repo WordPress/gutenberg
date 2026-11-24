@@ -48,9 +48,7 @@ function gutenberg_inject_rtc_compatible_meta_boxes( $wp_meta_boxes ) {
 					continue;
 				}
 
-				if ( ! isset( $meta_boxes_per_location[ $location ] ) ) {
-					$meta_boxes_per_location[ $location ] = array();
-				}
+				$meta_boxes_per_location[ $location ] ??= array();
 
 				$meta_boxes_per_location[ $location ][] = array(
 					'id'               => $meta_box['id'],
