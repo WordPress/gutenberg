@@ -273,6 +273,22 @@ test.describe( 'Site Editor Inserter', () => {
 			} );
 		} );
 	} );
+
+	// Both site editors register the experimental blocks of the Gutenberg
+	// plugin, so they offer the same blocks.
+	test( 'offers the experimental blocks', async ( { InserterUtils } ) => {
+		await InserterUtils.openBlockLibrary();
+		await InserterUtils.blockLibrary
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Table of Contents' );
+
+		await expect(
+			InserterUtils.blockLibrary.getByRole( 'option', {
+				name: 'Table of Contents',
+				exact: true,
+			} )
+		).toBeVisible();
+	} );
 } );
 
 class InserterUtils {
