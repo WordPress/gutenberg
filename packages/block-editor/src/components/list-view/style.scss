@@ -88,6 +88,7 @@
 	&.is-synced .block-editor-list-view-block-contents:focus::after {
 		--focus-color: var(--wp-block-synced-color);
 	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block__appender:focus,
 	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wp-block-synced-color);
 		@include outset-ring__focus();
@@ -96,6 +97,7 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
+	&.is-selected .block-editor-list-view-block__appender:focus,
 	&.is-selected .block-editor-list-view-block__menu:focus {
 		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
@@ -129,6 +131,7 @@
 		}
 
 		// The menu ring is inset over the selected background.
+		&.is-selected .block-editor-list-view-block__appender:focus,
 		&.is-selected .block-editor-list-view-block__menu:focus {
 			--focus-color: SelectedItemText;
 		}
@@ -320,18 +323,25 @@
 		flex: 0 0 $icon-size;
 	}
 
+	.block-editor-list-view-block__appender-cell,
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
 	.block-editor-list-view-block__contents-cell {
 		padding: 0;
 	}
 
+	.block-editor-list-view-block__appender-cell,
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell {
 		line-height: 0;
 		width: $button-size-small + $grid-unit-05;
 		vertical-align: middle;
+	}
 
+	// The + of a row stays visible, so which rows can hold items shows
+	// without a hover.
+	.block-editor-list-view-block__menu-cell,
+	.block-editor-list-view-block__mover-cell {
 		> * {
 			opacity: 0;
 		}

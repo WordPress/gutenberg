@@ -341,6 +341,8 @@ export type BlockListSettings = Record< string, unknown > & {
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	/** A function is deprecated. */
 	directInsert?: boolean | ( ( ...args: never[] ) => unknown );
+	/** Set when the block shows no appender for its inner blocks. */
+	hidesAppender?: boolean;
 };
 
 export interface ShowInsertionPointOptions {

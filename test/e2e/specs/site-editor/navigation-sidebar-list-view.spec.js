@@ -504,6 +504,59 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( optionsButton ).toBeFocused();
 		} );
 	} );
+
+	test( 'adds items to the end of a submenu from the + in its row, and offers none on a link', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Row Appender Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"Existing Submenu","type":"custom","url":"https://wordpress.org/2","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await expect(
+			listView.getByRole( 'row', { name: 'Existing Item' } )
+		).toBeVisible();
+
+		const submenuRow = listView.getByRole( 'row', {
+			name: 'Existing Submenu',
+		} );
+		await submenuRow
+			.getByRole( 'button', { name: 'Add to Existing Submenu' } )
+			.click();
+		await linkControl.useLinkControlSearch( 'Test Page 1' );
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Test Page 1' } )
+				.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+		).toBeVisible();
+
+		for ( const name of [
+			'Existing Item',
+			'Submenu Item',
+			'Test Page 1',
+		] ) {
+			await expect(
+				listView
+					.getByRole( 'row', { name } )
+					.getByRole( 'button', { name: /^Add to / } )
+			).toHaveCount( 0 );
+		}
+	} );
 } );
 
 class LinkControl {

@@ -176,9 +176,39 @@ function ListViewBlock( {
 		listViewInstanceId,
 		updateExpansion,
 		setInsertedBlockClientId,
+		BlockAppender,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
+
+	// Whether the row gets a + that adds a block inside it. The block must
+	// take inner blocks, show an appender for them on the canvas, and allow
+	// inserting them, so a block such as a Navigation Link, which shows none,
+	// gets no +. Should be kept in sync with the List View appender's own
+	// check.
+	const canAppend = useSelect(
+		( select ) => {
+			if ( ! BlockAppender ) {
+				return false;
+			}
+			const {
+				canEditBlock: _canEditBlock,
+				getBlockListSettings,
+				getTemplateLock,
+				isZoomOut,
+			} = unlock( select( blockEditorStore ) );
+			const templateLock = getTemplateLock( clientId );
+			const listSettings = getBlockListSettings( clientId );
+			return (
+				_canEditBlock( clientId ) &&
+				!! listSettings &&
+				! listSettings.hidesAppender &&
+				! ( !! templateLock && templateLock !== 'contentOnly' ) &&
+				! isZoomOut()
+			);
+		},
+		[ clientId, BlockAppender ]
+	);
 	const isMatch = useShortcutEventMatch();
 
 	// Determine which blocks to update:
@@ -586,11 +616,17 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
+	const hasRenderedAppender = canAppend && ! isDisabled;
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
+	}
+	// Rows without a + span its column, so the columns after it line up.
+	if ( BlockAppender && ! hasRenderedAppender ) {
+		colSpan = ( colSpan ?? 1 ) + 1;
 	}
 
 	const classes = clsx( {
@@ -733,6 +769,25 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasRenderedAppender && BlockAppender && (
+				<TreeGridCell
+					className="block-editor-list-view-block__appender-cell"
+					aria-selected={ !! isSelected }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockAppender
+							clientId={ clientId }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

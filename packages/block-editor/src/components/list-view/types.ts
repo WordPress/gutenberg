@@ -6,6 +6,7 @@ import type {
 	KeyboardEvent,
 	MouseEvent,
 	ReactNode,
+	RefAttributes,
 	RefObject,
 	SetStateAction,
 	DragEvent,
@@ -145,6 +146,9 @@ export type ListViewContextValue = {
 	listViewInstanceId?: number | string;
 	rootClientId?: string | null;
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	BlockAppender?: ComponentType<
+		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
+	> | null;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
 };
@@ -191,6 +195,10 @@ export type PrivateListViewProps = ListViewProps & {
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
+	/** Component that renders a + in each row that can take inner blocks, which adds one at the end of them. Rows get none when it is not set. */
+	blockAppender?: ComponentType<
+		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
+	> | null;
 };
 
 /**
@@ -293,6 +301,17 @@ export type ListViewAppenderProps = {
 	clientId?: string | null;
 	tabIndex?: number;
 	onFocus?: FocusEventHandler;
+};
+
+/**
+ * Props of the + in each row.
+ */
+export type ListViewBlockAppenderProps = {
+	clientId: string;
+	tabIndex?: number;
+	onFocus?: FocusEventHandler;
+	updateExpansion: UpdateListViewExpansion;
+	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
 };
 
 /**

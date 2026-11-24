@@ -12,6 +12,7 @@ import {
 } from './utils/search-ranking';
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
+import { ListViewBlockAppender } from './components/list-view/block-appender';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
@@ -101,6 +102,7 @@ lock( privateApis, {
 	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
+	ListViewBlockAppender,
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,

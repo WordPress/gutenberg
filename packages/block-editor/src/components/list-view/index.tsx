@@ -93,6 +93,7 @@ const expansion = (
  * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param props.additionalBlockContent Component that renders additional block content UI.
  * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
+ * @param props.blockAppender          Component that renders a + in each row that can take inner blocks, which adds one at the end of them. Rows get none when it is not set.
  * @param ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -110,6 +111,7 @@ function ListViewComponent(
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
 		showContentPopover = false,
+		blockAppender: BlockAppender,
 	}: PrivateListViewProps,
 	ref: ForwardedRef< HTMLElement >
 ) {
@@ -317,6 +319,7 @@ function ListViewComponent(
 			listViewInstanceId: instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			BlockAppender,
 			treeGridElementRef: elementRef,
 			updateExpansion,
 		} ),
@@ -326,6 +329,7 @@ function ListViewComponent(
 			instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			BlockAppender,
 			updateExpansion,
 		]
 	);
