@@ -636,3 +636,68 @@ svg {
 .list-view-appender__description {
 	display: none;
 }
+
+// The space that opens after a block's last inner block while the + in its row
+// is hovered or focused. It slides open, and its dashed outline fades in where
+// the new block's row will be.
+.block-editor-list-view-block-appender-preview > td {
+	padding: 0;
+}
+
+.block-editor-list-view-block-appender-preview__space {
+	position: relative;
+	height: $grid-unit-40;
+	overflow: hidden;
+
+	@media not ( prefers-reduced-motion ) {
+		animation: block-editor-list-view-block-appender-preview__slide-open 0.24s cubic-bezier(0.2, 0, 0, 1) both;
+
+		.is-closing & {
+			animation: block-editor-list-view-block-appender-preview__slide-shut 0.16s cubic-bezier(0.4, 0, 1, 1) both;
+		}
+	}
+}
+
+.block-editor-list-view-block-appender-preview__outline {
+	position: absolute;
+	top: $grid-unit-05 * 0.5;
+	bottom: $grid-unit-05 * 0.5;
+	// Starts where the icon of a row at the new block's level does.
+	left: calc(var(--wp-block-editor--list-view-preview-level) * #{$grid-unit-30} - #{$grid-unit-05});
+	right: $grid-unit-05;
+	border: $border-width dashed currentColor;
+	border-radius: $radius-small;
+	opacity: 0.4;
+
+	@media not ( prefers-reduced-motion ) {
+		animation: block-editor-list-view-block-appender-preview__fade-in 0.2s ease-out 0.06s both;
+
+		.is-closing & {
+			animation: block-editor-list-view-block-appender-preview__fade-out 0.12s ease-in both;
+		}
+	}
+}
+
+@keyframes block-editor-list-view-block-appender-preview__slide-open {
+	from {
+		height: 0;
+	}
+}
+
+@keyframes block-editor-list-view-block-appender-preview__slide-shut {
+	to {
+		height: 0;
+	}
+}
+
+@keyframes block-editor-list-view-block-appender-preview__fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes block-editor-list-view-block-appender-preview__fade-out {
+	to {
+		opacity: 0;
+	}
+}

@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { FocusEvent, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
@@ -66,6 +66,10 @@ function ListViewBlock( {
 }: ListViewBlockProps ) {
 	const cellRef = useRef< HTMLTableCellElement >( null );
 	const rowRef = useRef< HTMLTableRowElement >( null );
+	// The space a + opens stays open while the + is hovered or focused from
+	// the keyboard. `:hover` still matches during `mouseleave`, so hovering is
+	// tracked here.
+	const isAppenderHoveredRef = useRef( false );
 	const settingsToggleRef = useRef< HTMLButtonElement >( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	// The settings menu is costly to mount, so a row only gets one once it
@@ -178,6 +182,7 @@ function ListViewBlock( {
 		setInsertedBlockClientId,
 		BlockAppender,
 		hasBlockAppender,
+		setBlockAppenderPreview,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
@@ -620,6 +625,13 @@ function ListViewBlock( {
 
 	const hasRenderedAppender = canAppend && ! isDisabled;
 
+	const showBlockAppenderPreview = () =>
+		setBlockAppenderPreview( { clientId } );
+	const hideBlockAppenderPreview = () =>
+		setBlockAppenderPreview( ( current ) =>
+			current.clientId === clientId ? { clientId: null } : current
+		);
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
@@ -775,6 +787,44 @@ function ListViewBlock( {
 				<TreeGridCell
 					className="block-editor-list-view-block__appender-cell"
 					aria-selected={ !! isSelected }
+					// Hovering the +, or moving to it with the keyboard,
+					// opens a space where its new block will go.
+					onMouseEnter={ () => {
+						isAppenderHoveredRef.current = true;
+						showBlockAppenderPreview();
+					} }
+					onMouseLeave={ ( event: MouseEvent< HTMLElement > ) => {
+						isAppenderHoveredRef.current = false;
+						if (
+							! event.currentTarget.querySelector(
+								':focus-visible'
+							)
+						) {
+							hideBlockAppenderPreview();
+						}
+					} }
+					onFocus={ ( event: FocusEvent< HTMLElement > ) => {
+						if ( event.target.matches( ':focus-visible' ) ) {
+							showBlockAppenderPreview();
+						}
+					} }
+					onBlur={ ( event: FocusEvent< HTMLElement > ) => {
+						if (
+							! isAppenderHoveredRef.current &&
+							! event.currentTarget.contains(
+								event.relatedTarget as Node | null
+							)
+						) {
+							hideBlockAppenderPreview();
+						}
+					} }
+					// The new block takes the space's place.
+					onClick={ () =>
+						setBlockAppenderPreview( {
+							clientId: null,
+							isInstant: true,
+						} )
+					}
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockAppender

@@ -1236,6 +1236,106 @@ test.describe( 'Navigation block - List view editing', () => {
 				.toBe( 1 );
 		} );
 
+		test( 'opens a space where the new item will go while its + is hovered or focused', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			const preview = listView.locator(
+				'.block-editor-list-view-block-appender-preview'
+			);
+			const submenuRow = listView.getByRole( 'row', {
+				name: 'Top Level Item 2',
+			} );
+			const addButton = submenuRow.getByRole( 'button', {
+				name: 'Add to Top Level Item 2',
+			} );
+			await expect( addButton ).toBeAttached();
+			// The Page List's pages load after the menu's own items.
+			await expect(
+				listView.getByRole( 'row', { name: 'Test Page 1' } )
+			).toBeVisible();
+			const rowCount = await listView.getByRole( 'row' ).count();
+
+			await test.step( 'while hovered', async () => {
+				await addButton.hover();
+				await expect( preview ).toBeVisible();
+
+				// The space comes after the submenu's last item, where the
+				// new one will go, and is not a row of the tree grid.
+				const order = await listView.evaluate( ( grid ) => {
+					const rows = Array.from(
+						grid.querySelectorAll(
+							'[role=row], .block-editor-list-view-block-appender-preview'
+						)
+					);
+					return rows.map( ( row ) =>
+						row.matches(
+							'.block-editor-list-view-block-appender-preview'
+						)
+							? 'preview'
+							: row.querySelector(
+									'.block-editor-list-view-block-select-button__title'
+								)?.textContent
+					);
+				} );
+				expect(
+					order.slice(
+						order.indexOf( 'Submenu Item' ),
+						order.indexOf( 'Submenu Item' ) + 3
+					)
+				).toEqual( [ 'Submenu Item', 'preview', 'Buttons' ] );
+				await expect( listView.getByRole( 'row' ) ).toHaveCount(
+					rowCount
+				);
+
+				// Its dashed outline lines up with the submenu's items.
+				const outline = await preview
+					.locator(
+						'.block-editor-list-view-block-appender-preview__outline'
+					)
+					.boundingBox();
+				const itemIcon = await listView
+					.getByRole( 'row', { name: 'Submenu Item' } )
+					.locator( '.block-editor-block-icon' )
+					.boundingBox();
+				expect(
+					Math.abs( outline.x + 4 - itemIcon.x )
+				).toBeLessThanOrEqual( 1 );
+
+				await page.mouse.move( 0, 0 );
+				await expect( preview ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'while focused', async () => {
+				await listView
+					.getByRole( 'link', { name: 'Top Level Item 2' } )
+					.focus();
+				await page.keyboard.press( 'ArrowRight' );
+				await expect( addButton ).toBeFocused();
+				await expect( preview ).toBeVisible();
+				await page.keyboard.press( 'ArrowLeft' );
+				await expect( preview ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'gives way to the new item at once', async () => {
+				await addButton.hover();
+				await expect( preview ).toBeVisible();
+				await addButton.click();
+				await expect( preview ).toHaveCount( 0 );
+				await expect(
+					listView
+						.getByRole( 'gridcell' )
+						.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+				).toBeVisible();
+			} );
+		} );
+
 		test( 'adds the new item to the end of a collapsed submenu and expands it', async ( {
 			editor,
 			page,

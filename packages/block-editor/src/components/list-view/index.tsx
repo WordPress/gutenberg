@@ -17,6 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import {
+	ListViewBlockAppenderPreviewContext,
 	ListViewContext,
 	ListViewInsertedBlockContext,
 	ListViewTreeStateContext,
@@ -35,6 +36,7 @@ import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import type {
+	ListViewBlockAppenderPreview,
 	ListViewExpansionAction,
 	ListViewExpansionState,
 	ListViewProps,
@@ -143,6 +145,9 @@ function ListViewComponent(
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
 		string | null
 	>( null );
+
+	const [ blockAppenderPreview, setBlockAppenderPreview ] =
+		useState< ListViewBlockAppenderPreview >( { clientId: null } );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
@@ -323,6 +328,7 @@ function ListViewComponent(
 			setInsertedBlockClientId,
 			BlockAppender,
 			hasBlockAppender,
+			setBlockAppenderPreview,
 			treeGridElementRef: elementRef,
 			updateExpansion,
 		} ),
@@ -409,20 +415,24 @@ function ListViewComponent(
 					<ListViewInsertedBlockContext.Provider
 						value={ insertedBlockClientId }
 					>
-						<ListViewTreeStateContext.Provider
-							value={ treeStateContextValue }
+						<ListViewBlockAppenderPreviewContext.Provider
+							value={ blockAppenderPreview }
 						>
-							<ListViewBranch
-								blocks={ clientIdsTree }
-								parentId={ rootClientId }
-								selectBlock={ selectEditorBlock }
-								showBlockMovers={ showBlockMovers }
-								fixedListWindow={ fixedListWindow }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								showAppender={ showAppender }
-							/>
-						</ListViewTreeStateContext.Provider>
+							<ListViewTreeStateContext.Provider
+								value={ treeStateContextValue }
+							>
+								<ListViewBranch
+									blocks={ clientIdsTree }
+									parentId={ rootClientId }
+									selectBlock={ selectEditorBlock }
+									showBlockMovers={ showBlockMovers }
+									fixedListWindow={ fixedListWindow }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									showAppender={ showAppender }
+								/>
+							</ListViewTreeStateContext.Provider>
+						</ListViewBlockAppenderPreviewContext.Provider>
 					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>

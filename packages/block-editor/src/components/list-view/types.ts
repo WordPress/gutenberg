@@ -150,6 +150,9 @@ export type ListViewContextValue = {
 		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
 	> | null;
 	hasBlockAppender?: ( blockName: string ) => boolean;
+	setBlockAppenderPreview: Dispatch<
+		SetStateAction< ListViewBlockAppenderPreview >
+	>;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
 };
@@ -304,6 +307,16 @@ export type ListViewAppenderProps = {
 	clientId?: string | null;
 	tabIndex?: number;
 	onFocus?: FocusEventHandler;
+};
+
+/**
+ * The block whose + is hovered or focused, which opens a space where its new
+ * inner block will go.
+ */
+export type ListViewBlockAppenderPreview = {
+	clientId: string | null;
+	/** Close the space without animating it, as the new block takes its place. */
+	isInstant?: boolean;
 };
 
 /**

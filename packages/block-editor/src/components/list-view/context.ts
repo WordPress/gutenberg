@@ -1,5 +1,6 @@
 import { createContext, useContext } from '@wordpress/element';
 import type {
+	ListViewBlockAppenderPreview,
 	ListViewContextValue,
 	ListViewTreeStateContextValue,
 } from './types';
@@ -38,3 +39,14 @@ ListViewInsertedBlockContext.displayName = 'ListViewInsertedBlockContext';
 
 export const useInsertedBlockClientId = () =>
 	useContext( ListViewInsertedBlockContext );
+
+/**
+ * The block whose + is hovered or focused.
+ */
+export const ListViewBlockAppenderPreviewContext =
+	createContext< ListViewBlockAppenderPreview >( { clientId: null } );
+ListViewBlockAppenderPreviewContext.displayName =
+	'ListViewBlockAppenderPreviewContext';
+
+export const useBlockAppenderPreview = () =>
+	useContext( ListViewBlockAppenderPreviewContext );

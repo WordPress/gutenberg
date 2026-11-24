@@ -629,6 +629,63 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			listView.getByRole( 'button', { name: /^Add to / } )
 		).toHaveCount( 0 );
 	} );
+
+	test( 'opens a space at the end of a submenu while its + is hovered', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Preview Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"Existing Submenu","type":"custom","url":"https://wordpress.org/2","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const preview = listView.locator(
+			'.block-editor-list-view-block-appender-preview'
+		);
+		const addButton = listView
+			.getByRole( 'row', { name: 'Existing Submenu' } )
+			.getByRole( 'button', { name: 'Add to Existing Submenu' } );
+
+		await addButton.hover();
+		await expect( preview ).toBeVisible();
+		// The space comes after the submenu's last item, where the new one
+		// will go.
+		const order = await listView.evaluate( ( grid ) =>
+			Array.from(
+				grid.querySelectorAll(
+					'[role=row], .block-editor-list-view-block-appender-preview'
+				)
+			).map( ( row ) =>
+				row.matches( '.block-editor-list-view-block-appender-preview' )
+					? 'preview'
+					: row.querySelector(
+							'.block-editor-list-view-block-select-button__title'
+						)?.textContent
+			)
+		);
+		expect(
+			order.slice(
+				order.indexOf( 'Submenu Item' ),
+				order.indexOf( 'Submenu Item' ) + 3
+			)
+		).toEqual( [ 'Submenu Item', 'preview', 'Existing Item' ] );
+
+		await page.mouse.move( 0, 0 );
+		await expect( preview ).toHaveCount( 0 );
+	} );
 } );
 
 class LinkControl {
