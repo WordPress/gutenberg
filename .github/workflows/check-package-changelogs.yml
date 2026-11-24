@@ -155,7 +155,8 @@ jobs:
                   ignored+="|(tsconfig\.(stories|test|bin)\.json|\.(stylelintrc|eslintrc|prettierrc)[^/]*|\.gitignore)$"
                   ignored+=")"
 
-                  relevant_changes=$(git diff --name-only --no-renames "$BASE_SHA"...HEAD -- packages/ \
+                  merge_base=$(git merge-base "$BASE_SHA" HEAD)
+                  relevant_changes=$(git diff --name-only --no-renames "$merge_base" HEAD -- packages/ \
                       | grep -Ev "$ignored" || true)
 
                   # RUNNER_DEBUG is 1 when the run has debug logging enabled.
@@ -166,9 +167,19 @@ jobs:
 
                   changed=()
                   for package in "${packages[@]}"; do
-                      if grep -q "^packages/${package}/" <<< "$relevant_changes"; then
-                          changed+=( "$package" )
+                      package_changes=$(grep "^packages/${package}/" <<< "$relevant_changes" || true)
+                      [[ -n "$package_changes" ]] || continue
+
+                      # A devDependencies-only edit does not affect package consumers.
+                      manifest="packages/$package/package.json"
+                      if [[ "$package_changes" == "$manifest" ]] &&
+                          jq -es 'length == 2 and (map(del(.devDependencies)) | .[0] == .[1])' \
+                              <(git show "$merge_base:$manifest" 2>/dev/null) \
+                              <(git show "HEAD:$manifest" 2>/dev/null) > /dev/null; then
+                          continue
                       fi
+
+                      changed+=( "$package" )
                   done
 
                   echo "packages=$(jq --compact-output --null-input '$ARGS.positional' --args "${changed[@]}")" >> "$GITHUB_OUTPUT"
