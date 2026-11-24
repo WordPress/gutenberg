@@ -31,6 +31,7 @@ const DefaultComponent = ( args: ImageCropperProps ) => {
 };
 
 export const Default = {
+	tags: [ 'external-requests' ],
 	render: DefaultComponent,
 	args: {
 		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
@@ -227,6 +228,7 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 };
 
 export const WithControls = {
+	tags: [ 'external-requests' ],
 	parameters: {
 		// FIXME: Crop controls include an unlabeled input and unnamed select (label, select-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
