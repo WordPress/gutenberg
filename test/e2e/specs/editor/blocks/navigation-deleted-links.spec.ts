@@ -1,14 +1,30 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import {
+	test,
+	expect,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 // The URL binding the link UI adds to a link picked from the site's content.
 const URL_BINDING =
 	'"metadata":{"bindings":{"url":{"source":"core/post-data","args":{"field":"link"}}}}';
 
-function pageAttributes( page, label = page.title.raw ) {
+// A page as the REST API returns it in the edit context.
+type PageRecord = { id: number; link: string; title: { raw: string } };
+
+// `requestUtils.createPage()` is typed with only the ID and status.
+function publishPage( requestUtils: RequestUtils, title: string ) {
+	return requestUtils.rest< PageRecord >( {
+		method: 'POST',
+		path: '/wp/v2/pages',
+		data: { title, status: 'publish' },
+	} );
+}
+
+function pageAttributes( page: PageRecord, label = page.title.raw ) {
 	return `"label":"${ label }","type":"page","id":${ page.id },"url":"${ page.link }","kind":"post-type"`;
 }
 
-function boundPageLink( page ) {
+function boundPageLink( page: PageRecord ) {
 	return `<!-- wp:navigation-link {${ pageAttributes( page ) },${ URL_BINDING }} /-->`;
 }
 
@@ -33,18 +49,9 @@ test.describe( 'Navigation block: links to deleted content', () => {
 		page,
 		requestUtils,
 	} ) => {
-		const deleted = await requestUtils.createPage( {
-			title: 'Deleted page',
-			status: 'publish',
-		} );
-		const parent = await requestUtils.createPage( {
-			title: 'Parent page',
-			status: 'publish',
-		} );
-		const child = await requestUtils.createPage( {
-			title: 'Child page',
-			status: 'publish',
-		} );
+		const deleted = await publishPage( requestUtils, 'Deleted page' );
+		const parent = await publishPage( requestUtils, 'Parent page' );
+		const child = await publishPage( requestUtils, 'Child page' );
 		const menu = await requestUtils.createNavigationMenu( {
 			title: 'Main menu',
 			content:
@@ -111,7 +118,9 @@ test.describe( 'Navigation block: links to deleted content', () => {
 		await expect( pageLinks ).toContainText( 'Unbound link' );
 
 		const menuBlocks = await editor.getBlocks( {
-			clientId: await navigationBlock.getAttribute( 'data-block' ),
+			clientId:
+				( await navigationBlock.getAttribute( 'data-block' ) ) ??
+				undefined,
 		} );
 		expect( menuBlocks ).toMatchObject( [
 			{
