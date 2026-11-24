@@ -1,6 +1,4 @@
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
-@use "../utils/theme-variables" as *;
 
 .tab-list {
 	display: flex;
@@ -152,11 +150,7 @@
 		position: absolute;
 		z-index: -1;
 		pointer-events: none;
-
-		// Draw the indicator.
-		// Outline works for Windows high contrast mode as well.
-		outline: var(--wp-admin-border-width-focus) solid transparent;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 
 		// Animation
 		opacity: 0;
@@ -166,8 +160,10 @@
 		}
 	}
 
+	// Only keyboard focus draws an outline, which forced colors mode keeps,
+	// so a hovered tab does not look focused there.
 	&[data-focus-visible]::after {
-		outline-color: $components-color-accent;
+		outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus);
 		opacity: 1;
 	}
 
@@ -176,9 +172,12 @@
 		height: 48px;
 		scroll-margin: 24px;
 
+		// Center a background one control tall in the tab, with the same
+		// clearance on every side, so it stays clear of the selection indicator.
 		&::after {
 			content: "";
-			inset: var(--wpds-dimension-padding-md);
+			inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}
 
