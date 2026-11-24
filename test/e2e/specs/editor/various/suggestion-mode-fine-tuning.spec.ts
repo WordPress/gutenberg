@@ -431,6 +431,105 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'text typed after turning bold on is suggested in bold', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph.' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'primary+b' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' Bold words.' );
+		await saved;
+
+		const addition = paragraph.locator( 'mark.wp-suggestion-add' );
+		await expect( addition ).toHaveCount( 1 );
+		await expect( addition.locator( 'strong' ) ).toHaveText(
+			' Bold words.'
+		);
+
+		// Turning bold off again ends the bold run, not the suggestion.
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( ' Plain.' );
+		await expect( addition ).toHaveCount( 1 );
+		await expect( addition ).toHaveText( ' Bold words. Plain.' );
+		await expect( addition.locator( 'strong' ) ).toHaveText(
+			' Bold words.'
+		);
+
+		// One card for the text and the formatting it arrives with.
+		const sidebar = await openNotesSidebar( page );
+		const threads = sidebar.locator(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		await expect( threads ).toHaveCount( 1 );
+		await expect( threads ).toContainText( 'Add: “ Bold words. Plain.”' );
+		await expect( threads ).toContainText( 'Add formatting: bold' );
+
+		await decideSuggestion( page, 'Accept' );
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{
+					attributes: {
+						content:
+							'First paragraph.<strong> Bold words.</strong> Plain.',
+					},
+				},
+			] );
+	} );
+
+	test( 'text typed into bold text is suggested in bold', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Some <strong>bold</strong> text.' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await paragraph.click();
+		await page.keyboard.press( 'Home' );
+		// One of the presses crosses into the bold text without moving.
+		await pageUtils.pressKeys( 'ArrowRight', { times: 'Some b'.length + 1 } );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( 'XY' );
+		await saved;
+
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-add strong' )
+		).toHaveText( 'XY' );
+
+		// The bold is the surrounding text's, so the card proposes none.
+		const sidebar = await openNotesSidebar( page );
+		const summaries = sidebar.locator( SUMMARY );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Add: “XY”' );
+		await expect( summaries ).not.toContainText( 'formatting' );
+
+		await decideSuggestion( page, 'Accept' );
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{
+					attributes: {
+						content: 'Some <strong>bXYold</strong> text.',
+					},
+				},
+			] );
+	} );
+
 	test( 'opening the Template panel raises no refusal (F-68)', async ( {
 		editor,
 		page,

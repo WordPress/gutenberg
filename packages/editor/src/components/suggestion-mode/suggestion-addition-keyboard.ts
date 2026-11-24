@@ -39,6 +39,7 @@ import {
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
 import { readValueText, rebaseRunAnchor } from './run-anchor';
+import { formatTypedText, keepCaretFormats } from './caret-formats';
 
 /**
  * How long to wait before asking again for a note the server could not be
@@ -319,6 +320,7 @@ export default function SuggestionAdditionKeyboard() {
 				updateBlockAttributes( clientId, { [ attributeKey ]: value } );
 				selectionChange( clientId, attributeKey, caret, caret );
 			} );
+			keepCaretFormats( toRichTextRecord( value )?.text ?? '', caret );
 		},
 		[
 			registry,
@@ -707,8 +709,8 @@ export default function SuggestionAdditionKeyboard() {
 	 * described by a `RunSegment`) to the right place: buffer it while a note
 	 * request is in flight, grow the open marker when the caret is still at its
 	 * trailing edge, or start a new run. `allowGrow` is false for paste so a
-	 * pasted run is always its own marker — which also means a run only ever
-	 * grows by plain typed text.
+	 * pasted run is always its own marker, so a run only ever grows by typed
+	 * text.
 	 *
 	 * Returns whether the input was consumed. Callers must only cancel the
 	 * native edit when this returns true — when no valid single-attribute
@@ -725,6 +727,26 @@ export default function SuggestionAdditionKeyboard() {
 		( segment: RunSegment, allowGrow: boolean, domRange: any ) => {
 			const text = segment.text;
 			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
+			/*
+			 * Typed text takes the formats active at the caret, as it does
+			 * outside Suggestion mode: those of the text it is typed into, or
+			 * ones turned on first (Bold, then typing).
+			 */
+			const typedAt = domRange ?? caret;
+			if ( allowGrow && caret && typedAt.start === typedAt.end ) {
+				const html = formatTypedText(
+					text,
+					toRichTextRecord(
+						getBlockAttributes( caret.clientId )?.[
+							caret.attributeKey
+						]
+					)?.text ?? '',
+					typedAt.start
+				);
+				if ( html ) {
+					segment = { text, html };
+				}
+			}
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
 				/*
@@ -882,6 +904,7 @@ export default function SuggestionAdditionKeyboard() {
 				const value = getBlockAttributes( clientId )?.[ attributeKey ];
 				const grown = growInlineAddition( value, {
 					text,
+					html: segment.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						// The contiguity check above proved the id resolved.
 						id: run.id!,

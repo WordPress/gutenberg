@@ -1,4 +1,4 @@
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
@@ -8,12 +8,17 @@ import {
 	SUGGESTION_KIND_ORDER,
 	suggestionKindOf,
 } from '../inline-suggestions';
+import {
+	publishCaretFormats,
+	takeCaretFormatsToRestore,
+} from '../suggestion-mode/caret-formats';
 import { unlock } from '../../lock-unlock';
 
 interface SuggestionFormatEditProps {
 	isActive: boolean;
 	activeAttributes?: Record< string, string >;
 	value?: { activeFormats?: any[] };
+	onChange?: ( value: any ) => void;
 }
 
 /**
@@ -60,12 +65,14 @@ function innermostSuggestionId(
  * @param props.isActive         Whether a suggestion marker is at the caret.
  * @param props.activeAttributes The active marker's attributes.
  * @param props.value            Rich-text value, for the formats at the caret.
+ * @param props.onChange         Updates the rich-text value.
  * @return Renders nothing.
  */
 export default function SuggestionFormatEdit( {
 	isActive,
 	activeAttributes,
 	value,
+	onChange,
 }: SuggestionFormatEditProps ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { getSelectedNote, isNoteFocused } = unlock(
@@ -78,6 +85,17 @@ export default function SuggestionFormatEdit( {
 		: undefined;
 	const isCaretInMarker = !! caretNoteId;
 	const previousNoteIdRef = useRef( noteId );
+
+	// Typed text is written by the addition keyboard, which has no other way
+	// to the formats active at the caret; see `caret-formats.ts`.
+	useLayoutEffect( () => {
+		publishCaretFormats( value );
+		const activeFormats = takeCaretFormatsToRestore( value );
+		if ( activeFormats ) {
+			onChange?.( { ...value, activeFormats } );
+		}
+	} );
+	useEffect( () => () => publishCaretFormats( null ), [] );
 
 	useEffect( () => {
 		const previousNoteId = previousNoteIdRef.current;

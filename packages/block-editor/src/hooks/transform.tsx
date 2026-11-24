@@ -93,9 +93,17 @@ export function getStateInheritedValue(
 			continue;
 		}
 		for ( const [ key, layerValue ] of Object.entries( layerTransform ) ) {
-			if ( layerValue !== undefined && layerValue !== null ) {
-				transform[ key ] = layerValue;
+			if ( layerValue === undefined || layerValue === null ) {
+				continue;
 			}
+			// Translate axes layer one by one, as in the CSS.
+			transform[ key ] =
+				key === 'translate' && typeof layerValue === 'object'
+					? {
+							...( transform.translate as object | undefined ),
+							...layerValue,
+						}
+					: layerValue;
 		}
 	}
 
@@ -169,7 +177,11 @@ export function TransformPanel( {
 			onChange={ onChange }
 			// Unlike Global Styles, the block inspector hides a control
 			// unless the block shows it by default.
-			defaultControls={ { rotate: false, ...defaultControls } }
+			defaultControls={ {
+				rotate: false,
+				translate: false,
+				...defaultControls,
+			} }
 			inheritedValue={ inheritedValue }
 		/>
 	);
