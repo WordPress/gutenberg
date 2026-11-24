@@ -291,6 +291,16 @@ export default function useBlockSync( {
 	// containing useBlockSync() unmounts.
 	const unsetControlledBlocks = () => {
 		if ( clientId ) {
+			// Nothing to clean up after a block that is gone and no longer
+			// controlled, such as one that detached on edit.
+			if (
+				getBlockName( clientId ) === null &&
+				! registry
+					.select( blockEditorStore )
+					.areInnerBlocksControlled( clientId )
+			) {
+				return;
+			}
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );

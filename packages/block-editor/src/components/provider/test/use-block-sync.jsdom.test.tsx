@@ -177,6 +177,40 @@ describe( 'useBlockSync hook', () => {
 		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 3 );
 	} );
 
+	it( 'does not clean up after a block that is gone and no longer controlled', async () => {
+		const replaceInnerBlocks = vi.spyOn(
+			blockEditorActions,
+			'replaceInnerBlocks'
+		);
+		const setHasControlledInnerBlocks = vi.spyOn(
+			blockEditorActions,
+			'setHasControlledInnerBlocks'
+		);
+		let registry: DataRegistry | undefined;
+		const { unmount } = render(
+			<TestWrapper
+				clientId="test"
+				value={ [] }
+				onChange={ vi.fn() }
+				onInput={ vi.fn() }
+				setRegistry={ ( r ) => ( registry = r ) }
+			/>
+		);
+
+		// Like a detach, which lets go of the inner blocks of a block that
+		// is no longer there.
+		registry!
+			.dispatch( blockEditorStore )
+			.setHasControlledInnerBlocks( 'test', false );
+		replaceInnerBlocks.mockClear();
+		setHasControlledInnerBlocks.mockClear();
+
+		unmount();
+
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+		expect( setHasControlledInnerBlocks ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
 		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,

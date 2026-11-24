@@ -2239,47 +2239,48 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( false );
 				} );
 
-				it( 'should keep updates to the same block attribute exempt across a marked change that changes nothing', () => {
+				it( 'should start a new step after a marked change that changes nothing', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
 								partial< Block >( {
 									clientId: 'kumquat',
-									attributes: {},
+									attributes: { flag: true },
 									innerBlocks: [],
 								} ),
 							],
 						} )
 					);
+					// Like picking a Cover overlay color: set the color, then a
+					// marked update that finds the flag already set.
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
 						clientIds: [ 'kumquat' ],
 						attributes: {
-							updated: false,
+							color: 'red',
 						},
 					} );
-					// Like an inner block controller cleaning up after a
-					// block that is already gone.
 					original = blocks( original, {
 						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
-						history: 'ignore',
 					} );
 					original = blocks( original, {
-						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-						clientId: 'loquat',
-						hasControlledInnerBlocks: false,
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							flag: true,
+						},
 					} );
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
 						clientIds: [ 'kumquat' ],
 						attributes: {
-							updated: true,
+							color: 'blue',
 						},
 					} );
 
-					expect( state.isPersistentChange ).toBe( false );
+					expect( state.isPersistentChange ).toBe( true );
 				} );
 
 				it( 'should start a new step after a marked change that changes the blocks', () => {

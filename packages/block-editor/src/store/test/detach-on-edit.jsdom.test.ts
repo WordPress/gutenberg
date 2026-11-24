@@ -280,16 +280,10 @@ describe( 'blocks that detach on edit', () => {
 		expect( t.select.getBlock( t.ids.list ) ).toBeNull();
 		expect( t.select.isLastBlockChangePersistent() ).toBe( true );
 
-		// An inner block controller of the list would clean up when it
-		// unmounts (see `useBlockSync`), outside the history.
-		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
-			history: 'ignore',
-		} );
-		t.dispatch.setHasControlledInnerBlocks( t.ids.list, false );
-		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
-			history: 'ignore',
-		} );
-		t.dispatch.replaceInnerBlocks( t.ids.list, [] );
+		// The detach lets go of the controlled inner blocks, so the list's
+		// controller has nothing to clean up when it unmounts (see
+		// `useBlockSync`).
+		expect( t.select.areInnerBlocksControlled( t.ids.list ) ).toBe( false );
 
 		// The next keystroke updates the same attribute, as without the
 		// detach, so it doesn't start a new undo step.
