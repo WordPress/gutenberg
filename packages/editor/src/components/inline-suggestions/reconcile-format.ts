@@ -151,17 +151,13 @@ export function analyzeFormatEdit(
 
 export interface FormatPlan {
 	/**
-	 * `format` opens or revises a formatting suggestion; `merge-own` is a
-	 * change made only to the author's own proposed text, which already
-	 * carries it, so nothing is recorded.
+	 * `format` opens or revises a formatting suggestion; `unrecorded` is a
+	 * change to nothing a suggestion records, written as it is.
 	 */
-	kind: 'format' | 'merge-own' | 'none';
+	kind: 'format' | 'unrecorded' | 'none';
 	/** The changed character range. */
 	range?: { start: number; end: number };
-	/**
-	 * The characters the marker covers, in document order: the range less
-	 * the author's own proposed text.
-	 */
+	/** The characters the marker covers, in document order. */
 	indices?: number[];
 	/** What the change adds and removes, per covered character. */
 	delta?: FormatDelta;
@@ -201,29 +197,6 @@ function suggestionIdAt( record: any, index: number ): string | undefined {
 		SUGGESTION_ID_ATTRIBUTE
 	];
 	return id === undefined ? undefined : String( id );
-}
-
-/**
- * Every suggestion id a character carries, outermost first.
- *
- * A character can sit under more than one marker - a deletion nested in a
- * formatted run, say - and `formatMarkerAt` reports only the format marker.
- * The extend path checks the whole stack so it only revises a run that holds
- * no one else's marker.
- *
- * @param record Rich-text record.
- * @param index  Character index.
- * @return Marker ids at that character.
- */
-function suggestionIdsAt( record: any, index: number ): string[] {
-	const ids: string[] = [];
-	for ( const format of suggestionMarkersIn( record.formats?.[ index ] ) ) {
-		const id = format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
-		if ( id !== undefined ) {
-			ids.push( String( id ) );
-		}
-	}
-	return ids;
 }
 
 /**
@@ -271,8 +244,9 @@ function markerRun(
  * Conservative on purpose. The marker has to be a `format` marker, authored by
  * the suggester making this edit, unfragmented, identical in both values, and
  * has to cover the whole changed range. Anything else — someone else's marker,
- * an `add`/`del` marker, a toggle spilling past the marker's edges — is left
- * for the caller to decline.
+ * a `del` marker, a toggle spilling past the marker's edges — opens a second
+ * suggestion. The author's own older addition around the run is no obstacle:
+ * the formatting was proposed on that text.
  *
  * @param prev        Record before the edit.
  * @param next        Record after the edit.
@@ -311,13 +285,25 @@ function findExtendableFormatMarker(
 	const key = String( id );
 	/*
 	 * Every character in the toggled range must carry this marker and no other,
-	 * on both sides of the edit. A second marker nested under this one would be
-	 * stripped by the `applyFormatPlan` the extend plan leads to, leaving its note
-	 * anchored to nothing; refuse rather than extend over it.
+	 * on both sides of the edit, apart from the author's own additions older
+	 * than it. Text added since is missing from the original the note
+	 * recorded, so a run holding any is not revised.
 	 */
+	const isOlderOwnAddition = ( format: any ) =>
+		suggestionKindOf( format ) === SUGGESTION_TYPE_ADDITION &&
+		String( format.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ) ===
+			String( authorId ) &&
+		Number( format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ) <
+			Number( key );
 	const carriesOnly = ( record: any, i: number ) => {
-		const ids = suggestionIdsAt( record, i );
-		return ids.length === 1 && ids[ 0 ] === key;
+		const others = suggestionMarkersIn( record.formats?.[ i ] ).filter(
+			( format ) => ! isOlderOwnAddition( format )
+		);
+		return (
+			others.length === 1 &&
+			String( others[ 0 ].attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ) ===
+				key
+		);
 	};
 	for ( let i = range.start; i < range.end; i++ ) {
 		if ( ! carriesOnly( prev, i ) || ! carriesOnly( next, i ) ) {
@@ -410,10 +396,11 @@ function charactersToUnmarkedHTML( record: any, indices: number[] ): string {
  * The formatting an addition's text carries beyond the text it was typed
  * next to, as a before and after pair for the summary's format diff.
  *
- * Formatting the author's own proposed text opens no suggestion of its own
- * (see `merge-own`), so its card has to name the formatting. Text typed into
- * a formatted run inherits that run's formatting and proposes none: `before`
- * is the addition as it would read in its neighbor's formatting.
+ * No formatting suggestion covers the formats an addition arrives with (a
+ * formatted paste), so its card has to name them. Text typed into a formatted
+ * run inherits that run's formatting and proposes none: `before` is the
+ * addition as it would read in its neighbor's formatting. Characters under a
+ * pending formatting suggestion are left out; its card speaks for them.
  *
  * @param value Block attribute value (RichTextData, string, or other).
  * @param id    Suggestion id.
@@ -432,12 +419,19 @@ export function findAdditionFormatting(
 		( record.formats[ index ] ?? [] ).filter(
 			( format: any ) => ! isSuggestionFormat( format )
 		);
-	const indices = rangeIndices( range.start, range.end ).filter( ( index ) =>
-		suggestionMarkerListsAt( record.formats[ index ] ).add.some(
-			( marker ) =>
-				String( marker.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ) ===
-				String( id )
-		)
+	const indices = rangeIndices( range.start, range.end ).filter(
+		( index ) => {
+			const markers = suggestionMarkerListsAt( record.formats[ index ] );
+			return (
+				! markers.format.length &&
+				markers.add.some(
+					( marker ) =>
+						String(
+							marker.attributes?.[ SUGGESTION_ID_ATTRIBUTE ]
+						) === String( id )
+				)
+			);
+		}
 	);
 	if ( ! indices.some( ( index ) => ownFormats( index ).length > 0 ) ) {
 		return null;
@@ -518,40 +512,21 @@ export function planFormatMarkers(
 		};
 	}
 	/*
-	 * Formatting the author's own proposed text revises that proposal: the
-	 * addition carries its text's formatting, so those characters need no
-	 * marker. Everything else gets one formatting suggestion, nested in
-	 * other authors' additions, stacked on other formatting changes, and
-	 * crossing the edges of either.
+	 * The whole range gets one formatting suggestion, nested in additions
+	 * (the author's own included, so the text and its formatting are decided
+	 * apart), stacked on other formatting changes, and crossing the edges of
+	 * either.
 	 */
-	const token =
-		authorId === undefined || authorId === null ? null : String( authorId );
-	const indices: number[] = [];
-	for ( let i = range.start; i < range.end; i++ ) {
-		const ownAddition = suggestionMarkerListsAt(
-			prev.formats?.[ i ]
-		).add.some(
-			( marker ) =>
-				String(
-					marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
-				) === ( token ?? '' )
-		);
-		if ( ! ownAddition ) {
-			indices.push( i );
-		}
-	}
-	if ( ! indices.length ) {
-		return { kind: 'merge-own', range };
-	}
+	const indices = rangeIndices( range.start, range.end );
 	const delta = computeFormatDelta( prev, next, indices );
 	if ( isEmptyFormatDelta( delta ) ) {
-		return { kind: 'merge-own', range };
+		return { kind: 'unrecorded', range };
 	}
 	/*
 	 * Both runs are captured without markers, for the summary and as the
-	 * state below the change: inside someone's addition that is the
-	 * proposed text's own formatting, and on someone's formatting change it
-	 * is that change as shown.
+	 * state below the change: inside an addition that is the proposed
+	 * text's own formatting, and on someone's formatting change it is that
+	 * change as shown.
 	 */
 	return {
 		kind: 'format',

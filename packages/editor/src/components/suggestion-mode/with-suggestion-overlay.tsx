@@ -255,7 +255,7 @@ function SuggestingBlockEdit( {
 			const plan = planFormatMarkers( prevContent, nextContent, {
 				authorId,
 			} );
-			if ( plan.kind !== 'format' && plan.kind !== 'merge-own' ) {
+			if ( plan.kind !== 'format' && plan.kind !== 'unrecorded' ) {
 				return false;
 			}
 			// `prevContent` rides along so the handler can re-validate the
