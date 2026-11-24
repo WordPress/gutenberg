@@ -54,7 +54,7 @@ jobs:
         # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
-        timeout-minutes: 40
+        timeout-minutes: 60
         if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
             contents: read
@@ -96,7 +96,8 @@ jobs:
                   xcodebuild -version
 
             - name: Run the tests
-              run: ./test/ios/run.sh
+              # TEMPORARY (debugging a flaky test): run only this test, 15 times.
+              run: ./test/ios/run.sh -only-testing:SafariTests/SelectionTests/testTapFromHeadingIntoQuoteWithoutIframePlacesCaret -test-iterations 15
 
             - name: Archive the test results
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

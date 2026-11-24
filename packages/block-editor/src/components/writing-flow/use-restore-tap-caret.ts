@@ -21,10 +21,19 @@ export default function useRestoreTapCaret() {
 				( event.target as Node ).contains( selection.anchorNode )
 					? selection.getRangeAt( 0 ).cloneRange()
 					: undefined;
+				// TEMPORARY (debugging a flaky iOS test).
+				( window as any ).__iosTestLog?.(
+					'restore:save',
+					'saved=' + !! caret
+				);
 		}
 
 		// A new press or key may move the caret anywhere.
 		function forget() {
+			// TEMPORARY (debugging a flaky iOS test).
+			if ( caret ) {
+				( window as any ).__iosTestLog?.( 'restore:forget' );
+			}
 			caret = undefined;
 		}
 
@@ -35,8 +44,11 @@ export default function useRestoreTapCaret() {
 				selection.anchorNode &&
 				! activeElement?.contains( selection.anchorNode )
 			) {
+				// TEMPORARY (debugging a flaky iOS test).
+				( window as any ).__iosTestLog?.( 'restore:before' );
 				selection.removeAllRanges();
 				selection.addRange( caret );
+				( window as any ).__iosTestLog?.( 'restore:after' );
 				caret = undefined;
 			}
 		}

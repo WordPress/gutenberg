@@ -39,6 +39,59 @@ add_action(
 		wp_add_inline_script(
 			'standalone-editor',
 			<<<'JS'
+// TEMPORARY (debugging a flaky test): log the events of a tap to an element
+// whose accessibility label the UI test reads and prints.
+( () => {
+	const sink = document.createElement( 'div' );
+	sink.setAttribute( 'role', 'note' );
+	sink.style.cssText = 'position: fixed; right: 0; bottom: 0; width: 2px; height: 2px; overflow: hidden; z-index: 100001; pointer-events: none;';
+	sink.textContent = '.';
+	const lines = [];
+	const start = performance.now();
+	function describe( node ) {
+		if ( ! node ) {
+			return '-';
+		}
+		const element = node.nodeType === 1 ? node : node.parentElement;
+		if ( ! element ) {
+			return node.nodeName;
+		}
+		const block = element.closest( '[data-type]' );
+		const text = ( element.textContent || '' ).trim().slice( 0, 12 );
+		const editable = element.isContentEditable ? 'ce' : '';
+		return ( block ? block.dataset.type.replace( 'core/', '' ) : element.tagName.toLowerCase() ) + '[' + text + ']' + editable;
+	}
+	function state() {
+		const selection = document.getSelection();
+		const wrapper = document.querySelector( '.editor-styles-wrapper' );
+		return 'active=' + describe( document.activeElement ) +
+			' anchor=' + ( selection.rangeCount ? describe( selection.anchorNode ) + ':' + selection.anchorOffset : 'none' ) +
+			' wrapperCE=' + ( wrapper ? wrapper.contentEditable : '?' );
+	}
+	window.__iosTestLog = ( type, detail ) => {
+		lines.push( Math.round( performance.now() - start ) + 'ms ' + type + ( detail ? ' ' + detail : '' ) + ' ' + state() );
+		sink.setAttribute( 'aria-label', 'ioslog: ' + lines.join( ' || ' ) );
+	};
+	for ( const type of [ 'touchstart', 'touchend', 'pointerdown', 'pointerup', 'pointercancel', 'mousedown', 'mouseup', 'click', 'focusin', 'focusout', 'selectionchange', 'beforeinput', 'input' ] ) {
+		document.addEventListener(
+			type,
+			( event ) => {
+				let detail = 'target=' + describe( event.target );
+				if ( event.relatedTarget !== undefined ) {
+					detail += ' related=' + describe( event.relatedTarget );
+				}
+				if ( event.data ) {
+					detail += ' data=' + event.data;
+				}
+				window.__iosTestLog( type, type === 'selectionchange' ? '' : detail );
+			},
+			true
+		);
+	}
+	window.__iosTestLog( 'start' );
+	document.body.appendChild( sink );
+} )();
+
 const { createElement, createRoot, useState } = wp.element;
 const { BlockEditorProvider, BlockList, BlockTools, WritingFlow } =
 	wp.blockEditor;
