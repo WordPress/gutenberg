@@ -1,10 +1,10 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 // Runs against the classic site editor's navigation sidebar, or, with the
 // extensible site editor config, against its navigation screen.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
-const link = ( label ) =>
+const link = ( label: string ) =>
 	`<!-- wp:navigation-link {"label":"${ label }","url":"https://example.com/${ label.toLowerCase() }","kind":"custom"} /-->`;
 
 test.describe( 'Navigation menu screen: List View movers', () => {
@@ -52,7 +52,7 @@ test.describe( 'Navigation menu screen: List View movers', () => {
 		const listView = page.getByRole( 'treegrid', {
 			name: 'Block navigation structure',
 		} );
-		const row = ( label ) =>
+		const row = ( label: string ) =>
 			listView.getByRole( 'row' ).filter( {
 				has: page.getByRole( 'gridcell', {
 					name: new RegExp( `^${ label }\\b` ),

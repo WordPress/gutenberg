@@ -80,8 +80,8 @@ export default function useNestedSettingsUpdate(
 	captureToolbars: boolean | undefined,
 	orientation: 'horizontal' | 'vertical' | undefined,
 	layout: Layout | null | undefined,
-	isMoveTransparent: boolean | undefined,
-	detachesOnEdit: boolean | undefined
+	isMoveTransparent?: boolean,
+	detachesOnEdit?: boolean
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.

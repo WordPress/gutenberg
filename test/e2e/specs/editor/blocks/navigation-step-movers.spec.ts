@@ -1,11 +1,37 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import {
+	test as base,
+	expect,
+	type Admin,
+	type Editor,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
 
-const link = ( label ) =>
+const link = ( label: string ) =>
 	`<!-- wp:navigation-link {"label":"${ label }","url":"https://example.com/${ label.toLowerCase() }","kind":"custom"} /-->`;
 
-test.use( {
+// `requestUtils.createPage()` takes no menu order or parent page.
+function publishPage(
+	requestUtils: RequestUtils,
+	page: { title: string; menu_order?: number; parent?: number }
+) {
+	return requestUtils.rest< { id: number } >( {
+		method: 'POST',
+		path: '/wp/v2/pages',
+		data: { ...page, status: 'publish' },
+	} );
+}
+
+type Utils = {
+	admin: Admin;
+	editor: Editor;
+	page: Page;
+	requestUtils: RequestUtils;
+};
+
+const test = base.extend< { menuUtils: MenuUtils } >( {
 	menuUtils: async ( { admin, editor, page, requestUtils }, use ) => {
 		await use( new MenuUtils( { admin, editor, page, requestUtils } ) );
 	},
@@ -234,13 +260,16 @@ test.describe( 'Navigation: moving one step', () => {
 				const pages = await window.wp.apiFetch( {
 					path: '/wp/v2/pages?per_page=100&_fields=id,title',
 				} );
-				const byTitle = ( title ) =>
-					pages.find( ( p ) => p.title.rendered === title ).id;
+				const byTitle = ( title: string ) =>
+					pages.find(
+						( p: { title: { rendered: string } } ) =>
+							p.title.rendered === title
+					).id;
 				return { alpha: byTitle( 'Alpha' ), bravo: byTitle( 'Bravo' ) };
 			} );
 			// Alpha has no children, so the list shows a warning first; then
 			// Bravo's child appears as its only link.
-			const setParent = ( parentPageID ) =>
+			const setParent = ( parentPageID: number ) =>
 				page.evaluate( ( id ) => {
 					const blockEditor =
 						window.wp.data.select( 'core/block-editor' );
@@ -397,32 +426,33 @@ test.describe( 'Navigation: moving one step', () => {
 } );
 
 class MenuUtils {
-	constructor( { admin, editor, page, requestUtils } ) {
+	admin: Admin;
+	editor: Editor;
+	page: Page;
+	requestUtils: RequestUtils;
+
+	constructor( { admin, editor, page, requestUtils }: Utils ) {
 		this.admin = admin;
 		this.editor = editor;
 		this.page = page;
 		this.requestUtils = requestUtils;
 	}
 
-	async setUpPageListMenu( content ) {
-		await this.requestUtils.createPage( {
+	async setUpPageListMenu( content: string ) {
+		await publishPage( this.requestUtils, {
 			title: 'Alpha',
-			status: 'publish',
 			menu_order: 1,
 		} );
-		await this.requestUtils.createPage( {
+		await publishPage( this.requestUtils, {
 			title: 'Charlie',
-			status: 'publish',
 			menu_order: 2,
 		} );
-		const bravo = await this.requestUtils.createPage( {
+		const bravo = await publishPage( this.requestUtils, {
 			title: 'Bravo',
-			status: 'publish',
 			menu_order: 3,
 		} );
-		await this.requestUtils.createPage( {
+		await publishPage( this.requestUtils, {
 			title: 'Bravo Team',
-			status: 'publish',
 			parent: bravo.id,
 		} );
 		const menu = await this.openMenu( content );
@@ -435,7 +465,7 @@ class MenuUtils {
 		return menu;
 	}
 
-	async openMenu( content ) {
+	async openMenu( content: string ) {
 		const menu = await this.requestUtils.createNavigationMenu( {
 			title: 'Step menu',
 			content,
@@ -449,7 +479,7 @@ class MenuUtils {
 	}
 
 	// Select a link or submenu by its label, then show its toolbar.
-	async selectInCanvas( label ) {
+	async selectInCanvas( label: string ) {
 		await this.editor.canvas
 			.getByRole( 'textbox', { name: 'Navigation link text' } )
 			.filter( { hasText: new RegExp( `^${ label }$` ) } )
@@ -469,7 +499,7 @@ class MenuUtils {
 			.click();
 	}
 
-	listViewRow( label ) {
+	listViewRow( label: string ) {
 		return this.page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'treegrid' )
@@ -482,7 +512,7 @@ class MenuUtils {
 			.first();
 	}
 
-	async collapseListViewRow( label ) {
+	async collapseListViewRow( label: string ) {
 		// Focus the row without selecting the block, which would swap the
 		// inspector to that block's settings.
 		await this.listViewRow( label )
@@ -493,14 +523,14 @@ class MenuUtils {
 		await this.page.keyboard.press( 'ArrowLeft' );
 	}
 
-	async listViewMove( label, action ) {
+	async listViewMove( label: string, action: string ) {
 		const row = this.listViewRow( label );
 		await row.hover();
 		await row.getByRole( 'button', { name: 'Options' } ).click();
 		await this.page.getByRole( 'menuitem', { name: action } ).click();
 	}
 
-	async getState( menuId ) {
+	async getState( menuId: number ) {
 		return this.page.evaluate(
 			( { id, metaKey } ) => {
 				const blockEditor =
@@ -510,7 +540,7 @@ class MenuUtils {
 					blockEditor.getBlocksByName( 'core/navigation' );
 				// Controlled inner blocks are left out of the parent's tree,
 				// so read each block's children from the store.
-				const tree = ( clientIds ) =>
+				const tree = ( clientIds: string[] ): unknown[] =>
 					clientIds.map( ( clientId ) => {
 						const name = blockEditor.getBlockName( clientId );
 						const children = blockEditor.getBlockOrder( clientId );

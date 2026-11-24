@@ -1,11 +1,44 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import {
+	test as base,
+	expect,
+	type Admin,
+	type Editor,
+	type RequestUtils,
+} from '@wordpress/e2e-test-utils-playwright';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
 
 const MENU_CONTENT =
 	'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /--><!-- wp:page-list /-->';
 
-test.use( {
+// `requestUtils.createPage()` takes no menu order or parent page.
+function publishPage(
+	requestUtils: RequestUtils,
+	page: { title: string; menu_order?: number; parent?: number }
+) {
+	return requestUtils.rest< { id: number } >( {
+		method: 'POST',
+		path: '/wp/v2/pages',
+		data: { ...page, status: 'publish' },
+	} );
+}
+
+// A block as `getBlocks()` returns it.
+type Block = {
+	name: string;
+	clientId: string;
+	attributes: { label?: string };
+};
+
+type Utils = {
+	admin: Admin;
+	editor: Editor;
+	page: Page;
+	requestUtils: RequestUtils;
+};
+
+const test = base.extend< { pageListMenu: PageListMenu } >( {
 	pageListMenu: async ( { admin, editor, page, requestUtils }, use ) => {
 		await use( new PageListMenu( { admin, editor, page, requestUtils } ) );
 	},
@@ -283,7 +316,7 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			},
 		} );
 
-		const color = ( label ) =>
+		const color = ( label: string ) =>
 			editor.canvas
 				.getByRole( 'textbox', { name: 'Navigation link text' } )
 				.filter( { hasText: label } )
@@ -365,10 +398,10 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		await page.mouse.down();
 
 		// Over the leading edge of Bravo, in the menu's row.
-		const bravo = await editor.canvas
+		const bravo = ( await editor.canvas
 			.getByRole( 'document', { name: 'Block: Page Link' } )
 			.filter( { hasText: 'Bravo' } )
-			.boundingBox();
+			.boundingBox() )!;
 		// Playwright needs two moves before every browser fires `dragover`.
 		for ( let i = 0; i < 2; i += 1 ) {
 			await page.mouse.move( bravo.x + 2, bravo.y + bravo.height / 2 );
@@ -610,9 +643,8 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			menu.id
 		);
 
-		const delta = await requestUtils.createPage( {
+		const delta = await publishPage( requestUtils, {
 			title: 'Delta',
-			status: 'publish',
 			menu_order: 0,
 		} );
 		const saved = await requestUtils.rest( {
@@ -629,7 +661,12 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 } );
 
 class PageListMenu {
-	constructor( { admin, editor, page, requestUtils } ) {
+	admin: Admin;
+	editor: Editor;
+	page: Page;
+	requestUtils: RequestUtils;
+
+	constructor( { admin, editor, page, requestUtils }: Utils ) {
 		this.admin = admin;
 		this.editor = editor;
 		this.page = page;
@@ -642,9 +679,8 @@ class PageListMenu {
 			'Bravo',
 			'Charlie',
 		].entries() ) {
-			await this.requestUtils.createPage( {
+			await publishPage( this.requestUtils, {
 				title,
-				status: 'publish',
 				menu_order: index + 1,
 			} );
 		}
@@ -659,7 +695,7 @@ class PageListMenu {
 
 	// One click, like the menu's other links: the Page List has no overlay
 	// of its own. The Navigation block is already selected after insertion.
-	async selectLink( label ) {
+	async selectLink( label: string ) {
 		await this.editor.canvas
 			.getByRole( 'document', { name: 'Block: Page List' } )
 			.getByRole( 'textbox', { name: 'Navigation link text' } )
@@ -690,7 +726,7 @@ class PageListMenu {
 		return menu;
 	}
 
-	async getState( menuId ) {
+	async getState( menuId: number ) {
 		return this.page.evaluate(
 			( { id, metaKey } ) => {
 				const blockEditor =
@@ -698,7 +734,7 @@ class PageListMenu {
 				const core = window.wp.data.select( 'core' );
 				const [ navigationId ] =
 					blockEditor.getBlocksByName( 'core/navigation' );
-				const labels = ( blocks ) =>
+				const labels = ( blocks: Block[] ): unknown[] =>
 					blocks.flatMap( ( block ) =>
 						block.name === 'core/page-list'
 							? // Controlled inner blocks are left out of the
@@ -728,7 +764,7 @@ class PageListMenu {
 		);
 	}
 
-	async moveOutOfList( label, index ) {
+	async moveOutOfList( label: string, index: number ) {
 		await this.page.evaluate(
 			( { linkLabel, toIndex } ) => {
 				const blockEditor =
@@ -739,7 +775,9 @@ class PageListMenu {
 					blockEditor.getBlocksByName( 'core/page-list' );
 				const link = blockEditor
 					.getBlocks( pageListId )
-					.find( ( block ) => block.attributes.label === linkLabel );
+					.find(
+						( block: Block ) => block.attributes.label === linkLabel
+					);
 				window.wp.data
 					.dispatch( 'core/block-editor' )
 					.moveBlocksToPosition(
@@ -753,7 +791,7 @@ class PageListMenu {
 		);
 	}
 
-	async moveIntoList( label, index ) {
+	async moveIntoList( label: string, index: number ) {
 		await this.page.evaluate(
 			( { linkLabel, toIndex } ) => {
 				const blockEditor =
@@ -764,7 +802,9 @@ class PageListMenu {
 					blockEditor.getBlocksByName( 'core/page-list' );
 				const link = blockEditor
 					.getBlocks( navigationId )
-					.find( ( block ) => block.attributes.label === linkLabel );
+					.find(
+						( block: Block ) => block.attributes.label === linkLabel
+					);
 				window.wp.data
 					.dispatch( 'core/block-editor' )
 					.moveBlocksToPosition(
