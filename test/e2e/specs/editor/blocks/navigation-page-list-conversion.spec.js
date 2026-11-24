@@ -280,6 +280,47 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			} );
 	} );
 
+	test( 'a link dragged by its toolbar handle drops between the pages', async ( {
+		editor,
+		page,
+		pageListMenu,
+	} ) => {
+		const menu = await pageListMenu.setUp();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Navigation link text' } )
+			.filter( { hasText: 'Home' } )
+			.click();
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Drag', includeHidden: true } )
+			.hover();
+		await page.mouse.down();
+
+		// Over the leading edge of Bravo, in the menu's row.
+		const bravo = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Page Link' } )
+			.filter( { hasText: 'Bravo' } )
+			.boundingBox();
+		// Playwright needs two moves before every browser fires `dragover`.
+		for ( let i = 0; i < 2; i += 1 ) {
+			await page.mouse.move( bravo.x + 2, bravo.y + bravo.height / 2 );
+		}
+		await expect(
+			page.getByTestId( 'block-list-insertion-point-indicator' )
+		).toBeVisible();
+		await page.mouse.up();
+
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( {
+				pageLists: 0,
+				autoAdd: true,
+				labels: [ 'Alpha', 'Home', 'Bravo', 'Charlie' ],
+			} );
+	} );
+
 	test( 'removing a link converts the list', async ( {
 		editor,
 		pageListMenu,
