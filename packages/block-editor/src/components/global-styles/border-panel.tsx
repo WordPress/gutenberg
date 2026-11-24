@@ -3,6 +3,7 @@ import {
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	BaseControl,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -17,11 +18,6 @@ import {
 } from './utils';
 import { setImmutably } from '../../utils/object';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import type {
 	BorderPanelProps,
 	PanelBorderRadius,
@@ -116,7 +112,6 @@ export default function BorderPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: BorderPanelProps ) {
 	const colors = useColorsPerOrigin( settings );
 	const itemPopoverProps = useToolsPanelItemPopoverProps();
@@ -126,18 +121,6 @@ export default function BorderPanel( {
 			getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
 	);
-	// Always keep the layout className (e.g. `single-column`); only the
-	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = (
-		isInherited: boolean,
-		hasLocalOverride: boolean,
-		className?: string
-	) =>
-		getInheritanceProps(
-			showInheritanceLabelIndicators && isInherited,
-			showInheritanceLabelIndicators && hasLocalOverride,
-			className
-		);
 	const encodeColorValue = ( colorValue: StyleValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
@@ -349,14 +332,6 @@ export default function BorderPanel( {
 	};
 	const hasShadow = () => !! value?.shadow;
 	const resetShadow = () => setShadow( undefined );
-	// A local override exists when the user has set a shadow that shadows an
-	// inherited one. Only then does the toggle render the blue-dot reset
-	// affordance (mirroring the color/gradient controls); a merely-inherited
-	// value at rest shows no reset button.
-	const hasShadowLocalOverride =
-		showInheritanceLabelIndicators &&
-		hasShadow() &&
-		inheritedShadow !== undefined;
 
 	const resetBorder = () => {
 		if ( hasBorderRadius() ) {
@@ -393,10 +368,9 @@ export default function BorderPanel( {
 		// maintain its value. Read from `value` (local-only) rather than
 		// `border` (the merged display value), otherwise an inherited
 		// radius gets baked into the local override every time the
-		// user touches color/style/width — which both pollutes the
-		// stored attribute and causes the radius `ToolsPanelItem` to
-		// flip into the `has-local-override-from-global-styles` state
-		// even though the user never customised the radius. The
+		// user touches color/style/width. That pollutes the stored
+		// attribute and marks the radius as set even though the user
+		// never customised it. The
 		// `radius` key must come after the spread so it wins over any
 		// `radius` field forwarded by `BorderBoxControl`'s inner
 		// `BorderControl`, which merges its incoming `value` with the
@@ -436,30 +410,19 @@ export default function BorderPanel( {
 			label={ __( 'Borders' ) }
 		>
 			{ ( showBorderWidth || showBorderColor ) && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isBorderPlaceholder,
-						// The stored border has the shape the control edits.
-						isDefinedBorder( value?.border as BorderBoxValue ) &&
-							!! inheritedBorder &&
-							isDefinedBorder( inheritedBorder )
-					) }
+				<ToolsPanelItem
 					// The stored border has the shape the control edits.
 					hasValue={ () =>
 						isDefinedBorder( value?.border as BorderBoxValue )
 					}
 					label={ __( 'Border' ) }
-					hasInlineEndToggle
 					onDeselect={ () => resetBorder() }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
 				>
 					{ /* The visible label is always rendered, so the control's
 					    linked/unlinked toggle sits in a label row and lines up
-					    with the Radius control's. `BorderBoxControl` renders the
-					    label as `BaseControl.VisualLabel`, which is what the
-					    inheritance treatment and the local-override reset
-					    affordance target. */ }
+					    with the Radius control's. */ }
 					<BorderBoxControl
 						colors={ colors }
 						disableCustomColors={ ! areCustomSolidsEnabled }
@@ -472,17 +435,12 @@ export default function BorderPanel( {
 						value={ border }
 						__experimentalIsRenderedInSidebar
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showBorderRadius && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isBorderRadiusPlaceholder,
-						hasBorderRadius() && inheritedBorderRadius !== undefined
-					) }
+				<ToolsPanelItem
 					hasValue={ hasBorderRadius }
 					label={ __( 'Radius' ) }
-					hasInlineEndToggle
 					onDeselect={ () => setBorderRadius( undefined ) }
 					isShownByDefault={ defaultControls.radius }
 					panelId={ panelId }
@@ -494,23 +452,14 @@ export default function BorderPanel( {
 							setBorderRadius( newValue || undefined );
 						} }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ hasShadowControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						isShadowPlaceholder,
-						hasShadow() && inheritedShadow !== undefined
-					) }
+				<ToolsPanelItem
 					label={ __( 'Shadow' ) }
 					hasValue={ hasShadow }
 					onDeselect={ resetShadow }
 					isShownByDefault={ defaultControls.shadow }
-					// The shadow toggle renders its own reset affordance (blue
-					// dot for a local override, default reset otherwise) inside
-					// the control, mirroring the color/gradient controls, so the
-					// panel item must not render a second sibling reset dot.
-					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
 					<BaseControl.VisualLabel>
@@ -522,10 +471,9 @@ export default function BorderPanel( {
 						onShadowChange={ setShadowWithInheritedCommit }
 						settings={ settings }
 						hasLocalValue={ hasShadow() }
-						hasLocalOverride={ hasShadowLocalOverride }
 						onReset={ resetShadow }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 		</Wrapper>
 	);

@@ -1349,6 +1349,27 @@ test.describe( 'List View', () => {
 			] );
 	} );
 
+	test( 'opens the block settings menu on right-click', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/file' } );
+
+		const listView = await listViewUtils.openListView();
+
+		await listView
+			.getByRole( 'link', { name: 'Heading' } )
+			.click( { button: 'right' } );
+
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Duplicate' } )
+		).toBeVisible();
+	} );
+
 	test( 'block settings dropdown menu', async ( {
 		editor,
 		page,
@@ -1362,10 +1383,11 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		await listView
-			.getByRole( 'button', { name: 'Options' } )
-			.first()
-			.click();
+		const headingRows = listView.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'gridcell', { name: 'Heading' } ),
+		} );
+		await headingRows.hover();
+		await headingRows.getByRole( 'button', { name: 'Options' } ).click();
 
 		await page
 			.getByRole( 'menu', { name: 'Options' } )
@@ -1383,9 +1405,10 @@ test.describe( 'List View', () => {
 			] );
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
-		await listView
-			.getByRole( 'button', { name: 'Options' } )
+		await headingRows.first().hover();
+		await headingRows
 			.first()
+			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Options' } )
@@ -1462,8 +1485,10 @@ test.describe( 'List View', () => {
 		await optionsForFileToggle.click();
 		await expect(
 			optionsForFileMenu,
-			'Pressing Space should also open the menu dropdown'
+			'Clicking should also open the menu dropdown'
 		).toBeVisible();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
@@ -1485,6 +1510,8 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
@@ -1600,6 +1627,216 @@ test.describe( 'List View', () => {
 			},
 		] );
 	} );
+
+	test( 'keeps the canvas in place while scrolling to the selected block', async ( {
+		editor,
+		listViewUtils,
+		page,
+	} ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '2000px' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'link', { name: 'Spacer' } ).click();
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( () => ( document.scrollingElement.scrollTop = 0 ) );
+
+		const canvas = page.locator( '.editor-visual-editor' );
+		await canvas.evaluate( ( node ) =>
+			node.addEventListener( 'scroll', () =>
+				node.setAttribute( 'data-scrolled', '' )
+			)
+		);
+		await listView.getByRole( 'link', { name: 'Paragraph' } ).click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
+		).toBeInViewport( { ratio: 1 } );
+		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
+	} );
+
+	test.describe( 'long lists', () => {
+		test.beforeEach( async ( { editor } ) => {
+			// Sets the content in one go, as inserting the blocks one by one
+			// selects the last one and opens the list at its end.
+			await editor.setContent(
+				Array.from(
+					{ length: 200 },
+					( _, index ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+							index + 1
+						}"}} --><p></p><!-- /wp:paragraph -->`
+				).join( '' )
+			);
+		} );
+
+		test( 'shows the rows in view while scrolling', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await listViewUtils.getRow( 5 ).hover();
+
+			await page.mouse.wheel( 0, 4000 );
+			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+
+			await page.mouse.wheel( 0, -4000 );
+			await expect( listViewUtils.getRow( 5 ) ).toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+		} );
+
+		test( 'opens at a selected block far down the list', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await page.evaluate( () => {
+				const { getBlockOrder } =
+					window.wp.data.select( 'core/block-editor' );
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.selectBlock( getBlockOrder()[ 149 ] );
+			} );
+
+			await listViewUtils.openListView();
+
+			await expect( listViewUtils.getRow( 150 ) ).toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+		} );
+
+		test( 'keeps focus on a row scrolled out of view', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( listViewUtils.getRow( 2 ) ).toBeFocused();
+
+			await listViewUtils.getRow( 5 ).hover();
+			await page.mouse.wheel( 0, 4000 );
+			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
+
+			await expect( listViewUtils.getRow( 2 ) ).toBeFocused();
+		} );
+
+		test( 'pages through the list with Page Down @firefox @webkit', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'PageDown' );
+
+			await expect( listViewUtils.getRow( 1 ) ).not.toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+		} );
+
+		test( 'moves to both ends of the list with End and Home @firefox @webkit', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'End' );
+			await expect( listViewUtils.getRow( 200 ) ).toBeFocused();
+			await expect( listViewUtils.getRow( 200 ) ).toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+
+			await page.keyboard.press( 'Home' );
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
+		} );
+
+		test( 'moves to both ends of a nested list with End and Home', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				Array.from(
+					{ length: 100 },
+					( _, group ) =>
+						`<!-- wp:group {"metadata":{"name":"Group ${
+							group + 1
+						}"}} --><div class="wp-block-group">${ Array.from(
+							{ length: 4 },
+							( __, paragraph ) =>
+								`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+									group + 1
+								}.${
+									paragraph + 1
+								}"}} --><p></p><!-- /wp:paragraph -->`
+						).join( '' ) }</div><!-- /wp:group -->`
+				).join( '' )
+			);
+			const listView = await listViewUtils.openListView();
+			const getGroup = ( position ) =>
+				listView.getByRole( 'link', {
+					name: `Group ${ position }`,
+					exact: true,
+				} );
+			await expect( getGroup( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'End' );
+			await expect( getGroup( 100 ) ).toBeFocused();
+			await expect( getGroup( 100 ) ).toBeInViewport();
+
+			// Expands the last group, then leaves it far outside of the
+			// rendered rows.
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'Home' );
+			await expect( getGroup( 1 ) ).toBeFocused();
+			await expect( getGroup( 1 ) ).toBeInViewport();
+
+			await page.keyboard.press( 'End' );
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeFocused();
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeInViewport();
+		} );
+
+		test( 'moves to a parent far above with Arrow Left', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				`<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p></p><!-- /wp:paragraph --><!-- wp:group {"metadata":{"name":"Inner"}} --><div class="wp-block-group">${ Array.from(
+					{ length: 60 },
+					( _, index ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+							index + 1
+						}"}} --><p></p><!-- /wp:paragraph -->`
+				).join(
+					''
+				) }</div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph -->`
+			);
+			await page.evaluate( () => {
+				const [ outer ] = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.selectBlock(
+						outer.innerBlocks[ 1 ].innerBlocks[ 49 ].clientId
+					);
+			} );
+			const listView = await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 50 ) ).toBeFocused();
+
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect(
+				listView.getByRole( 'link', { name: 'Inner', exact: true } )
+			).toBeFocused();
+		} );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
@@ -1618,6 +1855,28 @@ class ListViewUtils {
 			name: 'Block navigation structure',
 		} );
 	}
+
+	/**
+	 * @param {number} position One-based position of a paragraph in the list.
+	 * @return {Locator} The link in the paragraph's row.
+	 */
+	getRow = ( position ) =>
+		this.listView.getByRole( 'link', {
+			name: `Paragraph ${ position }`,
+			exact: true,
+		} );
+
+	/**
+	 * Rows outside of the render window are replaced by a spacer before and
+	 * after the rendered rows, so neither should show up in the list.
+	 */
+	expectNoBlankRows = async () => {
+		const spacers = this.listView.locator(
+			'.block-editor-list-view-placeholder'
+		);
+		await expect( spacers.first() ).not.toBeInViewport();
+		await expect( spacers.last() ).not.toBeInViewport();
+	};
 
 	/**
 	 * Drags a List View row onto the bottom half of another row, with the

@@ -8,14 +8,7 @@ import {
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import {
-	Icon,
-	globe,
-	info,
-	linkOff,
-	pencil,
-	copySmall,
-} from '@wordpress/icons';
+import { Icon, globe, info, linkOff, pencil, copy } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -195,7 +188,7 @@ export default function LinkPreview( {
 					/>
 				) }
 				<Button
-					icon={ copySmall }
+					icon={ copy }
 					label={ __( 'Copy link' ) }
 					ref={ ref }
 					accessibleWhenDisabled

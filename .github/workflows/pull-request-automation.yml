@@ -97,7 +97,7 @@ jobs:
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: playground
-                  body: '[![Preview in WordPress Playground](https://img.shields.io/badge/Preview-WordPress%20Playground-3858e9?logo=wordpress)](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }})'
+                  body: '[![Preview in WordPress Playground](https://img.shields.io/badge/Preview-WordPress%20Playground-3858e9?logo=wordpress)](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }}) [![Preview in Storybook](https://img.shields.io/badge/Preview-Storybook-ff4785?logo=storybook)](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fplayground.wordpress.net%2Fplugin-proxy.php%3Forg%3DWordPress%26repo%3Dgutenberg%26workflow%3DBuild%2520Gutenberg%2520Plugin%2520Zip%26artifact%3Dstorybook-preview.zip%26pr%3D${{ github.event.pull_request.number }}&mode=seamless)'
                   pr-number: ${{ github.event.pull_request.number }}
                   # Sections are truncated at write from this commit on.
                   require-base-contains: d5eff1a2e1201f8644b2732d46fe0320670ef93e

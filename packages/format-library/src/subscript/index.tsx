@@ -24,6 +24,7 @@ export const subscript = {
 
 		return (
 			<RichTextToolbarButton
+				name="subscript"
 				icon={ subscriptIcon }
 				title={ title }
 				onClick={ onClick }

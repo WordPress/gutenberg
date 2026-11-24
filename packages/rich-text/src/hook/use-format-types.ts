@@ -1,8 +1,7 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import type { SelectFunction } from '@wordpress/data';
 import { store as richTextStore } from '../store';
-import type { RichTextFormatList } from '../types';
+import type { FormatType, RichTextFormatList } from '../types';
 
 /**
  * Format handlers derived from the editable tree and passed to `useRichText`.
@@ -11,10 +10,6 @@ type FormatHandler = (
 	formats: RichTextFormatList[],
 	text: string
 ) => RichTextFormatList[];
-
-function formatTypesSelector( select: SelectFunction ) {
-	return select( richTextStore ).getFormatTypes();
-}
 
 /**
  * Set of all interactive content tags.
@@ -34,6 +29,29 @@ const interactiveContentTags = new Set( [
 	'textarea',
 	'video',
 ] );
+
+// The key the format types are selected under, next to the props selected
+// for each format type, which are keyed by format names (`namespace/name`).
+const FORMAT_TYPES_KEY = 'formatTypes';
+
+function isFormatTypeAllowed(
+	{ name, interactive, tagName }: FormatType,
+	allowedFormats: readonly string[] | undefined,
+	withoutInteractiveFormatting: boolean | undefined
+) {
+	if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+		return false;
+	}
+
+	if (
+		withoutInteractiveFormatting &&
+		( interactive || interactiveContentTags.has( tagName ) )
+	) {
+		return false;
+	}
+
+	return true;
+}
 
 function prefixSelectKeys( selected: unknown, prefix: string ) {
 	if ( typeof selected !== 'object' || selected === null ) {
@@ -80,48 +98,62 @@ export function useFormatTypes( {
 	withoutInteractiveFormatting?: boolean;
 	__unstableFormatTypeHandlerContext?: object;
 } ) {
-	const allFormatTypes = useSelect( formatTypesSelector, [] );
-	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
-			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
-				return false;
-			}
+	// One subscription for the format types and the props some of them
+	// select: each mounted subscription costs every field.
+	const { [ FORMAT_TYPES_KEY ]: allFormatTypes, ...keyedSelected } =
+		useSelect(
+			( select ) => {
+				const selected: Record< string, unknown > = {
+					[ FORMAT_TYPES_KEY ]:
+						select( richTextStore ).getFormatTypes(),
+				};
 
-			if (
-				withoutInteractiveFormatting &&
-				( interactive || interactiveContentTags.has( tagName ) )
-			) {
-				return false;
-			}
+				if ( ! __unstableFormatTypeHandlerContext ) {
+					return selected;
+				}
 
-			return true;
-		} );
-	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
-	const keyedSelected = useSelect(
-		( select ) =>
-			formatTypes.reduce(
-				( accumulator: Record< string, unknown >, type ) => {
+				for ( const type of selected[
+					FORMAT_TYPES_KEY
+				] as FormatType[] ) {
 					if (
-						! type.__experimentalGetPropsForEditableTreePreparation ||
-						! __unstableFormatTypeHandlerContext
+						type.__experimentalGetPropsForEditableTreePreparation &&
+						isFormatTypeAllowed(
+							type,
+							allowedFormats,
+							withoutInteractiveFormatting
+						)
 					) {
-						return accumulator;
+						Object.assign(
+							selected,
+							prefixSelectKeys(
+								type.__experimentalGetPropsForEditableTreePreparation(
+									select,
+									__unstableFormatTypeHandlerContext
+								),
+								type.name
+							)
+						);
 					}
+				}
 
-					return {
-						...accumulator,
-						...prefixSelectKeys(
-							type.__experimentalGetPropsForEditableTreePreparation(
-								select,
-								__unstableFormatTypeHandlerContext
-							),
-							type.name
-						),
-					};
-				},
-				{}
+				return selected;
+			},
+			[
+				allowedFormats,
+				withoutInteractiveFormatting,
+				__unstableFormatTypeHandlerContext,
+			]
+		);
+	const formatTypes = useMemo(
+		() =>
+			( allFormatTypes as FormatType[] ).filter( ( type ) =>
+				isFormatTypeAllowed(
+					type,
+					allowedFormats,
+					withoutInteractiveFormatting
+				)
 			),
-		[ formatTypes, __unstableFormatTypeHandlerContext ]
+		[ allFormatTypes, allowedFormats, withoutInteractiveFormatting ]
 	);
 	const dispatch = useDispatch();
 	const prepareHandlers: FormatHandler[] = [];

@@ -147,6 +147,10 @@ export type AutocompleterUIProps = {
 	 */
 	onSelect: ( option: KeyedOption ) => void;
 	/**
+	 * A function to be called when the pointer moves over an option.
+	 */
+	onHover: ( index: number ) => void;
+	/**
 	 * A function that defines the behavior of the completer when it is reset
 	 */
 	reset: ( event: Event ) => void;
@@ -155,10 +159,6 @@ export type AutocompleterUIProps = {
 	 * `Autocomplete`'s `Popover`.
 	 */
 	contentRef: ContentRef;
-};
-
-export type CancelablePromise< T = void > = Promise< T > & {
-	canceled?: boolean;
 };
 
 export type UseAutocompleteProps< TReplacement = RichTextValue > = {

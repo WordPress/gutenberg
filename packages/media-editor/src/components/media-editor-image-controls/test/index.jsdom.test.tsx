@@ -4,9 +4,11 @@ import { useEffect, useState } from '@wordpress/element';
 import MediaEditorImageControls from '..';
 import type { MediaEditorImageControlsProps } from '..';
 import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
-import { MAX_ZOOM } from '../../../image-editor/core/constants';
 
-function setup( props: MediaEditorImageControlsProps = {}, zoom?: number ) {
+function setup(
+	props: MediaEditorImageControlsProps = {},
+	zoom?: number | 'max'
+) {
 	render(
 		<MediaEditorStateProvider>
 			<MediaEditorImageControls { ...props } />
@@ -15,18 +17,18 @@ function setup( props: MediaEditorImageControlsProps = {}, zoom?: number ) {
 	);
 }
 
-function CurrentState( { zoom }: { zoom?: number } ) {
+function CurrentState( { zoom }: { zoom?: number | 'max' } ) {
 	const {
-		cropper: { state, setZoom },
+		imageEditor: { state, setZoom, maxZoom },
 		cropOptions,
 	} = useMediaEditor();
 	// Start the cases that need it zoomed in. `setZoom` is a session edit,
 	// so these cases begin with one undo entry; none of them checks history.
 	useEffect( () => {
 		if ( zoom !== undefined ) {
-			setZoom( zoom );
+			setZoom( zoom === 'max' ? maxZoom : zoom );
 		}
-	}, [ setZoom, zoom ] );
+	}, [ setZoom, zoom, maxZoom ] );
 
 	return (
 		<>
@@ -97,14 +99,14 @@ describe( 'MediaEditorImageControls', () => {
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Zoom in' } ) );
 
-		// A factor of 2 from zoom 2 lands at 4 (within [minZoom, MAX_ZOOM]).
+		// A factor of 2 from zoom 2 lands at 4 (within [minZoom, maxZoom]).
 		expect(
 			Number( screen.getByTestId( 'current-zoom' ).textContent )
 		).toBe( 4 );
 	} );
 
 	it( 'disables Zoom in at the maximum zoom', () => {
-		setup( {}, MAX_ZOOM );
+		setup( {}, 'max' );
 		// Buttons use `accessibleWhenDisabled`, so the disabled state is
 		// expressed via aria-disabled, not the `disabled` attribute.
 		expect(

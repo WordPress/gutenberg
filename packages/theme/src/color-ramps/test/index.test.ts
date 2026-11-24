@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { getLuminance, serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+import {
+	get,
+	getLuminance,
+	serialize,
+	to,
+	HSL,
+	OKLCH,
+	sRGB,
+} from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '..';
 import { buildRamp } from '../lib';
 import {
@@ -12,6 +20,7 @@ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 import {
 	computeBetterFgColorDirection,
+	adjustContrastTarget,
 	sortByDependency,
 	stepsForStep,
 } from '../lib/utils';
@@ -53,6 +62,73 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 }
 
 describe( 'buildRamps', () => {
+	it( 'retains the richer background treatment instead of imposing a seed ceiling', () => {
+		// The global seed ceiling changed this step to #8d5d5d.
+		expect( buildBgRamp( '#996666' ).ramp.surface6 ).toBe( '#995758' );
+	} );
+
+	it.each( [
+		{ scheme: 'Blue', background: '#3876a8' },
+		{ scheme: 'Ocean', background: '#5f787f' },
+	] )(
+		'keeps weak neutral text at 4.5:1 or higher in the $scheme scheme',
+		( { background } ) => {
+			const { ramp, warnings } = buildBgRamp( background );
+
+			expect(
+				getContrast( ramp.surface3, ramp.fgSurface3 )
+			).toBeGreaterThanOrEqual( 4.5 );
+			expect( warnings ).toBeUndefined();
+		}
+	);
+
+	it( 'does not warn when emitted colors meet the configured target but miss the rounding reserve', () => {
+		const target = 20;
+		const { ramp, warnings } = buildRamp(
+			'rgb(0 10.6 0)',
+			{
+				...BG_RAMP_CONFIG,
+				fgSurface3: {
+					contrast: {
+						reference: 'seed',
+						followDirection: 'lighter',
+						target,
+					},
+					lightness: () => 1,
+				},
+			},
+			{ rescaleToFitContrastTargets: false }
+		);
+		const contrast = getContrast( ramp.surface2, ramp.fgSurface3 );
+
+		expect( contrast ).toBeGreaterThanOrEqual( target );
+		expect( contrast ).toBeLessThan( adjustContrastTarget( target ) );
+		expect( warnings ?? [] ).not.toContain( 'fgSurface3' );
+	} );
+
+	it( 'warns when emitted colors miss the configured target', () => {
+		const { ramp, warnings } = buildRamp(
+			'rgb(0 10.6 0)',
+			{
+				...BG_RAMP_CONFIG,
+				fgSurface3: {
+					contrast: {
+						reference: 'seed',
+						followDirection: 'lighter',
+						target: 20.05,
+					},
+					lightness: () => 1,
+				},
+			},
+			{ rescaleToFitContrastTargets: false }
+		);
+
+		expect( getContrast( ramp.surface2, ramp.fgSurface3 ) ).toBeLessThan(
+			20.05
+		);
+		expect( warnings ).toContain( 'fgSurface3' );
+	} );
+
 	it( 'restores the weak intent background colors', () => {
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const intentColors = [ 'info', 'success', 'warning', 'error' ] as const;
@@ -184,6 +260,68 @@ describe( 'buildRamps', () => {
 			).toMatchSnapshot();
 		}
 	);
+
+	it.each( [
+		// The "Modern" and "Light" admin backgrounds.
+		'#222524',
+		'#eaeeed',
+		// Near-white seeds whose tint is barely perceptible.
+		'#fcfcfd',
+		'#f6f7f9',
+	] )(
+		'keeps the generated neutral steps of near-gray seed %s near its hue and chroma',
+		( seed ) => {
+			const { ramp } = buildBgRamp( seed );
+			const seedChroma = get( seed, [ OKLCH, 'c' ] );
+			const seedHue = get( seed, [ OKLCH, 'h' ] );
+
+			// Both steps retain tint for all four seeds after rounding.
+			expect( get( ramp.surface1, [ OKLCH, 'c' ] ) ).toBeGreaterThan(
+				0.001
+			);
+			expect( get( ramp.stroke3, [ OKLCH, 'c' ] ) ).toBeGreaterThan(
+				0.001
+			);
+
+			for ( const step of [
+				'surface1',
+				'surface3',
+				'surface6',
+				'stroke1',
+				'stroke2',
+				'stroke3',
+				'stroke4',
+			] as const ) {
+				const chroma = get( ramp[ step ], [ OKLCH, 'c' ] );
+
+				// The neutral cap permits a small quadratic allowance. Use an
+				// absolute reserve because RGB rounding dominates very faint tints.
+				const ceiling = seedChroma * ( 1 + ( seedChroma / 0.02 ) ** 2 );
+				expect( chroma ).toBeLessThanOrEqual( ceiling + 0.002 );
+
+				// A faint enough tint can round to pure gray, which has no hue.
+				if ( chroma < 0.001 ) {
+					continue;
+				}
+				const hueDistance = Math.abs(
+					get( ramp[ step ], [ OKLCH, 'h' ] ) - seedHue
+				);
+				// One 8-bit RGB step shifts the hue of such a faint tint by
+				// up to about 20 degrees.
+				expect(
+					Math.min( hueDistance, 360 - hueDistance )
+				).toBeLessThan( 25 );
+			}
+		}
+	);
+
+	it( 'keeps tapered accent surfaces gray for a near-gray primary', () => {
+		const background = buildBgRamp( '#fcfcfc' );
+		const { ramp } = buildAccentRamp( '#222524', background );
+
+		expect( ramp.surface2 ).toBe( '#f8f8f8' );
+		expect( ramp.surface6 ).toBe( '#d1d1d1' );
+	} );
 
 	it( 'does not return warnings resolved by seed rescaling', () => {
 		const result = buildBgRamp( '#3876a8' );

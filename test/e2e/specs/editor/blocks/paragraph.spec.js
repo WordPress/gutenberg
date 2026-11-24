@@ -32,6 +32,44 @@ test.describe( 'Paragraph', () => {
 		expect( firstBlockTagName ).toBe( 'P' );
 	} );
 
+	test( 'should not show an empty toolbar group without alignment controls', async ( {
+		editor,
+		page,
+	} ) => {
+		// A theme without text or wide alignment leaves the toolbar's block
+		// group with nothing to show.
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const { __experimentalFeatures: features } =
+				select( 'core/block-editor' ).getSettings();
+			dispatch( 'core/block-editor' ).updateSettings( {
+				alignWide: false,
+				__experimentalFeatures: {
+					...features,
+					layout: undefined,
+					typography: { ...features.typography, textAlign: false },
+				},
+			} );
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'Hello' );
+		await editor.showBlockToolbar();
+
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Paragraph' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align text' } )
+		).toBeHidden();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Align block' } )
+		).toBeHidden();
+		await expect(
+			toolbar.locator( '.components-toolbar-group:not(:has(button))' )
+		).toHaveCount( 0 );
+	} );
+
 	test.describe( 'Empty paragraph', () => {
 		test.use( {
 			// Make the viewport large enough so that a scrollbar isn't displayed.

@@ -39,9 +39,18 @@ export type MoveBlocks = (
 ) => void;
 
 /**
+ * Runs custom behavior for dropped blocks, including unchanged block order.
+ */
+export type OnBlocksDrop = (
+	sourceClientIds: string[],
+	sourceRootClientId: string | null
+) => void;
+
+/**
  * Options of `useOnBlockDrop`.
  */
 export interface UseOnBlockDropOptions {
 	operation?: BlockDropOperation;
 	nearestSide?: 'left' | 'right';
+	onBlocksDrop?: OnBlocksDrop;
 }

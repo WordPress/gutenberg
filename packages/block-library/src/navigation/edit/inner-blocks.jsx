@@ -68,6 +68,18 @@ export default function NavigationInnerBlocks( {
 	const showPlaceholder =
 		! hasCustomPlaceholder && ! hasMenuItems && ! isSelected;
 
+	// When the block is selected but has no items yet, show the button
+	// appender. Otherwise, show the dropdown appender.
+	// As an exception to other blocks which feature nesting, the appender stays
+	// visible even when a child block (or a submenu item) is selected.
+	// See https://github.com/WordPress/gutenberg/issues/37572.
+	let renderAppender = false;
+	if ( isSelected && ! hasMenuItems ) {
+		renderAppender = InnerBlocks.ButtonBlockAppender;
+	} else if ( parentOrChildHasSelection || hasSelectedDescendant ) {
+		renderAppender = InnerBlocks.DefaultBlockAppender;
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -81,21 +93,7 @@ export default function NavigationInnerBlocks( {
 			directInsert: true,
 			orientation,
 			templateLock,
-
-			// As an exception to other blocks which feature nesting, show
-			// the block appender even when a child block is selected.
-			// This should be a temporary fix, to be replaced by improvements to
-			// the sibling inserter.
-			// See https://github.com/WordPress/gutenberg/issues/37572.
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				hasSelectedDescendant ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				parentOrChildHasSelection
-					? InnerBlocks.ButtonBlockAppender
-					: false,
+			renderAppender,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
 			__unstableDisableLayoutClassNames: true,

@@ -295,6 +295,8 @@ class BlocksManifestPlugin {
 const scriptConfig = {
 	...baseConfig,
 
+	name: 'scripts',
+
 	entry: getWebpackEntryPoints( 'script' ),
 
 	devServer: isProduction
@@ -466,6 +468,8 @@ if ( hasExperimentalModulesFlag ) {
 	/** @type {webpack.Configuration} */
 	const moduleConfig = {
 		...baseConfig,
+
+		name: 'modules',
 
 		entry: getWebpackEntryPoints( 'module' ),
 

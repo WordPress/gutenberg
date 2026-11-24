@@ -11,32 +11,39 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
-	const { blockName, isValid, shortcut } = useSelect(
+function NoteMenuItem( { clientIds, onClick, isDistractionFree } ) {
+	const { isValid, isClassicBlock, shortcut } = useSelect(
 		( select ) => {
 			const { getBlockName, isBlockValid } = select( blockEditorStore );
 			return {
-				blockName: getBlockName( clientId ),
-				isValid: isBlockValid( clientId ),
+				isValid: clientIds.every(
+					( clientId ) =>
+						isBlockValid( clientId ) &&
+						getBlockName( clientId ) !==
+							getUnregisteredTypeHandlerName()
+				),
+				isClassicBlock: clientIds.some(
+					( clientId ) => getBlockName( clientId ) === 'core/freeform'
+				),
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
 			};
 		},
-		[ clientId ]
+		[ clientIds ]
 	);
 
-	if ( ! isValid || blockName === getUnregisteredTypeHandlerName() ) {
+	if ( ! isValid ) {
 		return null;
 	}
 
-	const isDisabled = isDistractionFree || blockName === 'core/freeform';
+	const isDisabled = isDistractionFree || isClassicBlock;
 
 	let infoText;
 
 	if ( isDistractionFree ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
-	} else if ( blockName === 'core/freeform' ) {
+	} else if ( isClassicBlock ) {
 		infoText = __( 'Convert to blocks to add notes.' );
 	}
 
@@ -55,12 +62,12 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 	return (
 		<NoteIconSlotFill.Fill>
-			{ ( { clientId, onClose } ) => (
+			{ ( { clientIds, onClose } ) => (
 				<NoteMenuItem
-					clientId={ clientId }
+					clientIds={ clientIds }
 					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
-						onClick( clientId );
+						onClick( clientIds );
 						onClose();
 					} }
 				/>

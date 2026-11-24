@@ -195,7 +195,7 @@ export interface BaseProps extends Omit<
 	 */
 	month?: Date;
 	/**
-	 * The number of months displayed at once.
+	 * The number of months displayed at once, clamped between 1 and 3.
 	 * @default 1
 	 */
 	numberOfMonths?: number;

@@ -37,6 +37,24 @@ export const warnUniqueIdNotSupported = (
 	}
 };
 
+// Warns that the data-wp-bind directive doesn't set a given prop.
+export const warnUnbindableProp = ( suffix: string ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			`The data-wp-bind directive can't set the "${ suffix }" prop. Ignoring data-wp-bind--${ suffix }.`
+		);
+	}
+};
+
+// Warns that event handler attributes cannot be bound.
+export const warnEventHandlerBindNotSupported = ( attribute: string ): void => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		warn(
+			`Binding event handler attributes is not supported. Please use "data-wp-on--${ attribute.slice( 2 ) }" instead.`
+		);
+	}
+};
+
 // Warns about a deprecated async directive name and suggests the replacement.
 // `withSyncEvent()` should be used for synchronous event access.
 export const warnWithSyncEvent = (

@@ -30,7 +30,13 @@ const DEFAULT_FORM: Form = {
 			},
 		} ) ),
 		'date',
-		'author',
+		{
+			id: 'author',
+			layout: {
+				type: 'panel' as const,
+				showPlaceholderIfEmpty: true,
+			},
+		},
 		'filename',
 		'mime_type',
 		'filesize',
