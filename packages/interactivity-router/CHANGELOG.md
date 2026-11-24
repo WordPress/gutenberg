@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix router regions with `attachTo` pointing to the same parent no longer rendering after client-side navigation between pages that include different regions; each attached region now renders into its own root element.
+
 ## 3.2.0 (2026-11-18)
 
 ### Bug Fixes
