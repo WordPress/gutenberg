@@ -203,6 +203,9 @@ const { state, actions } = store(
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
 					if ( event.key === 'Escape' ) {
+						if ( event.isComposing || event.keyCode === 229 ) {
+							return;
+						}
 						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );
