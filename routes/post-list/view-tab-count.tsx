@@ -1,6 +1,3 @@
-/**
- * Style dependencies
- */
 import styles from './view-tab-count.module.css';
 
 interface ViewTabCountProps {
