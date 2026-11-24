@@ -397,7 +397,7 @@ export const PackageCard = ( {
 							href={ `./?path=/docs/${ storybookId }` }
 							target="_top"
 						>
-							See more
+							Learn more about { title }
 						</Link>
 						<Link href={ docsHref } openInNewTab>
 							Developer documentation
