@@ -1,3 +1,8 @@
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '../lock-unlock';
+
+const { getStyleTransform } = unlock( componentsPrivateApis );
+
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
@@ -91,13 +96,6 @@ export function getBlockClientId( node: Node | null ) {
 	return blockNode.id.slice( 'block-'.length );
 }
 
-const ANGLE_UNITS_IN_DEGREES: Record< string, number > = {
-	deg: 1,
-	grad: 0.9,
-	rad: 180 / Math.PI,
-	turn: 360,
-};
-
 /**
  * Returns whether a computed style rotates or skews an element, so that its
  * edges are no longer parallel to the viewport. Translating and scaling keep
@@ -107,44 +105,13 @@ const ANGLE_UNITS_IN_DEGREES: Record< string, number > = {
  * @return Whether the element is rotated or skewed.
  */
 export function isStyleRotated(
-	style: Pick< CSSStyleDeclaration, 'rotate' | 'transform' >
+	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
 ) {
-	// `rotate` serialises as `none`, `<angle>` or `<axis> <angle>`. Rotating
-	// around the x or y axis only foreshortens the element.
-	const rotate = style.rotate?.trim().split( /\s+/ ) ?? [];
-	if (
-		rotate.length === 1 ||
-		( rotate.length === 2 && rotate[ 0 ] === 'z' )
-	) {
-		const match = /^(-?[\d.]+)(deg|grad|rad|turn)$/.exec(
-			rotate.at( -1 )!
-		);
-		if (
-			match &&
-			( parseFloat( match[ 1 ] ) *
-				ANGLE_UNITS_IN_DEGREES[ match[ 2 ] ] ) %
-				90 !==
-				0
-		) {
-			return true;
-		}
-	}
-
-	// `transform` serialises as `none`, `matrix()` or `matrix3d()`.
-	const matrix = /^matrix(3d)?\((.+)\)$/.exec( style.transform ?? '' );
-	if ( matrix ) {
-		const values = matrix[ 2 ].split( ',' ).map( parseFloat );
-		const [ a, b ] = values;
-		const [ c, d ] = matrix[ 1 ]
-			? [ values[ 4 ], values[ 5 ] ]
-			: values.slice( 2 );
-		const isAxisAligned =
-			( Math.abs( b ) < 1e-6 && Math.abs( c ) < 1e-6 ) ||
-			( Math.abs( a ) < 1e-6 && Math.abs( d ) < 1e-6 );
-		return ! isAxisAligned;
-	}
-
-	return false;
+	const { a, b, c, d } = getStyleTransform( style );
+	const isAxisAligned =
+		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
+		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 );
+	return ! isAxisAligned;
 }
 
 /**
