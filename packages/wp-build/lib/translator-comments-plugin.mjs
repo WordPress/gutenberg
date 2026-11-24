@@ -3,11 +3,8 @@ import { parseSync } from 'rolldown/utils';
 
 /** @typedef {import('rolldown/utils').ParseResult['comments'][number]} Comment */
 
-/**
- * An ESTree node. Only its type and offsets are known in advance.
- *
- * @typedef {{ type: string, start: number, end: number, [ key: string ]: any }} Node
- */
+/** @typedef {import('rolldown/utils').ESTree.Node} Node */
+/** @typedef {import('rolldown/utils').ESTree.CallExpression} CallExpression */
 
 /**
  * A node and where it is in the tree.
@@ -51,7 +48,7 @@ export function isTranslatorComment( value ) {
  * `make-pot` understands: `__()`, `i18n.__()`, `wp.i18n.__()` and
  * `( 0, i18n.__ )()`.
  *
- * @param {Node} node Call expression node.
+ * @param {CallExpression} node Call expression node.
  * @return {string|undefined} Function name, if the callee has one.
  */
 function getCalleeName( node ) {
@@ -216,7 +213,7 @@ export function keepTranslatorComments( code, id, moduleType ) {
 
 	// The gettext calls, and for each offset the nodes that start there,
 	// outermost first.
-	/** @type {Node[]} */
+	/** @type {CallExpression[]} */
 	const gettextCalls = [];
 	/** @type {Map<number, NodeEntry[]>} */
 	const nodesByStart = new Map();
