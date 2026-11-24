@@ -25,6 +25,7 @@ import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
+	getUpdatedBlockVisibility,
 } from './utils';
 import type { TreeBlock } from '../../store/types';
 import type { BlockVisibilityModalProps } from './types';
@@ -109,8 +110,8 @@ export default function BlockVisibilityModal( {
 	const [ viewportChecked, setViewportChecked ] = useState(
 		initialViewportValues?.viewportChecked ?? {}
 	);
-	const [ hideEverywhere, setHideEverywhere ] = useState(
-		initialViewportValues?.hideEverywhere ?? false
+	const [ hideEverywhere, setHideEverywhere ] = useState< boolean | null >(
+		initialViewportValues.hideEverywhere
 	);
 
 	const handleViewportCheckboxChange = useCallback(
@@ -184,30 +185,16 @@ export default function BlockVisibilityModal( {
 	const handleSubmit = useCallback(
 		( event: FormEvent ) => {
 			event.preventDefault();
-			const newVisibility = hideEverywhere
-				? false
-				: {
-						viewport: viewportEntries.reduce(
-							( acc, [ , { key } ] ) => {
-								if ( viewportChecked[ key ] ) {
-									// Values are inverted to hide the block on the selected viewport.
-									// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
-									// so 'false' means hide the block on the selected viewport.
-									acc[ key ] = false;
-								}
-								return acc;
-							},
-							// The reducer fills the empty object.
-							{} as Record< string, boolean >
-						),
-					};
 			const attributesByClientId = Object.fromEntries(
-				blocks.map( ( { clientId, attributes } ) => [
-					clientId,
+				blocks.map( ( block ) => [
+					block.clientId,
 					{
 						metadata: cleanEmptyObject( {
-							...attributes?.metadata,
-							blockVisibility: newVisibility,
+							...block.attributes?.metadata,
+							blockVisibility: getUpdatedBlockVisibility( block, {
+								hideEverywhere,
+								viewportChecked,
+							} ),
 						} ),
 					},
 				] )
@@ -232,7 +219,6 @@ export default function BlockVisibilityModal( {
 			noticeMessage,
 			onClose,
 			updateBlockAttributes,
-			viewportEntries,
 			viewportChecked,
 		]
 	);
