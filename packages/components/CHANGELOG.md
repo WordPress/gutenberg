@@ -24,6 +24,7 @@
 -   `ToggleGroupControl`: Show option tooltips above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86804](https://github.com/WordPress/gutenberg/pull/86804)).
 -   `ColorPicker`: Show the typed alpha value in the RGB and HSL Alpha fields. Before, some values such as `29` showed one less ([#87291](https://github.com/WordPress/gutenberg/pull/87291)).
 -   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
+-   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
 
 ### Internal
 
