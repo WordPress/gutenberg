@@ -5,6 +5,10 @@
 ### Bug Fixes
 
 -   Skip uploading a generated sub-size that is larger than the site's upload limit, instead of sending a request the server rejects ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
+### Internal
+
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
 ## 0.45.0 (2026-11-18)
 
 ### New Features

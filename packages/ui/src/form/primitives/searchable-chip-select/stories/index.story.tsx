@@ -78,6 +78,7 @@ export const WithItemDescriptions: Story = {
  * returning an `Item` subcomponent for each item.
  */
 export const WithCustomChipsAndItems: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		...Default.args,
 		chipsContent: ( value: typeof ITEMS ) =>
