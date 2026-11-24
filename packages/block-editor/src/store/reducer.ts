@@ -23,6 +23,7 @@ import type {
 	BlocksState,
 	BlockTreeNode,
 	BlockWithoutAttributes,
+	DetachedBlock,
 	InitialPosition,
 	Settings,
 	State,
@@ -830,9 +831,11 @@ export const blocks = pipe(
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
+	// Needs to be before withPersistentBlockChange, so the inner blocks it
+	// removes count as part of the action, with the action's history mode.
+	withResetControlledBlocks,
 	withPersistentBlockChange,
-	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withIgnoredBlockChange
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
@@ -2122,6 +2125,32 @@ export function moveTransparentBlocks(
 }
 
 /**
+ * Reducer returning the blocks that detach on edit. See
+ * `setBlockDetachesOnEdit`.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function detachOnEditBlocks(
+	state: State[ 'detachOnEditBlocks' ] = {},
+	action: Action
+) {
+	if ( action.type !== 'SET_BLOCK_DETACHES_ON_EDIT' ) {
+		return state;
+	}
+	if ( action.detachesOnEdit === !! state[ action.clientId ] ) {
+		return state;
+	}
+	if ( action.detachesOnEdit ) {
+		return { ...state, [ action.clientId ]: true as const };
+	}
+	const { [ action.clientId ]: _removed, ...rest } = state;
+	return rest;
+}
+
+/**
  * Reducer returning the block insertion event list state.
  *
  * @param state  Current state.
@@ -2603,6 +2632,7 @@ const combinedReducers = combineReducers( {
 	lastFocus,
 	expandedBlock,
 	moveTransparentBlocks,
+	detachOnEditBlocks,
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,
@@ -3434,7 +3464,88 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 	};
 }
 
+const NO_DETACHED_BLOCKS: DetachedBlock[] = [];
+
+function getInnerBlocksInTree( blocksState: BlocksState, clientId: string ) {
+	return blocksState.tree.get(
+		blocksState.controlledInnerBlocks.has( clientId )
+			? 'controlled||' + clientId
+			: clientId
+	)?.innerBlocks;
+}
+
+/**
+ * Higher-order reducer that detaches the blocks marked to detach on edit (see
+ * `setBlockDetachesOnEdit`). When a persistent change alters the inner blocks
+ * of such a block, the same action replaces the block with them, so
+ * subscribers (such as an inner block controller recording undo levels) see a
+ * single change.
+ *
+ * @param reducer Original reducer function.
+ *
+ * @return Enhanced reducer function.
+ */
+function withDetachOnEdit( reducer: Reducer< State > ) {
+	return ( state: State | undefined, action: Action ) => {
+		let nextState = reducer( state, action );
+
+		if ( state && nextState.blocks === state.blocks ) {
+			// Take over the last value without creating a new reference.
+			nextState.lastDetachedBlocks = state.lastDetachedBlocks;
+			return nextState;
+		}
+
+		const detached: DetachedBlock[] = [];
+		const { isPersistentChange, isIgnoredChange } = nextState.blocks;
+		if ( state && isPersistentChange && ! isIgnoredChange ) {
+			for ( const clientId of Object.keys(
+				nextState.detachOnEditBlocks
+			) ) {
+				const block = nextState.blocks.byClientId.get( clientId );
+				// The block's own changes, such as to its attributes or its
+				// position, leave its inner blocks as they are.
+				if (
+					! block ||
+					! state.blocks.byClientId.has( clientId ) ||
+					getInnerBlocksInTree( state.blocks, clientId ) ===
+						getInnerBlocksInTree( nextState.blocks, clientId )
+				) {
+					continue;
+				}
+				const rootClientId =
+					nextState.blocks.parents.get( clientId ) ?? '';
+				const innerClientIds =
+					nextState.blocks.order.get( clientId ) ?? [];
+				// Moved rather than recreated, so they keep their client IDs
+				// (and the selection).
+				if ( innerClientIds.length ) {
+					nextState = reducer( nextState, {
+						type: 'MOVE_BLOCKS_TO_POSITION',
+						clientIds: innerClientIds,
+						fromRootClientId: clientId,
+						toRootClientId: rootClientId,
+						index: nextState.blocks.order
+							.get( rootClientId )!
+							.indexOf( clientId ),
+					} );
+				}
+				nextState = reducer( nextState, {
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				} );
+				detached.push( { clientId, name: block.name, rootClientId } );
+			}
+		}
+
+		nextState.lastDetachedBlocks = detached.length
+			? detached
+			: NO_DETACHED_BLOCKS;
+		return nextState;
+	};
+}
+
 export default pipe(
 	withDerivedBlockEditingModes,
-	withAutomaticChangeReset
+	withAutomaticChangeReset,
+	withDetachOnEdit
 )( combinedReducers ) as Reducer< State >;

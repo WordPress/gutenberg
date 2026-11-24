@@ -564,6 +564,16 @@ export interface RemovalPromptData {
 	message: RemovalPromptMessage;
 }
 
+/**
+ * A block a change replaced with its inner blocks. See `setBlockDetachesOnEdit`.
+ */
+export interface DetachedBlock {
+	clientId: string;
+	name: string;
+	/** The parent the block was in, which now holds its inner blocks. */
+	rootClientId: string;
+}
+
 export interface SelectedBlockStyleState {
 	clientId: string;
 	showStateOnCanvas: boolean;
@@ -593,6 +603,8 @@ export interface State {
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
 	moveTransparentBlocks: Record< string, true >;
+	detachOnEditBlocks: Record< string, true >;
+	lastDetachedBlocks: DetachedBlock[];
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
 	editedContentOnlySection: string | undefined;
@@ -745,6 +757,11 @@ export type Action =
 			mode: BlockEditingMode;
 	  }
 	| { type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW'; clientId: string | null }
+	| {
+			type: 'SET_BLOCK_DETACHES_ON_EDIT';
+			clientId: string;
+			detachesOnEdit: boolean;
+	  }
 	| {
 			type: 'SET_BLOCK_MOVE_TRANSPARENT';
 			clientId: string;

@@ -363,6 +363,43 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			} );
 	} );
 
+	test( 'undo and redo take a link moved out of the list in one step', async ( {
+		page,
+		pageListMenu,
+	} ) => {
+		const menu = await pageListMenu.setUp();
+		const converted = {
+			pageLists: 0,
+			autoAdd: true,
+			labels: [ 'Charlie', 'Home', 'Alpha', 'Bravo' ],
+		};
+
+		// The move changes the menu's own items as well as the list's.
+		await pageListMenu.moveOutOfList( 'Charlie', 0 );
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( converted );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		await topBar
+			.getByRole( 'button', { name: 'Undo', exact: true } )
+			.click();
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( {
+				pageLists: 1,
+				autoAdd: false,
+				labels: [ 'Home', 'Alpha', 'Bravo', 'Charlie' ],
+			} );
+
+		await topBar
+			.getByRole( 'button', { name: 'Redo', exact: true } )
+			.click();
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( converted );
+	} );
+
 	test( 'with more than 100 pages the list stays a Page List', async ( {
 		editor,
 		pageListMenu,

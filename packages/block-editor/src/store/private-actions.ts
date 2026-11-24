@@ -404,6 +404,29 @@ export function setBlockMoveTransparent(
 }
 
 /**
+ * Makes a block stand in for its inner blocks until they're edited: the first
+ * persistent change to them also replaces the block with them, as part of the
+ * same change, so a single undo step reverts both. Changes that aren't
+ * persistent, or are left out of the undo history (such as an inner block
+ * controller resetting the inner blocks), leave the block in place.
+ *
+ * @param clientId       The block's client ID.
+ * @param detachesOnEdit Whether the block detaches on edit.
+ *
+ * @return Action object.
+ */
+export function setBlockDetachesOnEdit(
+	clientId: string,
+	detachesOnEdit: boolean
+) {
+	return {
+		type: 'SET_BLOCK_DETACHES_ON_EDIT' as const,
+		clientId,
+		detachesOnEdit,
+	};
+}
+
+/**
  * @param clientId The block's clientId, or `null` to clear.
  *
  * @return  Action object.

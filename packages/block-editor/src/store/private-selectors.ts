@@ -1492,6 +1492,18 @@ export function isBlockMoveTransparent( state: State, clientId: string ) {
 }
 
 /**
+ * Returns the blocks that the latest change to the blocks replaced with their
+ * inner blocks, because they detach on edit. See `setBlockDetachesOnEdit`.
+ *
+ * @param state Block editor state.
+ *
+ * @return The detached blocks.
+ */
+export function getLastDetachedBlocks( state: State ) {
+	return state.lastDetachedBlocks;
+}
+
+/**
  * Where a one-step move puts blocks.
  */
 export type BlockMoveDestination = {
