@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 import { useSettings } from '../use-settings';
 import type { HeightControlProps } from './types';
 
-const RANGE_CONTROL_CUSTOM_SETTINGS: Record<
+export const RANGE_CONTROL_CUSTOM_SETTINGS: Record<
 	string,
 	{ max: number; step: number }
 > = {
