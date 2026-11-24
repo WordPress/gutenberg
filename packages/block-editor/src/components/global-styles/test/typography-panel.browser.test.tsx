@@ -724,6 +724,29 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			} );
 		} );
 
+		it( 'keeps inheriting when the inherited custom size is cleared', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+
+			// `30px` is not a preset, so the custom size input is shown.
+			await renderPanel( {
+				inheritedValue: { typography: { fontSize: '30px' } },
+				onChange,
+			} );
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
+			expect( input ).toHaveValue( 30 );
+
+			await user.clear( input );
+			await user.tab();
+
+			for ( const [ newValue ] of onChange.mock.calls ) {
+				expect( newValue?.typography?.fontSize ).toBeUndefined();
+			}
+		} );
+
 		describe( 'with more than five presets (select)', () => {
 			const settingsWithManySizes: StyleSettings = {
 				typography: {
