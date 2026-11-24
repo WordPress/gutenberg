@@ -55,7 +55,7 @@ const sampleMediaItem: MediaItem = {
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
 	class_list: [ 'post-123', 'attachment' ],
-	alt_text: 'A beautiful sample image',
+	alt_text: 'Illustrated Japanese-English vocabulary chart',
 	caption: {
 		raw: 'A caption for the image',
 		rendered: '<p>A caption for the image</p>\n',
@@ -71,9 +71,9 @@ const sampleMediaItem: MediaItem = {
 	source_url: IMAGE_URL,
 	media_details: {
 		file: 'sample-image.jpg',
-		width: 1920,
-		height: 1080,
-		filesize: 524288,
+		width: 1000,
+		height: 1464,
+		filesize: 146045,
 		image_meta: {
 			aperture: '2.8',
 			credit: '',
@@ -98,9 +98,9 @@ const sampleMediaItem: MediaItem = {
 				source_url: IMAGE_URL,
 			},
 			medium: {
-				file: 'sample-image-300x169.jpg',
-				width: 300,
-				height: 169,
+				file: 'sample-image-205x300.jpg',
+				width: 205,
+				height: 300,
 				filesize: 24576,
 				mime_type: 'image/jpeg',
 				source_url: IMAGE_URL,
