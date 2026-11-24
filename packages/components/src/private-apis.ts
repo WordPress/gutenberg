@@ -1,4 +1,5 @@
 import { useDrag } from '@use-gesture/react';
+import deprecated from '@wordpress/deprecated';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
@@ -11,14 +12,26 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { getScreenTransform, getStyleTransform } from './resizable-box/utils';
 
 export const privateApis = {};
 lock( privateApis, {
 	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
+	getScreenTransform,
+	getStyleTransform,
 	Tabs,
-	Menu,
+	// Retained for older bundled consumers. Check compatibility before removal.
+	get Menu() {
+		deprecated( '`privateApis.Menu` from `@wordpress/components`', {
+			since: '7.2',
+			version: '7.3',
+			alternative: '`DropdownMenu` from `@wordpress/components`',
+			hint: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead.',
+		} );
+		return Menu;
+	},
 	Badge,
 	useDrag,
 	ValidatedInputControl,

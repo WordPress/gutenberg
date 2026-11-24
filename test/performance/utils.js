@@ -42,7 +42,7 @@ export function median( array ) {
 }
 
 export function quartiles( array ) {
-	const numbers = array.slice().sort( ( a, b ) => a - b );
+	const numbers = array.toSorted( ( a, b ) => a - b );
 
 	function med( offset, length ) {
 		if ( length % 2 === 0 ) {

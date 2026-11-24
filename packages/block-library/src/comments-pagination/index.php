@@ -21,7 +21,7 @@ function render_block_core_comments_pagination( $attributes, $content ) {
 	}
 
 	if ( post_password_required() ) {
-		return;
+		return '';
 	}
 
 	$classes            = ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) ? 'has-link-color' : '';

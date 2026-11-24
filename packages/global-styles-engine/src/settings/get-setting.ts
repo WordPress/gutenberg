@@ -4,6 +4,7 @@ import type { GlobalStylesConfig } from '../types';
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundClip',
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
@@ -53,6 +54,8 @@ const VALID_SETTINGS = [
 	'spacing.margin',
 	'spacing.padding',
 	'spacing.units',
+	'transform.rotate',
+	'transform.translate',
 	'typography.fluid',
 	'typography.customFontSize',
 	'typography.defaultFontSizes',

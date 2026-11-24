@@ -3,6 +3,7 @@ import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
 import { useInstanceId } from '@wordpress/compose';
 import { useLayoutEffect, useRef } from '@wordpress/element';
+import { Tooltip, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import type {
@@ -11,14 +12,14 @@ import type {
 } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import styles from './style.module.scss';
-import Tooltip from '../../tooltip';
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } placement="top">
-				{ children }
-			</Tooltip>
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ children } />
+				<Tooltip.Popup>{ text }</Tooltip.Popup>
+			</Tooltip.Root>
 		);
 	}
 	return <>{ children }</>;
@@ -38,6 +39,8 @@ function ToggleGroupControlOptionBase(
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
+	useEnableWpCompatOverlaySlot();
+
 	const toggleGroupControlContext = useToggleGroupControlContext();
 
 	const id = useInstanceId(
@@ -96,6 +99,13 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
+	// Text labels reserve the width of their emphasized (pressed) weight, so
+	// that pressing an option doesn't change the width of the control.
+	const buttonContentProps = {
+		className: styles[ 'button-content' ],
+		'data-label': typeof children === 'string' ? children : undefined,
+	};
+
 	const labelRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( isPressed && labelRef.current ) {
@@ -117,9 +127,7 @@ function ToggleGroupControlOptionBase(
 						type="button"
 						onClick={ buttonOnClick }
 					>
-						<div className={ styles[ 'button-content' ] }>
-							{ children }
-						</div>
+						<div { ...buttonContentProps }>{ children }</div>
 					</button>
 				) : (
 					<Ariakit.Radio
@@ -141,9 +149,7 @@ function ToggleGroupControlOptionBase(
 						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
-						<div className={ styles[ 'button-content' ] }>
-							{ children }
-						</div>
+						<div { ...buttonContentProps }>{ children }</div>
 					</Ariakit.Radio>
 				) }
 			</WithToolTip>

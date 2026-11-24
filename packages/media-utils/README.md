@@ -27,7 +27,7 @@ Undocumented declaration.
 
 ### privateApis
 
-Private @wordpress/media-utils APIs.
+Private `@wordpress/media-utils` APIs.
 
 ### RestAttachment
 

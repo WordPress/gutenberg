@@ -3,18 +3,19 @@ import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
+import { Tooltip } from '@wordpress/ui';
 import { BaseControl } from '../base-control';
 import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
 import Button from '../button';
 import { Grid } from '../grid';
 import { HStack } from '../h-stack';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
 	isValueMixed,
 	isValuesDefined,
 	getAllowedSides,
+	getSelectedUnits,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
@@ -85,12 +86,9 @@ function BoxControl( {
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
-	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
-		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
-		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
-		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
-		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
-	} );
+	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >(
+		getSelectedUnits( valuesProp )
+	);
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
@@ -108,7 +106,7 @@ function BoxControl( {
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
-		setSelectedUnits( resetValues );
+		setSelectedUnits( getSelectedUnits( resetValues ) );
 		setIsDirty( false );
 	};
 
@@ -138,64 +136,66 @@ function BoxControl( {
 	}
 
 	return (
-		<Grid
-			id={ id }
-			columns={ 3 }
-			templateColumns="1fr min-content min-content"
-			role="group"
-			aria-labelledby={ headingId }
-		>
-			<BaseControl.VisualLabel id={ headingId }>
-				{ label }
-			</BaseControl.VisualLabel>
-			{ isLinked && (
-				<HStack className={ styles[ 'input-wrapper' ] }>
-					<BoxInputControl side="all" { ...inputControlProps } />
-				</HStack>
-			) }
-			{ ! hasOneSide && (
-				<div className={ styles[ 'linked-button-wrapper' ] }>
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				</div>
-			) }
+		<Tooltip.Provider>
+			<Grid
+				id={ id }
+				columns={ 3 }
+				templateColumns="1fr min-content min-content"
+				role="group"
+				aria-labelledby={ headingId }
+			>
+				<BaseControl.VisualLabel id={ headingId }>
+					{ label }
+				</BaseControl.VisualLabel>
+				{ isLinked && (
+					<HStack className={ styles[ 'input-wrapper' ] }>
+						<BoxInputControl side="all" { ...inputControlProps } />
+					</HStack>
+				) }
+				{ ! hasOneSide && (
+					<div className={ styles[ 'linked-button-wrapper' ] }>
+						<LinkedButton
+							onClick={ toggleLinked }
+							isLinked={ isLinked }
+						/>
+					</div>
+				) }
 
-			{ ! isLinked &&
-				splitOnAxis &&
-				[ 'vertical', 'horizontal' ].map( ( axis ) => (
-					<BoxInputControl
-						key={ axis }
-						side={ axis as 'horizontal' | 'vertical' }
-						{ ...inputControlProps }
-					/>
-				) ) }
-			{ ! isLinked &&
-				! splitOnAxis &&
-				Array.from( sidesToRender ).map( ( axis ) => (
-					<BoxInputControl
-						key={ axis }
-						side={ axis }
-						{ ...inputControlProps }
-					/>
-				) ) }
-			{ allowReset && (
-				<Button
-					className={ clsx(
-						styles[ 'reset-button' ],
-						'component-box-control__reset-button'
-					) }
-					variant="secondary"
-					size="small"
-					onClick={ handleOnReset }
-					disabled={ ! isDirty }
-					accessibleWhenDisabled
-				>
-					{ __( 'Reset' ) }
-				</Button>
-			) }
-		</Grid>
+				{ ! isLinked &&
+					splitOnAxis &&
+					[ 'vertical', 'horizontal' ].map( ( axis ) => (
+						<BoxInputControl
+							key={ axis }
+							side={ axis as 'horizontal' | 'vertical' }
+							{ ...inputControlProps }
+						/>
+					) ) }
+				{ ! isLinked &&
+					! splitOnAxis &&
+					Array.from( sidesToRender ).map( ( axis ) => (
+						<BoxInputControl
+							key={ axis }
+							side={ axis }
+							{ ...inputControlProps }
+						/>
+					) ) }
+				{ allowReset && (
+					<Button
+						className={ clsx(
+							styles[ 'reset-button' ],
+							'component-box-control__reset-button'
+						) }
+						variant="secondary"
+						size="small"
+						onClick={ handleOnReset }
+						disabled={ ! isDirty }
+						accessibleWhenDisabled
+					>
+						{ __( 'Reset' ) }
+					</Button>
+				) }
+			</Grid>
+		</Tooltip.Provider>
 	);
 }
 

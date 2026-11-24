@@ -25,7 +25,7 @@ export type MenuItemsChoiceProps = {
 	 *
 	 * @default noop
 	 */
-	onHover: ( value: string | null ) => void;
+	onHover?: ( value: string | null ) => void;
 };
 
 export type MenuItemChoice = {

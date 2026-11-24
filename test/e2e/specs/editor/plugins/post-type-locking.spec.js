@@ -130,9 +130,7 @@ test.describe( 'Post-type locking', () => {
 			await pageUtils.pressKeys( 'secondary+M' );
 
 			await expect(
-				page.locator(
-					'.editor-template-validation-notice .components-notice__content'
-				)
+				page.locator( '.editor-template-validation-notice' )
 			).toContainText(
 				'The content of your post doesn’t match the template assigned to your post type.'
 			);

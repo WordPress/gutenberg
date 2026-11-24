@@ -7,7 +7,7 @@ import { generateMarkdownDocs } from './markdown/index.mjs';
 import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
 import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
 
-export const ROOT_DIR = path.resolve(
+const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../../..'
 );
@@ -128,6 +128,7 @@ await Promise.all(
 			typeDocs,
 			subcomponentTypeDocs,
 			tags,
+			deprecated: manifest.deprecated,
 		} );
 		const outputFile = path.resolve(
 			path.dirname( manifestPath ),

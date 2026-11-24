@@ -22,7 +22,10 @@ import type { FieldsetDetailsProps } from './types';
 export const FieldsetDetails = forwardRef<
 	HTMLDivElement,
 	FieldsetDetailsProps
->( function FieldsetDetails( { className, children, ...restProps }, ref ) {
+>( function UnforwardedFieldsetDetails(
+	{ className, children, ...restProps },
+	ref
+) {
 	const id = useId();
 	const { registerDescriptionId, unregisterDescriptionId } =
 		useFieldsetContext( 'Fieldset.Details' );

@@ -2,7 +2,7 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { AutocompleteStatusProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Announces a status message politely to screen readers. Use it for the
@@ -13,7 +13,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * instead.
  */
 export const Status = forwardRef< HTMLDivElement, AutocompleteStatusProps >(
-	function Status( { className, ...restProps }, ref ) {
+	function UnforwardedStatus( { className, ...restProps }, ref ) {
 		return (
 			<_Autocomplete.Status
 				className={ clsx( itemPopupStyles.status, className ) }

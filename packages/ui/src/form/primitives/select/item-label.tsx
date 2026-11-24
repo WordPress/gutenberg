@@ -2,7 +2,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../../../text';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import type { SelectItemLabelProps } from './types';
 
 /**
@@ -12,7 +12,10 @@ import type { SelectItemLabelProps } from './types';
  * value) or from `Select.Trigger` children.
  */
 export const ItemLabel = forwardRef< HTMLDivElement, SelectItemLabelProps >(
-	function ItemLabel( { children, className, render, ...restProps }, ref ) {
+	function UnforwardedItemLabel(
+		{ children, className, render, ...restProps },
+		ref
+	) {
 		return (
 			<Text
 				ref={ ref }

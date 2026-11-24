@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Spinner,
+	Spinner as WCSpinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
@@ -13,10 +13,14 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -42,7 +46,6 @@ function VideoEdit( {
 	insertBlocksAfter,
 	onReplace,
 } ) {
-	const videoPlayer = useRef();
 	const {
 		id,
 		controls,
@@ -56,23 +59,24 @@ function VideoEdit( {
 		muted,
 		playsInline,
 	} = attributes;
-	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
-	// stored dimensions. The width/height attributes alone only yield
-	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
-	// natural ratio while the poster/metadata load - during which Chrome briefly
-	// computes a runaway height (tens of thousands of pixels) before settling.
-	// That spike is what reads as a duplicated image during the GIF-to-video
-	// swap. A non-`auto` ratio governs the box height throughout the load.
+	// `auto` makes the ratio size the content box, so a border does not shrink
+	// the picture under `box-sizing: border-box`. Until metadata loads the video
+	// has no natural ratio, so `W / H` holds the height and avoids the runaway
+	// height Chrome computed during the GIF-to-video swap (#78410).
 	const aspectRatio =
-		width && height ? `${ width } / ${ height }` : undefined;
+		width && height ? `auto ${ width } / ${ height }` : undefined;
+	const borderProps = useBorderProps( attributes );
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
+		...borderProps.style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	const prefersReducedMotion = useReducedMotion();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -81,25 +85,21 @@ function VideoEdit( {
 		onError: onUploadError,
 	} );
 
-	useEffect( () => {
-		// Placeholder may be rendered.
-		if ( videoPlayer.current ) {
-			videoPlayer.current.load();
-		}
-	}, [ poster ] );
+	// `autoPlay` only applies when the video loads, so reload it when reduced
+	// motion changes.
+	const videoRef = useRefEffect(
+		( node ) => {
+			node.load();
+		},
+		[ poster, prefersReducedMotion ]
+	);
+
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
-			// In this case there was an error
-			// previous attributes should be removed
-			// because they may be temporary blob urls.
-			setAttributes( {
-				src: undefined,
-				id: undefined,
-				poster: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current video, poster and caption intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -118,6 +118,17 @@ function VideoEdit( {
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
 			caption: media.caption,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetVideo() {
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			poster: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -152,13 +163,17 @@ function VideoEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className={ clsx(
+					'block-editor-media-placeholder',
+					borderProps.className
+				) }
 				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
 				instructions={ __(
 					'Drag and drop a video, upload, or choose from your library.'
 				) }
+				style={ borderProps.style }
 			>
 				{ content }
 			</Placeholder>
@@ -211,7 +226,7 @@ function VideoEdit( {
 							onSelect={ onSelectVideo }
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
-							onReset={ () => onSelectVideo( undefined ) }
+							onReset={ onResetVideo }
 							variant="toolbar"
 						/>
 					</BlockControls>
@@ -250,11 +265,12 @@ function VideoEdit( {
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					poster={ poster }
 					src={ src || temporaryURL }
-					ref={ videoPlayer }
-					autoPlay={ autoplay }
+					className={ borderProps.className }
+					ref={ videoRef }
+					autoPlay={ autoplay && ! prefersReducedMotion }
 					loop={ loop }
 					muted={ muted }
 					playsInline={ playsInline }
@@ -268,7 +284,7 @@ function VideoEdit( {
 				>
 					<Tracks tracks={ tracks } />
 				</video>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

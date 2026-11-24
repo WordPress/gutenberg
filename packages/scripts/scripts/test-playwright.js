@@ -14,9 +14,24 @@ const {
 	fromConfigRoot,
 	hasProjectFile,
 	hasArgInCLI,
+	getArgFromCLI,
 	getArgsFromCLI,
 	getAsBooleanFromENV,
 } = require( '../utils' );
+
+const wpEnvConfig = getArgFromCLI( '--wp-env-config' );
+
+if ( wpEnvConfig === null ) {
+	console.error(
+		'Error: The --wp-env-config option requires the path to a wp-env config file, as in --wp-env-config=<path>.'
+	);
+	process.exit( 1 );
+}
+
+// Playwright rejects options it does not know.
+const playwrightArgs = getArgsFromCLI().filter(
+	( arg ) => arg.split( '=' )[ 0 ] !== '--wp-env-config'
+);
 
 /**
  * @typedef {import('../../env/lib/config/load-config').WPConfig} WPConfig
@@ -25,7 +40,7 @@ const {
 /**
  * Loads any configuration from a given directory.
  *
- * @type {(configDirectoryPath: string) => Promise<WPConfig> | null}
+ * @type {(configDirectoryPath: string, customConfigPath?: string|null) => Promise<WPConfig> | null}
  */
 let loadConfig = null;
 
@@ -72,7 +87,7 @@ function spawnProcess() {
 			require.resolve( '@playwright/test/cli' ),
 			'test',
 			...config,
-			...getArgsFromCLI(),
+			...playwrightArgs,
 		],
 		{
 			stdio: 'inherit',
@@ -84,10 +99,18 @@ function spawnProcess() {
 	}
 }
 
-if ( loadConfig ) {
-	loadConfig( resolve( '.' ) ).then( ( envConfig ) => {
-		if ( ! process.env.WP_BASE_URL && envConfig?.env?.tests?.port ) {
-			process.env.WP_BASE_URL = `http://localhost:${ envConfig.env.tests.port }`;
+if ( loadConfig && ! process.env.WP_BASE_URL ) {
+	// As with `wp-env start`, this merges in the override file of the config
+	// (such as `.wp-env.test.override.json` for `.wp-env.test.json`) and any
+	// `WP_ENV_*` environment variables. Versions of `@wordpress/env` before
+	// support for `--config` ignore the custom config path.
+	loadConfig( resolve( '.' ), wpEnvConfig ).then( ( envConfig ) => {
+		// A config without the deprecated tests environment has only the
+		// development environment to run the tests against.
+		const port =
+			envConfig?.env?.tests?.port ?? envConfig?.env?.development?.port;
+		if ( port ) {
+			process.env.WP_BASE_URL = `http://localhost:${ port }`;
 		}
 		spawnProcess();
 	} );

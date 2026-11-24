@@ -7,25 +7,6 @@
 
 class Tests_Icons_WpGetIcon extends WP_UnitTestCase {
 
-	public function set_up() {
-		parent::set_up();
-
-		/*
-		 * Other suites reset the `WP_Icons_Registry` singleton, wiping the collections and
-		 * icons that `init` only registers once. Replay the registration so order-dependent
-		 * tests pass. `gutenberg_register_default_icon_collections()` registers every default
-		 * collection at once, so drop whatever survived rather than topping up.
-		 */
-		$collections_registry = WP_Icon_Collections_Registry::get_instance();
-		foreach ( array( 'core', 'core-admin' ) as $collection_slug ) {
-			if ( $collections_registry->is_registered( $collection_slug ) ) {
-				$collections_registry->unregister( $collection_slug );
-			}
-		}
-		gutenberg_register_default_icon_collections();
-		gutenberg_register_default_icons();
-	}
-
 	public function test_wp_get_icon_returns_svg_for_known_icon() {
 		$output = wp_get_icon( 'core/plus' );
 		$this->assertStringStartsWith( '<svg ', $output );

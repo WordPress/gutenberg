@@ -11,7 +11,7 @@
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" }
 	]
 }

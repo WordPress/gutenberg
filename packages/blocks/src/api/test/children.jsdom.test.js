@@ -1,6 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { renderToString } from '@wordpress/element';
-import { logged } from '@wordpress/deprecated';
 import {
 	getSerializeCapableElement,
 	concat,
@@ -8,10 +7,6 @@ import {
 	fromDOM,
 } from '../children';
 /* eslint-disable testing-library/render-result-naming-convention */
-
-afterEach( () => {
-	Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
-} );
 
 describe( 'getSerializeCapableElement', () => {
 	it( 'returns a serialize capable element', () => {

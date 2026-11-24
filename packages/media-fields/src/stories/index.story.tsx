@@ -44,6 +44,7 @@ const sampleMediaItem: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -141,6 +142,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -240,6 +242,7 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -346,6 +349,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 };
 
 export const DataFormsPreview = {
+	tags: [ 'external-requests' ],
 	render: DataFormsComponent,
 	argTypes: {
 		type: {
@@ -399,6 +403,7 @@ export const DataViewsPreview = () => {
 	);
 };
 
+DataViewsPreview.tags = [ 'external-requests' ];
 DataViewsPreview.parameters = {
 	// FIXME: Preview table has an empty column header (empty-table-header).
 	// See: https://github.com/WordPress/gutenberg/issues/81596

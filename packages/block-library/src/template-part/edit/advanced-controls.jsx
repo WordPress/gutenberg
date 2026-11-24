@@ -1,8 +1,6 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import {
-	SelectControl as WCSelectControl,
-	TextControl,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -10,6 +8,10 @@ import { TemplatePartImportControls } from './import-controls';
 import { unlock } from '../../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+
+// The default tag name is stored as an empty string, but the select treats an
+// empty value as no selection and shows its placeholder.
+const DEFAULT_TAG_NAME = '__default';
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -60,18 +62,29 @@ export function TemplatePartAdvancedControls( {
 						} }
 						onFocus={ ( event ) => event.target.select() }
 					/>
-					<WCSelectControl
+					<SelectControl
 						label={ __( 'Area' ) }
-						labelPosition="top"
-						options={ areaOptions }
-						value={ area }
-						onChange={ setArea }
+						items={ areaOptions }
+						value={
+							areaOptions.find(
+								( item ) => item.value === area
+							) ?? null
+						}
+						onValueChange={ ( item ) => {
+							if ( item && item.value !== area ) {
+								setArea( item.value );
+							}
+						} }
 					/>
 				</>
 			) }
 			<HTMLElementControl
-				tagName={ tagName || '' }
-				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+				tagName={ tagName || DEFAULT_TAG_NAME }
+				onChange={ ( value ) =>
+					setAttributes( {
+						tagName: value === DEFAULT_TAG_NAME ? '' : value,
+					} )
+				}
 				clientId={ clientId }
 				options={ [
 					{
@@ -80,7 +93,7 @@ export function TemplatePartAdvancedControls( {
 							__( 'Default based on area (%s)' ),
 							`<${ defaultWrapper }>`
 						),
-						value: '',
+						value: DEFAULT_TAG_NAME,
 					},
 					{ label: '<header>', value: 'header' },
 					{ label: '<main>', value: 'main' },

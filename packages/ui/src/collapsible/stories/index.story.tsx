@@ -68,7 +68,7 @@ export const Disabled: Story = {
  * match — improving discoverability without sacrificing the collapsed layout.
  */
 export const HiddenUntilFound: Story = {
-	render: function HiddenUntilFound() {
+	render: function HiddenUntilFoundRender() {
 		return (
 			<div>
 				<p>
@@ -96,7 +96,7 @@ export const Controlled: Story = {
 		open: { control: false },
 		defaultOpen: { control: false },
 	},
-	render: function Controlled() {
+	render: function ControlledRender() {
 		const [ open, setOpen ] = useState( false );
 		return (
 			<Collapsible.Root open={ open } onOpenChange={ setOpen }>

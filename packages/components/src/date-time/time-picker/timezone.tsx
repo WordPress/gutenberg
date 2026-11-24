@@ -1,13 +1,21 @@
-import { __ } from '@wordpress/i18n';
+import clsx from 'clsx';
+import { __, sprintf } from '@wordpress/i18n';
 import { getSettings as getDateSettings } from '@wordpress/date';
-import Tooltip from '../../tooltip';
-import { TimeZone as StyledComponent } from './styles';
+import {
+	Button,
+	Popover,
+	VisuallyHidden,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
+import styles from './style.module.scss';
 
 /**
  * Displays timezone information when user timezone is different from site
  * timezone.
  */
 const TimeZone = () => {
+	useEnableWpCompatOverlaySlot();
+
 	const { timezone } = getDateSettings();
 
 	// Convert timezone offset to hours.
@@ -25,8 +33,8 @@ const TimeZone = () => {
 			? timezone.abbr
 			: `UTC${ offsetSymbol }${ timezone.offsetFormatted }`;
 
-	// Replace underscore with space in strings like `America/Costa_Rica`.
-	const prettyTimezoneString = timezone.string.replace( '_', ' ' );
+	// Replace underscores with spaces in strings like `America/Costa_Rica`.
+	const prettyTimezoneString = timezone.string.replaceAll( '_', ' ' );
 
 	const timezoneDetail =
 		'UTC' === timezone.string
@@ -34,20 +42,41 @@ const TimeZone = () => {
 			: `(${ zoneAbbr }) ${ prettyTimezoneString }`;
 
 	// When the prettyTimezoneString is empty, there is no additional timezone
-	// detail information to show in a Tooltip.
+	// detail information to show in an infotip.
 	const hasNoAdditionalTimezoneDetail =
 		prettyTimezoneString.trim().length === 0;
 
-	return hasNoAdditionalTimezoneDetail ? (
-		<StyledComponent className="components-datetime__timezone">
-			{ zoneAbbr }
-		</StyledComponent>
-	) : (
-		<Tooltip placement="top" text={ timezoneDetail }>
-			<StyledComponent className="components-datetime__timezone">
+	if ( hasNoAdditionalTimezoneDetail ) {
+		return (
+			<div className="components-datetime__timezone">{ zoneAbbr }</div>
+		);
+	}
+
+	return (
+		<Popover.Root>
+			<Popover.Trigger
+				openOnHover
+				render={ <Button variant="unstyled" /> }
+				className={ clsx(
+					'components-datetime__timezone',
+					styles[ 'time-zone-trigger' ]
+				) }
+				aria-label={ sprintf(
+					/* translators: %s: timezone abbreviation, e.g. "CEST" or "UTC+3". */
+					__( 'Timezone: %s' ),
+					zoneAbbr
+				) }
+			>
 				{ zoneAbbr }
-			</StyledComponent>
-		</Tooltip>
+			</Popover.Trigger>
+			<Popover.Popup positioner={ <Popover.Positioner side="top" /> }>
+				<Popover.Arrow />
+				<VisuallyHidden render={ <Popover.Title /> }>
+					{ __( 'Timezone' ) }
+				</VisuallyHidden>
+				<Popover.Description>{ timezoneDetail }</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
 	);
 };
 

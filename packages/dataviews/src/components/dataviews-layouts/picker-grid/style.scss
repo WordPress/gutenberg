@@ -64,11 +64,8 @@
 		// Always show the checkbox in picker mode.
 		top: var(--wpds-dimension-padding-sm) !important;
 
-		input {
-			// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
-			// Only the item card itself is clickable.
-			pointer-events: none;
-		}
+		// The card owns selection in picker mode.
+		pointer-events: none;
 	}
 
 	.dataviews-view-picker-grid__media {
@@ -165,7 +162,8 @@
 }
 
 .dataviews-view-picker-grid__field-value:empty,
-.dataviews-view-picker-grid__field:empty {
+.dataviews-view-picker-grid__field:empty,
+.dataviews-view-picker-grid__badge-fields .dataviews-view-picker-grid__field-value:has(> :only-child:empty) {
 	display: none;
 }
 
@@ -175,6 +173,8 @@
 	left: var(--wpds-dimension-padding-sm);
 	// Ensure selection checkbox stays above the preview field.
 	z-index: 1;
+	// Set the checkbox apart from previews of any color, as the grid does.
+	box-shadow: 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.

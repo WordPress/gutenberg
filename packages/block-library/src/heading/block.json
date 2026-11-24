@@ -31,6 +31,7 @@
 		"className": true,
 		"splitting": true,
 		"background": {
+			"backgroundClip": true,
 			"backgroundImage": true,
 			"backgroundSize": true,
 			"gradient": true,
@@ -53,7 +54,15 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"shadow": true,
+		"transform": {
+			"rotate": true,
+			"translate": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -66,6 +75,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,

@@ -21,18 +21,6 @@ const waitForClosedMenu = () =>
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
 	);
 
-const openMenu = async ( user: ReturnType< typeof userEvent.setup > ) => {
-	await user.click( screen.getByRole( 'button', { name: 'Open dropdown' } ) );
-	await waitForFocusedMenu();
-};
-
-// TODO: Add browser coverage for the computed overflow once component stories
-// use interaction tests. Jest mocks stylesheet imports, so this only verifies
-// the handoff between Ariakit's inline lock and Modal's body class.
-const isBodyScrollLocked = () =>
-	document.body.style.overflow === 'hidden' ||
-	document.body.classList.contains( 'modal-open' );
-
 const resetTypeahead = () => {
 	act( () => vi.advanceTimersByTime( 500 ) );
 };
@@ -251,29 +239,6 @@ describe( 'Menu', () => {
 			);
 
 			await waitFor( () => expect( trigger ).toHaveFocus() );
-		} );
-
-		it( 'should keep body scroll locked while handing off to a modal', async () => {
-			render( <MenuWithModal /> );
-
-			expect( isBodyScrollLocked() ).toBe( false );
-			await openMenu( user );
-			expect( isBodyScrollLocked() ).toBe( true );
-
-			await user.click(
-				screen.getByRole( 'menuitem', { name: 'Open modal' } )
-			);
-			await waitForClosedMenu();
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
-			expect( isBodyScrollLocked() ).toBe( true );
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Close modal' } )
-			);
-			await waitFor( () =>
-				expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
-			);
-			await waitFor( () => expect( isBodyScrollLocked() ).toBe( false ) );
 		} );
 
 		it( 'should stay open when `hideOnClick` is `false`', async () => {

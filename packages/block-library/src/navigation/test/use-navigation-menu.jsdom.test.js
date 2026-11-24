@@ -3,7 +3,7 @@ import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const BASE_ENTITY = {
 	kind: 'postType',

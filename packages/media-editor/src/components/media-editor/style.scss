@@ -51,8 +51,13 @@
 		// canvas takes whatever the 320px panel leaves — about 200px at
 		// 600px, 380px at 782px. Cramped, but a cramped preview beside
 		// reachable controls beats a panel that hides the image outright.
+		// The right gutter goes when the sidebar opens beside the canvas. It
+		// moves with the sidebar's width animation, so it uses the same
+		// duration and easing.
 		@include break-small() {
 			margin: 0 $grid-unit-30;
+			transition: margin-right 0.3s cubic-bezier(0.6, 0, 0.4, 1);
+			@include reduce-motion("transition");
 		}
 
 		// Promise the canvas a floor only where the body is wide enough to
@@ -115,11 +120,32 @@
 			height: 100%;
 		}
 
+		// The grey stage is for previewing media. Without a preview, e.g. for
+		// a zip file or a file that failed to load, the placeholder sits on
+		// the surface instead.
+		&:has(.media-editor-preview.is-placeholder) {
+			background: none;
+		}
+
 		img,
 		video {
 			max-width: 100%;
 			max-height: 100%;
 			object-fit: contain;
+		}
+	}
+
+	// Animates its width when the sidebar opens or closes. The sidebar keeps
+	// its own width inside, so its contents are clipped rather than reflowed.
+	.media-editor__sidebar-container {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+		min-height: 0;
+		overflow: hidden;
+
+		@include break-small() {
+			flex: none;
 		}
 	}
 
@@ -146,6 +172,18 @@
 		@include break-small() {
 			flex: none;
 			width: var(--wpds-dimension-surface-width-sm);
+		}
+	}
+
+	// The grey stage normally marks the panel's edge. Without it, e.g. for a
+	// file without a preview, the panel takes a border instead.
+	.media-editor__body:has(.media-editor-preview.is-placeholder)
+	.media-editor__sidebar {
+		@include break-small() {
+			// Matches the page header's bottom border in the route.
+			border-inline-start:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-surface-neutral-weak);
 		}
 	}
 
@@ -203,9 +241,10 @@
 	.media-editor__body.has-panel-open .media-editor__content {
 		display: none;
 
+		// Only remove the right margin, so the route's bottom margin still applies.
 		@include break-small() {
 			display: flex;
-			margin: 0 0 0 $grid-unit-30;
+			margin-right: 0;
 		}
 	}
 

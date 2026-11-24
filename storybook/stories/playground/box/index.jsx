@@ -1,19 +1,14 @@
-import { useEffect, useState } from '@wordpress/element';
-import { registerCoreBlocks } from '@wordpress/block-library';
+import { useState } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { editorStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 import styles from './style.module.css';
 
-export default function EditorBox() {
+export default function EditorBox( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -30,7 +25,10 @@ export default function EditorBox() {
 				} }
 			>
 				<BlockToolbar hideDragHandle />
-				<BlockCanvas height="500px" styles={ editorStyles } />
+				<BlockCanvas
+					height="500px"
+					styles={ contentStyles[ direction ] }
+				/>
 			</BlockEditorProvider>
 		</div>
 	);

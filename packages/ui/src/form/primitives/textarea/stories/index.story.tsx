@@ -6,6 +6,9 @@ const meta: Meta< typeof Textarea > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Textarea',
 	id: 'design-system-components-form-primitives-textarea',
 	component: Textarea,
+	argTypes: {
+		onValueChange: { action: 'onValueChange' },
+	},
 	parameters: {
 		componentStatus: {
 			status: 'recommended',

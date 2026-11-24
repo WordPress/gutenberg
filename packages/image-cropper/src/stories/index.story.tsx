@@ -4,8 +4,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
@@ -31,6 +31,7 @@ const DefaultComponent = ( args: ImageCropperProps ) => {
 };
 
 export const Default = {
+	tags: [ 'external-requests' ],
 	render: DefaultComponent,
 	args: {
 		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
@@ -188,10 +189,22 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 							cropperState.aspectRatio.toFixed( 2 )
 						) }
 					</Heading>
-					<WCSelectControl
-						value={ cropperState.aspectRatio.toString() }
-						options={ aspectRatioOptions }
-						onChange={ handleAspectRatioChange }
+					<SelectControl
+						label={ __( 'Aspect ratio' ) }
+						hideLabelFromVision
+						value={
+							aspectRatioOptions.find(
+								( item ) =>
+									item.value ===
+									cropperState.aspectRatio.toString()
+							) ?? null
+						}
+						items={ aspectRatioOptions }
+						onValueChange={ ( item ) => {
+							if ( item && item.value !== null ) {
+								handleAspectRatioChange( item.value );
+							}
+						} }
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>
@@ -215,6 +228,7 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 };
 
 export const WithControls = {
+	tags: [ 'external-requests' ],
 	parameters: {
 		// FIXME: Crop controls include an unlabeled input and unnamed select (label, select-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596

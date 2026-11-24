@@ -115,6 +115,32 @@ test.describe( 'Canvas as a single tab stop', () => {
 		} );
 	}
 
+	test( 'leaves Tab with Ctrl or Cmd to the browser', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.canvas.getByText( 'First' ).click();
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( paragraph ).toBeFocused();
+
+		// Ctrl+Shift+Tab and Ctrl+Tab switch browser tabs, and Cmd+Shift+Tab
+		// is taken by macOS. None of them move focus out of the canvas.
+		for ( const keys of [
+			'Control+Shift+Tab',
+			'Control+Tab',
+			'Meta+Shift+Tab',
+		] ) {
+			await page.keyboard.press( keys );
+			await expect( paragraph ).toBeFocused();
+		}
+	} );
+
 	test( 'Escape steps out onto the canvas stop and Enter goes back in', async ( {
 		editor,
 		page,
@@ -234,9 +260,31 @@ class KeyboardNavigableBlocks {
 	}
 
 	async expectLabelToHaveFocus( label ) {
+		if ( label.startsWith( 'Block: ' ) ) {
+			await this.expectBlockToOwnFocus( label );
+			return;
+		}
 		// Poll: the focused element and its label may settle asynchronously
 		// (selection changes sync to the store on `selectionchange`).
 		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
+	}
+
+	// The selected block is the labelled one, and it owns focus: it is
+	// focused itself, or the focused editing host contains it and the
+	// selection.
+	async expectBlockToOwnFocus( label ) {
+		const clientId = await this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId()
+		);
+		const block = this.editor.canvas.locator(
+			`[data-block="${ clientId }"]`
+		);
+		await expect( block ).toHaveAttribute( 'aria-label', label );
+		await expect
+			.poll( () => this.editor.ownsSelection( block ) )
+			.toBe( true );
 	}
 
 	async navigateThroughBlockToolbar() {

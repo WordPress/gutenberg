@@ -13,6 +13,7 @@ import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
+import getActionLabel from '../../utils/get-action-label';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -48,7 +49,6 @@ function BulkSelectionCheckbox< Item >( {
 	if ( disableSelectAll ) {
 		return (
 			<WCCheckboxControl
-				className="dataviews-view-table-selection-checkbox"
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
 				onChange={ () => {
@@ -61,7 +61,6 @@ function BulkSelectionCheckbox< Item >( {
 
 	return (
 		<WCCheckboxControl
-			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
@@ -114,8 +113,7 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, isEligible, callback } =
-					action;
+				const { id, icon, isPrimary, isEligible, callback } = action;
 
 				// `items` holds the current page's selection only, so an
 				// action without `isEligible` stays enabled for a selection
@@ -123,8 +121,7 @@ function ActionButtons< Item >( {
 				const eligibleItems = isEligible
 					? items.filter( ( item ) => isEligible( item ) )
 					: items;
-				const _label =
-					typeof label === 'string' ? label : label( items );
+				const label = getActionLabel( action, items );
 				const variant = isPrimary ? 'primary' : 'tertiary';
 				const isInProgress = id === actionInProgress;
 
@@ -149,7 +146,7 @@ function ActionButtons< Item >( {
 						size="compact"
 						variant={ variant }
 					>
-						{ _label }
+						{ label }
 					</Button>
 				);
 			} ) }

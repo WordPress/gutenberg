@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render as renderInBrowser } from 'vitest-browser-react';
 import type { WidgetAction } from '@wordpress/widget-primitives';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { ActionsMenu } from '../components/actions-menu/actions-menu';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
@@ -10,6 +11,20 @@ import { WidgetLayoutControls } from '../components/widget-layout-controls/widge
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import type { DashboardWidget } from '../types';
 import { WidgetDashboard } from '../widget-dashboard';
+
+/* The menu reads the pending map from the dashboard's context. */
+function renderInDashboard( ui: ReactNode ) {
+	return renderInBrowser(
+		<WidgetDashboard
+			layout={ [] }
+			onLayoutChange={ () => {} }
+			widgetTypes={ [] }
+			resolveWidgetModule={ async () => ( { default: () => null } ) }
+		>
+			{ ui }
+		</WidgetDashboard>
+	);
+}
 
 function LayoutControls() {
 	const { layout } = useDashboardInternalContext();
@@ -84,7 +99,9 @@ describe( 'Widget Dashboard menus', () => {
 				openInNewTab: true,
 			},
 		];
-		await renderInBrowser( <WidgetActions actions={ actions } /> );
+		await renderInDashboard(
+			<WidgetActions uuid="w1" actions={ actions } />
+		);
 
 		await user.click( screen.getByRole( 'button', { name: 'More' } ) );
 		const action = await screen.findByRole( 'menuitem', {
@@ -99,8 +116,9 @@ describe( 'Widget Dashboard menus', () => {
 
 	it( 'closes the widget action menu when a link is activated', async () => {
 		const user = userEvent.setup();
-		await renderInBrowser(
+		await renderInDashboard(
 			<WidgetActions
+				uuid="w1"
 				actions={ [
 					{
 						id: 'view-report',
@@ -130,8 +148,9 @@ describe( 'Widget Dashboard menus', () => {
 		'closes the widget action menu for %s-click',
 		async ( modifier ) => {
 			const user = userEvent.setup();
-			await renderInBrowser(
+			await renderInDashboard(
 				<WidgetActions
+					uuid="w1"
 					actions={ [
 						{
 							id: 'view-report',

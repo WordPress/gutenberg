@@ -16,7 +16,10 @@ import type { CheckboxProps } from './types';
  * documentation.
  */
 export const Checkbox = forwardRef< HTMLSpanElement, CheckboxProps >(
-	function Checkbox( { className, indeterminate, ...restProps }, ref ) {
+	function UnforwardedCheckbox(
+		{ className, indeterminate, ...restProps },
+		ref
+	) {
 		return (
 			<_Checkbox.Root
 				ref={ ref }

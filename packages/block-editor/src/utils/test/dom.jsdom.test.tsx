@@ -1,0 +1,345 @@
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
+	VisuallyHidden as WCVisuallyHidden,
+} from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import {
+	extendRectToTop,
+	getElementBounds,
+	isElementVisible,
+	isStyleRotated,
+	WITH_OVERFLOW_ELEMENT_BLOCKS,
+} from '../dom';
+
+function mockVisibleBoundingClientRect( element: HTMLElement ) {
+	element.getBoundingClientRect = vi.fn().mockReturnValue( {
+		left: 0,
+		top: 0,
+		right: 100,
+		bottom: 20,
+		width: 100,
+		height: 20,
+		x: 0,
+		y: 0,
+	} );
+}
+
+describe( 'dom', () => {
+	describe( 'isElementVisible', () => {
+		it( 'returns false for @wordpress/components VisuallyHidden', () => {
+			render(
+				<WCVisuallyHidden data-testid="wc-visually-hidden">
+					Hidden
+				</WCVisuallyHidden>
+			);
+			const element = screen.getByTestId( 'wc-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+
+		it( 'returns false for @wordpress/ui VisuallyHidden', () => {
+			render(
+				<VisuallyHidden data-testid="ui-visually-hidden">
+					Hidden
+				</VisuallyHidden>
+			);
+			const element = screen.getByTestId( 'ui-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getElementBounds', () => {
+		it( 'should return a DOMRectReadOnly object if the viewport is not available', () => {
+			const element = {
+				ownerDocument: {
+					defaultView: null,
+				},
+				// A partial element: only the window lookup is read.
+			} as unknown as Element;
+			expect( getElementBounds( element ) ).toEqual(
+				new window.DOMRectReadOnly()
+			);
+		} );
+		it( 'should return a DOMRectReadOnly object if the viewport is available', () => {
+			const element = {
+				ownerDocument: {
+					defaultView: {
+						getComputedStyle: () => ( {
+							display: 'block',
+							visibility: 'visible',
+							opacity: '1',
+						} ),
+					},
+				},
+				getBoundingClientRect: () => ( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+				} ),
+				getAttribute: ( x: string ) => x,
+				// A partial element: only what the bounds are computed from.
+			} as unknown as Element;
+			expect( getElementBounds( element ) ).toEqual(
+				new window.DOMRectReadOnly( 0, 0, 100, 100 )
+			);
+		} );
+		it( 'should clip left and right values when an element is larger than the viewport width', () => {
+			const element = window.document.createElement( 'div' );
+			element.getBoundingClientRect = vi.fn().mockReturnValue( {
+				left: -10,
+				top: 0,
+				right: window.innerWidth + 10,
+				bottom: 100,
+				width: window.innerWidth,
+				height: 100,
+			} );
+			expect( getElementBounds( element ).toJSON() ).toEqual( {
+				left: 0, // Reset to min left bound.
+				top: 0,
+				right: window.innerWidth, // Reset to max right bound.
+				bottom: 100,
+				width: window.innerWidth,
+				height: 100,
+				x: 0,
+				y: 0,
+			} );
+		} );
+		it( 'should return the parent DOMRectReadOnly object if the parent block type is not supported', () => {
+			const element = window.document.createElement( 'div' );
+			element.getBoundingClientRect = vi.fn().mockReturnValue( {
+				left: 0,
+				top: 0,
+				right: 100,
+				bottom: 100,
+				width: 100,
+				height: 100,
+			} );
+			element.setAttribute( 'data-type', 'test' );
+			const childElement = window.document.createElement( 'div' );
+			childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+				left: 0,
+				top: 0,
+				right: 333,
+				bottom: 333,
+				width: 333,
+				height: 333,
+				x: 0,
+				y: 0,
+			} );
+			element.appendChild( childElement );
+
+			expect( getElementBounds( element ).toJSON() ).toEqual( {
+				left: 0,
+				top: 0,
+				right: 100,
+				bottom: 100,
+				width: 100,
+				height: 100,
+				x: 0,
+				y: 0,
+			} );
+		} );
+		describe( 'With known block type', () => {
+			it( 'should return the child DOMRectReadOnly object if it is visible and a known block type', () => {
+				const element = window.document.createElement( 'div' );
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+				} );
+				element.setAttribute(
+					'data-type',
+					WITH_OVERFLOW_ELEMENT_BLOCKS[ 0 ]
+				);
+				const childElement = window.document.createElement( 'div' );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
+				element.appendChild( childElement );
+
+				expect( getElementBounds( element ).toJSON() ).toEqual( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
+			} );
+			it( 'should return the parent DOMRectReadOnly if the child is scrollable', () => {
+				const element = window.document.createElement( 'div' );
+				element.setAttribute(
+					'data-type',
+					WITH_OVERFLOW_ELEMENT_BLOCKS[ 0 ]
+				);
+				element.style.overflowX = 'auto';
+				element.style.overflowY = 'auto';
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+				} );
+				const childElement = window.document.createElement( 'div' );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
+				element.appendChild( childElement );
+
+				expect( getElementBounds( element ).toJSON() ).toEqual( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+					x: 0,
+					y: 0,
+				} );
+			} );
+			it( 'should return the parent DOMRectReadOnly object if the child element is not visible', () => {
+				const element = window.document.createElement( 'div' );
+				element.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+				} );
+				element.setAttribute(
+					'data-type',
+					WITH_OVERFLOW_ELEMENT_BLOCKS[ 0 ]
+				);
+				const childElement = window.document.createElement( 'div' );
+				childElement.getBoundingClientRect = vi.fn().mockReturnValue( {
+					left: 0,
+					top: 0,
+					right: 333,
+					bottom: 333,
+					width: 333,
+					height: 333,
+					x: 0,
+					y: 0,
+				} );
+				childElement.style.display = 'none';
+				element.appendChild( childElement );
+
+				expect( getElementBounds( element ).toJSON() ).toEqual( {
+					left: 0,
+					top: 0,
+					right: 100,
+					bottom: 100,
+					width: 100,
+					height: 100,
+					x: 0,
+					y: 0,
+				} );
+			} );
+		} );
+	} );
+
+	describe( 'isStyleRotated', () => {
+		it.each( [
+			[ 'none', 'none', 'none' ],
+			[ '0deg', 'none', 'none' ],
+			[ '90deg', 'none', 'none' ],
+			[ '180deg', 'none', 'none' ],
+			[ '270deg', 'none', 'none' ],
+			[ '360deg', 'none', 'none' ],
+			[ '-180deg', 'none', 'none' ],
+			[ '0.5turn', 'none', 'none' ],
+			[ '200grad', 'none', 'none' ],
+			[ '3.14159rad', 'none', 'none' ],
+			[ 'x 30deg', 'none', 'none' ],
+			[ 'none', '2 0.5', 'none' ],
+			[ 'none', 'none', 'matrix(1, 0, 0, 1, 40, 20)' ],
+			[ 'none', 'none', 'matrix(1.5, 0, 0, 0.5, 0, 0)' ],
+			[ 'none', 'none', 'matrix(0, 1, -1, 0, 0, 0)' ],
+			[
+				'45deg',
+				'none',
+				'matrix(0.7071, -0.7071, 0.7071, 0.7071, 0, 0)',
+			],
+		] )(
+			'returns false for rotate %s, scale %s and transform %s',
+			( rotate, scale, transform ) => {
+				expect( isStyleRotated( { rotate, scale, transform } ) ).toBe(
+					false
+				);
+			}
+		);
+
+		it.each( [
+			[ '12deg', 'none', 'none' ],
+			[ '45deg', 'none', 'none' ],
+			[ '-0.1rad', 'none', 'none' ],
+			[ 'z 45deg', 'none', 'none' ],
+			[ '45deg', '2 3', 'none' ],
+			[ 'none', 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
+			[ 'none', 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
+			[
+				'none',
+				'none',
+				'matrix3d(0.978, 0.208, 0, 0, -0.208, 0.978, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+			],
+		] )(
+			'returns true for rotate %s, scale %s and transform %s',
+			( rotate, scale, transform ) => {
+				expect( isStyleRotated( { rotate, scale, transform } ) ).toBe(
+					true
+				);
+			}
+		);
+	} );
+
+	describe( 'extendRectToTop', () => {
+		it( 'moves the top up and keeps the bottom and horizontal extent', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 120 ).toJSON() ).toEqual( {
+				left: 30,
+				top: 120,
+				right: 130,
+				bottom: 250,
+				width: 100,
+				height: 130,
+				x: 30,
+				y: 120,
+			} );
+		} );
+
+		it( 'returns the rectangle unchanged when the top is lower', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 220 ) ).toBe( rect );
+		} );
+	} );
+} );

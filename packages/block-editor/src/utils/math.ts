@@ -1,9 +1,9 @@
 /**
  * A string representing the name of an edge.
  */
-type EdgeName = 'top' | 'right' | 'bottom' | 'left';
+export type EdgeName = 'top' | 'right' | 'bottom' | 'left';
 
-interface Point {
+export interface Point {
 	/** The horizontal position. */
 	x: number;
 	/** The vertical position. */
@@ -77,8 +77,13 @@ export function getDistanceFromPointToEdge(
 export function getDistanceToNearestEdge(
 	point: Point,
 	rect: DOMRect,
-	allowedEdges: EdgeName[] = [ 'top', 'bottom', 'left', 'right' ]
-) {
+	allowedEdges: [ EdgeName, ...EdgeName[] ] = [
+		'top',
+		'bottom',
+		'left',
+		'right',
+	]
+): [ number, EdgeName ] {
 	let candidateDistance: number | undefined;
 	let candidateEdge: EdgeName | undefined;
 
@@ -91,7 +96,8 @@ export function getDistanceToNearestEdge(
 		}
 	} );
 
-	return [ candidateDistance, candidateEdge ];
+	// `allowedEdges` is never empty.
+	return [ candidateDistance!, candidateEdge! ];
 }
 
 /**

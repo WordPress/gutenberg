@@ -36,11 +36,11 @@ function gutenberg_register_position_support( $block_type ) {
 function gutenberg_get_position_support_styles( $selector, $position, $allowed_position_types ) {
 	$styles = array();
 
-	if ( ! is_array( $position ) ) {
+	if ( ! is_array( $position ) || ! is_string( $position['type'] ?? null ) ) {
 		return $styles;
 	}
 
-	$position_type = $position['type'] ?? '';
+	$position_type = $position['type'];
 
 	if ( ! in_array( $position_type, $allowed_position_types, true ) ) {
 		return $styles;

@@ -15,7 +15,7 @@ describe( 'Dialog', () => {
 		const headerRef = createRef< HTMLElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
-		const closeIconRef = createRef< HTMLButtonElement >();
+		const closeIconButtonRef = createRef< HTMLButtonElement >();
 		const footerRef = createRef< HTMLElement >();
 		const contentRef = createRef< HTMLDivElement >();
 
@@ -27,7 +27,7 @@ describe( 'Dialog', () => {
 						<Dialog.Title ref={ titleRef }>
 							Test Dialog
 						</Dialog.Title>
-						<Dialog.CloseIcon ref={ closeIconRef } />
+						<Dialog.CloseIconButton ref={ closeIconButtonRef } />
 					</Dialog.Header>
 					<Dialog.Content ref={ contentRef }>
 						<Dialog.Description ref={ descriptionRef }>
@@ -57,7 +57,9 @@ describe( 'Dialog', () => {
 		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
-		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( closeIconButtonRef.current ).toBeInstanceOf(
+			HTMLButtonElement
+		);
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
@@ -152,7 +154,7 @@ describe( 'Dialog', () => {
 					<Dialog.Popup>
 						<Dialog.Header>
 							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
+							<Dialog.CloseIconButton />
 						</Dialog.Header>
 						<button>Content Button</button>
 					</Dialog.Popup>
@@ -179,7 +181,7 @@ describe( 'Dialog', () => {
 					<Dialog.Popup>
 						<Dialog.Header>
 							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
+							<Dialog.CloseIconButton />
 						</Dialog.Header>
 						<p>No tabbable content here</p>
 					</Dialog.Popup>
@@ -206,7 +208,7 @@ describe( 'Dialog', () => {
 					<Dialog.Popup initialFocus={ false }>
 						<Dialog.Header>
 							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
+							<Dialog.CloseIconButton />
 						</Dialog.Header>
 						<button>Content Button</button>
 					</Dialog.Popup>
@@ -240,7 +242,7 @@ describe( 'Dialog', () => {
 					<Dialog.Popup initialFocus={ customFocus }>
 						<Dialog.Header>
 							<Dialog.Title>My Title</Dialog.Title>
-							<Dialog.CloseIcon />
+							<Dialog.CloseIconButton />
 						</Dialog.Header>
 						<button>Content Button</button>
 					</Dialog.Popup>
