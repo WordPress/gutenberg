@@ -39,10 +39,12 @@ export default function useRestoreTapCaret() {
 
 		function onSelectionChange() {
 			const { activeElement } = ownerDocument;
+			// iOS's repeated tap either moves the caret out of the field or
+			// clears the selection.
 			if (
 				caret &&
-				selection.anchorNode &&
-				! activeElement?.contains( selection.anchorNode )
+				( ! selection.anchorNode ||
+					! activeElement?.contains( selection.anchorNode ) )
 			) {
 				// TEMPORARY (debugging a flaky iOS test).
 				( window as any ).__iosTestLog?.( 'restore:before' );
