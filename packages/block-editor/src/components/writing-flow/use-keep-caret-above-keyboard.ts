@@ -10,9 +10,9 @@ export default function useKeepCaretAboveKeyboard() {
 	return useRefEffect< HTMLElement >( ( node ) => {
 		// A node attached to a document has a window.
 		const defaultView = node.ownerDocument.defaultView!;
-		const { frameElement } = defaultView;
 		// In an iframe, the keyboard slides the parent window.
-		const view = frameElement?.ownerDocument.defaultView ?? defaultView;
+		const view =
+			defaultView.frameElement?.ownerDocument.defaultView ?? defaultView;
 		const { visualViewport } = view;
 
 		if ( ! visualViewport ) {
@@ -27,10 +27,10 @@ export default function useKeepCaretAboveKeyboard() {
 			}
 			// Focus is outside the canvas, like a sidebar field: that slide
 			// reveals it.
+			const { ownerDocument } = node;
 			if (
-				( frameElement &&
-					view.document.activeElement !== frameElement ) ||
-				! node.contains( node.ownerDocument.activeElement )
+				! ownerDocument.hasFocus() ||
+				! node.contains( ownerDocument.activeElement )
 			) {
 				return;
 			}
