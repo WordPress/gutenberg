@@ -182,14 +182,9 @@ export const WithActions: Story = {
 	args: {
 		title: 'Settings',
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Cancel
-				</Button>
-				<Button size="compact" variant="solid">
-					Save
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -225,19 +220,22 @@ export const WithInteractiveNavigation: Story = {
 			[]
 		);
 
+		const pages = [
+			{ label: 'General', href: '/settings/general' },
+			{ label: 'Writing', href: '/settings/writing' },
+			{ label: 'Reading', href: '/settings/reading' },
+			{ label: 'Discussion', href: '/settings/discussion' },
+		];
+		const currentPage = pages.find( ( page ) => page.href === currentHref );
+
 		return (
 			<Page
 				{ ...args }
+				// Adjacent pages share the "Settings" title, so name each page
+				// region after its page.
+				ariaLabel={ `${ currentPage?.label } settings` }
 				components={ { link } }
-				navigation={ {
-					items: [
-						{ label: 'General', href: '/settings/general' },
-						{ label: 'Writing', href: '/settings/writing' },
-						{ label: 'Reading', href: '/settings/reading' },
-						{ label: 'Discussion', href: '/settings/discussion' },
-					],
-					currentHref,
-				} }
+				navigation={ { items: pages, currentHref } }
 			/>
 		);
 	},
@@ -259,14 +257,9 @@ export const WithNavigationAndActions: Story = {
 		title: 'Settings',
 		subTitle: 'Manage how your site looks and works.',
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Cancel
-				</Button>
-				<Button size="compact" variant="solid">
-					Save
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -274,10 +267,13 @@ export const WithNavigationAndActions: Story = {
 	},
 };
 
-export const FullHeader: Story = {
+/**
+ * The header of a settings subpage. The breadcrumbs lead back to the parent
+ * page, the badge shows the status of the page, and "Save changes" saves it.
+ */
+export const WithBreadcrumbsAndActions: Story = {
 	decorators: [ withRouter ],
 	args: {
-		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'Choose how your site collects and shares visitor data.',
 		ariaLabel: 'Privacy',
 		breadcrumbs: (
@@ -289,22 +285,10 @@ export const FullHeader: Story = {
 			/>
 		),
 		badges: <Badge intent="informational">Policy published</Badge>,
-		navigation: {
-			items: [
-				{ label: 'Settings', href: '/settings/privacy' },
-				{ label: 'Policy Guide', href: '/settings/privacy/guide' },
-			],
-			currentHref: '/settings/privacy',
-		},
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Cancel
-				</Button>
-				<Button size="compact" variant="solid">
-					Save
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
