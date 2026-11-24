@@ -131,15 +131,17 @@ export default function UploadProgressSnackbar() {
 	// brief display. Held so a new upload can cancel it.
 	const completionTimeoutRef = useRef( null );
 
-	// Remove the notice on unmount. Nothing would update it after that, so an
-	// in-progress notice would be left showing the spinner. Uploads keep
-	// running, and a remount picks them up again.
+	// Remove the notices on unmount. Nothing would update them after that, so
+	// an in-progress notice would be left showing the spinner, and a warning
+	// would outlive the editor it belongs to. Uploads keep running, and a
+	// remount picks them up again.
 	useEffect( () => {
 		return () => {
 			if ( completionTimeoutRef.current ) {
 				clearTimeout( completionTimeoutRef.current );
 			}
 			removeNotice( NOTICE_ID );
+			removeNotice( WARNING_NOTICE_ID );
 		};
 	}, [ removeNotice ] );
 

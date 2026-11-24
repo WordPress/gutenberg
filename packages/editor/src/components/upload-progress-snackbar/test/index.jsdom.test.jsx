@@ -443,4 +443,19 @@ describe( 'UploadProgressSnackbar', () => {
 
 		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
 	} );
+
+	it( 'removes the warning notice when it unmounts', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+
+		mockQueue( [] );
+		const { rerender, unmount } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
+		expect( mockRemoveNotice ).not.toHaveBeenCalled();
+
+		unmount();
+
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-warning' );
+	} );
 } );
