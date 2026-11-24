@@ -36,16 +36,15 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Whether a stored value has the shape of a reaction key.
+	 * Determines if a given value represents a valid reaction key.
 	 *
-	 * A key is one or more Unicode scalar values in lowercase hex, joined
-	 * by `-`. The shape is checked, not the curated set, so a reaction
-	 * stays readable if the set changes.
-	 *
+	 * Reaction keys are described by a sequence of one or more Unicode
+	 * Scalar Values joined by a hyphen (U+2D).
+	 * 
 	 * @since 7.2.0
 	 *
-	 * @param string $value Stored reaction content.
-	 * @return bool True for a well-formed key.
+	 * @param string $value Potentially contains a valid reaction key.
+	 * @param bool Whether the given value comprises a well-formed reaction key.
 	 */
 	private static function is_reaction_key( string $value ): bool {
 		if ( 1 !== preg_match( '/^[0-9a-f]{4,6}(?:-[0-9a-f]{4,6})*$/D', $value ) ) {
