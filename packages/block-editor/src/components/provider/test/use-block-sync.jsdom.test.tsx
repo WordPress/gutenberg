@@ -717,7 +717,20 @@ describe( 'useBlockSync hook', () => {
 				<TestWrapper
 					clientId="controller"
 					setRegistry={ ( reg: DataRegistry ) => {
-						registry = reg;
+						if ( ! registry ) {
+							registry = reg;
+							// The hook ignores changes to the clones of a
+							// controller with no block in the store.
+							const host: TestBlock = {
+								name: 'test/test-block',
+								clientId: 'controller',
+								innerBlocks: [],
+								attributes: {},
+							};
+							reg.dispatch( blockEditorStore ).resetBlocks( [
+								host,
+							] as Block[] );
+						}
 					} }
 					value={ [ block( { foo: 1 } ) ] }
 					onChange={ onChange }
