@@ -8,6 +8,7 @@ import {
 import { select } from '@wordpress/data';
 import {
 	analyzeFormatEdit,
+	findAdditionFormatting,
 	planFormatMarkers,
 	applyFormatPlan,
 } from '../reconcile-format';
@@ -356,5 +357,47 @@ describe( 'applyFormatPlan', () => {
 		expect( html ).toContain( 'href="https://w.org"' );
 		expect( html ).toContain( 'data-suggestion-type="format"' );
 		expect( html.match( /docs/g ) ).toHaveLength( 1 );
+	} );
+} );
+
+describe( 'findAdditionFormatting', () => {
+	const addMark = ( id: number | string, inner: string ) =>
+		`<mark class="wp-suggestion-add" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="7">${ inner }</mark>`;
+
+	it( 'reports the formatting given to an addition', () => {
+		expect(
+			findAdditionFormatting(
+				rtd( `Hello${ addMark( 5, '<strong> world</strong>' ) }` ),
+				5
+			)
+		).toEqual( {
+			beforeHTML: ' world',
+			afterHTML: '<strong> world</strong>',
+		} );
+	} );
+
+	it( 'reports nothing for an unformatted addition', () => {
+		expect(
+			findAdditionFormatting(
+				rtd( `Hello${ addMark( 5, ' world' ) }` ),
+				5
+			)
+		).toBeNull();
+	} );
+
+	it( 'reads an addition typed into a formatted run as unchanged', () => {
+		expect(
+			findAdditionFormatting(
+				rtd( `<strong>Hello${ addMark( 5, ' world' ) }</strong>` ),
+				5
+			)
+		).toEqual( {
+			beforeHTML: '<strong> world</strong>',
+			afterHTML: '<strong> world</strong>',
+		} );
+	} );
+
+	it( 'reports nothing once the marker is gone', () => {
+		expect( findAdditionFormatting( rtd( 'Hello world' ), 5 ) ).toBeNull();
 	} );
 } );

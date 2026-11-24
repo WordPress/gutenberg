@@ -22,8 +22,10 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	removeAllSuggestionMarkers,
 	SUGGESTION_ID_ATTRIBUTE,
+	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_FORMAT,
 	canonicalizeSuggestionStack,
+	findSuggestionRange,
 	isSuggestionFormat,
 	suggestionFormatNameFor,
 	suggestionKindOf,
@@ -402,6 +404,55 @@ function charactersToUnmarkedHTML( record: any, indices: number[] ): string {
 		previous = index;
 	}
 	return html;
+}
+
+/**
+ * The formatting an addition's text carries beyond the text it was typed
+ * next to, as a before and after pair for the summary's format diff.
+ *
+ * Formatting the author's own proposed text opens no suggestion of its own
+ * (see `merge-own`), so its card has to name the formatting. Text typed into
+ * a formatted run inherits that run's formatting and proposes none: `before`
+ * is the addition as it would read in its neighbor's formatting.
+ *
+ * @param value Block attribute value (RichTextData, string, or other).
+ * @param id    Suggestion id.
+ * @return The pair, or null when the addition is gone or unformatted.
+ */
+export function findAdditionFormatting(
+	value: any,
+	id: number | string
+): { beforeHTML: string; afterHTML: string } | null {
+	const range = findSuggestionRange( value, id, SUGGESTION_TYPE_ADDITION );
+	const record = range && toRichTextRecord( value );
+	if ( ! range || ! record ) {
+		return null;
+	}
+	const ownFormats = ( index: number ): any[] =>
+		( record.formats[ index ] ?? [] ).filter(
+			( format: any ) => ! isSuggestionFormat( format )
+		);
+	const indices = rangeIndices( range.start, range.end ).filter( ( index ) =>
+		suggestionMarkerListsAt( record.formats[ index ] ).add.some(
+			( marker ) =>
+				String( marker.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ) ===
+				String( id )
+		)
+	);
+	if ( ! indices.some( ( index ) => ownFormats( index ).length > 0 ) ) {
+		return null;
+	}
+	const neighbor = ownFormats(
+		range.start > 0 ? range.start - 1 : range.end
+	);
+	const formats: any[] = record.formats.slice();
+	for ( const index of indices ) {
+		formats[ index ] = neighbor.length ? neighbor : undefined;
+	}
+	return {
+		beforeHTML: charactersToUnmarkedHTML( { ...record, formats }, indices ),
+		afterHTML: charactersToUnmarkedHTML( record, indices ),
+	};
 }
 
 /**

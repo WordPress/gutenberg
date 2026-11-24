@@ -1036,6 +1036,22 @@ export function summarizeOperations(
 				continue;
 			}
 			/*
+			 * Formatting the author gave their own proposed text is part
+			 * of that proposal, so it is named beside the text.
+			 */
+			if ( isTextLike( op.text ) && op.textAfterHTML ) {
+				const { added } = diffInlineFormats(
+					op.textBeforeHTML ?? '',
+					op.textAfterHTML
+				);
+				if ( added.length > 0 ) {
+					addedFormats.push( ...added );
+					if ( added.includes( INLINE_FORMAT_TAG_LABELS.a ) ) {
+						linkUrls.push( ...linkTargets( op.textAfterHTML ) );
+					}
+				}
+			}
+			/*
 			 * A type-over is one note owning both runs: quote the replaced
 			 * text and its replacement on one line, the way the word-diff
 			 * path reports a rewrite. Either side can be empty once the
