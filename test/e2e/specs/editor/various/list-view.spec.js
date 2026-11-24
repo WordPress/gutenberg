@@ -1349,6 +1349,27 @@ test.describe( 'List View', () => {
 			] );
 	} );
 
+	test( 'opens the block settings menu on right-click', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/file' } );
+
+		const listView = await listViewUtils.openListView();
+
+		await listView
+			.getByRole( 'link', { name: 'Heading' } )
+			.click( { button: 'right' } );
+
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Duplicate' } )
+		).toBeVisible();
+	} );
+
 	test( 'block settings dropdown menu', async ( {
 		editor,
 		page,
@@ -1362,10 +1383,11 @@ test.describe( 'List View', () => {
 		// Open List View.
 		const listView = await listViewUtils.openListView();
 
-		await listView
-			.getByRole( 'button', { name: 'Options' } )
-			.first()
-			.click();
+		const headingRows = listView.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'gridcell', { name: 'Heading' } ),
+		} );
+		await headingRows.hover();
+		await headingRows.getByRole( 'button', { name: 'Options' } ).click();
 
 		await page
 			.getByRole( 'menu', { name: 'Options' } )
@@ -1383,9 +1405,10 @@ test.describe( 'List View', () => {
 			] );
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
-		await listView
-			.getByRole( 'button', { name: 'Options' } )
+		await headingRows.first().hover();
+		await headingRows
 			.first()
+			.getByRole( 'button', { name: 'Options' } )
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Options' } )
