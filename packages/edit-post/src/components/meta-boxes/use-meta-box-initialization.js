@@ -127,13 +127,22 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		}
 
 		// Keep the drag helper out of the meta box scroll containers, so it
-		// doesn't stretch or get clipped by them.
+		// doesn't stretch or get clipped by them. The wrapper matches the meta
+		// box area markup, so that the helper keeps the meta box styles.
+		const dragHelperWrapper = document.createElement( 'div' );
+		dragHelperWrapper.className =
+			'edit-post-meta-boxes-area is-drag-helper';
+		const dragHelperContainer = document.createElement( 'div' );
+		dragHelperContainer.id = 'poststuff';
+		dragHelperWrapper.append( dragHelperContainer );
+		document.body.append( dragHelperWrapper );
+
 		// Not limited to `META_BOX_SORTABLES`: an area that isn't rendered yet,
 		// e.g. the sidebar one while the sidebar is closed, is outside it.
 		jQuery( '.meta-box-sortables' ).sortable(
 			'option',
 			'appendTo',
-			document.body
+			dragHelperContainer
 		);
 
 		jQuery( document ).on(
@@ -148,6 +157,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 				META_BOX_SORTABLES,
 				revealMetaBoxDropZones
 			);
+			dragHelperWrapper.remove();
 		};
 	}, [ isEnabledAndEditorReady ] );
 };
