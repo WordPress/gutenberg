@@ -265,13 +265,35 @@ describe( 'blocks that detach on edit', () => {
 	} );
 
 	it( 'keeps typing after the detaching keystroke in the same undo step', () => {
-		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'a' } );
+		// The list's inner blocks are controlled, like a Page List's.
+		const x = createBlock( 'test/item' );
+		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
+			history: 'ignore',
+		} );
+		t.dispatch.setHasControlledInnerBlocks( t.ids.list, true );
+		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
+			history: 'ignore',
+		} );
+		t.dispatch.replaceInnerBlocks( t.ids.list, [ x ] );
+
+		t.dispatch.updateBlockAttributes( x.clientId, { label: 'a' } );
 		expect( t.select.getBlock( t.ids.list ) ).toBeNull();
 		expect( t.select.isLastBlockChangePersistent() ).toBe( true );
 
+		// An inner block controller of the list would clean up when it
+		// unmounts (see `useBlockSync`), outside the history.
+		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
+			history: 'ignore',
+		} );
+		t.dispatch.setHasControlledInnerBlocks( t.ids.list, false );
+		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
+			history: 'ignore',
+		} );
+		t.dispatch.replaceInnerBlocks( t.ids.list, [] );
+
 		// The next keystroke updates the same attribute, as without the
 		// detach, so it doesn't start a new undo step.
-		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'ab' } );
+		t.dispatch.updateBlockAttributes( x.clientId, { label: 'ab' } );
 		expect( t.select.isLastBlockChangePersistent() ).toBe( false );
 	} );
 

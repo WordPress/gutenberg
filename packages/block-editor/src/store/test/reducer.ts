@@ -2239,18 +2239,13 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( false );
 				} );
 
-				it( 'should keep updates to the same block attribute exempt across a change outside the history', () => {
+				it( 'should keep updates to the same block attribute exempt across a marked change that changes nothing', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
 								partial< Block >( {
 									clientId: 'kumquat',
-									attributes: {},
-									innerBlocks: [],
-								} ),
-								partial< Block >( {
-									clientId: 'loquat',
 									attributes: {},
 									innerBlocks: [],
 								} ),
@@ -2264,6 +2259,8 @@ describe( 'state', () => {
 							updated: false,
 						},
 					} );
+					// Like an inner block controller cleaning up after a
+					// block that is already gone.
 					original = blocks( original, {
 						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
 						history: 'ignore',
@@ -2271,7 +2268,7 @@ describe( 'state', () => {
 					original = blocks( original, {
 						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
 						clientId: 'loquat',
-						hasControlledInnerBlocks: true,
+						hasControlledInnerBlocks: false,
 					} );
 
 					const state = blocks( original, {
@@ -2283,6 +2280,54 @@ describe( 'state', () => {
 					} );
 
 					expect( state.isPersistentChange ).toBe( false );
+				} );
+
+				it( 'should start a new step after a marked change that changes the blocks', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: false,
+						},
+					} );
+					// Like an undo, which resets the blocks outside the
+					// history.
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					original = blocks( original, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'kumquat',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( true );
 				} );
 
 				it( 'should flag an explicitly marked persistent change', () => {

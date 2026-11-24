@@ -480,11 +480,12 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
-		// have resulted in a changed state. Leave out changes outside the
-		// history and a detach's own steps, so they don't split an undo step
-		// (such as typing) in two.
+		// have resulted in a changed state. Leave out a detach's own steps,
+		// and a change marked not persistent that changed nothing (such as an
+		// inner block controller cleaning up after a detached block), so they
+		// don't split an undo step (such as typing) in two.
 		if (
-			pendingHistoryMode !== 'ignore' &&
+			! ( pendingHistoryMode && state === nextState ) &&
 			! detachActions.has( action )
 		) {
 			lastAction = action;
@@ -3525,6 +3526,15 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 							},
 						]
 					: [];
+				// Let go of controlled inner blocks here, so the controller's
+				// own cleanup when it unmounts changes nothing.
+				if ( nextState.blocks.controlledInnerBlocks.has( clientId ) ) {
+					steps.push( {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId,
+						hasControlledInnerBlocks: false,
+					} );
+				}
 				steps.push( {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
