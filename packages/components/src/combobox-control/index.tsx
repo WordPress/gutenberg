@@ -207,9 +207,13 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					preventDefault = true;
 					break;
 				case 'Escape':
-					setIsExpanded( false );
-					setSelectedSuggestion( null );
-					preventDefault = true;
+					// Only consume the key while the suggestions list is open, so
+					// that a parent Modal or Popover can still be closed with it.
+					if ( isExpanded ) {
+						setIsExpanded( false );
+						setSelectedSuggestion( null );
+						preventDefault = true;
+					}
 					break;
 				default:
 					break;
