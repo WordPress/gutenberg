@@ -96,7 +96,10 @@ function isSameTransform( m: LinearTransform, n: LinearTransform ) {
 	);
 }
 
-function useHandleStyles( resizableRef: RefObject< Resizable | null > ) {
+function useHandleStyles(
+	resizableRef: RefObject< Resizable | null >,
+	showHandle: boolean
+) {
 	const [ matrix, setMatrix ] = useState< LinearTransform >( {
 		a: 1,
 		b: 0,
@@ -106,6 +109,10 @@ function useHandleStyles( resizableRef: RefObject< Resizable | null > ) {
 	// A transform is a style, not a prop, so read it after every render.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useLayoutEffect( () => {
+		// Consumers re-render on every move during a drag.
+		if ( ! showHandle || resizableRef.current?.state.isResizing ) {
+			return;
+		}
 		const element = resizableRef.current?.resizable;
 		if ( ! element ) {
 			return;
@@ -151,7 +158,7 @@ function UnforwardedResizableBox(
 ) {
 	const resizableRef = useRef< Resizable >( null );
 	const mergedRef = useMergeRefs( [ ref, resizableRef ] );
-	const handleStyles = useHandleStyles( resizableRef );
+	const handleStyles = useHandleStyles( resizableRef, showHandle );
 	return (
 		<TransformAwareResizable
 			className={ clsx(
