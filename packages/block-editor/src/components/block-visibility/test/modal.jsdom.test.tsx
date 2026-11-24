@@ -31,7 +31,10 @@ describe( 'visibility editing permissions', () => {
 			apiVersion: 3,
 			title: 'Visibility',
 			category: 'text',
-			attributes: { metadata: { type: 'object' } },
+			attributes: {
+				lock: { type: 'object' },
+				metadata: { type: 'object' },
+			},
 			save: () => null,
 		} )
 	);
@@ -60,6 +63,22 @@ describe( 'visibility editing permissions', () => {
 		registry
 			.dispatch( store )
 			.setBlockEditingMode( ids[ 1 ], 'contentOnly' );
+		expect(
+			unlock( registry.select( store ) ).canEditBlocksVisibility( ids )
+		).toBe( false );
+		render(
+			<RegistryProvider value={ registry }>
+				<BlockVisibilityViewportMenuItem clientIds={ ids } />
+			</RegistryProvider>
+		);
+		expect(
+			screen.queryByRole( 'menuitem', { name: 'Hide' } )
+		).not.toBeInTheDocument();
+	} );
+	it( 'withholds visibility editing from a selection containing an edit-locked block', () => {
+		registry.dispatch( store ).updateBlockAttributes( [ ids[ 1 ] ], {
+			lock: { edit: true },
+		} );
 		expect(
 			unlock( registry.select( store ) ).canEditBlocksVisibility( ids )
 		).toBe( false );
