@@ -135,6 +135,41 @@ function hierarchical_without_title_cpt() {
 add_action( 'init', 'hierarchical_without_title_cpt' );
 
 /**
+ * Registers a non-hierarchical post type that supports page attributes.
+ */
+function non_hierarchical_with_page_attributes_cpt() {
+	register_post_type(
+		'non-hierarchical',
+		array(
+			'public'       => true,
+			'label'        => 'Non-Hierarchical',
+			'show_in_rest' => true,
+			'hierarchical' => false,
+			'supports'     => array( 'title', 'editor', 'page-attributes' ),
+		)
+	);
+}
+add_action( 'init', 'non_hierarchical_with_page_attributes_cpt' );
+
+/**
+ * Registers a hierarchical post type that is not publicly viewable.
+ */
+function hierarchical_not_viewable_cpt() {
+	register_post_type(
+		'hierar-private',
+		array(
+			'public'       => false,
+			'show_ui'      => true,
+			'label'        => 'Hierarchical Private',
+			'show_in_rest' => true,
+			'hierarchical' => true,
+			'supports'     => array( 'title', 'editor', 'page-attributes' ),
+		)
+	);
+}
+add_action( 'init', 'hierarchical_not_viewable_cpt' );
+
+/**
  * Registers a custom post type that includes a legacy block in `template`.
  */
 function legacy_block_in_template_cpt() {

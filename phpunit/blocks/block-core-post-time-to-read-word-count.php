@@ -55,6 +55,24 @@ class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 				'characters_excluding_spaces' => 11,
 				'characters_including_spaces' => 13,
 			),
+			'No-break space' => array(
+				'string'                      => 'one' . json_decode( '"\u00a0"' ) . 'two' . json_decode( '"\u00a0"' ) . 'three',
+				'words'                       => 3,
+				'characters_excluding_spaces' => 11,
+				'characters_including_spaces' => 13,
+			),
+			'Unicode spaces' => array(
+				'string'                      => 'one' . json_decode( '"\u2003"' ) . 'two' . json_decode( '"\u202f"' ) . 'three',
+				'words'                       => 3,
+				'characters_excluding_spaces' => 11,
+				'characters_including_spaces' => 13,
+			),
+			'NBSP in number' => array(
+				'string'                      => 'Il a payé 10' . json_decode( '"\u00a0"' ) . '000 euros',
+				'words'                       => 6,
+				'characters_excluding_spaces' => 17,
+				'characters_including_spaces' => 22,
+			),
 			'Punctuation'    => array(
 				'string'                      => "It's two three " . json_decode( '"\u2026"' ) . ' 4?',
 				'words'                       => 4,
