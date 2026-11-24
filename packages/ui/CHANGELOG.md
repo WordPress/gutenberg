@@ -11,12 +11,14 @@
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
+-   `Tabs`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, and draw the focus ring inside it. Default tabs give the background the same clearance on every side. In minimal tabs, it extends 4px past the label ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Bug Fixes
 
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Name the chips toolbar "Selected items" for any number of chips, so it translates correctly in languages that use the singular form for numbers other than one ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
 -   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 -   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#87256](https://github.com/WordPress/gutenberg/pull/87256)).
+-   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Internal
 
@@ -52,7 +54,6 @@
 -   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 -   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
--   `Tabs`: Draw the hover, pressed, and focus states as a background that keeps the tab's own silhouette and is the size of a button in the same chrome, which it already matches in background color and corner radius. Horizontal tabs inset it within the taller tab; vertical tabs fill the row, so it lines up with the controls stacked above it. Horizontal tab lists previously painted a pill whose rounding came from a shadow spread ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Bug Fixes
 
