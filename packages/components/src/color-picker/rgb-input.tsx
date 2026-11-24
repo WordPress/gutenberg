@@ -44,7 +44,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
 					max={ 100 }
 					label={ __( 'Alpha (RGB A value)' ) }
 					abbreviation="A"
-					value={ Math.trunc( a * 100 ) }
+					value={ Math.round( a * 100 ) }
 					onChange={ ( nextA: number ) =>
 						onChange(
 							colord( {

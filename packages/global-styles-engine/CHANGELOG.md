@@ -10,6 +10,10 @@
 
 -   Type Definitions: Add `customFontSize` and `lineHeight` to `TypographySettings`, `gradient` to `GlobalStylesStyles[ 'color' ]`, and `':hover'` state to `GlobalStylesStyles[ 'blocks' ]` ([#87122](https://github.com/WordPress/gutenberg/pull/87122)).
 
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
 ## 2.2.0 (2026-11-18)
 
 ### Bug Fixes
