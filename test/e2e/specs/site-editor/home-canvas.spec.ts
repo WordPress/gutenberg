@@ -106,6 +106,16 @@ test.describe( 'Home canvas', () => {
 			editor.canvas.getByText( 'Home template' )
 		).toBeVisible();
 		await expect( editor.canvas.getByText( 'Page template' ) ).toBeHidden();
+
+		// The editor is no longer in the mode of the page either, so what
+		// reads it treats the home template as the post being edited.
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).getRenderingMode()
+				)
+			)
+			.toBe( 'post-only' );
 	} );
 
 	// The canvas of Home is a preview in the extensible site editor, which

@@ -61,6 +61,15 @@ const NON_CONTEXTUAL_POST_TYPES = [
 ];
 
 /**
+ * Post types that are never rendered inside a template, so whose only rendering
+ * mode is `post-only`.
+ */
+const POST_TYPES_WITHOUT_TEMPLATE = [
+	'wp_template',
+	...NON_CONTEXTUAL_POST_TYPES,
+];
+
+/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -77,14 +86,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
-	// The rendering mode is the editor's rather than the canvas's, so it can
-	// be the one that shows the template when this canvas has none to show:
-	// a route can ask for that mode whatever its canvas resolves to, and the
-	// mode of the last canvas stays until this one settles its own. The post
-	// is rendered on its own then, rather than the blocks of a template that
-	// is not there, which would leave the last canvas in place.
-	const rootLevelPost =
-		mode === 'template-locked' && template ? 'template' : 'post';
+	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -179,12 +181,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		recovery,
 		initialEdits,
 		initialViewport,
-		renderingMode,
+		renderingMode: requestedRenderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
 		const hasTemplate = !! template;
+		// A post that is never rendered inside a template has no other mode
+		// than `post-only`, whatever mode the caller names. Waiting for its
+		// template would wait forever, and leave the editor in the mode of the
+		// last post, such as a page shown inside its template before Home.
+		const neverHasTemplate = POST_TYPES_WITHOUT_TEMPLATE.includes(
+			post.type
+		);
+		const renderingMode =
+			requestedRenderingMode && neverHasTemplate
+				? 'post-only'
+				: requestedRenderingMode;
 		const {
 			editorSettings,
 			selection,
@@ -213,8 +226,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
-				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+				const _defaultMode = neverHasTemplate
+					? 'post-only'
+					: ( renderingMode ?? getDefaultRenderingMode( post.type ) );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -254,7 +268,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[ post.type, post.id, hasTemplate, neverHasTemplate, renderingMode ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -468,13 +482,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ /*
-									   Only while a template is rendered
-									   around the post: a canvas with none
-									   has nothing to lock, whatever mode
-									   the editor was left in.
-									 */ }
-									{ shouldRenderTemplate && (
+									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }
 									{ type === 'wp_navigation' && (
