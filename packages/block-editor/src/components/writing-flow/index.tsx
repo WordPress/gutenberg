@@ -14,6 +14,7 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useRestoreTapCaret from './use-restore-tap-caret';
 import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
@@ -48,6 +49,9 @@ export function useWritingFlow(): [
 			useEditableRoot(),
 			useHomeEnd(),
 			useDragSelection(),
+			// Before the selection observer, which then reads the caret put
+			// back.
+			useRestoreTapCaret(),
 			useSelectionObserver(),
 			useClickSelection(),
 			useMultiSelection(),
