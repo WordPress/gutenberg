@@ -62,6 +62,10 @@ Builds only the minified `.min.js` and `.min.css` files, leaving out the non-min
 
 `wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
 
+Without the non-minified files, `wp i18n make-pot` (which WordPress.org also runs to import plugin strings) skips `*.min.js` and reads JavaScript strings only from the `*.min.js.map` source maps. Ship those maps with the plugin, and do not exclude `*.map` in `.distignore`, or the plugin's JavaScript strings cannot be translated. This works because the maps embed the JavaScript that `wp-build` compiles each package to; `make-pot` cannot parse TypeScript, so it finds no strings in a source map that embeds TypeScript sources. Routes and widgets are built without source maps, so their strings are not extracted from a `--no-script-debug` build.
+
+Gutenberg's own build does not support the flag yet. Its `lib/client-assets.php` registers some stylesheets by hand without checking `has_debug_assets`, so a Gutenberg build made with `--no-script-debug` requests missing non-minified files when `SCRIPT_DEBUG` is enabled.
+
 ### Build Concurrency
 
 By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.

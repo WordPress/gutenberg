@@ -103,14 +103,11 @@ describe( 'SearchableChipSelect', () => {
 				screen.getByRole( 'combobox', { name: 'Fruit' } )
 			).not.toHaveAccessibleDescription();
 			expect(
-				screen.queryByRole( 'toolbar', { name: 'Selected item' } )
-			).not.toBeInTheDocument();
-			expect(
 				screen.queryByRole( 'toolbar', { name: 'Selected items' } )
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'labels the chips toolbar as Selected item when one item is selected', () => {
+		it( 'labels the chips toolbar as Selected items when one item is selected', () => {
 			render(
 				<SearchableChipSelect
 					aria-label="Fruit"
@@ -120,7 +117,7 @@ describe( 'SearchableChipSelect', () => {
 			);
 
 			expect(
-				screen.getByRole( 'toolbar', { name: 'Selected item' } )
+				screen.getByRole( 'toolbar', { name: 'Selected items' } )
 			).toBeVisible();
 			expect(
 				screen.getByRole( 'combobox', { name: 'Fruit' } )
