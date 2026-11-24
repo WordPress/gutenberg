@@ -21,11 +21,11 @@ export default function useRestoreTapCaret() {
 				( event.target as Node ).contains( selection.anchorNode )
 					? selection.getRangeAt( 0 ).cloneRange()
 					: undefined;
-				// TEMPORARY (debugging a flaky iOS test).
-				( window as any ).__iosTestLog?.(
-					'restore:save',
-					'saved=' + !! caret
-				);
+			// TEMPORARY (debugging a flaky iOS test).
+			( window as any ).__iosTestLog?.(
+				'restore:save',
+				'saved=' + !! caret
+			);
 		}
 
 		// A new press or key may move the caret anywhere.
