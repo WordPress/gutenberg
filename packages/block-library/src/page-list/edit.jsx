@@ -353,10 +353,6 @@ export default function PageListEdit( {
 		isChildOfNavigation &&
 		canConvert &&
 		allowConvertToLinks &&
-		// A parent page that isn't among the fetched pages (not published)
-		// can't be shown as links.
-		( ! parentPageID ||
-			pages.some( ( page ) => page.id === parentPageID ) ) &&
 		totalItems !== null &&
 		totalItems <= MAX_PAGE_COUNT;
 

@@ -138,6 +138,14 @@ describe( 'getBlockMoveDestination', () => {
 		).toEqual( { rootClientId: '', index: 1 } );
 	} );
 
+	it( 'returns null for a block that cannot move', () => {
+		t.dispatch.updateBlockAttributes( t.ids.a, {
+			lock: { move: true },
+		} );
+
+		expect( t.destination( t.ids.a, 'down' ) ).toBeNull();
+	} );
+
 	it( 'keeps a block that cannot be removed in its parent', () => {
 		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
 		t.dispatch.updateBlockAttributes( t.ids.a, {

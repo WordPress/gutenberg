@@ -19,6 +19,7 @@ import {
 	getBlockRootClientId,
 	getBlockAttributes,
 	canInsertBlocks,
+	canMoveBlocks,
 	canRemoveBlocks,
 } from './selectors';
 import {
@@ -1536,7 +1537,7 @@ export function getBlockMoveDestination(
 	direction: 'up' | 'down',
 	{ isExpanded, canStepOut }: BlockMoveOptions = {}
 ): BlockMoveDestination | null {
-	if ( ! clientIds.length ) {
+	if ( ! clientIds.length || ! canMoveBlocks( state, clientIds ) ) {
 		return null;
 	}
 	const isDown = direction === 'down';
