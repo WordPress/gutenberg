@@ -1944,6 +1944,50 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs a translation with a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							transform: {
+								rotate: '5deg',
+								translate: { x: '10px', y: '-50%' },
+							},
+							'@mobile': {
+								transform: {
+									translate: { y: '1rem' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					featureSelectors: {
+						transform: '.wp-block-button .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}'
+			);
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},
