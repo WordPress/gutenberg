@@ -57,13 +57,8 @@ export const Default: StoryObj< typeof Card > = {
 					<Text>CardBody (after CardDivider)</Text>
 				</CardBody>
 				<CardMedia>
-					<div
-						style={ {
-							height: 180,
-							background:
-								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-						} }
-					/>
+					{ /* Served from `storybook/static`. */ }
+					<img alt="Card Media" src="landscape.svg" />
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
