@@ -140,14 +140,6 @@ function InputField(
 		( dragProps ) => {
 			const { cancel, distance, dragging, event, target } = dragProps;
 
-			if ( ( target as HTMLInputElement ).matches( ':disabled' ) ) {
-				cancel();
-				if ( isDragging ) {
-					dragEnd( dragProps );
-				}
-				return;
-			}
-
 			// The drag gesture is not offered for touch input, where there is
 			// no cursor affordance for it, and where it's easy to accidentally
 			// change the value when only meaning to tap or move the caret.
@@ -168,6 +160,16 @@ function InputField(
 				...dragProps.event,
 				target,
 			};
+
+			// Ends gesture if the element is disabled.
+			if ( ( target as HTMLInputElement ).matches( ':disabled' ) ) {
+				cancel();
+				if ( isDragging ) {
+					onDragEnd( dragProps );
+					dragEnd( dragProps );
+				}
+				return;
+			}
 
 			if ( ! distance ) {
 				return;
