@@ -382,6 +382,7 @@ export const AsyncItems: Story = {
  * In this example, some extra information is added to each list item as an ARIA description.
  */
 export const WithCustomTriggerAndItem: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		items: ITEMS,
 		defaultValue: ITEMS[ 0 ],

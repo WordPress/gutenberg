@@ -18,6 +18,7 @@ import {
 	type DateSettings,
 } from '@wordpress/date';
 import TimePicker from '..';
+import Popover from '../../../popover';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -546,6 +547,74 @@ describe( 'TimePicker', () => {
 		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
 	} );
 
+	describe( 'time zone', () => {
+		let originalSettings: DateSettings;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -5,
+					offsetFormatted: '-5',
+					string: 'America/New_York',
+					abbr: 'EST',
+				},
+			} );
+		} );
+
+		beforeEach( () => {
+			timezoneMock.register( 'US/Pacific' );
+		} );
+
+		afterEach( () => {
+			timezoneMock.unregister();
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		it( 'should show the site time zone detail from a keyboard', async () => {
+			const user = userEvent.setup();
+
+			render( <TimePicker currentTime="1986-10-18T11:00:00" /> );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Timezone: EST',
+			} );
+			trigger.focus();
+			await user.keyboard( '{Enter}' );
+
+			expect(
+				await screen.findByRole( 'dialog', { name: 'Timezone' } )
+			).toHaveAccessibleDescription( '(EST) America/New York' );
+		} );
+
+		it( 'should close only the time zone infotip on Escape inside a popover after clicking the abbreviation', async () => {
+			const user = userEvent.setup();
+			const onClose = vi.fn();
+
+			render(
+				<Popover onClose={ onClose }>
+					<TimePicker currentTime="1986-10-18T11:00:00" />
+				</Popover>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Timezone: EST' } )
+			);
+			const infotip = await screen.findByRole( 'dialog', {
+				name: 'Timezone',
+			} );
+
+			await user.keyboard( '{Escape}' );
+
+			await waitFor( () => expect( infotip ).not.toBeInTheDocument() );
+			expect( onClose ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'input types with timezone variations', () => {
 		let originalSettings: DateSettings;
 
@@ -704,7 +773,7 @@ describe( 'TimePicker', () => {
 		} );
 	} );
 
-	describe( 'timezone tooltip', () => {
+	describe( 'time zone with a numeric abbreviation', () => {
 		let originalSettings: DateSettings;
 
 		beforeAll( () => {
