@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useDialog`: Don't close the dialog when Escape is pressed to cancel an IME composition.
+
 ## 9.2.0 (2026-11-18)
 
 ### Bug Fixes
