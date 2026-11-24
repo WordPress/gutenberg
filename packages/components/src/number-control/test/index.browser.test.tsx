@@ -44,7 +44,7 @@ describe( 'NumberControl drag to change value', () => {
 		const screen = await render( <StatefulNumberControl /> );
 		const input = screen.getByRole( 'spinbutton' );
 
-		dragInput( input.element(), 'touch' );
+		await dragInput( input.element(), 'touch' );
 
 		await expect.element( input ).toHaveValue( 5 );
 	} );
@@ -53,7 +53,7 @@ describe( 'NumberControl drag to change value', () => {
 		const screen = await render( <StatefulNumberControl /> );
 		const input = screen.getByRole( 'spinbutton' );
 
-		dragInput( input.element(), 'mouse' );
+		await dragInput( input.element(), 'mouse' );
 
 		await expect.element( input ).toHaveValue( 55 );
 	} );
@@ -62,7 +62,7 @@ describe( 'NumberControl drag to change value', () => {
 		const screen = await render( <StatefulNumberControl disabled /> );
 		const input = screen.getByRole( 'spinbutton' );
 
-		dragInput( input.element(), 'mouse' );
+		await dragInput( input.element(), 'mouse' );
 
 		await expect.element( input ).toHaveValue( 5 );
 	} );
@@ -75,7 +75,7 @@ describe( 'NumberControl drag to change value', () => {
 		);
 		const input = screen.getByRole( 'spinbutton' );
 
-		dragInput( input.element(), 'mouse' );
+		await dragInput( input.element(), 'mouse' );
 
 		await expect.element( input ).toHaveValue( 5 );
 	} );
@@ -121,7 +121,7 @@ describe( 'NumberControl drag to change value', () => {
 		const input = screen.getByRole( 'spinbutton' );
 
 		// Drag 6px upwards (delta of -6 for north direction modifier -1 => +0.6).
-		dragInput( input.element(), 'mouse', [ 6, 0 ] );
+		await dragInput( input.element(), 'mouse', [ 6, 0 ] );
 
 		await expect.element( input ).toHaveValue( 0.9 );
 	} );
