@@ -71,12 +71,19 @@ export function getBlockAndPreviewFromMedia(
 	media: MediaItem,
 	mediaType: MediaType
 ): [ Block, ReactElement ] {
+	const mediaSrc = media.url;
+	// Shown for media with no visual preview of its own: files and audio.
+	const filePreview = (
+		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
+	);
+	if ( mediaType === 'file' ) {
+		return [ createFileBlock( media ), filePreview ];
+	}
 	// Add the common attributes between the different media types.
 	const attributes: Record< string, unknown > = {
 		id: media.id || undefined,
 		caption: media.caption || undefined,
 	};
-	const mediaSrc = media.url;
 	const alt = media.alt || undefined;
 	if ( mediaType === 'image' ) {
 		attributes.url = mediaSrc;
@@ -100,11 +107,7 @@ export function getBlockAndPreviewFromMedia(
 			} }
 		/>
 	) : (
-		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
+		filePreview
 	);
-	const block =
-		mediaType === 'file'
-			? createFileBlock( media )
-			: createBlock( `core/${ mediaType }`, attributes );
-	return [ block, preview ];
+	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];
 }
