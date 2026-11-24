@@ -4,9 +4,19 @@
 
 ### Bug Fixes
 
+-   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
+-   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
+-   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#87087](https://github.com/WordPress/gutenberg/pull/87087)).
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 -   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
+-   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 12.2.0 (2026-11-18)
 
