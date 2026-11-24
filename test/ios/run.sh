@@ -50,7 +50,15 @@ fetch() { [ -f "$2" ] || { curl -sSLf -o "$2.part" "$1" && mv "$2.part" "$2"; };
 fetch https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar "$CACHE/wp-cli.phar"
 fetch https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip "$CACHE/sqlite.zip"
 # Without the JIT: compiling WordPress takes longer than running it.
-wp() { php -d memory_limit=512M -d opcache.jit=disable "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
+wp_once() { php -d memory_limit=512M -d opcache.jit=disable "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
+# Exit status 139: PHP segfaults now and then on the CI runner.
+wp() {
+	wp_once "$@" && return
+	local status=$?
+	[ "$status" -eq 139 ] || return "$status"
+	echo "PHP crashed running wp $1: running it again."
+	wp_once "$@"
+}
 rm -rf "$WP_DIR"
 # The same WordPress as the end-to-end tests: a GitHub repository, with
 # an optional #branch, from .wp-env.test.json.
@@ -69,7 +77,8 @@ SQLITE="$WP_DIR/wp-content/plugins/sqlite-database-integration"
 sed -e "s#{SQLITE_IMPLEMENTATION_FOLDER_PATH}#$SQLITE#" -e "s#{SQLITE_PLUGIN}#sqlite-database-integration/load.php#" \
 	"$SQLITE/db.copy" > "$WP_DIR/wp-content/db.php"
 step "Installing WordPress"
-wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check
+# --force: a try that crashed may have written wp-config.php already.
+wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --skip-check --force
 # No requests to other sites: a fresh site's first admin page otherwise
 # checks wordpress.org for updates.
 wp config set WP_HTTP_BLOCK_EXTERNAL true --raw
@@ -150,11 +159,18 @@ step "Generating the Xcode project"
 step "Building and running the tests"
 rm -rf test/ios/build/results.xcresult
 STATUS=0
+LOG=test/ios/build/xcodebuild.log
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
 	-scheme SafariTests \
 	-destination "id=${UDID}" \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
-	"$@" || STATUS=$?
+	"$@" 2>&1 | tee "$LOG" || STATUS=$?
+# Flag tests that passed only on a retry.
+sed -nE "s/^Test Case '-\[(.+)\]' failed .*/\1/p" "$LOG" | sort -u | while read -r TEST; do
+	if grep -qF "Test Case '-[$TEST]' passed" "$LOG"; then
+		echo "${GITHUB_ACTIONS:+::warning title=Flaky iOS test::}$TEST failed, then passed on a retry"
+	fi
+done
 exit "$STATUS"
