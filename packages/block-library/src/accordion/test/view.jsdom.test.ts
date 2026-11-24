@@ -1,23 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { getContext, getElement, store } from '@wordpress/interactivity';
 
-let mockRegisteredStore;
-let mockCurrentContext;
+type AccordionContext = {
+	id: string;
+	autoclose: boolean;
+	accordionItems: { id: string; isOpen: boolean }[];
+};
+
+let mockRegisteredStore: { actions: { toggle: () => void } };
+let mockCurrentContext: AccordionContext;
 
 vi.mock( import( '@wordpress/interactivity' ), () => ( {
-	store: ( name, config ) => {
+	store: ( ( name: string, config: typeof mockRegisteredStore ) => {
 		mockRegisteredStore = config;
 		return config;
-	},
-	getContext: () => mockCurrentContext,
-	getElement: () => ( { ref: {} } ),
+	} ) as unknown as typeof store,
+	getContext: ( () => mockCurrentContext ) as typeof getContext,
+	getElement: ( () => ( { ref: {} } ) ) as unknown as typeof getElement,
 } ) );
 
 describe( 'Accordion view script', () => {
 	beforeEach( async () => {
 		vi.resetModules();
-		mockRegisteredStore = null;
-		mockCurrentContext = null;
-		await import( '../view.js' );
+		await vi.importActual( '../view' );
 	} );
 
 	it( 'does nothing when toggling an item that is not in accordionItems yet', () => {
