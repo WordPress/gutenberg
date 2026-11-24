@@ -1691,11 +1691,7 @@ describe( 'actions', () => {
 		it( 'should return undefined if no template assigned', async () => {
 			const result = await store.dispatch(
 				// @ts-expect-error The store middleware runs thunks, which the Redux types do not model.
-				validateBlocksToTemplate(
-					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-					// @ts-expect-error The action takes no store.
-					store
-				)
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
 			expect( result ).toEqual( undefined );

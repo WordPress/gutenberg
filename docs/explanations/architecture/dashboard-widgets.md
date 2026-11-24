@@ -83,6 +83,8 @@ An attribute may also reference a field type by name (`"type": "location"`). The
 
 `<WidgetRender>` then resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`; hosts with other loading strategies supply their own.
 
+It also lends the subtree a filtered slice of the type's identity. `useWidgetIdentity` is how consumers read that data consistently — today the translated `title`, for example when naming content inside the widget — without depending on host-specific discovery.
+
 For what a widget declares through that contract, layer by layer, see [Anatomy of a widget type](https://github.com/WordPress/gutenberg/blob/HEAD/packages/widget-primitives/src/stories/anatomy.md).
 
 ## Hosts

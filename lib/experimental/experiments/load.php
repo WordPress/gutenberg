@@ -25,11 +25,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-global-styles-inheritance-ui',
-					'label'       => __( 'Global Styles inheritance indicators in the block inspector', 'gutenberg' ),
-					'description' => __( 'Marks which block inspector controls show a value inherited from Global Styles, and adds a shortcut to clear a value you set back to the inherited one. Inherited values show in the inspector whether or not this is on.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),

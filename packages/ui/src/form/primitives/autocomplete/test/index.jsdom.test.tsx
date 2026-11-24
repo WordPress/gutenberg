@@ -101,6 +101,37 @@ describe( 'Autocomplete', () => {
 		);
 	} );
 
+	it( 'rejects an input inside the popup', () => {
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ ITEMS } open>
+					<Autocomplete.Popup>
+						<Autocomplete.Input aria-label="Search" />
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			)
+		).toThrow(
+			'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup, which is the suggestion list for an input outside it. For a searchable picker that opens from a button, render <Autocomplete.Root inline open> inside a standalone Popover component instead.'
+		);
+	} );
+
+	it( 'allows the input of a nested autocomplete inside the popup', () => {
+		expect( () =>
+			render(
+				<Autocomplete.Root items={ ITEMS } open>
+					<Autocomplete.Popup>
+						<Autocomplete.Root items={ ITEMS } inline open>
+							<Autocomplete.Input aria-label="Nested search" />
+						</Autocomplete.Root>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			)
+		).not.toThrow();
+		expect(
+			screen.getByRole( 'combobox', { name: 'Nested search' } )
+		).toBeInTheDocument();
+	} );
+
 	describe( 'when disabled', () => {
 		it( 'hides the clear button from screen readers', () => {
 			renderDisabledAutocompleteWithClear();

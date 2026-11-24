@@ -9,7 +9,9 @@ import type {
 import { __ } from '@wordpress/i18n';
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+const { getViewportBreakpoints, resolveStyle } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 /**
  * State definition with value and label.
@@ -294,4 +296,101 @@ export function getNewIndexFromPresets(
 		return currentHighest;
 	}, 0 );
 	return highestPresetValue + 1;
+}
+
+// Heading blocks render at any level, so every heading screen shares one list.
+const HEADING_ELEMENTS = [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
+
+// Has no block styles, so resolving with it leaves only the root and element
+// layers, while `{ ref }` values can still point into `styles.blocks`.
+const ELEMENT_ONLY_BLOCK_NAME = 'core/__element-only';
+
+function getElementKeys( element: string ): string[] {
+	return HEADING_ELEMENTS.includes( element )
+		? HEADING_ELEMENTS
+		: [ element ];
+}
+
+// State and viewport styles go to other selectors, so they cannot override
+// the element itself.
+function isOwnStylePath( path: string ) {
+	return ! path.startsWith( ':' ) && ! path.startsWith( '@' );
+}
+
+const BOX_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+// Shorthands whose longhands live elsewhere in the tree. Nested longhands,
+// such as `border.radius.topLeft` or `spacing.padding.top`, sit under their
+// shorthand and match by path.
+const SHORTHAND_LONGHANDS: Record< string, string[] > = {
+	'border.color': BOX_SIDES.map( ( side ) => `border.${ side }.color` ),
+	'border.style': BOX_SIDES.map( ( side ) => `border.${ side }.style` ),
+	'border.width': BOX_SIDES.map( ( side ) => `border.${ side }.width` ),
+	// Output as the `background` shorthand.
+	'color.gradient': [
+		'color.background',
+		'background.backgroundImage',
+		'background.backgroundPosition',
+		'background.backgroundRepeat',
+		'background.backgroundSize',
+		'background.backgroundAttachment',
+		'background.backgroundClip',
+	],
+};
+
+function isSameOrNestedPath( path: string, otherPath: string ) {
+	return (
+		path === otherPath ||
+		path.startsWith( `${ otherPath }.` ) ||
+		otherPath.startsWith( `${ path }.` )
+	);
+}
+
+// Whether two paths set any of the same CSS, whichever sets the shorthand.
+function setsSameProperty( path: string, otherPath: string ) {
+	const longhands = SHORTHAND_LONGHANDS[ path ] ?? [ path ];
+	const otherLonghands = SHORTHAND_LONGHANDS[ otherPath ] ?? [ otherPath ];
+	return longhands.some( ( longhand ) =>
+		otherLonghands.some( ( otherLonghand ) =>
+			isSameOrNestedPath( longhand, otherLonghand )
+		)
+	);
+}
+
+/**
+ * The block types an element paints whose own Global Styles beat the element
+ * for at least one property it sets. Block style variations are not counted.
+ *
+ * @param config     Merged Global Styles config.
+ * @param element    Element key, e.g. `heading`, `h2` or `button`.
+ * @param blockNames Block types that paint the element.
+ * @return Block names, in the given order.
+ */
+export function getOverridingBlockTypes(
+	config: GlobalStylesConfig | undefined,
+	element: string,
+	blockNames: string[]
+): string[] {
+	if ( ! blockNames.length || ! config?.styles ) {
+		return [];
+	}
+	const elements = getElementKeys( element );
+	const { sources: elementSources } = resolveStyle( config, {
+		blockName: ELEMENT_ONLY_BLOCK_NAME,
+		elements,
+	} );
+	const elementPaths = Object.keys( elementSources ).filter(
+		( path ) => elementSources[ path ].layer === 'element'
+	);
+	return blockNames.filter( ( blockName ) => {
+		const { sources } = resolveStyle( config, { blockName, elements } );
+		return Object.keys( sources ).some(
+			( path ) =>
+				isOwnStylePath( path ) &&
+				sources[ path ].layer === 'block' &&
+				elementPaths.some( ( elementPath ) =>
+					setsSameProperty( path, elementPath )
+				)
+		);
+	} );
 }

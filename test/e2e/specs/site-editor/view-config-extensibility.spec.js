@@ -101,7 +101,9 @@ test.describe( 'View config extensibility', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await expect( page.getByLabel( 'Sort by' ) ).toHaveValue( 'date' );
+		await expect(
+			page.getByRole( 'combobox', { name: 'Sort by' } )
+		).toHaveText( 'Date' );
 		await expect(
 			page.getByRole( 'radio', { name: 'Sort descending' } )
 		).toBeChecked();

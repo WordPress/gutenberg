@@ -14,6 +14,8 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 	mediaUtilsPrivateApis
 );
 
+const EMPTY_FIELDS = [];
+
 /**
  * Supplies the modal with the post it was opened from, so that its "Attached to"
  * filter can offer media uploaded to that post, labelled with the post type's
@@ -25,6 +27,11 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
  * the same reasoning, and the same `viewable` check, as attaching media on save.
  * Their entity ID is a slug rather than a number besides, which the media query
  * has no use for.
+ *
+ * It also supplies the fields registered for attachments on the server, so
+ * that a plugin's fields show in the modal as columns and filters. They are
+ * requested the first time the modal opens rather than wherever a media
+ * placeholder renders.
  *
  * @param {Object} props Props passed through to the modal.
  */
@@ -44,11 +51,23 @@ function MediaUploadModalWithPostContext( props ) {
 		return { postId: currentPostId, postType: currentPostType };
 	}, [] );
 
+	const fields = useSelect(
+		( select ) =>
+			props.isOpen
+				? unlock( select( editorStore ) ).getEntityFields(
+						'postType',
+						'attachment'
+					)
+				: EMPTY_FIELDS,
+		[ props.isOpen ]
+	);
+
 	return (
 		<MediaUploadModalComponent
 			{ ...props }
 			postId={ postId }
 			postType={ postType }
+			fields={ fields }
 		/>
 	);
 }

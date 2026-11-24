@@ -76,6 +76,40 @@ test.describe( 'Block Locking', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
+	test( 'keeps template lock when only movement is locked', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { templateLock: 'all' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'WordPress' },
+				},
+			],
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await page
+			.getByRole( 'checkbox', { name: 'Lock movement', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				attributes: {
+					lock: { move: true, remove: false },
+					templateLock: 'all',
+				},
+			},
+		] );
+	} );
+
 	test( 'can unlock from toolbar', async ( { editor, page } ) => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )

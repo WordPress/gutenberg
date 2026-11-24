@@ -884,6 +884,101 @@ describe( 'state', () => {
 			} );
 		} );
 
+		describe( 'resetting to blocks from the tree', () => {
+			const createState = () =>
+				blocks( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [
+						partial< Block >( {
+							clientId: 'chicken',
+							name: 'core/test-block',
+							attributes: { layout: 'flex' },
+							innerBlocks: [
+								partial< Block >( {
+									clientId: 'ribs',
+									name: 'core/test-block',
+									attributes: { content: 'ribs' },
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'wings',
+									name: 'core/test-block',
+									attributes: { content: 'wings' },
+									innerBlocks: [],
+								} ),
+							],
+						} ),
+						partial< Block >( {
+							clientId: 'veggies',
+							name: 'core/test-block',
+							attributes: { content: 'veggies' },
+							innerBlocks: [],
+						} ),
+					],
+				} );
+
+			it( 'should use the blocks as tree nodes', () => {
+				const veggies = partial< Block >( {
+					clientId: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} );
+				const state = blocks( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ veggies ],
+				} );
+
+				expect( state.tree.get( 'veggies' ) ).toBe( veggies );
+			} );
+
+			it( 'should keep the state of blocks handed back unchanged', () => {
+				const original = createState();
+				const [ chicken, veggies ] =
+					original.tree.get( '' )!.innerBlocks;
+				const [ ribs, wings ] = chicken.innerBlocks;
+				const spicyWings = {
+					...wings,
+					attributes: { content: 'spicy wings' },
+				};
+				const state = blocks( original, {
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{ ...chicken, innerBlocks: [ ribs, spicyWings ] },
+						veggies,
+					] as Block[],
+				} );
+
+				expect( state.order ).toBe( original.order );
+				expect( state.parents ).toBe( original.parents );
+				expect( state.byClientId.get( 'ribs' ) ).toBe(
+					original.byClientId.get( 'ribs' )
+				);
+				expect( state.byClientId.get( 'veggies' ) ).toBe(
+					original.byClientId.get( 'veggies' )
+				);
+				expect( state.tree.get( 'ribs' ) ).toBe( ribs );
+				expect( state.tree.get( 'veggies' ) ).toBe( veggies );
+				expect( state.tree.get( 'wings' ) ).toBe( spicyWings );
+				expect( state.attributes.get( 'wings' ) ).toEqual( {
+					content: 'spicy wings',
+				} );
+			} );
+
+			it( 'should keep the whole state when the same blocks are handed back', () => {
+				const original = createState();
+				const state = blocks( original, {
+					type: 'RESET_BLOCKS',
+					blocks: original.tree.get( '' )!.innerBlocks as Block[],
+				} );
+
+				expect( state.byClientId ).toBe( original.byClientId );
+				expect( state.attributes ).toBe( original.attributes );
+				expect( state.order ).toBe( original.order );
+				expect( state.parents ).toBe( original.parents );
+			} );
+		} );
+
 		it( 'should insert block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -927,6 +1022,51 @@ describe( 'state', () => {
 				attributes: {},
 				innerBlocks: [],
 			} );
+		} );
+
+		it( 'should append received blocks to the root order', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'RECEIVE_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'wings',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				],
+			} );
+
+			expect( Object.fromEntries( state.order ) ).toEqual( {
+				'': [ 'chicken', 'ribs' ],
+				chicken: [],
+				ribs: [ 'wings' ],
+				wings: [],
+			} );
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
 		} );
 
 		it( 'should replace the block', () => {
@@ -1249,6 +1389,33 @@ describe( 'state', () => {
 			);
 		} );
 
+		it( 'should move the block up when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_UP',
+				clientIds: [ 'ribs' ],
+				rootClientId: null,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
 		it( 'should move the nested block up', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
@@ -1402,6 +1569,33 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
 				clientIds: [ 'chicken' ],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should move the block down when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_DOWN',
+				clientIds: [ 'chicken' ],
+				rootClientId: null,
 			} );
 
 			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
@@ -1684,6 +1878,40 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should insert into the root order when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'kumquat',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			const state = blocks( original, {
+				type: 'INSERT_BLOCKS',
+				rootClientId: null,
+				blocks: [
+					partial< Block >( {
+						clientId: 'persimmon',
+						name: 'core/registered-block',
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'kumquat',
+				'persimmon',
+			] );
+			expect( state.order.has( null as unknown as string ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'should move block to lower index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -1711,6 +1939,45 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				clientIds: [ 'ribs' ],
+				index: 0,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'ribs',
+				'chicken',
+				'veggies',
+			] );
+		} );
+
+		it( 'should move block when fromRootClientId and toRootClientId are null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
+				fromRootClientId: null,
+				toRootClientId: null,
 				index: 0,
 			} );
 
@@ -2756,6 +3023,109 @@ describe( 'state', () => {
 					).toEqual( [ 'content-inner' ] );
 				} );
 
+				it( 'should ignore inner blocks in RESET_BLOCKS for a controlled block with no inner blocks', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					// A block preview nested in another one can be reset with
+					// inner blocks that the controller did not provide.
+					const state = blocks( withControlled, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [
+									partial< Block >( {
+										clientId: 'ribs',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									} ),
+								],
+							} ),
+						],
+					} );
+
+					const fullState = partial< State >( { blocks: state } );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
+					expect( getBlockOrder( fullState, 'chicken' ) ).toEqual(
+						[]
+					);
+					expect( getBlocks( fullState, 'chicken' ) ).toEqual( [] );
+					expect(
+						( getBlocks( fullState )[ 0 ] as Block ).innerBlocks
+					).toEqual( [] );
+				} );
+
+				it( 'should keep controlled inner blocks out of the parent tree in RESET_BLOCKS', () => {
+					const outer = partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'ribs',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ outer ],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'ribs',
+						hasControlledInnerBlocks: true,
+					} );
+					const withControlledContent = blocks( withControlled, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'ribs',
+						blocks: [
+							partial< Block >( {
+								clientId: 'content',
+								innerBlocks: [],
+							} ),
+						],
+					} );
+
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [ outer ],
+					} );
+
+					const fullState = partial< State >( { blocks: state } );
+					const ribs = ( getBlocks( fullState )[ 0 ] as Block )
+						.innerBlocks[ 0 ];
+					expect( ribs.clientId ).toBe( 'ribs' );
+					expect( ribs.innerBlocks ).toEqual( [] );
+					expect(
+						getBlocks( fullState, 'ribs' ).map(
+							( b ) => ( b as Block ).clientId
+						)
+					).toEqual( [ 'content' ] );
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = partial< Block >( {
 						clientId: 'template',
@@ -3580,6 +3950,68 @@ describe( 'state', () => {
 							count: 2,
 						},
 					} ),
+				} );
+			} );
+		} );
+		describe( 'default block variation handling', () => {
+			const blockWithDefaultVariation =
+				'core/test-block-with-default-variation';
+			beforeAll( () => {
+				registerBlockType(
+					blockWithDefaultVariation,
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						title: 'Block with a default variation',
+						attributes: { layout: { type: 'object' } },
+						variations: [
+							partial< BlockVariation >( {
+								name: 'default',
+								attributes: { layout: { type: 'constrained' } },
+								isDefault: true,
+							} ),
+							partial< BlockVariation >( {
+								name: 'row',
+								attributes: { layout: { type: 'flex' } },
+								isActive: [ 'layout.type' ],
+							} ),
+						],
+					} )
+				);
+			} );
+			afterAll( () => {
+				unregisterBlockType( blockWithDefaultVariation );
+			} );
+			it( 'should record inserts that match no variation under the default variation', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						partial< Block >( {
+							clientId: 'default',
+							name: blockWithDefaultVariation,
+							attributes: { layout: { type: 'constrained' } },
+						} ),
+						partial< Block >( {
+							clientId: 'row',
+							name: blockWithDefaultVariation,
+							attributes: { layout: { type: 'flex' } },
+						} ),
+					],
+					time: 123456,
+				} );
+
+				expect( state ).toEqual( {
+					insertUsage: {
+						[ `${ blockWithDefaultVariation }/default` ]: {
+							time: 123456,
+							count: 1,
+						},
+						[ `${ blockWithDefaultVariation }/row` ]: {
+							time: 123456,
+							count: 1,
+						},
+					},
 				} );
 			} );
 		} );
