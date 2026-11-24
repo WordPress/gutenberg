@@ -249,10 +249,6 @@ parameters:
 			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
 			identifier: function.notFound
 			path: packages/block-library/src/post-featured-image/index.php
-		-
-			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
-			identifier: function.notFound
-			path: packages/block-library/src/site-logo/index.php
 
 		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
@@ -264,6 +260,10 @@ parameters:
 			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
 			identifier: function.notFound
 			path: packages/block-library/src/post-navigation-link/index.php
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/site-logo/index.php
 
 		# Level 3:
 		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
