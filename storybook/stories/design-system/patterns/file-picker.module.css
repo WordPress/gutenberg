@@ -159,7 +159,10 @@
 	white-space: nowrap;
 }
 
-/* A short progress bar sits beside the remove button while a file uploads. */
+/*
+ * While a file uploads, a short progress bar takes the place of its type and
+ * size, at about the same width, so the name doesn't jump when it finishes.
+ */
 .progress {
 	flex: none;
 	inline-size: calc(var(--wpds-dimension-size-lg) * 2);

@@ -206,8 +206,8 @@ export function FilePickerUpload() {
 											? `Cancel upload of ${ upload.file.name }`
 											: undefined
 									}
-									actions={
-										( upload.status === 'uploading' && (
+									progress={
+										upload.status === 'uploading' && (
 											<Progress.Root
 												className={ styles.progress }
 												value={ upload.progress }
@@ -217,8 +217,10 @@ export function FilePickerUpload() {
 													<Progress.Indicator />
 												</Progress.Track>
 											</Progress.Root>
-										) ) ||
-										( upload.status === 'failed' && (
+										)
+									}
+									actions={
+										upload.status === 'failed' && (
 											<Button
 												variant="minimal"
 												tone="neutral"
@@ -230,7 +232,7 @@ export function FilePickerUpload() {
 											>
 												Retry
 											</Button>
-										) )
+										)
 									}
 									onRemove={ () => remove( upload ) }
 								/>

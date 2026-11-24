@@ -76,10 +76,16 @@ function usePreviewUrl( file: File ) {
 export function FileSummary( {
 	file,
 	status,
+	isPending = false,
 }: {
 	file: File;
 	/** Text after the type and size, such as "Uploaded". */
 	status?: React.ReactNode;
+	/**
+	 * Whether the file is still on its way, such as during an upload. The name
+	 * is weaker, and the type and size are hidden to make room for progress.
+	 */
+	isPending?: boolean;
 } ) {
 	const previewUrl = usePreviewUrl( file );
 	const extension = getExtension( file.name );
@@ -99,17 +105,25 @@ export function FileSummary( {
 					<Icon icon={ fileIcon } />
 				) }
 			</span>
-			<Text className={ styles.name }>{ file.name }</Text>
-			<Text variant="body-sm" className={ styles.meta }>
-				{ extension.slice( 1 ).toUpperCase() || 'File' }
-				<span aria-hidden="true"> ·</span>{ ' ' }
-				{ formatFileSize( file.size ) }
-				{ status && (
-					<>
-						<span aria-hidden="true"> ·</span> { status }
-					</>
-				) }
+			<Text
+				className={ `${ styles.name } ${
+					isPending ? styles.weak : ''
+				}` }
+			>
+				{ file.name }
 			</Text>
+			{ ! isPending && (
+				<Text variant="body-sm" className={ styles.meta }>
+					{ extension.slice( 1 ).toUpperCase() || 'File' }
+					<span aria-hidden="true"> ·</span>{ ' ' }
+					{ formatFileSize( file.size ) }
+					{ status && (
+						<>
+							<span aria-hidden="true"> ·</span> { status }
+						</>
+					) }
+				</Text>
+			) }
 		</Stack>
 	);
 }
@@ -129,13 +143,18 @@ export const SelectedFile = forwardRef<
 		removeLabel?: string;
 		/** Text after the type and size, such as "Uploaded". */
 		status?: React.ReactNode;
-		/** Content before the remove button, such as a progress bar or "Retry". */
+		/**
+		 * A progress bar for a file that's still on its way. It takes the place
+		 * of the type and size, and the name is weaker until it's gone.
+		 */
+		progress?: React.ReactNode;
+		/** Buttons before the remove button, such as "Retry". */
 		actions?: React.ReactNode;
 		/** Whether the remove button is disabled. */
 		disabled?: boolean;
 	}
 >( function UnforwardedSelectedFile(
-	{ file, onRemove, removeLabel, status, actions, disabled },
+	{ file, onRemove, removeLabel, status, progress, actions, disabled },
 	ref
 ) {
 	return (
@@ -146,7 +165,12 @@ export const SelectedFile = forwardRef<
 			gap="sm"
 			className={ `${ styles.surface } ${ styles.row }` }
 		>
-			<FileSummary file={ file } status={ status } />
+			<FileSummary
+				file={ file }
+				status={ status }
+				isPending={ !! progress }
+			/>
+			{ progress }
 			{ actions }
 			<IconButton
 				ref={ ref }

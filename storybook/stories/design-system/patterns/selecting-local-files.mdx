@@ -75,7 +75,7 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 
 ## Upload status
 
-When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar sits beside its remove button, so the row stays one line. When it finishes, "Uploaded" follows the type and size. When it fails, "Couldn't upload" follows them and the row gets a "Retry" button.
+When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar takes the place of its type and size, and its name is weaker, so the row stays one line and the name keeps most of the space. When it finishes, the type and size come back, followed by "Uploaded". When it fails, "Couldn't upload" follows the type and size, so people can tell which file failed, and the row gets a "Retry" button.
 
 <Canvas
 	of={ FilePickerUploadStories.UploadStatus }
