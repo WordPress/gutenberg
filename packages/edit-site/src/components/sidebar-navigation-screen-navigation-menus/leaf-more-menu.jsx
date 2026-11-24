@@ -1,4 +1,4 @@
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -16,15 +16,13 @@ const POPOVER_PROPS = {
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { useListViewMoveDestination } = unlock( blockEditorPrivateApis );
+const { ListViewMoveMenuItems } = unlock( blockEditorPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const getMoveDestination = useListViewMoveDestination();
-	const { moveBlocksToPosition, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -38,13 +36,12 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, blockName, attributes } = useSelect(
+	const { blockName, attributes } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
+			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
 
 			return {
-				rootClientId: getBlockRootClientId( clientId ),
 				blockName: getBlockName( clientId ),
 				attributes: getBlockAttributes( clientId ),
 			};
@@ -82,66 +79,36 @@ export default function LeafMoreMenu( props ) {
 			noIcons
 			{ ...props }
 		>
-			{ ( { onClose } ) => {
-				// Read when the menu opens, so the moves follow the rows the
-				// List View shows expanded right now.
-				const moveUpTo = getMoveDestination( [ clientId ], 'up' );
-				const moveDownTo = getMoveDestination( [ clientId ], 'down' );
-				const move = ( destination ) => {
-					if ( ! destination ) {
-						return;
-					}
-					moveBlocksToPosition(
-						[ clientId ],
-						rootClientId,
-						destination.rootClientId,
-						destination.index
-					);
-					onClose();
-				};
-				return (
-					<>
-						<MenuGroup>
-							<MenuItem
-								icon={ chevronUp }
-								disabled={ ! moveUpTo }
-								accessibleWhenDisabled
-								onClick={ () => move( moveUpTo ) }
-							>
-								{ __( 'Move up' ) }
-							</MenuItem>
-							<MenuItem
-								icon={ chevronDown }
-								disabled={ ! moveDownTo }
-								accessibleWhenDisabled
-								onClick={ () => move( moveDownTo ) }
-							>
-								{ __( 'Move down' ) }
-							</MenuItem>
-							{ attributes?.type === 'page' && attributes?.id && (
-								<MenuItem
-									onClick={ () => {
-										onGoToPage();
-										onClose();
-									} }
-								>
-									{ goToLabel }
-								</MenuItem>
-							) }
-						</MenuGroup>
-						<MenuGroup>
+			{ ( { onClose } ) => (
+				<>
+					<MenuGroup>
+						<ListViewMoveMenuItems
+							clientIds={ [ clientId ] }
+							onClose={ onClose }
+						/>
+						{ attributes?.type === 'page' && attributes?.id && (
 							<MenuItem
 								onClick={ () => {
-									removeBlocks( [ clientId ], false );
+									onGoToPage();
 									onClose();
 								} }
 							>
-								{ removeLabel }
+								{ goToLabel }
 							</MenuItem>
-						</MenuGroup>
-					</>
-				);
-			} }
+						) }
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							onClick={ () => {
+								removeBlocks( [ clientId ], false );
+								onClose();
+							} }
+						>
+							{ removeLabel }
+						</MenuItem>
+					</MenuGroup>
+				</>
+			) }
 		</DropdownMenu>
 	);
 }
