@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Add a Submenu Display setting to vertical menus, so submenus that open on click can unfold inline instead of floating over the items below them ([#NEW_PR](https://github.com/WordPress/gutenberg/pull/NEW_PR)).
+
 ### Bug Fixes
 
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).

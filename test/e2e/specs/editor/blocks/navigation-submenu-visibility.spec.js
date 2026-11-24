@@ -259,3 +259,180 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		} );
 	} );
 } );
+
+test.describe( 'Navigation block - Submenu Display', () => {
+	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+		await admin.createNewPost();
+
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Test Menu with Inline Submenu',
+			content:
+				'<!-- wp:navigation-link {"label":"Home","url":"#"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"About"} -->' +
+				'<!-- wp:navigation-link {"label":"Team","url":"#"} /-->' +
+				'<!-- wp:navigation-link {"label":"Contact","url":"#"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-submenu {"label":"Services"} -->' +
+				'<!-- wp:navigation-link {"label":"Design","url":"#"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"Blog","url":"#"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menu.id,
+			},
+		} );
+
+		const navBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+			exact: true,
+		} );
+		await expect( navBlock ).toBeVisible();
+		await editor.selectBlocks( navBlock );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMenus();
+	} );
+
+	test( 'When Inline is selected, click submenus unfold inline on the page', async ( {
+		editor,
+		page,
+	} ) => {
+		await test.step( 'Submenu Display is only shown for vertical menus that open on click', async () => {
+			await editor.openDocumentSettingsSidebar();
+			await setNavigationOrientationToVertical( page );
+
+			const settingsPanel = await getSettingsPanel( page );
+			const submenuVisibilityGroup = settingsPanel.getByRole(
+				'radiogroup',
+				{ name: 'Submenu Visibility' }
+			);
+			const submenuDisplayGroup = settingsPanel.getByRole( 'radiogroup', {
+				name: 'Submenu Display',
+			} );
+
+			await expect( submenuDisplayGroup ).toBeHidden();
+
+			await submenuVisibilityGroup
+				.getByRole( 'radio', { name: 'Click' } )
+				.click();
+			await expect( submenuDisplayGroup ).toBeVisible();
+			await submenuDisplayGroup
+				.getByRole( 'radio', { name: 'Inline' } )
+				.click();
+
+			await submenuVisibilityGroup
+				.getByRole( 'radio', { name: 'Hover' } )
+				.click();
+			await expect( submenuDisplayGroup ).toBeHidden();
+
+			await submenuVisibilityGroup
+				.getByRole( 'radio', { name: 'Click' } )
+				.click();
+			await expect(
+				submenuDisplayGroup.getByRole( 'radio', { name: 'Inline' } )
+			).toBeChecked();
+		} );
+
+		await test.step( 'Opening a submenu pushes the items after it down', async () => {
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const navigation = page.getByRole( 'navigation' );
+			const blogLink = navigation.getByRole( 'link', { name: 'Blog' } );
+			const teamLink = navigation.getByRole( 'link', { name: 'Team' } );
+			const submenuToggle = navigation.getByRole( 'button', {
+				name: 'About',
+			} );
+
+			const closedTop = ( await blogLink.boundingBox() ).y;
+
+			await submenuToggle.click();
+			await expect( teamLink ).toBeVisible();
+			expect( ( await blogLink.boundingBox() ).y ).toBeGreaterThan(
+				closedTop
+			);
+
+			await submenuToggle.click();
+			await expect( teamLink ).toBeHidden();
+			expect( ( await blogLink.boundingBox() ).y ).toBe( closedTop );
+		} );
+	} );
+
+	test( 'An open inline submenu stays open when another submenu is opened', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.evaluate( () => {
+			const { getSelectedBlockClientId } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientId(), {
+					submenuVisibility: 'click',
+					submenuDisplay: 'inline',
+					layout: { type: 'flex', orientation: 'vertical' },
+				} );
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const navigation = page.getByRole( 'navigation' );
+		await navigation.getByRole( 'button', { name: 'About' } ).click();
+		await expect(
+			navigation.getByRole( 'link', { name: 'Team' } )
+		).toBeVisible();
+
+		// Clicking the next toggle must open it in one click. If the open
+		// submenu closed when focus moved, the toggle would jump up under
+		// the pointer and the click would be lost.
+		await navigation.getByRole( 'button', { name: 'Services' } ).click();
+		await expect(
+			navigation.getByRole( 'link', { name: 'Design' } )
+		).toBeVisible();
+		await expect(
+			navigation.getByRole( 'link', { name: 'Team' } )
+		).toBeVisible();
+	} );
+
+	test( 'Inline submenus follow the menu justification', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.evaluate( () => {
+			const { getSelectedBlockClientId } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientId(), {
+					submenuVisibility: 'click',
+					submenuDisplay: 'inline',
+					layout: {
+						type: 'flex',
+						orientation: 'vertical',
+						justifyContent: 'right',
+					},
+				} );
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const navigation = page.getByRole( 'navigation' );
+		await navigation.getByRole( 'button', { name: 'About' } ).click();
+		const teamLink = navigation.getByRole( 'link', { name: 'Team' } );
+		await expect( teamLink ).toBeVisible();
+
+		const rightEdge = ( box ) => Math.round( box.x + box.width );
+		const blogRight = rightEdge(
+			await navigation.getByRole( 'link', { name: 'Blog' } ).boundingBox()
+		);
+		expect(
+			Math.abs( rightEdge( await teamLink.boundingBox() ) - blogRight )
+		).toBeLessThanOrEqual( 1 );
+	} );
+} );

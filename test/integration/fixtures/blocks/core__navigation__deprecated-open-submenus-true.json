@@ -8,7 +8,8 @@
 			"icon": "handle",
 			"hasIcon": true,
 			"maxNestingLevel": 5,
-			"submenuVisibility": "click"
+			"submenuVisibility": "click",
+			"submenuDisplay": "dropdown"
 		},
 		"innerBlocks": [
 			{

@@ -5,6 +5,7 @@
 		"attributes": {
 			"showSubmenuIcon": true,
 			"submenuVisibility": "hover",
+			"submenuDisplay": "dropdown",
 			"overlayMenu": "mobile",
 			"icon": "handle",
 			"hasIcon": true,

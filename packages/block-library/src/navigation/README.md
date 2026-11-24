@@ -53,6 +53,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `rgbBackgroundColor` | `string` | — | — |
 | `showSubmenuIcon` | `boolean` | `true` | — |
 | `submenuVisibility` | `string` | `"hover"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `hover`, `click`, `always` |
+| `submenuDisplay` | `string` | `"dropdown"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `dropdown`, `inline` |
 | `overlayMenu` | `string` | `"mobile"` | — |
 | `overlay` | `string` | — | — |
 | `icon` | `string` | `"handle"` | — |

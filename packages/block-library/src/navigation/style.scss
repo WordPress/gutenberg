@@ -141,6 +141,47 @@ $navigation-icon-size: 24px;
 		.wp-block-navigation-item:not(.open-always) > .wp-block-navigation__submenu-container {
 			text-align: initial;
 		}
+
+		// Submenus that open on click can unfold inline, pushing the items
+		// after them down, instead of floating over them.
+		&.has-inline-submenus .has-child {
+			flex-wrap: wrap;
+
+			> .wp-block-navigation__submenu-container {
+				flex-basis: 100%;
+				position: static;
+				border: none;
+				background-color: transparent;
+				color: inherit;
+				padding-left: var(--wp--style--block-gap, 2em);
+				// Has to be !important to override the inline instance style.
+				box-shadow: none !important;
+				// Follow the menu's justification, as open-always submenus do.
+				text-align: inherit;
+
+				> .wp-block-navigation-item {
+					justify-content: var(--navigation-layout-justify, initial);
+
+					// Keep nested items as wide as their label, as at the top level.
+					> .wp-block-navigation-item__content {
+						flex-grow: 0;
+					}
+				}
+			}
+
+			// Nested submenus unfold downwards too, so their arrow points down
+			// rather than towards a flyout.
+			.wp-block-navigation__submenu-icon svg {
+				transform: none;
+			}
+
+			.wp-block-navigation-submenu__toggle[aria-expanded="true"] {
+				+ .wp-block-navigation__submenu-icon > svg,
+				> svg {
+					transform: rotate(180deg);
+				}
+			}
+		}
 	}
 
 	&.no-wrap {
