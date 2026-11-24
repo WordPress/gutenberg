@@ -46,6 +46,7 @@ function InputField(
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
+	isDragEnabled &&= ! disabled;
 	const {
 		// State.
 		state,
@@ -137,7 +138,7 @@ function InputField(
 
 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
-			const { distance, dragging, event, target } = dragProps;
+			const { cancel, distance, dragging, event, target } = dragProps;
 
 			// The drag gesture is not offered for touch input, where there is
 			// no cursor affordance for it, and where it's easy to accidentally
@@ -159,6 +160,16 @@ function InputField(
 				...dragProps.event,
 				target,
 			};
+
+			// Ends gesture if the element is disabled.
+			if ( ( target as HTMLInputElement ).matches( ':disabled' ) ) {
+				cancel();
+				if ( isDragging ) {
+					onDragEnd( dragProps );
+					dragEnd( dragProps );
+				}
+				return;
+			}
 
 			if ( ! distance ) {
 				return;
@@ -191,13 +202,11 @@ function InputField(
 		}
 	);
 
-	const dragProps = isDragEnabled ? dragGestureProps() : {};
-
 	return (
 		<PolymorphicElement
 			as="input"
 			{ ...props }
-			{ ...dragProps }
+			{ ...dragGestureProps() }
 			className={ clsx( 'components-input-control__input', styles.input, {
 				[ styles[ 'is-small' ] ]: size === 'small',
 				[ styles[ 'is-compact' ] ]: size === 'compact',
