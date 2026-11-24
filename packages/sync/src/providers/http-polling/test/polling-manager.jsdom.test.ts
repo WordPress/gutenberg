@@ -7,7 +7,7 @@ import {
 	vi,
 	type Mock,
 } from 'vitest';
-import { type SyncPayload, type SyncResponse } from '../types';
+import { SyncUpdateType, type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 vi.mock( import( 'yjs' ), async ( importOriginal ) => ( {
@@ -85,6 +85,7 @@ interface PollingManager {
 		room: string;
 		doc: unknown;
 		awareness: unknown;
+		flushLocalUpdates?: () => void;
 		log: () => void;
 		onStatusChange: () => void;
 	} ) => void;
@@ -232,6 +233,44 @@ describe( 'polling-manager', () => {
 			configurable: true,
 			get: () => 'visible',
 		} );
+	} );
+
+	it.each( [
+		SyncUpdateType.UPDATE,
+		SyncUpdateType.SYNC_STEP_2,
+		SyncUpdateType.COMPACTION,
+	] )( 'flushes local edits before applying a remote %s', async ( type ) => {
+		const flushLocalUpdates = vi.fn();
+		const { applyUpdateV2 } = await import( 'yjs' );
+		const { readSyncMessage } = await import( 'y-protocols/sync' );
+		const applyRemoteUpdate = vi.mocked(
+			type === SyncUpdateType.SYNC_STEP_2
+				? readSyncMessage
+				: applyUpdateV2
+		);
+		mockPostSyncUpdate.mockResolvedValue( {
+			rooms: [
+				{
+					...syncResponse.rooms[ 0 ],
+					updates: [ { type, data: 'AA==' } ],
+				},
+			],
+		} );
+		pollingManager.registerRoom( {
+			room: 'test-room',
+			doc: createMockDoc(),
+			awareness: createMockAwareness(),
+			flushLocalUpdates,
+			log: vi.fn(),
+			onStatusChange: vi.fn(),
+		} );
+		await advancePollingTime( 0 );
+
+		expect( flushLocalUpdates ).toHaveBeenCalledTimes( 1 );
+		expect( applyRemoteUpdate ).toHaveBeenCalledTimes( 1 );
+		expect( flushLocalUpdates.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			applyRemoteUpdate.mock.invocationCallOrder[ 0 ]
+		);
 	} );
 
 	describe( 'document size limit', () => {

@@ -37,6 +37,7 @@
 				}
 
 				@media ( forced-colors: active ) {
+					--_gcd-input-color-disabled: GrayText;
 					color: GrayText;
 				}
 			}
@@ -69,6 +70,14 @@
 
 			@media (min-width: 600px) {
 				font-size: var(--wpds-typography-font-size-md);
+			}
+
+			&:has(> .input[readonly]) {
+				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+
+				@media (forced-colors: active) {
+					border-color: GrayText;
+				}
 			}
 		}
 	}

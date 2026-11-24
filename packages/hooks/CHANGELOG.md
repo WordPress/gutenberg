@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.2.0 (2026-11-18)
+
+## 5.1.0 (2026-11-04)
+
 ### Bug Fixes
 
 -   Correct remove-all hook signatures while keeping namespaces required for individual removal ([#85141](https://github.com/WordPress/gutenberg/pull/85141)).

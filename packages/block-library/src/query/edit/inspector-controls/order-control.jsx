@@ -1,4 +1,4 @@
-import { SelectControl as WCSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 const defaultOrderByOptions = [
@@ -29,12 +29,21 @@ function OrderControl( {
 	onChange,
 } ) {
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Order by' ) }
-			value={ `${ orderBy }/${ order }` }
-			options={ orderByOptions }
-			onChange={ ( value ) => {
-				const [ newOrderBy, newOrder ] = value.split( '/' );
+			value={
+				orderByOptions.find(
+					( item ) => item.value === `${ orderBy }/${ order }`
+				) ??
+				orderByOptions[ 0 ] ??
+				null
+			}
+			items={ orderByOptions }
+			onValueChange={ ( item ) => {
+				if ( ! item || item.value === `${ orderBy }/${ order }` ) {
+					return;
+				}
+				const [ newOrderBy, newOrder ] = item.value.split( '/' );
 				onChange( { order: newOrder, orderBy: newOrderBy } );
 			} }
 		/>

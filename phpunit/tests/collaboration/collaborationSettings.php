@@ -23,7 +23,7 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 		$wp_scripts                     = wp_scripts();
 		$this->core_data_was_registered = isset( $wp_scripts->registered['wp-core-data'] );
 		if ( ! $this->core_data_was_registered ) {
-			wp_register_script( 'wp-core-data', '' );
+			wp_register_script( 'wp-core-data', false );
 		}
 
 		$core_data_script                        = $wp_scripts->registered['wp-core-data'];

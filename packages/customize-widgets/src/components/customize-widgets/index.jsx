@@ -6,7 +6,7 @@ import {
 	createPortal,
 	useMemo,
 } from '@wordpress/element';
-import { SlotFillProvider, Popover } from '@wordpress/components';
+import { SlotFillProvider, Popover as WCPopover } from '@wordpress/components';
 import { ThemeProvider } from '@wordpress/theme';
 import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import ErrorBoundary from '../error-boundary';
@@ -66,7 +66,7 @@ export default function CustomizeWidgets( {
 		parentContainer &&
 		createPortal(
 			<div className="customize-widgets-popover" ref={ popoverRef }>
-				<Popover.Slot />
+				<WCPopover.Slot />
 			</div>,
 			parentContainer
 		);

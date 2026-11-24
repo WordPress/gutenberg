@@ -1,7 +1,7 @@
 import {
 	Button,
 	TextControl,
-	Notice,
+	Notice as WCNotice,
 	CheckboxControl as WCCheckboxControl,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -137,9 +137,9 @@ export function LinkUIPageCreator( {
 						/>
 
 						{ lastError && (
-							<Notice status="error" isDismissible={ false }>
+							<WCNotice status="error" isDismissible={ false }>
 								{ lastError.message }
-							</Notice>
+							</WCNotice>
 						) }
 
 						<HStack spacing={ 2 } justify="flex-end">

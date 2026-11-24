@@ -83,10 +83,11 @@ function block_core_table_of_contents_get_heading_link( $id, $context = array() 
  * @return string Content with page breaks wrapped as nextpage blocks.
  */
 function block_core_table_of_contents_normalize_nextpage_blocks( $content ) {
-	// Collapse already-wrapped nextpage blocks first so the replacement below
-	// never nests a page break inside another nextpage wrapper.
+	// Collapse already-wrapped nextpage blocks first, with or without
+	// attributes, so the replacement below never nests a page break inside
+	// another nextpage wrapper.
 	$content = preg_replace(
-		'/<!--\s+wp:(?:core\/)?nextpage\s+-->\s*<!--nextpage-->\s*<!--\s+\/wp:(?:core\/)?nextpage\s+-->/',
+		'/<!--\s+wp:(?:core\/)?nextpage\s+(?:\{.*?\}\s+)?-->\s*<!--nextpage-->\s*<!--\s+\/wp:(?:core\/)?nextpage\s+-->/',
 		'<!--nextpage-->',
 		$content
 	);
@@ -137,6 +138,11 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
 	}
 
 	$content = preg_replace( '/<br\s*\/?>/i', ' ', $rendered_heading );
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the ToC entry.
+	$content = preg_replace( '/<annotation(?:\s[^>]*)?>.*?<\/annotation>/is', '', $content );
+	// Footnote numbers aren't part of the heading text, so leave them out too.
+	$content = preg_replace( '/<sup\s[^>]*\bdata-fn=[^>]*>.*?<\/sup>/is', '', $content );
 	// Decode entities from rendered heading HTML before the ToC escapes them
 	// once. Use html_entity_decode() because wp_specialchars_decode() only
 	// handles special HTML characters, while headings can contain other named
@@ -395,7 +401,13 @@ function block_core_table_of_contents_render( $attributes, $content, $block = nu
 		return '';
 	}
 
-	$post = get_post( $block->context['postId'] );
+	// On Preview, WordPress applies the unsaved changes to the global post
+	// only, so read it when it is the post in context. Loading the post by
+	// ID would read the saved version.
+	$post = get_post();
+	if ( ! $post || (int) $block->context['postId'] !== $post->ID ) {
+		$post = get_post( $block->context['postId'] );
+	}
 	if ( ! $post || post_password_required( $post ) ) {
 		return '';
 	}

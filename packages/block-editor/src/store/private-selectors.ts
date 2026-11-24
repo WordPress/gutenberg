@@ -25,7 +25,6 @@ import {
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
-	getInsertBlockTypeDependants,
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
@@ -265,7 +264,8 @@ function hasExplicitDisabledParent( state: State, clientId: string ) {
  * Returns true when the writing flow wrapper can host editing for the given
  * block: it supports `editableRoot`, is edited visually in the default
  * editing mode, and has sibling blocks for a native selection to extend
- * into, all of them editable.
+ * into, all of them editable. Never in preview mode, where the content is
+ * read-only and the wrapper taking focus would stop preview mode navigation.
  *
  * @param state    Global application state.
  * @param clientId Block client ID.
@@ -276,6 +276,7 @@ export const canHostEditableRoot = createSelector(
 	( state: State, clientId: string ) => {
 		if (
 			! clientId ||
+			state.settings.isPreviewMode ||
 			getBlockEditingMode( state, clientId ) !== 'default' ||
 			// Not when the block is edited as HTML: there is no rich text to
 			// host then, only a textarea, which the editing host would
@@ -313,6 +314,7 @@ export const canHostEditableRoot = createSelector(
 		state.blocks.blockEditingModes,
 		state.derivedBlockEditingModes,
 		state.blocksMode,
+		state.settings.isPreviewMode,
 	]
 );
 
@@ -588,44 +590,6 @@ export const getInserterMediaCategories = createSelector(
 	]
 );
 
-/**
- * Returns whether there is at least one allowed pattern for inner blocks children.
- * This is useful for deferring the parsing of all patterns until needed.
- *
- * @param state               Editor state.
- * @param [rootClientId=null] Target root client ID.
- *
- * @return If there is at least one allowed pattern.
- */
-export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
-	createSelector(
-		( state: State, rootClientId: string | null = null ): boolean => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const { allowedBlockTypes } = getSettings( state );
-			return patterns.some( ( pattern: BlockPattern ) => {
-				const { inserter = true } = pattern;
-				if ( ! inserter ) {
-					return false;
-				}
-				const grammar = getGrammar( pattern );
-				return (
-					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
-					grammar.every(
-						// @ts-expect-error Grammar blocks have `blockName`, so this is always undefined.
-						( { name: blockName } ) =>
-							canInsertBlockType( state, blockName, rootClientId )
-					)
-				);
-			} );
-		},
-		( state: State, rootClientId?: string | null ) => [
-			...getAllPatternsDependants( select )( state ),
-			...getInsertBlockTypeDependants( select )( state, rootClientId ),
-		]
-	)
-);
-
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state: State, patternName: string ) => {
@@ -696,6 +660,33 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
 	}, getAllPatternsDependants( select ) )
+);
+
+/**
+ * Returns whether the patterns are being resolved.
+ * This is used to determine if the patterns are still being fetched
+ * from the server or if they are already available in the store.
+ *
+ * @param state Block editor state.
+ *
+ * @return Whether the patterns are being resolved.
+ */
+export const isResolvingPatterns = createRegistrySelector(
+	( select ) =>
+		( state: State ): boolean => {
+			const blockPatternsSelect =
+				state.settings[ selectBlockPatternsKey ];
+			const reusableBlocksSelect =
+				state.settings[ reusableBlocksSelectKey ];
+			return (
+				( blockPatternsSelect
+					? blockPatternsSelect( select ) === undefined
+					: false ) ||
+				( reusableBlocksSelect
+					? reusableBlocksSelect( select ) === undefined
+					: false )
+			);
+		}
 );
 
 const EMPTY_ARRAY: never[] = [];
@@ -1203,18 +1194,6 @@ export const isBlockParentHiddenAtViewport = (
 		isBlockHiddenAtViewport( state, parentId, viewport )
 	);
 };
-
-/**
- * Returns true if there is a spotlighted block, which is the case while a
- * contentOnly section is being edited.
- *
- * @param state Global application state.
- *
- * @return Whether the block is currently spotlighted.
- */
-export function hasBlockSpotlight( state: State ) {
-	return !! state.editedContentOnlySection;
-}
 
 /**
  * Returns whether a block is locked to prevent editing.

@@ -7,13 +7,13 @@ import {
 	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { applyPlainTextEdit, getPlainText } from '../../utils/plain-text-edit';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
@@ -153,9 +153,11 @@ export function Controls( {
 			>
 				<TextControl
 					label={ __( 'Text' ) }
-					value={ label ? stripHTML( label ) : '' }
+					value={ getPlainText( label ) }
 					onChange={ ( labelValue ) => {
-						setAttributes( { label: labelValue } );
+						setAttributes( {
+							label: applyPlainTextEdit( label, labelValue ),
+						} );
 					} }
 					autoComplete="off"
 				/>

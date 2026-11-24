@@ -112,7 +112,9 @@ function Edit( {
 			onChange(
 				applyFormat( value, {
 					type: name,
-					attributes: { url: `tel:${ text.replace( /\D/g, '' ) }` },
+					attributes: {
+						url: `tel:${ text.replace( /[^\d+]/g, '' ) }`,
+					},
 				} )
 			);
 		} else {

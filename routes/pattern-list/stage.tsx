@@ -33,7 +33,7 @@ import type { NormalizedPattern } from './use-patterns';
 import ImportPatternButton from './import-pattern-button';
 // Unlock WordPress private APIs
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
 /**
  * Style dependencies
@@ -299,23 +299,23 @@ function PatternListView( {
 		>
 			{ DEFAULT_VIEWS.length > 1 && (
 				<div className="routes-pattern-list__tabs-wrapper">
-					<Tabs
+					<WCTabs
 						onSelect={ handleTabChange }
 						selectedTabId={ type ?? 'all' }
 					>
-						<Tabs.TabList>
+						<WCTabs.TabList>
 							{ DEFAULT_VIEWS.map(
 								( filter: { slug: string; label: string } ) => (
-									<Tabs.Tab
+									<WCTabs.Tab
 										tabId={ filter.slug }
 										key={ filter.slug }
 									>
 										{ filter.label }
-									</Tabs.Tab>
+									</WCTabs.Tab>
 								)
 							) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews

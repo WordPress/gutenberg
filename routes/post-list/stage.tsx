@@ -39,7 +39,7 @@ import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
  */
@@ -166,9 +166,19 @@ function PostListView( {
 		}
 	};
 
+	const hasTaxonomies = !! postTypeObject?.taxonomies?.length;
+	const taxonomies = useSelect(
+		( select ) =>
+			hasTaxonomies
+				? select( coreStore ).getTaxonomies( {
+						type: postType,
+					} )
+				: undefined,
+		[ hasTaxonomies, postType ]
+	);
 	const postTypeQuery = useMemo(
-		() => viewToQuery( view, postType ),
-		[ view, postType ]
+		() => viewToQuery( view, postType, taxonomies ?? [] ),
+		[ view, postType, taxonomies ]
 	);
 	const {
 		records: posts,
@@ -342,18 +352,18 @@ function PostListView( {
 		>
 			{ viewList && viewList.length > 1 && (
 				<div className="routes-post-list__tabs-wrapper">
-					<Tabs onSelect={ handleTabChange } selectedTabId={ slug }>
-						<Tabs.TabList>
+					<WCTabs onSelect={ handleTabChange } selectedTabId={ slug }>
+						<WCTabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ entry.slug }
 									key={ entry.slug }
 								>
 									{ entry.title }
-								</Tabs.Tab>
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews
