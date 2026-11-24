@@ -100,6 +100,22 @@
  * ==========================================================================
  */
 
+/*
+ * Outline custom properties are set on the element that should draw the
+ * outline (e.g. by the `focus-ring()` mixin). Register them as
+ * non-inheriting so that a focused container doesn't draw outlines on all
+ * descendants that use the `.div` or `.a` defense.
+ */
+@property --_gcd-div-outline {
+	syntax: "*";
+	inherits: false;
+}
+
+@property --_gcd-a-outline {
+	syntax: "*";
+	inherits: false;
+}
+
 .div {
 	outline: var(--_gcd-div-outline, 0 solid transparent);
 }

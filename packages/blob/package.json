@@ -41,8 +41,8 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
-		"@types/node": "^24.13.3",
-		"vitest": "^5.1.0"
+		"@types/node": "^24.19.2",
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
