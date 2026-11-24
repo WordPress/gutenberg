@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Suggestion mode: a suggestion card no longer offers Edit, and formatting applied to your own suggested text is named on its card ("Add formatting: bold") ([#87293](https://github.com/WordPress/gutenberg/pull/87293)).
 -   Suggestion mode: fix nine flows that regressed since the August test run. A color and a font size suggestion on one block no longer overwrite each other, text typed while offline is kept and suggested on reconnect, an unfilled new block is left out of a save made while suggesting, a suggestion card no longer offers Delete, a decided card still says what was decided, a `style` suggestion is summarized by the setting it changes, a block preview raises no refusal, the suggestions of a deletion across blocks resolve together, and notes are only requested for a post type that supports them ([#87293](https://github.com/WordPress/gutenberg/pull/87293)).
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).

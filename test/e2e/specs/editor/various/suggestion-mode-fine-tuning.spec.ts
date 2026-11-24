@@ -265,7 +265,7 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		);
 	} );
 
-	test( 'a suggestion card does not offer Delete (F-54)', async ( {
+	test( 'a suggestion card offers neither Edit nor Delete (F-54)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -283,14 +283,76 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 
 		const sidebar = await openNotesSidebar( page );
 		await sidebar.locator( SUMMARY ).first().click();
-		await sidebar.getByRole( 'button', { name: 'Actions' } ).click();
-		const menu = page.getByRole( 'menu', { name: 'Actions' } );
+		// The card is selected once it offers a reply.
 		await expect(
-			menu.getByRole( 'menuitem', { name: 'Edit', exact: true } )
+			sidebar.getByRole( 'textbox', { name: /reply/i } )
 		).toBeVisible();
+		// Nothing is left for the menu to offer while the suggestion is
+		// pending, so the card has no Actions button.
 		await expect(
-			menu.getByRole( 'menuitem', { name: 'Delete', exact: true } )
+			sidebar.getByRole( 'button', { name: 'Actions' } )
 		).toBeHidden();
+	} );
+
+	test( 'formatting your own added text is named on its card', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph.' },
+		} );
+		// A block's toolbar covers the block above it, so the two edited
+		// paragraphs are kept one apart.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Third paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		let saved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' New sentence.' );
+		await saved;
+
+		// Another suggestion further down, then back to the first one.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.nth( 2 )
+			.click();
+		await page.keyboard.press( 'End' );
+		saved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' MORE' );
+		await saved;
+
+		// Bold exactly the added text.
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', {
+			times: ' New sentence.'.length,
+		} );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await expect(
+			paragraph.locator( 'mark.wp-suggestion-add strong' )
+		).toHaveText( ' New sentence.' );
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator( SUMMARY ).filter( {
+			hasText: 'New sentence.',
+		} );
+		await expect( summary ).toHaveCount( 1 );
+		await expect( summary ).toContainText( 'Add: “ New sentence.”' );
+		await expect( summary ).toContainText( 'Add formatting: bold' );
+		// The formatting is part of the addition, not a suggestion of its own.
+		await expect( sidebar.locator( SUMMARY ) ).toHaveCount( 2 );
 	} );
 
 	test( 'opening the Template panel raises no refusal (F-68)', async ( {
