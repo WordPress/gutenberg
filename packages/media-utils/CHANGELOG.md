@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Show the image preview for attachments with `media_type` `image` and an empty `mime_type` ([#87207](https://github.com/WordPress/gutenberg/pull/87207)).
+
 ### Enhancements
 
 -   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
