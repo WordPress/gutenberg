@@ -40,12 +40,6 @@ export default function useEditableRoot() {
 			} = registry.select( blockEditorStore );
 
 			const { activeElement } = node.ownerDocument;
-
-			// Not while a block's own element outside its fields has focus, as
-			// after a press on a list item's bullet: it is dragged from there.
-			if ( isBlockElementOutsideFields( activeElement ) ) {
-				return;
-			}
 			// A mounted element's window has a selection.
 			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			const isFieldFocused =
@@ -67,7 +61,13 @@ export default function useEditableRoot() {
 
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
-			if ( ! setContentEditableWrapper( node, true, { focus: false } ) ) {
+			if (
+				// Not while a block's own element outside its fields has
+				// focus, as after a press on a bullet: it is dragged from
+				// there. Still return the cleanup for editing that starts later.
+				! isBlockElementOutsideFields( activeElement ) &&
+				! setContentEditableWrapper( node, true, { focus: false } )
+			) {
 				return;
 			}
 

@@ -563,16 +563,20 @@ test.describe( 'Draggable block', () => {
 			} );
 
 			const items = editor.canvas.getByRole( 'document', {
-				name: 'Block: List item',
+				name: 'Block: List Item',
+				exact: true,
 			} );
 			if ( caretIn ) {
 				await editor.canvas
-					.getByRole( 'textbox', { name: 'List text' } )
+					.getByRole( 'textbox', { name: 'List text', exact: true } )
 					.getByText( caretIn, { exact: true } )
 					.click();
 			}
 			await expect(
-				editor.canvas.getByRole( 'textbox', { name: 'Editor canvas' } )
+				editor.canvas.getByRole( 'textbox', {
+					name: 'Editor canvas',
+					exact: true,
+				} )
 			).toHaveCount( caretIn ? 1 : 0 );
 
 			const firstItemBox = await items.nth( 0 ).boundingBox();
@@ -631,6 +635,54 @@ test.describe( 'Draggable block', () => {
 			] );
 		} );
 	}
+
+	test( 'stops editing the canvas after a press on a bullet when another block is selected (@webkit)', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: '1' } },
+				{ name: 'core/list-item', attributes: { content: '2' } },
+			],
+		} );
+		await editor.insertBlock( { name: 'core/separator' } );
+
+		const firstItemBox = await editor.canvas
+			.getByRole( 'document', { name: 'Block: List Item', exact: true } )
+			.first()
+			.boundingBox();
+		// Press and release the first item's bullet.
+		await page.mouse.move(
+			firstItemBox.x - 16,
+			firstItemBox.y + firstItemBox.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.up();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'List text', exact: true } )
+			.getByText( '2', { exact: true } )
+			.click();
+		const editorCanvas = editor.canvas.getByRole( 'textbox', {
+			name: 'Editor canvas',
+			exact: true,
+		} );
+		await expect( editorCanvas ).toHaveCount( 1 );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const separator = page
+			.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				exact: true,
+			} )
+			.getByRole( 'gridcell', { name: 'Separator', exact: true } );
+		await separator.click();
+
+		await expect( separator ).toHaveAttribute( 'aria-selected', 'true' );
+		await expect( editorCanvas ).toHaveCount( 0 );
+	} );
 
 	test( 'can drag a multi-selection by dragging inside a selected block', async ( {
 		editor,
