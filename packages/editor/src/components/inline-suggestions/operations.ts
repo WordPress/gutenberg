@@ -1,4 +1,10 @@
-import { RichTextData, create, insert, remove } from '@wordpress/rich-text';
+import {
+	RichTextData,
+	concat,
+	create,
+	insert,
+	remove,
+} from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_CLASS_PROBE,
@@ -414,7 +420,9 @@ function unwrapMarker(
 			end
 		);
 	}
-	return new RichTextData( result as any );
+	// `concat` gives a format the run shares with the text around it one
+	// identity again, so the two serialize as one element.
+	return new RichTextData( concat( result ) as any );
 }
 
 /**
