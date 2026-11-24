@@ -36,7 +36,10 @@ const FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS = {
 };
 
 // System colors that Chromium does not map to the forced colors palette.
-const SELECTED_ITEM_SYSTEM_COLOR = /(?<![\w$-])SelectedItem(?:Text)?(?![\w-])/i;
+// Matches the keyword only: the prefix skips over quoted strings, and the
+// lookarounds reject asset paths, `url()` contents, and longer identifiers.
+const SELECTED_ITEM_SYSTEM_COLOR =
+	/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^"'])*?(?<=^|[\s,(])(?<!url\(\s*)(SelectedItem(?:Text)?)(?=$|[\s,)!;])/i;
 
 /** @type {import('stylelint').Config} */
 module.exports = {
@@ -83,7 +86,7 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					const [ selectedItem ] =
+					const [ , selectedItem ] =
 						value.match( SELECTED_ITEM_SYSTEM_COLOR ) ?? [];
 					if ( selectedItem ) {
 						const replacement = /text$/i.test( selectedItem )
