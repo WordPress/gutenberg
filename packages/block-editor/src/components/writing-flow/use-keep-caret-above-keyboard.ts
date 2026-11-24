@@ -27,6 +27,10 @@ export default function useKeepCaretAboveKeyboard() {
 				return;
 			}
 			const canvas = getScrollContainer( node )!;
+			// The page itself scrolls the canvas: nothing to move.
+			if ( canvas === view.document.scrollingElement ) {
+				return;
+			}
 			const { scrollTop } = canvas;
 			canvas.scrollTop += slide;
 			// Near its end, the canvas can't take all of it: the page keeps the
