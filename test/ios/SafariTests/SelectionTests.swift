@@ -242,6 +242,37 @@ final class SelectionTests: XCTestCase {
 		)
 	}
 
+	func testTapAfterSwipingKeyboardAwayPlacesCaret() throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem(
+			name: "content",
+			value: "<!-- wp:paragraph --><p>First here</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Second here</p><!-- /wp:paragraph -->"
+		) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		let second = editor.block( title: "Paragraph", content: "Second here" )
+		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		let keyboard = app.keyboards.firstMatch
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+
+		// Unlike Done, this leaves the canvas focused, with the page blurred.
+		let window = app.windows.firstMatch
+		window.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.3 ) ).press( forDuration: 0.05, thenDragTo: window.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.98 ) ) )
+		XCTAssertTrue( keyboard.waitForNonExistence( timeout: 5 ), "The drag did not hide the keyboard" )
+
+		second.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
+		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard again" )
+		app.typeText( "X" )
+
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "XSecond here" ).waitForExistence( timeout: 5 ), "The paragraph did not get the X at its start" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "First here" ).exists )
+		XCTAssertEqual( editor.getBlocks().count, 2 )
+	}
+
 	/// Drags the canvas in small steps until the element's middle is between
 	/// these heights.
 	func scroll( to element: XCUIElement, between low: CGFloat, and high: CGFloat ) {
