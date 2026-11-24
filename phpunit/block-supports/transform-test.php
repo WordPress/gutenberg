@@ -109,10 +109,10 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_translate_styles
 	 *
-	 * @param array  $transform    Transform styles.
-	 * @param string $expected_css Expected inline CSS.
+	 * @param array $transform Transform styles.
+	 * @param array $expected  Expected inline CSS and class.
 	 */
-	public function test_translation_is_returned_as_a_wrapper_inline_style( $transform, $expected_css ) {
+	public function test_translation_is_returned_as_a_wrapper_inline_style( $transform, $expected ) {
 		$block_type = $this->register_transform_block(
 			array(
 				'rotate'    => true,
@@ -121,7 +121,7 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			array( 'style' => $expected_css ),
+			$expected,
 			gutenberg_apply_transform_support( $block_type, array( 'style' => array( 'transform' => $transform ) ) )
 		);
 	}
@@ -140,9 +140,9 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 						'y' => '-50%',
 					),
 				),
-				'--wp--style--translate-x:10px;--wp--style--translate-y:-50%;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+				array( 'style' => '--wp--style--translate-x:10px;--wp--style--translate-y:-50%;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);' ),
 			),
-			'one axis'        => array( array( 'translate' => array( 'y' => '2rem' ) ), '--wp--style--translate-y:2rem;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);' ),
+			'one axis'        => array( array( 'translate' => array( 'y' => '2rem' ) ), array( 'style' => '--wp--style--translate-y:2rem;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);' ) ),
 			'unknown z axis'  => array(
 				array(
 					'translate' => array(
@@ -150,14 +150,17 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 						'z' => '5px',
 					),
 				),
-				'--wp--style--translate-x:1px;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+				array( 'style' => '--wp--style--translate-x:1px;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);' ),
 			),
 			'with a rotation' => array(
 				array(
 					'rotate'    => '15deg',
 					'translate' => array( 'x' => '1em' ),
 				),
-				'rotate:15deg;--wp--style--translate-x:1em;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+				array(
+					'style' => 'rotate:15deg;--wp--style--translate-x:1em;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+					'class' => 'has-rotation',
+				),
 			),
 		);
 	}
@@ -172,7 +175,10 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			array( 'style' => 'rotate:15deg;' ),
+			array(
+				'style' => 'rotate:15deg;',
+				'class' => 'has-rotation',
+			),
 			gutenberg_apply_transform_support(
 				$block_type,
 				array(
