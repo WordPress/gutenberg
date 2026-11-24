@@ -10,6 +10,7 @@ import {
 	getActiveUploadCount,
 	getFailureCount,
 	getActiveImageProcessingCount,
+	hasActiveVipsOperations,
 	getActiveVideoProcessingCount,
 	getFailedItems,
 	getItemProgress,
@@ -241,6 +242,56 @@ describe( 'selectors', () => {
 			};
 
 			expect( getActiveImageProcessingCount( state ) ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'hasActiveVipsOperations', () => {
+		const settings = {
+			mediaUpload: vi.fn(),
+			maxConcurrentUploads: 5,
+			maxConcurrentImageProcessing: 2,
+		};
+
+		it.each( [
+			OperationType.ResizeCrop,
+			OperationType.Rotate,
+			OperationType.TranscodeImage,
+			OperationType.DetectUltraHdr,
+		] )( 'should return true while an item runs %s', ( operation ) => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: operation,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				settings,
+			};
+
+			expect( hasActiveVipsOperations( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when no item uses the vips worker', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+					{ id: '2', status: ItemStatus.Processing },
+				] as QueueItem[],
+				queueStatus: 'active',
+				failureCount: 0,
+				blobUrls: {},
+				settings,
+			};
+
+			expect( hasActiveVipsOperations( state ) ).toBe( false );
 		} );
 	} );
 

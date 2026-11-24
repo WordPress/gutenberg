@@ -20,6 +20,8 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsCancelOperations,
+	isVipsWorkerRecycleDue,
+	maybeRecycleVipsWorker,
 } from '../utils';
 
 const mockConvertImageFormat = vi.mocked( vipsWorker.vipsConvertImageFormat );
@@ -29,6 +31,7 @@ const mockHasTransparency = vi.mocked( vipsWorker.vipsHasTransparency );
 const mockResizeImage = vi.mocked( vipsWorker.vipsResizeImage );
 const mockRotateImage = vi.mocked( vipsWorker.vipsRotateImage );
 const mockCancelOperations = vi.mocked( vipsWorker.vipsCancelOperations );
+const mockTerminateVipsWorker = vi.mocked( vipsWorker.terminateVipsWorker );
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
 	type: 'image/jpeg',
@@ -445,6 +448,45 @@ describe( 'vips utilities', () => {
 
 			expect( mockCancelOperations ).toHaveBeenCalledWith( 'item-456' );
 			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'maybeRecycleVipsWorker', () => {
+		const MB = 1024 * 1024;
+
+		beforeEach( async () => {
+			// Load the vips module, then start from a fresh budget.
+			mockCancelOperations.mockResolvedValue( false );
+			await vipsCancelOperations( 'item-1' );
+			maybeRecycleVipsWorker( false, 1024 * MB );
+			mockTerminateVipsWorker.mockClear();
+		} );
+
+		it( 'recycles the idle worker once it has read too many bytes', () => {
+			expect( maybeRecycleVipsWorker( false, 60 * MB ) ).toBe( false );
+			expect( isVipsWorkerRecycleDue() ).toBe( false );
+			expect( mockTerminateVipsWorker ).not.toHaveBeenCalled();
+
+			expect( maybeRecycleVipsWorker( false, 10 * MB ) ).toBe( true );
+			expect( isVipsWorkerRecycleDue() ).toBe( false );
+			expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'recycles the idle worker after 50 operations', () => {
+			for ( let i = 0; i < 49; i++ ) {
+				expect( maybeRecycleVipsWorker( false ) ).toBe( false );
+			}
+			expect( maybeRecycleVipsWorker( false ) ).toBe( true );
+			expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'waits for in-flight operations before recycling', () => {
+			expect( maybeRecycleVipsWorker( true, 70 * MB ) ).toBe( false );
+			expect( isVipsWorkerRecycleDue() ).toBe( true );
+			expect( mockTerminateVipsWorker ).not.toHaveBeenCalled();
+
+			expect( maybeRecycleVipsWorker( false ) ).toBe( true );
+			expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

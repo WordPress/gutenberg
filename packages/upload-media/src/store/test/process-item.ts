@@ -20,7 +20,11 @@ import { createRegistry } from '@wordpress/data';
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
-import { vipsResizeImage } from '../utils';
+import {
+	isVipsWorkerRecycleDue,
+	maybeRecycleVipsWorker,
+	vipsResizeImage,
+} from '../utils';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -44,7 +48,11 @@ vi.mock(
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
-			maybeRecycleVipsWorker: vi.fn(),
+			maybeRecycleVipsWorker: vi.fn( () => false ),
+			isVipsWorkerRecycleDue: vi.fn( () => false ),
+			isVipsOperation: vi.fn(
+				( operation?: string ) => operation === 'RESIZE_CROP'
+			),
 		} ) as unknown as typeof import( '../utils' )
 );
 
@@ -195,6 +203,57 @@ describe( 'processItem re-entrancy', () => {
 		await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
 
 		expect( mediaUpload ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'holds new image processing until a due worker recycle has happened', async () => {
+		unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+			mediaUpload: createStalledMediaUpload(),
+		} );
+
+		let finishResize: ( file: File ) => void = () => {};
+		( vipsResizeImage as Mock ).mockReturnValueOnce(
+			new Promise< File >( ( resolve ) => {
+				finishResize = resolve;
+			} )
+		);
+		( vipsResizeImage as Mock ).mockReturnValue( new Promise( () => {} ) );
+		const resizeThenUpload = [
+			[ OperationType.ResizeCrop, { resize: { width: 5, height: 5 } } ],
+			OperationType.Upload,
+		] as const;
+
+		await unlock( registry.dispatch( uploadStore ) ).addItem( {
+			file: jpegFile,
+			operations: [ ...resizeThenUpload ],
+		} );
+		expect( vipsResizeImage ).toHaveBeenCalledTimes( 1 );
+
+		// The budget is spent while the first resize is still running, so
+		// the second one waits even though a processing slot is free.
+		( isVipsWorkerRecycleDue as Mock ).mockReturnValue( true );
+		await unlock( registry.dispatch( uploadStore ) ).addItem( {
+			file: otherJpegFile,
+			operations: [ ...resizeThenUpload ],
+		} );
+		expect( vipsResizeImage ).toHaveBeenCalledTimes( 1 );
+
+		// The worker is idle once the first resize finishes: it is recycled
+		// and the waiting item starts in the fresh worker.
+		( maybeRecycleVipsWorker as Mock ).mockImplementationOnce( () => {
+			( isVipsWorkerRecycleDue as Mock ).mockReturnValue( false );
+			return true;
+		} );
+		finishResize(
+			new File( [ 'foo' ], 'example-5x5.jpg', { type: 'image/jpeg' } )
+		);
+
+		await vi.waitFor( () => {
+			expect( vipsResizeImage ).toHaveBeenCalledTimes( 2 );
+		} );
+		expect( maybeRecycleVipsWorker ).toHaveBeenCalledWith(
+			false,
+			jpegFile.size
+		);
 	} );
 
 	describe( 'retries', () => {

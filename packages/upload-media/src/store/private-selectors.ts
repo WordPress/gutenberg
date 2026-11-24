@@ -137,6 +137,24 @@ export function getActiveImageProcessingCount( state: State ): number {
 }
 
 /**
+ * Returns whether any item is currently running an operation in the vips
+ * worker. The worker must not be recycled while this is true.
+ *
+ * @param state Upload state.
+ *
+ * @return Whether a vips operation is in flight.
+ */
+export function hasActiveVipsOperations( state: State ): boolean {
+	return state.queue.some(
+		( item ) =>
+			item.currentOperation === OperationType.ResizeCrop ||
+			item.currentOperation === OperationType.Rotate ||
+			item.currentOperation === OperationType.TranscodeImage ||
+			item.currentOperation === OperationType.DetectUltraHdr
+	);
+}
+
+/**
  * Returns the number of items currently performing video processing operations.
  *
  * This counts items whose current operation is TranscodeGif,

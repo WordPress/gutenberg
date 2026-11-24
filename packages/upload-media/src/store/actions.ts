@@ -27,7 +27,11 @@ import type {
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
-import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
+import {
+	isVipsOperation,
+	maybeRecycleVipsWorker,
+	vipsCancelOperations,
+} from './utils';
 import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
 import { ErrorCode, UploadError } from '../upload-error';
@@ -240,9 +244,20 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// Failed vips ops also leak WASM memory, so count them toward the
+		// recycle budget. Without this, a long burst of failures (e.g. a
+		// gallery of unsupported AVIFs) could grow memory unbounded.
+		const wasRecycled =
+			isVipsOperation( currentOperation ) &&
+			maybeRecycleVipsWorker(
+				select.hasActiveVipsOperations(),
+				item.file.size
+			);
+
 		// A concurrency slot just freed up. Kick any items that were
 		// waiting in the queue, mirroring finishOperation's behavior.
 		if (
+			wasRecycled ||
 			currentOperation === OperationType.ResizeCrop ||
 			currentOperation === OperationType.Rotate
 		) {
@@ -259,17 +274,6 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			for ( const pending of select.getPendingVideoProcessing() ) {
 				dispatch.processItem( pending.id );
 			}
-		}
-
-		// Failed vips ops also leak WASM memory, so count them toward the
-		// recycle budget. Without this, a long burst of failures (e.g. a
-		// gallery of unsupported AVIFs) could grow memory unbounded.
-		if (
-			currentOperation === OperationType.ResizeCrop ||
-			currentOperation === OperationType.Rotate ||
-			currentOperation === OperationType.TranscodeImage
-		) {
-			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
 		}
 
 		// If this was a child sideload item, handle the parent.
