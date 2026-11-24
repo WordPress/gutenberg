@@ -346,6 +346,39 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [ { label: 'Add:', value: '“new text”' } ] );
 	} );
 
+	it( 'names the formatting an added text carries', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: 'new text',
+				textBeforeHTML: 'new text',
+				textAfterHTML:
+					'<strong>new</strong> <a href="https://example.org/">text</a>',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add:', value: '“new text”' },
+			{ label: 'Add formatting:', value: 'bold, link' },
+			{ label: 'Link:', value: 'https://example.org/' },
+		] );
+	} );
+
+	it( 'leaves out formatting an added text inherits', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: 'new text',
+				textBeforeHTML: '<strong>new text</strong>',
+				textAfterHTML: '<strong>new text</strong>',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Add:', value: '“new text”' } ] );
+	} );
+
 	it( 'summarizes an inline-suggestion del op as "Delete: <text>"', () => {
 		const lines = summarizeOperations( [
 			{

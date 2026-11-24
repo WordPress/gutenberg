@@ -41,7 +41,9 @@ import {
 import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
+	SUGGESTION_TYPE_FORMAT,
 	SUGGESTION_TYPE_REPLACEMENT,
+	findAdditionFormatting,
 	findSuggestionText,
 	suggestionRelations,
 	suggestionsEmptiedBy,
@@ -528,9 +530,10 @@ function ResolvedSuggestionSummary( {
 				return EMPTY_ARRAY;
 			}
 			/*
-			 * Two entries per op, kept flat so the comparison stays per
+			 * Four entries per op, kept flat so the comparison stays per
 			 * string: the text the op proposes, then (for a replacement,
-			 * whose one id also marks the replaced run) the replaced text.
+			 * whose one id also marks the replaced run) the replaced text,
+			 * then the proposed text's formatting as a before and after pair.
 			 */
 			return operations.flatMap( ( op: any ) => {
 				if (
@@ -538,24 +541,36 @@ function ResolvedSuggestionSummary( {
 					! op.attribute ||
 					op.text
 				) {
-					return [ null, null ];
+					return [ null, null, null, null ];
 				}
 				const value = attributes[ op.attribute ];
-				if ( op.suggestionType === SUGGESTION_TYPE_REPLACEMENT ) {
+				if ( op.suggestionType === SUGGESTION_TYPE_FORMAT ) {
 					return [
-						findSuggestionText(
-							value,
-							thread.id,
-							SUGGESTION_TYPE_ADDITION
-						),
-						findSuggestionText(
-							value,
-							thread.id,
-							SUGGESTION_TYPE_DELETION
-						),
+						findSuggestionText( value, thread.id ),
+						null,
+						null,
+						null,
 					];
 				}
-				return [ findSuggestionText( value, thread.id ), null ];
+				const formatting = findAdditionFormatting( value, thread.id );
+				const isReplacement =
+					op.suggestionType === SUGGESTION_TYPE_REPLACEMENT;
+				return [
+					findSuggestionText(
+						value,
+						thread.id,
+						isReplacement ? SUGGESTION_TYPE_ADDITION : undefined
+					),
+					isReplacement
+						? findSuggestionText(
+								value,
+								thread.id,
+								SUGGESTION_TYPE_DELETION
+							)
+						: null,
+					formatting?.beforeHTML ?? null,
+					formatting?.afterHTML ?? null,
+				];
 			} );
 		},
 		[ operations, thread?.blockClientId, thread?.id ]
@@ -597,12 +612,13 @@ function ResolvedSuggestionSummary( {
 				// A decided suggestion has no marker left; the payload
 				// recorded what it said.
 				const text =
-					markerTexts[ index * 2 ] ||
+					markerTexts[ index * 4 ] ||
 					blockTexts[ index ] ||
 					op.decidedText ||
 					null;
 				const deletedText =
-					markerTexts[ index * 2 + 1 ] || op.decidedDeletedText;
+					markerTexts[ index * 4 + 1 ] || op.decidedDeletedText;
+				const textAfterHTML = markerTexts[ index * 4 + 3 ];
 				if ( ! text && ! deletedText ) {
 					return op;
 				}
@@ -610,6 +626,10 @@ function ResolvedSuggestionSummary( {
 					...op,
 					...( text && { text } ),
 					...( deletedText && { deletedText } ),
+					...( textAfterHTML && {
+						textBeforeHTML: markerTexts[ index * 4 + 2 ] ?? '',
+						textAfterHTML,
+					} ),
 				};
 			} ),
 		[ operations, markerTexts, blockTexts ]
