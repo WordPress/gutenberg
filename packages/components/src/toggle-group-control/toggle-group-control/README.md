@@ -6,7 +6,7 @@
 
 This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use [`Tabs` from `@wordpress/ui`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tabs--docs) instead.
 
-Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+Only use this control when you know the labels won't wrap. For items with longer labels, consider [`SelectControl`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui`.
 
 ## Usage
 

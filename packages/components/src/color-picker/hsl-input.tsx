@@ -49,7 +49,7 @@ export const HslInput = ( { hsla, onChange, enableAlpha }: HslInputProps ) => {
 					max={ 100 }
 					label={ __( 'Alpha (HSL A value)' ) }
 					abbreviation="A"
-					value={ Math.trunc( 100 * hsla.a ) }
+					value={ Math.round( 100 * hsla.a ) }
 					onChange={ ( nextA: number ) => {
 						updateHSLAValue( { a: nextA / 100 } );
 					} }

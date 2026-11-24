@@ -1,0 +1,80 @@
+@use "@wordpress/base-styles/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.text {
+			/* Text variants can render as either paragraphs or headings, so both
+			   element-specific CSS defenses need the variant's typography. */
+			--_gcd-heading-font-size: var(--_wp-ui-text-font-size);
+			--_gcd-heading-font-weight: var(--_wp-ui-text-font-weight);
+			--_gcd-p-font-size: var(--_wp-ui-text-font-size);
+			--_gcd-p-line-height: var(--_wp-ui-text-line-height);
+
+			margin: 0;
+			font-family: var(--_wp-ui-text-font-family);
+			font-size: var(--_wp-ui-text-font-size);
+			line-height: var(--_wp-ui-text-line-height);
+			font-weight: var(--_wp-ui-text-font-weight);
+			text-wrap: pretty;
+		}
+
+		/* Interpolating the prefix lets Sass emit the mixin's declarations as
+		   custom properties shared by Text and the global CSS defenses. */
+		.heading-2xl {
+			#{--_wp-ui-text}: {
+				@include mixins.heading-2x-large();
+			}
+		}
+
+		.heading-xl {
+			#{--_wp-ui-text}: {
+				@include mixins.heading-x-large();
+			}
+		}
+
+		.heading-lg {
+			#{--_wp-ui-text}: {
+				@include mixins.heading-large();
+			}
+		}
+
+		.heading-md {
+			#{--_wp-ui-text}: {
+				@include mixins.heading-medium();
+			}
+		}
+
+		.heading-sm {
+			#{--_wp-ui-text}: {
+				@include mixins.heading-small();
+			}
+			text-transform: uppercase;
+		}
+
+		.body-xl {
+			#{--_wp-ui-text}: {
+				@include mixins.body-x-large();
+			}
+		}
+
+		.body-lg {
+			#{--_wp-ui-text}: {
+				@include mixins.body-large();
+			}
+		}
+
+		.body-md {
+			#{--_wp-ui-text}: {
+				@include mixins.body-medium();
+			}
+		}
+
+		.body-sm {
+			#{--_wp-ui-text}: {
+				@include mixins.body-small();
+			}
+		}
+	}
+}

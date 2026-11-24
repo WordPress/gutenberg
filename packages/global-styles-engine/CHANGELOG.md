@@ -4,7 +4,34 @@
 
 ### New Features
 
+-   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `transform.translate` setting ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+
+### Bug Fixes
+
+-   Type Definitions: Add `customFontSize` and `lineHeight` to `TypographySettings`, `gradient` to `GlobalStylesStyles[ 'color' ]`, and `':hover'` state to `GlobalStylesStyles[ 'blocks' ]` ([#87122](https://github.com/WordPress/gutenberg/pull/87122)).
+-   A breakpoint pseudo-state, such as `@mobile` `:hover`, undoes a text gradient set by the default pseudo-state when it sets a box clip or text color ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
+## 2.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
+-   Add the missing `dimensions.aspectRatios` entry to `PRESET_METADATA`, so the editor outputs the `--wp--preset--aspect-ratio--*` variables ([#86049](https://github.com/WordPress/gutenberg/pull/86049)).
+
+## 2.1.0 (2026-11-04)
+
+### New Features
+
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
+### Bug Fixes
+
+-   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 ### Internal
 

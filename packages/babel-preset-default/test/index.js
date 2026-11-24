@@ -39,4 +39,19 @@ describe( 'Babel preset default', () => {
 
 		expect( output.code ).toContain( '/* wp:polyfill */' );
 	} );
+
+	test( 'transpilation includes magic comment for always included polyfills', () => {
+		const output = transform( 'window.sorted = [ 2, 1 ].toSorted();', {
+			filename: 'input.js',
+			configFile: false,
+			envName: 'production',
+			presets: [ babelPresetDefault ],
+			caller: {
+				name: 'WP_BUILD_MAIN',
+				addPolyfillComments: true,
+			},
+		} );
+
+		expect( output.code ).toContain( '/* wp:polyfill */' );
+	} );
 } );

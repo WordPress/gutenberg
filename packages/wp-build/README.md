@@ -9,6 +9,7 @@ Build tool for WordPress plugins.
 - **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
+- **Translator Comments**: Keeps `translators:` comments next to the `__()`, `_x()`, `_n()` and `_nx()` calls they describe in the transpiled and unminified output, so `wp i18n make-pot` can extract them from the built files
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
 - **Watch Mode**: Incremental rebuilds during development
 
@@ -51,6 +52,20 @@ or via npm script:
 	}
 }
 ```
+
+### Skipping Debug Assets
+
+```bash
+wp-build --no-script-debug
+```
+
+Builds only the minified `.min.js` and `.min.css` files, leaving out the non-minified copies used when `SCRIPT_DEBUG` is enabled. The generated registration code then loads the minified files even with `SCRIPT_DEBUG` on. Code that registers files from the build directory by hand should check the `has_debug_assets` key of the array that `build/constants.php` returns, the same way. The flag is ignored in watch mode.
+
+`wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
+
+Without the non-minified files, `wp i18n make-pot` (which WordPress.org also runs to import plugin strings) skips `*.min.js` and reads JavaScript strings only from the `*.min.js.map` source maps. Ship those maps with the plugin, and do not exclude `*.map` in `.distignore`, or the plugin's JavaScript strings cannot be translated. This works because the maps embed the JavaScript that `wp-build` compiles each package to; `make-pot` cannot parse TypeScript, so it finds no strings in a source map that embeds TypeScript sources. Routes and widgets are built without source maps, so their strings are not extracted from a `--no-script-debug` build.
+
+Gutenberg's own build does not support the flag yet. Its `lib/client-assets.php` registers some stylesheets by hand without checking `has_debug_assets`, so a Gutenberg build made with `--no-script-debug` requests missing non-minified files when `SCRIPT_DEBUG` is enabled.
 
 ### Build Concurrency
 
@@ -137,19 +152,36 @@ Custom SCSS entry point patterns:
 
 ### `wpCopyFiles`
 
-Files to copy with optional PHP transformations:
+Files to copy to `build/scripts/{package}/`, with optional PHP transformations:
 
 ```json
 {
-	"wpCopyFiles": [
-		{
-			"from": "src/index.php",
-			"to": "build/index.php",
-			"transform": "php"
+	"wpCopyFiles": {
+		"files": [ "src/**/*.php", "src/*/block.json" ],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_",
+				"classSuffix": "_Gutenberg",
+				"prefixFunctions": [ "wp_apply_colors_support" ],
+				"suffixClasses": [ "WP_Navigation_Block_Renderer" ],
+				"addActionPriority": 20,
+				"flattenIndexFiles": true
+			}
 		}
-	]
+	}
 }
 ```
+
+`files` are glob patterns relative to the package, and each file keeps its path relative to `src/`. The PHP transforms apply only to `.php` files, and are skipped when `IS_WORDPRESS_CORE` is set:
+
+- `functionPrefix`: Prefix for the functions a file defines, replacing a `wp_` prefix, and for their uses.
+- `prefixFunctions`: Other functions to prefix with `functionPrefix`.
+- `classSuffix` and `suffixClasses`: Suffix to add to the given classes.
+- `addActionPriority`: Priority to add to the `init` action registering a block.
+- `filenameSuffix`: Suffix for the copied file's name, e.g. `-gutenberg` for `class-wp-style-engine-gutenberg.php`.
+- `flattenIndexFiles`: Copy `{name}/index.php` to `{name}.php`.
+
+In watch mode, a change to one of these PHP files copies only that file to the build, without rebuilding the package. Adding or removing a file rebuilds the package, but the build's copy of a removed file is not deleted.
 
 ### `wpWorkers`
 
@@ -480,7 +512,7 @@ routes/
     stage.tsx       # Main content component
     inspector.tsx   # Optional sidebar component
     canvas.tsx      # Optional custom canvas component
-    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas)
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas, title)
 ```
 
 ### Route Configuration
@@ -550,6 +582,7 @@ Export a `route` object with optional hooks. Each hook receives `{ params, searc
     - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
     - `null` → custom `canvas.tsx` component (if provided)
     - `undefined` or omitted → no canvas
+- **`title`** — Runs in parallel with `loader`. Returns the page's title as a string, or a promise of a string. After each navigation within the application, the title is announced to screen readers and used to update the document title. Every route should define it: without it, screen reader users do not hear that the page changed, and the browser tab keeps the title of the previous page.
 
 ```tsx
 export const route = {
@@ -573,6 +606,10 @@ export const route = {
 
 		// Return undefined to show no canvas
 		// return undefined;
+	},
+	title: ( { params, search } ) => {
+		// Return the page title
+		return __( 'Settings', 'my-plugin' );
 	},
 };
 ```
@@ -726,7 +763,7 @@ The generated `widgets.php` registers each widget's entries as script modules vi
 {handlePrefix}/widgets/{widget-dir-name}/widget
 ```
 
-Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded. Builds made with `--no-script-debug` do not include the non-minified files, so they always load the minified ones.
 
 ### Watch Mode
 

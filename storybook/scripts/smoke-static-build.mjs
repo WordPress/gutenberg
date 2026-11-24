@@ -6,6 +6,8 @@ const storybookDir = path.resolve( import.meta.dirname, '..' );
 const storybookUrl = 'http://127.0.0.1:50240';
 const maxConcurrentStories = 4;
 const storyTimeout = 15_000;
+// Stories with this tag may request other hosts until they stop doing so.
+const externalRequestsTag = 'external-requests';
 /** @type {import('playwright').Browser | undefined} */
 let browser;
 let server;
@@ -28,13 +30,10 @@ try {
 	 * @type {{ entries: Record<string, { id: string, type: string, tags?: string[] }> }}
 	 */
 	const { entries } = await indexResponse.json();
-	const storyIds = Object.values( entries )
-		.filter(
-			( entry ) =>
-				entry.type === 'story' && entry.tags?.includes( 'test' )
-		)
-		.map( ( entry ) => entry.id );
-	if ( ! storyIds.length ) {
+	const stories = Object.values( entries ).filter(
+		( entry ) => entry.type === 'story' && entry.tags?.includes( 'test' )
+	);
+	if ( ! stories.length ) {
 		throw new Error(
 			'Static Storybook does not contain testable stories.'
 		);
@@ -46,21 +45,25 @@ try {
 	const failures = [];
 	let nextStoryIndex = 0;
 	let renderedStories = 0;
-	const workerCount = Math.min( maxConcurrentStories, storyIds.length );
+	const workerCount = Math.min( maxConcurrentStories, stories.length );
 
 	await Promise.all(
 		Array.from( { length: workerCount }, async () => {
 			const context = await launchedBrowser.newContext();
 
 			try {
-				while ( nextStoryIndex < storyIds.length ) {
-					const storyId = storyIds[ nextStoryIndex++ ];
+				while ( nextStoryIndex < stories.length ) {
+					const story = stories[ nextStoryIndex++ ];
 
 					try {
-						await renderStory( context, storyId );
+						await renderStory(
+							context,
+							story.id,
+							!! story.tags?.includes( externalRequestsTag )
+						);
 					} catch ( error ) {
 						failures.push(
-							`${ storyId }: ${
+							`${ story.id }: ${
 								error instanceof Error
 									? error.message
 									: String( error )
@@ -71,7 +74,7 @@ try {
 					renderedStories++;
 					if ( renderedStories % 50 === 0 ) {
 						console.log(
-							`Rendered ${ renderedStories }/${ storyIds.length } static stories.`
+							`Rendered ${ renderedStories }/${ stories.length } static stories.`
 						);
 					}
 				}
@@ -90,7 +93,7 @@ try {
 	}
 
 	console.log(
-		`Rendered all ${ storyIds.length } testable stories from the static Storybook build.`
+		`Rendered all ${ stories.length } testable stories from the static Storybook build.`
 	);
 } finally {
 	await browser?.close();
@@ -98,10 +101,15 @@ try {
 }
 
 /**
+ * Renders a story with requests to other hosts blocked, so a third-party
+ * outage or rate limit cannot fail the smoke test. A story fails when it makes
+ * such a request, unless `allowExternalRequests` is set.
+ *
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
+ * @param {boolean}                             allowExternalRequests
  */
-async function renderStory( context, storyId ) {
+async function renderStory( context, storyId, allowExternalRequests ) {
 	const page = await context.newPage();
 	/** @type {string[]} */
 	const failedResponses = [];
@@ -116,6 +124,20 @@ async function renderStory( context, storyId ) {
 			);
 		}
 	} );
+
+	await page.route(
+		( url ) =>
+			[ 'http:', 'https:' ].includes( url.protocol ) &&
+			url.origin !== storybookUrl,
+		( route ) => {
+			if ( ! allowExternalRequests ) {
+				failedResponses.push(
+					`External request: ${ route.request().url() }`
+				);
+			}
+			return route.abort( 'blockedbyclient' );
+		}
+	);
 
 	try {
 		const response = await page.goto(

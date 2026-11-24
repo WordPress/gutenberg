@@ -13,7 +13,7 @@ import {
 import {
 	ToolbarButton,
 	Spinner as WCSpinner,
-	Notice,
+	Notice as WCNotice,
 	ComboboxControl,
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
@@ -85,9 +85,9 @@ function BlockContent( {
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}
@@ -95,9 +95,9 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status="info" isDismissible={ false }>
+				<WCNotice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}
@@ -123,9 +123,9 @@ function BlockContent( {
 
 		return (
 			<div { ...blockProps }>
-				<Notice status="warning" isDismissible={ false }>
+				<WCNotice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				</WCNotice>
 			</div>
 		);
 	}

@@ -59,6 +59,10 @@
 			"minWidth": true
 		},
 		"shadow": true,
+		"transform": {
+			"rotate": true,
+			"translate": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,

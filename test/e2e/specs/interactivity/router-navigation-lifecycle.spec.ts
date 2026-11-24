@@ -29,6 +29,28 @@ const readLog = async < T = LogEntry >(
 };
 
 /**
+ * Like `readLog`, but returns `null` while the log still shows the
+ * server-rendered `not hydrated` placeholder. A reload or traversal that
+ * replaces the document leaves the page in that state until the Interactivity
+ * API hydrates, so a poll that follows one must treat it as "not there yet"
+ * rather than as malformed JSON.
+ *
+ * @param page   The Playwright page.
+ * @param testId Which log to read.
+ * @return The parsed log entries, or `null` before hydration.
+ */
+const readHydratedLog = async < T = LogEntry >(
+	page: Page,
+	testId: 'lifecycle log' | 'settlement log'
+): Promise< T[] | null > => {
+	const text = await page.getByTestId( testId ).textContent();
+	if ( text?.trim() === 'not hydrated' ) {
+		return null;
+	}
+	return JSON.parse( text ?? '[]' );
+};
+
+/**
  * Waits, by polling, for one of the fixture's logs to reach the given
  * length. A **positive**, waiting assertion -- used both as the checkpoint
  * a negative assertion must be preceded by, and wherever a flow's own
@@ -44,7 +66,7 @@ const waitForLogLength = async (
 	length: number
 ) => {
 	await expect
-		.poll( async () => ( await readLog( page, testId ) ).length )
+		.poll( async () => ( await readHydratedLog( page, testId ) )?.length )
 		.toBe( length );
 };
 
@@ -64,7 +86,7 @@ const waitForLogLength = async (
 const waitForTruthyLogEntry = async ( page: Page ) => {
 	await expect
 		.poll( async () =>
-			( await readLog( page, 'lifecycle log' ) ).some(
+			( await readHydratedLog( page, 'lifecycle log' ) )?.some(
 				( entry ) => entry.navigating === 'navigating'
 			)
 		)
@@ -892,8 +914,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'lifecycle-b' );
 
 			// Release A's destination -- A's, not B's -- and wait for its
-			// generator to actually resume and take the `navigatingTo`
-			// bail. `page.waitForResponse` is the accurate signal here --
+			// generator to actually resume and take the superseded
+			// navigation's bail. `page.waitForResponse` is the accurate signal here --
 			// it resolves once the browser has the full response, unlike a
 			// Node-side "the route handler returned" signal, which can
 			// resolve well before the page's own fetch-then-parse pipeline

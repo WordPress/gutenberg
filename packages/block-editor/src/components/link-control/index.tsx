@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import {
 	Button,
 	Spinner as WCSpinner,
-	Notice,
+	Notice as WCNotice,
 	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -365,7 +365,11 @@ function LinkControl( {
 		}
 
 		// Preserve the URL for taxonomy entities before binding overrides it
-		if ( updatedValue?.kind === 'taxonomy' && updatedValue?.url ) {
+		if (
+			( updatedValue?.kind === 'taxonomy' ||
+				updatedValue?.kind === 'post-type' ) &&
+			updatedValue?.url
+		) {
 			entityUrlFallbackRef.current = updatedValue.url;
 		}
 
@@ -565,7 +569,7 @@ function LinkControl( {
 	const previewValue = useMemo( () => {
 		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
 		if (
-			value?.kind === 'taxonomy' &&
+			( value?.kind === 'taxonomy' || value?.kind === 'post-type' ) &&
 			! value?.url &&
 			entityUrlFallbackRef.current
 		) {
@@ -663,13 +667,13 @@ function LinkControl( {
 						) }
 					</div>
 					{ errorMessage && (
-						<Notice
+						<WCNotice
 							className="block-editor-link-control__search-error"
 							status="error"
 							isDismissible={ false }
 						>
 							{ errorMessage }
-						</Notice>
+						</WCNotice>
 					) }
 				</>
 			) }
@@ -780,7 +784,7 @@ function SearchSuffixControl( {
 		<InputControlSuffixWrapper variant="control">
 			<Button
 				onClick={ isDisabled ? noop : onSubmit }
-				label={ __( 'Submit' ) }
+				label={ __( 'Apply' ) }
 				icon={ keyboardReturn }
 				className="block-editor-link-control__search-submit"
 				aria-disabled={ isDisabled }

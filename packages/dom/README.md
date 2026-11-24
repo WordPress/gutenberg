@@ -357,7 +357,7 @@ _Returns_
 
 ### safeHTML
 
-Strips scripts and on\* attributes from HTML.
+Strips scripts, on\* attributes, script URLs and other active content from HTML, and sandboxes iframes that the same-origin policy doesn't isolate.
 
 _Parameters_
 

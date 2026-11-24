@@ -1,11 +1,27 @@
-// Type declarations for lib-font.browser.js
-export class Font {
-	constructor( name: string, options?: any );
-	opentype: any;
-	tables: any;
-	onload?: ( event: { detail: { font: any } } ) => void;
-	fromDataBuffer( buffer: ArrayBuffer | any, filename: string ): void;
-	static create( name: string, options?: any ): Font;
-	static load( url: string, options?: any ): Promise< Font >;
-	static loadFromArrayBuffer( arrayBuffer: ArrayBuffer, options?: any ): Font;
+/**
+ * Type declarations for lib-font.browser.js.
+ *
+ * Only what this package reads is typed. A table is missing when the font lacks it.
+ */
+
+export interface FontEvent {
+	detail: { font: Font };
+}
+
+export interface FontTables {
+	name?: { get( nameID: number ): string | undefined };
+	'OS/2'?: { usWeightClass: number };
+	fvar?: {
+		axes: Array< { tag: string; minValue: number; maxValue: number } >;
+	};
+}
+
+export declare class Font {
+	constructor( name: string );
+	opentype: { tables: FontTables };
+	onload?: ( event: FontEvent ) => void;
+	fromDataBuffer(
+		buffer: ArrayBuffer,
+		filenameOrUrL: string
+	): Promise< void >;
 }

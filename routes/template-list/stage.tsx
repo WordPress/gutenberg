@@ -24,7 +24,7 @@ import AddNewTemplate from './add-new-template';
 // Unlock WordPress private APIs
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
  */
@@ -234,21 +234,21 @@ function TemplateListView( {
 		>
 			{ viewList && viewList.length > 1 && (
 				<div className="routes-template-list__tabs-wrapper">
-					<Tabs
+					<WCTabs
 						onSelect={ handleTabChange }
 						selectedTabId={ activeView }
 					>
-						<Tabs.TabList>
+						<WCTabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ entry.slug }
 									key={ entry.slug }
 								>
 									{ entry.title }
-								</Tabs.Tab>
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews

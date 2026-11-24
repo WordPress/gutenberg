@@ -5,8 +5,6 @@ import { useDebounce } from '@wordpress/compose';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- SearchableSelect is the only searchable single-select in `@wordpress/ui`.
 	SearchableSelect,
-	Spinner,
-	Stack,
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
@@ -70,10 +68,9 @@ function PostAuthorControl() {
 			placeholder={ __( 'Select author' ) }
 			statusContent={
 				isSearching ? (
-					<Stack direction="row" gap="sm" align="center">
-						<Spinner />
+					<SearchableSelect.LoadingIndicator>
 						{ __( 'Searching…' ) }
-					</Stack>
+					</SearchableSelect.LoadingIndicator>
 				) : (
 					authors.length > 0 && (
 						<VisuallyHidden>

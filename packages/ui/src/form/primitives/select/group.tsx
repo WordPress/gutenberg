@@ -2,7 +2,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { SelectGroupProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Groups related items together with an associated label rendered by

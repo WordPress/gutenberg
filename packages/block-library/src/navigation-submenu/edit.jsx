@@ -110,7 +110,6 @@ export default function NavigationSubmenuEdit( {
 	const {
 		parentCount,
 		isParentOfSelectedBlock,
-		isImmediateParentOfSelectedBlock,
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
@@ -151,10 +150,6 @@ export default function NavigationSubmenuEdit( {
 					clientId,
 					true
 				),
-				isImmediateParentOfSelectedBlock: hasSelectedInnerBlock(
-					clientId,
-					false
-				),
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
@@ -189,11 +184,9 @@ export default function NavigationSubmenuEdit( {
 	 * The hook shouldn't be necessary but due to a focus loss happening
 	 * when selecting a suggestion in the link popover, we force close on block unselection.
 	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
+	if ( ! isSelected && isLinkOpen ) {
+		setIsLinkOpen( false );
+	}
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
@@ -281,14 +274,12 @@ export default function NavigationSubmenuEdit( {
 		// see: https://github.com/WordPress/gutenberg/pull/34615.
 		__experimentalCaptureToolbars: true,
 
-		renderAppender:
-			isSelected ||
-			( isImmediateParentOfSelectedBlock &&
-				! selectedBlockHasChildren ) ||
-			// Show the appender while dragging to allow inserting element between item and the appender.
-			hasChildren
-				? InnerBlocks.ButtonBlockAppender
-				: false,
+		// Show the dropdown appender whenever the submenu has items, also
+		// while dragging to allow inserting element between item and the
+		// appender. An empty submenu falls back to the button appender.
+		renderAppender: hasChildren
+			? InnerBlocks.DefaultBlockAppender
+			: isSelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';

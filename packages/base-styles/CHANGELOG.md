@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `input-control` and `editor-input-reset` mixins now use the `--wpds-typography-font-size-md` design token for their font size ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
+
+## 15.1.0 (2026-11-18)
+
+### Enhancements
+
+-   The `heading-*` and `body-*` mixins now use `--wpds-typography-*` design tokens for font family, size, and line height ([#86635](https://github.com/WordPress/gutenberg/pull/86635)).
+
+## 15.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Remove the `checkbox-control` and `radio-control` Sass mixins. Use the `Checkbox` and `Radio` primitives from `@wordpress/ui` instead, with `Radio` inside a `RadioGroup` ([#85248](https://github.com/WordPress/gutenberg/pull/85248)).

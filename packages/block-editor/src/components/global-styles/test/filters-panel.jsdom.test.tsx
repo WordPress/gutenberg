@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { UserEvent } from '@testing-library/user-event';
@@ -6,19 +6,8 @@ import FiltersPanel from '../filters-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
-
 /**
- * Tests for the inherited Global Styles label treatment in `FiltersPanel`.
+ * Tests for inherited Global Styles values in `FiltersPanel`.
  * The panel hosts a single duotone slot rendered as a `Dropdown` whose toggle
  * shows a `DuotoneSwatch`.
  *
@@ -53,32 +42,7 @@ const baseSettings = {
 	},
 };
 
-describe( 'FiltersPanel — visual treatment and display-without-commit', () => {
-	it( 'renders the InheritanceResetButton for a local override', () => {
-		const inheritedValue = {
-			filter: { duotone: [ '#000000', '#ffffff' ] },
-		};
-		const value = {
-			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
-		};
-
-		render(
-			<FiltersPanel
-				value={ value }
-				inheritedValue={ inheritedValue }
-				settings={ baseSettings }
-				onChange={ () => {} }
-				panelId="test-panel"
-			/>
-		);
-
-		expect(
-			screen.getByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).toBeInTheDocument();
-	} );
-
+describe( 'FiltersPanel display-without-commit', () => {
 	it( 'renders the default reset button for a locally-set duotone with no inherited value', () => {
 		const value = {
 			filter: { duotone: [ '#8c00b7', '#fcff41' ] },
@@ -97,11 +61,6 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 		expect(
 			screen.getByRole( 'button', { name: /^reset$/i } )
 		).toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).not.toBeInTheDocument();
 	} );
 
 	it( 'does not invoke onChange on mount when only inherited duotone is present (display-without-commit)', () => {

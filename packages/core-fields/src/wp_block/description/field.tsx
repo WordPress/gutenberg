@@ -1,5 +1,4 @@
 import { decodeEntities } from '@wordpress/html-entities';
-import { Text } from '@wordpress/ui';
 import type { FieldsScriptParts } from '../../types';
 
 type Pattern = {
@@ -19,8 +18,10 @@ function getPatternDescription( item: Pattern ) {
  */
 export const fieldExtensions: FieldsScriptParts< Pattern >[ string ] = {
 	getValue: ( { item } ) => getPatternDescription( item ),
+	// Renders as plain text that takes the typography of where it renders,
+	// like the values of other fields.
 	render: ( { item } ) => {
 		const description = getPatternDescription( item );
-		return description ? <Text>{ description }</Text> : null;
+		return description ? <span>{ description }</span> : null;
 	},
 };
