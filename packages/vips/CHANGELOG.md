@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   No longer throw (and leak memory) when `getUltraHdrInfo` probes a plain JPEG ([#87203](https://github.com/WordPress/gutenberg/pull/87203)).
+-   No longer throw (and leak memory) when `getUltraHdrInfo` probes a plain JPEG ([#87314](https://github.com/WordPress/gutenberg/pull/87314)).
 
 ## 5.2.0 (2026-11-18)
 

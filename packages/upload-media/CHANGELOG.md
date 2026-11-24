@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Replace the wasm-vips worker once it has read 64 MB of image data, and hold new image processing until it has been replaced, so a batch of large photos no longer runs it out of memory and loses uploads ([#84798](https://github.com/WordPress/gutenberg/pull/84798)).
+-   Replace the wasm-vips worker once it has read 64 MB of image data, and hold new image processing until it has been replaced, so a batch of large photos no longer runs it out of memory and loses uploads ([#87314](https://github.com/WordPress/gutenberg/pull/87314)).
 
 ### Internal
 
