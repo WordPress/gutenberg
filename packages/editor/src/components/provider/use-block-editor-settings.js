@@ -181,6 +181,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		viewablePostTypeLabel,
 		currentPostId,
+		isEditingTemplate,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -277,6 +278,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? postTypeObject?.labels?.singular_name
 					: undefined,
 				currentPostId: getCurrentPostId(),
+				// The post being edited, rather than the root-level entity,
+				// which is a template whenever "Show template" is on.
+				isEditingTemplate: currentPostType === 'wp_template',
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -480,9 +484,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			].includes( postType ),
 			[ isNavigationPostEditorKey ]: postType === 'wp_navigation',
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
-			// don't treat template parts as contentOnly sections.
+			// don't treat template parts as contentOnly sections. A template shown
+			// inside the template it is rendered inside keeps them, so that its own
+			// template parts are sections as they are when it is edited on its
+			// own; the ones of the template around it are locked explicitly, which
+			// takes precedence.
 			disableContentOnlyForTemplateParts:
-				renderingMode === 'template-locked' ||
+				( renderingMode === 'template-locked' &&
+					! isEditingTemplate ) ||
 				settings.disableContentOnlyForTemplateParts,
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
@@ -527,6 +536,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		imageMaxBitDepth,
 		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
+		isEditingTemplate,
 	] );
 }
 

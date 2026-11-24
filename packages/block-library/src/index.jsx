@@ -124,6 +124,7 @@ import * as tabList from './tab-list';
 import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
+import * as templateSlot from './template-slot';
 import * as termCount from './term-count';
 import * as termDescription from './term-description';
 import * as termName from './term-name';
@@ -267,6 +268,12 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		// Blocks added here are only registered when the "Block experiments"
 		// option is enabled in the Gutenberg > Experiments settings page.
+	}
+
+	if ( window?.__experimentalTemplateInheritance ) {
+		// Only registered when the "Templates inside templates" option is
+		// enabled in the Gutenberg > Experiments settings page.
+		blocks.push( templateSlot );
 	}
 
 	blocks.push( classic );

@@ -84,6 +84,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-template-inheritance',
+					'label'       => __( 'Templates inside templates', 'gutenberg' ),
+					'description' => __( 'Lets a template name another template to be rendered inside, so that a header, a footer and whatever else surrounds a template live in one place instead of being repeated in every template.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),

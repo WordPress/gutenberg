@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#86603](https://github.com/WordPress/gutenberg/pull/86603)).
+
 ### Bug Fixes
 
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).

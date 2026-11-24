@@ -129,6 +129,7 @@
           - any-glob-to-any-file: 'packages/fields/**'
           - any-glob-to-any-file: 'packages/core-fields/**'
           - any-glob-to-any-file: 'packages/core-actions/**'
+          - any-glob-to-any-file: 'packages/template-inheritance/**'
 
 '[Package] Format library':
     - changed-files:

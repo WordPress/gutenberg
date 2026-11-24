@@ -10,9 +10,12 @@ const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART = [
 	'wp_template_part',
 ];
 
+// The blocks of a template that hold the blocks of something else.
+const BLOCKS_HOLDING_ANOTHER_ENTITY = [ 'core/template-part', 'core/block' ];
+
 /**
  * In some specific contexts,
- * the template part and post content blocks need to be hidden.
+ * the template part, post content and template slot blocks need to be hidden.
  *
  * @param {string} postType Post Type
  * @param {string} mode     Rendering mode
@@ -66,6 +69,43 @@ export function useHideBlocksFromInserter( postType, mode ) {
 			}
 		);
 
+		/*
+		 * Prevent adding a template slot anywhere but among the blocks of a
+		 * template. It is where the templates rendered inside a template go,
+		 * and it is looked for among the blocks of the template alone: not
+		 * in its template parts, nor in its synced patterns.
+		 */
+		addFilter(
+			'blockEditor.__unstableCanInsertBlockType',
+			'removeTemplateSlotFromInserter',
+			(
+				canInsert,
+				blockType,
+				rootClientId,
+				{ getBlock, getBlockParentsByBlockName }
+			) => {
+				if ( blockType.name !== 'core/template-slot' ) {
+					return canInsert;
+				}
+				if ( postType !== 'wp_template' ) {
+					return false;
+				}
+				if (
+					rootClientId &&
+					( BLOCKS_HOLDING_ANOTHER_ENTITY.includes(
+						getBlock( rootClientId )?.name
+					) ||
+						getBlockParentsByBlockName(
+							rootClientId,
+							BLOCKS_HOLDING_ANOTHER_ENTITY
+						).length > 0 )
+				) {
+					return false;
+				}
+				return canInsert;
+			}
+		);
+
 		return () => {
 			removeFilter(
 				'blockEditor.__unstableCanInsertBlockType',
@@ -74,6 +114,10 @@ export function useHideBlocksFromInserter( postType, mode ) {
 			removeFilter(
 				'blockEditor.__unstableCanInsertBlockType',
 				'removePostContentFromInserter'
+			);
+			removeFilter(
+				'blockEditor.__unstableCanInsertBlockType',
+				'removeTemplateSlotFromInserter'
 			);
 		};
 	}, [ postType, mode ] );
