@@ -50,9 +50,20 @@
 	}
 }
 
-/* The focus ring follows the rounded corners of the drop area. */
-.surface > .choose {
-	border-radius: inherit;
+/*
+ * The picker button can't wrap the remove button, so the drop area draws the
+ * button's focus ring. It then spans the whole row, like the hover background.
+ * `Button` shows its ring on any focus that isn't a press, so this does too.
+ */
+.surface > .choose:focus {
+	outline: none;
+}
+
+.surface:has(> .choose:focus:not(:active)) {
+	outline:
+		var(--wpds-border-width-focus) solid
+		var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
 /* Leave room for a remove button beside the picker button. */
