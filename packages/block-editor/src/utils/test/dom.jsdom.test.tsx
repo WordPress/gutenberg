@@ -8,7 +8,6 @@ import { VisuallyHidden } from '@wordpress/ui';
 import {
 	extendRectToTop,
 	getElementBounds,
-	getOutermostRotatedAncestorBlock,
 	isElementVisible,
 	isStyleRotated,
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
@@ -300,51 +299,6 @@ describe( 'dom', () => {
 				expect( isStyleRotated( { rotate, transform } ) ).toBe( true );
 			}
 		);
-	} );
-
-	describe( 'getOutermostRotatedAncestorBlock', () => {
-		function createBlock( parent: Element, rotate = 'none' ) {
-			const block = window.document.createElement( 'div' );
-			block.className = 'block-editor-block-list__block';
-			block.dataset.rotate = rotate;
-			parent.appendChild( block );
-			return block;
-		}
-
-		function mockComputedRotate() {
-			const getComputedStyle = window.getComputedStyle;
-			return vi
-				.spyOn( window, 'getComputedStyle' )
-				.mockImplementation( ( element: Element ) => ( {
-					...getComputedStyle( element ),
-					rotate: ( element as HTMLElement ).dataset.rotate ?? 'none',
-					transform: 'none',
-				} ) );
-		}
-
-		it( 'returns the outermost rotated block, skipping the element itself', () => {
-			const spy = mockComputedRotate();
-			const outer = createBlock( window.document.body, '10deg' );
-			const middle = createBlock( outer, '5deg' );
-			const inner = createBlock( createBlock( middle ), '20deg' );
-
-			expect( getOutermostRotatedAncestorBlock( inner ) ).toBe( outer );
-			expect( getOutermostRotatedAncestorBlock( outer ) ).toBeUndefined();
-
-			outer.remove();
-			spy.mockRestore();
-		} );
-
-		it( 'returns undefined when no ancestor block is rotated', () => {
-			const spy = mockComputedRotate();
-			const outer = createBlock( window.document.body );
-			const inner = createBlock( outer );
-
-			expect( getOutermostRotatedAncestorBlock( inner ) ).toBeUndefined();
-
-			outer.remove();
-			spy.mockRestore();
-		} );
 	} );
 
 	describe( 'extendRectToTop', () => {
