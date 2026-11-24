@@ -1,4 +1,8 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
+// Records every selection that enters the duplicate Navigation block.
+type TrackedWindow = typeof window & { __selectionsInDuplicate: string[] };
 
 const MENU_CONTENT =
 	'<!-- wp:navigation-link {"label":"Item","type":"custom","url":"https://example.com/","kind":"custom"} /-->';
@@ -10,12 +14,11 @@ const MENU_CONTENT =
  * clones of the menu's blocks, so the selected client ID only identifies an
  * instance once it is resolved back to the Navigation block containing it.
  *
- * @param {Object} page Playwright page.
- * @return {Promise<number|null>} Index of the containing Navigation block in
- *                                document order, or null when the selection is
- *                                outside every Navigation block.
+ * @param page Playwright page.
+ * @return Index of the containing Navigation block in document order, or null
+ *         when the selection is outside every Navigation block.
  */
-function getSelectedNavigationIndex( page ) {
+function getSelectedNavigationIndex( page: Page ): Promise< number | null > {
 	return page.evaluate( () => {
 		const { getSelectedBlockClientId, getBlocksByName, getBlockParents } =
 			window.wp.data.select( 'core/block-editor' );
@@ -26,7 +29,7 @@ function getSelectedNavigationIndex( page ) {
 		const navigationBlocks = getBlocksByName( 'core/navigation' );
 		const parents = getBlockParents( selected );
 		const index = navigationBlocks.findIndex(
-			( clientId ) =>
+			( clientId: string ) =>
 				clientId === selected || parents.includes( clientId )
 		);
 		return index === -1 ? null : index;
@@ -108,16 +111,17 @@ test.describe( 'Duplicate Navigation blocks using the same menu', () => {
 				getBlockParents,
 			} = window.wp.data.select( 'core/block-editor' );
 			const duplicate = getBlocksByName( 'core/navigation' ).at( -1 );
-			window.__selectionsInDuplicate = [];
+			const tracked = window as TrackedWindow;
+			tracked.__selectionsInDuplicate = [];
 			window.wp.data.subscribe( () => {
 				const selected = getSelectedBlockClientId();
 				if (
 					selected &&
 					( selected === duplicate ||
 						getBlockParents( selected ).includes( duplicate ) ) &&
-					window.__selectionsInDuplicate.at( -1 ) !== selected
+					tracked.__selectionsInDuplicate.at( -1 ) !== selected
 				) {
-					window.__selectionsInDuplicate.push( selected );
+					tracked.__selectionsInDuplicate.push( selected );
 				}
 			} );
 		} );
@@ -131,7 +135,9 @@ test.describe( 'Duplicate Navigation blocks using the same menu', () => {
 		await expect( labels.first() ).toHaveText( 'IteXm' );
 		await expect( labels.last() ).toHaveText( 'IteXm' );
 		expect(
-			await page.evaluate( () => window.__selectionsInDuplicate )
+			await page.evaluate(
+				() => ( window as TrackedWindow ).__selectionsInDuplicate
+			)
 		).toEqual( [] );
 		expect( await getSelectedNavigationIndex( page ) ).toBe( 0 );
 	} );
