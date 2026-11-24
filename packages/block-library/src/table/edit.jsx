@@ -304,7 +304,7 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
 		const newColumnIndex = columnIndex + delta;
 
 		setAttributes(
@@ -312,9 +312,10 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column.
+		// Select the cell in the new column.
 		setSelectedCell( {
-			rowIndex: 0,
+			sectionName,
+			rowIndex,
 			columnIndex: newColumnIndex,
 			type: 'cell',
 		} );
