@@ -15,9 +15,9 @@ const AUTHORS_QUERY = {
 
 export default function UserControl( { value, onChange } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const { authors, isLoading } = useSelect(
+	const { authors, selectedUser, isLoading } = useSelect(
 		( select ) => {
-			const { getUsers, isResolving } = select( coreStore );
+			const { getUser, getUsers, isResolving } = select( coreStore );
 
 			const query = { ...AUTHORS_QUERY };
 			if ( filterValue ) {
@@ -27,20 +27,37 @@ export default function UserControl( { value, onChange } ) {
 
 			return {
 				authors: getUsers( query ),
-				isLoading: isResolving( 'getUsers', [ query ] ),
+				selectedUser: value
+					? getUser( value, { context: 'view' } )
+					: null,
+				isLoading:
+					isResolving( 'getUsers', [ query ] ) ||
+					isResolving( 'getUser', [ value, { context: 'view' } ] ),
 			};
 		},
-		[ filterValue ]
+		[ filterValue, value ]
 	);
 
 	const options = useMemo( () => {
-		return ( authors ?? [] ).map( ( author ) => {
+		const userOptions = ( authors ?? [] ).map( ( author ) => {
 			return {
 				value: author.id,
 				label: decodeEntities( author.name ),
 			};
 		} );
-	}, [ authors ] );
+
+		if (
+			selectedUser &&
+			! userOptions.some( ( option ) => option.value === selectedUser.id )
+		) {
+			userOptions.unshift( {
+				value: selectedUser.id,
+				label: decodeEntities( selectedUser.name ),
+			} );
+		}
+
+		return userOptions;
+	}, [ authors, selectedUser ] );
 
 	return (
 		<ComboboxControl
