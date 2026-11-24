@@ -73,7 +73,7 @@ test.describe( 'Transform block support', () => {
 		expect( await getRotate( group ) ).toBe( '30deg' );
 		expect(
 			await group.evaluate(
-				( element ) =>
+				( element: HTMLElement ) =>
 					element.offsetWidth < element.parentElement!.offsetWidth
 			)
 		).toBe( true );
