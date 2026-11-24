@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show undo and redo in the header on phones, and move Preview and View post to the Options menu there ([#87368](https://github.com/WordPress/gutenberg/pull/87368)).
+
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
