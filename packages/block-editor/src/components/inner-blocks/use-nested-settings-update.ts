@@ -5,6 +5,10 @@ import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type { DataRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
+import {
+	detachesOnEditKey,
+	isMoveTransparentKey,
+} from '../../store/private-keys';
 import type { BlockListSettings, SettingsByClientId } from '../../store/types';
 import type { Layout } from '../../layouts/types';
 import type { DirectInsert, DirectInsertBlock } from './types';
@@ -58,6 +62,10 @@ function useShallowMemo< T >( value: T ) {
  * @param orientation                The direction in which the block
  *                                   should face.
  * @param layout                     The layout object for the block container.
+ * @param isMoveTransparent          Whether one-step moves treat the block as
+ *                                   transparent. See `isMoveTransparentKey`.
+ * @param detachesOnEdit             Whether the block detaches on edit. See
+ *                                   `detachesOnEditKey`.
  */
 export default function useNestedSettingsUpdate(
 	clientId: string,
@@ -71,7 +79,9 @@ export default function useNestedSettingsUpdate(
 	templateLock: string | false | undefined,
 	captureToolbars: boolean | undefined,
 	orientation: 'horizontal' | 'vertical' | undefined,
-	layout: Layout | null | undefined
+	layout: Layout | null | undefined,
+	isMoveTransparent?: boolean,
+	detachesOnEdit?: boolean
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -151,6 +161,14 @@ export default function useNestedSettingsUpdate(
 			newSettings.directInsert = directInsert;
 		}
 
+		if ( isMoveTransparent ) {
+			newSettings[ isMoveTransparentKey ] = true;
+		}
+
+		if ( detachesOnEdit ) {
+			newSettings[ detachesOnEditKey ] = true;
+		}
+
 		if (
 			newSettings.directInsert !== undefined &&
 			typeof newSettings.directInsert !== 'boolean'
@@ -194,6 +212,8 @@ export default function useNestedSettingsUpdate(
 		captureToolbars,
 		orientation,
 		layout,
+		isMoveTransparent,
+		detachesOnEdit,
 		registry,
 	] );
 }

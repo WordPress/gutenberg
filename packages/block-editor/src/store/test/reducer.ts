@@ -50,7 +50,11 @@ import {
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	isMoveTransparentKey,
+} from '.././private-keys';
 import type {
 	Action,
 	BlocksState,
@@ -2502,6 +2506,98 @@ describe( 'state', () => {
 					expect( state.isPersistentChange ).toBe( false );
 				} );
 
+				it( 'should start a new step after a marked change that changes nothing', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: { flag: true },
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					// Like picking a Cover overlay color: set the color, then a
+					// marked update that finds the flag already set.
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							color: 'red',
+						},
+					} );
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+					} );
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							flag: true,
+						},
+					} );
+
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							color: 'blue',
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'should start a new step after a marked change that changes the blocks', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: false,
+						},
+					} );
+					// Like an undo, which resets the blocks outside the
+					// history.
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					original = blocks( original, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'kumquat',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
 				it( 'should flag an explicitly marked persistent change', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
@@ -4179,6 +4275,34 @@ describe( 'state', () => {
 					],
 				] )
 			);
+		} );
+
+		it( 'should update private settings, which have symbol keys', () => {
+			const clientId = '9db792c6-a25a-495d-adbd-97d56a4c4189';
+			const original = deepFreeze(
+				new Map( [ [ clientId, { allowedBlocks: true } ] ] )
+			);
+
+			const added = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				clientId,
+				settings: {
+					allowedBlocks: true,
+					[ isMoveTransparentKey ]: true,
+				},
+			} );
+			const removed = blockListSettings( added, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				clientId,
+				settings: { allowedBlocks: true },
+			} );
+
+			expect( added.get( clientId )?.[ isMoveTransparentKey ] ).toBe(
+				true
+			);
+			expect(
+				removed.get( clientId )?.[ isMoveTransparentKey ]
+			).toBeUndefined();
 		} );
 
 		it( 'should remove existing settings if updated settings not assigned', () => {

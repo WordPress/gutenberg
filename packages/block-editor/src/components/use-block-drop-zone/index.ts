@@ -236,37 +236,27 @@ export function isDropTargetValid(
 	draggedBlockNames: string[],
 	targetBlockName: string | null
 ): boolean {
-	// At root level allowedBlocks is undefined and all blocks are allowed.
-	// Otherwise, check if all dragged blocks are allowed.
-	let areBlocksAllowed = true;
+	// The allowed blocks of a target already take the dragged blocks' allowed
+	// parents into account (see `canInsertBlockType`), so a container can
+	// allow a block whose allowed parent is another block, as a submenu
+	// allows links.
 	if ( allowedBlocks ) {
 		// A string entry has no `name`, so it never matches.
 		const allowedBlockNames = (
 			allowedBlocks as Array< { name?: string } >
-		 )?.map( ( { name } ) => name );
+		 ).map( ( { name } ) => name );
 
-		areBlocksAllowed = draggedBlockNames.every( ( name ) =>
-			allowedBlockNames?.includes( name )
+		return draggedBlockNames.every( ( name ) =>
+			allowedBlockNames.includes( name )
 		);
 	}
 
-	// Work out if dragged blocks have an allowed parent and if so
-	// check target block matches the allowed parent.
-	const draggedBlockTypes = draggedBlockNames.map( ( name ) =>
-		getBlockType( name )
-	);
-	const targetMatchesDraggedBlockParents = draggedBlockTypes.every(
-		( block ) => {
-			const [ allowedParentName ] = block?.parent || [];
-			if ( ! allowedParentName ) {
-				return true;
-			}
-
-			return allowedParentName === targetBlockName;
-		}
-	);
-
-	return areBlocksAllowed && targetMatchesDraggedBlockParents;
+	// At root level allowedBlocks is undefined and all blocks are allowed,
+	// except those with an allowed parent, which the root never matches.
+	return draggedBlockNames.every( ( name ) => {
+		const [ allowedParentName ] = getBlockType( name )?.parent || [];
+		return ! allowedParentName || allowedParentName === targetBlockName;
+	} );
 }
 
 /**

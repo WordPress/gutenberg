@@ -5,7 +5,7 @@ import {
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -18,6 +18,7 @@ import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
+import ListViewMoveMenuItems from '../list-view/move-menu-items';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
@@ -88,8 +89,6 @@ export function BlockSettingsDropdown( {
 		isZoomOut,
 		canEdit,
 		canMove,
-		isFirst,
-		isLast,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -102,8 +101,6 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut,
 				canEditBlock,
 				canMoveBlocks,
-				getBlockIndex,
-				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -130,10 +127,6 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),
-				isFirst: getBlockIndex( firstBlockClientId ) === 0,
-				isLast:
-					getBlockIndex( firstBlockClientId ) ===
-					getBlockCount( _firstParentClientId ) - 1,
 			};
 		},
 		[ firstBlockClientId, clientIds ]
@@ -141,8 +134,6 @@ export function BlockSettingsDropdown( {
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
-
-	const { moveBlocksDown, moveBlocksUp } = useDispatch( blockEditorStore );
 
 	// `MenuItem` renders no shortcut for `null`.
 	const shortcuts = useSelect( ( select ) => {
@@ -259,34 +250,10 @@ export function BlockSettingsDropdown( {
 										/>
 									) }
 									{ canMove && isContentOnlyListView && (
-										<>
-											<MenuItem
-												icon={ chevronUp }
-												disabled={ isFirst }
-												accessibleWhenDisabled
-												onClick={ pipe( onClose, () => {
-													moveBlocksUp(
-														clientIds,
-														firstParentClientId
-													);
-												} ) }
-											>
-												{ __( 'Move up' ) }
-											</MenuItem>
-											<MenuItem
-												icon={ chevronDown }
-												disabled={ isLast }
-												accessibleWhenDisabled
-												onClick={ pipe( onClose, () => {
-													moveBlocksDown(
-														clientIds,
-														firstParentClientId
-													);
-												} ) }
-											>
-												{ __( 'Move down' ) }
-											</MenuItem>
-										</>
+										<ListViewMoveMenuItems
+											clientIds={ clientIds }
+											onClose={ onClose }
+										/>
 									) }
 									{ canEdit && count === 1 && (
 										<BlockHTMLConvertButton

@@ -134,44 +134,8 @@ function gutenberg_navigation_blocks_have_page_list( $blocks ) {
 }
 
 /**
- * Inserts a link to a page among its sibling blocks in page order.
- *
- * The link goes before the first link to a page that sorts after it by menu
- * order and then title, as the Page List block sorts pages. When no linked
- * page sorts after it, it goes after the last link to a page, or at the end
- * when there is none. Other blocks keep their places.
- *
- * @param array[] $blocks Parsed sibling blocks, modified in place.
- * @param WP_Post $page   The page the link points at.
- * @param array   $link   Parsed block linking to the page.
- */
-function gutenberg_navigation_insert_page_link( &$blocks, $page, $link ) {
-	$before = null;
-	$after  = null;
-	foreach ( $blocks as $index => $block ) {
-		$sibling = isset( $block['attrs']['id'] ) && gutenberg_navigation_block_links_to_page( $block, $block['attrs']['id'] )
-			? get_post( $block['attrs']['id'] )
-			: null;
-		if ( ! $sibling || 'page' !== $sibling->post_type ) {
-			continue;
-		}
-		$order = $sibling->menu_order <=> $page->menu_order;
-		if ( 0 === $order ) {
-			$order = strcasecmp( $sibling->post_title, $page->post_title );
-		}
-		if ( $order > 0 ) {
-			$before = $index;
-			break;
-		}
-		$after = $index + 1;
-	}
-
-	array_splice( $blocks, $before ?? $after ?? count( $blocks ), 0, array( $link ) );
-}
-
-/**
- * Nests a link to a page under the first block in a tree that links to the
- * page's parent, in page order among the parent's other links.
+ * Nests a link to a page at the end of the first block in a tree that links
+ * to the page's parent.
  *
  * A Navigation Link for the page becomes a Navigation Submenu with the same
  * attributes, so the link keeps working as before and gains a submenu.
@@ -184,10 +148,10 @@ function gutenberg_navigation_insert_page_link( &$blocks, $page, $link ) {
 function gutenberg_navigation_nest_block_under_page( &$blocks, $page, $link ) {
 	foreach ( $blocks as &$block ) {
 		if ( gutenberg_navigation_block_links_to_page( $block, $page->post_parent ) ) {
-			$block['blockName'] = 'core/navigation-submenu';
-			gutenberg_navigation_insert_page_link( $block['innerBlocks'], $page, $link );
-			$block['innerHTML']    = '';
-			$block['innerContent'] = array_fill( 0, count( $block['innerBlocks'] ), null );
+			$block['blockName']     = 'core/navigation-submenu';
+			$block['innerBlocks'][] = $link;
+			$block['innerHTML']     = '';
+			$block['innerContent']  = array_fill( 0, count( $block['innerBlocks'] ), null );
 			return true;
 		}
 		if ( ! empty( $block['innerBlocks'] ) && gutenberg_navigation_nest_block_under_page( $block['innerBlocks'], $page, $link ) ) {
@@ -202,8 +166,8 @@ function gutenberg_navigation_nest_block_under_page( &$blocks, $page, $link ) {
  * Adds a link to a newly published page to every Navigation Menu that has
  * "Auto add new pages" switched on.
  *
- * A top-level page is added to the menu in page order. A child page is nested
- * under the link to its parent, which becomes a submenu; a menu with no link
+ * A top-level page is appended to the menu. A child page is appended under
+ * the link to its parent, which becomes a submenu; a menu with no link
  * to the parent is left alone, and so is a menu with a Page List block, which
  * already shows the page. Like `_wp_auto_add_pages_to_menu()` for classic
  * menus, only the transition into `publish` counts, and a page the menu
@@ -238,7 +202,7 @@ function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status
 
 		$link = gutenberg_navigation_build_page_link_block( $post );
 		if ( empty( $post->post_parent ) ) {
-			gutenberg_navigation_insert_page_link( $blocks, $post, $link );
+			$blocks[] = $link;
 		} elseif ( ! gutenberg_navigation_nest_block_under_page( $blocks, $post, $link ) ) {
 			continue;
 		}

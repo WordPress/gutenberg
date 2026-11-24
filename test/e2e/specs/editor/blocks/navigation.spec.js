@@ -1884,35 +1884,23 @@ test.describe( 'Navigation block', () => {
 			} );
 			await expect( pageListBlock ).toBeVisible();
 
-			// Verify pages are shown in the list
-			const pageItems = pageListBlock.locator( 'li' );
+			// Verify pages are shown in the list, as Page Links.
+			const pageItems = pageListBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} );
 
 			// Wait for Page List to load pages
 			await pageItems.first().waitFor( { state: 'visible' } );
 			const itemCount = await pageItems.count();
 			expect( itemCount ).toBeGreaterThan( 0 );
 
-			// Step 4: Convert Page List using the Detach button
-			// Select the Page List block
-			await editor.selectBlocks( pageListBlock );
-
-			// Try using the toolbar Detach button instead
-			const detachButton = page
-				.getByRole( 'button', { name: 'Detach' } )
-				.first();
-			await expect( detachButton ).toBeVisible();
-
-			await detachButton.click();
-
-			// Wait for the confirmation dialog and approve conversion
-			const detachDialog = page.getByRole( 'dialog', {
-				name: 'Detach Page List',
-			} );
-			await expect( detachDialog ).toBeVisible();
-
-			await detachDialog
-				.getByRole( 'button', { name: 'Detach' } )
+			// Step 4: Convert Page List by editing one of its pages: moving
+			// the last page left turns the list into links.
+			await pageItems
+				.last()
+				.getByRole( 'textbox', { name: 'Navigation link text' } )
 				.click();
+			await editor.clickBlockToolbarButton( 'Move left' );
 
 			// Wait for conversion - check that Page List is gone
 			await expect( pageListBlock ).toBeHidden();

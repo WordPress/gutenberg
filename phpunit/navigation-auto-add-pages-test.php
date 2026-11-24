@@ -420,7 +420,7 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 	 * Where a page is added.
 	 */
 
-	public function test_a_page_is_inserted_in_page_order_among_the_page_links() {
+	public function test_a_top_level_page_goes_at_the_end_of_the_menu() {
 		$about_id = $this->publish_new_page(
 			array(
 				'post_title' => 'About',
@@ -436,11 +436,12 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		$menu_id  = $this->create_menu(
 			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->' .
 			$this->page_link_markup( $about_id ) .
-			'<!-- wp:navigation-link {"label":"Shop","url":"https://example.com/shop","kind":"custom"} /-->' .
-			$this->page_link_markup( $team_id ),
+			$this->page_link_markup( $team_id ) .
+			'<!-- wp:navigation-link {"label":"Contact","url":"https://example.com/contact","kind":"custom"} /-->',
 			true
 		);
 
+		// Sorts between About and Team by page order, but goes at the end.
 		$this->publish_new_page(
 			array(
 				'post_title' => 'Pricing',
@@ -449,54 +450,12 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		);
 
 		$this->assertSame(
-			array( 'Home', 'About', 'Shop', 'Pricing', 'Team' ),
+			array( 'Home', 'About', 'Team', 'Contact', 'Pricing' ),
 			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
 		);
 	}
 
-	public function test_a_page_that_sorts_last_goes_after_the_last_page_link() {
-		$about_id = $this->publish_new_page(
-			array(
-				'post_title' => 'About',
-				'menu_order' => 1,
-			)
-		);
-		$menu_id  = $this->create_menu(
-			$this->page_link_markup( $about_id ) .
-			'<!-- wp:navigation-link {"label":"Contact","url":"https://example.com/contact","kind":"custom"} /-->',
-			true
-		);
-
-		$this->publish_new_page(
-			array(
-				'post_title' => 'Team',
-				'menu_order' => 5,
-			)
-		);
-
-		$this->assertSame(
-			array( 'About', 'Team', 'Contact' ),
-			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
-		);
-	}
-
-	public function test_pages_with_the_same_order_are_sorted_by_title() {
-		$alpha_id   = $this->publish_new_page( array( 'post_title' => 'Alpha' ) );
-		$charlie_id = $this->publish_new_page( array( 'post_title' => 'Charlie' ) );
-		$menu_id    = $this->create_menu(
-			$this->page_link_markup( $alpha_id ) . $this->page_link_markup( $charlie_id ),
-			true
-		);
-
-		$this->publish_new_page( array( 'post_title' => 'Bravo' ) );
-
-		$this->assertSame(
-			array( 'Alpha', 'Bravo', 'Charlie' ),
-			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
-		);
-	}
-
-	public function test_a_child_page_is_inserted_in_page_order_within_its_parent_submenu() {
+	public function test_a_child_page_goes_at_the_end_of_its_parent_submenu() {
 		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
 		$first_id  = $this->publish_new_page(
 			array(
@@ -523,6 +482,7 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 			true
 		);
 
+		// Sorts between First and Third by page order, but goes at the end.
 		$this->publish_new_page(
 			array(
 				'post_title'  => 'Second',
@@ -533,7 +493,7 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 
 		$blocks = $this->get_menu_blocks( $menu_id );
 		$this->assertSame(
-			array( 'First', 'Second', 'Third' ),
+			array( 'First', 'Third', 'Second' ),
 			$this->get_labels( $blocks[0]['innerBlocks'] )
 		);
 	}

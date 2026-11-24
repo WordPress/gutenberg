@@ -142,6 +142,14 @@ export type ListViewBlockSettingsMenuProps = Omit<
 export type ListViewContextValue = {
 	AdditionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	BlockSettingsMenu?: ComponentType< ListViewBlockSettingsMenuProps >;
+	/**
+	 * Where moving blocks one step up or down lands, following which rows
+	 * this List View shows expanded. `null` when they can't move that way.
+	 */
+	getMoveDestination: (
+		clientIds: string[],
+		direction: 'up' | 'down'
+	) => { rootClientId: string; index: number } | null;
 	listViewInstanceId?: number | string;
 	rootClientId?: string | null;
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;

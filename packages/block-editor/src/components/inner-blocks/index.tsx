@@ -26,6 +26,10 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { normalizeLegacyLayout } from '../../layouts/utils';
 import { unlock } from '../../lock-unlock';
+import {
+	detachesOnEditKey,
+	isMoveTransparentKey,
+} from '../../store/private-keys';
 import type { Layout } from '../../layouts/types';
 import type {
 	InnerBlocksOptions,
@@ -88,6 +92,8 @@ function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
 		blockType,
 		parentLock,
 		defaultLayout,
+		isMoveTransparent,
+		detachesOnEdit,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -102,7 +108,9 @@ function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout
+		layout,
+		isMoveTransparent,
+		detachesOnEdit
 	);
 
 	useInnerBlockTemplateSync(
@@ -333,6 +341,10 @@ export function useInnerBlocksProps<
 		parentLock,
 		defaultLayout,
 		...options,
+		// Under string keys, as React 18 drops symbol-keyed props, and after
+		// the options, so that only the private keys set them.
+		isMoveTransparent: options[ isMoveTransparentKey ],
+		detachesOnEdit: options[ detachesOnEditKey ],
 	};
 	const InnerBlocks =
 		innerBlocksProps.value && innerBlocksProps.onChange

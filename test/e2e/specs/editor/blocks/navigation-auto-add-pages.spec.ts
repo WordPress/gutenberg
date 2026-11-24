@@ -305,7 +305,7 @@ test.describe( 'Navigation block: Auto add new pages', () => {
 			name: 'Auto add new pages',
 		} );
 		await expect( toggle ).toHaveAccessibleDescription(
-			'Pages published from now on are added to this menu. Existing pages are not.'
+			'Adds pages to this navigation when they are published.'
 		);
 		await expect( toggle ).toBeChecked();
 		await toggle.click();

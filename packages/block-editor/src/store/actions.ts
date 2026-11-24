@@ -474,7 +474,29 @@ const createOnMove =
 			return;
 		}
 
-		dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
+		// A step into or out of a transparent block leaves the parent.
+		const normalizedClientIds = castArray( clientIds );
+		const sourceRoot =
+			rootClientId ??
+			select.getBlockRootClientId( normalizedClientIds[ 0 ] ) ??
+			'';
+		const destination = select.getBlockMoveDestination(
+			normalizedClientIds,
+			type === 'MOVE_BLOCKS_DOWN' ? 'down' : 'up'
+		);
+		if ( destination && destination.rootClientId !== sourceRoot ) {
+			dispatch(
+				moveBlocksToPosition(
+					normalizedClientIds,
+					sourceRoot,
+					destination.rootClientId,
+					destination.index
+				)
+			);
+			return;
+		}
+
+		dispatch( { type, clientIds: normalizedClientIds, rootClientId } );
 	};
 
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );

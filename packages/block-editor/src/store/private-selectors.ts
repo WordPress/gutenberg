@@ -18,6 +18,9 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	canInsertBlocks,
+	canMoveBlocks,
+	canRemoveBlocks,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -35,6 +38,7 @@ import {
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
+	isMoveTransparentKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
@@ -1452,4 +1456,165 @@ export function isSelectedBlockStyleStateShownOnCanvas(
 	}
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
+}
+
+/**
+ * Returns whether one-step moves treat a block as transparent. See
+ * `isMoveTransparentKey`.
+ *
+ * @param state    Block editor state.
+ * @param clientId The block's client ID.
+ *
+ * @return Whether the block is transparent to one-step moves.
+ */
+export function isBlockMoveTransparent( state: State, clientId: string ) {
+	return !! state.blockListSettings.get( clientId )?.[ isMoveTransparentKey ];
+}
+
+/**
+ * Returns the blocks that the latest change to the blocks replaced with their
+ * inner blocks, because they detach on edit. See `detachesOnEditKey`.
+ *
+ * @param state Block editor state.
+ *
+ * @return The detached blocks.
+ */
+export function getLastDetachedBlocks( state: State ) {
+	return state.lastDetachedBlocks;
+}
+
+/**
+ * Where a one-step move puts blocks.
+ */
+export type BlockMoveDestination = {
+	rootClientId: string;
+	/** Index the blocks end up at, counted after they are taken out. */
+	index: number;
+};
+
+export type BlockMoveOptions = {
+	/**
+	 * Whether a container shows its children, so that a neighbor moving
+	 * toward it goes in. Without it (in the canvas) no container does, and
+	 * transparent blocks always count as open.
+	 */
+	isExpanded?: ( clientId: string ) => boolean;
+	/**
+	 * Whether a block at the edge of this parent can move out of it.
+	 * Defaults to transparent parents only.
+	 */
+	canStepOut?: ( clientId: string ) => boolean;
+};
+
+/**
+ * Returns where moving blocks one step up or down puts them, or `null` when
+ * they can't move that way.
+ *
+ * One step moves past the next block. A transparent block isn't a step: its
+ * children are passed one at a time, and a child at its edge steps out past
+ * the block beyond it. An expanded container (see `isExpanded`) is entered.
+ *
+ * @param state              Block editor state.
+ * @param clientIds          The blocks to move, in order and with the same parent.
+ * @param direction          The direction to move in.
+ * @param options            How containers count as steps.
+ * @param options.isExpanded Whether a container shows its children.
+ * @param options.canStepOut Whether a block can move out of this parent.
+ *
+ * @return The destination, or `null`.
+ */
+export function getBlockMoveDestination(
+	state: State,
+	clientIds: string[],
+	direction: 'up' | 'down',
+	{ isExpanded, canStepOut }: BlockMoveOptions = {}
+): BlockMoveDestination | null {
+	if ( ! clientIds.length || ! canMoveBlocks( state, clientIds ) ) {
+		return null;
+	}
+	const isDown = direction === 'down';
+	const isTransparent = ( clientId: string ) =>
+		isBlockMoveTransparent( state, clientId );
+	// Blocks that can't be removed stay in their parent and step past whole
+	// blocks only.
+	const canLeave = canRemoveBlocks( state, clientIds );
+	const canEnter = ( clientId: string ) =>
+		canLeave && canInsertBlocks( state, clientIds, clientId );
+	const isOpen = ( clientId: string ) =>
+		isExpanded ? isExpanded( clientId ) : isTransparent( clientId );
+	const sourceRoot = getBlockRootClientId( state, clientIds[ 0 ] ) ?? '';
+	const sourceOrder = getBlockOrder( state, sourceRoot );
+	const sourceIndex = sourceOrder.indexOf( clientIds[ 0 ] );
+
+	// Counts an index in the current order as it will be once the blocks
+	// are taken out.
+	const land = ( rootClientId: string, index: number ) => ( {
+		rootClientId,
+		index:
+			rootClientId === sourceRoot && index > sourceIndex
+				? index - clientIds.length
+				: index,
+	} );
+
+	// Steps past `neighbor`, a block in `rootClientId` beside the blocks.
+	const pass = (
+		rootClientId: string,
+		neighbor: string
+	): BlockMoveDestination => {
+		if (
+			isTransparent( neighbor ) &&
+			isOpen( neighbor ) &&
+			canEnter( neighbor )
+		) {
+			const children = getBlockOrder( state, neighbor );
+			const nearest = isDown
+				? children[ 0 ]
+				: children[ children.length - 1 ];
+			if ( nearest ) {
+				return pass( neighbor, nearest );
+			}
+		} else if (
+			isOpen( neighbor ) &&
+			// A block with no children has nothing expanded to step into.
+			getBlockOrder( state, neighbor ).length &&
+			canEnter( neighbor )
+		) {
+			return land(
+				neighbor,
+				isDown ? 0 : getBlockOrder( state, neighbor ).length
+			);
+		}
+		const index = getBlockOrder( state, rootClientId ).indexOf( neighbor );
+		return land( rootClientId, isDown ? index + 1 : index );
+	};
+
+	const edgeIndex = sourceOrder.indexOf(
+		clientIds[ isDown ? clientIds.length - 1 : 0 ]
+	);
+	if ( edgeIndex === -1 ) {
+		return null;
+	}
+	const neighbor = sourceOrder[ isDown ? edgeIndex + 1 : edgeIndex - 1 ];
+	if ( neighbor ) {
+		return pass( sourceRoot, neighbor );
+	}
+
+	// At the edge of the parent: step out of it, if allowed.
+	if ( ! sourceRoot || ! ( canStepOut ?? isTransparent )( sourceRoot ) ) {
+		return null;
+	}
+	const parentRoot = getBlockRootClientId( state, sourceRoot ) ?? '';
+	if ( ! canEnter( parentRoot ) ) {
+		return null;
+	}
+	const parentOrder = getBlockOrder( state, parentRoot );
+	const parentIndex = parentOrder.indexOf( sourceRoot );
+	if ( isTransparent( sourceRoot ) ) {
+		// The parent isn't a step of its own, so pass the block beyond it.
+		// With nothing beyond, stepping out would look like no move at all.
+		const outside =
+			parentOrder[ isDown ? parentIndex + 1 : parentIndex - 1 ];
+		return outside ? pass( parentRoot, outside ) : null;
+	}
+	return land( parentRoot, isDown ? parentIndex + 1 : parentIndex );
 }

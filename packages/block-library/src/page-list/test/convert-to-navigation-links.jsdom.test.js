@@ -439,6 +439,80 @@ describe( 'page list convert to links', () => {
 			] );
 		} );
 
+		it( 'Finds a parent page whose own parent is not published', () => {
+			// Page 1, the parent of page 2, isn't among the pages.
+			const page = ( id, parent, title ) => ( {
+				id,
+				parent,
+				title: { raw: title, rendered: title },
+				link: `http://example.com/${ id }`,
+				type: 'page',
+			} );
+			const pages = [
+				page( 5, 0, 'Top' ),
+				page( 2, 1, 'Parent' ),
+				page( 3, 2, 'Child one' ),
+				page( 4, 2, 'Child two' ),
+			];
+
+			const links = convertToNavigationLinks( pages, 2 );
+
+			expect( links.map( ( link ) => link.attributes.label ) ).toEqual( [
+				'Child one',
+				'Child two',
+			] );
+		} );
+
+		it( 'Finds the children of a parent page that is not published', () => {
+			const page = ( id, parent, title ) => ( {
+				id,
+				parent,
+				title: { raw: title, rendered: title },
+				link: `http://example.com/${ id }`,
+				type: 'page',
+			} );
+			// Page 1 isn't among the pages.
+			const pages = [ page( 5, 0, 'Top' ), page( 2, 1, 'Child' ) ];
+
+			const links = convertToNavigationLinks( pages, 1 );
+
+			expect( links.map( ( link ) => link.attributes.label ) ).toEqual( [
+				'Child',
+			] );
+		} );
+
+		it( 'Labels a page with an empty title as it shows in the list', () => {
+			const page = ( id, parent, title ) => ( {
+				id,
+				parent,
+				title: { raw: title, rendered: title },
+				link: `http://example.com/${ id }`,
+				type: 'page',
+			} );
+			const pages = [ page( 1, 0, '' ), page( 2, 1, ' ' ) ];
+
+			const [ submenu ] = convertToNavigationLinks( pages );
+
+			expect( submenu.attributes.label ).toBe( '(no title)' );
+			expect( submenu.innerBlocks[ 0 ].attributes.label ).toBe(
+				'(no title)'
+			);
+		} );
+
+		it( 'Returns no links when the parent page is missing', () => {
+			const pages = [
+				{
+					id: 5,
+					parent: 0,
+					title: { raw: 'Top', rendered: 'Top' },
+					link: 'http://example.com/5',
+					type: 'page',
+				},
+			];
+
+			expect( convertToNavigationLinks( pages, 99 ) ).toEqual( [] );
+		} );
+
 		it( 'Can use a different parent page', () => {
 			const pages = [
 				{

@@ -9,6 +9,10 @@ import type { BlockType } from '@wordpress/blocks';
 import type { Layout } from '../../layouts/types';
 import type { UseBlockSyncProps } from '../provider/types';
 import type { BlockTemplate } from '../../store/types';
+import type {
+	detachesOnEditKey,
+	isMoveTransparentKey,
+} from '../../store/private-keys';
 
 /**
  * The block an appender inserts directly.
@@ -66,6 +70,10 @@ export interface InnerBlocksOptions extends Pick<
 	__unstableDisableDropZone?: boolean;
 	/** An element to use as the drop zone, in place of the wrapper. */
 	dropZoneElement?: HTMLElement | null;
+	/** Private, see `isMoveTransparentKey`. */
+	[ isMoveTransparentKey ]?: boolean;
+	/** Private, see `detachesOnEditKey`. */
+	[ detachesOnEditKey ]?: boolean;
 }
 
 /**
@@ -80,6 +88,9 @@ export interface InnerBlocksProps extends Omit< InnerBlocksOptions, 'layout' > {
 	blockType?: BlockType;
 	parentLock?: string | false;
 	defaultLayout?: Layout;
+	/** The private options, under string keys. */
+	isMoveTransparent?: boolean;
+	detachesOnEdit?: boolean;
 }
 
 /**

@@ -66,7 +66,7 @@ test.describe( 'Navigation sidebar: Auto add new pages', () => {
 			name: 'Auto add new pages',
 		} );
 		await expect( toggle ).toHaveAccessibleDescription(
-			'Pages published from now on are added to this menu. Existing pages are not.'
+			'Adds pages to this navigation when they are published.'
 		);
 		await expect( toggle ).not.toBeChecked();
 		await toggle.click();
@@ -182,7 +182,7 @@ test.describe( 'Navigation menu screen: Auto add new pages', () => {
 			name: 'Auto add new pages',
 		} );
 		await expect( toggle ).toHaveAccessibleDescription(
-			'Pages published from now on are added to this menu. Existing pages are not.'
+			'Adds pages to this navigation when they are published.'
 		);
 		await expect( toggle ).not.toBeChecked();
 		await toggle.click();
