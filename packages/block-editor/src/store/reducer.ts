@@ -3506,6 +3506,9 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 					nextState.blocks.parents.get( clientId ) ?? '';
 				const innerClientIds =
 					nextState.blocks.order.get( clientId ) ?? [];
+				const siblingClientIds =
+					nextState.blocks.order.get( rootClientId )!;
+				const index = siblingClientIds.indexOf( clientId );
 				// Moved rather than recreated, so they keep their client IDs
 				// (and the selection).
 				const steps: Action[] = innerClientIds.length
@@ -3515,9 +3518,7 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 								clientIds: innerClientIds,
 								fromRootClientId: clientId,
 								toRootClientId: rootClientId,
-								index: nextState.blocks.order
-									.get( rootClientId )!
-									.indexOf( clientId ),
+								index,
 							},
 						]
 					: [];
@@ -3525,6 +3526,21 @@ function withDetachOnEdit( reducer: Reducer< State > ) {
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				} );
+				// Removing an inner block selects the block itself when no
+				// block is before it. Select what removing the block would,
+				// as `selectPreviousBlock` does.
+				const blockToSelect =
+					siblingClientIds[ index - 1 ] ?? rootClientId;
+				if (
+					nextState.selection.selectionStart.clientId === clientId &&
+					blockToSelect
+				) {
+					steps.push( {
+						type: 'SELECT_BLOCK',
+						clientId: blockToSelect,
+						initialPosition: nextState.initialPosition,
+					} );
+				}
 				for ( const step of steps ) {
 					detachActions.add( step );
 					nextState = reducer( nextState, step );

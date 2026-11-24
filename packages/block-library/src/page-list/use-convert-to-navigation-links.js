@@ -1,5 +1,6 @@
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
@@ -23,7 +24,11 @@ function createNavigationLinks( pages = [] ) {
 			'core/navigation-link',
 			{
 				id,
-				label: title.rendered,
+				label:
+					// translators: displayed when a page has an empty title.
+					title.rendered.trim() !== ''
+						? title.rendered
+						: __( '(no title)' ),
 				url,
 				type,
 				kind: POST_TYPE_KIND,

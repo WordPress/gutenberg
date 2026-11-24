@@ -339,6 +339,26 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			} );
 	} );
 
+	test( 'deleting the first page selects the link before the list', async ( {
+		editor,
+		pageListMenu,
+	} ) => {
+		const menu = await pageListMenu.setUp();
+
+		await pageListMenu.selectLink( 'Alpha' );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		await expect
+			.poll( () => pageListMenu.getState( menu.id ) )
+			.toMatchObject( {
+				pageLists: 0,
+				labels: [ 'Home', 'Bravo', 'Charlie' ],
+			} );
+		await expect
+			.poll( () => pageListMenu.getSelectedLabel() )
+			.toBe( 'Home' );
+	} );
+
 	test( 'adding a link after one in the list converts it', async ( {
 		editor,
 		pageListMenu,

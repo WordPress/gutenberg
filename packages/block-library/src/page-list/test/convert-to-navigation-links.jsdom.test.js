@@ -481,6 +481,24 @@ describe( 'page list convert to links', () => {
 			] );
 		} );
 
+		it( 'Labels a page with an empty title as it shows in the list', () => {
+			const page = ( id, parent, title ) => ( {
+				id,
+				parent,
+				title: { raw: title, rendered: title },
+				link: `http://example.com/${ id }`,
+				type: 'page',
+			} );
+			const pages = [ page( 1, 0, '' ), page( 2, 1, ' ' ) ];
+
+			const [ submenu ] = convertToNavigationLinks( pages );
+
+			expect( submenu.attributes.label ).toBe( '(no title)' );
+			expect( submenu.innerBlocks[ 0 ].attributes.label ).toBe(
+				'(no title)'
+			);
+		} );
+
 		it( 'Returns no links when the parent page is missing', () => {
 			const pages = [
 				{

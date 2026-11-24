@@ -265,25 +265,46 @@ describe( 'blocks that detach on edit', () => {
 	} );
 
 	it( 'keeps typing after the detaching keystroke in the same undo step', () => {
-		// The list's inner blocks are controlled, like a Page List's.
-		const x = createBlock( 'test/item' );
-		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
-			history: 'ignore',
-		} );
-		t.dispatch.setHasControlledInnerBlocks( t.ids.list, true );
-		t.dispatch.__unstableMarkNextChangeAsNotPersistent( {
-			history: 'ignore',
-		} );
-		t.dispatch.replaceInnerBlocks( t.ids.list, [ x ] );
-
-		t.dispatch.updateBlockAttributes( x.clientId, { label: 'a' } );
+		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'a' } );
 		expect( t.select.getBlock( t.ids.list ) ).toBeNull();
 		expect( t.select.isLastBlockChangePersistent() ).toBe( true );
 
 		// The next keystroke updates the same attribute, as without the
 		// detach, so it doesn't start a new undo step.
-		t.dispatch.updateBlockAttributes( x.clientId, { label: 'ab' } );
+		t.dispatch.updateBlockAttributes( t.ids.x, { label: 'ab' } );
 		expect( t.select.isLastBlockChangePersistent() ).toBe( false );
+	} );
+
+	describe( 'move a selection on them as removing them would, to', () => {
+		// Removing their first inner block selects them, since it has no
+		// block before it.
+		it( 'the block before them', () => {
+			t.dispatch.selectBlock( t.ids.x );
+			t.dispatch.removeBlocks( [ t.ids.x ] );
+
+			expect( t.select.getBlock( t.ids.list ) ).toBeNull();
+			expect( t.select.getSelectedBlockClientId() ).toBe( t.ids.a );
+		} );
+
+		it( 'their parent, when no block is before them', () => {
+			const menu = createBlock( 'test/item', {}, [
+				createBlock( 'test/item', {}, [
+					createBlock( 'test/item' ),
+					createBlock( 'test/item' ),
+				] ),
+			] );
+			const [ list ] = menu.innerBlocks;
+			t.dispatch.resetBlocks( [ menu ] );
+			t.dispatch.updateBlockListSettings( list.clientId, {
+				[ detachesOnEditKey ]: true,
+			} );
+
+			t.dispatch.selectBlock( list.innerBlocks[ 0 ].clientId );
+			t.dispatch.removeBlocks( [ list.innerBlocks[ 0 ].clientId ] );
+
+			expect( t.select.getBlock( list.clientId ) ).toBeNull();
+			expect( t.select.getSelectedBlockClientId() ).toBe( menu.clientId );
+		} );
 	} );
 
 	it( 'reports the blocks the last change detached, until the next change', () => {

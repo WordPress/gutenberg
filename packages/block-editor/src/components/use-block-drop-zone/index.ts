@@ -252,7 +252,7 @@ export function isDropTargetValid(
 	}
 
 	// At root level allowedBlocks is undefined and all blocks are allowed,
-	// except those with an allowed parent that the target doesn't match.
+	// except those with an allowed parent, which the root never matches.
 	return draggedBlockNames.every( ( name ) => {
 		const [ allowedParentName ] = getBlockType( name )?.parent || [];
 		return ! allowedParentName || allowedParentName === targetBlockName;
