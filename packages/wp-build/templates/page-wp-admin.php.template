@@ -178,10 +178,69 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	if ( file_exists( $asset_file ) ) {
 		$asset = require $asset_file;
 
+		// Build dependencies for {{PAGE_SLUG}}-wp-admin module
+		$boot_dependencies = array(
+			array(
+				'import' => 'static',
+				'id'     => '@wordpress/boot',
+			),
+		);
+
+		// Add init modules as static dependencies
+{{INIT_MODULES_PHP_ARRAY}}
+
+		// Add all registered routes as dependencies
+		foreach ( $routes as $route ) {
+			if ( isset( $route['route_module'] ) ) {
+				$boot_dependencies[] = array(
+					'import' => 'static',
+					'id'     => $route['route_module'],
+				);
+			}
+			if ( isset( $route['content_module'] ) ) {
+				$boot_dependencies[] = array(
+					'import' => 'dynamic',
+					'id'     => $route['content_module'],
+				);
+			}
+		}
+
+		/**
+		 * Filters the boot script-module dependencies for the
+		 * {{PAGE_SLUG}}-wp-admin page.
+		 *
+		 * Surfaces extending this page can append entries to the boot
+		 * dependency list. Each entry is an array with 'import' (string
+		 * 'static' or 'dynamic') and 'id' (script-module handle) keys.
+		 *
+		 * @param array $boot_dependencies Boot dependencies for the page.
+		 */
+		$boot_dependencies = apply_filters(
+			'{{PAGE_SLUG}}-wp-admin_boot_dependencies',
+			$boot_dependencies
+		);
+
+		/*
+		 * Load the classic scripts that every script module of the page needs,
+		 * not only those of boot: a route, or a module it imports such as the
+		 * lazy editor, can need a script that boot doesn't.
+		 */
+		$script_dependencies = $asset['dependencies'];
+		if ( function_exists( '{{PREFIX}}_get_script_module_script_dependencies' ) ) {
+			$script_dependencies = array_values(
+				array_unique(
+					array_merge(
+						$script_dependencies,
+						{{PREFIX}}_get_script_module_script_dependencies( wp_list_pluck( $boot_dependencies, 'id' ) )
+					)
+				)
+			);
+		}
+
 		// This script serves two purposes:
 		// 1. It ensures all the globals that are made available to the modules are loaded.
 		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $asset['dependencies'], $asset['version'], true );
+		wp_register_script( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $script_dependencies, $asset['version'], true );
 
 		$init_modules = {{INIT_MODULES_JSON}};
 
@@ -221,7 +280,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 
 		// Register prerequisites style by filtering script dependencies to find registered styles
 		$style_dependencies = array_filter(
-			$asset['dependencies'],
+			$script_dependencies,
 			function ( $handle ) {
 				return wp_style_is( $handle, 'registered' );
 			}
@@ -279,48 +338,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		}
 		CSS;
 		wp_add_inline_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', $page_styles );
-
-		// Build dependencies for {{PAGE_SLUG}}-wp-admin module
-		$boot_dependencies = array(
-			array(
-				'import' => 'static',
-				'id'     => '@wordpress/boot',
-			),
-		);
-
-		// Add init modules as static dependencies
-{{INIT_MODULES_PHP_ARRAY}}
-
-		// Add all registered routes as dependencies
-		foreach ( $routes as $route ) {
-			if ( isset( $route['route_module'] ) ) {
-				$boot_dependencies[] = array(
-					'import' => 'static',
-					'id'     => $route['route_module'],
-				);
-			}
-			if ( isset( $route['content_module'] ) ) {
-				$boot_dependencies[] = array(
-					'import' => 'dynamic',
-					'id'     => $route['content_module'],
-				);
-			}
-		}
-
-		/**
-		 * Filters the boot script-module dependencies for the
-		 * {{PAGE_SLUG}}-wp-admin page.
-		 *
-		 * Surfaces extending this page can append entries to the boot
-		 * dependency list. Each entry is an array with 'import' (string
-		 * 'static' or 'dynamic') and 'id' (script-module handle) keys.
-		 *
-		 * @param array $boot_dependencies Boot dependencies for the page.
-		 */
-		$boot_dependencies = apply_filters(
-			'{{PAGE_SLUG}}-wp-admin_boot_dependencies',
-			$boot_dependencies
-		);
 
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(

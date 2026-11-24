@@ -499,6 +499,17 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$boot_asset_file   = include __DIR__ . '/../../build/modules/boot/index.min.asset.php';
 			$boot_dependencies = $boot_asset_file['dependencies'] ?? array();
 
+			/*
+			 * Boot pages also load the classic scripts of the script modules boot
+			 * imports, such as the lazy editor that requests these assets.
+			 */
+			if ( function_exists( 'gutenberg_get_script_module_script_dependencies' ) ) {
+				$boot_dependencies = array_merge(
+					$boot_dependencies,
+					gutenberg_get_script_module_script_dependencies( array( '@wordpress/boot' ) )
+				);
+			}
+
 			// Get all dependencies that should be excluded (boot dependencies + their deep dependencies).
 			$excluded_scripts = $this->get_all_dependencies( $boot_dependencies, $wp_scripts );
 			$excluded_styles  = $this->get_all_dependencies( array( 'wp-components', 'wp-commands', 'dashicons' ), $wp_styles );

@@ -11,6 +11,63 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Records the dependencies a script module declares in its asset file.
+ *
+ * Script modules can only depend on other script modules, so the classic
+ * scripts a module needs (its `dependencies`, for example `wp-editor` for a
+ * module importing `@wordpress/editor`) are kept here, for the pages that load
+ * the module to enqueue.
+ *
+ * @param string $id    Script module ID.
+ * @param array  $asset Contents of the module's asset file.
+ */
+function {{PREFIX}}_set_script_module_asset_dependencies( $id, $asset ) {
+	global ${{PREFIX}}_script_module_asset_dependencies;
+
+	$module_ids = array();
+	foreach ( $asset['module_dependencies'] ?? array() as $dependency ) {
+		$module_ids[] = is_array( $dependency ) ? $dependency['id'] : $dependency;
+	}
+
+	${{PREFIX}}_script_module_asset_dependencies[ $id ] = array(
+		'scripts' => $asset['dependencies'] ?? array(),
+		'modules' => $module_ids,
+	);
+}
+
+/**
+ * Gets the classic scripts that script modules need, including those of the
+ * modules they import, statically or dynamically.
+ *
+ * A dynamically imported module also reads the globals of its classic scripts
+ * as soon as it loads, so they must be on the page before it is imported.
+ *
+ * @param string[] $ids Script module IDs.
+ * @return string[] Classic script handles.
+ */
+function {{PREFIX}}_get_script_module_script_dependencies( $ids ) {
+	global ${{PREFIX}}_script_module_asset_dependencies;
+
+	$scripts = array();
+	$visited = array();
+	$queue   = array_values( $ids );
+	while ( $queue ) {
+		$id = array_shift( $queue );
+		if ( isset( $visited[ $id ] ) ) {
+			continue;
+		}
+		$visited[ $id ] = true;
+		if ( empty( ${{PREFIX}}_script_module_asset_dependencies[ $id ] ) ) {
+			continue;
+		}
+		$scripts = array_merge( $scripts, ${{PREFIX}}_script_module_asset_dependencies[ $id ]['scripts'] );
+		$queue   = array_merge( $queue, ${{PREFIX}}_script_module_asset_dependencies[ $id ]['modules'] );
+	}
+
+	return array_values( array_unique( $scripts ) );
+}
+
+/**
  * Register all script modules.
  */
 function {{PREFIX}}_register_script_modules() {
@@ -47,6 +104,7 @@ function {{PREFIX}}_register_script_modules() {
 
 		$asset_path = $modules_dir . '/' . $module['asset'];
 		$asset = file_exists( $asset_path ) ? require $asset_path : array();
+		{{PREFIX}}_set_script_module_asset_dependencies( $module['id'], $asset );
 
 		// Deregister first to override any previously registered version
 		// (e.g., Core's default modules when running as a plugin).

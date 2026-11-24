@@ -69,6 +69,9 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$content_asset['module_dependencies'] ?? array(),
 					$content_asset['version'] ?? false
 				);
+				if ( function_exists( '{{PREFIX}}_set_script_module_asset_dependencies' ) ) {
+					{{PREFIX}}_set_script_module_asset_dependencies( $content_handle, $content_asset );
+				}
 			}
 		}
 
@@ -91,6 +94,9 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$route_asset['module_dependencies'] ?? array(),
 					$route_asset['version'] ?? false
 				);
+				if ( function_exists( '{{PREFIX}}_set_script_module_asset_dependencies' ) ) {
+					{{PREFIX}}_set_script_module_asset_dependencies( $route_handle, $route_asset );
+				}
 			}
 		}
 

@@ -6,6 +6,10 @@
 
 -   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them. The generated registration code loads the minified files even when `SCRIPT_DEBUG` is enabled if the build has no unminified files ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
+### Bug Fixes
+
+-   Generated pages now load the classic scripts that their route modules, and the script modules those and `@wordpress/boot` import, declare in their asset files, not only the ones `@wordpress/boot` declares. A route that imports a script package such as `@wordpress/editor` no longer depends on boot importing it too.
+
 ### Internal
 
 -   The generated registration PHP now picks the `SCRIPT_DEBUG` file extension with an `if` that also checks the new `has_debug_assets` key of `build/constants.php`, in every build. Tools that post-process the generated PHP may need updating; read `has_debug_assets` instead of matching the template code ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
