@@ -24,6 +24,20 @@ describe( 'getTransformClassesAndStyles', () => {
 		).toEqual( { style: { rotate: '15deg' } } );
 	} );
 
+	it( 'returns an offset as the axis it sets', () => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { translate: { y: '2rem' } } },
+			} )
+		).toEqual( {
+			style: {
+				'--wp--style--translate-y': '2rem',
+				translate:
+					'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+			},
+		} );
+	} );
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
@@ -107,5 +121,15 @@ describe( 'getStateInheritedValue', () => {
 				{ viewport: '@mobile', pseudo: ':hover' }
 			).transform
 		).toEqual( { rotate: '15deg' } );
+	} );
+
+	it( 'layers offset axes one by one', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { translate: { x: '5px' } } },
+				{ transform: { translate: { y: '20px' } } },
+				mobile
+			).transform
+		).toEqual( { translate: { x: '5px', y: '20px' } } );
 	} );
 } );
