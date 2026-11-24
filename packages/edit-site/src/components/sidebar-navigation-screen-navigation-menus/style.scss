@@ -10,6 +10,10 @@
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
+	// The List View's chevrons take this background to cut the line to the
+	// space a row's + opens.
+	--wp-admin--list-view-background: var(--wpds-color-background-surface-neutral-weak);
+
 	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
 		white-space: normal;
 	}

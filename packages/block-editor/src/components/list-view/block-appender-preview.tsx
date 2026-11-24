@@ -10,16 +10,19 @@ import { useBlockAppenderPreview } from './context';
  * not a row of the tree grid, so the arrow keys and screen readers pass over
  * it.
  *
- * @param props          Component props.
- * @param props.clientId The block the + adds to.
- * @param props.level    The nesting level of the block's inner blocks.
+ * @param props               Component props.
+ * @param props.clientId      The block the + adds to.
+ * @param props.level         The nesting level of the block's inner blocks.
+ * @param props.innerRowCount The rows between the block's row and the space.
  */
 export default function ListViewBlockAppenderPreview( {
 	clientId,
 	level,
+	innerRowCount,
 }: {
 	clientId: string;
 	level: number;
+	innerRowCount: number;
 } ) {
 	const { clientId: previewClientId, isInstant } = useBlockAppenderPreview();
 	const isOpen = previewClientId === clientId;
@@ -46,14 +49,20 @@ export default function ListViewBlockAppenderPreview( {
 			aria-hidden="true"
 		>
 			{ /* Spans the row's contents, + and Options columns. */ }
-			<td colSpan={ 3 }>
+			<td
+				colSpan={ 3 }
+				style={
+					{
+						'--wp-block-editor--list-view-preview-level': level,
+						'--wp-block-editor--list-view-preview-rows':
+							innerRowCount,
+					} as CSSProperties
+				}
+			>
+				{ /* Runs from the block's icon, down and across to the outline. */ }
+				<div className="block-editor-list-view-block-appender-preview__line" />
 				<div
 					className="block-editor-list-view-block-appender-preview__space"
-					style={
-						{
-							'--wp-block-editor--list-view-preview-level': level,
-						} as CSSProperties
-					}
 					onAnimationEnd={ ( event: AnimationEvent ) => {
 						if (
 							! isOpen &&

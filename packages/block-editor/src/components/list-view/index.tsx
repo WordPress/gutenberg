@@ -390,6 +390,7 @@ function ListViewComponent(
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,
+					'has-block-appender': !! BlockAppender,
 				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }

@@ -683,6 +683,29 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			)
 		).toEqual( [ 'Submenu Item', 'preview', 'Existing Item' ] );
 
+		// An L-shaped line runs from under the submenu's icon, down and
+		// across to the space's outline.
+		const outline = await preview
+			.locator(
+				'.block-editor-list-view-block-appender-preview__outline'
+			)
+			.boundingBox();
+		const line = await preview
+			.locator( '.block-editor-list-view-block-appender-preview__line' )
+			.boundingBox();
+		const submenuIcon = await listView
+			.getByRole( 'row', { name: 'Existing Submenu' } )
+			.locator( '.block-editor-block-icon' )
+			.boundingBox();
+		for ( const [ actual, expected ] of [
+			[ line.x, submenuIcon.x + submenuIcon.width / 2 ],
+			[ line.y, submenuIcon.y + submenuIcon.height ],
+			[ line.x + line.width, outline.x ],
+			[ line.y + line.height, outline.y + outline.height / 2 ],
+		] ) {
+			expect( Math.abs( actual - expected ) ).toBeLessThanOrEqual( 2 );
+		}
+
 		await page.mouse.move( 0, 0 );
 		await expect( preview ).toHaveCount( 0 );
 	} );
