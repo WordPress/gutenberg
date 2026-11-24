@@ -46,6 +46,10 @@ function isHidden( element: Element, root: Element ) {
 	return false;
 }
 
+// Best-effort fallback for notices without `spokenMessage`. Keep it limited to
+// plain text and default HTML structure, such as the line breaks below. Content
+// this can't read correctly should set `spokenMessage`, so don't add CSS or
+// layout handling here.
 function readMessage( root: HTMLElement ) {
 	function readText( kind: 'title' | 'description' ) {
 		return Array.from(
