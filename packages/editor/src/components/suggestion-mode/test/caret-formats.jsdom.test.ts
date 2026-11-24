@@ -74,9 +74,7 @@ describe( 'takeCaretFormatsToRestore', () => {
 	it( 'keeps the caret inside the formats of the text before it', () => {
 		const value = at( 'Hi<strong>x</strong>', 3 );
 		keepCaretFormats( 'Hix', 3 );
-		expect( takeCaretFormatsToRestore( value ) ).toBe(
-			value.formats[ 2 ]
-		);
+		expect( takeCaretFormatsToRestore( value ) ).toBe( value.formats[ 2 ] );
 		// Asked for once.
 		expect( takeCaretFormatsToRestore( value ) ).toBeNull();
 	} );
