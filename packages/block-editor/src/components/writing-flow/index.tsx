@@ -14,6 +14,8 @@ import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
+import useUndoKeyboardSlide from './use-undo-keyboard-slide';
+import useRestoreTapCaret from './use-restore-tap-caret';
 import usePreventFocusCapture from './use-prevent-focus-capture';
 import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
@@ -49,7 +51,11 @@ export function useWritingFlow(): [
 			useEditableRoot(),
 			useHomeEnd(),
 			useDragSelection(),
+			// Before the selection observer, which then reads the caret put
+			// back.
+			useRestoreTapCaret(),
 			useSelectionObserver(),
+			useUndoKeyboardSlide(),
 			usePreventFocusCapture(),
 			useClickSelection(),
 			useMultiSelection(),

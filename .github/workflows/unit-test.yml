@@ -61,7 +61,10 @@ jobs:
                           - '**'
                           # Documentation.
                           - '!**/*.md'
-                          - '!{backport-changelog,docs,storybook}/**'
+                          - '!{backport-changelog,docs}/**'
+                          # Storybook, except its unit tests and the top-level modules they import.
+                          - '!storybook/!(test)/**/*'
+                          - '!storybook/*.!(ts)'
                           # Development tooling and its configuration.
                           - '!tools/{docs,eslint,stylelint}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
@@ -144,8 +147,7 @@ jobs:
                     --sequence.seed="$GITHUB_RUN_NUMBER" \
                     --project=node \
                     --project=jsdom \
-                    --shard="$SHARD" \
-                    --passWithNoTests
+                    --shard="$SHARD"
 
     unit-js-browser:
         name: JavaScript Browser (Chromium, Node.js 24) - shard ${{ matrix.shard }}
