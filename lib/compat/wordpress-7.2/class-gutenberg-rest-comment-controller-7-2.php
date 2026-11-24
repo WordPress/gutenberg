@@ -39,19 +39,26 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Determines if a given value represents a valid reaction key.
 	 *
 	 * Reaction keys are described by a sequence of one or more Unicode
-	 * Scalar Values joined by a hyphen (U+2D).
-	 * 
+	 * Scalar Values joined by a hyphen (U+2D). Each is written one way
+	 * only: lowercase hex, zero-padded to four digits.
+	 *
 	 * @since 7.2.0
 	 *
 	 * @param string $value Potentially contains a valid reaction key.
-	 * @param bool Whether the given value comprises a well-formed reaction key.
+	 * @return bool Whether the given value comprises a well-formed reaction key.
 	 */
 	private static function is_reaction_key( string $value ): bool {
-		if ( 1 !== preg_match( '/^[0-9a-f]{4,6}(?:-[0-9a-f]{4,6})*$/D', $value ) ) {
+		if ( strlen( $value ) !== strspn( $value, '-0123456789abcdef' ) ) {
 			return false;
 		}
 
 		foreach ( explode( '-', $value ) as $hex ) {
+			$length = strlen( $hex );
+			// Too short (or an empty span), too long, or zero-padded past four digits.
+			if ( $length < 4 || $length > 6 || ( $length > 4 && '0' === $hex[0] ) ) {
+				return false;
+			}
+
 			$code_point = hexdec( $hex );
 			// Beyond the last code point, or a surrogate.
 			if ( $code_point > 0x10FFFF || ( $code_point >= 0xD800 && $code_point <= 0xDFFF ) ) {

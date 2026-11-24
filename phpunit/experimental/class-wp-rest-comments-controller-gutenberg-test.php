@@ -1085,6 +1085,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	public function test_reaction_summary_omits_malformed_reaction_content( string $content ): void {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
 		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id, '2764' );
@@ -1120,6 +1121,56 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'beyond the last code point' => array( '110000' ),
 			'surrogate'                  => array( 'd83d' ),
 			'trailing separator'         => array( '1f44d-' ),
+			'leading separator'          => array( '-1f44d' ),
+			'empty span'                 => array( '1f44d--fe0f' ),
+			'fewer than four digits'     => array( 'a9' ),
+			'padded past four digits'    => array( '02764' ),
+			'more than six digits'       => array( '0002764' ),
+		);
+	}
+
+	/**
+	 * A well-formed key outside the curated set stays readable, so a
+	 * reaction survives a change to the set.
+	 *
+	 * @dataProvider data_well_formed_reaction_content
+	 *
+	 * @param string $content The stored reaction content.
+	 */
+	public function test_reaction_summary_keeps_well_formed_reaction_content( string $content ): void {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id, $content );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$data = rest_get_server()->dispatch( $request )->get_data();
+		$this->assertIsArray( $data );
+
+		$this->assertSame(
+			array(
+				$content => array(
+					'count'                 => 1,
+					'current_user_reaction' => $reaction_id,
+				),
+			),
+			$data['reaction_summary']
+		);
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_well_formed_reaction_content(): array {
+		return array(
+			'padded to four digits' => array( '00a9' ),
+			'five digits'           => array( '1f680' ),
+			'last code point'       => array( '10ffff' ),
+			'keycap sequence'       => array( '0023-fe0f-20e3' ),
+			'joined sequence'       => array( '1f468-200d-1f469-200d-1f467' ),
 		);
 	}
 
