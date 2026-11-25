@@ -4,6 +4,7 @@ import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 import type * as ET from '../entity-types';
+import { unlock } from '../lock-unlock';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
@@ -349,4 +350,60 @@ describe( 'getRevisions', () => {
 		// @ts-expect-error Bug: `getRevisions` is typed as the revisions state, not the revisions it returns.
 		expect( allRevisions.map( ( r ) => r.id ) ).toEqual( [ 2, 3, 4 ] );
 	} );
+} );
+
+describe( 'getRegisteredPostMeta', () => {
+	let registry: ReturnType< typeof createRegistry >;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		apiFetchMock.mockReset();
+	} );
+
+	it.each( [
+		[ 'getPostType', [ 'post' ] ],
+		[ 'getEntityRecord', [ 'root', 'postType', 'post' ] ],
+	] as const )(
+		'refetches the registered meta when %s is invalidated',
+		async ( selectorName, args ) => {
+			let metaProperties: Record< string, unknown > = {
+				first_key: { type: 'string' },
+			};
+			apiFetchMock.mockImplementation( ( options ) => {
+				if ( ( options as { method?: string } ).method === 'OPTIONS' ) {
+					return Promise.resolve( {
+						schema: {
+							properties: {
+								meta: { properties: metaProperties },
+							},
+						},
+					} );
+				}
+				return Promise.resolve( {
+					json: () =>
+						Promise.resolve( { slug: 'post', rest_base: 'posts' } ),
+					headers: { get: () => null },
+				} );
+			} );
+
+			const { getRegisteredPostMeta } = unlock(
+				registry.resolveSelect( coreDataStore )
+			);
+			await expect( getRegisteredPostMeta( 'post' ) ).resolves.toEqual(
+				metaProperties
+			);
+
+			metaProperties = {
+				first_key: { type: 'string' },
+				second_key: { type: 'string' },
+			};
+			registry
+				.dispatch( coreDataStore )
+				.invalidateResolution( selectorName, [ ...args ] );
+
+			await expect( getRegisteredPostMeta( 'post' ) ).resolves.toEqual(
+				metaProperties
+			);
+		}
+	);
 } );
