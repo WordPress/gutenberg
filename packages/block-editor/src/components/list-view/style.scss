@@ -108,8 +108,7 @@
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 	@media (forced-colors: active) {
-		&.is-selected td,
-		&.is-selected.is-synced td {
+		&.is-selected td {
 			background: SelectedItem;
 		}
 
