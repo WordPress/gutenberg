@@ -52,20 +52,31 @@ export function getDial( {
 		100,
 		Math.max( decimalPlaces( first ), decimalPlaces( step ) )
 	);
+	// The value of a step, rounded as the dial reports it.
+	const reach = ( index: number ) =>
+		Number( ( first + index * step ).toFixed( precision ) );
 	// Rounding can put the last step of a bounded dial a hair above `max`, so
 	// values stop there.
-	const toValue = ( index: number ) => {
-		const value = Number( ( first + index * step ).toFixed( precision ) );
-		return ( wraps ? value : Math.min( value, max ) ) || 0;
-	};
-	// Count the steps that fit. Division can land a hair off a whole number,
-	// so a count within rounding error of one is taken as whole. A wrapping
-	// dial then leaves out the full turn, which has the heading of zero.
-	const count = span / step;
-	const whole = Math.round( count );
-	let lastStep = Math.max( 0, Math.floor( count ) );
-	if ( Math.abs( count - whole ) <= 4 * Number.EPSILON * whole ) {
-		lastStep = wraps ? whole - 1 : whole;
+	const toValue = ( index: number ) =>
+		( wraps ? reach( index ) : Math.min( reach( index ), max ) ) || 0;
+	// Count the steps that fit. The nearest whole count is right unless its
+	// step goes past the limit, in which case the step before it is the last.
+	// The slack covers the rounding error of the arithmetic, so a step that
+	// lands on the limit counts as reaching it. A wrapping dial leaves out
+	// the full turn, which has the heading of zero.
+	const limit = wraps ? unitsPerTurn : max;
+	const slack =
+		8 *
+		Number.EPSILON *
+		Math.max( Math.abs( first ), Math.abs( limit ), step );
+	let lastStep = Math.max( 0, Math.round( span / step ) );
+	if (
+		lastStep > 0 &&
+		( wraps
+			? reach( lastStep ) > limit - slack
+			: reach( lastStep ) > limit + slack )
+	) {
+		lastStep--;
 	}
 	// Angles come from the rounded values, so an end at zero is exactly zero.
 	const toAngle = ( index: number ) =>

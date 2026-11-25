@@ -88,6 +88,8 @@ describe( 'getDial', () => {
 			config: { min: -0.3, max: 0.3, step: 0.1, unitsPerTurn: 1 },
 			last: 0.3,
 		},
+		// Decimal bounds whose difference is inexact still end on `max`.
+		{ config: { min: 350.1, max: 359.9, step: 0.1 }, last: 359.9 },
 		// An upper limit off the step grid keeps the step below it.
 		{ config: { min: 0, max: 100, step: 30 }, last: 90 },
 		{ config: { min: 0, max: 359.9999999995 }, last: 359 },
@@ -124,6 +126,39 @@ describe( 'getDial', () => {
 		expect( getDial( {} ).toValue( getDial( {} ).toIndex( 450 ) ) ).toBe(
 			90
 		);
+	} );
+
+	it( 'counts the steps of generated decimal ranges exactly', () => {
+		const random = createRandom( 5 );
+		const failures: string[] = [];
+		for ( let run = 0; run < 3000; run++ ) {
+			// Whole numbers of thousandths, so the expected count is exact.
+			const places = Math.floor( random() * 3 );
+			const scale = 10 ** places;
+			const stepUnits = [ 1, 2, 5, 25 ][ Math.floor( random() * 4 ) ];
+			const firstUnits = Math.floor( random() * 8000 ) - 4000;
+			const count = 2 + Math.floor( random() * 3000 );
+			// Some limits stop short of the next step.
+			const extraUnits = Math.floor( random() * stepUnits );
+			const config = {
+				min: firstUnits / scale,
+				max: ( firstUnits + count * stepUnits + extraUnits ) / scale,
+				step: stepUnits / scale,
+			};
+			const dial = getDial( config );
+			const expected = ( firstUnits + count * stepUnits ) / scale;
+			if (
+				dial.lastStep !== count ||
+				dial.toValue( dial.lastStep ) !== expected
+			) {
+				failures.push(
+					`${ describeConfig( config ) }: ${ dial.lastStep } steps to ${ dial.toValue(
+						dial.lastStep
+					) }, expected ${ count } to ${ expected }`
+				);
+			}
+		}
+		expect( failures ).toEqual( [] );
 	} );
 
 	it( 'keeps every step distinct, in order, and within the range for generated dials', () => {
@@ -364,24 +399,40 @@ describe( 'turnBetween', () => {
 
 	it( 'adds up to the turns a pointer makes, however finely its path is sampled', () => {
 		const random = createRandom( 4 );
+		// A pointer reports its heading between -180 and 180 degrees.
+		const reported = ( angle: number ) => modulo( angle + 180, 360 ) - 180;
+		const failures: string[] = [];
 		for ( let run = 0; run < 500; run++ ) {
-			// A path of headings that never jumps half a turn at once.
-			let heading = random() * 360 - 180;
-			let total = 0;
+			// A path that never turns half a turn in one move, even when
+			// only every third position is kept.
+			const start = random() * 360 - 180;
+			let position = start;
+			let fine = 0;
 			let coarse = 0;
-			let lastCoarse = heading;
+			let lastCoarse = start;
 			for ( let move = 0; move < 60; move++ ) {
-				const next = heading + ( random() - 0.4 ) * 80;
-				total += turnBetween( heading, next );
-				heading = next;
-				// Keep only every third position, as a slower browser might.
+				const next = position + ( random() - 0.4 ) * 80;
+				fine += turnBetween( reported( position ), reported( next ) );
+				position = next;
 				if ( move % 3 === 2 ) {
-					coarse += turnBetween( lastCoarse, heading );
-					lastCoarse = heading;
+					coarse += turnBetween(
+						reported( lastCoarse ),
+						reported( position )
+					);
+					lastCoarse = position;
 				}
 			}
-			expect( coarse ).toBeCloseTo( total, 6 );
+			const turned = position - start;
+			if (
+				Math.abs( fine - turned ) > 1e-6 ||
+				Math.abs( coarse - turned ) > 1e-6
+			) {
+				failures.push(
+					`from ${ start }: turned ${ turned }, counted ${ fine } and ${ coarse }`
+				);
+			}
 		}
+		expect( failures ).toEqual( [] );
 	} );
 } );
 

@@ -1,6 +1,6 @@
 import { Slider } from '@base-ui/react/slider';
 import clsx from 'clsx';
-import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
+import { useEvent, useMergeRefs } from '@wordpress/compose';
 import { flushSync, forwardRef, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
@@ -100,13 +100,6 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			value === undefined ? uncontrolledValue : ( value ?? placeholder );
 		const index = toIndex( shownValue );
 		const angle = toAngle( index );
-		// A press reads the value after it has moved focus to the dial, so it
-		// needs the value of the latest render and not of its own.
-		const latest = useRef( { shownValue, isEmpty } );
-		useIsomorphicLayoutEffect( () => {
-			latest.current = { shownValue, isEmpty };
-		} );
-
 		function select( nextIndex: number ) {
 			const nextValue = toValue( nextIndex );
 			if ( value === undefined ) {
@@ -126,6 +119,40 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 		}
 
+		// Starts a gesture from a press. It runs as an event callback so that
+		// it sees the render that follows the change of focus, with whatever
+		// value, range, or handler a paired field committed on the way.
+		const startGesture = useEvent(
+			( dial: HTMLElement, event: React.PointerEvent ) => {
+				if ( ! input.current?.matches( ':enabled' ) ) {
+					return;
+				}
+				dial.setPointerCapture( event.pointerId );
+				const pointer = measure( dial )( event );
+				// A press on the dot, or in the middle where there is no
+				// heading, takes hold of the dial where it is. A press
+				// anywhere else turns it to that heading.
+				const turnsTo =
+					pointer.heading === null || isOnDot( pointer, angle )
+						? null
+						: press( pointer.heading, exactAngle( shownValue ) );
+				gesture.current = {
+					pointerId: event.pointerId,
+					...pointer,
+					angle: turnsTo ?? angle,
+					// The press selects its step unless the value is on it
+					// already. An empty dial has no value, and a press on a
+					// heading does not keep a value that lies between steps.
+					index:
+						isEmpty ||
+						( turnsTo !== null && toValue( index ) !== shownValue )
+							? null
+							: index,
+				};
+				selectReached( gesture.current );
+			}
+		);
+
 		function handlePointerDown(
 			event: React.PointerEvent< HTMLDivElement >
 		) {
@@ -139,33 +166,10 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
-			event.currentTarget.setPointerCapture( event.pointerId );
-			// Focus the dial before reading the value. A paired field that
-			// commits when it loses focus then has its say first, and the
-			// press counts its turn from that value.
+			// Focus the dial before the gesture starts. A paired field that
+			// commits when it loses focus then has its say first.
 			flushSync( () => input.current?.focus( { preventScroll: true } ) );
-			const now = latest.current;
-			const shownIndex = toIndex( now.shownValue );
-			const dotAngle = toAngle( shownIndex );
-			const pointer = measure( event.currentTarget )( event );
-			gesture.current = {
-				pointerId: event.pointerId,
-				...pointer,
-				// A press on the dot, or in the middle where there is no
-				// heading, takes hold of the dial where it is. A press
-				// anywhere else turns it to that heading.
-				angle:
-					pointer.heading === null || isOnDot( pointer, dotAngle )
-						? dotAngle
-						: press(
-								pointer.heading,
-								exactAngle( now.shownValue )
-							),
-				// An empty dial has no step yet, so its first press selects
-				// one even when that is the step it already points to.
-				index: now.isEmpty ? null : shownIndex,
-			};
-			selectReached( gesture.current );
+			startGesture( event.currentTarget, event );
 		}
 
 		function handlePointerMove(
@@ -179,6 +183,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			) {
 				return;
 			}
+			// The gesture is over once the primary button or contact is up.
+			// A pen can keep the pointer captured with its other button.
+			if ( event.buttons % 2 === 0 ) {
+				gesture.current = null;
+				return;
+			}
 			// The dial is measured on every move, because it can move on the
 			// page. Positions in its middle have no heading and are skipped.
 			const pointer = measure( event.currentTarget )( event );
@@ -189,12 +199,14 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// shorter way. The total keeps counting across twelve o'clock and
 			// past the ends, so the dot waits at an end until the pointer
 			// comes back. A move through the middle has no way round, so it
-			// selects the heading it lands on, like a press.
-			current.angle =
-				current.heading === null || crossesMiddle( current, pointer )
+			// selects the heading it lands on, like a press. The first
+			// heading after a press in the middle only starts the count.
+			if ( current.heading !== null ) {
+				current.angle = crossesMiddle( current, pointer )
 					? press( pointer.heading, current.angle )
 					: current.angle +
 						turnBetween( current.heading, pointer.heading );
+			}
 			Object.assign( current, pointer );
 			selectReached( current );
 		}

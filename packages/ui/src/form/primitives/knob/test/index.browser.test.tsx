@@ -351,6 +351,111 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'keeps the value when the middle is pressed, until the pointer turns', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" onValueChange={ onValueChange } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { center, right, bottom } = getPoints( dial );
+		await userEvent.pointer( [
+			{ target: dial, coords: center, keys: '[MouseLeft>]' },
+			{ target: dial, coords: right },
+		] );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await userEvent.pointer( [
+			{ target: dial, coords: bottom },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
+	it( 'leaves the value on the pressed step when it was between steps', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Angle"
+					value={ 450.25 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { right } = getPoints( dial );
+		// The dial already points to three o'clock, but the value is not 90.
+		await dial.click( { position: right } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
+	it( 'uses the unit and the callback that a paired field commits as it loses focus', async () => {
+		const beforeCommit = vi.fn();
+		const afterCommit = vi.fn();
+		function Rotation() {
+			const [ inTurns, setInTurns ] = useState( false );
+			return (
+				<ThemeProvider isRoot>
+					<input
+						aria-label="Rotation"
+						onBlur={ () => setInTurns( true ) }
+					/>
+					<Knob
+						aria-label="Rotation dial"
+						min={ inTurns ? -2 : -720 }
+						max={ inTurns ? 2 : 720 }
+						unitsPerTurn={ inTurns ? 1 : 360 }
+						value={ 0 }
+						onValueChange={ inTurns ? afterCommit : beforeCommit }
+					/>
+				</ThemeProvider>
+			);
+		}
+		await render( <Rotation /> );
+		await page.getByRole( 'textbox' ).click();
+		const dial = page.getByRole( 'group' );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
+		expect( beforeCommit ).not.toHaveBeenCalled();
+		expect( afterCommit ).toHaveBeenCalledExactlyOnceWith( 0.25 );
+	} );
+
+	it( 'stops turning once the pointer is no longer pressed, even if it stays captured', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" onValueChange={ onValueChange } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { top, right } = getPoints( dial );
+		let pointerId = 0;
+		dial.element().addEventListener( 'pointerdown', ( event ) => {
+			pointerId = ( event as PointerEvent ).pointerId;
+		} );
+		await userEvent.pointer( {
+			target: dial,
+			coords: top,
+			keys: '[MouseLeft>]',
+		} );
+		// A pen whose tip lifts while its barrel button is held keeps
+		// reporting moves, with only the secondary button down.
+		const face = dial.element().getBoundingClientRect();
+		dial.element().firstElementChild?.dispatchEvent(
+			new PointerEvent( 'pointermove', {
+				bubbles: true,
+				pointerId,
+				isPrimary: true,
+				buttons: 2,
+				clientX: face.left + right.x,
+				clientY: face.top + right.y,
+			} )
+		);
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await userEvent.pointer( '[/MouseLeft]' );
+	} );
+
 	it( 'waits at the end of a bounded range until the pointer comes back round to it', async () => {
 		const onValueChange = vi.fn();
 		await render(
