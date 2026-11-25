@@ -3,6 +3,7 @@ import {
 	MINIMUM_TEXT_CONTRAST,
 } from '../../semantic-color-contrast-pairs.ts';
 import type { RampStepConfig, RampConfig, RampDirection } from './types.ts';
+import { getContrastReferences } from './utils.ts';
 import type { TaperChromaOptions } from './taper-chroma.ts';
 
 const lightnessConstraintForegroundHighContrast = (
@@ -340,20 +341,32 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 function createPrimaryRampConfig(
 	brandSurface: 'surface1' | 'surface3'
 ): RampConfig {
+	// Add each surface target the step does not already meet or exceed.
 	const withSurfaceTargets = (
 		config: RampStepConfig,
 		target: number
-	): RampStepConfig => ( {
-		...config,
-		contrast: {
-			...config.contrast,
-			additionalReferences: [
-				...( config.contrast.additionalReferences ?? [] ),
-				{ reference: 'neutralSurface', target },
-				{ reference: brandSurface, target },
-			],
-		},
-	} );
+	): RampStepConfig => {
+		const existing = getContrastReferences( config.contrast );
+		return {
+			...config,
+			contrast: {
+				...config.contrast,
+				additionalReferences: [
+					...( config.contrast.additionalReferences ?? [] ),
+					...( [ 'neutralSurface', brandSurface ] as const )
+						.filter(
+							( reference ) =>
+								! existing.some(
+									( current ) =>
+										current.reference === reference &&
+										current.target >= target
+								)
+						)
+						.map( ( reference ) => ( { reference, target } ) ),
+				],
+			},
+		};
+	};
 
 	return {
 		...ACCENT_RAMP_CONFIG,
