@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
+-   ExternalLink thickens the underline on hover, press, and keyboard focus ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 -   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height ([#87154](https://github.com/WordPress/gutenberg/pull/87154)).
 -   `TimePicker`: Use the WordPress UI select for choosing a month ([#87079](https://github.com/WordPress/gutenberg/pull/87079)).
 -   `QueryControls`: Use the WordPress UI select for the Order by field and show a placeholder when the current sort is missing or unavailable ([#87078](https://github.com/WordPress/gutenberg/pull/87078)).
