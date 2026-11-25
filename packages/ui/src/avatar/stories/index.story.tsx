@@ -5,10 +5,8 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
-// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
-// Used under the Unsplash License: https://unsplash.com/license
-const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
+// Served from `storybook/static`.
+const IMAGE_SRC = 'profile-picture.svg';
 
 const meta: Meta< typeof Avatar > = {
 	title: 'Components/@wordpress-ui/Avatar',
@@ -28,13 +26,11 @@ export default meta;
 type Story = StoryObj< typeof Avatar >;
 
 export const Default: Story = {
-	tags: [ 'external-requests' ],
 	args: { src: IMAGE_SRC },
 };
 
 /** The assigned color sets the activity ring; the initials fill adapts to contrast with it. */
 export const WithColor: Story = {
-	tags: [ 'external-requests' ],
 	args: { color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
@@ -47,7 +43,6 @@ export const WithColor: Story = {
 
 /** Activity changes the ring without changing the avatar's footprint. */
 export const Activity: Story = {
-	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } active={ false } />
@@ -89,14 +84,13 @@ export const Sizes: Story = {
 
 /** Use a circle for a person's portrait and a square to preserve the corners of a site logo. */
 export const Shapes: Story = {
-	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } src={ IMAGE_SRC } shape="circle" />
 			<Avatar
 				{ ...args }
 				name="WordPress"
-				src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+				src="wordpress-wmark.svg"
 				shape="square"
 			/>
 		</Stack>
