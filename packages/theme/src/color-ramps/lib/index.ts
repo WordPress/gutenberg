@@ -109,6 +109,19 @@ function calculateRamp( {
 			}
 		);
 
+		// The primary ramp keeps emitted colors that meet the actual targets.
+		// Other ramps keep a reserve for rounding.
+		const meetsTargets = ( candidate: PlainColorObject ) =>
+			references.every( ( { color, target } ) =>
+				neutralSurface
+					? getContrast(
+							getColorString( color ),
+							getColorString( candidate )
+						) >= target
+					: getContrast( color, candidate ) >=
+						adjustContrastTarget( target )
+			);
+
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
@@ -118,13 +131,8 @@ function calculateRamp( {
 				);
 			}
 
-			const candidateMeetsTarget = references.every(
-				( { color, target } ) =>
-					getContrast( color, candidateColor ) >=
-					adjustContrastTarget( target )
-			);
 			// If the candidate meets every contrast requirement, use it.
-			if ( candidateMeetsTarget ) {
+			if ( meetsTargets( candidateColor ) ) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
@@ -154,13 +162,9 @@ function calculateRamp( {
 					// Keep the preferred text direction if it fits both fills. If
 					// neither fits, the seed search needs to move away from the surface.
 					for ( const direction of [ better, worse ] ) {
-						const endpoint =
-							direction === 'lighter' ? WHITE : BLACK;
 						if (
-							references.every(
-								( { color, target } ) =>
-									getContrast( color, endpoint ) >=
-									adjustContrastTarget( target )
+							meetsTargets(
+								direction === 'lighter' ? WHITE : BLACK
 							)
 						) {
 							return direction;
@@ -337,6 +341,14 @@ export function buildRamp(
 		} );
 	}
 
+	function meetsEmittedTargets( ramp: Ramp, candidate: PlainColorObject ) {
+		return (
+			getBrandSurfaceContrast( ramp, mainDir ) >=
+				MINIMUM_NON_TEXT_CONTRAST &&
+			getWarnings( ramp, candidate ).length === 0
+		);
+	}
+
 	let bestRamp = rampResults;
 
 	if (
@@ -344,14 +356,15 @@ export function buildRamp(
 		rescaleToFitContrastTargets &&
 		// A rounding reserve helps the numerical search. An already emitted
 		// primary ramp only needs to meet the actual contrast targets.
-		( ! neutralSurface ||
-			getBrandSurfaceContrast( rampResults, mainDir ) <
-				MINIMUM_NON_TEXT_CONTRAST ||
-			getWarnings( rampResults, seed ).length > 0 )
+		( ! neutralSurface || ! meetsEmittedTargets( rampResults, seed ) )
 	) {
 		const iterSteps = neutralSurface
 			? sortedSteps
 			: stepsForStep( maxDeficitStep!, config );
+
+		const seedL = get( seed, [ OKLCH, 'l' ] );
+		// The search can end on a failing sample after passing a closer one.
+		let passing: { seed: PlainColorObject; ramp: Ramp } | undefined;
 
 		function getSeedForL( l: number ): PlainColorObject {
 			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
@@ -368,6 +381,18 @@ export function buildRamp(
 				pinLightness,
 			} );
 
+			if (
+				neutralSurface &&
+				meetsEmittedTargets( iterationResults.rampResults, s ) &&
+				( ! passing ||
+					Math.abs( get( s, [ OKLCH, 'l' ] ) - seedL ) <
+						Math.abs(
+							get( passing.seed, [ OKLCH, 'l' ] ) - seedL
+						) )
+			) {
+				passing = { seed: s, ramp: iterationResults.rampResults };
+			}
+
 			// If the constraints start failing in the opposite direction to the original
 			// iteration's direction, that means we've moved too far away from the target.
 			// Don't use the `maxDeficit` value because it's not related to our search,
@@ -381,7 +406,7 @@ export function buildRamp(
 		// by darkening the seed. For "darker" direction, by lightening the seed.
 		const lowerSeedL = maxDeficitDirection === 'lighter' ? 0 : 1;
 		const lowerDeficit = -maxDeficit;
-		const upperSeedL = get( seed, [ OKLCH, 'l' ] );
+		const upperSeedL = seedL;
 		const upperDeficit = maxDeficit;
 
 		const bestSeed = solveWithBisect(
@@ -405,6 +430,11 @@ export function buildRamp(
 		} );
 		bestRamp = finalResult.rampResults;
 		seed = bestSeed;
+
+		if ( passing && ! meetsEmittedTargets( bestRamp, seed ) ) {
+			bestRamp = passing.ramp;
+			seed = passing.seed;
+		}
 	}
 
 	// Check emitted colors, including reused steps. Numerical search results

@@ -65,6 +65,30 @@ describe( 'accent focus contrast', () => {
 		}
 	);
 
+	it.each( [
+		[ '#000000', '#3858e9', '#fff' ],
+		[ '#3f3f3f', '#8f8f8f', '#1e1e1e' ],
+	] )(
+		'keeps the brand fill and its text on background %s when primary %s already meets the targets',
+		( background, seed, text ) => {
+			const { ramp, warnings } = buildAccentRamp(
+				'primary',
+				seed,
+				buildBgRamp( background )
+			);
+			expect( warnings ).toBeUndefined();
+			expect( ramp.bgFill1 ).toBe( seed );
+			expect( ramp.fgFill ).toBe( text );
+		}
+	);
+
+	it( 'keeps a passing seed when the seed search ends on a failing one', () => {
+		expect(
+			buildAccentRamp( 'primary', '#000000', buildBgRamp( '#608010' ) )
+				.warnings
+		).toBeUndefined();
+	} );
+
 	it( 'retains a primary ramp that already meets the focus constraints', () => {
 		const neutral = buildBgRamp( '#fcfcfc' );
 		expect( buildAccentRamp( 'primary', '#3858e9', neutral ) ).toEqual(
