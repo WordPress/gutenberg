@@ -2,6 +2,7 @@
 import {
 	createElement,
 	Fragment,
+	useState,
 	type ChangeEvent,
 	type CSSProperties,
 } from 'react';
@@ -16,10 +17,12 @@ import {
 } from 'storybook/internal/components';
 import { useTheme } from 'storybook/theming';
 import {
+	CONTRAST_LEVELS,
 	DARK_THEME_COLORS,
 	getCustomThemeColors,
 	LIGHT_THEME_COLORS,
 	normalizeColorTheme,
+	normalizeContrast,
 	type ColorTheme,
 } from './constants';
 
@@ -282,6 +285,131 @@ function ThemeColorControls() {
 	);
 }
 
+const CONTRAST_OPTIONS = [
+	{ value: CONTRAST_LEVELS.minimum, title: 'Minimum' },
+	{ value: CONTRAST_LEVELS.standard, title: 'Standard' },
+	{ value: CONTRAST_LEVELS.enhanced, title: 'Enhanced' },
+];
+
+const contrastRowStyle = {
+	alignItems: 'center',
+	display: 'grid',
+	fontSize: 11,
+	gap: 8,
+	gridTemplateColumns: '1fr auto',
+	marginTop: 8,
+} satisfies CSSProperties;
+
+function ThemeContrastControls() {
+	const [ globals, updateGlobals ] = useGlobals();
+	const theme = useTheme();
+	const contrast = normalizeContrast( globals.dsContrast );
+	// Rebuilding the theme for every step of a drag is slow, so while the
+	// slider is being dragged it keeps its own value, and only updates the
+	// global when released.
+	const [ draft, setDraft ] = useState< number | null >( null );
+	const sliderValue = draft ?? contrast;
+
+	const commitFromEvent = ( event: { currentTarget: HTMLInputElement } ) =>
+		commit( Number( event.currentTarget.value ) );
+
+	const commit = ( value: number ) => {
+		setDraft( null );
+		const normalized = normalizeContrast( value );
+		if ( normalized === contrast ) {
+			return;
+		}
+		updateGlobals( {
+			dsContrast: normalized === 0 ? undefined : String( normalized ),
+		} );
+	};
+
+	return createElement(
+		'div',
+		{
+			style: {
+				borderTop: `1px solid ${ theme.appBorderColor }`,
+				boxSizing: 'border-box',
+				color: theme.color.defaultText,
+				lineHeight: '18px',
+				padding: 15,
+				width: 280,
+			},
+		},
+		createElement(
+			'div',
+			{ style: { fontWeight: theme.typography.weight.bold } },
+			'Contrast'
+		),
+		createElement(
+			'div',
+			{
+				role: 'group',
+				'aria-label': 'Contrast level',
+				style: colorPresetGridStyle,
+			},
+			...CONTRAST_OPTIONS.map( ( option ) => {
+				const isSelected = contrast === option.value;
+				return createElement(
+					ToggleButton,
+					{
+						key: option.title,
+						type: 'button',
+						ariaLabel: false,
+						pressed: isSelected,
+						size: 'small',
+						variant: 'outline',
+						style: {
+							...colorPresetButtonStyle,
+							background: isSelected
+								? theme.background.hoverable
+								: undefined,
+							boxShadow: isSelected
+								? `${ theme.barSelectedColor } 0 0 0 2px inset`
+								: undefined,
+						},
+						onClick: () => commit( option.value ),
+					},
+					option.title
+				);
+			} )
+		),
+		createElement(
+			'div',
+			{ style: contrastRowStyle },
+			createElement( 'input', {
+				type: 'range',
+				'aria-label': 'Contrast',
+				min: -1,
+				max: 1,
+				step: 0.1,
+				value: sliderValue,
+				style: { accentColor: theme.color.secondary, width: '100%' },
+				onChange: ( event: ChangeEvent< HTMLInputElement > ) =>
+					setDraft( normalizeContrast( event.currentTarget.value ) ),
+				// Read the live value: a quick second key press can arrive
+				// before React re-renders with the first one.
+				onPointerUp: commitFromEvent,
+				onKeyUp: commitFromEvent,
+				onBlur: commitFromEvent,
+			} ),
+			createElement(
+				'output',
+				{
+					style: {
+						color: theme.textMutedColor,
+						fontFamily: theme.typography.fonts.mono,
+						fontSize: 10,
+						minWidth: 28,
+						textAlign: 'end',
+					},
+				},
+				String( sliderValue )
+			)
+		)
+	);
+}
+
 function ThemeTooltipMessage( {
 	title,
 	globalName,
@@ -310,6 +438,7 @@ const ThemeTool = () => {
 		Fragment,
 		null,
 		createElement( ThemeColorControls ),
+		createElement( ThemeContrastControls ),
 		createElement( ThemeTooltipMessage, {
 			title: 'Cursor control',
 			globalName: 'dsCursorControl',

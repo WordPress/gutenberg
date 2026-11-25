@@ -65,6 +65,12 @@ export type ContrastRequirement = {
 	 * target as a reason to recalculate the ramp.
 	 */
 	ignoreWhenAdjustingSeed?: boolean;
+	/**
+	 * When true, a missed target doesn't cause the seed to be adjusted, but is
+	 * still reported as a warning. Unlike `ignoreWhenAdjustingSeed`, the step
+	 * stays in the warnings check.
+	 */
+	skipSeedAdjustment?: boolean;
 };
 
 export type RampStepConfig = {
@@ -77,6 +83,31 @@ export type RampStepConfig = {
 	 * in the ramp and improves consistency.
 	 */
 	sameAsIfPossible?: keyof Ramp;
+	/**
+	 * Scales the contrast of the `lightness` constraint by this exponent. The
+	 * constraint's color becomes the color whose contrast with the reference
+	 * is the constraint's contrast raised to this power. `1` (or omitted)
+	 * keeps the constraint as it is.
+	 */
+	lightnessExponent?: number;
+	/**
+	 * A second, independent minimum contrast against another step. When the
+	 * solved color falls short of it, the color is moved away from that step
+	 * until it meets it.
+	 */
+	minimumContrastWith?: {
+		step: keyof Ramp;
+		target: number;
+	};
+	/**
+	 * Keeps the step's contrast at least `ratio` times lower than `step`'s
+	 * contrast against the same reference when the `lightness` constraint is
+	 * scaled, but never below the step's own target.
+	 */
+	maxRatioBelow?: {
+		step: keyof Ramp;
+		ratio: number;
+	};
 };
 
 export type RampConfig = Record< keyof Ramp, RampStepConfig >;

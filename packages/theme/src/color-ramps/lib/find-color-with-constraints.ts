@@ -28,6 +28,8 @@ function cdiff( c1: number, c2: number ) {
  * @param options.lightnessConstraint
  * @param options.lightnessConstraint.type
  * @param options.lightnessConstraint.value
+ * @param options.lightnessConstraint.exponent    Scales the contrast of an `onlyIfSucceeds` constraint.
+ * @param options.lightnessConstraint.maxContrast Upper bound on the scaled constraint's contrast.
  * @param options.taperChromaOptions
  */
 export function findColorMeetingRequirements(
@@ -42,6 +44,8 @@ export function findColorMeetingRequirements(
 		lightnessConstraint?: {
 			type: 'force' | 'onlyIfSucceeds';
 			value: number;
+			exponent?: number;
+			maxContrast?: number;
 		};
 		taperChromaOptions?: TaperChromaOptions;
 	} = {}
@@ -100,13 +104,46 @@ export function findColorMeetingRequirements(
 		// min/max L values.
 		const colorWithExactL = getColorForL( lightnessConstraint.value );
 		const exactLContrast = getContrast( reference, colorWithExactL );
+
+		// A scaled constraint becomes a preferred contrast: the constraint's
+		// contrast raised to the exponent, within what the endpoint can reach.
+		// Like `onlyIfSucceeds`, it applies only when it also meets the target;
+		// otherwise the target search below runs, rather than the unscaled
+		// constraint, so the step still follows the scale.
+		const { exponent = 1, maxContrast = Infinity } = lightnessConstraint;
+		const isScaled =
+			lightnessConstraint.type === 'onlyIfSucceeds' && exponent !== 1;
+		if ( isScaled ) {
+			const preferred = Math.min(
+				exactLContrast ** exponent,
+				maxContrast,
+				highestContrast * Math.exp( -CONTRAST_EPSILON )
+			);
+			if ( cdiff( preferred, target ) >= -CONTRAST_EPSILON ) {
+				const preferredResult = findColorMeetingRequirements(
+					reference,
+					seed,
+					preferred,
+					direction,
+					{ taperChromaOptions }
+				);
+				return {
+					...preferredResult,
+					reached: true,
+					// Report the headroom against the step's own target, so the
+					// seed adjustment isn't misled by the clamped preference.
+					deficit: cdiff( target, preferredResult.achieved ),
+				};
+			}
+		}
+
 		const exactLContrastMeetsTarget =
 			cdiff( exactLContrast, target ) >= -CONTRAST_EPSILON;
 
 		// If the L constraint is of "force" type, apply it even when it doesn't
 		// meet the contrast target.
 		if (
-			exactLContrastMeetsTarget ||
+			( exactLContrastMeetsTarget && ! isScaled ) ||
 			lightnessConstraint.type === 'force'
 		) {
 			return {

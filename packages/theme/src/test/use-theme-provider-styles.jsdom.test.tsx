@@ -218,6 +218,80 @@ describe( 'useThemeProviderStyles', () => {
 		} );
 	} );
 
+	describe( 'contrast', () => {
+		it( 'resolves to 0 by default and leaves color unset', () => {
+			const { result } = renderHook( () => useThemeProviderStyles() );
+
+			expect( result.current.resolvedSettings.contrast ).toBe( 0 );
+			expect( result.current.themeProviderStyles ).not.toHaveProperty(
+				'--wpds-color-foreground-content-neutral'
+			);
+		} );
+
+		it( 'clamps and rounds the local value', () => {
+			const { result, rerender } = renderHook(
+				( { contrast }: { contrast: number } ) =>
+					useThemeProviderStyles( { contrast } ),
+				{ initialProps: { contrast: 0.44 } }
+			);
+			expect( result.current.resolvedSettings.contrast ).toBe( 0.4 );
+
+			rerender( { contrast: -5 } );
+			expect( result.current.resolvedSettings.contrast ).toBe( -1 );
+		} );
+
+		it( 'generates colors from the default seeds when only contrast is set', () => {
+			const { result: standard } = renderHook( () =>
+				useThemeProviderStyles( {
+					color: { background: DEFAULT_SEED_COLORS.background },
+				} )
+			);
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( { contrast: -1 } )
+			);
+
+			expect( result.current.resolvedSettings.color ).toEqual( {
+				primary: DEFAULT_SEED_COLORS.primary,
+				background: DEFAULT_SEED_COLORS.background,
+			} );
+			const key = '--wpds-color-foreground-content-neutral';
+			expect( result.current.themeProviderStyles ).toHaveProperty( key );
+			expect( result.current.themeProviderStyles[ key ] ).not.toBe(
+				standard.current.themeProviderStyles[ key ]
+			);
+		} );
+
+		it( 'inherits the parent value', () => {
+			const wrapper = ( { children }: { children: ReactNode } ) => (
+				<ThemeProvider contrast={ 0.5 }>{ children }</ThemeProvider>
+			);
+
+			const { result } = renderHook( () => useThemeProviderStyles(), {
+				wrapper,
+			} );
+
+			expect( result.current.resolvedSettings.contrast ).toBe( 0.5 );
+			expect( result.current.themeProviderStyles ).toHaveProperty(
+				'--wpds-color-foreground-content-neutral'
+			);
+		} );
+
+		it.each( [ -1, -0.5, 0.5, 1 ] )(
+			'reports no semantic contrast warnings for the default seeds at %s',
+			( contrast ) => {
+				const { result } = renderHook( () =>
+					useThemeProviderStyles( { contrast } )
+				);
+
+				expect(
+					result.current.colorWarnings?.filter(
+						( warning ) => warning.type === 'contrast'
+					)
+				).toEqual( [] );
+			}
+		);
+	} );
+
 	describe( 'cursor', () => {
 		it( 'sets the cursor control custom property when provided', () => {
 			const { result } = renderHook( () =>

@@ -62,6 +62,24 @@ export interface ThemeProviderSettings {
 	 * parent value, the prebuilt default applies (`subtle`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
+
+	/**
+	 * Adjusts contrast across the generated theme colors, from `-1` (lowest)
+	 * to `1` (highest). `0` keeps the standard colors. Values outside the
+	 * range are clamped, and values are rounded to steps of `0.1`.
+	 *
+	 * Higher values strengthen text, strokes and surface separation; at `1`
+	 * every text role reaches at least 7:1. Lower values soften the theme,
+	 * and below `0` weak text and strokes no longer meet WCAG AA. Focus
+	 * indicators, solid fills and text on them keep their standard contrast or
+	 * higher at every value. See `contrastLevels` for documented values.
+	 *
+	 * Any value other than `0` generates every color ramp at runtime.
+	 *
+	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
+	 * parent value, `0` applies.
+	 */
+	contrast?: number;
 }
 
 /**

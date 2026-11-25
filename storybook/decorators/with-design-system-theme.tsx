@@ -5,12 +5,13 @@ import {
 	getCustomThemeColors,
 	LIGHT_THEME_COLORS,
 	normalizeColorTheme,
+	normalizeContrast,
 } from '../addons/design-system-theme/constants';
 
 type ThemeProviderProps = React.ComponentProps< typeof ThemeProvider >;
 type ThemeProviderSettings = Pick<
 	ThemeProviderProps,
-	'color' | 'cornerRadius' | 'cursor'
+	'color' | 'cornerRadius' | 'cursor' | 'contrast'
 >;
 
 export function getDesignSystemThemeSettings(
@@ -35,6 +36,8 @@ export function getDesignSystemThemeSettings(
 		color,
 		cursor: cursorControl ? { control: cursorControl } : undefined,
 		cornerRadius: cornerRadiusPreset,
+		// Globals arrive as strings from the URL.
+		contrast: normalizeContrast( globals.dsContrast ) || undefined,
 	};
 }
 

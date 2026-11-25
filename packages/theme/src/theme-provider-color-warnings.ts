@@ -30,9 +30,34 @@ export type ThemeProviderColorWarning =
 			achievedContrast: number;
 	  };
 
+/**
+ * Minimum contrasts for the checked semantic pairs. Text on solid fills (the
+ * `-strong` interactive foregrounds) and focus indicators can have their own
+ * minimums, because the contrast setting holds them while other text softens.
+ */
+export type ThemeProviderContrastThresholds = {
+	text: number;
+	fillText: number;
+	focus: number;
+};
+
+const DEFAULT_THRESHOLDS: ThemeProviderContrastThresholds = {
+	text: MINIMUM_TEXT_CONTRAST,
+	fillText: MINIMUM_TEXT_CONTRAST,
+	focus: MINIMUM_NON_TEXT_CONTRAST,
+};
+
+function isFillTextPair( foreground: ThemeProviderSemanticColorToken ) {
+	return (
+		foreground.startsWith( 'foreground.interactive.' ) &&
+		/-strong(-active)?$/.test( foreground )
+	);
+}
+
 export function collectThemeProviderColorWarnings(
 	ramps: ReadonlyMap< ThemeProviderColorRampName, RampResult >,
-	colorValues: ReadonlyMap< string, string >
+	colorValues: ReadonlyMap< string, string >,
+	thresholds: ThemeProviderContrastThresholds = DEFAULT_THRESHOLDS
 ): ThemeProviderColorWarning[] {
 	const warnings: ThemeProviderColorWarning[] = [];
 
@@ -53,11 +78,13 @@ export function collectThemeProviderColorWarnings(
 	} of [
 		...SEMANTIC_COLOR_CONTRAST_PAIRS.map( ( pair ) => ( {
 			...pair,
-			requiredContrast: MINIMUM_TEXT_CONTRAST,
+			requiredContrast: isFillTextPair( pair.foreground )
+				? thresholds.fillText
+				: thresholds.text,
 		} ) ),
 		...SEMANTIC_FOCUS_CONTRAST_PAIRS.map( ( pair ) => ( {
 			...pair,
-			requiredContrast: MINIMUM_NON_TEXT_CONTRAST,
+			requiredContrast: thresholds.focus,
 		} ) ),
 	] ) {
 		const backgroundColor = colorValues.get(

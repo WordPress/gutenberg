@@ -25,6 +25,7 @@
 
 ### New Features
 
+-   Add a `contrast` setting to `ThemeProvider` that adjusts contrast across the generated colors from `-1` to `1`, and export `contrastLevels` with documented values. `0` keeps today's colors.
 -   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` for the knob of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
