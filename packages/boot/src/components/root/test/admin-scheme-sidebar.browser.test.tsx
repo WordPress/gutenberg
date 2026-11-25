@@ -38,6 +38,9 @@ describe( 'admin color scheme sidebar', () => {
 			).backgroundColor;
 			const actual = sidebarColor.match( /\d+/g )!.map( Number );
 
+			// An opaque color, `rgb( r, g, b )`, has no alpha channel.
+			expect( actual ).toHaveLength( 3 );
+
 			hexToChannels( core ).forEach( ( channel, index ) => {
 				expect(
 					Math.abs( channel - actual[ index ] )
