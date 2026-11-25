@@ -1755,6 +1755,87 @@ test.describe( 'List View', () => {
 			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
 			await listViewUtils.expectNoBlankRows();
 		} );
+
+		test( 'moves to both ends of a nested list with End and Home', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				Array.from(
+					{ length: 100 },
+					( _, group ) =>
+						`<!-- wp:group {"metadata":{"name":"Group ${
+							group + 1
+						}"}} --><div class="wp-block-group">${ Array.from(
+							{ length: 4 },
+							( __, paragraph ) =>
+								`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+									group + 1
+								}.${
+									paragraph + 1
+								}"}} --><p></p><!-- /wp:paragraph -->`
+						).join( '' ) }</div><!-- /wp:group -->`
+				).join( '' )
+			);
+			const listView = await listViewUtils.openListView();
+			const getGroup = ( position ) =>
+				listView.getByRole( 'link', {
+					name: `Group ${ position }`,
+					exact: true,
+				} );
+			await expect( getGroup( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'End' );
+			await expect( getGroup( 100 ) ).toBeFocused();
+			await expect( getGroup( 100 ) ).toBeInViewport();
+
+			// Expands the last group, then leaves it far outside of the
+			// rendered rows.
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'Home' );
+			await expect( getGroup( 1 ) ).toBeFocused();
+			await expect( getGroup( 1 ) ).toBeInViewport();
+
+			await page.keyboard.press( 'End' );
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeFocused();
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeInViewport();
+		} );
+
+		test( 'moves to a parent far above with Arrow Left', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				`<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p></p><!-- /wp:paragraph --><!-- wp:group {"metadata":{"name":"Inner"}} --><div class="wp-block-group">${ Array.from(
+					{ length: 60 },
+					( _, index ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+							index + 1
+						}"}} --><p></p><!-- /wp:paragraph -->`
+				).join(
+					''
+				) }</div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph -->`
+			);
+			await page.evaluate( () => {
+				const [ outer ] = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.selectBlock(
+						outer.innerBlocks[ 1 ].innerBlocks[ 49 ].clientId
+					);
+			} );
+			const listView = await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 50 ) ).toBeFocused();
+
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect(
+				listView.getByRole( 'link', { name: 'Inner', exact: true } )
+			).toBeFocused();
+		} );
 	} );
 } );
 
