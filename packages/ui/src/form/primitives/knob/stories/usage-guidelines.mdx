@@ -12,20 +12,6 @@ import * as KnobStories from './index.story';
 
 Do not use a knob on its own. A small dial is hard to set to an exact value, so there must always be an input beside it that edits the same value.
 
-## Choose the range
-
-Without `min` and `max`, the dial covers one turn and wraps. Zero points up, 90 points right, and one step past 359 returns to 0. Use this for a direction, such as a gradient angle.
-
-<Canvas of={ KnobStories.Default } />
-
-Set `min` and `max` together when the number of turns matters. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A click picks the heading on the turn nearest the current value, so clicking three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
-
-<Canvas of={ KnobStories.Bounded } />
-
-`unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. Set `step` to the smallest change the value should take. Steps count from `min`, so choose a `min` that is a whole number of steps away from zero.
-
-<Canvas of={ KnobStories.WithUnits } />
-
 ## Pair it with an input
 
 The input owns the value. It decides which numbers it accepts and what gets saved. The dial reads that value and reports changes with `onValueChange`.
@@ -38,14 +24,30 @@ A wrapping dial shows a value outside one turn at the same heading. The field be
 
 Both controls stay in the Tab order, so each needs its own name. Let the visible label name the input. Give the dial an `aria-label` that starts with the same words, such as “Rotation dial”. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText`.
 
-### Show an unset value
+## Choose the range
+
+Without `min` and `max`, the dial covers one turn and wraps, as in the example above. Zero points up, 90 points right, and one step past 359 returns to 0. Use this for a direction, such as a gradient angle.
+
+Set `min` and `max` together when the number of turns matters. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A click picks the heading on the turn nearest the current value, so clicking three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
+
+`unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. `step` is the smallest change the value can take. It defaults to 1 for degrees and gradians, and to 0.01 for radians and turns.
+
+Steps count from `min`. Choose a `min` that is a whole number of steps away from zero, so zero stays selectable. If the steps do not land on `max`, the highest selectable value is the last step below it.
+
+<Canvas of={ KnobStories.WithUnits } />
+
+## Show an unset value
 
 Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Turning the dial from there sets a value. Clicking the heading it already points to sets that value too.
 
-A slider always has a number, so assistive technology reads the placeholder as the dial's value. The input is where an unset value shows as empty. `undefined` does not mean unset. It makes the dial uncontrolled, starting from `defaultValue`.
+A slider always has a number, so assistive technology reads the placeholder as the dial's value. Use `getAriaValueText` to say where that number comes from, such as “45 degrees, inherited”. The input is where an unset value shows as empty. `undefined` does not mean unset. It makes the dial uncontrolled, starting from `defaultValue`.
 
 <Canvas of={ KnobStories.WithInheritedValue } />
 
+## Pointer interaction
+
+Click or tap a heading to select it, or drag around the center to keep turning. The value changes when the pointer moves or lifts, so a canceled press leaves it alone. Past an end of a bounded dial, the dot waits at that end until the pointer comes back round to it.
+
 ## Keyboard interaction
 
-Tab focuses the dial. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to ten steps. Home and End go to the first and last selectable values. A wrapping dial continues past either end.
+Tab focuses the dial. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to ten steps and is rounded to a whole number of steps. Home and End go to the first and last selectable values. A wrapping dial continues past either end.

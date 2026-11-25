@@ -67,13 +67,14 @@ export const Disabled: Story = {
  */
 export const WithNumberInput: Story = {
 	args: { format: DEGREES },
-	render: function GradientAngle( { onValueChange, ...args } ) {
+	render: function GradientAngle( { onValueChange, name, ...args } ) {
 		const [ angle, setAngle ] = useState( 135 );
 		const [ draft, setDraft ] = useState< string >();
 		return (
 			<Stack direction="row" gap="sm" align="flex-end">
 				<InputControl
 					label="Gradient angle"
+					name={ name }
 					type="number"
 					suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 					disabled={ args.disabled }
@@ -102,12 +103,12 @@ export const WithNumberInput: Story = {
 
 /**
  * An unset rotation shows the inherited angle as the field's placeholder and
- * as a hollow dot on the dial. Clearing the field restores it. Entering zero
- * sets an explicit 0°.
+ * as a hollow dot on the dial, which reads “45 degrees, inherited”. Clearing
+ * the field restores it. Entering zero sets an explicit 0°.
  */
 export const WithInheritedValue: Story = {
 	args: { min: -720, max: 720, format: DEGREES },
-	render: function Rotation( { onValueChange, ...args } ) {
+	render: function Rotation( { onValueChange, name, ...args } ) {
 		const inherited = 45;
 		const numberHelpId = useId();
 		const dialHelpId = useId();
@@ -118,6 +119,7 @@ export const WithInheritedValue: Story = {
 				<Stack direction="row" gap="sm" align="flex-end">
 					<InputControl
 						label="Rotation"
+						name={ name }
 						type="number"
 						suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 						min={ args.min }
@@ -144,6 +146,11 @@ export const WithInheritedValue: Story = {
 						aria-describedby={ dialHelpId }
 						value={ rotation }
 						placeholder={ inherited }
+						getAriaValueText={
+							rotation === null
+								? ( formatted ) => `${ formatted }, inherited`
+								: undefined
+						}
 						onValueChange={ ( next ) => {
 							setRotation( next );
 							onValueChange?.( next );
@@ -189,8 +196,10 @@ export const WithUnits: Story = {
 	parameters: { controls: { disable: true } },
 	render: function RotationWithUnits() {
 		const [ unit, setUnit ] = useState( UNITS[ 0 ] );
-		const [ rotation, setRotation ] = useState( 90 );
+		// Keep the rotation in turns, so changing the unit never rounds it.
+		const [ turns, setTurns ] = useState( 0.25 );
 		const [ draft, setDraft ] = useState< string >();
+		const rotation = Number( ( turns * unit.unitsPerTurn ).toFixed( 2 ) );
 		// Two turns either way, rounded down to a whole number of steps so that
 		// zero stays selectable.
 		const limit = Number(
@@ -208,7 +217,9 @@ export const WithUnits: Story = {
 					onChange={ ( { currentTarget } ) => {
 						setDraft( currentTarget.value );
 						if ( currentTarget.value !== '' ) {
-							setRotation( currentTarget.valueAsNumber );
+							setTurns(
+								currentTarget.valueAsNumber / unit.unitsPerTurn
+							);
 						}
 					} }
 					onBlur={ () => setDraft( undefined ) }
@@ -217,19 +228,13 @@ export const WithUnits: Story = {
 					label="Unit"
 					items={ UNITS }
 					value={ unit }
-					onValueChange={ ( next ) => {
-						const nextUnit =
+					onValueChange={ ( next ) =>
+						setUnit(
 							UNITS.find(
 								( item ) => item.value === next?.value
-							) ?? unit;
-						const turns = rotation / unit.unitsPerTurn;
-						setUnit( nextUnit );
-						setRotation(
-							Number(
-								( turns * nextUnit.unitsPerTurn ).toFixed( 2 )
-							)
-						);
-					} }
+							) ?? unit
+						)
+					}
 				/>
 				<Knob
 					aria-label="Rotation dial"
@@ -241,7 +246,9 @@ export const WithUnits: Story = {
 						`${ formatted } ${ unit.label }`
 					}
 					value={ rotation }
-					onValueChange={ setRotation }
+					onValueChange={ ( next ) =>
+						setTurns( next / unit.unitsPerTurn )
+					}
 				/>
 			</Stack>
 		);
