@@ -4,8 +4,9 @@ import { useRefEffect } from '@wordpress/compose';
  * Puts the caret back when iOS moves it out of a field right after focus
  * moved there from the wrapper, as the editing host. Moving focus soon after
  * a tap makes WebKit reset its text gestures, and UIKit then repeats the tap
- * at the top left corner of the page, moving the caret there. Focus stays in
- * the field, so only that repeat leaves the caret outside it.
+ * at the top left corner of the page, moving the caret there or clearing the
+ * selection. Focus stays in the field, so only that repeat leaves the caret
+ * outside it, or leaves no caret at all.
  */
 export default function useRestoreTapCaret() {
 	return useRefEffect< HTMLElement >( ( node ) => {
@@ -23,19 +24,10 @@ export default function useRestoreTapCaret() {
 					? selection.getRangeAt( 0 ).cloneRange()
 					: undefined;
 			field = caret && ( event.target as Node );
-			// TEMPORARY (debugging a flaky iOS test).
-			( window as any ).__iosTestLog?.(
-				'restore:save',
-				'saved=' + !! caret
-			);
 		}
 
 		// A new press or key may move the caret anywhere.
 		function forget() {
-			// TEMPORARY (debugging a flaky iOS test).
-			if ( caret ) {
-				( window as any ).__iosTestLog?.( 'restore:forget' );
-			}
 			caret = undefined;
 		}
 
@@ -46,25 +38,22 @@ export default function useRestoreTapCaret() {
 				selection.anchorNode &&
 				! activeElement?.contains( selection.anchorNode )
 			) {
-				// TEMPORARY (debugging a flaky iOS test).
-				( window as any ).__iosTestLog?.( 'restore:before' );
 				selection.removeAllRanges();
 				selection.addRange( caret );
-				( window as any ).__iosTestLog?.( 'restore:after' );
 				caret = undefined;
 			}
 		}
 
-		// The repeat can also clear the selection, leaving focus in the field.
-		// Nothing else then puts the caret back, so a key would do nothing.
+		// When the repeat clears the selection instead, the next key would do
+		// nothing. Restoring the caret only then, and not as soon as the
+		// selection is cleared, leaves alone the block editor's own clearing of
+		// it, such as when a whole block is selected.
 		function onKeyDown() {
 			if (
 				caret &&
 				! selection.rangeCount &&
 				ownerDocument.activeElement === field
 			) {
-				// TEMPORARY (debugging a flaky iOS test).
-				( window as any ).__iosTestLog?.( 'restore:keydown' );
 				selection.addRange( caret );
 			}
 			forget();

@@ -75,11 +75,6 @@ export default function useClickSelection() {
 						node
 					) as HTMLElement | undefined;
 
-					// TEMPORARY (debugging a flaky iOS test).
-					( window as any ).__iosTestLog?.(
-						'handoff',
-						'field=' + ( field?.textContent ?? 'none' )
-					);
 					if ( field ) {
 						setContentEditableWrapper( node, false );
 						field.focus( { preventScroll: true } );

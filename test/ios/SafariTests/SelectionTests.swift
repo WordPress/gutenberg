@@ -301,21 +301,10 @@ final class SelectionTests: XCTestCase {
 		heading.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
 		let keyboard = app.keyboards.firstMatch
 		XCTAssertTrue( keyboard.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
-		let keyboardShownAt = Date()
 		quote.coordinate( withNormalizedOffset: CGVector( dx: 0.02, dy: 0.5 ) ).tap()
-		let tapDelay = Date().timeIntervalSince( keyboardShownAt )
 		app.typeText( "X" )
 
-		// TEMPORARY (debugging this flaky test): print where the X went and
-		// the events of the taps, whether the test passes or fails.
-		let gotX = editor.block( title: "Paragraph", content: "XQuote here" ).waitForExistence( timeout: 5 )
-		print( "IOSDEBUG result=\( gotX ? "PASS" : "FAIL" ) tapDelay=\( String( format: "%.2f", tapDelay ) )s blocks=\( editor.getBlocks() )" )
-		// The page writes the log 1.5 seconds after the last event.
-		sleep( 3 )
-		let log = web.descendants( matching: .any ).matching( NSPredicate( format: "label BEGINSWITH 'ioslog: '" ) ).firstMatch
-		print( "IOSDEBUG log=\( log.exists ? log.label : "missing" )" )
-
-		XCTAssertTrue( gotX, "The quote did not get the X" )
+		XCTAssertTrue( editor.block( title: "Paragraph", content: "XQuote here" ).waitForExistence( timeout: 5 ), "The quote did not get the X" )
 		XCTAssertTrue( editor.block( title: "Heading 2", content: "Heading here" ).exists, "The heading changed" )
 		XCTAssertTrue( editor.block( title: "Paragraph", content: "Paragraph here" ).exists )
 	}
