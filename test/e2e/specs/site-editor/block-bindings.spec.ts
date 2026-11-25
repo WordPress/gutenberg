@@ -54,4 +54,30 @@ test.describe( 'Block bindings in the site editor', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'Movie field default value' );
 	} );
+
+	test( 'should be possible to connect a post meta field through the attributes panel', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.getByLabel( 'Attributes options' ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'content, show' } )
+			.click();
+		await page
+			.getByRole( 'button', {
+				name: 'content Not connected',
+				exact: true,
+			} )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Post Meta' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox' )
+			.filter( { hasText: 'Movie field label' } )
+			.click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'Movie field default value' );
+	} );
 } );

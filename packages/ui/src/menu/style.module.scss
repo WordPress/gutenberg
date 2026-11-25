@@ -270,6 +270,7 @@
 		}
 
 		.item-selection-indicator {
+			position: relative;
 			grid-column: selection-start / selection-end;
 			justify-self: center;
 			justify-items: center;
@@ -290,8 +291,7 @@
 		}
 
 		.checkbox-selection-icon {
-			/* Optical alignment with the item label. */
-			translate: 0 1px;
+			position: absolute;
 		}
 
 		.radio-selection-icon {

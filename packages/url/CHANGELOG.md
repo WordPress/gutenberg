@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `getFilename`: Decode the filename so non-ASCII names read as written ([#86422](https://github.com/WordPress/gutenberg/pull/86422)).

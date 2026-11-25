@@ -92,19 +92,34 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
 			// Simplified context handling: mobile vs default.
 			// Only 'mobile' context is special; everything else uses the default editor context.
-			$context_param       = $request->get_param( 'context' );
-			$editor_context_name = 'mobile' === $context_param ? 'core/mobile' : 'core/edit-post';
+			$is_mobile           = 'mobile' === $request->get_param( 'context' );
+			$editor_context_name = $is_mobile ? 'core/mobile' : 'core/edit-post';
 
-			// Apply mobile-specific settings filter only for mobile context.
-			if ( 'mobile' === $context_param ) {
+			/*
+			 * The default settings serve the site editor, but they are built for
+			 * core/edit-post without a post, where Core never grants
+			 * edit_block_binding. Check it with the site editor context, as
+			 * site-editor.php does. It runs before any other filter, so plugins
+			 * can still change the value.
+			 */
+			$set_can_update_block_bindings = static function ( $settings ) {
+				$settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) ) );
+				return $settings;
+			};
+
+			if ( $is_mobile ) {
 				add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+			} else {
+				add_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
 			$settings       = get_block_editor_settings( array(), $editor_context );
 
-			if ( 'mobile' === $context_param ) {
+			if ( $is_mobile ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+			} else {
+				remove_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			return rest_ensure_response( $settings );
@@ -391,7 +406,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				);
 			}
 
-			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.editor.registerCoreBlockBindingsSources();';
+			/*
+			 * The experimental blocks are registered as the classic site editor
+			 * registers them, so that both site editors offer the same blocks.
+			 * The function is only defined in the Gutenberg plugin.
+			 */
+			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.blockLibrary.__experimentalRegisterExperimentalCoreBlocks?.( { enableFSEBlocks: true } ); wp.editor.registerCoreBlockBindingsSources();';
 			wp_add_inline_script(
 				'wp-block-library',
 				$load_blocks_scripts,
@@ -403,6 +423,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_enqueue_script( 'wp-block-library' );
 			wp_enqueue_style( 'wp-editor' );
 			wp_enqueue_style( 'wp-block-library' );
+			// Block editor UI outside the canvas, such as inspector controls.
+			wp_enqueue_style( 'wp-block-library-editor' );
 			wp_enqueue_style( 'wp-format-library' );
 			wp_enqueue_media();
 

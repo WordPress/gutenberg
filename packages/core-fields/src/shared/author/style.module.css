@@ -6,15 +6,16 @@
 .icon {
 	display: flex;
 	align-items: center;
-	flex-shrink: 0;
+	justify-content: center;
 	inline-size: var(--wpds-dimension-size-2xs);
+	flex-shrink: 0;
 	/* One line of text tall, so it sits on the first line of a name that wraps. */
 	block-size: 1lh;
 }
 
 .icon svg {
-	/* Crop the empty edges of the 24px icon, so the gap sits next to the glyph. */
-	margin-inline: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+	/* Center the full icon while leaving its empty edges outside the column. */
+	flex-shrink: 0;
 	fill: currentColor;
 }
 
