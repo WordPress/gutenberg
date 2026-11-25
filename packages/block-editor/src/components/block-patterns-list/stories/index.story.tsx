@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 // @ts-expect-error Vite loads the `?raw` stylesheet as a string, which TypeScript cannot resolve.
 import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { getBlockType } from '@wordpress/blocks';
 import BlockPatternsList from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import patterns from './fixtures';
@@ -14,6 +17,14 @@ const meta = {
 	component: BlockPatternsList,
 	id: 'blockeditor-blockpatternslist',
 	title: 'Editor/Block Editor/BlockPatternsList',
+	// The pattern previews render core blocks. Another story may have
+	// registered them already, and registering them twice adds their filters
+	// twice.
+	beforeEach: () => {
+		if ( ! getBlockType( 'core/paragraph' ) ) {
+			registerCoreBlocks();
+		}
+	},
 } satisfies Meta< typeof BlockPatternsList >;
 export default meta;
 
