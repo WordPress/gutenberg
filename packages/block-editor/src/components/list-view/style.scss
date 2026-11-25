@@ -253,7 +253,7 @@
 	}
 
 	// List View renders a fixed number of items and relies on each item having a fixed height of 32px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// If this value changes, we should also change BLOCK_LIST_ITEM_HEIGHT.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	.block-editor-list-view-block-contents {
 		display: flex;
@@ -436,7 +436,7 @@
 		background: $gray-100;
 		color: $gray-800;
 		font-size: var(--wpds-typography-font-size-sm);
-		line-height: $font-line-height-small;
+		line-height: var(--wpds-typography-line-height-sm);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

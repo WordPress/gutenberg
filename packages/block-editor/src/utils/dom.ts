@@ -1,3 +1,8 @@
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '../lock-unlock';
+
+const { getStyleTransform } = unlock( componentsPrivateApis );
+
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
@@ -92,6 +97,64 @@ export function getBlockClientId( node: Node | null ) {
 }
 
 /**
+ * Returns whether a computed style rotates or skews an element, so that its
+ * edges are no longer parallel to the viewport. Translating and scaling keep
+ * them parallel, so they don't count.
+ *
+ * @param style The computed style of the element.
+ * @return Whether the element is rotated or skewed.
+ */
+export function isStyleRotated(
+	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
+) {
+	const { a, b, c, d } = getStyleTransform( style );
+	const isAxisAligned =
+		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
+		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 );
+	return ! isAxisAligned;
+}
+
+/**
+ * Returns the outermost block element containing the given element that is
+ * rotated or skewed, if any.
+ *
+ * @param element Element.
+ * @return The outermost rotated ancestor block element.
+ */
+export function getOutermostRotatedAncestorBlock( element: Element ) {
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return;
+	}
+
+	let rotatedAncestor: Element | undefined;
+	let ancestor = element.parentElement?.closest( BLOCK_SELECTOR );
+	while ( ancestor ) {
+		if ( isStyleRotated( view.getComputedStyle( ancestor ) ) ) {
+			rotatedAncestor = ancestor;
+		}
+		ancestor = ancestor.parentElement?.closest( BLOCK_SELECTOR );
+	}
+
+	return rotatedAncestor;
+}
+
+/**
+ * Whether an element is a block's own element outside its fields, such as a
+ * list item's bullet. Fields keep their own `contentEditable`.
+ *
+ * @param element Element.
+ *
+ * @return Whether the element is a block's own element outside its fields.
+ */
+export function isBlockElementOutsideFields( element: Element | null ) {
+	return (
+		( element as HTMLElement | null )?.contentEditable === 'inherit' &&
+		element!.hasAttribute( 'data-block' )
+	);
+}
+
+/**
  * Calculates the union of two rectangles.
  *
  * @param rect1 First rectangle.
@@ -105,6 +168,26 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	const top = Math.min( rect1.top, rect2.top );
 
 	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
+}
+
+/**
+ * Extends a rectangle upwards to a given top, keeping its horizontal extent.
+ *
+ * @param rect Rectangle.
+ * @param top  The top to extend to.
+ * @return The extended rectangle, or the original one if it is already higher.
+ */
+export function extendRectToTop( rect: DOMRect, top: number ) {
+	if ( top >= rect.top ) {
+		return rect;
+	}
+
+	return new window.DOMRectReadOnly(
+		rect.left,
+		top,
+		rect.width,
+		rect.bottom - top
+	);
 }
 
 /**

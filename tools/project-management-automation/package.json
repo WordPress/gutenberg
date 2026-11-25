@@ -30,8 +30,8 @@
 		"@octokit/openapi-webhooks-types": "^12.1.0"
 	},
 	"devDependencies": {
-		"@types/node": "^24.13.3",
-		"vitest": "^5.1.0"
+		"@types/node": "^24.19.2",
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

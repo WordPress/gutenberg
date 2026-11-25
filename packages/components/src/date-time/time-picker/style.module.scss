@@ -95,6 +95,10 @@
 	width: 56px;
 }
 
-.time-zone {
+.time-zone-trigger {
+	border-radius: var(--wpds-border-radius-sm);
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
+	line-height: inherit;
 	text-decoration: underline dotted;
 }
