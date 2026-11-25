@@ -163,8 +163,8 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const cellCount =
 		columnCount === undefined ? firstRow?.cells?.length : columnCount;
 
-	// Bail early if the function cannot determine how many cells to add.
-	if ( ! cellCount ) {
+	// Bail early if the function cannot determine how many cells to add or the section does not exist.
+	if ( ! cellCount || ! state[ sectionName ] ) {
 		return state;
 	}
 
@@ -208,6 +208,10 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
  * @return {Object} New table state.
  */
 export function deleteRow( state, { sectionName, rowIndex } ) {
+	if ( ! state[ sectionName ] ) {
+		return state;
+	}
+
 	return {
 		[ sectionName ]: state[ sectionName ].filter(
 			( row, index ) => index !== rowIndex

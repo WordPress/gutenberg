@@ -145,20 +145,40 @@ describe( 'router regions in HTML directive content', () => {
 		expect( current.innerHTML ).toBe( '<p>A</p>' );
 	} );
 
-	test( 'updates beneath a suffixed html attribute but excludes unique-id html content', async () => {
-		const current = hydrateHtml( regionHtml( '<p>A</p>' ) );
-		const container = current.parentElement!;
-		for ( const spelling of [ 'data-wp-html--x', 'data-wp-html---x' ] ) {
-			await navigate(
-				`<div data-wp-interactive="${ namespace }" ${ spelling }="state.pending">${ regionHtml( '<p>B</p>' ) }</div>`
-			);
-			expect( container ).toHaveTextContent(
-				spelling === 'data-wp-html--x' ? /^B$/ : /^$/
-			);
-			expect(
-				container.querySelectorAll( '[data-wp-router-region]' )
-			).toHaveLength( spelling === 'data-wp-html--x' ? 1 : 0 );
-		}
+	test( 'updates regions beneath ignored HTML variants in both documents', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', false );
+		const readHtml = vi.fn();
+		store( namespace, {
+			state: {
+				/** Records any forbidden evaluation of an ignored HTML reference. */
+				get ignored() {
+					readHtml();
+					return asDangerousHTML( '<b>ignored</b>' );
+				},
+			},
+		} );
+		const variants = [ '---id', '--suffix', '--suffix---id' ];
+		/**
+		 * Builds current and destination regions below the same ignored entries.
+		 *
+		 * @param letter The page's region content.
+		 * @return The interactive page markup.
+		 */
+		const body = ( letter: string ) =>
+			`<main data-wp-interactive="${ namespace }">${ variants
+				.map(
+					( variant, index ) =>
+						`<section data-wp-html${ variant }="state.ignored"><div data-wp-router-region="${ namespace }/${ index }"><p>${ letter }${ index }</p></div></section>`
+				)
+				.join( '' ) }</main>`;
+		const root = hydrateHtml( body( 'A' ) );
+		await navigate( body( 'B' ) );
+		expect(
+			[ ...root.querySelectorAll( '[data-wp-router-region]' ) ].map(
+				( region ) => region.innerHTML
+			)
+		).toEqual( variants.map( ( _, index ) => `<p>B${ index }</p>` ) );
+		expect( readHtml ).not.toHaveBeenCalled();
 	} );
 
 	// The runtime logs each warning once per module, so every region carrying

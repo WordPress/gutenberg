@@ -1,11 +1,10 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../../utils/theme-variables" as *;
 
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $components-color-foreground;
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral-strong);
 	border-radius: $radius-small;
 	flex-shrink: 0;
 
@@ -53,9 +52,10 @@
 			border-radius: $radius-small;
 			height: $grid-unit-40;
 
-			// Position the focus rectangle.
-			left: $grid-unit-10;
-			right: $grid-unit-10;
+			// Position the focus rectangle. Offsets are measured from the
+			// padding box, so subtract the button's reserved border.
+			left: $grid-unit-10 - $border-width;
+			right: $grid-unit-10 - $border-width;
 			z-index: -1;
 
 			// Animate in.
@@ -75,14 +75,14 @@
 
 		// Toggled style.
 		&.is-pressed {
-			background: transparent;
-
-			&:hover {
+			&,
+			&:is(:disabled, [aria-disabled="true"]) {
 				background: transparent;
 			}
 
 			&::before {
-				background: $components-color-foreground;
+				background: var(--_wp-components-button-pressed-background);
+				background-position: inherit;
 			}
 
 			// The fill stays on the `::before`, which is inset from the button. A
@@ -111,7 +111,7 @@
 
 		// Focus style.
 		&:focus::before {
-			@include block-toolbar-button-style__focus();
+			@include outset-ring__focus();
 		}
 
 		// Ensure the icon buttons remain square.

@@ -2,13 +2,23 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 5.0.0 (2026-11-18)
+
 ### Breaking Changes
 
--   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead. `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs in a future release ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   `--wpds-color-background-thumb-neutral` is now a light color for switch knobs in light and dark themes alike, where it was previously dark. Anything still using it for a progressbar or meter fill should move to `--wpds-color-background-indicator-neutral` ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 
 ### New Features
 
 -   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
+-   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` for the knob of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 
 ### Enhancements
@@ -23,6 +33,7 @@
 
 ### Internal
 
+-   Update the PostCSS development dependency to `^8.5.33` ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

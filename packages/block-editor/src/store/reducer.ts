@@ -29,6 +29,7 @@ import type {
 	State,
 	TraversedBlock,
 	TreeBlock,
+	UpdateBlockAttributesAction,
 } from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -188,6 +189,37 @@ export function isUpdatingSameBlockAttribute(
 	);
 }
 
+/**
+ * Returns the attributes an `UPDATE_BLOCK_ATTRIBUTES` action sets, keyed by
+ * client ID. Blocks that aren't in state, or get no attributes, are left out.
+ *
+ * @param attributes Block attributes state.
+ * @param action     The `UPDATE_BLOCK_ATTRIBUTES` action.
+ *
+ * @return Attributes to set, keyed by client ID.
+ */
+function getAttributeUpdates(
+	attributes: BlocksState[ 'attributes' ],
+	action: UpdateBlockAttributesAction
+) {
+	const updates = new Map< string, BlockAttributes >();
+	for ( const clientId of action.clientIds ) {
+		if ( ! attributes.has( clientId ) ) {
+			continue;
+		}
+
+		const blockAttributes = action.options?.uniqueByBlock
+			? ( action.attributes[ clientId ] as BlockAttributes | undefined )
+			: action.attributes;
+		if ( ! blockAttributes ) {
+			continue;
+		}
+
+		updates.set( clientId, blockAttributes );
+	}
+	return updates;
+}
+
 function updateBlockTreeForBlocks( state: BlocksState, blocks: Block[] ) {
 	const treeToUpdate = state.tree;
 	const stack = [ ...blocks ];
@@ -297,16 +329,20 @@ const withBlockTree =
 				);
 				break;
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
+				const updates = getAttributeUpdates(
+					newState.attributes,
+					action
+				);
 				newState.tree = new Map( newState.tree );
-				action.clientIds.forEach( ( clientId ) => {
+				for ( const clientId of updates.keys() ) {
 					newState.tree.set( clientId, {
 						...newState.tree.get( clientId ),
 						attributes: newState.attributes.get( clientId ),
 					} as TreeBlock );
-				} );
+				}
 				updateParentInnerBlocksInTree(
 					newState,
-					action.clientIds,
+					updates.keys(),
 					false
 				);
 				break;
@@ -971,21 +1007,16 @@ export const blocks = pipe(
 			}
 
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
-				// Avoid a state change if none of the block IDs are known.
-				if ( action.clientIds.every( ( id ) => ! state.get( id ) ) ) {
+				const updates = getAttributeUpdates( state, action );
+				if ( ! updates.size ) {
 					return state;
 				}
 
 				let hasChange = false;
 				const newState = new Map( state );
-				for ( const clientId of action.clientIds ) {
-					const updatedAttributeEntries = Object.entries(
-						!! action.options?.uniqueByBlock
-							? ( action.attributes[
-									clientId
-								] as BlockAttributes )
-							: ( action.attributes ?? {} )
-					);
+				for ( const [ clientId, blockAttributes ] of updates ) {
+					const updatedAttributeEntries =
+						Object.entries( blockAttributes );
 					if ( updatedAttributeEntries.length === 0 ) {
 						continue;
 					}
@@ -1054,15 +1085,12 @@ export const blocks = pipe(
 				} );
 				newState.set(
 					'',
-					( state.get( '' ) ?? [] ).concat(
-						// @ts-expect-error `blockOrder` is a `Map`, so this reads `undefined`.
-						blockOrder[ '' ]
-					)
+					( state.get( '' ) ?? [] ).concat( blockOrder.get( '' )! )
 				);
 				return newState;
 			}
 			case 'INSERT_BLOCKS': {
-				const { rootClientId = '' } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const subState = state.get( rootClientId ) || [];
 				const mappedBlocks = mapBlockOrder(
 					action.blocks,
@@ -1085,11 +1113,9 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				const {
-					fromRootClientId = '',
-					toRootClientId = '',
-					clientIds,
-				} = action;
+				const { clientIds } = action;
+				const fromRootClientId = action.fromRootClientId ?? '';
+				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
 
 				// Moving inside the same parent block.
@@ -1128,7 +1154,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const subState = state.get( rootClientId )!;
 
@@ -1151,7 +1178,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const lastClientId = clientIds[ clientIds.length - 1 ];
 				const subState = state.get( rootClientId )!;
@@ -1924,10 +1952,14 @@ export function preferences(
 					let id = blockName;
 					// If a block variation match is found change the name to be the same with the
 					// one that is used for block variations in the Inserter (`getItemFromVariation`).
-					const match = select( blocksStore ).getActiveBlockVariation(
-						blockName,
-						attributes
-					);
+					const { getActiveBlockVariation, getBlockVariations } =
+						select( blocksStore );
+					// Fall back to the default variation, which replaces the block in the Inserter.
+					const match =
+						getActiveBlockVariation( blockName, attributes ) ??
+						getBlockVariations( blockName, 'inserter' )?.find(
+							( { isDefault } ) => isDefault
+						);
 					if ( match?.name ) {
 						id += '/' + match.name;
 					}
@@ -3123,17 +3155,11 @@ export function withDerivedBlockEditingModes( reducer: Reducer< State > ) {
 				const addedBlocks: Array< TreeBlock | undefined > = [];
 				const removedClientIds: string[] = [];
 
-				for ( const clientId of action?.clientIds ) {
-					const attributes = (
-						action.options?.uniqueByBlock
-							? action.attributes[ clientId ]
-							: action.attributes
-					) as BlockAttributes | undefined;
-
-					if ( ! attributes ) {
-						break;
-					}
-
+				const updates = getAttributeUpdates(
+					state.blocks.attributes,
+					action
+				);
+				for ( const [ clientId, attributes ] of updates ) {
 					if (
 						// patternName is switching from falsy to truthy, indicating
 						// this block is becoming an unsynced pattern.

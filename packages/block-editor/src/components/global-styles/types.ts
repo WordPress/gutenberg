@@ -1,5 +1,5 @@
 import type { ComponentProps, ComponentType, ReactNode } from 'react';
-import type { Dropdown, DropdownMenu } from '@wordpress/components';
+import type { Dropdown } from '@wordpress/components';
 import type {
 	Color,
 	Duotone,
@@ -13,6 +13,7 @@ import type { ColorGradientOptions } from '../colors-gradients/types';
 import type { Layout, LayoutBlockSupport } from '../../layouts/types';
 import type { BlockStyleState } from '../../hooks/types';
 import type { DimensionSizes } from '../dimension-control/types';
+import type { ChildLayout } from '../child-layout-control/types';
 
 export type ToolsPanelPopoverProps = Pick<
 	NonNullable< ComponentProps< typeof Dropdown >[ 'popoverProps' ] >,
@@ -99,6 +100,11 @@ export interface StyleSettings {
 		units?: string[];
 		spacingSizes?: Record< string, SpacingSizePreset[] >;
 		defaultSpacingSizes?: boolean;
+	};
+	transform?: Record< string, unknown > & {
+		rotate?: boolean;
+		translate?: boolean;
+		scale?: boolean;
 	};
 	typography?: TypographyStyleSettings;
 }
@@ -205,6 +211,11 @@ export interface PanelStyle {
 	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
+	transform?: {
+		rotate?: StyleValue;
+		translate?: { x?: string; y?: string };
+		scale?: number | string;
+	};
 	elements?: Record< string, PanelStyle >;
 	css?: string;
 	[ state: `:${ string }` ]: PanelStyle | undefined;
@@ -237,7 +248,7 @@ export interface StateControlProps {
 	/** Whether to show text label on the toggle. Default true. */
 	showText?: boolean;
 	/** Popover props for the dropdown menu. */
-	popoverProps?: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ];
+	popoverProps?: ToolsPanelPopoverProps;
 	/** Optional menu content rendered after the state groups. */
 	children?: ReactNode;
 }
@@ -501,6 +512,25 @@ export interface FiltersPanelProps {
 	defaultControls?: Record< string, boolean | undefined >;
 }
 
+export interface TransformPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The default state styles, set only while another state is selected. */
+	baseValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+}
+
 /**
  * A border radius preset from theme.json.
  */
@@ -555,6 +585,8 @@ export interface DimensionsPanelProps {
 	onChange: ( value: PanelStyle ) => void;
 	/** The styles inherited from global styles. */
 	inheritedValue?: PanelStyle;
+	/** The block's default child layout, inherited by viewport states. */
+	inheritedChildLayout?: ChildLayout;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
 	/** ID of the panel. */

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
 import type { ButtonProps } from '../button/types';
+import type { ButtonLinkProps } from '../button-link/types';
 import type { IconButtonProps } from '../icon-button/types';
 import type { LinkProps } from '../link/types';
 
@@ -114,6 +115,16 @@ export interface ActionButtonProps extends Omit<
 }
 
 export interface ActionLinkProps extends Omit< LinkProps, 'variant' | 'tone' > {
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}
+
+export interface ActionButtonLinkProps extends Omit<
+	ButtonLinkProps,
+	'size' | 'tone'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */

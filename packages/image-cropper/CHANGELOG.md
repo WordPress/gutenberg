@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.0 (2026-11-18)
+
 ### Deprecations
 
 -   Deprecate the package in favour of `@wordpress/image-editor` ([#86417](https://github.com/WordPress/gutenberg/pull/86417)).

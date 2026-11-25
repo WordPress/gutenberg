@@ -246,16 +246,6 @@ body.modal-open {
 	justify-content: flex-start;
 }
 
-.components-modal__header-icon-container {
-	display: inline-block;
-
-	svg {
-		max-width: variables.$button-size;
-		max-height: variables.$button-size;
-		padding: var(--wpds-dimension-padding-sm);
-	}
-}
-
 // Modal contents.
 .components-modal__content {
 	flex: 1;

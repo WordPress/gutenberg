@@ -655,6 +655,54 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			] );
 	} );
 
+	// Regression test for https://github.com/WordPress/gutenberg/issues/53774.
+	// This test MUST fail when these lines are removed:
+	// https://github.com/WordPress/gutenberg/blob/59bbbc23f099c7505046cf15f803c9ca8acddb06/packages/block-editor/src/components/rich-text/index.tsx#L655-L656
+	test( 'should cut a partial selection after right-clicking it', async ( {
+		editor,
+		page,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'first block' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'second block' },
+		} );
+		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 6 } );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 9 } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+
+		// Right-click the selected "ck" in the first block to open the context menu.
+		const first = editor.canvas.getByText( 'first block', { exact: true } );
+		const position = await first.evaluate( ( element ) => {
+			const range = element.ownerDocument.createRange();
+			range.setStart( element.firstChild, 9 );
+			range.setEnd( element.firstChild, 11 );
+			const text = range.getBoundingClientRect();
+			const box = element.getBoundingClientRect();
+			return {
+				x: text.x - box.x + text.width / 2,
+				y: text.y - box.y + text.height / 2,
+			};
+		} );
+		await first.click( { button: 'right', position } );
+		await pageUtils.pressKeys( 'primary+x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'first blo block' },
+			},
+		] );
+	} );
+
 	// This test MUST fail when this line is removed:
 	// https://github.com/WordPress/gutenberg/blob/eb2bb1d3456ea98db74b4518e3394ed6aed9e79f/packages/block-editor/src/components/writing-flow/use-drag-selection.js#L68
 	test( 'should return original focus after failed multi selection attempt', async ( {

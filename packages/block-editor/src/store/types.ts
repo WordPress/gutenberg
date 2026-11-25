@@ -638,7 +638,7 @@ export type Action =
 			type: 'INSERT_BLOCKS';
 			blocks: Block[];
 			index?: number;
-			rootClientId?: string;
+			rootClientId?: string | null;
 			updateSelection?: boolean;
 			initialPosition?: InitialPosition;
 			meta?: BlocksMeta;
@@ -652,12 +652,20 @@ export type Action =
 	| {
 			type: 'MOVE_BLOCKS_TO_POSITION';
 			clientIds: string[];
-			fromRootClientId?: string;
-			toRootClientId?: string;
+			fromRootClientId?: string | null;
+			toRootClientId?: string | null;
 			index?: number;
 	  }
-	| { type: 'MOVE_BLOCKS_UP'; clientIds: string[]; rootClientId?: string }
-	| { type: 'MOVE_BLOCKS_DOWN'; clientIds: string[]; rootClientId?: string }
+	| {
+			type: 'MOVE_BLOCKS_UP';
+			clientIds: string[];
+			rootClientId?: string | null;
+	  }
+	| {
+			type: 'MOVE_BLOCKS_DOWN';
+			clientIds: string[];
+			rootClientId?: string | null;
+	  }
 	| {
 			type: 'MULTI_SELECT';
 			start: string;
@@ -814,6 +822,11 @@ export type Action =
 	| { type: 'UPDATE_SETTINGS'; settings: Settings; reset?: boolean };
 
 export type RemoveBlocksAction = Extract< Action, { type: 'REMOVE_BLOCKS' } >;
+
+export type UpdateBlockAttributesAction = Extract<
+	Action,
+	{ type: 'UPDATE_BLOCK_ATTRIBUTES' }
+>;
 
 export type Reducer< S > = ( state: S | undefined, action: Action ) => S;
 

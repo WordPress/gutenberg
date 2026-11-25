@@ -387,6 +387,15 @@ describe( 'insertRow', () => {
 
 		expect( state ).toBe( tableWithHead );
 	} );
+
+	it( 'should have no effect if the section does not exist in state', () => {
+		const state = insertRow( tableWithHead, {
+			sectionName: 'nonExistentSection',
+			rowIndex: 0,
+		} );
+
+		expect( state ).toBe( tableWithHead );
+	} );
 } );
 
 describe( 'insertColumn', () => {
@@ -735,6 +744,15 @@ describe( 'deleteRow', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'should have no effect if the section does not exist in state', () => {
+		const state = deleteRow( tableWithContent, {
+			sectionName: 'nonExistentSection',
+			rowIndex: 0,
+		} );
+
+		expect( state ).toBe( tableWithContent );
 	} );
 } );
 

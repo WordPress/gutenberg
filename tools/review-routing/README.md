@@ -41,7 +41,7 @@ Run it from the repository root:
 npm run --workspace @wordpress/review-routing-tools route -- --pr 12345
 ```
 
-It prints a Markdown table of the decisions. `--json` prints them as JSON. `--dry-run` prints the evidence and the questions without calling the model, and needs no credentials: use it to see what the model reads when you change a routing file.
+It prints a Markdown table of the decisions. `--json` prints them as JSON, and `--json-file <path>` also writes the JSON to a file. `--dry-run` prints the evidence and the questions without calling the model, and needs no credentials: use it to see what the model reads when you change a routing file.
 
 ### Credentials
 
