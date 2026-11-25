@@ -43,4 +43,25 @@ describe( 'useInspectorControlsTabs', () => {
 			TAB_STYLES,
 		] );
 	} );
+
+	it.each( [ 'background', 'filter', 'elements' ] )(
+		'includes Styles when the %s group is the only style control',
+		( group ) => {
+			const { Fill } = groups[ group ];
+			const { result } = renderHook(
+				() =>
+					useInspectorControlsTabs( 'test/block', [], false, false ),
+				{
+					wrapper: ( { children }: { children: ReactNode } ) => (
+						<SlotFillProvider>
+							<Fill>{ group }</Fill>
+							{ children }
+						</SlotFillProvider>
+					),
+				}
+			);
+
+			expect( result.current ).toEqual( [ TAB_STYLES ] );
+		}
+	);
 } );

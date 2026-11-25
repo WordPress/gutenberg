@@ -36,11 +36,14 @@ export default function useInspectorControlsTabs(
 ): InspectorTab[] {
 	const tabs: InspectorTab[] = [];
 	const {
+		background: backgroundGroup,
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
 		content: contentGroup,
 		default: defaultGroup,
+		elements: elementsGroup,
+		filter: filterGroup,
 		layout: layoutGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
@@ -61,12 +64,16 @@ export default function useInspectorControlsTabs(
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
+	// Keep this list in sync with the groups rendered by `StylesTab`.
 	const styleFills = [
+		...( useSlotFills( backgroundGroup.name ) || [] ),
 		...( useSlotFills( borderGroup.name ) || [] ),
 		...( useSlotFills( colorGroup.name ) || [] ),
 		...( useSlotFills( layoutGroup.name ) || [] ),
 		...( useSlotFills( positionGroup.name ) || [] ),
 		...( useSlotFills( dimensionsGroup.name ) || [] ),
+		...( useSlotFills( elementsGroup.name ) || [] ),
+		...( useSlotFills( filterGroup.name ) || [] ),
 		...( useSlotFills( stylesGroup.name ) || [] ),
 		...( useSlotFills( transformGroup.name ) || [] ),
 		...( useSlotFills( typographyGroup.name ) || [] ),
