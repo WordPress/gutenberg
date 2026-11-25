@@ -117,7 +117,14 @@ function getRotate( value: string ): LinearTransform3D {
 		[ ux * uy * t - uz * sin, cos + uy * uy * t, uy * uz * t + ux * sin ],
 		[ ux * uz * t + uy * sin, uy * uz * t - ux * sin, cos + uz * uz * t ],
 	];
-	return matrix.flat().every( Number.isFinite ) ? matrix : IDENTITY_3D;
+	if ( ! matrix.flat().every( Number.isFinite ) ) {
+		return IDENTITY_3D;
+	}
+	// Drop the rounding error of the trigonometry and the axis length, so a
+	// quarter turn flattens exactly, as it does in a serialized `matrix3d()`.
+	return matrix.map( ( column ) =>
+		column.map( ( entry ) => Math.round( entry * 1e12 ) / 1e12 + 0 )
+	) as LinearTransform3D;
 }
 
 function getScale( value: string ): LinearTransform3D {

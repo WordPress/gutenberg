@@ -120,6 +120,22 @@ describe( 'getStyleLinearTransform', () => {
 		).toEqual( { a: 0.5, b: 0.75, c: 0, d: 0.5 } );
 	} );
 
+	it.each( [
+		[ 'x 90deg', { a: 1, b: 0, c: 0, d: 0 } ],
+		[ '1 1 0 90deg', { a: 0.5, b: 0.5, c: 0.5, d: 0.5 } ],
+	] )(
+		'flattens %s exactly, as the browser serializes it',
+		( rotate, expected ) => {
+			const matrix = getStyleLinearTransform( {
+				rotate,
+				scale: 'none',
+				transform: 'none',
+			} );
+			expect( matrix ).toEqual( expected );
+			expect( matrix.a * matrix.d - matrix.b * matrix.c ).toBe( 0 );
+		}
+	);
+
 	it( 'reads every angle unit', () => {
 		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
 			expect(
