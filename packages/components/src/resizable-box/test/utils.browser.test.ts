@@ -4,6 +4,7 @@ import {
 	getHandleCursor,
 	getResizeStep,
 	getScreenTransform,
+	getStyleTransform,
 	getTransformedHandleStyles,
 	measureGain,
 	toLocalDelta,
@@ -80,6 +81,40 @@ describe( 'getScreenTransform', () => {
 		expect(
 			round( getScreenTransform( createNested( 'rotate: x 30deg' ) ) )
 		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	} );
+} );
+
+describe( 'getStyleTransform', () => {
+	it( 'returns the identity for no transform', () => {
+		expect(
+			getStyleTransform( {
+				rotate: 'none',
+				scale: 'none',
+				transform: 'none',
+			} )
+		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	} );
+
+	it( 'applies `rotate`, then `scale`, then `transform`', () => {
+		expect(
+			round(
+				getStyleTransform( {
+					rotate: '90deg',
+					scale: '2 3',
+					transform: 'matrix(1, 0, 1, 1, 0, 0)',
+				} )
+			)
+		).toEqual( { a: 0, b: 2, c: -3, d: 2 } );
+	} );
+
+	it( 'reads every angle unit', () => {
+		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
+			expect(
+				round(
+					getStyleTransform( { rotate, scale: '', transform: '' } )
+				)
+			).toEqual( { a: 0, b: 1, c: -1, d: 0 } );
+		}
 	} );
 } );
 
