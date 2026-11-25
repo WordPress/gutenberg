@@ -1,3 +1,8 @@
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { unlock } from '../lock-unlock';
+
+const { getStyleTransform } = unlock( componentsPrivateApis );
+
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
 const BLOCK_APPENDER_CLASS = '.block-editor-button-block-appender';
@@ -92,6 +97,49 @@ export function getBlockClientId( node: Node | null ) {
 }
 
 /**
+ * Returns whether a computed style rotates or skews an element, so that its
+ * edges are no longer parallel to the viewport. Translating and scaling keep
+ * them parallel, so they don't count.
+ *
+ * @param style The computed style of the element.
+ * @return Whether the element is rotated or skewed.
+ */
+export function isStyleRotated(
+	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
+) {
+	const { a, b, c, d } = getStyleTransform( style );
+	const isAxisAligned =
+		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
+		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 );
+	return ! isAxisAligned;
+}
+
+/**
+ * Returns the outermost block element containing the given element that is
+ * rotated or skewed, if any.
+ *
+ * @param element Element.
+ * @return The outermost rotated ancestor block element.
+ */
+export function getOutermostRotatedAncestorBlock( element: Element ) {
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return;
+	}
+
+	let rotatedAncestor: Element | undefined;
+	let ancestor = element.parentElement?.closest( BLOCK_SELECTOR );
+	while ( ancestor ) {
+		if ( isStyleRotated( view.getComputedStyle( ancestor ) ) ) {
+			rotatedAncestor = ancestor;
+		}
+		ancestor = ancestor.parentElement?.closest( BLOCK_SELECTOR );
+	}
+
+	return rotatedAncestor;
+}
+
+/**
  * Whether an element is a block's own element outside its fields, such as a
  * list item's bullet. Fields keep their own `contentEditable`.
  *
@@ -120,6 +168,424 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	const top = Math.min( rect1.top, rect2.top );
 
 	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
+}
+
+const ANGLE_UNITS: Record< string, number > = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
+
+const ROTATE_AXES: Record< string, [ number, number, number ] > = {
+	'': [ 0, 0, 1 ],
+	x: [ 1, 0, 0 ],
+	y: [ 0, 1, 0 ],
+	z: [ 0, 0, 1 ],
+};
+
+function parseAngle( value: string ) {
+	const match = value.match(
+		/^(-?[\d.]+(?:e[+-]?\d+)?)(deg|grad|rad|turn)$/
+	);
+	return match ? parseFloat( match[ 1 ] ) * ANGLE_UNITS[ match[ 2 ] ] : NaN;
+}
+
+function parseLength( value: string, size: number ) {
+	if ( value.endsWith( '%' ) ) {
+		return ( parseFloat( value ) / 100 ) * size;
+	}
+	return value.endsWith( 'px' ) ? parseFloat( value ) : NaN;
+}
+
+/**
+ * Builds the matrix an element's own `translate`, `rotate`, `scale` and
+ * `transform` apply to its border box, about its transform origin.
+ *
+ * @param element Element.
+ * @param style   Computed style of the element.
+ *
+ * @return The matrix, or undefined when the element is not transformed or
+ *         a value can't be read.
+ */
+function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
+	const {
+		translate = 'none',
+		rotate = 'none',
+		scale = 'none',
+		transform = 'none',
+	} = style;
+
+	if (
+		translate === 'none' &&
+		rotate === 'none' &&
+		scale === 'none' &&
+		transform === 'none'
+	) {
+		return;
+	}
+
+	const { offsetWidth: width, offsetHeight: height } = element;
+	const [ originX, originY ] = style.transformOrigin
+		.split( ' ' )
+		.map( ( value ) => parseFloat( value ) );
+	// CSS applies `translate`, then `rotate`, then `scale`, then `transform`.
+	const matrix = new window.DOMMatrix().translateSelf( originX, originY );
+
+	if ( translate !== 'none' ) {
+		const [ x, y = '0px' ] = translate.split( ' ' );
+		matrix.translateSelf(
+			parseLength( x, width ),
+			parseLength( y, height )
+		);
+	}
+
+	if ( rotate !== 'none' ) {
+		const parts = rotate.split( ' ' );
+		const angle = parseAngle( parts.pop()! );
+		const [ x, y, z ] =
+			ROTATE_AXES[ parts.join( ' ' ) ] ??
+			parts.map( ( value ) => parseFloat( value ) );
+		matrix.rotateAxisAngleSelf( x, y, z, angle );
+	}
+
+	if ( scale !== 'none' ) {
+		const [ x, y = x ] = scale
+			.split( ' ' )
+			.map( ( value ) =>
+				value.endsWith( '%' )
+					? parseFloat( value ) / 100
+					: parseFloat( value )
+			);
+		matrix.scaleSelf( x, y );
+	}
+
+	if ( transform !== 'none' ) {
+		matrix.multiplySelf( new window.DOMMatrix( transform ) );
+	}
+
+	matrix.translateSelf( -originX, -originY );
+
+	// The page is painted flat, so only the 2D part reaches the screen.
+	const { a, b, c, d, e, f } = matrix;
+	return [ a, b, c, d, e, f ].every( Number.isFinite )
+		? new window.DOMMatrix( [ a, b, c, d, e, f ] )
+		: undefined;
+}
+
+function getElementTransform( element: Element ) {
+	const view = element.ownerDocument.defaultView;
+
+	if ( ! view || ! ( 'offsetWidth' in element ) ) {
+		return;
+	}
+
+	return getOwnTransform(
+		element as HTMLElement,
+		view.getComputedStyle( element )
+	);
+}
+
+/**
+ * Returns the matrix that maps the untransformed layout of the nearest
+ * transformed element, from `element` up, to client coordinates. Blocks
+ * inside that element keep their layout in this space, however it is
+ * moved, turned or resized on screen.
+ *
+ * @param element Element to start from, usually a block's parent.
+ * @return The matrix, or null when nothing is transformed.
+ */
+export function getLayoutFrame( element: Element | null ): DOMMatrix | null {
+	for ( let current = element; current; current = current.parentElement ) {
+		const transform = getElementTransform( current );
+
+		if ( ! transform ) {
+			continue;
+		}
+
+		const frame = getLayoutFrame( current.parentElement );
+		const { left, top } = getLayoutRect( current, frame );
+		const matrix = ( frame ?? new window.DOMMatrix() )
+			.translate( left, top )
+			.multiply( transform );
+
+		return matrix.a * matrix.d - matrix.b * matrix.c ? matrix : null;
+	}
+
+	// No `DOMMatrix` here: jsdom, which runs the unit tests, has none.
+	return null;
+}
+
+/**
+ * Returns the rectangle an element takes up in the layout, before any
+ * transform moves, turns or resizes it or its ancestors. Transforms only
+ * change how an element is painted, so this is where neighbouring blocks
+ * and a newly inserted block line up. An untransformed element outside
+ * transformed ancestors gets its bounding client rect.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @return The element's untransformed rect in the frame's coordinates.
+ */
+export function getLayoutRect(
+	element: Element,
+	frame = getLayoutFrame( element.parentElement )
+) {
+	const rect = element.getBoundingClientRect();
+	const transform = getElementTransform( element );
+
+	if ( ! transform && ! frame ) {
+		return rect;
+	}
+
+	const { offsetWidth: width, offsetHeight: height } = element as HTMLElement;
+	// An affine map takes a box's centre to the centre of its bounding rect.
+	const center = ( frame ?? new window.DOMMatrix() )
+		.inverse()
+		.transformPoint( {
+			x: rect.left + rect.width / 2,
+			y: rect.top + rect.height / 2,
+		} );
+	const painted = ( transform ?? new window.DOMMatrix() ).transformPoint( {
+		x: width / 2,
+		y: height / 2,
+	} );
+
+	return new window.DOMRect(
+		center.x - painted.x,
+		center.y - painted.y,
+		width,
+		height
+	);
+}
+
+/**
+ * Maps a point in client coordinates into a layout frame.
+ *
+ * @param frame Layout frame, see `getLayoutFrame`.
+ * @param x     Client x coordinate.
+ * @param y     Client y coordinate.
+ * @return The point in the frame's coordinates.
+ */
+export function toLayoutPoint( frame: DOMMatrix | null, x: number, y: number ) {
+	return frame ? frame.inverse().transformPoint( { x, y } ) : { x, y };
+}
+
+/**
+ * Maps a rect in a layout frame to client coordinates. The result stays
+ * level: it is centred on the rect's place on screen and scaled with the
+ * frame, but never turned.
+ *
+ * @param frame Layout frame, see `getLayoutFrame`.
+ * @param rect  Rect in the frame's coordinates.
+ * @return The rect in client coordinates.
+ */
+export function toClientRect( frame: DOMMatrix | null, rect: DOMRect ) {
+	if ( ! frame ) {
+		return rect;
+	}
+
+	const center = frame.transformPoint( {
+		x: rect.left + rect.width / 2,
+		y: rect.top + rect.height / 2,
+	} );
+	const width = rect.width * Math.hypot( frame.a, frame.b );
+	const height = rect.height * Math.hypot( frame.c, frame.d );
+
+	return new window.DOMRect(
+		center.x - width / 2,
+		center.y - height / 2,
+		width,
+		height
+	);
+}
+
+/**
+ * Extends a rectangle upwards to a given top, keeping its horizontal extent.
+ *
+ * @param rect Rectangle.
+ * @param top  The top to extend to.
+ * @return The extended rectangle, or the original one if it is already higher.
+ */
+export function extendRectToTop( rect: DOMRect, top: number ) {
+	if ( top >= rect.top ) {
+		return rect;
+	}
+
+	return new window.DOMRectReadOnly(
+		rect.left,
+		top,
+		rect.width,
+		rect.bottom - top
+	);
+}
+
+/**
+ * Returns the corners of an element's painted box in client coordinates,
+ * after every transform, in order around the box.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @return The four corners.
+ */
+function getPaintedCorners( element: Element, frame: DOMMatrix | null ) {
+	const { x, y, width, height } = getLayoutRect( element, frame );
+	const transform = getElementTransform( element );
+	const corners = [
+		[ 0, 0 ],
+		[ width, 0 ],
+		[ width, height ],
+		[ 0, height ],
+	];
+
+	if ( ! frame && ! transform ) {
+		return corners.map( ( [ cornerX, cornerY ] ) => ( {
+			x: x + cornerX,
+			y: y + cornerY,
+		} ) );
+	}
+
+	const matrix = ( frame ?? new window.DOMMatrix() )
+		.translate( x, y )
+		.multiply( transform ?? new window.DOMMatrix() );
+	return corners.map( ( [ cornerX, cornerY ] ) =>
+		matrix.transformPoint( { x: cornerX, y: cornerY } )
+	);
+}
+
+/**
+ * Returns the top and bottom of an element's painted box within a column of
+ * the screen, after every transform.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @param left    Left edge of the column, in client coordinates.
+ * @param right   Right edge of the column, in client coordinates.
+ * @return The span, or undefined when the box is outside the column.
+ */
+function getPaintedSpan(
+	element: Element,
+	frame: DOMMatrix | null,
+	left: number,
+	right: number
+) {
+	const corners = getPaintedCorners( element, frame );
+	const ys: number[] = [];
+
+	corners.forEach( ( start, index ) => {
+		const end = corners[ ( index + 1 ) % corners.length ];
+
+		if ( start.x >= left && start.x <= right ) {
+			ys.push( start.y );
+		}
+
+		// Where an edge crosses a side of the column.
+		for ( const edge of [ left, right ] ) {
+			if ( ( start.x - edge ) * ( end.x - edge ) < 0 ) {
+				ys.push(
+					start.y +
+						( ( edge - start.x ) / ( end.x - start.x ) ) *
+							( end.y - start.y )
+				);
+			}
+		}
+	} );
+
+	return ys.length
+		? { top: Math.min( ...ys ), bottom: Math.max( ...ys ) }
+		: undefined;
+}
+
+/**
+ * Returns the space between two stacked blocks as painted on screen, across
+ * the width of an insertion line. A transform can move a block's painting
+ * away from its layout box, so this keeps a level line clear of both blocks.
+ *
+ * @param previous Element of the block above.
+ * @param next     Element of the block below.
+ * @param frame    Layout frame of their parent, see `getLayoutFrame`.
+ * @param line     The line's rect in client coordinates.
+ * @return The visible gap, or undefined when the painted blocks overlap.
+ */
+export function getVisibleGap(
+	previous: Element,
+	next: Element,
+	frame: DOMMatrix | null,
+	line: DOMRect
+) {
+	const above = getPaintedSpan( previous, frame, line.left, line.right );
+	const below = getPaintedSpan( next, frame, line.left, line.right );
+
+	if ( ! above || ! below || below.top <= above.bottom ) {
+		return;
+	}
+
+	return new window.DOMRect(
+		line.left,
+		above.bottom,
+		line.width,
+		below.top - above.bottom
+	);
+}
+
+/**
+ * Shortens a level insertion line to the part around its middle that crosses
+ * neither painted block. Inside a rotated container the layout gap is
+ * slanted, so a full width line runs into the blocks at its ends.
+ *
+ * @param previous Element of the block above.
+ * @param next     Element of the block below.
+ * @param frame    Layout frame of their parent, see `getLayoutFrame`.
+ * @param line     The line's rect in client coordinates.
+ * @return The shortened line, or undefined when a block covers its middle.
+ */
+export function getClearLine(
+	previous: Element,
+	next: Element,
+	frame: DOMMatrix | null,
+	line: DOMRect
+) {
+	// The line is drawn across the middle of its rect.
+	const y = line.top + line.height / 2;
+	const middle = line.left + line.width / 2;
+	let left = line.left;
+	let right = line.right;
+
+	for ( const element of [ previous, next ] ) {
+		const corners = getPaintedCorners( element, frame );
+		const xs: number[] = [];
+
+		corners.forEach( ( start, index ) => {
+			const end = corners[ ( index + 1 ) % corners.length ];
+
+			if ( start.y !== end.y && ( start.y - y ) * ( end.y - y ) <= 0 ) {
+				xs.push(
+					start.x +
+						( ( y - start.y ) / ( end.y - start.y ) ) *
+							( end.x - start.x )
+				);
+			}
+		} );
+
+		if ( ! xs.length ) {
+			continue;
+		}
+
+		const blockLeft = Math.min( ...xs );
+		const blockRight = Math.max( ...xs );
+
+		if ( blockLeft <= middle && blockRight >= middle ) {
+			return;
+		}
+
+		if ( blockRight < middle ) {
+			left = Math.max( left, blockRight );
+		} else {
+			right = Math.min( right, blockLeft );
+		}
+	}
+
+	return new window.DOMRect( left, line.top, right - left, line.height );
 }
 
 /**
