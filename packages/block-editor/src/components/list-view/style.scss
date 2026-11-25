@@ -474,17 +474,11 @@
 		border-radius: $radius-x-small;
 
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small $white;
+			box-shadow: 0 0 0 $radius-small var(--list-view-selected-background, #{$white});
 		}
 
 		&:not(:first-child) {
 			margin-left: #{$grid-unit-15 * -0.5};
-		}
-	}
-
-	&.is-selected .block-editor-list-view-block-select-button__image {
-		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small var(--list-view-selected-background);
 		}
 	}
 
