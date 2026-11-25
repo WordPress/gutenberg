@@ -16,6 +16,7 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -350,13 +351,13 @@ export function NoteThread( {
 					isKeyboardTabbingRef.current = false;
 				}
 			} }
-			onKeyDown={ ( event ) => {
+			onKeyDown={ withIgnoreIMEEvents( ( event ) => {
 				if ( event.key === 'Tab' ) {
 					isKeyboardTabbingRef.current = true;
 				} else {
 					onKeyDown( event );
 				}
-			} }
+			} ) }
 			tabIndex={ 0 }
 			role="treeitem"
 			aria-label={ ariaLabel }

@@ -644,6 +644,11 @@ describe( 'rotate', () => {
 			expect( compileCSS( { transform: { rotate } } ) ).toEqual( '' );
 		}
 	);
+
+	it( 'should output nothing for a numeric rotation', () => {
+		// @ts-expect-error Test that a number is not a rotation.
+		expect( compileCSS( { transform: { rotate: 0 } } ) ).toEqual( '' );
+	} );
 } );
 
 describe( 'translate', () => {
@@ -686,5 +691,50 @@ describe( 'translate', () => {
 	] )( 'should output nothing for %s', ( _, translate ) => {
 		// @ts-expect-error Test that invalid offsets output nothing.
 		expect( compileCSS( { transform: { translate } } ) ).toEqual( '' );
+	} );
+} );
+
+describe( 'scale', () => {
+	it.each( [
+		[ 1.2, '1.2' ],
+		[ 0, '0' ],
+		[ '0.75', '0.75' ],
+		[ '.5', '.5' ],
+		[ '120%', '120%' ],
+	] )(
+		'should output the individual scale property for %s',
+		( scale, css ) => {
+			expect( compileCSS( { transform: { scale } } ) ).toEqual(
+				`scale: ${ css };`
+			);
+		}
+	);
+
+	it( 'should combine with a rotation and an offset', () => {
+		expect(
+			compileCSS( {
+				transform: {
+					rotate: '15deg',
+					translate: { x: '1em' },
+					scale: 1.5,
+				},
+			} )
+		).toEqual(
+			'rotate: 15deg; --wp--style--translate-x: 1em; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0); scale: 1.5;'
+		);
+	} );
+
+	it.each( [
+		[ 'a negative number', -1 ],
+		[ 'a negative string', '-0.5' ],
+		[ 'two values', '1.2 1.5' ],
+		[ 'calc()', 'calc(1 + 0.2)' ],
+		[ 'var()', 'var(--scale)' ],
+		[ 'a length', '2px' ],
+		[ 'an object', { x: 1.2 } ],
+		[ 'Infinity', Infinity ],
+	] )( 'should output nothing for %s', ( _, scale ) => {
+		// @ts-expect-error Test that invalid scales output nothing.
+		expect( compileCSS( { transform: { scale } } ) ).toEqual( '' );
 	} );
 } );

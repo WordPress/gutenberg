@@ -2,11 +2,18 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
 import { create, getTextContent } from '@wordpress/rich-text';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { Path, SVG, Line, Rect } from '@wordpress/components';
 import DocumentOutlineItem from './item';
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 /**
  * Module constants
@@ -92,9 +99,9 @@ const isEmptyHeading = ( heading ) =>
 /**
  * Renders a document outline component.
  *
- * @param {Object}   props                         Props.
- * @param {Function} props.onSelect                Function to be called when an outline item is selected
- * @param {boolean}  props.hasOutlineItemsDisabled Indicates whether the outline items are disabled.
+ * @param {Object}     props                         Props.
+ * @param {() => void} [props.onSelect]              Function to be called when an outline item is selected
+ * @param {boolean}    props.hasOutlineItemsDisabled Indicates whether the outline items are disabled.
  *
  * @return {React.ReactNode} The rendered component.
  */
@@ -103,15 +110,27 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { title, isTitleSupported } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			title: getEditedPostAttribute( 'title' ),
-			isTitleSupported: postType?.supports?.title ?? false,
-		};
-	} );
+	const { title, isTitleSupported, isTitleRendered, postTitleClientId } =
+		useSelect( ( select ) => {
+			const {
+				getEditedPostAttribute,
+				getRenderingMode,
+				getPostBlocksByName,
+			} = unlock( select( editorStore ) );
+			const { getPostType } = select( coreStore );
+			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const postType = getPostType( postTypeSlug );
+			const isPostOnly = getRenderingMode() === 'post-only';
+			return {
+				title: getEditedPostAttribute( 'title' ),
+				isTitleSupported: postType?.supports?.title ?? false,
+				isTitleRendered:
+					isPostOnly && ! DESIGN_POST_TYPES.includes( postTypeSlug ),
+				postTitleClientId: isPostOnly
+					? undefined
+					: getPostBlocksByName( 'core/post-title' )[ 0 ],
+			};
+		}, [] );
 	const blocks = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants, getBlock } =
 			select( blockEditorStore );
@@ -126,16 +145,18 @@ export default function DocumentOutline( {
 			return undefined;
 		}
 
-		const { getBlocksByName, getClientIdsOfDescendants } =
-			select( blockEditorStore );
-		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
+		const [ postContentClientId ] = unlock(
+			select( editorStore )
+		).getPostBlocksByName( 'core/post-content' );
 
 		// Do nothing if there's no post content block.
 		if ( ! postContentClientId ) {
 			return undefined;
 		}
 
-		return getClientIdsOfDescendants( postContentClientId );
+		return select( blockEditorStore ).getClientIdsOfDescendants(
+			postContentClientId
+		);
 	}, [] );
 
 	const prevHeadingLevelRef = useRef( 1 );
@@ -144,6 +165,9 @@ export default function DocumentOutline( {
 		() => computeOutlineHeadings( blocks ),
 		[ blocks ]
 	);
+	const canvasDocument = useBlockElement(
+		headings[ 0 ]?.clientId
+	)?.ownerDocument;
 
 	if ( headings.length < 1 ) {
 		return (
@@ -158,9 +182,8 @@ export default function DocumentOutline( {
 		);
 	}
 
-	// Not great but it's the simplest way to locate the title right now.
-	const titleNode = document.querySelector( '.editor-post-title__input' );
-	const hasTitle = isTitleSupported && title && titleNode;
+	const hasTitle =
+		isTitleSupported && title && ( isTitleRendered || postTitleClientId );
 	const countByLevel = headings.reduce(
 		( acc, heading ) => ( {
 			...acc,
@@ -183,8 +206,19 @@ export default function DocumentOutline( {
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onSelect={ onSelect }
-						href={ `#${ titleNode.id }` }
+						onSelect={ () => {
+							if ( postTitleClientId ) {
+								selectBlock( postTitleClientId );
+							} else {
+								canvasDocument
+									?.querySelector(
+										'.editor-post-title__input'
+									)
+									?.focus();
+							}
+							onSelect?.();
+						} }
+						href="#"
 						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
