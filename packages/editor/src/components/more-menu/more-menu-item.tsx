@@ -137,14 +137,13 @@ function UnforwardedMoreMenuItem(
 	) : null;
 	let prefix: ReactNode;
 	if ( icon ) {
-		if (
+		// Preserve support for Dashicon slugs and custom icon components.
+		// Plugin SVG icons often leave out their fill. Default it to the text
+		// color as an attribute, which a fill the icon sets itself still
+		// overrides.
+		prefix =
 			isValidElement< ComponentProps< 'svg' > >( icon ) &&
-			( icon.type === 'svg' || icon.type === SVG )
-		) {
-			// Plugin icons often leave out their fill. Default it to the text
-			// color as an attribute, which a fill the icon sets itself still
-			// overrides.
-			prefix = (
+			( icon.type === 'svg' || icon.type === SVG ) ? (
 				<Menu.PrefixIcon
 					icon={
 						icon.props.fill === undefined
@@ -153,11 +152,9 @@ function UnforwardedMoreMenuItem(
 					}
 					className={ icon.props.className }
 				/>
+			) : (
+				<WCIcon icon={ icon } />
 			);
-		} else {
-			// Preserve support for Dashicon slugs and custom icon components.
-			prefix = <WCIcon icon={ icon } />;
-		}
 	}
 	const itemShortcut = adaptShortcut( shortcut );
 	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets
