@@ -1,3 +1,5 @@
+@use "../utils/css/mixins";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -180,8 +182,10 @@
 
 			/* Only keyboard focus draws an outline, which forced colors mode
 			 * keeps, so a hovered tab does not look focused there. */
-			&:focus-visible::after {
-				outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+			&:focus-visible::after,
+			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] &:focus-visible::before {
+				@include mixins.focus-ring();
+				outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				opacity: 1;
 			}
 
@@ -196,7 +200,6 @@
 				&::after {
 					content: "";
 					inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 			}
 
@@ -240,18 +243,10 @@
 					z-index: 0;
 					inset-block: calc((48px - var(--wpds-dimension-size-md)) / 2);
 					inset-inline: 0;
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 
-				&:focus-visible {
-					&::before {
-						outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-						opacity: 1;
-					}
-
-					&::after {
-						outline: none;
-					}
+				&:focus-visible::after {
+					outline: none;
 				}
 			}
 
@@ -262,7 +257,6 @@
 				&::after {
 					content: "";
 					inset: 0;
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 			}
 		}
@@ -289,7 +283,7 @@
 				/* SVG clamps the two axes independently. Keep the corners circular. */
 				rx: min(var(--wpds-border-radius-sm), var(--wpds-dimension-size-md) / 2, 50% + var(--wpds-dimension-padding-xs));
 				fill: none;
-				stroke: var(--wpds-color-stroke-focus);
+				stroke: var(--focus-color, var(--wpds-color-stroke-focus));
 				stroke-width: calc(2 * var(--wpds-border-width-focus));
 				clip-path: inset(0 round var(--wpds-border-radius-sm)) fill-box;
 

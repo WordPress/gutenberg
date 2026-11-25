@@ -2,7 +2,7 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useRegisterTab } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { TabProps } from './types';
 
 /**
