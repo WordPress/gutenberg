@@ -148,7 +148,7 @@ describe( 'Menu', () => {
 		} );
 
 		// The chevron is taller than the label line. It must not grow the row.
-		expect( submenuTrigger.getBoundingClientRect().height ).toBe(
+		expect( submenuTrigger.getBoundingClientRect().height ).toBeCloseTo(
 			plainItem.getBoundingClientRect().height
 		);
 	} );

@@ -1,0 +1,41 @@
+.card-group {
+	margin-block: 24px;
+	container-type: inline-size;
+}
+
+.card {
+	// Three per row when there is room; wrap rather than get narrower than 16rem.
+	flex: 1 1 16rem;
+	min-width: min(16rem, 100%);
+	max-width: 100%;
+
+	// Once two cards fit in a row, never let a lone card on a wrapped row
+	// stretch past half of the container.
+	@container (min-width: 33rem) {
+		max-width: calc(50% - var(--wpds-dimension-gap-lg) / 2);
+	}
+}
+
+.principle-card {
+	// Never more than two per row: half the row (minus half the gap) once two
+	// fit at 20rem or more, otherwise one per row.
+	flex: 1 1 max(20rem, calc(50% - var(--wpds-dimension-gap-lg) / 2));
+	min-width: min(20rem, 100%);
+	max-width: 100%;
+}
+
+.illustration {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 2 / 1;
+}
+
+// `sb-unstyled` on the card opts it out of Storybook's docs resets, which are
+// unlayered and would otherwise zero the margins Card.FullBleed relies on.
+
+// Card.Content pads 24px on every side; the illustration above already ends
+// flush, so half of that is enough between it and the heading.
+.body {
+	padding-block-start: var(--wpds-dimension-padding-md);
+}
