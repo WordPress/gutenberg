@@ -637,10 +637,11 @@ A single settings button that opens a menu built from the fields and the view. I
 
 -   **Filters.** Each filter that is set by picking among a short, fixed list of options, shown as the field defines it: radio items with an "All" item when it takes one value (the `is` operator), or checkboxes when it takes several (`isAny`). A filter is left out when it needs another kind of control (a date, a number, free text), has more than 10 options, loads its options with `getElements`, or is locked.
 -   **Sort.** The field to sort by and the order, when `showSort` is set. It lists the fields with sorting enabled, as the view options do.
--   **Reset view.** Calls `onReset`. It is hidden when `onReset` is `undefined` and disabled when it is `false`.
 -   **Extra items.** The `children`, such as a link to a help page.
 
 When the groups hold more than 10 options in all, each group moves to a submenu.
+
+The menu has no "Reset view" item. `onReset` is meant for saved views and comes with the "modified" indicator of the view options button, which the settings button doesn't have. A consumer that needs one can add it through `children`.
 
 Properties:
 
@@ -648,7 +649,7 @@ Properties:
 -   `requiredFields`: `string[]`. Ids of single-choice fields that always filter by one value. Their group has no "All" item, and the view is expected to start with a filter for each of them.
 -   `showSort`: `boolean`. Whether the menu offers sorting. Defaults to `false`.
 -   `size`: `'compact' | 'default'`. The size of the settings button: `compact` to sit next to `DataViews.Search`, or `default` to sit next to a 40px control. Defaults to `compact`.
--   `children`: React node. Extra menu items, rendered after "Reset view".
+-   `children`: React node. Extra menu items, rendered at the end of the menu.
 
 #### `DataViews.FilterTabs`
 

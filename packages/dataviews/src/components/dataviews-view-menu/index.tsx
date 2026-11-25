@@ -54,7 +54,7 @@ export interface ViewMenuProps {
 	size?: 'compact' | 'default';
 
 	/**
-	 * Extra menu items, added after "Reset view". For example, a
+	 * Extra menu items, added at the end of the menu. For example, a
 	 * `Menu.LinkItem` pointing to a help page.
 	 */
 	children?: ReactNode;
@@ -287,7 +287,7 @@ function SortDirectionRadioGroup() {
 /**
  * A single settings button, in place of the filters and the view options
  * buttons of the default UI. It opens a menu with the filters that have a
- * short list of choices, sorting, "Reset view" and any extra items.
+ * short list of choices, sorting and any extra items.
  *
  * It is meant for narrow, single-purpose panels, where the filters bar and the
  * view options popover don't fit. It builds itself from the fields and the
@@ -301,16 +301,15 @@ export default function DataViewsViewMenu( {
 	size = 'compact',
 	children,
 }: ViewMenuProps ) {
-	const { fields, filters, onReset } = useContext( DataViewsContext );
+	const { fields, filters } = useContext( DataViewsContext );
 	const menuFilters = getMenuFilters( filters, fields, excludeFields );
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false
 	);
 	const hasSort = showSort && sortableFields.length > 0;
-	const hasReset = onReset !== undefined;
 	const hasChildren = Children.toArray( children ).length > 0;
 
-	if ( ! menuFilters.length && ! hasSort && ! hasReset && ! hasChildren ) {
+	if ( ! menuFilters.length && ! hasSort && ! hasChildren ) {
 		return null;
 	}
 
@@ -382,29 +381,8 @@ export default function DataViewsViewMenu( {
 		}
 	}
 
-	if ( hasReset || hasChildren ) {
-		sections.push( {
-			key: 'actions',
-			content: (
-				<>
-					{ hasReset && (
-						<Menu.Item
-							disabled={ onReset === false }
-							onClick={ () => {
-								if ( typeof onReset === 'function' ) {
-									onReset();
-								}
-							} }
-						>
-							<Menu.ItemLabel>
-								{ __( 'Reset view' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
-					) }
-					{ children }
-				</>
-			),
-		} );
+	if ( hasChildren ) {
+		sections.push( { key: 'extra', content: children } );
 	}
 
 	return (

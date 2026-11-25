@@ -90,11 +90,9 @@ const DEFAULT_VIEW: View = {
 function renderViewMenu( {
 	menuProps,
 	view = DEFAULT_VIEW,
-	onReset,
 }: {
 	menuProps?: React.ComponentProps< typeof DataViews.ViewMenu >;
 	view?: View;
-	onReset?: ( () => void ) | false;
 } = {} ) {
 	const onChangeView = vi.fn();
 	render(
@@ -106,7 +104,6 @@ function renderViewMenu( {
 			paginationInfo={ { totalItems: data.length, totalPages: 1 } }
 			defaultLayouts={ { list: {} } }
 			getItemId={ ( item ) => item.id.toString() }
-			onReset={ onReset }
 		>
 			<DataViews.ViewMenu { ...menuProps } />
 		</DataViews>
@@ -248,19 +245,6 @@ describe( 'DataViews.ViewMenu', () => {
 				( item ) => item.textContent
 			)
 		).toEqual( [ 'Draft', 'Published' ] );
-	} );
-
-	it( 'resets the view from the menu', async () => {
-		const user = userEvent.setup();
-		const onReset = vi.fn();
-		renderViewMenu( { onReset } );
-
-		await openMenu( user );
-		await user.click(
-			await screen.findByRole( 'menuitem', { name: 'Reset view' } )
-		);
-
-		expect( onReset ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'renders nothing when the menu would be empty', () => {
