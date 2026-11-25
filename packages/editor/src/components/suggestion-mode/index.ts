@@ -27,3 +27,8 @@ export {
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
 } from './operations';
+export { wordDiff } from './word-diff';
+export {
+	default as SuggestionSummary,
+	summarizeOperations,
+} from './suggestion-summary';

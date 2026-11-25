@@ -14,6 +14,10 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import SuggestionActions, {
+	SuggestionActionButtons,
+	useSuggestionDecision,
+} from './suggestion-actions';
 import { NoteReactions } from './reactions/note-reactions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
@@ -82,7 +86,14 @@ export function Note( {
 		}
 	}, [ rawContent ] );
 
-	const canResolve = note.parent === 0;
+	// Suggestion threads expose their own Accept/Reject affordance in the
+	// header; the generic "Resolve" button would duplicate that action with
+	// a confusingly similar checkmark icon, so hide it for suggestion notes.
+	const hasSuggestionPayload = !! note?.meta?._wp_suggestion;
+	const suggestionDecision = useSuggestionDecision(
+		hasSuggestionPayload ? note : null
+	);
+	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -192,9 +203,13 @@ export function Note( {
 		);
 	}
 
-	const actions = isSelected ? (
+	const showActions = isSelected || hasSuggestionPayload;
+	const actions = showActions ? (
 		<>
-			{ canResolve && onResolve && (
+			{ hasSuggestionPayload && (
+				<SuggestionActionButtons decision={ suggestionDecision } />
+			) }
+			{ isSelected && canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -204,10 +219,12 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ isSelected && (
+				<NoteActionsMenu
+					items={ availableItems }
+					buttonRef={ actionButtonRef }
+				/>
+			) }
 		</>
 	) : null;
 
@@ -232,6 +249,12 @@ export function Note( {
 					disabled={ isThreadResolved }
 				/>
 			</div>
+			{ hasSuggestionPayload && (
+				<SuggestionActions
+					thread={ note }
+					decision={ suggestionDecision }
+				/>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen
