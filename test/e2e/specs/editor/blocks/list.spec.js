@@ -1022,13 +1022,12 @@ test.describe( 'List (@firefox)', () => {
 		await editor.canvas.getByText( 'B', { exact: true } ).click();
 		await editor.clickBlockToolbarButton( 'Indent' );
 
-		// "B" joins "y" in the last nested list, after it.
+		// "B" joins "y" in the last nested list, after it. "A" is untouched,
+		// so it keeps its loaded markup.
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
-<li>A
-
-<!-- wp:list -->
+<li>A<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
 <li>x</li>
 <!-- /wp:list-item --></ul>
