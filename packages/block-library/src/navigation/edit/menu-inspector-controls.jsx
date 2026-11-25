@@ -14,6 +14,7 @@ import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
+import { hasNavigationInnerBlockAppender } from './has-inner-block-appender';
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -78,6 +79,8 @@ const MainContent = ( {
 				isExpanded
 				description={ description }
 				showAppender
+				showInnerBlockAppenders
+				hasInnerBlockAppender={ hasNavigationInnerBlockAppender }
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }

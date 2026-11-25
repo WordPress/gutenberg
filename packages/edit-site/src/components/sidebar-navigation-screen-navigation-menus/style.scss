@@ -10,6 +10,9 @@
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
+	// The List View's chevrons take this background to cut its lines.
+	--wp-admin--list-view-background: var(--wpds-color-background-surface-neutral-weak);
+
 	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
 		white-space: normal;
 	}
@@ -47,6 +50,19 @@
 		&:focus {
 			background: var(--wpds-color-background-interactive-brand-strong-active);
 			color: var(--wpds-color-foreground-interactive-brand-strong-active);
+		}
+	}
+
+	// A nested appender is a plain + in the color of the rows, and turns
+	// blue while hovered or focused.
+	.block-editor-list-view-appender-row:not([aria-level="1"]) .list-view-appender .block-editor-inserter__toggle {
+		background: transparent;
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
+
+		&:hover,
+		&:focus {
+			background: transparent;
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
 }

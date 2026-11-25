@@ -22,6 +22,13 @@
 	&.is-dragging tbody {
 		pointer-events: none;
 	}
+
+	// The rows that move aside to open a gap for the drop would cover the
+	// appender rows, which stay in place. The top-level appender comes after
+	// every block, so no row moves over it.
+	&.is-dragging .block-editor-list-view-appender-row:not([aria-level="1"]) {
+		display: none;
+	}
 }
 
 .block-editor-list-view-leaf {
@@ -623,6 +630,101 @@ svg {
 	}
 }
 
+// A nested appender row is as tall as a block row, which the render window
+// counts on, with the + centered in it.
+.block-editor-list-view-appender-row:not([aria-level="1"]) {
+	height: $grid-unit-40;
+
+	.list-view-appender {
+		display: flex;
+	}
+}
+
+// A nested appender is a plain + in the color of the rows. It turns blue
+// while hovered or focused.
+.block-editor-list-view-appender-row:not([aria-level="1"]) .list-view-appender .block-editor-inserter__toggle {
+	background: transparent;
+	color: inherit;
+	margin-top: 0;
+
+	&:hover,
+	&:focus {
+		background: transparent;
+		color: var(--wp-admin-theme-color);
+	}
+}
+
 .list-view-appender__description {
 	display: none;
+}
+
+// In a List View with nested appenders, each + sits where the item it adds
+// will show its icon. A light line runs from the + left to the column of
+// those items' chevrons, which is under the icon of the block it adds to,
+// and up that column to the icon, or to the top of the list.
+.block-editor-list-view-tree.has-inner-block-appenders {
+	// The lines are drawn behind the rows.
+	isolation: isolate;
+
+	@for $i from 0 to $block-navigation-max-indent {
+		.block-editor-list-view-appender-row[aria-level="#{ $i + 1 }"]
+		.list-view-appender
+		.block-editor-inserter__toggle {
+			// Less the cell's 1px, so the + centers under the items' icons.
+			margin-left: ($grid-unit-30 * ( $i + 1 )) - $border-width;
+		}
+	}
+
+	.list-view-appender .block-editor-inserter__toggle {
+		position: relative;
+
+		&::before,
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: -1;
+			left: calc(50% - #{$grid-unit-30});
+			background: var(--wpds-color-stroke-surface-neutral);
+		}
+
+		// The line ends level with the middle of the +, where it turns.
+		&::before {
+			bottom: 50%;
+			width: $border-width;
+			// The + is 4px below the top of its row.
+			height: calc(var(--wp-admin--list-view-appender-line-height, 0px) + 50% + #{$grid-unit-05});
+		}
+
+		// The line turns across to the +.
+		&::after {
+			top: calc(50% - #{$border-width});
+			right: 100%;
+			height: $border-width;
+		}
+	}
+
+	// The top-level + is 8px below the top of its row, plus the cell's 1px.
+	.block-editor-list-view-appender-row[aria-level="1"] .list-view-appender .block-editor-inserter__toggle::before {
+		height: calc(var(--wp-admin--list-view-appender-line-height, 0px) + 50% + #{$grid-unit-10 + $border-width});
+	}
+
+	// A chevron the line passes has the background of the list, so the line
+	// stops short of it.
+	.block-editor-list-view-leaf:not(.is-selected) .block-editor-list-view__expander svg {
+		background: var(--wp-admin--list-view-background, var(--wpds-color-background-surface-neutral-strong));
+	}
+
+	.block-editor-list-view-leaf.is-branch-selected:not(.is-selected) .block-editor-list-view__expander svg {
+		background:
+			linear-gradient(rgba(var(--wp-admin-theme-color--rgb), 0.04), rgba(var(--wp-admin-theme-color--rgb), 0.04)),
+			var(--wp-admin--list-view-background, var(--wpds-color-background-surface-neutral-strong));
+	}
+
+	// The rows move during a drag, and the lines would not follow them.
+	&.is-dragging .list-view-appender .block-editor-inserter__toggle {
+		&::before,
+		&::after {
+			display: none;
+		}
+	}
 }

@@ -168,9 +168,12 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		const appender = listView.getByRole( 'button', {
-			name: 'Add page',
-		} );
+		// Every list keeps an appender row, and the top-level one comes last.
+		const appender = listView
+			.getByRole( 'button', {
+				name: 'Add page',
+			} )
+			.last();
 
 		await expect( appender ).toBeVisible();
 
@@ -307,7 +310,11 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		// The top-level appender comes after any submenu's appender row.
+		await listView
+			.getByRole( 'button', { name: 'Add page' } )
+			.last()
+			.click();
 
 		await expect( linkControl.getSearchInput() ).toBeFocused();
 		await page.keyboard.type( 'Home', { delay: 50 } );
@@ -622,10 +629,12 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
+		// The top-level appender comes after any submenu's appender row.
 		await listView
 			.getByRole( 'button', {
 				name: 'Add page',
 			} )
+			.last()
 			.click();
 
 		// Expect the Link UI to be focused.
@@ -955,7 +964,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 		// Items can be added here, as the canvas appender shows, so the List
 		// View offers its appender too.
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		// The top-level appender comes after any submenu's appender row.
+		const appender = listView
+			.getByRole( 'button', { name: 'Add page' } )
+			.last();
 		await expect( appender ).toBeVisible();
 		await appender.click();
 
@@ -965,6 +977,43 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			listView.getByRole( 'link', { name: 'Test Page 1' } )
 		).toBeVisible();
+	} );
+
+	test( 'moves past a submenu with the arrow keys when the menu is locked against inserting', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Locked Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"Top Level Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+		} );
+
+		await editor.setContent(
+			`<!-- wp:navigation {"ref":${ menu.id },"templateLock":"insert"} /-->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// Nothing can be added to the submenu, so it ends with no appender
+		// row that would stop the arrow keys.
+		await listView.getByRole( 'link', { name: 'Submenu Item' } ).focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			listView.getByRole( 'link', { name: 'Top Level Item 2' } )
+		).toBeFocused();
 	} );
 
 	test( 'edits a Button from the List View popover in a contentOnly locked section', async ( {

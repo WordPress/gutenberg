@@ -15,6 +15,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { END, HOME } from '@wordpress/keycodes';
 import ListViewBranch from './branch';
 import {
 	ListViewContext,
@@ -79,21 +80,23 @@ const expansion = (
 /**
  * Show a hierarchical list of blocks.
  *
- * @param props                        Components props.
- * @param props.id                     An HTML element id for the root element of ListView.
- * @param props.blocks                 _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param props.dropZoneElement        Optional element to be used as the drop zone.
- * @param props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
- * @param props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
- * @param props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
- * @param props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
- * @param props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
- * @param props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
- * @param props.description            Optional accessible description for the tree grid component.
- * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
- * @param props.additionalBlockContent Component that renders additional block content UI.
- * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
- * @param ref                          Forwarded ref
+ * @param props                         Components props.
+ * @param props.id                      An HTML element id for the root element of ListView.
+ * @param props.blocks                  _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param props.dropZoneElement         Optional element to be used as the drop zone.
+ * @param props.showBlockMovers         Flag to enable block movers. Defaults to `false`.
+ * @param props.isExpanded              Flag to determine whether nested levels are expanded by default. Defaults to `false`.
+ * @param props.showAppender            Flag to show or hide the block appender. Defaults to `false`.
+ * @param props.showInnerBlockAppenders Flag to also end every expanded nested list with an appender when `showAppender` is set. Defaults to `false`.
+ * @param props.hasInnerBlockAppender   Whether a block that takes inner blocks gets an appender for them when `showInnerBlockAppenders` is set, given its name. Every such block gets one when it is not set.
+ * @param props.focusOnMount            Flag to move focus into the list when it mounts. Defaults to `false`.
+ * @param props.blockSettingsMenu       Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
+ * @param props.rootClientId            The client id of the root block from which we determine the blocks to show in the list.
+ * @param props.description             Optional accessible description for the tree grid component.
+ * @param props.onSelect                Optional callback to be invoked when a block is selected. Receives the block object that was selected.
+ * @param props.additionalBlockContent  Component that renders additional block content UI.
+ * @param props.showContentPopover      Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
+ * @param ref                           Forwarded ref
  */
 function ListViewComponent(
 	{
@@ -103,6 +106,8 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		showInnerBlockAppenders = false,
+		hasInnerBlockAppender,
 		focusOnMount = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
@@ -248,17 +253,27 @@ function ListViewComponent(
 			updateExpansion( { type: 'collapse', clientIds: [ clientId ] } );
 		}
 	}, [] );
+	// Tree grid rows carry `data-block`, except appender rows. A move off an
+	// appender row goes on from the block row that focus last left, or else
+	// from the row it moves to.
+	const lastBlockRowRef = useRef< string | undefined >( undefined );
 	const focusRow = useCallback(
 		(
 			event: KeyboardEvent,
 			startRow: HTMLElement,
 			endRow: HTMLElement
 		) => {
-			if ( event.shiftKey ) {
+			const clientId =
+				startRow?.dataset?.block ?? lastBlockRowRef.current;
+			// Home and End jump past the rows next to the one they move to.
+			const isJump = event.keyCode === HOME || event.keyCode === END;
+			lastBlockRowRef.current =
+				isJump && ! event.shiftKey ? undefined : clientId;
+			const fromClientId = clientId ?? endRow?.dataset?.block;
+			if ( event.shiftKey && fromClientId ) {
 				updateBlockSelection(
 					event,
-					// Tree grid rows carry `data-block`.
-					startRow?.dataset?.block as string,
+					fromClientId,
 					endRow?.dataset?.block
 				);
 			}
@@ -317,6 +332,7 @@ function ListViewComponent(
 			listViewInstanceId: instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			hasInnerBlockAppender,
 			treeGridElementRef: elementRef,
 			updateExpansion,
 		} ),
@@ -326,6 +342,7 @@ function ListViewComponent(
 			instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			hasInnerBlockAppender,
 			updateExpansion,
 		]
 	);
@@ -376,6 +393,8 @@ function ListViewComponent(
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,
+					'has-inner-block-appenders':
+						showAppender && showInnerBlockAppenders,
 				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
@@ -413,6 +432,9 @@ function ListViewComponent(
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								showAppender={ showAppender }
+								showInnerBlockAppenders={
+									showAppender && showInnerBlockAppenders
+								}
 							/>
 						</ListViewTreeStateContext.Provider>
 					</ListViewInsertedBlockContext.Provider>
@@ -437,6 +459,7 @@ export default forwardRef< HTMLElement, ListViewProps >( ( props, ref ) => {
 			ref={ ref }
 			{ ...props }
 			showAppender={ false }
+			showInnerBlockAppenders={ false }
 			rootClientId={ null }
 			onSelect={ null }
 			additionalBlockContent={ null }
