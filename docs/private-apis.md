@@ -44,6 +44,12 @@ Private exports:
 - `Menu`
 - `kebabCase`
 
+## dom
+
+- `getStyleLinearTransform` maps 2D directions and deltas from an element's local axes to its parent's axes using its computed style.
+- `getViewportLinearTransform` includes the transforms of the element's ancestors to map those directions and deltas to its document's viewport axes.
+- `getElementBoxTransform` returns the element's own transform for border-box points. It accounts for translation and transform origin when locating insertion gaps.
+
 ## commands
 
 Private exports:
