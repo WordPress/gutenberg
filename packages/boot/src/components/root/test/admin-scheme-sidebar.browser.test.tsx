@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -27,14 +26,14 @@ describe( 'admin color scheme sidebar', () => {
 		async ( { scheme, core } ) => {
 			document.body.className = `admin-color-${ scheme }`;
 
-			await render(
+			const view = await render(
 				<ThemeProvider color={ getAdminThemeColors() }>
 					<div className={ styles.layout }>sidebar</div>
 				</ThemeProvider>
 			);
 
 			const sidebarColor = getComputedStyle(
-				screen.getByText( 'sidebar' )
+				view.getByText( 'sidebar' ).element()
 			).backgroundColor;
 			const actual = sidebarColor.match( /\d+/g )!.map( Number );
 
