@@ -39,23 +39,50 @@ function parseAngleInDegrees( value: string ): number {
 	return match ? parseFloat( match[ 1 ] ) * ANGLE_UNITS[ match[ 2 ] ] : NaN;
 }
 
+const ROTATE_AXES: Record< string, [ number, number, number ] > = {
+	'': [ 0, 0, 1 ],
+	x: [ 1, 0, 0 ],
+	y: [ 0, 1, 0 ],
+	z: [ 0, 0, 1 ],
+};
+
 /**
- * Reads the computed `rotate` property. Only a turn around the z axis keeps
- * the element flat, so any other axis is treated as no rotation.
+ * Splits a computed `rotate` value into its axis and angle.
+ *
+ * @param value Computed `rotate` value, other than `none`.
+ */
+function parseRotate( value: string ): [ number, number, number, number ] {
+	const parts = value.trim().split( /\s+/ );
+	const degrees = parseAngleInDegrees( parts.pop()! );
+	const [ x, y, z ] =
+		ROTATE_AXES[ parts.join( ' ' ) ] ??
+		parts.map( ( part ) => parseFloat( part ) );
+	return [ x, y, z, degrees ];
+}
+
+/**
+ * Reads the computed `rotate` property. A turn out of the page is projected
+ * onto it, the same way the 2D part of a `rotate3d()` transform is.
  *
  * @param value Computed `rotate` value.
  */
 function getRotate( value: string ): LinearTransform {
-	const parts = value.trim().split( /\s+/ );
-	const degrees = parseAngleInDegrees( parts[ parts.length - 1 ] );
-	const axis = parts.slice( 0, -1 ).join( ' ' );
-	if ( Number.isNaN( degrees ) || ! [ '', 'z', '0 0 1' ].includes( axis ) ) {
+	if ( value === 'none' ) {
 		return IDENTITY;
 	}
+	const [ x, y, z, degrees ] = parseRotate( value );
+	const length = Math.hypot( x, y, z );
 	const angle = ( degrees * Math.PI ) / 180;
 	const cos = Math.cos( angle );
 	const sin = Math.sin( angle );
-	return { a: cos, b: sin, c: -sin, d: cos };
+	const [ ux, uy, uz ] = [ x / length, y / length, z / length ];
+	const matrix = {
+		a: cos + ux * ux * ( 1 - cos ),
+		b: ux * uy * ( 1 - cos ) + uz * sin,
+		c: ux * uy * ( 1 - cos ) - uz * sin,
+		d: cos + uy * uy * ( 1 - cos ),
+	};
+	return Object.values( matrix ).every( Number.isFinite ) ? matrix : IDENTITY;
 }
 
 function parseScale( value: string ): [ number, number ] {
@@ -127,8 +154,8 @@ export function isStyleTransformAxisAligned( style: TransformStyle ): boolean {
 
 /**
  * Maps 2D directions and distances from the element's local axes to its
- * document's viewport axes. Includes ancestor transforms. Only in-plane
- * rotations from the individual CSS `rotate` property contribute.
+ * document's viewport axes. Includes ancestor transforms, and projects turns
+ * out of the page onto it.
  *
  * @param element The element to measure.
  */
@@ -152,13 +179,6 @@ export function getViewportVectorTransform(
 	}
 	return matrix;
 }
-
-const ROTATE_AXES: Record< string, [ number, number, number ] > = {
-	'': [ 0, 0, 1 ],
-	x: [ 1, 0, 0 ],
-	y: [ 0, 1, 0 ],
-	z: [ 0, 0, 1 ],
-};
 
 function parseLength( value: string, size: number ) {
 	if ( value.endsWith( '%' ) ) {
@@ -210,12 +230,7 @@ function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
 	}
 
 	if ( rotate !== 'none' ) {
-		const parts = rotate.split( ' ' );
-		const angle = parseAngleInDegrees( parts.pop()! );
-		const [ x, y, z ] =
-			ROTATE_AXES[ parts.join( ' ' ) ] ??
-			parts.map( ( value ) => parseFloat( value ) );
-		matrix.rotateAxisAngleSelf( x, y, z, angle );
+		matrix.rotateAxisAngleSelf( ...parseRotate( rotate ) );
 	}
 
 	if ( scale !== 'none' ) {

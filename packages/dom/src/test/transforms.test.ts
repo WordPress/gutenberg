@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { isStyleTransformAxisAligned } from '../transforms';
+import {
+	getStyleLinearTransform,
+	isStyleTransformAxisAligned,
+} from '../transforms';
+
+function round( matrix: Record< string, number > ) {
+	return Object.fromEntries(
+		Object.entries( matrix ).map( ( [ key, value ] ) => [
+			key,
+			Math.round( value * 1000 ) / 1000 + 0,
+		] )
+	);
+}
 
 describe( 'isStyleTransformAxisAligned', () => {
 	it.each( [
@@ -33,6 +45,7 @@ describe( 'isStyleTransformAxisAligned', () => {
 		[ '45deg', 'none', 'none' ],
 		[ '-0.1rad', 'none', 'none' ],
 		[ 'z 45deg', 'none', 'none' ],
+		[ '1 1 0 45deg', 'none', 'none' ],
 		[ '45deg', '2 3', 'none' ],
 		[ 'none', 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
 		[ 'none', 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
@@ -49,4 +62,54 @@ describe( 'isStyleTransformAxisAligned', () => {
 			).toBe( false );
 		}
 	);
+} );
+
+describe( 'getStyleLinearTransform', () => {
+	it( 'returns the identity for no transform', () => {
+		expect(
+			getStyleLinearTransform( {
+				rotate: 'none',
+				scale: 'none',
+				transform: 'none',
+			} )
+		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	} );
+
+	it( 'applies `rotate`, then `scale`, then `transform`', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: '90deg',
+					scale: '2 3',
+					transform: 'matrix(1, 0, 1, 1, 0, 0)',
+				} )
+			)
+		).toEqual( { a: 0, b: 2, c: -3, d: 2 } );
+	} );
+
+	it( 'projects a turn out of the page', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: 'none',
+					transform: 'none',
+				} )
+			)
+		).toEqual( { a: 1, b: 0, c: 0, d: 0.5 } );
+	} );
+
+	it( 'reads every angle unit', () => {
+		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
+			expect(
+				round(
+					getStyleLinearTransform( {
+						rotate,
+						scale: '',
+						transform: '',
+					} )
+				)
+			).toEqual( { a: 0, b: 1, c: -1, d: 0 } );
+		}
+	} );
 } );

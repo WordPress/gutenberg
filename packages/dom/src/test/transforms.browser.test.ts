@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
 	getBorderBoxPointTransform,
-	getStyleLinearTransform,
 	getViewportVectorTransform,
 } from '../transforms';
 
@@ -76,7 +75,7 @@ describe( 'getViewportVectorTransform', () => {
 		).toEqual( { a: 0, b: 2, c: -2, d: 0 } );
 	} );
 
-	it( 'keeps movement in plane and projects border-box points for an x-axis rotation', () => {
+	it( 'projects a turn out of the page the same way for vectors and points', () => {
 		const element = createNested(
 			'',
 			'rotate: x 60deg; transform-origin: 0 0;'
@@ -90,45 +89,23 @@ describe( 'getViewportVectorTransform', () => {
 			a: 1,
 			b: 0,
 			c: 0,
-			d: 1,
+			d: 0.5,
 		} );
 	} );
-} );
 
-describe( 'getStyleLinearTransform', () => {
-	it( 'returns the identity for no transform', () => {
-		expect(
-			getStyleLinearTransform( {
-				rotate: 'none',
-				scale: 'none',
-				transform: 'none',
-			} )
-		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
-	} );
-
-	it( 'applies `rotate`, then `scale`, then `transform`', () => {
+	it( 'reads the rotate property and a rotate3d transform alike', () => {
 		expect(
 			round(
-				getStyleLinearTransform( {
-					rotate: '90deg',
-					scale: '2 3',
-					transform: 'matrix(1, 0, 1, 1, 0, 0)',
-				} )
-			)
-		).toEqual( { a: 0, b: 2, c: -3, d: 2 } );
-	} );
-
-	it( 'reads every angle unit', () => {
-		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
-			expect(
-				round(
-					getStyleLinearTransform( {
-						rotate,
-						scale: '',
-						transform: '',
-					} )
+				getViewportVectorTransform(
+					createNested( 'rotate: 1 1 0 45deg' )
 				)
-			).toEqual( { a: 0, b: 1, c: -1, d: 0 } );
-		}
+			)
+		).toEqual(
+			round(
+				getViewportVectorTransform(
+					createNested( 'transform: rotate3d(1, 1, 0, 45deg)' )
+				)
+			)
+		);
 	} );
 } );
