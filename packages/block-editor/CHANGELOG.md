@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   Inspector: Show the Styles tab for blocks whose only style controls are in the Background, Filters or Elements panels, such as the Gallery block in a classic theme ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
