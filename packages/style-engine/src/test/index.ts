@@ -644,6 +644,11 @@ describe( 'rotate', () => {
 			expect( compileCSS( { transform: { rotate } } ) ).toEqual( '' );
 		}
 	);
+
+	it( 'should output nothing for a numeric rotation', () => {
+		// @ts-expect-error Test that a number is not a rotation.
+		expect( compileCSS( { transform: { rotate: 0 } } ) ).toEqual( '' );
+	} );
 } );
 
 describe( 'translate', () => {

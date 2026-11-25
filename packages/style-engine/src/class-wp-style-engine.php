@@ -559,8 +559,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				foreach ( $definition_group_style as $style_definition ) {
 					$style_value = _wp_array_get( $block_styles, $style_definition['path'], null );
 
-					// A numeric transform value, such as a `0` scale, is not empty.
-					if ( 'transform' === $definition_group_key && ( is_int( $style_value ) || is_float( $style_value ) ) ) {
+					// A numeric scale, such as `0`, is not empty. Mirror of `getScaleCSSValue()` in JS.
+					if ( array( 'transform', 'scale' ) === $style_definition['path'] && ( is_int( $style_value ) || is_float( $style_value ) ) ) {
 						$style_value = (string) $style_value;
 					}
 
