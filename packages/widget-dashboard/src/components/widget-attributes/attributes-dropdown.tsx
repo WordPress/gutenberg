@@ -41,8 +41,7 @@ export interface AttributesDropdownProps {
 	onOpenChange: ( open: boolean ) => void;
 
 	/**
-	 * Ref to the trigger, so the caller can move focus onto it when the
-	 * inline controls collapse while focused.
+	 * Trigger ref, for moving focus onto it when focused inline controls collapse.
 	 */
 	triggerRef?: Ref< HTMLButtonElement >;
 }

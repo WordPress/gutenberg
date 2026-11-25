@@ -62,13 +62,9 @@ export function WidgetAttributes( {
 	const settingsReserveRef =
 		useReserveHeaderSpace< HTMLSpanElement >( 'settings' );
 
-	// While the user interacts with the collapsed presentation, the fit
-	// holds it in place; expanding mid-interaction would drop focus on the
-	// floor. The hold covers the open dropdown and focus on its trigger:
-	// dismissing the popup restores focus to the trigger asynchronously, so
-	// the trigger must survive until focus moves on. The pending expansion
-	// applies afterwards. Focus inside the inline form is tracked only to
-	// hand it to the trigger if the controls collapse.
+	// Hold the collapsed presentation while the dropdown is open or its
+	// trigger has focus (dismissing the popup refocuses the trigger
+	// asynchronously). Inline focus is tracked only for the handoff below.
 	const [ dropdownOpen, setDropdownOpen ] = useState( false );
 	const [ inlineHasFocus, setInlineHasFocus ] = useState( false );
 	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
@@ -78,10 +74,9 @@ export function WidgetAttributes( {
 		locked: dropdownOpen || dropdownTriggerHasFocus,
 	} );
 
-	// Inline controls that stop fitting collapse even while focused. Their
-	// focus moves to the dropdown trigger, which takes their place, so a
-	// keyboard user is not dropped onto the page. Noted while rendering:
-	// the unmount can blur the inline form before an effect runs.
+	// Focused inline controls that stop fitting still collapse; their focus
+	// moves to the trigger. Noted during render: the unmount can blur the
+	// form before an effect runs.
 	const triggerRef = useRef< HTMLButtonElement >( null );
 	const [ wasCollapsed, setWasCollapsed ] = useState( collapsed );
 	const [ focusTrigger, setFocusTrigger ] = useState( false );
@@ -90,8 +85,7 @@ export function WidgetAttributes( {
 		setFocusTrigger( collapsed && inlineHasFocus );
 	}
 
-	// An expansion can only start once focus left the dropdown; clear the
-	// flag of whichever presentation unmounted with it still set.
+	// Clear the focus flag of whichever presentation unmounted.
 	useEffect( () => {
 		if ( collapsed ) {
 			setInlineHasFocus( false );
@@ -106,10 +100,8 @@ export function WidgetAttributes( {
 		}
 		setFocusTrigger( false );
 
-		// Hand focus over only if it dropped to the document with the inline
-		// controls. A focused field removed from the form (hidden by
-		// `isVisible`, say) never reports its blur, so the flag can be stale
-		// while the user is focused elsewhere; leave that focus alone.
+		// Only if focus dropped to the document: a field hidden while focused
+		// never blurs, so the flag can be stale.
 		const trigger = triggerRef.current;
 		const { activeElement, body } = trigger?.ownerDocument ?? document;
 		if ( trigger && ( ! activeElement || activeElement === body ) ) {

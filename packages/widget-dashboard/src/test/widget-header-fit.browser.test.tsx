@@ -127,8 +127,8 @@ describe( 'WidgetHeader fit', () => {
 		radio.focus();
 		expect( radio ).toHaveFocus();
 
-		// Focus does not hold the inline presentation: the controls collapse
-		// before the title clips, and focus follows to the trigger.
+		// Focus does not hold the inline controls; they collapse before
+		// the title clips, and focus follows to the trigger.
 		const clippedInline = [];
 		for ( let width = 600; width >= 240 && isInline(); width -= 4 ) {
 			await view.rerender( <Tile width={ width } /> );

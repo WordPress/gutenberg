@@ -256,8 +256,7 @@ describe( 'WidgetAttributes fit', () => {
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
-		// Focused inline controls still collapse when they stop fitting, so
-		// focus inside them must not hold the presentation.
+		// Focused inline controls must still be able to collapse.
 		await user.click( screen.getAllByRole( 'combobox' )[ 0 ] );
 
 		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(

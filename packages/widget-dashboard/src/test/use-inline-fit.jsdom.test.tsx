@@ -86,8 +86,7 @@ describe( 'useInlineFit', () => {
 		measureFields( 100 );
 		expect( result.current.collapsed ).toBe( false );
 
-		// The user starts interacting; space shrinks meanwhile. Holding the
-		// inline controls would clip them, so they collapse at once.
+		// Space shrinks mid-interaction: collapse anyway, rather than clip.
 		rerender( { locked: true } );
 		availableSize = 80;
 		rerender( { locked: true } );

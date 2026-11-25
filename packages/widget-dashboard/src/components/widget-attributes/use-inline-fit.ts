@@ -9,11 +9,9 @@ const EXPAND_BUFFER = 16;
 
 interface InlineFitOptions {
 	/**
-	 * Holds the collapsed presentation while the user interacts with it (an
-	 * open dropdown, focus on its trigger), so it does not expand under
-	 * them; the expansion applies when the hold releases. Collapsing is
-	 * never held: inline controls that no longer fit would be clipped, so
-	 * they collapse even while the user interacts with them.
+	 * Holds the collapsed presentation while the user interacts with it;
+	 * the expansion applies on release. Collapsing is never held, since
+	 * inline controls that no longer fit would be clipped.
 	 */
 	locked?: boolean;
 }
@@ -61,9 +59,7 @@ export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
 			? naturalSize + EXPAND_BUFFER > availableSize
 			: naturalSize > availableSize );
 
-	// The latch: while locked, a collapsed presentation is not expanded
-	// under the user; releasing the lock lets the expansion apply. A
-	// collapse applies at once, locked or not.
+	// The latch: a lock defers expansion, never collapse.
 	const collapsed = computed || ( locked && held );
 	if ( held !== collapsed ) {
 		setHeld( collapsed );

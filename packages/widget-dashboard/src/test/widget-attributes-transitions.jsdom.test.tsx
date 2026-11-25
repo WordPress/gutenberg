@@ -337,8 +337,7 @@ describe( 'WidgetAttributes presentation transitions', () => {
 		await user.click( screen.getByRole( 'combobox' ) );
 		expect( screen.getByRole( 'combobox' ) ).toHaveFocus();
 
-		// Space shrinks while the inline controls have focus: they collapse
-		// instead of clipping, and focus follows to the trigger.
+		// Shrinking collapses the focused controls; focus follows.
 		notifyResize( header, 200 );
 		const trigger = await screen.findByRole( 'button', {
 			name: 'Widget controls',
@@ -375,16 +374,14 @@ describe( 'WidgetAttributes presentation transitions', () => {
 		} );
 		act( () => settings.focus() );
 
-		// Space shrinks while focus is outside the inline controls: they
-		// collapse, and focus stays where the user left it.
+		// Focus is elsewhere, so the collapse leaves it there.
 		notifyResize( header, 200 );
 		await screen.findByRole( 'button', { name: 'Widget controls' } );
 		expect( settings ).toHaveFocus();
 	} );
 
 	it( 'leaves focus alone after a focused inline field was hidden', async () => {
-		// A field shown only for one metric: hiding it while it has focus
-		// removes it without a blur event.
+		// Hiding the focused field removes it without a blur event.
 		const types: WidgetType[] = [
 			{
 				...widgetTypes[ 0 ],
