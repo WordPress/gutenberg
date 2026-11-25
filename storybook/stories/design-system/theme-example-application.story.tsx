@@ -30,7 +30,7 @@ const SIDEBAR_THEME_PRESETS = [
 	{
 		id: 'blue',
 		title: 'Blue',
-		colors: { primary: '#437aa8', background: '#3876a8' },
+		colors: { primary: '#437aa8', background: '#24567e' },
 	},
 	{
 		id: 'ectoplasm',

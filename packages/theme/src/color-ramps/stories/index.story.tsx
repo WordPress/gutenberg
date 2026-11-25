@@ -230,7 +230,7 @@ const SAMPLE_COMBINATIONS = [
 	{
 		label: 'Blue',
 		source: 'WordPress admin scheme',
-		background: '#3876a8',
+		background: '#24567e',
 		primary: '#437aa8',
 	},
 	{
@@ -260,7 +260,7 @@ const SAMPLE_COMBINATIONS = [
 	{
 		label: 'Sunrise',
 		source: 'WordPress admin scheme',
-		background: '#cc4541',
+		background: '#933330',
 		primary: '#ad631e',
 	},
 ] as const satisfies readonly Combination[];

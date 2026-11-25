@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getAdminThemeColors`: Adjust the Blue and Sunrise background colors so the admin sidebar matches the Core color schemes again ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Internal
 
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
