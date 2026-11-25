@@ -1,7 +1,7 @@
 <?php
 /**
- * Tests that this combined testing branch reports the Suggestion mode
- * experiment as on to server code, with or without a saved choice.
+ * Tests that this combined testing branch has the Suggestion mode experiment
+ * on by default, and that the Experiments screen can still switch it off.
  *
  * @group suggestions
  */
@@ -19,8 +19,7 @@ class Tests_Suggestion_Bundle_Default_On extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A REST request registers the option with an empty default, which core
-	 * applies through the same `default_option_*` hook.
+	 * A REST request registers the option with an empty default.
 	 */
 	public function test_experiment_is_on_in_a_rest_request_without_a_saved_option(): void {
 		delete_option( 'gutenberg-experiments' );
@@ -35,5 +34,12 @@ class Tests_Suggestion_Bundle_Default_On extends WP_UnitTestCase {
 
 		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-suggestion-mode' ) );
 		$this->assertTrue( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) );
+	}
+
+	public function test_experiment_is_off_when_the_site_switched_it_off(): void {
+		update_option( 'gutenberg-experiments', array( 'gutenberg-suggestion-mode' => false ) );
+		gutenberg_initialize_experiments_settings();
+
+		$this->assertFalse( gutenberg_is_experiment_enabled( 'gutenberg-suggestion-mode' ) );
 	}
 }

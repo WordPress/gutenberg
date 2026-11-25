@@ -65,6 +65,14 @@ function gutenberg_get_experiment_default( $name ) {
 		case 'gutenberg-react-19':
 			return ! gutenberg_has_react_19_incompatible_extension();
 
+		/*
+		 * On by default on this combined testing branch only, so testers get
+		 * the feature without visiting the Experiments screen first. On the
+		 * reviewable stack (#80427 and up) it is off by default.
+		 */
+		case 'gutenberg-suggestion-mode':
+			return true;
+
 		default:
 			return false;
 	}
