@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove the empty `search` query arg from the Patterns URL after resetting the filters or clearing the search.
+
 ## 8.2.0 (2026-11-18)
 
 ### Enhancements
