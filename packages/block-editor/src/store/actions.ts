@@ -1258,7 +1258,9 @@ export const __unstableSplitSelection =
 				? [ firstBlock ]
 				: switchToBlockType( firstBlock, headType.name );
 
-		if ( firstBlocks?.length ) {
+		// Only merge a block without inner blocks: how two sets of inner
+		// blocks combine is up to the block, so insert the rest whole.
+		if ( firstBlocks?.length && ! firstBlocks[ 0 ].innerBlocks.length ) {
 			const first = firstBlocks.shift()!;
 			head = {
 				...head,
@@ -1296,7 +1298,10 @@ export const __unstableSplitSelection =
 					? [ lastBlock ]
 					: switchToBlockType( lastBlock, tailType.name );
 
-			if ( lastBlocks?.length ) {
+			if (
+				lastBlocks?.length &&
+				! lastBlocks[ lastBlocks.length - 1 ].innerBlocks.length
+			) {
 				const last = lastBlocks.pop()!;
 				output.push( {
 					...tail,
