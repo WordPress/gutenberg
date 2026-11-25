@@ -1,5 +1,5 @@
 import { Icon as WCIcon } from '@wordpress/components';
-import { forwardRef, isValidElement } from '@wordpress/element';
+import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
@@ -136,11 +136,18 @@ function UnforwardedMoreMenuItem(
 	let prefix: ReactNode;
 	if ( icon ) {
 		// Preserve support for Dashicon slugs and custom icon components.
+		// Plugin SVG icons often leave out their fill. Default it to the text
+		// color as an attribute, which a fill the icon sets itself still
+		// overrides.
 		prefix =
 			isValidElement< ComponentProps< 'svg' > >( icon ) &&
 			( icon.type === 'svg' || icon.type === SVG ) ? (
 				<Menu.PrefixIcon
-					icon={ icon }
+					icon={
+						icon.props.fill === undefined
+							? cloneElement( icon, { fill: 'currentColor' } )
+							: icon
+					}
 					className={ icon.props.className }
 				/>
 			) : (
