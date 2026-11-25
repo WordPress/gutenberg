@@ -26,6 +26,7 @@ import type { QueriedMeta, Query } from './queried-data/types';
 import type { PermissionResource } from './utils/types';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import type { Action, CoreDataThunkArgs } from './private-types';
+import type { State } from './selectors';
 import type { EntityConfig, RestRecord, TransientEditConfig } from './types';
 
 /**
@@ -75,11 +76,8 @@ export const getEntityRecord =
 		registry,
 		resolveSelect,
 	}: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -314,11 +312,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords =
 	( kind: string, name: string, query: Query = {} ) =>
 	async ( { dispatch, registry, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -637,14 +632,11 @@ export const canUser =
 				return;
 			}
 
-			const configs = await resolveSelect.getEntitiesConfig(
-				resource.kind
-			);
-			const entityConfig = configs.find(
-				( config ) =>
-					config.name === resource.name &&
-					config.kind === resource.kind
-			);
+			const entityConfig: EntityConfig | undefined =
+				await resolveSelect.getEntityConfig(
+					resource.kind,
+					resource.name
+				);
 			if ( ! entityConfig ) {
 				return;
 			}
@@ -1018,11 +1010,8 @@ export const getRevisions =
 		query: Query = {}
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		if ( ! entityConfig || ! isSafeEntityKey( recordKey ) ) {
 			return;
@@ -1166,11 +1155,8 @@ export const getRevision =
 		query?: Query
 	) =>
 	async ( { select, dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		if (
 			! entityConfig ||
@@ -1326,6 +1312,31 @@ export const getEntitiesConfig =
 			// Do nothing if the request comes back with an API error.
 		}
 	};
+
+/**
+ * Requests the entity config for the given kind and name from the REST API.
+ *
+ * @param kind Entity kind.
+ * @param name Entity name.
+ */
+export const getEntityConfig =
+	( kind: string, name: string ) =>
+	async ( { resolveSelect }: CoreDataThunkArgs ) => {
+		const hasLoader = additionalEntityConfigLoaders.some(
+			( loader ) =>
+				loader.kind === kind &&
+				( ! loader.name || loader.name === name )
+		);
+		if ( hasLoader ) {
+			// Loaders request every config of a kind at once.
+			await resolveSelect.getEntitiesConfig( kind );
+		}
+	};
+
+getEntityConfig.isFulfilled = ( state: State, kind: string, name: string ) =>
+	state.entities.config.some(
+		( config ) => config.kind === kind && config.name === name
+	);
 
 /**
  * Requests editor settings from the REST API.

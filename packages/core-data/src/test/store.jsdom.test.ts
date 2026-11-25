@@ -125,6 +125,38 @@ describe( 'getEntityRecord', () => {
 		} );
 		expect( triggerFetch ).not.toHaveBeenCalled();
 	} );
+
+	it( 'does not wait for the site entity config to resolve other root entities', async () => {
+		const widget = { name: 'core/stats' };
+		apiFetchMock.mockImplementation( ( { path } ) =>
+			path.startsWith( '/wp/v2/settings' )
+				? new Promise( () => {} )
+				: Promise.resolve( {
+						async json() {
+							return widget;
+						},
+					} )
+		);
+
+		const { getEntityConfig, getEntityRecord } =
+			registry.resolveSelect( coreDataStore );
+		await expect(
+			getEntityConfig( 'root', 'widgetModule' )
+		).resolves.toBeUndefined();
+
+		registry.dispatch( coreDataStore ).addEntities( [
+			{
+				kind: 'root',
+				name: 'widgetModule',
+				key: 'name',
+				baseURL: '/wp/v2/widget-modules',
+			},
+		] );
+
+		await expect(
+			getEntityRecord( 'root', 'widgetModule', 'core/stats' )
+		).resolves.toEqual( widget );
+	} );
 } );
 
 describe( 'getEntityRecords', () => {
