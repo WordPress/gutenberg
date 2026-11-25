@@ -708,7 +708,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 /**
  * Returns the current editor intent. The intent represents the user's
  * editing purpose — directly editing content (`edit`), or suggesting
- * changes that the author can apply or reject (`suggest`).
+ * changes that the author can accept or reject (`suggest`).
  *
  * Mostly orthogonal to the `editorMode` preference (visual vs. code); the
  * exception is `suggest`, which forces `getEditorMode` to report `visual`

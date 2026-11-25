@@ -377,7 +377,7 @@ describe( 'hasAttributeConflict', () => {
 		// as plain strings. Without a string-vs-wrapper fallback,
 		// `hasAttributeConflict` flagged every content suggestion as stale
 		// because `typeof string` !== `typeof object`, which short-circuited
-		// the apply flow into a never-visible "Apply anyway" dialog.
+		// the apply flow into a never-visible "Accept anyway" dialog.
 		const wrapper = {
 			toString() {
 				return 'Hello';
