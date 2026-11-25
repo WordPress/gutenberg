@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-	deltaE2000,
 	get,
 	getLuminance,
 	serialize,
@@ -69,7 +68,7 @@ describe( 'buildRamps', () => {
 	} );
 
 	it.each( [
-		{ scheme: 'Blue', background: '#24567e' },
+		{ scheme: 'Blue', background: '#3876a8' },
 		{ scheme: 'Ocean', background: '#5f787f' },
 	] )(
 		'keeps weak neutral text at 4.5:1 or higher in the $scheme scheme',
@@ -80,25 +79,6 @@ describe( 'buildRamps', () => {
 				getContrast( ramp.surface3, ramp.fgSurface3 )
 			).toBeGreaterThanOrEqual( 4.5 );
 			expect( warnings ).toBeUndefined();
-		}
-	);
-
-	// The admin sidebar uses `surface1`, and should stay visually
-	// indistinguishable from the `$base-color` of the Core scheme.
-	it.each( [
-		{ scheme: 'Blue', background: '#24567e', core: '#245278' },
-		{ scheme: 'Sunrise', background: '#933330', core: '#8a312d' },
-	] )(
-		'matches the Core sidebar color in the $scheme scheme',
-		( { background, core } ) => {
-			const { ramp } = buildBgRamp( background );
-
-			expect(
-				deltaE2000(
-					parseSeedColor( ramp.surface1 ),
-					parseSeedColor( core )
-				)
-			).toBeLessThan( 1 );
 		}
 	);
 

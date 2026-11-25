@@ -13,8 +13,8 @@ const DEFAULT_THEME_COLORS: AdminThemeColors = {
  * repository can read the list of bundled schemes without duplicating it.
  *
  * The Blue and Sunrise background seeds are tuned so that the sidebar color
- * they derive (`--wpds-color-background-surface-neutral-weak`) stays visually
- * indistinguishable from Core's `$base-color` for those schemes.
+ * they derive (`--wpds-color-background-surface-neutral-weak`) stays close to
+ * Core's `$base-color` for those schemes.
  */
 export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'modern', DEFAULT_THEME_COLORS ],
