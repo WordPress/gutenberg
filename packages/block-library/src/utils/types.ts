@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type {
 	BlockStyle,
 	BlockStyleState,
@@ -145,4 +146,23 @@ export interface DimensionResetOptions {
 	hasSelectedStyleState?: boolean;
 	keys: string[];
 	defaultAttributes?: Record< string, unknown >;
+}
+
+/**
+ * Props for `HtmlRenderer`.
+ */
+export interface HtmlRendererProps {
+	/**
+	 * The props to merge with the root element.
+	 * `className` and `style` are merged with the parsed HTML attributes.
+	 */
+	wrapperProps?: {
+		className?: string;
+		style?: CSSProperties;
+		[ key: string ]: unknown;
+	};
+	/**
+	 * The HTML content to render.
+	 */
+	html?: string;
 }
