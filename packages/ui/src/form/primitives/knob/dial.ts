@@ -35,7 +35,12 @@ export function getDial( {
 	unitsPerTurn?: number;
 } ) {
 	const unitsPerTurn = positive( unitsPerTurnProp, 360 );
-	const step = positive( stepProp, 1 );
+	// By default, the largest power of ten that gives a turn at least 100
+	// steps: 1 for degrees and gradians, 0.01 for radians and turns.
+	const step = positive(
+		stepProp,
+		10 ** Math.floor( Math.log10( unitsPerTurn / 100 ) )
+	);
 	const wraps = min === undefined || max === undefined;
 	const first = wraps ? 0 : min;
 	const precision = Math.min(
@@ -44,33 +49,45 @@ export function getDial( {
 	);
 	const toValue = ( index: number ) =>
 		Number( ( first + index * step ).toFixed( precision ) ) || 0;
-	const upperStep = Math.ceil(
-		( wraps ? unitsPerTurn : max - first ) / step
+	// Division can land a hair above a whole number, so count down from the
+	// first candidate to the last step that fits.
+	let lastStep = Math.max(
+		0,
+		Math.ceil( ( wraps ? unitsPerTurn : max - first ) / step )
 	);
-	const fits = wraps
-		? toValue( upperStep ) < unitsPerTurn
-		: toValue( upperStep ) <= max;
-	const lastStep = Math.max( 0, fits ? upperStep : upperStep - 1 );
+	while (
+		lastStep > 0 &&
+		( wraps
+			? toValue( lastStep ) >= unitsPerTurn
+			: toValue( lastStep ) > max )
+	) {
+		lastStep--;
+	}
 	const degreesPerStep = ( step / unitsPerTurn ) * 360;
 	const firstAngle = ( first / unitsPerTurn ) * 360;
+
+	function toIndex( value: number ) {
+		if ( ! wraps ) {
+			return clamp( Math.round( ( value - first ) / step ), 0, lastStep );
+		}
+		const turned = modulo( value, unitsPerTurn );
+		const index = Math.min( Math.round( turned / step ), lastStep );
+		// Past the last step, zero can be the nearer neighbor.
+		return unitsPerTurn - turned < turned - toValue( index ) ? 0 : index;
+	}
 
 	return {
 		wraps,
 		step,
 		precision,
 		lastStep,
-		degreesPerStep,
 		firstAngle,
 		lastAngle: firstAngle + lastStep * degreesPerStep,
 		toValue,
-		toIndex: ( value: number ) =>
-			wraps
-				? modulo(
-						Math.round( modulo( value, unitsPerTurn ) / step ),
-						lastStep + 1
-					)
-				: clamp( Math.round( ( value - first ) / step ), 0, lastStep ),
+		toIndex,
 		toAngle: ( index: number ) => firstAngle + index * degreesPerStep,
+		fromAngle: ( angle: number ) =>
+			toIndex( ( angle / 360 ) * unitsPerTurn ),
 	};
 }
 

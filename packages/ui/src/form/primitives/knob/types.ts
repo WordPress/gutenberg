@@ -12,7 +12,9 @@ type KnobRange =
 			 */
 			min: number;
 			/**
-			 * The highest selectable value. Set it together with `min`.
+			 * The upper limit. Set it together with `min`. Steps count from
+			 * `min`, so the highest selectable value is the last step that
+			 * does not pass `max`.
 			 */
 			max: number;
 	  }
@@ -60,8 +62,14 @@ export type KnobProps = Omit<
 		 */
 		unitsPerTurn?: number;
 		/**
+		 * The smallest change in value.
+		 *
+		 * @default 1 for degrees and gradians, 0.01 for radians and turns
+		 */
+		step?: number;
+		/**
 		 * The amount that Page Up, Page Down, and Shift with an arrow key
-		 * change the value by.
+		 * change the value by. It is rounded to a whole number of steps.
 		 *
 		 * @default 10 × `step`
 		 */

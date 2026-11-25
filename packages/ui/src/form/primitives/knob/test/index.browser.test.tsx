@@ -191,8 +191,134 @@ describe( 'Knob', () => {
 		await dial.click( { position: { x: width - 3, y: height / 2 } } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveFocus();
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
+		const center = dial.element().getBoundingClientRect();
+		const dot = dial
+			.element()
+			.querySelectorAll( 'circle' )[ 1 ]
+			.getBoundingClientRect();
+		expect( dot.left ).toBeGreaterThan( center.left + center.width / 2 );
+		expect( dot.top + dot.height / 2 ).toBeCloseTo(
+			center.top + center.height / 2,
+			0
+		);
 		await dial.click( { position: { x: width / 2, y: 3 } } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'waits for the pointer to be released before a tap changes the value', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" onValueChange={ onValueChange } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await userEvent.pointer( {
+			target: dial,
+			coords: { x: width - 3, y: height / 2 },
+			keys: '[MouseLeft>]',
+		} );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await userEvent.pointer( '[/MouseLeft]' );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
+	it( 'gives turns a fractional step when none is set', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" unitsPerTurn={ 1 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		await expect
+			.element( page.getByRole( 'slider' ) )
+			.toHaveValue( '0.25' );
+	} );
+
+	it( 'selects zero when a tap is nearer to it than to the last coarse step', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" step={ 100 } defaultValue={ 200 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		// 340 degrees: 20 from zero and 40 from the last step at 300.
+		await dial.click( {
+			position: { x: width / 2 - 5.8, y: height / 2 - 16 },
+		} );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'wraps below zero when the steps divide a turn only approximately', async () => {
+		await render(
+			<Knob aria-label="Angle" unitsPerTurn={ 2.1 } step={ 0.3 } />
+		);
+		const slider = page.getByRole( 'slider' );
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowDown}' );
+		await expect.element( slider ).toHaveValue( '1.8' );
+	} );
+
+	it( 'selects the end nearest to a tap outside a bounded range', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" min={ 0 } max={ 180 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		// Just past six o'clock, on the far side of the 180 degree stop.
+		await dial.click( { position: { x: width / 2 - 1, y: height - 3 } } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
+	} );
+
+	it( 'returns to the pointer after a drag goes past the end and back', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 90 }
+					defaultValue={ 90 }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		const right = { x: width - 3, y: height / 2 };
+		const bottom = { x: width / 2, y: height - 3 };
+		await userEvent.pointer( [
+			{ target: dial, coords: right, keys: '[MouseLeft>]' },
+			{ target: dial, coords: bottom },
+			{ target: dial, coords: right },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
+	} );
+
+	it( 'selects the heading under the pointer after a drag crosses the center', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" min={ 0 } max={ 360 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await userEvent.pointer( [
+			{
+				target: dial,
+				coords: { x: width / 2, y: 3 },
+				keys: '[MouseLeft>]',
+			},
+			{ target: dial, coords: { x: width / 2, y: height / 2 } },
+			{ target: dial, coords: { x: width / 2, y: height - 3 } },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
 	} );
 
 	it( 'follows a drag across twelve o’clock on a wrapping dial', async () => {

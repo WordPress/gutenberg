@@ -63,12 +63,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			step,
 			precision,
 			lastStep,
-			degreesPerStep,
 			firstAngle,
 			lastAngle,
 			toValue,
 			toIndex,
 			toAngle,
+			fromAngle,
 		} = getDial( { min, max, step: stepProp, unitsPerTurn } );
 		const largeStepCount = Math.max(
 			1,
@@ -80,10 +80,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		);
 		const angle = toAngle( index );
 
-		function selectIndex( next: number, evenIfUnchanged = false ) {
-			const nextIndex = wraps
-				? modulo( next, lastStep + 1 )
-				: clamp( next, 0, lastStep );
+		function selectIndex( nextIndex: number, evenIfUnchanged = false ) {
 			if ( nextIndex === index && ! evenIfUnchanged ) {
 				return;
 			}
@@ -94,18 +91,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			onValueChange?.( nextValue );
 		}
 
-		function selectAngle( dialAngle: number, evenIfUnchanged = false ) {
-			const turned = wraps
-				? modulo( dialAngle, 360 )
-				: dialAngle - firstAngle;
-			selectIndex(
-				Math.round( turned / degreesPerStep ),
-				evenIfUnchanged
-			);
-		}
-
 		// The pointer names a heading. Take it on the turn nearest to `from`,
-		// so a click never moves the value by more than it has to.
+		// so a click never moves the value by more than it has to. A heading
+		// outside a bounded range stays as close to an end as it can.
 		function getDialAngle( pointerAngle: number, from: number ) {
 			const nearest =
 				pointerAngle +
@@ -113,11 +101,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			if ( wraps ) {
 				return nearest;
 			}
-			return (
-				[ nearest, nearest - 360, nearest + 360 ].find(
-					( candidate ) =>
-						candidate >= firstAngle && candidate <= lastAngle
-				) ?? clamp( nearest, firstAngle, lastAngle )
+			const outside = ( dialAngle: number ) =>
+				Math.max( firstAngle - dialAngle, dialAngle - lastAngle, 0 );
+			return [ nearest - 360, nearest + 360 ].reduce(
+				( best, candidate ) =>
+					outside( candidate ) < outside( best ) ? candidate : best,
+				nearest
 			);
 		}
 
@@ -133,27 +122,23 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const pointerAngle = getPointerAngle( event );
-			const dialAngle =
-				pointerAngle === null
-					? angle
-					: getDialAngle( pointerAngle, angle );
+			// The value changes once the pointer moves or lifts, so a
+			// canceled press leaves it alone.
 			gesture.current = {
 				pointerId: event.pointerId,
 				pointerAngle,
-				dialAngle,
+				dialAngle:
+					pointerAngle === null
+						? angle
+						: getDialAngle( pointerAngle, angle ),
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
 			event.currentTarget.setPointerCapture( event.pointerId );
 			input.current.focus( { preventScroll: true } );
-			if ( pointerAngle !== null ) {
-				// An empty dial has no value yet, so picking the heading it
-				// already points to is still a choice.
-				selectAngle( dialAngle, isEmpty );
-			}
 		}
 
-		function handlePointerMove(
+		function handlePointerMoveOrUp(
 			event: React.PointerEvent< HTMLDivElement >
 		) {
 			const current = gesture.current;
@@ -166,9 +151,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 			const pointerAngle = getPointerAngle( event );
 			if ( pointerAngle === null ) {
+				// There is no heading at the center. Pick one afresh when
+				// the pointer leaves it.
+				current.pointerAngle = null;
 				return;
 			}
-			const nextAngle =
+			let dialAngle =
 				current.pointerAngle === null
 					? getDialAngle( pointerAngle, current.dialAngle )
 					: // Add the shorter way round, so the turn count carries across twelve o'clock.
@@ -178,11 +166,21 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 							360
 						) -
 						180;
-			current.dialAngle = wraps
-				? nextAngle
-				: clamp( nextAngle, firstAngle, lastAngle );
+			if ( ! wraps ) {
+				// Past an end, keep less than a turn. The dot then meets the
+				// pointer as soon as it comes back round to that end.
+				const beyond =
+					dialAngle - clamp( dialAngle, firstAngle, lastAngle );
+				dialAngle -= 360 * Math.trunc( beyond / 360 );
+			}
+			current.dialAngle = dialAngle;
 			current.pointerAngle = pointerAngle;
-			selectAngle( current.dialAngle );
+			// An empty dial has no value yet, so releasing on the heading it
+			// already points to is still a choice.
+			selectIndex(
+				fromAngle( dialAngle ),
+				isEmpty && event.type === 'pointerup'
+			);
 		}
 
 		function handleKeyDown(
@@ -237,7 +235,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						tabIndex={ tabIndex }
 						onKeyDown={ handleKeyDown }
 						onPointerDown={ handlePointerDown }
-						onPointerMove={ handlePointerMove }
+						onPointerMove={ handlePointerMoveOrUp }
+						onPointerUp={ handlePointerMoveOrUp }
 						onLostPointerCapture={ ( event ) => {
 							if (
 								gesture.current?.pointerId === event.pointerId
