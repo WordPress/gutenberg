@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   List View: Color selected rows with the design system brand colors, so their labels, anchor badges and focus rings stay readable when a `ThemeProvider` changes those colors ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
+-   List View: Color selected rows with the `ThemeProvider` brand colors instead of `--wp-admin-theme-color`, so their labels, anchor badges and focus rings stay readable on any brand color ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
