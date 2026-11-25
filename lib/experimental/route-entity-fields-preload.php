@@ -136,3 +136,38 @@ function _gutenberg_preload_route_entity_fields() {
 }
 add_action( 'site-editor-v2_init', '_gutenberg_preload_route_entity_fields' );
 add_action( 'media-editor-wp-admin_init', '_gutenberg_preload_route_entity_fields' );
+
+/**
+ * Adds the script modules of the entity fields and actions to the import map
+ * of the experimental pages.
+ *
+ * They are listed on the `wp-editor` script, which these pages won't load up
+ * front once boot stops depending on it. It then comes with the editor assets,
+ * after the import map is printed, and Firefox doesn't merge an import map
+ * added later. A dynamic dependency is only listed in the import map: the
+ * module is fetched when it is imported.
+ *
+ * @param array $boot_dependencies Boot dependencies for the page.
+ * @return array Boot dependencies, with the entity modules added.
+ */
+function _gutenberg_add_entity_modules_to_boot_dependencies( $boot_dependencies ) {
+	$modules = array();
+	foreach ( array( wp_get_all_registered_entity_field_modules(), wp_get_all_registered_entity_action_modules() ) as $kinds ) {
+		foreach ( $kinds as $entities ) {
+			foreach ( $entities as $entity_modules ) {
+				$modules = array_merge( $modules, $entity_modules );
+			}
+		}
+	}
+
+	foreach ( array_unique( $modules ) as $module ) {
+		$boot_dependencies[] = array(
+			'import' => 'dynamic',
+			'id'     => $module,
+		);
+	}
+
+	return $boot_dependencies;
+}
+add_filter( 'site-editor-v2_boot_dependencies', '_gutenberg_add_entity_modules_to_boot_dependencies' );
+add_filter( 'media-editor-wp-admin_boot_dependencies', '_gutenberg_add_entity_modules_to_boot_dependencies' );
