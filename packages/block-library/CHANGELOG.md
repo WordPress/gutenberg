@@ -16,6 +16,7 @@
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
 -   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
 -   Gallery: In a multiselection, hide the settings that only apply to the first gallery, such as Link, Detach, Source, Order by, Resolution, Open images in new tab, and Aspect ratio ([#87374](https://github.com/WordPress/gutenberg/pull/87374)).
+-   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 
 ### Internal
 
