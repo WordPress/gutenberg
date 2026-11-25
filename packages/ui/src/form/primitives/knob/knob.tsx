@@ -113,12 +113,6 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		// The step the dial shows, and where its dot points.
 		const shown = snap( shownValue );
 		const angle = toAngle( shown );
-		const selection = {
-			stepsPerTurn: perTurn,
-			reference: shownValue,
-			step: shown,
-			offStep: isEmpty || shown !== shownValue,
-		};
 
 		function select( next: number ) {
 			if ( value === undefined ) {
@@ -166,8 +160,11 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				gesture.current = {
 					pointerId: event.pointerId,
 					...pointer,
-					...selection,
 					position: turnsTo ?? shown,
+					stepsPerTurn: perTurn,
+					reference: shownValue,
+					step: shown,
+					offStep: isEmpty || shown !== shownValue,
 				};
 				// A press on a heading names it. So does any press on an
 				// empty dial, which sets the value it shows.
@@ -209,12 +206,16 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			) {
 				return;
 			}
-			// A unit change keeps the angle of the drag, including any
-			// distance past a stop. Report its next step in the new unit.
+			// Convert both the pointer position and the gesture's last value.
+			// The parent may still show an earlier value in the new unit.
 			if ( current.stepsPerTurn !== perTurn ) {
-				current.position =
-					( current.position / current.stepsPerTurn ) * perTurn;
-				Object.assign( current, selection );
+				const rescale = ( steps: number ) =>
+					( steps * perTurn ) / current.stepsPerTurn;
+				current.position = rescale( current.position );
+				current.reference = rescale( current.reference );
+				current.step = snap( current.reference );
+				current.offStep = current.reference !== current.step;
+				current.stepsPerTurn = perTurn;
 			}
 			const previousStep = current.step;
 			const wasOffStep = current.offStep;

@@ -582,12 +582,15 @@ describe( 'Knob', () => {
 			keys: '[MouseLeft>]',
 		} );
 		await rerender( quarterTurn( 100 ) );
+		await userEvent.pointer( { target: dial, coords: bottom } );
+		// The parent still shows a quarter turn. The gesture reached half
+		// a turn, so turning back must report the quarter turn again.
+		await rerender( quarterTurn( 360 ) );
 		await userEvent.pointer( [
-			{ target: dial, coords: bottom },
 			{ target: dial, coords: dot },
 			'[/MouseLeft]',
 		] );
-		expect( onValueChange.mock.calls ).toEqual( [ [ 50 ], [ 25 ] ] );
+		expect( onValueChange.mock.calls ).toEqual( [ [ 50 ], [ 90 ] ] );
 	} );
 
 	it( 'ends the drag when a value change replaces the captured thumb', async () => {
