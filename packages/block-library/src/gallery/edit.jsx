@@ -415,7 +415,7 @@ export default function GalleryEdit( props ) {
 			<InspectorControls
 				group={ isViewportStyleState ? 'style-state' : 'default' }
 			>
-				{ ! isViewportStyleState && (
+				{ ! isViewportStyleState && ! multiGallerySelection && (
 					<GallerySourcePanel
 						dynamic={ dynamic }
 						hasImages={ hasImages }
@@ -436,42 +436,49 @@ export default function GalleryEdit( props ) {
 					updateInnerImages={ updateInnerImages }
 					appliedSort={ appliedSort }
 					setAppliedSort={ setAppliedSort }
+					multiGallerySelection={ multiGallerySelection }
 				/>
 			</InspectorControls>
-			<BlockControls group="block">
-				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ linkOptions.map( ( linkItem ) => {
-								const isOptionSelected =
-									linkTo === linkItem.value;
-								return (
-									<MenuItem
-										key={ linkItem.value }
-										isSelected={ isOptionSelected }
-										className={ clsx(
-											'components-dropdown-menu__menu-item',
-											{
-												'is-active': isOptionSelected,
-											}
-										) }
-										iconPosition="left"
-										icon={ linkItem.icon }
-										onClick={ () => {
-											setLinkTo( linkItem.value );
-											onClose();
-										} }
-										role="menuitemradio"
-										info={ linkItem.infoText }
-									>
-										{ linkItem.label }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</ToolbarDropdownMenu>
-			</BlockControls>
+			{ ! multiGallerySelection && (
+				<BlockControls group="block">
+					<ToolbarDropdownMenu
+						icon={ linkIcon }
+						label={ __( 'Link' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ linkOptions.map( ( linkItem ) => {
+									const isOptionSelected =
+										linkTo === linkItem.value;
+									return (
+										<MenuItem
+											key={ linkItem.value }
+											isSelected={ isOptionSelected }
+											className={ clsx(
+												'components-dropdown-menu__menu-item',
+												{
+													'is-active':
+														isOptionSelected,
+												}
+											) }
+											iconPosition="left"
+											icon={ linkItem.icon }
+											onClick={ () => {
+												setLinkTo( linkItem.value );
+												onClose();
+											} }
+											role="menuitemradio"
+											info={ linkItem.infoText }
+										>
+											{ linkItem.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				</BlockControls>
+			) }
 			{ ! multiGallerySelection && ! isDynamic && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
