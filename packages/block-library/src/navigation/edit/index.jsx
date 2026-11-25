@@ -458,8 +458,8 @@ function Navigation( {
 	} = useNavigationMenu( ref );
 
 	// Each permission is `undefined` until it resolves, then `true` or `false`.
-	// A block with a menu only uses them while it or its inner blocks are
-	// selected, so skip the requests until then.
+	// The block only uses them while it or its inner blocks are selected, so
+	// skip the requests until then.
 	const isBlockOrInnerBlockSelected = isSelected || isInnerBlockSelected;
 	const {
 		canUserCreateNavigationMenus,
@@ -467,7 +467,7 @@ function Navigation( {
 		canUserDeleteNavigationMenu,
 	} = useSelect(
 		( select ) => {
-			if ( ref && ! isBlockOrInnerBlockSelected ) {
+			if ( ! isBlockOrInnerBlockSelected ) {
 				return {};
 			}
 
