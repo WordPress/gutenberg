@@ -12,9 +12,11 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 -   `Tabs`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, and draw the focus ring inside it. Default tabs give the background the same clearance on every side ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `Tabs`: Give the interaction background and keyboard focus ring of minimal horizontal tabs the same corners as default tabs ([#87348](https://github.com/WordPress/gutenberg/pull/87348)).
 
 ### Bug Fixes
 
+-   `Fieldset`: Let children wrap or truncate long text in a narrow container ([#87300](https://github.com/WordPress/gutenberg/pull/87300)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Name the chips toolbar "Selected items" for any number of chips, so it translates correctly in languages that use the singular form for numbers other than one ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
 -   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 -   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#87256](https://github.com/WordPress/gutenberg/pull/87256)).
