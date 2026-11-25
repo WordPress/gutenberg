@@ -25,6 +25,12 @@
 
 				width: fit-content;
 
+				/* Let the list shrink as a flex item so overflowing tabs scroll
+				 * instead of pushing the parent wider. `overflow: visible` below
+				 * would otherwise keep the automatic minimum size at the
+				 * content width. */
+				min-width: 0;
+
 				/* Paint outside the list when the tabs fit. Shadows and outlines
 				 * do not contribute to the measured scrollable width. */
 				&:not(.is-scrolling) {
