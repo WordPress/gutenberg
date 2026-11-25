@@ -94,9 +94,10 @@ Three layers cooperate:
 A plain JS store created via `createBoardStore()` (one per mounted `Notes`). It is the only place that reads layout for the thread positions; the scroll mirror in `useMirroredScroll` reads the canvas's scroll range separately. It holds:
 
 - `blockRefs: Map<noteId, HTMLElement>` - each note's associated block element.
+- `clientIds: Map<noteId, clientId>` and `blockOrder` - each note's block and the document's block order. A block hidden at the current viewport has no element once it is deselected, so `getHiddenBlockAnchorTop` anchors its thread to the top of the next rendered block (or the bottom of the previous one).
 - `floatingRefs: Map<noteId, HTMLElement>` - each note's floating DOM node.
 - `idByElement: WeakMap<HTMLElement, noteId>` - reverse lookup for the `ResizeObserver`.
-- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block), its scroll container, and the canvas `iframe`. When the root changes, the observers are rebuilt.
+- `rootEl` / `canvas` / `frameEl` - the block-list root (`.is-root-container`, found from the first registered block, or from the threads' document when every noted block is hidden), its scroll container, and the canvas `iframe`. When the root changes, the observers are rebuilt.
 - `snapshot: { heights, anchorRects, canvas, frameOffset }` - plain data for `useSyncExternalStore`. `anchorRects[id].top` is in canvas content-space (viewport top + `scrollTop`), so scrolling alone never changes it. `frameOffset` is the canvas frame's top minus the top of the threads' container (their `offsetParent`): anchors are read in the frame's viewport, threads are positioned in the container, and anything above the canvas (e.g. an editor notice or the device preview inset) separates the two.
 
 One `ResizeObserver` watches:

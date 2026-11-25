@@ -106,6 +106,22 @@ export function NoteThread( {
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
 
+	// A hidden block has no element, or a collapsed one while it is selected.
+	// Checking its settings too keeps a block that is still mounting from
+	// reading as hidden.
+	const canBlockBeHidden = useSelect(
+		( select ) =>
+			!! note.blockClientId &&
+			unlock( select( blockEditorStore ) ).isBlockHiddenAnywhere(
+				note.blockClientId
+			),
+		[ note.blockClientId ]
+	);
+	const isBlockHidden =
+		canBlockBeHidden &&
+		( ! relatedBlockElement ||
+			relatedBlockElement.classList.contains( 'is-block-hidden' ) );
+
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
 
@@ -114,10 +130,21 @@ export function NoteThread( {
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {
-			registerThread( note.id, relatedBlockElement, floatingEl );
+			registerThread(
+				note.id,
+				relatedBlockElement,
+				floatingEl,
+				note.blockClientId
+			);
 		}
 		return () => unregisterThread?.( note.id );
-	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
+	}, [
+		relatedBlockElement,
+		note.id,
+		note.blockClientId,
+		registerThread,
+		unregisterThread,
+	] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
 	// when its floating position or height settles after `useFloatingBoard`
@@ -255,17 +282,26 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
+	let ariaLabel;
+	if ( ! note.blockClientId ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Original block deleted. Note: %s' ),
+			noteExcerpt
+		);
+	} else if ( isBlockHidden ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note on hidden block: %s' ),
+			noteExcerpt
+		);
+	} else {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note: %s' ),
+			noteExcerpt
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -327,6 +363,11 @@ export function NoteThread( {
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
+				</p>
+			) }
+			{ isBlockHidden && (
+				<p className="editor-collab-sidebar-panel__hidden-block-notice">
+					{ __( 'Block is hidden.' ) }
 				</p>
 			) }
 			<Note

@@ -1014,6 +1014,7 @@ export function useFloatingBoard( {
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
+	orderedBlockIds,
 } ) {
 	const [ store ] = useState( createBoardStore );
 
@@ -1027,8 +1028,9 @@ export function useFloatingBoard( {
 
 	// Moving blocks shifts anchors without resizing anything or re-registering.
 	useLayoutEffect( () => {
+		store.setBlockOrder( orderedBlockIds );
 		store.requestMeasure();
-	}, [ store, threads ] );
+	}, [ store, threads, orderedBlockIds ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(
