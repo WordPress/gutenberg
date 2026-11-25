@@ -45,10 +45,19 @@ export function AddSubmenuItem( {
 		useDispatch( blockEditorStore );
 	const { getBlock } = useSelect( blockEditorStore );
 	const isDisabled = useSelect(
-		( select ) =>
-			! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
-				select( blockEditorStore ).getBlockName( clientId )
-			),
+		( select ) => {
+			const { getBlockName, getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			return (
+				! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( blockName ) ||
+				( blockName === 'core/navigation-link' &&
+					! canInsertBlockType(
+						'core/navigation-submenu',
+						getBlockRootClientId( clientId )
+					) )
+			);
+		},
 		[ clientId ]
 	);
 
