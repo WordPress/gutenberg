@@ -38,6 +38,18 @@ describe( 'getTransformClassesAndStyles', () => {
 		} );
 	} );
 
+	it.each( [
+		[ 1.2, '1.2' ],
+		[ 0, '0' ],
+		[ '120%', '120%' ],
+	] )( 'returns a %s scale as an inline style', ( scale, expected ) => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { scale } },
+			} )
+		).toEqual( { style: { scale: expected } } );
+	} );
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
@@ -131,5 +143,15 @@ describe( 'getStateInheritedValue', () => {
 				mobile
 			).transform
 		).toEqual( { translate: { x: '5px', y: '20px' } } );
+	} );
+
+	it( 'starts a state scale from the block scale', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { rotate: '5deg', scale: '120%' } },
+				{ transform: { scale: 0.8 } },
+				mobile
+			).transform
+		).toEqual( { rotate: '5deg', scale: 0.8 } );
 	} );
 } );

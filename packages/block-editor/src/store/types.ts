@@ -823,6 +823,11 @@ export type Action =
 
 export type RemoveBlocksAction = Extract< Action, { type: 'REMOVE_BLOCKS' } >;
 
+export type UpdateBlockAttributesAction = Extract<
+	Action,
+	{ type: 'UPDATE_BLOCK_ATTRIBUTES' }
+>;
+
 export type Reducer< S > = ( state: S | undefined, action: Action ) => S;
 
 /**
