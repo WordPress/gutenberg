@@ -21,6 +21,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { withUnavailableItem } from '../utils/with-unavailable-item';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
@@ -86,14 +87,19 @@ export default function PostNavigationLinkEdit( {
 			label: __( 'Unfiltered' ),
 			value: '',
 		},
-		...( taxonomies ?? [] )
-			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
-			.map( ( item ) => {
-				return {
-					value: item.slug,
-					label: item.name,
-				};
-			} ),
+		...withUnavailableItem(
+			taxonomies
+				?.filter(
+					( { visibility } ) => !! visibility?.publicly_queryable
+				)
+				.map( ( item ) => {
+					return {
+						value: item.slug,
+						label: item.name,
+					};
+				} ),
+			taxonomy
+		),
 	];
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -207,7 +213,7 @@ export default function PostNavigationLinkEdit( {
 					value={
 						taxonomyOptions.find(
 							( item ) => item.value === taxonomy
-						) ?? taxonomyOptions[ 0 ]
+						) ?? null
 					}
 					onValueChange={ ( item ) =>
 						item &&

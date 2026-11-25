@@ -32,6 +32,7 @@ import {
 	useOrderByOptions,
 } from '../../utils';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
+import { withUnavailableItem } from '../../../utils/with-unavailable-item';
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
@@ -121,6 +122,16 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
+	const isPostTypeUnavailable =
+		postTypesSelectOptions.length > 0 &&
+		! postTypesSelectOptions.some( ( item ) => item.value === postType );
+	// A toggle can't show a saved post type that isn't among its options.
+	const showPostTypeSelect =
+		postTypesSelectOptions.length > 2 || isPostTypeUnavailable;
+	const postTypeItems = withUnavailableItem(
+		postTypesSelectOptions,
+		postType
+	);
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
@@ -274,13 +285,13 @@ export default function QueryInspectorControls( props ) {
 							onDeselect={ () => onPostTypeChange( 'post' ) }
 							isShownByDefault
 						>
-							{ postTypesSelectOptions.length > 2 ? (
+							{ showPostTypeSelect ? (
 								<SelectControl
-									items={ postTypesSelectOptions }
+									items={ postTypeItems }
 									value={
-										postTypesSelectOptions.find(
+										postTypeItems.find(
 											( item ) => item.value === postType
-										) ?? postTypesSelectOptions[ 0 ]
+										) ?? null
 									}
 									label={ postTypeControlLabel }
 									onValueChange={ ( item ) => {

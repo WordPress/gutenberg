@@ -23,6 +23,7 @@ import { useDisabled } from '@wordpress/compose';
 import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import { withUnavailableItem } from '../utils/with-unavailable-item';
 
 /**
  * Minimum number of tags a user can show using this block.
@@ -72,14 +73,17 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			value: '',
 			disabled: true,
 		},
-		...( taxonomies ?? [] )
-			.filter( ( tax ) => !! tax.show_cloud )
-			.map( ( item ) => {
-				return {
-					value: item.slug,
-					label: item.name,
-				};
-			} ),
+		...withUnavailableItem(
+			taxonomies
+				?.filter( ( tax ) => !! tax.show_cloud )
+				.map( ( item ) => {
+					return {
+						value: item.slug,
+						label: item.name,
+					};
+				} ),
+			taxonomy
+		),
 	];
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
@@ -139,9 +143,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 						value={
 							taxonomyItems.find(
 								( item ) => item.value === taxonomy
-							) ??
-							taxonomyItems.find( ( item ) => ! item.disabled ) ??
-							null
+							) ?? null
 						}
 						onValueChange={ ( item ) =>
 							item && setAttributes( { taxonomy: item.value } )

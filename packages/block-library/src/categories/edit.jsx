@@ -20,6 +20,7 @@ import { useDispatch } from '@wordpress/data';
 import { SelectControl, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { withUnavailableItem } from '../utils/with-unavailable-item';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -45,10 +46,13 @@ export default function CategoriesEdit( {
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
-	const taxonomyItems = ( taxonomies ?? [] ).map( ( t ) => ( {
-		label: t.name,
-		value: t.slug,
-	} ) );
+	const taxonomyItems = withUnavailableItem(
+		taxonomies?.map( ( t ) => ( {
+			label: t.name,
+			value: t.slug,
+		} ) ),
+		taxonomySlug
+	);
 
 	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
 
@@ -217,7 +221,7 @@ export default function CategoriesEdit( {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ taxonomyItems.length > 0 && (
+					{ taxonomies?.length > 0 && (
 						<ToolsPanelItem
 							hasValue={ () => {
 								return taxonomySlug !== 'category';
@@ -234,7 +238,7 @@ export default function CategoriesEdit( {
 								value={
 									taxonomyItems.find(
 										( item ) => item.value === taxonomySlug
-									) ?? taxonomyItems[ 0 ]
+									) ?? null
 								}
 								onValueChange={ ( item ) =>
 									item &&
