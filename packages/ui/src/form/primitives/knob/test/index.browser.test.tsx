@@ -1,11 +1,30 @@
 import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
+import type { Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { createRef, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import { ThemeProvider } from '../../../../utils/theme-provider';
 import { Field } from '../../../primitives';
 import { Knob } from '../index';
+
+// Positions on a dial, given in the 40-unit square it is drawn in and scaled to
+// its rendered size.
+function getPoints( dial: Locator ) {
+	const { width, height } = dial.element().getBoundingClientRect();
+	const at = ( x: number, y: number ) => ( {
+		x: ( x * width ) / 40,
+		y: ( y * height ) / 40,
+	} );
+	return {
+		at,
+		top: at( 20, 3 ),
+		right: at( 37, 20 ),
+		bottom: at( 20, 37 ),
+		left: at( 3, 20 ),
+		center: at( 20, 20 ),
+	};
+}
 
 describe( 'Knob', () => {
 	it( 'wraps in both directions with small and large keyboard steps', async () => {
@@ -139,8 +158,8 @@ describe( 'Knob', () => {
 			);
 			const slider = page.getByRole( 'slider' );
 			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			await dial.click( { position: { x: width - 3, y: height / 2 } } );
+			const { right } = getPoints( dial );
+			await dial.click( { position: right } );
 			await expect.element( slider ).toHaveValue( quarter );
 			await userEvent.keyboard( '{Home}{ArrowDown}' );
 			await expect.element( slider ).toHaveValue( last );
@@ -189,21 +208,21 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		const { top, right } = getPoints( dial );
+		await dial.click( { position: right } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveFocus();
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
-		const center = dial.element().getBoundingClientRect();
+		const face = dial.element().getBoundingClientRect();
 		const dot = dial
 			.element()
 			.querySelectorAll( 'circle' )[ 1 ]
 			.getBoundingClientRect();
-		expect( dot.left ).toBeGreaterThan( center.left + center.width / 2 );
+		expect( dot.left ).toBeGreaterThan( face.left + face.width / 2 );
 		expect( dot.top + dot.height / 2 ).toBeCloseTo(
-			center.top + center.height / 2,
+			face.top + face.height / 2,
 			0
 		);
-		await dial.click( { position: { x: width / 2, y: 3 } } );
+		await dial.click( { position: top } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
 
@@ -215,8 +234,7 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		const right = { x: width - 3, y: height / 2 };
+		const { right } = getPoints( dial );
 		await userEvent.pointer( [
 			{ target: dial, coords: right, keys: '[MouseLeft>]' },
 			// A pen reports changes in pressure as moves at the same point.
@@ -234,10 +252,10 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const { at } = getPoints( dial );
 		// 340 degrees: 20 from zero and 40 from the last step at 300.
 		await dial.click( {
-			position: { x: width / 2 - 5.8, y: height / 2 - 16 },
+			position: at( 14.2, 4 ),
 		} );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
@@ -259,9 +277,9 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const { at } = getPoints( dial );
 		// Just past six o'clock, on the far side of the 180 degree stop.
-		await dial.click( { position: { x: width / 2 - 1, y: height - 3 } } );
+		await dial.click( { position: at( 19, 37 ) } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
 	} );
 
@@ -277,9 +295,7 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		const right = { x: width - 3, y: height / 2 };
-		const bottom = { x: width / 2, y: height - 3 };
+		const { right, bottom } = getPoints( dial );
 		await userEvent.pointer( [
 			{ target: dial, coords: right, keys: '[MouseLeft>]' },
 			{ target: dial, coords: bottom },
@@ -304,8 +320,8 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width / 2, y: 3 } } );
+		const { top } = getPoints( dial );
+		await dial.click( { position: top } );
 		expect( onValueChange ).not.toHaveBeenCalled();
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
@@ -345,7 +361,9 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		// Inside the dot, two degrees clockwise of the 30 degree stop.
-		await page.getByRole( 'group' ).click( { position: { x: 25, y: 12 } } );
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await dial.click( { position: at( 25, 12 ) } );
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 30 );
 	} );
 
@@ -380,8 +398,8 @@ describe( 'Knob', () => {
 		await render( <Rotation /> );
 		await page.getByRole( 'spinbutton' ).fill( '390' );
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '450' );
 	} );
 
@@ -397,12 +415,7 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		const top = { x: width / 2, y: 3 };
-		const right = { x: width - 3, y: height / 2 };
-		const bottom = { x: width / 2, y: height - 3 };
-		const left = { x: 3, y: height / 2 };
-		const center = { x: width / 2, y: height / 2 };
+		const { top, right, bottom, left, center } = getPoints( dial );
 		await userEvent.pointer( [
 			{ target: dial, coords: top, keys: '[MouseLeft>]' },
 			...[ right, bottom, left, center, right ].map( ( coords ) => ( {
@@ -421,14 +434,14 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const { top, bottom } = getPoints( dial );
 		await userEvent.pointer( [
 			{
 				target: dial,
-				coords: { x: width / 2, y: 3 },
+				coords: top,
 				keys: '[MouseLeft>]',
 			},
-			{ target: dial, coords: { x: width / 2, y: height - 3 } },
+			{ target: dial, coords: bottom },
 			'[/MouseLeft]',
 		] );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
@@ -441,15 +454,50 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
 		// From just above the center, through it, to just left of it. Turning
 		// a quarter turn back from zero would stop at the lower end instead.
 		await userEvent.pointer( [
-			{ target: dial, coords: { x: 20, y: 14 }, keys: '[MouseLeft>]' },
-			{ target: dial, coords: { x: 17, y: 17 } },
-			{ target: dial, coords: { x: 14, y: 20 } },
+			{ target: dial, coords: at( 20, 14 ), keys: '[MouseLeft>]' },
+			{ target: dial, coords: at( 17, 17 ) },
+			{ target: dial, coords: at( 14, 20 ) },
 			'[/MouseLeft]',
 		] );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '270' );
+	} );
+
+	it( 'selects a heading near the stop when a tap misses the dot', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" min={ 0 } max={ 360 } />
+			</ThemeProvider>
+		);
+		// On the rim at 339 degrees, 21 degrees short of the dot at zero.
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await dial.click( { position: at( 14, 4 ) } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '339' );
+	} );
+
+	it( 'keeps the value when the dot is pressed off its center', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 360 }
+					defaultValue={ 360 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		// One pixel left of the center of the dot, which sits at twelve o'clock.
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await dial.click( { position: at( 19, 10 ) } );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '360' );
 	} );
 
 	it( 'selects a heading the range has before treating a tap as past an end', async () => {
@@ -464,9 +512,9 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		// Half past ten, the heading of the upper end at 315 degrees.
-		await page
-			.getByRole( 'group' )
-			.click( { position: { x: 11.5, y: 11.5 } } );
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await dial.click( { position: at( 11.5, 11.5 ) } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '315' );
 	} );
 
@@ -482,9 +530,7 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		const top = { x: width / 2, y: 3 };
-		const right = { x: width - 3, y: height / 2 };
+		const { top, right } = getPoints( dial );
 		await userEvent.pointer( [
 			{ target: dial, coords: top, keys: '[MouseLeft>]' },
 			{ target: dial, coords: right },
@@ -510,11 +556,11 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const { right } = getPoints( dial );
 		await userEvent.pointer( [
 			{
 				target: dial,
-				coords: { x: width - 3, y: height / 2 },
+				coords: right,
 				keys: '[MouseLeft>]',
 			},
 			// Straight out to the right, so the heading stays the same.
@@ -531,10 +577,10 @@ describe( 'Knob', () => {
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const { at } = getPoints( dial );
 		await dial.dropTo( dial, {
-			sourcePosition: { x: width * 0.25, y: height * 0.25 },
-			targetPosition: { x: width * 0.75, y: height * 0.25 },
+			sourcePosition: at( 10, 10 ),
+			targetPosition: at( 30, 10 ),
 		} );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '45' );
 	} );
@@ -577,8 +623,8 @@ describe( 'Knob', () => {
 				</ThemeProvider>
 			);
 			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			await dial.click( { position: { x: width - 3, y: height / 2 } } );
+			const { right } = getPoints( dial );
+			await dial.click( { position: right } );
 			await expect
 				.element( page.getByRole( 'slider' ) )
 				.toHaveValue( expected );
@@ -615,11 +661,7 @@ describe( 'Knob', () => {
 				</ThemeProvider>
 			);
 			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			const top = { x: width / 2, y: 3 };
-			const right = { x: width - 3, y: height / 2 };
-			const bottom = { x: width / 2, y: height - 3 };
-			const left = { x: 3, y: height / 2 };
+			const { top, right, bottom, left } = getPoints( dial );
 			const turn =
 				direction === 'clockwise'
 					? [ right, bottom, left, top ]
@@ -714,8 +756,8 @@ describe( 'Knob', () => {
 		const dial = page.getByRole( 'group' );
 		await expect.element( slider ).toHaveValue( '90' );
 		expect( slider.element().closest( '[data-empty]' ) ).not.toBeNull();
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 		await rerender(
 			<ThemeProvider isRoot>
@@ -743,8 +785,8 @@ describe( 'Knob', () => {
 		const slider = page.getByRole( 'slider', { name: 'Angle' } );
 		await expect.element( slider ).toBeDisabled();
 		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
 		expect( onValueChange ).not.toHaveBeenCalled();
 	} );
 
@@ -760,8 +802,8 @@ describe( 'Knob', () => {
 		);
 		const slider = page.getByRole( 'slider' );
 		const dial = page.getByRole( 'group', { name: '', exact: true } );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
 		await expect.element( slider ).toBeDisabled();
 		await expect.element( slider ).toHaveValue( '0' );
 		expect( onValueChange ).not.toHaveBeenCalled();

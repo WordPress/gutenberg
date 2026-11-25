@@ -171,13 +171,20 @@ export const WithUnits: Story = {
 		// Keep the rotation in turns, so changing the unit never rounds it.
 		const [ turns, setTurns ] = useState( 0.25 );
 		const [ draft, setDraft ] = useState< string >();
-		const rotation = Number( ( turns * unit.unitsPerTurn ).toFixed( 2 ) );
 		// Two turns either way, rounded down to a whole number of steps so that
 		// zero stays selectable.
 		const limit = Number(
 			(
 				Math.floor( ( 2 * unit.unitsPerTurn ) / unit.step ) * unit.step
 			).toFixed( 2 )
+		);
+		// Show the rotation on the step grid of the chosen unit, within its
+		// limits, so the field always holds a value it accepts.
+		const steps = Math.round( ( turns * unit.unitsPerTurn ) / unit.step );
+		const rotation = Number(
+			Math.min( limit, Math.max( -limit, steps * unit.step ) ).toFixed(
+				2
+			)
 		);
 		return (
 			<Stack direction="row" gap="sm" align="flex-end">

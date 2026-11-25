@@ -6,7 +6,16 @@ import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
-import { clamp, getDial, getPointer, getStepChange, modulo } from './dial';
+import {
+	DOT_OFFSET,
+	DOT_RADIUS,
+	VIEW_SIZE,
+	clamp,
+	getDial,
+	getPointer,
+	getStepChange,
+	modulo,
+} from './dial';
 import type { KnobProps } from './types';
 import styles from './style.module.scss';
 
@@ -19,6 +28,9 @@ type Gesture = {
 	dialAngle: number | null;
 	// The step the gesture last selected, or null before it selects one.
 	index: number | null;
+	// Whether the press landed on the dot. It then takes hold of the dot where
+	// it is, and only turning moves it.
+	onDot: boolean;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
@@ -28,10 +40,6 @@ const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
 // The largest turn, in degrees, that one pointer move can add. A larger jump
 // means the pointer cut across the dial instead of going around it.
 const CUT_ACROSS = 120;
-
-// How far from the dot, in degrees, a press still takes hold of it. This is a
-// little more than the dot covers.
-const GRAB = 30;
 
 /**
  * A dial for choosing an angle. It sits beside an input that shows the exact
@@ -114,13 +122,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			const nearest =
 				pointerAngle +
 				360 * Math.round( ( start - pointerAngle ) / 360 );
-			// A press on the dot takes hold of it where it is. At a stop, the
-			// far side of the dot is past the end and still means that end.
-			if ( Math.abs( nearest - start ) <= GRAB ) {
-				return nearest;
-			}
-			// Otherwise take the turn that has this heading, or else the one
-			// that brings it closest to an end.
+			// Take the turn that has this heading, or else the one that
+			// brings it closest to an end.
 			const outside = ( dialAngle: number ) =>
 				Math.max( firstAngle - dialAngle, dialAngle - lastAngle, 0 );
 			return [ nearest - 360, nearest + 360 ].reduce(
@@ -144,11 +147,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// The value changes once the pointer moves or lifts, so a
 			// canceled press leaves it alone. The turn is chosen then too:
 			// focusing the dial below can make a paired field commit a value.
+			const { angle: pointerAngle, onDot } = getPointer( event, angle );
 			gesture.current = {
 				pointerId: event.pointerId,
-				pointerAngle: getPointer( event ).angle,
+				pointerAngle,
 				dialAngle: null,
 				index: null,
+				onDot,
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
@@ -168,7 +173,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const isRelease = event.type === 'pointerup';
-			const { angle: pointerAngle, inside } = getPointer( event );
+			const { angle: pointerAngle, inside } = getPointer( event, angle );
 			if ( pointerAngle === null ) {
 				// There is no heading at the center. Pick one afresh when
 				// the pointer leaves it.
@@ -190,7 +195,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			let from = current.dialAngle;
 			if ( from === null ) {
 				from =
-					current.pointerAngle === null
+					current.onDot || current.pointerAngle === null
 						? angle
 						: getDialAngle( current.pointerAngle, angle );
 			}
@@ -300,22 +305,24 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						} }
 					>
 						<svg
-							viewBox="0 0 40 40"
+							viewBox={ `0 0 ${ VIEW_SIZE } ${ VIEW_SIZE }` }
 							aria-hidden="true"
 							focusable="false"
 						>
 							<circle
 								className={ styles.outline }
-								cx="20"
-								cy="20"
-								r="19.5"
+								cx={ VIEW_SIZE / 2 }
+								cy={ VIEW_SIZE / 2 }
+								r={ VIEW_SIZE / 2 - 0.5 }
 							/>
 							<circle
 								className={ styles.indicator }
-								cx="20"
-								cy="10"
-								r={ isEmpty ? 3 : 4 }
-								transform={ `rotate(${ angle } 20 20)` }
+								cx={ VIEW_SIZE / 2 }
+								cy={ VIEW_SIZE / 2 - DOT_OFFSET }
+								r={ isEmpty ? DOT_RADIUS - 1 : DOT_RADIUS }
+								transform={ `rotate(${ angle } ${ VIEW_SIZE / 2 } ${
+									VIEW_SIZE / 2
+								})` }
 							/>
 						</svg>
 					</Slider.Thumb>

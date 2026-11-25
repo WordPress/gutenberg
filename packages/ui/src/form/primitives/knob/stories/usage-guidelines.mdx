@@ -30,7 +30,7 @@ Without `min` and `max`, the dial covers one turn and wraps, as in the example a
 
 Set `min` and `max` together when the number of turns matters. The range needs room for at least two steps. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A click picks the heading on the turn nearest the current value, so clicking three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
 
-`unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. `step` is the smallest change the value can take. It defaults to 1 for degrees and gradians, and to 0.01 for radians and turns.
+`unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. `step` is the smallest change the value can take. It defaults to 1 for degrees and gradians, and to 0.01 for radians and turns. It needs to be smaller than a turn.
 
 Steps count from `min`. Choose a `min` that is a whole number of steps away from zero, so zero stays selectable. If the steps do not land on `max`, the highest selectable value is the last step below it.
 
@@ -38,7 +38,7 @@ Steps count from `min`. Choose a `min` that is a whole number of steps away from
 
 ## Show an unset value
 
-Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Turning the dial from there sets a value. Clicking the heading it already points to sets that value too.
+Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Turning the dial from there sets a value. Clicking the dot sets the value it points to.
 
 A slider always has a number, so assistive technology reads the placeholder as the dial's value. Use `getAriaValueText` to say where that number comes from, such as “45 degrees, inherited”. The input is where an unset value shows as empty. `undefined` does not mean unset. It makes the dial uncontrolled, starting from `defaultValue`.
 
@@ -46,7 +46,7 @@ A slider always has a number, so assistive technology reads the placeholder as t
 
 ## Pointer interaction
 
-Click or tap a heading to select it, or drag around the center to keep turning. The value changes when the pointer moves or lifts, so a canceled press leaves it alone. A tap is also dropped when the pointer lifts outside the dial without turning it. On a bounded dial, pressing the dot at a stop keeps that end. During a drag past an end, the dot waits there until the pointer comes back round to it.
+Click or tap a heading to select it, or drag around the center to keep turning. Pressing the dot takes hold of it where it is, so only turning moves it. The value changes when the pointer moves or lifts, so a canceled press leaves it alone. A tap is also dropped when the pointer lifts outside the dial without turning it. During a drag past an end of a bounded dial, the dot waits there until the pointer comes back round to it.
 
 ## Keyboard interaction
 

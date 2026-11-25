@@ -42,9 +42,10 @@ export function getDial( {
 	// steps: 1 for degrees and gradians, 0.01 for radians and turns.
 	const defaultStep = 10 ** Math.floor( Math.log10( unitsPerTurn / 100 ) );
 	const requestedStep = positive( stepProp, defaultStep );
-	// A step too small to count falls back to the default.
+	// A step too small to count, or too large to leave a second value, falls
+	// back to the default.
 	const step =
-		span / requestedStep <= Number.MAX_SAFE_INTEGER
+		requestedStep < span && span / requestedStep <= Number.MAX_SAFE_INTEGER
 			? requestedStep
 			: defaultStep;
 	const precision = Math.min(
@@ -94,22 +95,42 @@ export function getDial( {
 	};
 }
 
+// The dial is drawn in a square of this many units. The dot sits `DOT_OFFSET`
+// units out from the center and is `DOT_RADIUS` units across its radius.
+export const VIEW_SIZE = 40;
+export const DOT_OFFSET = 10;
+export const DOT_RADIUS = 4;
+// How far from the center of the dot a press still lands on it. The slack
+// around the dot allows for a fingertip.
+const DOT_REACH = 6;
+
 // Where the pointer is on the dial. `angle` is its clockwise angle from twelve
 // o'clock, between -180 and 180 degrees, or null at the center, which has no
-// meaningful angle.
-export function getPointer( event: React.PointerEvent< HTMLElement > ) {
+// meaningful angle. `onDot` says whether it is on the dot at `dialAngle`.
+export function getPointer(
+	event: React.PointerEvent< HTMLElement >,
+	dialAngle: number
+) {
 	const { left, top, width, height } =
 		event.currentTarget.getBoundingClientRect();
 	const x = event.clientX - left - width / 2;
 	const y = event.clientY - top - height / 2;
 	const distance = Math.hypot( x, y );
 	const radius = Math.min( width, height ) / 2;
+	const unit = ( 2 * radius ) / VIEW_SIZE;
+	const heading = ( dialAngle * Math.PI ) / 180;
 	return {
 		angle:
 			distance < radius / 4
 				? null
 				: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
 		inside: distance <= radius,
+		onDot:
+			Math.hypot(
+				x - DOT_OFFSET * unit * Math.sin( heading ),
+				y + DOT_OFFSET * unit * Math.cos( heading )
+			) <=
+			DOT_REACH * unit,
 	};
 }
 

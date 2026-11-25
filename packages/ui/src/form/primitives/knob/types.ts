@@ -64,7 +64,8 @@ export type KnobProps = Omit<
 		 */
 		unitsPerTurn?: number;
 		/**
-		 * The smallest change in value.
+		 * The smallest change in value. It needs to be smaller than a turn,
+		 * and smaller than the range of a bounded dial.
 		 *
 		 * @default 1 for degrees and gradians, 0.01 for radians and turns
 		 */
