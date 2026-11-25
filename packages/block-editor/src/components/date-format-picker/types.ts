@@ -12,4 +12,6 @@ export interface NonDefaultControlsProps {
 	format: string;
 	/** Called when a selection is made. */
 	onChange: ( format: string | null ) => void;
+	/** The current date used for formatting examples. */
+	currentDate: Date;
 }
