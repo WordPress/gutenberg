@@ -28,6 +28,7 @@ import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getResponsiveMediaQueries } from '../utils/viewport';
+import { isZeroRotation } from '../utils/transform';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
 
@@ -1768,7 +1769,7 @@ export const generateCustomProperties = (
  * @param selector     Block or block style variation selector.
  * @param declarations The node's declarations.
  * @param nodes        Nodes whose `dimensions.width` takes precedence.
- * @param blockName    Block name, whose `transform.fitContent` support can opt out.
+ * @param blockName    Block name, whose `transform.fitContent` support opts in.
  * @return The ruleset, or an empty string.
  */
 function getRotationFitContentRuleset(
@@ -1777,12 +1778,15 @@ function getRotationFitContentRuleset(
 	nodes: any[],
 	blockName: string
 ): string {
+	const rotate = declarations
+		.find( ( declaration ) => declaration.startsWith( 'rotate:' ) )
+		?.slice( 'rotate:'.length )
+		.trim();
 	if (
-		! declarations.some( ( declaration ) =>
-			declaration.startsWith( 'rotate:' )
-		) ||
+		! rotate ||
+		isZeroRotation( rotate ) ||
 		nodes.some( ( node ) => node?.dimensions?.width !== undefined ) ||
-		getBlockSupport( blockName, 'transform.fitContent', true ) === false
+		! getBlockSupport( blockName, 'transform.fitContent', false )
 	) {
 		return '';
 	}

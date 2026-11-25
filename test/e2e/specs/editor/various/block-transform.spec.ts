@@ -42,17 +42,15 @@ test.describe( 'Transform block support', () => {
 		page,
 	} ) => {
 		await editor.insertBlock( {
-			name: 'core/group',
-			innerBlocks: [
-				{ name: 'core/paragraph', attributes: { content: 'Tilted' } },
-			],
+			name: 'core/heading',
+			attributes: { content: 'Tilted' },
 		} );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Level' },
 		} );
 		await editor.selectBlocks(
-			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
 		);
 		await editor.openDocumentSettingsSidebar();
 		await showTransformControl( page, /Rotation/ );
@@ -64,22 +62,22 @@ test.describe( 'Transform block support', () => {
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toContain(
-				'<div class="wp-block-group has-rotation" style="rotate:30deg">'
+				'<h2 class="wp-block-heading has-rotation" style="rotate:30deg">'
 			);
 
-		const editorGroup = editor.canvas.getByRole( 'document', {
-			name: 'Block: Group',
+		const editorHeading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
 		} );
-		await expect.poll( () => getRotate( editorGroup ) ).toBe( '30deg' );
+		await expect.poll( () => getRotate( editorHeading ) ).toBe( '30deg' );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		const group = page.locator( '.wp-block-group' );
-		await expect( group ).toHaveAttribute( 'style', 'rotate:30deg' );
-		expect( await getRotate( group ) ).toBe( '30deg' );
+		const heading = page.getByRole( 'heading', { name: 'Tilted' } );
+		await expect( heading ).toHaveAttribute( 'style', 'rotate:30deg' );
+		expect( await getRotate( heading ) ).toBe( '30deg' );
 		expect(
-			await group.evaluate(
+			await heading.evaluate(
 				( element: HTMLElement ) =>
 					element.offsetWidth <
 					( element.nextElementSibling as HTMLElement ).offsetWidth
@@ -159,6 +157,129 @@ test.describe( 'Transform block support', () => {
 					( element.nextElementSibling as HTMLElement ).offsetWidth
 			)
 		).toBe( true );
+	} );
+
+	test( 'keeps the width of rotated containers', async ( {
+		editor,
+		page,
+	} ) => {
+		const rotate = { transform: { rotate: '4deg' } };
+		const paragraphs = [
+			{ name: 'core/paragraph', attributes: { content: 'One' } },
+			{ name: 'core/paragraph', attributes: { content: 'Two' } },
+			{ name: 'core/paragraph', attributes: { content: 'Three' } },
+		];
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { className: 'is-plain', style: rotate },
+			innerBlocks: [ paragraphs[ 0 ] ],
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				className: 'is-row',
+				layout: {
+					type: 'flex',
+					flexWrap: 'nowrap',
+					justifyContent: 'space-between',
+				},
+				style: rotate,
+			},
+			innerBlocks: paragraphs.slice( 0, 2 ),
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {
+				className: 'is-grid',
+				layout: { type: 'grid', columnCount: 3 },
+				style: rotate,
+			},
+			innerBlocks: paragraphs,
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { className: 'is-level', content: 'Level' },
+		} );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const levelWidth = await page
+			.locator( '.is-level' )
+			.evaluate( ( element: HTMLElement ) => element.offsetWidth );
+		for ( const className of [ 'is-plain', 'is-row', 'is-grid' ] ) {
+			const group = page.locator( `.wp-block-group.${ className }` );
+			expect( await getRotate( group ) ).toBe( '4deg' );
+			await expect( group ).not.toHaveClass( /has-rotation/ );
+			expect(
+				await group.evaluate(
+					( element: HTMLElement ) => element.offsetWidth
+				)
+			).toBe( levelWidth );
+		}
+	} );
+
+	test( 'does not fit a block with a zero rotation', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const stylesPostId =
+			await requestUtils.getCurrentThemeGlobalStylesPostId();
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/global-styles/${ stylesPostId }`,
+			data: {
+				id: stylesPostId,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': { transform: { rotate: '0deg' } },
+					},
+				},
+			},
+		} );
+
+		try {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: { content: 'Global' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'Level',
+					style: { transform: { rotate: '0deg' } },
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'After' },
+			} );
+
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toContain(
+					'<h2 class="wp-block-heading" style="rotate:0deg">Level</h2>'
+				);
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const isSameWidthAsSibling = ( element: HTMLElement ) =>
+				element.offsetWidth ===
+				( element.nextElementSibling as HTMLElement ).offsetWidth;
+			for ( const name of [ 'Global', 'Level' ] ) {
+				const heading = page.getByRole( 'heading', { name } );
+				expect( await getRotate( heading ) ).toBe( '0deg' );
+				await expect( heading ).not.toHaveClass( /has-rotation/ );
+				expect( await heading.evaluate( isSameWidthAsSibling ) ).toBe(
+					true
+				);
+			}
+		} finally {
+			await requestUtils.resetThemeGlobalStyles();
+		}
 	} );
 
 	test( 'saves only the axis a user sets over a Global Styles axis', async ( {

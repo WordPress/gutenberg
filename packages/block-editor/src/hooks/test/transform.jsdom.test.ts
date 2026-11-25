@@ -50,6 +50,17 @@ describe( 'getTransformClassesAndStyles', () => {
 		).toEqual( { style: { scale: expected } } );
 	} );
 
+	it.each( [ '0', '0deg', '-0deg', '+0.0rad', '.0grad', '0TURN' ] )(
+		'returns a %s rotation as an inline style without a class',
+		( rotate ) => {
+			expect(
+				getTransformClassesAndStyles( {
+					style: { transform: { rotate } },
+				} )
+			).toEqual( { className: undefined, style: { rotate } } );
+		}
+	);
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
@@ -82,7 +93,7 @@ describe( 'transform serialization', () => {
 	} );
 
 	it( 'saves a has-rotation class next to the existing classes', () => {
-		registerTransformBlock( { rotate: true } );
+		registerTransformBlock( { rotate: true, fitContent: true } );
 
 		expect(
 			transformSupport.addSaveProps(
@@ -93,18 +104,37 @@ describe( 'transform serialization', () => {
 		).toBe( 'is-style-a has-rotation' );
 	} );
 
-	it( 'saves no has-rotation class for a block that keeps its width', () => {
-		registerTransformBlock( { rotate: true, fitContent: false } );
+	it.each( [
+		[ 'leaves out fitContent', { rotate: true } ],
+		[ 'turns fitContent off', { rotate: true, fitContent: false } ],
+	] )(
+		'saves no has-rotation class for a block that %s',
+		( _label, supports ) => {
+			registerTransformBlock( supports );
 
-		expect(
-			transformSupport.addSaveProps( {}, 'test/transform', {
-				style: { transform: { rotate: '15deg' } },
-			} ).className
-		).toBeUndefined();
-	} );
+			expect(
+				transformSupport.addSaveProps( {}, 'test/transform', {
+					style: { transform: { rotate: '15deg' } },
+				} ).className
+			).toBeUndefined();
+		}
+	);
+
+	it.each( [ '0deg', '-0turn' ] )(
+		'saves no has-rotation class for a %s rotation',
+		( rotate ) => {
+			registerTransformBlock( { rotate: true, fitContent: true } );
+
+			expect(
+				transformSupport.addSaveProps( {}, 'test/transform', {
+					style: { transform: { rotate } },
+				} ).className
+			).toBeUndefined();
+		}
+	);
 
 	it( 'saves no has-rotation class for an invalid rotation', () => {
-		registerTransformBlock( { rotate: true } );
+		registerTransformBlock( { rotate: true, fitContent: true } );
 
 		expect(
 			transformSupport.addSaveProps( {}, 'test/transform', {
@@ -121,6 +151,7 @@ describe( 'transform serialization', () => {
 		( _label, skipSerialization ) => {
 			registerTransformBlock( {
 				rotate: true,
+				fitContent: true,
 				__experimentalSkipSerialization: skipSerialization,
 			} );
 			const attributes = {

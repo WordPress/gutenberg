@@ -47,7 +47,12 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 	}
 
 	public function test_rotation_is_returned_as_a_wrapper_class_and_inline_style() {
-		$block_type = $this->register_transform_block( array( 'rotate' => true ) );
+		$block_type = $this->register_transform_block(
+			array(
+				'rotate'     => true,
+				'fitContent' => true,
+			)
+		);
 
 		$this->assertSame(
 			array(
@@ -115,8 +120,9 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 	public function test_translation_is_returned_as_a_wrapper_inline_style( $transform, $expected ) {
 		$block_type = $this->register_transform_block(
 			array(
-				'rotate'    => true,
-				'translate' => true,
+				'rotate'     => true,
+				'translate'  => true,
+				'fitContent' => true,
 			)
 		);
 
@@ -170,6 +176,7 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 			array(
 				'rotate'                          => true,
 				'translate'                       => true,
+				'fitContent'                      => true,
 				'__experimentalSkipSerialization' => array( 'translate' ),
 			)
 		);
@@ -193,20 +200,50 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_rotation_keeps_the_width_of_a_block_that_opts_out_of_fitting() {
-		$block_type = $this->register_transform_block(
-			array(
-				'rotate'     => true,
-				'fitContent' => false,
-			)
-		);
+	/**
+	 * @dataProvider data_rotation_without_fit_class
+	 *
+	 * @param array  $supports Transform block support configuration.
+	 * @param string $rotate   Rotation value.
+	 */
+	public function test_rotation_without_fit_class( $supports, $rotate ) {
+		$block_type = $this->register_transform_block( $supports );
 
 		$this->assertSame(
-			array( 'style' => 'rotate:15deg;' ),
+			array( 'style' => "rotate:{$rotate};" ),
 			gutenberg_apply_transform_support(
 				$block_type,
-				array( 'style' => array( 'transform' => array( 'rotate' => '15deg' ) ) )
+				array( 'style' => array( 'transform' => array( 'rotate' => $rotate ) ) )
 			)
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_rotation_without_fit_class() {
+		$fit_content = array(
+			'rotate'     => true,
+			'fitContent' => true,
+		);
+
+		return array(
+			'fitContent left out' => array( array( 'rotate' => true ), '15deg' ),
+			'fitContent off'      => array(
+				array(
+					'rotate'     => true,
+					'fitContent' => false,
+				),
+				'15deg',
+			),
+			'unitless zero'       => array( $fit_content, '0' ),
+			'zero degrees'        => array( $fit_content, '0deg' ),
+			'negative zero'       => array( $fit_content, '-0deg' ),
+			'signed zero radians' => array( $fit_content, '+0.0rad' ),
+			'zero gradians'       => array( $fit_content, '.0grad' ),
+			'zero turns'          => array( $fit_content, '0TURN' ),
 		);
 	}
 
@@ -242,6 +279,15 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 			'no style'             => array( array() ),
 			'non-array transform'  => array( array( 'style' => array( 'transform' => '15deg' ) ) ),
 			'invalid rotation'     => array( array( 'style' => array( 'transform' => array( 'rotate' => '15' ) ) ) ),
+		);
+	}
+
+	public function test_classes_and_styles_add_no_class_for_a_zero_rotation() {
+		$this->assertSame(
+			array( 'style' => 'rotate:-0turn;' ),
+			gutenberg_get_transform_classes_and_styles(
+				array( 'style' => array( 'transform' => array( 'rotate' => '-0turn' ) ) )
+			)
 		);
 	}
 

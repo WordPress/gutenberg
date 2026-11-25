@@ -2815,16 +2815,17 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string      $selector     Block or block style variation selector.
 	 * @param array       $declarations The node's declarations.
 	 * @param array       $nodes        Nodes whose `dimensions.width` takes precedence.
-	 * @param string|null $block_name   Block name, whose `transform.fitContent` support can opt out.
+	 * @param string|null $block_name   Block name, whose `transform.fitContent` support opts in.
 	 * @return string The ruleset, or an empty string.
 	 */
 	protected static function get_rotation_fit_content_ruleset( $selector, $declarations, $nodes, $block_name ) {
-		if ( ! in_array( 'rotate', array_column( $declarations, 'name' ), true ) ) {
+		$rotate = array_column( $declarations, 'value', 'name' )['rotate'] ?? null;
+		if ( null === $rotate || gutenberg_is_zero_rotation( $rotate ) ) {
 			return '';
 		}
 
 		$block_type = $block_name ? WP_Block_Type_Registry::get_instance()->get_registered( $block_name ) : null;
-		if ( $block_type && ! block_has_support( $block_type, array( 'transform', 'fitContent' ), true ) ) {
+		if ( ! $block_type || ! block_has_support( $block_type, array( 'transform', 'fitContent' ), false ) ) {
 			return '';
 		}
 

@@ -63,8 +63,8 @@ function gutenberg_apply_transform_support( $block_type, $block_attributes ) {
 
 	$classes_and_styles = gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
 
-	// A block that keeps its width when rotated does not need the fit class.
-	if ( ! block_has_support( $block_type, array( 'transform', 'fitContent' ), true ) ) {
+	// Only a block that opts in fits its content when rotated.
+	if ( ! block_has_support( $block_type, array( 'transform', 'fitContent' ), false ) ) {
 		unset( $classes_and_styles['class'] );
 	}
 
@@ -99,11 +99,27 @@ function gutenberg_get_transform_classes_and_styles( $block_attributes ) {
 	$classes_and_styles = array( 'style' => $styles['css'] );
 
 	// Lets the shared stylesheet fit a rotated block to its content.
-	if ( isset( $styles['declarations']['rotate'] ) ) {
+	if (
+		isset( $styles['declarations']['rotate'] ) &&
+		! gutenberg_is_zero_rotation( $styles['declarations']['rotate'] )
+	) {
 		$classes_and_styles['class'] = 'has-rotation';
 	}
 
 	return $classes_and_styles;
+}
+
+/**
+ * Checks whether a rotation is a zero angle, such as `0`, `0deg` or `-0turn`,
+ * which turns nothing. Mirror of `isZeroRotation()` in the global styles engine.
+ *
+ * @since 7.3.0
+ *
+ * @param mixed $rotate Rotation value.
+ * @return bool Whether the rotation is a zero angle.
+ */
+function gutenberg_is_zero_rotation( $rotate ) {
+	return is_string( $rotate ) && 1 === preg_match( '/^[+-]?(?:0+(?:\.0+)?|\.0+)(?:deg|grad|rad|turn)?$/iD', $rotate );
 }
 
 // Register the block support.

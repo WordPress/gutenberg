@@ -49,7 +49,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `rotate`: `true`
   - `translate`: `true`
   - `scale`: `true`
-  - `fitContent`: `false`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minWidth`: `true`
   - `minHeight`: `true`

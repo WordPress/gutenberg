@@ -62,7 +62,8 @@
 		"transform": {
 			"rotate": true,
 			"translate": true,
-			"scale": true
+			"scale": true,
+			"fitContent": true
 		},
 		"spacing": {
 			"margin": true,
