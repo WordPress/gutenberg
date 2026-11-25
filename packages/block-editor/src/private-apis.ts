@@ -12,6 +12,7 @@ import {
 } from './utils/search-ranking';
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
+import ListViewMoveMenuItems from './components/list-view/move-menu-items';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
@@ -55,6 +56,8 @@ import {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	isMoveTransparentKey,
+	detachesOnEditKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateBlockPopover } from './components/block-popover';
@@ -101,6 +104,7 @@ lock( privateApis, {
 	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
+	ListViewMoveMenuItems,
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
@@ -148,6 +152,8 @@ lock( privateApis, {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	isMoveTransparentKey,
+	detachesOnEditKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

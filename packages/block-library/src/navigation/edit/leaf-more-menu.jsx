@@ -3,17 +3,19 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	addSubmenu,
-	chevronUp,
-	chevronDown,
-	moreVertical,
-} from '@wordpress/icons';
+import { addSubmenu, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { DEFAULT_BLOCK } from '../constants';
+import { unlock } from '../../lock-unlock';
+
+const { ListViewMoveMenuItems } = unlock( blockEditorPrivateApis );
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -98,8 +100,6 @@ export default function LeafMoreMenu( {
 	...props
 } ) {
 	const {
-		moveBlocksDown,
-		moveBlocksUp,
 		removeBlocks,
 		duplicateBlocks,
 		insertBeforeBlock,
@@ -112,22 +112,13 @@ export default function LeafMoreMenu( {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const {
-		blockName,
-		rootClientId,
-		canDuplicate,
-		canInsertBlock,
-		isFirst,
-		isLast,
-	} = useSelect(
+	const { blockName, canDuplicate, canInsertBlock } = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockName,
 				canInsertBlockType,
 				getDirectInsertBlock,
-				getBlockIndex,
-				getBlockCount,
 			} = select( blockEditorStore );
 			const { getDefaultBlockName } = select( blocksStore );
 
@@ -143,7 +134,6 @@ export default function LeafMoreMenu( {
 
 			return {
 				blockName: _blockName,
-				rootClientId: _rootClientId,
 				canDuplicate:
 					!! _blockName &&
 					hasBlockSupport( _blockName, 'multiple', true ) &&
@@ -152,10 +142,6 @@ export default function LeafMoreMenu( {
 					( canInsertDefaultBlock || !! directInsertBlock ) &&
 					!! _blockName &&
 					canInsertBlockType( _blockName, _rootClientId ),
-				isFirst: getBlockIndex( clientId ) === 0,
-				isLast:
-					getBlockIndex( clientId ) ===
-					getBlockCount( _rootClientId ) - 1,
 			};
 		},
 		[ clientId ]
@@ -176,28 +162,10 @@ export default function LeafMoreMenu( {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							disabled={ isFirst }
-							accessibleWhenDisabled
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							disabled={ isLast }
-							accessibleWhenDisabled
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move down' ) }
-						</MenuItem>
+						<ListViewMoveMenuItems
+							clientIds={ [ clientId ] }
+							onClose={ onClose }
+						/>
 						<AddSubmenuItem
 							clientId={ clientId }
 							onClose={ onClose }

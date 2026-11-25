@@ -148,7 +148,12 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
 						.length >= maxNestingLevel,
-				isTopLevelLink: isTopLevel,
+				// Links a Page List shows in the menu sit at the top level too.
+				isTopLevelLink:
+					isTopLevel ||
+					( parentBlockName === 'core/page-list' &&
+						getBlockName( getBlockRootClientId( rootClientId ) ) ===
+							'core/navigation' ),
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true

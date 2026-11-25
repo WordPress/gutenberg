@@ -1,5 +1,6 @@
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
@@ -8,7 +9,9 @@ import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
  *
  * @param {Array} pages An array of pages.
  *
- * @return {Array} A nested array of navigation link blocks.
+ * @return {Object} The top-level navigation link blocks (`navigationLinks`),
+ *                  and every link by page ID (`linkMap`), including pages
+ *                  whose parent isn't among the pages.
  */
 function createNavigationLinks( pages = [] ) {
 	const POST_TYPE_KIND = 'post-type';
@@ -21,7 +24,11 @@ function createNavigationLinks( pages = [] ) {
 			'core/navigation-link',
 			{
 				id,
-				label: title.rendered,
+				label:
+					// translators: displayed when a page has an empty title.
+					title?.rendered?.trim() !== ''
+						? title.rendered
+						: __( '(no title)' ),
 				url,
 				type,
 				kind: POST_TYPE_KIND,
@@ -46,53 +53,19 @@ function createNavigationLinks( pages = [] ) {
 		}
 	} );
 
-	return navigationLinks;
-}
-
-/**
- * Finds a navigation link block by id, recursively.
- * It might be possible to make this a more generic helper function.
- *
- * @param {Array}  navigationLinks An array of navigation link blocks.
- * @param {number} id              The id of the navigation link to find.
- *
- * @return {Object|null} The navigation link block with the given id.
- */
-function findNavigationLinkById( navigationLinks, id ) {
-	for ( const navigationLink of navigationLinks ) {
-		// Is this the link we're looking for?
-		if ( navigationLink.attributes.id === id ) {
-			return navigationLink;
-		}
-
-		// If not does it have innerBlocks?
-		if ( navigationLink.innerBlocks && navigationLink.innerBlocks.length ) {
-			const foundNavigationLink = findNavigationLinkById(
-				navigationLink.innerBlocks,
-				id
-			);
-
-			if ( foundNavigationLink ) {
-				return foundNavigationLink;
-			}
-		}
-	}
-
-	return null;
+	return { navigationLinks, linkMap };
 }
 
 export function convertToNavigationLinks( pages = [], parentPageID = null ) {
-	let navigationLinks = createNavigationLinks( pages );
+	const { navigationLinks: topLevelLinks, linkMap } =
+		createNavigationLinks( pages );
+	let navigationLinks = topLevelLinks;
 
 	// If a parent page ID is provided, only return the children of that page.
+	// Look it up by ID, since it may sit under a page that isn't among the
+	// pages (one that isn't published).
 	if ( parentPageID ) {
-		const parentPage = findNavigationLinkById(
-			navigationLinks,
-			parentPageID
-		);
-		if ( parentPage && parentPage.innerBlocks ) {
-			navigationLinks = parentPage.innerBlocks;
-		}
+		navigationLinks = linkMap[ parentPageID ]?.innerBlocks ?? [];
 	}
 
 	// Transform all links with innerBlocks into Submenus. This can't be done

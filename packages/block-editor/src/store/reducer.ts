@@ -10,7 +10,11 @@ import {
 import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
+import {
+	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	detachesOnEditKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	Action,
@@ -24,6 +28,7 @@ import type {
 	BlocksState,
 	BlockTreeNode,
 	BlockWithoutAttributes,
+	DetachedBlock,
 	InitialPosition,
 	Settings,
 	State,
@@ -412,6 +417,13 @@ const withBlockTree =
 	};
 
 /**
+ * The actions `withDetachOnEdit` dispatches to carry out a detach. They're part
+ * of the change that caused it, so `withPersistentBlockChange` doesn't compare
+ * the next action against them.
+ */
+const detachActions = new WeakSet< Action >();
+
+/**
  * Higher-order reducer intended to augment the blocks reducer, assigning an
  * `isPersistentChange` property value corresponding to whether a change in
  * state can be considered as persistent. All changes are considered persistent
@@ -453,8 +465,11 @@ function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
 
 		// In comparing against the previous action, consider only those which
 		// would have qualified as one which would have been ignored or not
-		// have resulted in a changed state.
-		lastAction = action;
+		// have resulted in a changed state. Leave out a detach's own steps,
+		// so they don't split the undo step (such as typing) that caused it.
+		if ( ! detachActions.has( action ) ) {
+			lastAction = action;
+		}
 
 		if ( pendingHistoryMode === 'ignore' ) {
 			return {
@@ -699,18 +714,39 @@ const withBlockReset =
 			const fixedClientIds: string[] = [];
 			for ( const clientId of newState.controlledInnerBlocks ) {
 				const controlledOrder = newState.order.get( clientId )!;
-				const innerBlocks = controlledOrder.map(
-					( id ) => state!.tree.get( id ) as TreeBlock
+				// When the preserved sub-tree is unchanged, keep the previous
+				// entry so `getBlocks( clientId )` keeps its reference: the
+				// controller syncing those blocks to its entity would otherwise
+				// see a change it did not make and report it as an edit.
+				const previousEntry = state!.tree.get(
+					'controlled||' + clientId
 				);
+				const isUnchanged =
+					previousEntry?.innerBlocks.length ===
+						controlledOrder.length &&
+					controlledOrder.every(
+						( id, index ) =>
+							previousEntry.innerBlocks[ index ] ===
+							state!.tree.get( id )
+					);
+				const innerBlocks = isUnchanged
+					? previousEntry.innerBlocks
+					: controlledOrder.map(
+							( id ) => state!.tree.get( id ) as TreeBlock
+						);
 				const existingEntry = newState.tree.get( clientId );
-				if ( existingEntry ) {
+				// A preserved entry already has none, so it keeps its reference.
+				if ( existingEntry?.innerBlocks.length ) {
 					newState.tree.set( clientId, {
 						...existingEntry,
 						innerBlocks: [],
 					} );
 					fixedClientIds.push( clientId );
 				}
-				newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+				newState.tree.set(
+					'controlled||' + clientId,
+					isUnchanged ? previousEntry : { innerBlocks }
+				);
 				const preserveTreeEntry = ( blockId: string ) => {
 					const treeEntry = state!.tree.get( blockId );
 					if ( ! treeEntry ) {
@@ -862,9 +898,11 @@ export const blocks = pipe(
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
+	// Needs to be before withPersistentBlockChange, so the inner blocks it
+	// removes count as part of the action, with the action's history mode.
+	withResetControlledBlocks,
 	withPersistentBlockChange,
-	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withIgnoredBlockChange
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
@@ -1960,6 +1998,29 @@ export function preferences(
 }
 
 /**
+ * Returns whether two block list settings are the same. `fastDeepEqual` skips
+ * symbol keys, so the private settings, which have them, are compared here.
+ *
+ * @param previous The current settings.
+ * @param next     The new settings.
+ *
+ * @return Whether the settings are the same.
+ */
+function areBlockListSettingsEqual(
+	previous: BlockListSettings | undefined,
+	next: BlockListSettings
+) {
+	const privateKeys = Object.getOwnPropertySymbols( {
+		...previous,
+		...next,
+	} ) as Array< keyof BlockListSettings & symbol >;
+	return (
+		fastDeepEqual( previous, next ) &&
+		privateKeys.every( ( key ) => previous?.[ key ] === next[ key ] )
+	);
+}
+
+/**
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
@@ -2011,7 +2072,10 @@ export const blockListSettings = (
 				( [ clientId, nextSettings ] ) =>
 					! nextSettings
 						? state.has( clientId )
-						: ! fastDeepEqual( state.get( clientId ), nextSettings )
+						: ! areBlockListSettingsEqual(
+								state.get( clientId ),
+								nextSettings
+							)
 			);
 
 			if ( ! relevantUpdates.length ) {
@@ -3440,7 +3504,116 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 	};
 }
 
+const NO_DETACHED_BLOCKS: DetachedBlock[] = [];
+
+function getInnerBlocksInTree( blocksState: BlocksState, clientId: string ) {
+	return blocksState.tree.get(
+		blocksState.controlledInnerBlocks.has( clientId )
+			? 'controlled||' + clientId
+			: clientId
+	)?.innerBlocks;
+}
+
+/**
+ * Higher-order reducer that detaches the blocks marked to detach on edit (see
+ * `detachesOnEditKey`). When a persistent change alters the inner blocks
+ * of such a block, the same action replaces the block with them, so
+ * subscribers (such as an inner block controller recording undo levels) see a
+ * single change.
+ *
+ * @param reducer Original reducer function.
+ *
+ * @return Enhanced reducer function.
+ */
+function withDetachOnEdit( reducer: Reducer< State > ) {
+	return ( state: State | undefined, action: Action ) => {
+		let nextState = reducer( state, action );
+
+		if ( state && nextState.blocks === state.blocks ) {
+			// Take over the last value without creating a new reference.
+			nextState.lastDetachedBlocks = state.lastDetachedBlocks;
+			return nextState;
+		}
+
+		const detached: DetachedBlock[] = [];
+		const { isPersistentChange, isIgnoredChange } = nextState.blocks;
+		if ( state && isPersistentChange && ! isIgnoredChange ) {
+			for ( const [
+				clientId,
+				listSettings,
+			] of nextState.blockListSettings ) {
+				if ( ! listSettings[ detachesOnEditKey ] ) {
+					continue;
+				}
+				const block = nextState.blocks.byClientId.get( clientId );
+				// The block's own changes, such as to its attributes or its
+				// position, leave its inner blocks as they are.
+				if (
+					! block ||
+					! state.blocks.byClientId.has( clientId ) ||
+					getInnerBlocksInTree( state.blocks, clientId ) ===
+						getInnerBlocksInTree( nextState.blocks, clientId )
+				) {
+					continue;
+				}
+				const rootClientId =
+					nextState.blocks.parents.get( clientId ) ?? '';
+				const innerClientIds =
+					nextState.blocks.order.get( clientId ) ?? [];
+				const siblingClientIds =
+					nextState.blocks.order.get( rootClientId )!;
+				const index = siblingClientIds.indexOf( clientId );
+				// Moved rather than recreated, so they keep their client IDs
+				// (and the selection).
+				const steps: Action[] = innerClientIds.length
+					? [
+							{
+								type: 'MOVE_BLOCKS_TO_POSITION',
+								clientIds: innerClientIds,
+								fromRootClientId: clientId,
+								toRootClientId: rootClientId,
+								index,
+							},
+						]
+					: [];
+				steps.push( {
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				} );
+				// Removing an inner block selects the block itself when no
+				// block is before it. Select what removing the block would,
+				// as `selectPreviousBlock` does.
+				const { selectionStart, selectionEnd } = nextState.selection;
+				const blockToSelect =
+					siblingClientIds[ index - 1 ] ?? rootClientId;
+				if (
+					selectionStart.clientId === clientId &&
+					selectionEnd.clientId === clientId &&
+					blockToSelect
+				) {
+					steps.push( {
+						type: 'SELECT_BLOCK',
+						clientId: blockToSelect,
+						initialPosition: nextState.initialPosition,
+					} );
+				}
+				for ( const step of steps ) {
+					detachActions.add( step );
+					nextState = reducer( nextState, step );
+				}
+				detached.push( { clientId, name: block.name, rootClientId } );
+			}
+		}
+
+		nextState.lastDetachedBlocks = detached.length
+			? detached
+			: NO_DETACHED_BLOCKS;
+		return nextState;
+	};
+}
+
 export default pipe(
 	withDerivedBlockEditingModes,
-	withAutomaticChangeReset
+	withAutomaticChangeReset,
+	withDetachOnEdit
 )( combinedReducers ) as Reducer< State >;

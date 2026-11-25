@@ -9,11 +9,6 @@ Display a list of all pages.
 - **Block Type:** [Dynamic](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (server-rendered)
 - **Keywords:** `menu`, `navigation`
 
-## Block Relationships
-
-**[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
-- [`core/page-list-item`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
-
 ## Attributes
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._

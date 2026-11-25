@@ -1,13 +1,20 @@
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	useEntityBlockEditor,
+	useEntityId,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
+import { unlock } from '../../lock-unlock';
+
+const AUTO_ADD_PAGES_META_KEY = 'wp_navigation_auto_add_pages';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -49,6 +56,40 @@ export default function NavigationInnerBlocks( {
 		'postType',
 		'wp_navigation'
 	);
+	const menuId = useEntityId( 'postType', 'wp_navigation' );
+	const registry = useRegistry();
+	const { editEntityRecord } = useDispatch( coreStore );
+
+	// When an edit replaces a Page List in this menu with its links (see the
+	// Page List block), the menu takes over adding new pages: switch "Auto
+	// add new pages" on. A cached edit joins the undo level `onChange` just
+	// added, so one undo reverts the edit, the replacement and the setting.
+	const onChangeWithAutoAddPages = useCallback(
+		( newBlocks, options ) => {
+			// Read before `onChange`: the signal covers only the latest
+			// change to the blocks.
+			const { getLastDetachedBlocks, getBlockParents } = unlock(
+				registry.select( blockEditorStore )
+			);
+			const hasDetachedPageList = getLastDetachedBlocks().some(
+				( { name, rootClientId } ) =>
+					name === 'core/page-list' &&
+					( rootClientId === clientId ||
+						getBlockParents( rootClientId ).includes( clientId ) )
+			);
+			onChange( newBlocks, options );
+			if ( hasDetachedPageList ) {
+				editEntityRecord(
+					'postType',
+					'wp_navigation',
+					menuId,
+					{ meta: { [ AUTO_ADD_PAGES_META_KEY ]: true } },
+					{ isCached: true }
+				);
+			}
+		},
+		[ onChange, registry, clientId, editEntityRecord, menuId ]
+	);
 
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
@@ -87,7 +128,7 @@ export default function NavigationInnerBlocks( {
 		{
 			value: blocks,
 			onInput,
-			onChange,
+			onChange: onChangeWithAutoAddPages,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,

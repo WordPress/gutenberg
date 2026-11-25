@@ -24,8 +24,10 @@ import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
+	detachesOnEditKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	isMoveTransparentKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
@@ -341,6 +343,8 @@ export type BlockListSettings = Record< string, unknown > & {
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	/** A function is deprecated. */
 	directInsert?: boolean | ( ( ...args: never[] ) => unknown );
+	[ isMoveTransparentKey ]?: true;
+	[ detachesOnEditKey ]?: true;
 };
 
 export interface ShowInsertionPointOptions {
@@ -564,6 +568,16 @@ export interface RemovalPromptData {
 	message: RemovalPromptMessage;
 }
 
+/**
+ * A block a change replaced with its inner blocks. See `detachesOnEditKey`.
+ */
+export interface DetachedBlock {
+	clientId: string;
+	name: string;
+	/** The parent the block was in, which now holds its inner blocks. */
+	rootClientId: string;
+}
+
 export interface SelectedBlockStyleState {
 	clientId: string;
 	showStateOnCanvas: boolean;
@@ -592,6 +606,7 @@ export interface State {
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
+	lastDetachedBlocks: DetachedBlock[];
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
 	editedContentOnlySection: string | undefined;

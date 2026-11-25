@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Add an "Auto add new pages" menu setting. While it is on, publishing a page adds a link to the menu, as classic menus do: a top-level page is added, and a child page is nested under the link to its parent, which becomes a submenu ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
+
 ### Bug Fixes
 
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).

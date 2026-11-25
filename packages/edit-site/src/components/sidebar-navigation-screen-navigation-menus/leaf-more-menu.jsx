@@ -1,9 +1,13 @@
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -12,13 +16,13 @@ const POPOVER_PROPS = {
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { ListViewMoveMenuItems } = unlock( blockEditorPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -32,13 +36,12 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, blockName, attributes } = useSelect(
+	const { blockName, attributes } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
+			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
 
 			return {
-				rootClientId: getBlockRootClientId( clientId ),
 				blockName: getBlockName( clientId ),
 				attributes: getBlockAttributes( clientId ),
 			};
@@ -79,24 +82,10 @@ export default function LeafMoreMenu( props ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move down' ) }
-						</MenuItem>
+						<ListViewMoveMenuItems
+							clientIds={ [ clientId ] }
+							onClose={ onClose }
+						/>
 						{ attributes?.type === 'page' && attributes?.id && (
 							<MenuItem
 								onClick={ () => {

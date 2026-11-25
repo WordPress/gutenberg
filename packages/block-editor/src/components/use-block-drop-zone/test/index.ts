@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getDropTargetPosition } from '..';
+import { getDropTargetPosition, isDropTargetValid } from '..';
 import type { BlockListOrientation, DropTargetBlockData } from '../types';
 
 interface ElementData {
@@ -540,5 +540,56 @@ describe( 'getDropTargetPosition', () => {
 				)
 			).toEqual( [ 1, 'replace' ] );
 		} );
+	} );
+} );
+
+describe( 'isDropTargetValid', () => {
+	// A link may only be a direct child of a menu, unless a container lists
+	// it among its own allowed blocks, as a submenu does.
+	const blockTypes: Record< string, { parent?: string[] } > = {
+		'core/navigation-link': { parent: [ 'core/navigation' ] },
+		'core/paragraph': {},
+	};
+	const getBlockType = ( name: string ) => blockTypes[ name ];
+
+	it( 'allows blocks that the target allows, whatever their allowed parent', () => {
+		expect(
+			isDropTargetValid(
+				getBlockType,
+				[ { name: 'core/navigation-link' } ],
+				[ 'core/navigation-link' ],
+				'core/navigation-submenu'
+			)
+		).toBe( true );
+	} );
+
+	it( 'does not allow blocks that the target leaves out', () => {
+		expect(
+			isDropTargetValid(
+				getBlockType,
+				[ { name: 'core/navigation-link' } ],
+				[ 'core/navigation-link', 'core/paragraph' ],
+				'core/navigation-submenu'
+			)
+		).toBe( false );
+	} );
+
+	it( 'allows blocks at the root unless they need another parent', () => {
+		expect(
+			isDropTargetValid(
+				getBlockType,
+				undefined,
+				[ 'core/paragraph' ],
+				null
+			)
+		).toBe( true );
+		expect(
+			isDropTargetValid(
+				getBlockType,
+				undefined,
+				[ 'core/navigation-link' ],
+				null
+			)
+		).toBe( false );
 	} );
 } );

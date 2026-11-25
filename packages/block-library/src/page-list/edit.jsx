@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
@@ -8,6 +8,7 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -23,8 +24,17 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import {
+	convertToNavigationLinks as buildNavigationLinks,
+	useConvertToNavigationLinks,
+} from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
+import { unlock } from '../lock-unlock';
+
+const { isMoveTransparentKey, detachesOnEditKey } = unlock(
+	blockEditorPrivateApis
+);
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -60,7 +70,9 @@ function BlockContent( {
 	pages,
 	parentPageID,
 } ) {
-	if ( ! hasResolvedPages ) {
+	// Only before the first result: a refetch (after a page is saved) keeps
+	// showing the pages, so the inner blocks and their sync stay mounted.
+	if ( ! hasResolvedPages && ! pages ) {
 		return (
 			<div { ...blockProps }>
 				<div className="wp-block-page-list__loading-indicator-container">
@@ -133,19 +145,19 @@ export default function PageListEdit( {
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			per_page: MAX_PAGE_COUNT,
-			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		}
-	);
+	const {
+		records: pages,
+		hasResolved: hasResolvedPages,
+		totalItems,
+	} = useEntityRecords( 'postType', 'page', {
+		per_page: MAX_PAGE_COUNT,
+		_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+		// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+		// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+		// sort.
+		orderby: 'menu_order',
+		order: 'asc',
+	} );
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
@@ -264,12 +276,20 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		parentOrientation,
+		canConvert,
+		allowedBlocksKey,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getBlockRootClientId,
+				getBlockListSettings,
+				getBlockAttributes,
+				canRemoveBlock,
+				canInsertBlockType,
 			} = select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
@@ -281,6 +301,33 @@ export default function PageListEdit( {
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
+				parentOrientation: getBlockListSettings(
+					getBlockRootClientId( clientId )
+				)?.orientation,
+				// Converting needs a menu to switch "Auto add new pages" on
+				// for, and must be allowed to replace the list with links.
+				// The links count as the menu's own items, so whatever the
+				// list's parent takes can go among them (as a string, to keep
+				// the value stable).
+				allowedBlocksKey: (
+					getBlockType( 'core/navigation' )?.allowedBlocks ?? []
+				)
+					.filter(
+						( name ) =>
+							name !== 'core/page-list' &&
+							canInsertBlockType(
+								name,
+								getBlockRootClientId( clientId )
+							)
+					)
+					.join( ',' ),
+				canConvert:
+					!! getBlockAttributes( navigationBlockParents[ 0 ] )?.ref &&
+					canRemoveBlock( clientId ) &&
+					canInsertBlockType(
+						'core/navigation-link',
+						getBlockRootClientId( clientId )
+					),
 			};
 		},
 		[ clientId ]
@@ -293,27 +340,128 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+	// Inside a Navigation block, the pages show as editable Navigation Links.
+	// The block stays a live Page List until one of them is changed (moved,
+	// removed, edited, or a block is dropped among them). Then the Page List
+	// is replaced by the links as they are after that change, and the menu's
+	// "Auto add new pages" setting is switched on so new pages keep arriving.
+	// The query stops at MAX_PAGE_COUNT, so the total decides: converting a
+	// longer list would drop the pages past the first MAX_PAGE_COUNT.
+	// Converting also drops the list's own attributes, such as its styles,
+	// so a list that has any keeps Detach and its warning.
+	const hasOwnAttributes = Object.entries( attributes ).some(
+		( [ key, value ] ) =>
+			value !== undefined &&
+			! [ 'parentPageID', 'lock', 'metadata' ].includes( key )
+	);
+	const isLinkMode =
+		isChildOfNavigation &&
+		canConvert &&
+		! hasOwnAttributes &&
+		allowConvertToLinks &&
+		totalItems !== null &&
+		totalItems <= MAX_PAGE_COUNT;
+
+	// The pages query hands back a new array whenever any page record is
+	// received (the links' bindings fetch each page), even with the same
+	// data. Rebuilding the links then replaces them with new client IDs and
+	// drops a selection made in between, so rebuild only on a real change.
+	const pagesKey = useMemo(
+		() =>
+			pages
+				? JSON.stringify(
+						pages.map( ( { id, parent, link, type, title } ) => [
+							id,
+							parent,
+							link,
+							type,
+							title?.rendered,
+						] )
+					)
+				: null,
+		[ pages ]
+	);
+	const navigationLinks = useMemo(
+		() =>
+			isLinkMode && pagesKey
+				? buildNavigationLinks(
+						JSON.parse( pagesKey ).map(
+							( [ id, parent, link, type, title ] ) => ( {
+								id,
+								parent,
+								link,
+								type,
+								title: { rendered: title },
+							} )
+						),
+						parentPageID
+					)
+				: null,
+		[ isLinkMode, pagesKey, parentPageID ]
+	);
+
+	// In link mode, editing a page already turns the list into links, with
+	// "Auto add new pages" on, so there is no separate Detach.
+	const canDetach = allowConvertToLinks && ! isLinkMode;
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: false,
+		__unstableDisableDropZone: ! isLinkMode,
+		templateLock: isChildOfNavigation ? false : 'all',
+		allowedBlocks: isLinkMode
+			? allowedBlocksKey.split( ',' )
+			: [ 'core/page-list-item' ],
+		// The same container settings as a Navigation Submenu, so the links
+		// get the same block actions (such as "Add before" and "Add after").
+		defaultBlock: isLinkMode ? DEFAULT_BLOCK : undefined,
+		directInsert: isLinkMode,
+		// Laid out like the menu's own items, so the movers point the same way.
+		orientation: isLinkMode ? parentOrientation : undefined,
+		// In line with the menu's other items, so one-step moves (the block
+		// movers) pass the links one at a time instead of jumping the whole
+		// list, and an edge link can move out.
+		[ isMoveTransparentKey ]: isLinkMode,
+		// The first change to the links replaces the list with them, in the
+		// same undo level, and the Navigation block switches the menu's "Auto
+		// add new pages" setting on.
+		[ detachesOnEditKey ]: isLinkMode,
+		__experimentalCaptureToolbars: isLinkMode,
+		onInput: NOOP,
+		onChange: NOOP,
+		value: isLinkMode ? ( navigationLinks ?? [] ) : blockList,
+	} );
+
 	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			setIsConfirmingDetach( true );
-			selectBlock( parentClientId );
+		if ( isLinkMode ) {
+			return;
 		}
-	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
+		if ( ! hasSelectedChild && ! hasDraggedChild ) {
+			return;
+		}
+		// The list has no overlay, so a click can land on one of its pages.
+		// Outside a Navigation block the pages can't be edited, so select
+		// the list itself.
+		if ( ! isChildOfNavigation ) {
+			selectBlock( clientId );
+			return;
+		}
+		setIsConfirmingDetach( true );
+		selectBlock( parentClientId );
+	}, [
+		isLinkMode,
+		isChildOfNavigation,
+		hasSelectedChild,
+		hasDraggedChild,
+		clientId,
+		parentClientId,
+		selectBlock,
+	] );
 
 	return (
 		<>
-			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
+			{ ( pagesTree.length > 0 || canDetach ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -348,7 +496,7 @@ export default function PageListEdit( {
 							</ToolsPanelItem>
 						) }
 
-						{ allowConvertToLinks && (
+						{ canDetach && (
 							<Button
 								__next40pxDefaultSize
 								variant="secondary"
@@ -368,7 +516,7 @@ export default function PageListEdit( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			{ allowConvertToLinks && (
+			{ canDetach && (
 				<>
 					<BlockControls group="other">
 						<ToolbarButton

@@ -1,0 +1,512 @@
+<?php
+/**
+ * Tests for the "Auto add new pages" navigation menu setting.
+ *
+ * @package gutenberg
+ */
+
+/**
+ * @covers ::gutenberg_register_navigation_auto_add_pages_meta
+ * @covers ::gutenberg_navigation_auto_add_page_on_publish
+ */
+class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
+	const META_KEY = 'wp_navigation_auto_add_pages';
+
+	protected static $admin_id;
+
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+	}
+
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$admin_id );
+	}
+
+	public function set_up() {
+		parent::set_up();
+		// The test framework unregisters every meta key after each test.
+		gutenberg_register_navigation_auto_add_pages_meta();
+	}
+
+	public function tear_down() {
+		$this->delete_all_posts_of_type( 'wp_navigation' );
+		$this->delete_all_posts_of_type( 'page' );
+		$this->delete_all_posts_of_type( 'post' );
+		parent::tear_down();
+	}
+
+	private function delete_all_posts_of_type( $post_type ) {
+		$posts = get_posts(
+			array(
+				'post_type'      => $post_type,
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+			)
+		);
+		foreach ( $posts as $post_id ) {
+			wp_delete_post( $post_id, true );
+		}
+	}
+
+	private function create_menu( $content, $auto_add = null ) {
+		$menu_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_status'  => 'publish',
+				'post_title'   => 'Menu',
+				'post_content' => wp_slash( $content ),
+			)
+		);
+		if ( null !== $auto_add ) {
+			update_post_meta( $menu_id, self::META_KEY, $auto_add );
+		}
+		return $menu_id;
+	}
+
+	private function get_menu_blocks( $menu_id ) {
+		$blocks = parse_blocks( get_post( $menu_id )->post_content );
+		return array_values(
+			array_filter(
+				$blocks,
+				static function ( $block ) {
+					return null !== $block['blockName'];
+				}
+			)
+		);
+	}
+
+	private function publish_new_page( $args = array() ) {
+		$page_id = self::factory()->post->create(
+			array_merge(
+				array(
+					'post_type'   => 'page',
+					'post_status' => 'draft',
+					'post_title'  => 'New Page',
+				),
+				$args
+			)
+		);
+		wp_publish_post( $page_id );
+		return $page_id;
+	}
+
+	private function page_link_markup( $page_id ) {
+		return sprintf(
+			'<!-- wp:navigation-link {"label":"%s","type":"page","kind":"post-type","id":%d,"url":"%s"} /-->',
+			get_the_title( $page_id ),
+			$page_id,
+			get_permalink( $page_id )
+		);
+	}
+
+	private function get_labels( $blocks ) {
+		return array_map(
+			static function ( $block ) {
+				return $block['attrs']['label'];
+			},
+			$blocks
+		);
+	}
+
+	private function assert_page_link_block( $block, $page_id ) {
+		$page = get_post( $page_id );
+		$this->assertSame( 'core/navigation-link', $block['blockName'] );
+		$this->assertSame( $page_id, $block['attrs']['id'] );
+		$this->assertSame( $page->post_title, $block['attrs']['label'] );
+		$this->assertSame( get_permalink( $page ), $block['attrs']['url'] );
+		$this->assertSame( 'page', $block['attrs']['type'] );
+		$this->assertSame( 'post-type', $block['attrs']['kind'] );
+		$this->assertSame(
+			array(
+				'url' => array(
+					'source' => 'core/post-data',
+					'args'   => array( 'field' => 'link' ),
+				),
+			),
+			$block['attrs']['metadata']['bindings']
+		);
+	}
+
+	/*
+	 * Meta registration.
+	 */
+
+	public function test_meta_is_registered_as_boolean_for_rest() {
+		$registered = get_registered_meta_keys( 'post', 'wp_navigation' );
+
+		$this->assertArrayHasKey( self::META_KEY, $registered );
+		$this->assertSame( 'boolean', $registered[ self::META_KEY ]['type'] );
+		$this->assertTrue( $registered[ self::META_KEY ]['single'] );
+		$this->assertNotEmpty( $registered[ self::META_KEY ]['show_in_rest'] );
+		$this->assertFalse( $registered[ self::META_KEY ]['default'] );
+		$this->assertTrue( post_type_supports( 'wp_navigation', 'custom-fields' ) );
+	}
+
+	public function test_meta_is_readable_and_writable_through_rest() {
+		wp_set_current_user( self::$admin_id );
+		$menu_id = $this->create_menu( '' );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/navigation/' . $menu_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertFalse( $response->get_data()['meta'][ self::META_KEY ] );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/navigation/' . $menu_id );
+		$request->set_body_params( array( 'meta' => array( self::META_KEY => true ) ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertTrue( $response->get_data()['meta'][ self::META_KEY ] );
+		$this->assertTrue( (bool) get_post_meta( $menu_id, self::META_KEY, true ) );
+	}
+
+	/*
+	 * Auto add on publish.
+	 */
+
+	public function test_publishing_a_top_level_page_appends_a_link_to_a_menu_with_the_setting_on() {
+		$menu_id = $this->create_menu(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
+			true
+		);
+
+		$page_id = $this->publish_new_page( array( 'post_title' => 'About us' ) );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 2, $blocks );
+		$this->assertSame( 'Home', $blocks[0]['attrs']['label'], 'Existing items are left in place.' );
+		$this->assert_page_link_block( $blocks[1], $page_id );
+	}
+
+	public function test_a_menu_with_the_setting_off_or_missing_is_untouched() {
+		$content  = '<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->';
+		$off_id   = $this->create_menu( $content, false );
+		$unset_id = $this->create_menu( $content );
+
+		$this->publish_new_page();
+
+		$this->assertSame( $content, get_post( $off_id )->post_content );
+		$this->assertSame( $content, get_post( $unset_id )->post_content );
+	}
+
+	public function test_a_page_already_in_the_menu_is_not_added_twice() {
+		$page_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'draft',
+			)
+		);
+		// Nested inside a submenu, to prove the check is recursive.
+		$content = sprintf(
+			'<!-- wp:navigation-submenu {"label":"Company","url":"https://example.com","kind":"custom"} --><!-- wp:navigation-link {"label":"Page","type":"page","kind":"post-type","id":%d,"url":"https://example.com/page"} /--><!-- /wp:navigation-submenu -->',
+			$page_id
+		);
+		$menu_id = $this->create_menu( $content, true );
+
+		wp_publish_post( $page_id );
+
+		$this->assertSame( $content, get_post( $menu_id )->post_content );
+	}
+
+	public function test_other_post_types_and_republished_pages_are_ignored() {
+		$menu_id = $this->create_menu( '', true );
+
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ), 'The top-level parent is added.' );
+
+		$post_id = self::factory()->post->create( array( 'post_status' => 'draft' ) );
+		wp_publish_post( $post_id );
+		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ), 'A post is not added.' );
+
+		wp_update_post(
+			array(
+				'ID'         => $parent_id,
+				'post_title' => 'Parent renamed',
+			)
+		);
+		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ), 'Updating a published page adds nothing.' );
+	}
+
+	public function test_a_scheduled_page_is_added_when_it_publishes() {
+		$menu_id = $this->create_menu( '', true );
+		$page_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'future',
+				'post_date'   => gmdate( 'Y-m-d H:i:s', time() + DAY_IN_SECONDS ),
+			)
+		);
+		$this->assertCount( 0, $this->get_menu_blocks( $menu_id ), 'Scheduling alone adds nothing.' );
+
+		// `check_and_publish_future_post()` refuses to publish before the scheduled
+		// time, so call what it calls once the time arrives.
+		wp_publish_post( $page_id );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assert_page_link_block( $blocks[0], $page_id );
+	}
+
+	public function test_every_menu_with_the_setting_on_receives_the_link() {
+		$first_id  = $this->create_menu( '', true );
+		$second_id = $this->create_menu( '', true );
+
+		$page_id = $this->publish_new_page();
+
+		$this->assert_page_link_block( $this->get_menu_blocks( $first_id )[0], $page_id );
+		$this->assert_page_link_block( $this->get_menu_blocks( $second_id )[0], $page_id );
+	}
+
+	public function test_a_published_page_can_be_edited_by_a_user_without_unfiltered_html() {
+		$menu_id = $this->create_menu( '', true );
+		$author  = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $author );
+		kses_init();
+
+		$page_id = $this->publish_new_page( array( 'post_title' => 'Terms & "Conditions"' ) );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assert_page_link_block( $blocks[0], $page_id );
+		kses_remove_filters();
+	}
+
+	public function test_a_page_published_with_no_current_user_is_added_with_its_title_intact() {
+		// A scheduled page publishes from cron, where there is no user and
+		// kses filters the menu content on save.
+		$menu_id = $this->create_menu(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->',
+			true
+		);
+		$before  = $this->get_menu_blocks( $menu_id );
+		wp_set_current_user( 0 );
+		kses_init();
+
+		$page_id = $this->publish_new_page( array( 'post_title' => 'Tom & Jerry\'s <Big> "Day"' ) );
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 2, $blocks );
+		$this->assertSame( $before[0], $blocks[0] );
+		$this->assert_page_link_block( $blocks[1], $page_id );
+		kses_remove_filters();
+	}
+
+	/*
+	 * Child pages.
+	 */
+
+	public function test_a_child_page_turns_its_parent_link_into_a_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$content   = sprintf(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /--><!-- wp:navigation-link {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s","opensInNewTab":true,"rel":"nofollow"} /-->',
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id   = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 2, $blocks, 'The child is not added at the top level.' );
+		$this->assertSame( 'Home', $blocks[0]['attrs']['label'] );
+
+		$parent = $blocks[1];
+		$this->assertSame( 'core/navigation-submenu', $parent['blockName'], 'The parent link becomes a submenu.' );
+		$this->assertSame( $parent_id, $parent['attrs']['id'] );
+		$this->assertSame( 'Parent', $parent['attrs']['label'] );
+		$this->assertSame( 'page', $parent['attrs']['type'] );
+		$this->assertSame( 'post-type', $parent['attrs']['kind'] );
+		$this->assertTrue( $parent['attrs']['opensInNewTab'], 'The parent link keeps its attributes.' );
+		$this->assertSame( 'nofollow', $parent['attrs']['rel'], 'The parent link keeps its attributes.' );
+
+		$this->assertCount( 1, $parent['innerBlocks'] );
+		$this->assert_page_link_block( $parent['innerBlocks'][0], $child_id );
+	}
+
+	public function test_a_child_page_is_appended_to_an_existing_parent_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$content   = sprintf(
+			'<!-- wp:navigation-submenu {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} --><!-- wp:navigation-link {"label":"Existing","url":"https://example.com/existing","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id   = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/navigation-submenu', $blocks[0]['blockName'] );
+		$this->assertCount( 2, $blocks[0]['innerBlocks'] );
+		$this->assertSame( 'Existing', $blocks[0]['innerBlocks'][0]['attrs']['label'], 'Existing items are left in place.' );
+		$this->assert_page_link_block( $blocks[0]['innerBlocks'][1], $child_id );
+	}
+
+	public function test_a_grandchild_page_nests_under_its_parent_inside_a_submenu() {
+		$grandparent_id = $this->publish_new_page( array( 'post_title' => 'Grandparent' ) );
+		$parent_id      = $this->publish_new_page(
+			array(
+				'post_title'  => 'Parent',
+				'post_parent' => $grandparent_id,
+			)
+		);
+		$content        = sprintf(
+			'<!-- wp:navigation-submenu {"label":"Grandparent","type":"page","kind":"post-type","id":%d,"url":"%s"} --><!-- wp:navigation-link {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} /--><!-- /wp:navigation-submenu -->',
+			$grandparent_id,
+			get_permalink( $grandparent_id ),
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id        = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assertCount( 1, $blocks[0]['innerBlocks'] );
+
+		$parent = $blocks[0]['innerBlocks'][0];
+		$this->assertSame( 'core/navigation-submenu', $parent['blockName'] );
+		$this->assertSame( $parent_id, $parent['attrs']['id'] );
+		$this->assertCount( 1, $parent['innerBlocks'] );
+		$this->assert_page_link_block( $parent['innerBlocks'][0], $child_id );
+	}
+
+	public function test_a_child_page_whose_parent_is_not_in_the_menu_is_skipped() {
+		$parent_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_title'  => 'Parent',
+			)
+		);
+		// A custom link to the parent's URL does not count: only a link to the page itself does.
+		$content = sprintf(
+			'<!-- wp:navigation-link {"label":"Parent","url":"%s","kind":"custom"} /-->',
+			get_permalink( $parent_id )
+		);
+		$menu_id = $this->create_menu( $content, true );
+
+		$this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$this->assertSame( $content, get_post( $menu_id )->post_content );
+	}
+
+	/*
+	 * Where a page is added.
+	 */
+
+	public function test_a_top_level_page_goes_at_the_end_of_the_menu() {
+		$about_id = $this->publish_new_page(
+			array(
+				'post_title' => 'About',
+				'menu_order' => 1,
+			)
+		);
+		$team_id  = $this->publish_new_page(
+			array(
+				'post_title' => 'Team',
+				'menu_order' => 5,
+			)
+		);
+		$menu_id  = $this->create_menu(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /-->' .
+			$this->page_link_markup( $about_id ) .
+			$this->page_link_markup( $team_id ) .
+			'<!-- wp:navigation-link {"label":"Contact","url":"https://example.com/contact","kind":"custom"} /-->',
+			true
+		);
+
+		// Sorts between About and Team by page order, but goes at the end.
+		$this->publish_new_page(
+			array(
+				'post_title' => 'Pricing',
+				'menu_order' => 3,
+			)
+		);
+
+		$this->assertSame(
+			array( 'Home', 'About', 'Team', 'Contact', 'Pricing' ),
+			$this->get_labels( $this->get_menu_blocks( $menu_id ) )
+		);
+	}
+
+	public function test_a_child_page_goes_at_the_end_of_its_parent_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$first_id  = $this->publish_new_page(
+			array(
+				'post_title'  => 'First',
+				'post_parent' => $parent_id,
+				'menu_order'  => 1,
+			)
+		);
+		$third_id  = $this->publish_new_page(
+			array(
+				'post_title'  => 'Third',
+				'post_parent' => $parent_id,
+				'menu_order'  => 3,
+			)
+		);
+		$menu_id   = $this->create_menu(
+			sprintf(
+				'<!-- wp:navigation-submenu {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} -->%s%s<!-- /wp:navigation-submenu -->',
+				$parent_id,
+				get_permalink( $parent_id ),
+				$this->page_link_markup( $first_id ),
+				$this->page_link_markup( $third_id )
+			),
+			true
+		);
+
+		// Sorts between First and Third by page order, but goes at the end.
+		$this->publish_new_page(
+			array(
+				'post_title'  => 'Second',
+				'post_parent' => $parent_id,
+				'menu_order'  => 2,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertSame(
+			array( 'First', 'Third', 'Second' ),
+			$this->get_labels( $blocks[0]['innerBlocks'] )
+		);
+	}
+
+	public function test_a_menu_with_a_page_list_is_untouched() {
+		$top_level = '<!-- wp:page-list /-->';
+		$nested    = '<!-- wp:navigation-submenu {"label":"More","url":"https://example.com/more","kind":"custom"} --><!-- wp:page-list /--><!-- /wp:navigation-submenu -->';
+		$top_id    = $this->create_menu( $top_level, true );
+		$nested_id = $this->create_menu( $nested, true );
+
+		$this->publish_new_page();
+
+		$this->assertSame( $top_level, get_post( $top_id )->post_content );
+		$this->assertSame( $nested, get_post( $nested_id )->post_content );
+	}
+}
