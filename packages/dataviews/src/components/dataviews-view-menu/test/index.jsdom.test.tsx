@@ -293,6 +293,66 @@ describe( 'DataViews.ViewMenu', () => {
 		expect( options[ 0 ] ).toBeChecked();
 	} );
 
+	it( 'keeps a long list in the menu when it is the only group', async () => {
+		const user = userEvent.setup();
+		const sources = Array.from( { length: 14 }, ( _source, index ) => ( {
+			value: `source-${ index }`,
+			label: `Source ${ index }`,
+		} ) );
+		const onChangeView = vi.fn();
+		render(
+			<DataViews
+				data={ data }
+				fields={ [
+					{
+						id: 'source',
+						label: 'Source',
+						type: 'text',
+						getValue: () => 'source-0',
+						elements: sources,
+						filterBy: { operators: [ 'is' ] },
+						enableSorting: false,
+					},
+				] }
+				view={ {
+					...DEFAULT_VIEW,
+					titleField: undefined,
+					filters: [
+						{ field: 'source', operator: 'is', value: 'source-0' },
+					],
+				} }
+				onChangeView={ onChangeView }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { list: {} } }
+				getItemId={ ( item ) => item.id.toString() }
+			>
+				<DataViews.ViewMenu requiredFields={ [ 'source' ] } />
+			</DataViews>
+		);
+
+		await openMenu( user );
+
+		expect(
+			await screen.findAllByRole( 'menuitemradio', { name: /^Source/ } )
+		).toHaveLength( 14 );
+		expect(
+			screen.queryByRole( 'menuitem', { name: 'Source' } )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'menuitemradio', { name: 'Source 13' } )
+		);
+
+		expect( onChangeView ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				page: 1,
+				filters: [
+					{ field: 'source', operator: 'is', value: 'source-13' },
+				],
+			} )
+		);
+	} );
+
 	it( 'renders nothing when the menu would be empty', () => {
 		renderViewMenu( {
 			menuProps: { excludeFields: [ 'status', 'tags' ] },

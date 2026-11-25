@@ -639,7 +639,7 @@ A single settings button that opens a menu built from the fields and the view. I
 -   **Sort.** The field to sort by and the order, when `showSort` is set. It lists the fields with sorting enabled, as the view options do.
 -   **Extra items.** The `children`, such as a link to a help page.
 
-When the groups hold more than 10 options in all, each group moves to a submenu, which scrolls when its list is long.
+When the groups hold more than 10 options in all, each group moves to a submenu. A long list scrolls, and a group on its own stays in the menu, where a submenu would only add a step.
 
 The menu has no "Reset view" item. `onReset` is meant for saved views and comes with the "modified" indicator of the view options button, which the settings button doesn't have. A consumer that needs one can add it through `children`.
 

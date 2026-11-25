@@ -3,7 +3,8 @@ import type { NormalizedField, NormalizedFilter } from '../../types';
 
 /**
  * How many options the menu shows at once. With more, each group of options
- * moves to its own submenu, so the menu stays short.
+ * moves to its own submenu, so the menu stays short. A group on its own stays
+ * in the menu however long it is.
  */
 export const MAX_INLINE_OPTIONS = 10;
 

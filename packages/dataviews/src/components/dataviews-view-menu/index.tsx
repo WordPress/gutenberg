@@ -315,14 +315,16 @@ export default function DataViewsViewMenu( {
 
 	const sections: { key: string; content: ReactNode }[] = [];
 
-	// With many options in all, each group moves to a submenu.
+	// With many options in all, each group moves to a submenu. A group on its
+	// own stays in the menu, which scrolls: a submenu would only add a step.
+	const groupCount = menuFilters.length + ( hasSort ? 1 : 0 );
 	const optionCount =
 		menuFilters.reduce(
 			( count, filter ) => count + ( filter.elements?.length ?? 0 ),
 			0
 		) + ( hasSort ? sortableFields.length + SORTING_DIRECTIONS.length : 0 );
 
-	if ( optionCount > MAX_INLINE_OPTIONS ) {
+	if ( optionCount > MAX_INLINE_OPTIONS && groupCount > 1 ) {
 		sections.push( {
 			key: 'submenus',
 			content: (
