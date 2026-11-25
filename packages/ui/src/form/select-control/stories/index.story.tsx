@@ -169,6 +169,7 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
  * selected item. The popup keeps the standard item rendering.
  */
 export const WithCustomTrigger: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		...Default.args,
 		items: userOptions,

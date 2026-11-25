@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import BlockStyles from '../block-styles';
@@ -151,6 +151,13 @@ const StylesTab = ( {
 					<InspectorControls.Slot
 						group="border"
 						label={ __( 'Borders' ) }
+					/>
+					<InspectorControls.Slot
+						group="transform"
+						label={ _x(
+							'Transform',
+							'Visual transform styles such as rotate, move and scale'
+						) }
 					/>
 					<InspectorControls.Slot
 						group="elements"

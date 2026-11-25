@@ -98,8 +98,6 @@ export default function save( { attributes } ) {
 						alt={ alt }
 						src={ url }
 						style={ { objectPosition } }
-						data-object-fit="cover"
-						data-object-position={ objectPosition }
 					/>
 				) : (
 					<div
@@ -122,8 +120,6 @@ export default function save( { attributes } ) {
 					src={ url }
 					poster={ poster }
 					style={ { objectPosition } }
-					data-object-fit="cover"
-					data-object-position={ objectPosition }
 				/>
 			) }
 			{ isEmbedVideoBackground && url && (

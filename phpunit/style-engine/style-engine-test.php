@@ -305,6 +305,103 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_transform_rotate_style'          => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'rotate:-0.25turn;',
+					'declarations' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+			),
+
+			'inline_invalid_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '1 0 0 45deg',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => "45deg\n",
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_valid_transform_translate_style'       => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '-50%',
+							'y' => '1.5rem',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => '--wp--style--translate-x:-50%;--wp--style--translate-y:1.5rem;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+					'declarations' => array(
+						'--wp--style--translate-x' => '-50%',
+						'--wp--style--translate-y' => '1.5rem',
+						'translate'                => 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+					),
+				),
+			),
+
+			'inline_partial_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'y' => '10px',
+							'z' => '5px',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => '--wp--style--translate-y:10px;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+					'declarations' => array(
+						'--wp--style--translate-y' => '10px',
+						'translate'                => 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+					),
+				),
+			),
+
+			'inline_invalid_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '10px',
+							'y' => 'calc(1px + 2px)',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array( 'x' => "10px\n" ),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(
@@ -1024,6 +1121,43 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'border-top-style' => 'solid',
 					'padding-left'     => '1em',
 					'font-size'        => '12px',
+				),
+			),
+			gutenberg_style_engine_get_styles( $block_styles )
+		);
+	}
+
+	/**
+	 * Tests that a context with no store returns an empty stylesheet
+	 * instead of calling {@see WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_all_rules()} on null.
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_context
+	 */
+	public function test_should_return_empty_stylesheet_for_context_without_store(): void {
+		$this->assertSame( '', gutenberg_style_engine_get_stylesheet_from_context( 123 ) ); // @phpstan-ignore argument.type (An invalid context is what is tested.)
+	}
+
+	/**
+	 * Tests that a preset for an individual border side that matches none of its
+	 * CSS var patterns is left out of the returned declarations, not returned as empty.
+	 *
+	 * @covers ::gutenberg_style_engine_get_styles
+	 */
+	public function test_should_omit_unmatched_individual_preset_from_declarations(): void {
+		$block_styles = array(
+			'border' => array(
+				'top' => array(
+					'color' => 'var:preset|font-size|large',
+					'style' => 'solid',
+				),
+			),
+		);
+
+		$this->assertSame(
+			array(
+				'css'          => 'border-top-style:solid;',
+				'declarations' => array(
+					'border-top-style' => 'solid',
 				),
 			),
 			gutenberg_style_engine_get_styles( $block_styles )

@@ -1,6 +1,7 @@
 import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn, isReservedKey, jsonReviver } from './utils';
 import { type DirectiveEntry } from './hooks';
+import { unsupportedHtmlElements } from './html';
 
 /** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
 const htmlFallbacks = new WeakMap< object, DocumentFragment >();
@@ -283,6 +284,8 @@ export const getInteractiveNamespace = (
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
+ * Only supported `data-wp-html` entries on supported elements own opaque
+ * content; ignored HTML bindings leave descendants under ordinary conversion.
  *
  * Unprefixed directives get the namespace of the nearest `data-wp-interactive`
  * at or above their element within `root`. Where there is none, the namespace
@@ -474,12 +477,18 @@ function convertToVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		const hasDefaultHtmlDirective = props.__directives?.html?.some(
-			( { suffix }: DirectiveEntry ) => suffix === null
-		);
+		const hasSupportedHtmlDirective =
+			! unsupportedHtmlElements.has( localName ) &&
+			props.__directives?.html?.some(
+				( { suffix, uniqueId }: DirectiveEntry ) =>
+					suffix === null && uniqueId === null
+			);
 
-		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
-			// `data-wp-html` owns this element's content entirely — whether
+		if (
+			props.__directives?.[ 'each-child' ] ||
+			hasSupportedHtmlDirective
+		) {
+			// Supported `data-wp-html` owns this element's content entirely — whether
 			// that's still the server-rendered fallback or HTML the
 			// directive has since applied — so it's treated as opaque here,
 			// the same way `each-child` is: don't walk its children into
@@ -490,7 +499,7 @@ function convertToVdom( root: Node ): ComponentChild {
 				__html: elementNode.innerHTML,
 			};
 			props.dangerouslySetInnerHTML = htmlProps;
-			if ( hasDefaultHtmlDirective ) {
+			if ( hasSupportedHtmlDirective ) {
 				// Preserve a script-free snapshot in the live document's shared
 				// template-contents document. Importing directly there neither
 				// requests fallback resources nor keeps a parsed page alive.

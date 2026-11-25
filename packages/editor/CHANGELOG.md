@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### New Features
+
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+
+### Bug Fixes
+
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+-   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
+## 16.2.0 (2026-11-18)
+
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
@@ -11,6 +35,7 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
 -   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
@@ -25,6 +50,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Editor: Escape Openverse metadata in image captions.
 
 ### Internal
 
@@ -34,7 +60,6 @@
 
 ### New Features
 
--   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 -   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
 
 ### Enhancements
@@ -363,6 +388,12 @@
 
 ## 14.34.0 (2025-10-29)
 
+## 14.33.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)
@@ -391,6 +422,12 @@
 
 ## 14.20.0 (2025-03-13)
 
+## 14.19.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.19.0 (2025-02-28)
 
 ## 14.18.0 (2025-02-12)
@@ -417,6 +454,12 @@
 
 ## 14.9.0 (2024-10-03)
 
+## 14.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)
@@ -436,6 +479,12 @@
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)
+
+## 14.0.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 14.0.0 (2024-05-31)
 
@@ -462,6 +511,12 @@
 
 ## 13.29.0 (2024-02-21)
 
+## 13.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.28.0 (2024-02-09)
 
 ## 13.27.0 (2024-01-24)
@@ -484,6 +539,12 @@
 
 ## 13.20.0 (2023-10-05)
 
+## 13.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.19.0 (2023-09-20)
 
 ## 13.18.0 (2023-08-31)
@@ -497,6 +558,12 @@
 ## 13.14.0 (2023-07-05)
 
 ## 13.13.0 (2023-06-23)
+
+## 13.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.12.0 (2023-06-07)
 
@@ -515,6 +582,12 @@
 ## 13.5.0 (2023-03-01)
 
 ## 13.4.0 (2023-02-15)
+
+## 13.3.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.3.0 (2023-02-01)
 
