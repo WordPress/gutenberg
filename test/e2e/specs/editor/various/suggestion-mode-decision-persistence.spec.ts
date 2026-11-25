@@ -739,4 +739,72 @@ test.describe( 'Suggestion mode decisions are provisional until the post is save
 				.toEqual( [ 'hold', 'pending' ] );
 		} );
 	} );
+
+	test( 'the sidebar filter lists accepted and rejected suggestions', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		for ( const [ index, text ] of [ ' kept', ' dropped' ].entries() ) {
+			// The first block's toolbar covers the second, so no click.
+			await editor.selectBlocks( paragraphs.nth( index ) );
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( text );
+			await expect(
+				paragraphs.nth( index ).locator( 'mark.wp-suggestion-add' )
+			).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		}
+		await editor.saveDraft();
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		const keptThread = sidebar
+			.getByRole( 'treeitem' )
+			.filter( { hasText: 'kept' } );
+		const droppedThread = sidebar
+			.getByRole( 'treeitem' )
+			.filter( { hasText: 'dropped' } );
+		await keptThread
+			.getByRole( 'button', { name: 'Accept suggestion' } )
+			.click();
+		await droppedThread
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.click();
+		await editor.saveDraft();
+		// A reload clears the selection, which the filters always keep.
+		await page.reload();
+		await waitForEditor( page );
+		await openNotesSidebar( page );
+
+		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
+		await page
+			.getByRole( 'menuitemradio', { name: 'Accepted suggestions' } )
+			.click();
+		await expect( keptThread ).toBeVisible();
+		await expect( droppedThread ).toBeHidden();
+
+		await page
+			.getByRole( 'menuitemradio', { name: 'Rejected suggestions' } )
+			.click();
+		await expect( droppedThread ).toBeVisible();
+		await expect( keptThread ).toBeHidden();
+
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			sidebar.getByRole( 'button', {
+				name: 'Filter: Rejected suggestions',
+			} )
+		).toBeVisible();
+	} );
 } );
