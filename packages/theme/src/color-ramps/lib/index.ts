@@ -26,7 +26,12 @@ import {
 	BRAND_FOCUS_STEPS,
 	MINIMUM_NON_TEXT_CONTRAST,
 } from '../../semantic-color-contrast-pairs.ts';
-import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
+import {
+	BLACK,
+	WHITE,
+	CONTRAST_EPSILON,
+	MAX_BISECTION_ITERATIONS,
+} from './constants.ts';
 
 // Surface steps are swapped for darker ramps before exposing the public tokens.
 function getBrandSurfaceContrast( ramp: Ramp, mainDir: RampDirection ) {
@@ -430,7 +435,30 @@ export function buildRamp(
 		);
 
 		if ( passing ) {
-			// Primary samples already hold the complete ramp.
+			// The search can stop on a passing seed far from the supplied one,
+			// because another step's deficit is close to zero there. Narrow the
+			// gap to the closest passing seed. Primary samples hold the full ramp.
+			let failingL = seedL;
+			let passingL = get( passing.seed, [ OKLCH, 'l' ] );
+			for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
+				const l = ( failingL + passingL ) / 2;
+				const candidate = getSeedForL( l );
+				const { rampResults: ramp } = calculateRamp( {
+					seed: candidate,
+					sortedSteps,
+					config,
+					mainDir,
+					oppDir,
+					neutralSurface,
+					pinLightness,
+				} );
+				if ( meetsEmittedTargets( ramp, candidate ) ) {
+					passing = { seed: candidate, ramp };
+					passingL = l;
+				} else {
+					failingL = l;
+				}
+			}
 			bestRamp = passing.ramp;
 			seed = passing.seed;
 		} else {

@@ -133,7 +133,7 @@ describe( 'useThemeProviderStyles', () => {
 				result.current.themeProviderStyles[
 					'--wpds-color-background-interactive-brand-strong'
 				]
-			).toBe( '#128af8' );
+			).toBe( '#148af9' );
 		} );
 
 		it( 'keeps white legacy accent text when it fits the legacy accent', () => {

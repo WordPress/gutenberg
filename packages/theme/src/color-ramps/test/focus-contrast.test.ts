@@ -91,10 +91,26 @@ describe( 'accent focus contrast', () => {
 	} );
 
 	it( 'keeps the passing seed closest to the supplied one', () => {
-		expect(
-			buildAccentRamp( 'primary', '#fae95b', buildBgRamp( '#e7fe44' ) )
-				.ramp.bgFill1
-		).toBe( '#968400' );
+		const { ramp, warnings } = buildAccentRamp(
+			'primary',
+			'#fae95b',
+			buildBgRamp( '#e7fe44' )
+		);
+		expect( warnings ).toBeUndefined();
+		expect( ramp.bgFill1 ).toBe( '#958500' );
+	} );
+
+	it( 'moves neighboring near-black seeds to the same nearby fill', () => {
+		const neutral = buildBgRamp( '#fcfcfc' );
+		for ( const seed of [ '#1d1d1d', '#1e1e1e' ] ) {
+			const { ramp, warnings } = buildAccentRamp(
+				'primary',
+				seed,
+				neutral
+			);
+			expect( warnings ).toBeUndefined();
+			expect( ramp.bgFill1 ).toBe( '#2c2c2c' );
+		}
 	} );
 
 	it( 'keeps a stroke target when gamut mapping lowers the searched color', () => {
