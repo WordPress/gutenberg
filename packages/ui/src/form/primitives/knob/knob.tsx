@@ -11,6 +11,7 @@ import {
 	DOT_RADIUS,
 	VIEW_SIZE,
 	clamp,
+	crossesCenter,
 	getDial,
 	getPointer,
 	getStepChange,
@@ -21,25 +22,23 @@ import styles from './style.module.scss';
 
 type Gesture = {
 	pointerId: number;
-	// The heading of the last pointer position, or null at the center.
-	pointerAngle: number | null;
+	// The last pointer position on the screen. The dial can move under it.
+	clientX: number;
+	clientY: number;
 	// The angle the gesture has turned the dial to, counted across turns. It
 	// is null until the first move or the release.
 	dialAngle: number | null;
 	// The step the gesture last selected, or null before it selects one.
 	index: number | null;
-	// Whether the press landed on the dot. It then takes hold of the dot where
-	// it is, and only turning moves it.
-	onDot: boolean;
+	// The dial angle when the press landed on the dot, or null when it landed
+	// elsewhere. A press on the dot takes hold of it where it is, so only
+	// turning moves it.
+	grabbedAt: number | null;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
 // range input inside the dial so its focus target matches what is on screen.
 const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
-
-// The largest turn, in degrees, that one pointer move can add. A larger jump
-// means the pointer cut across the dial instead of going around it.
-const CUT_ACROSS = 120;
 
 /**
  * A dial for choosing an angle. It sits beside an input that shows the exact
@@ -86,6 +85,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			lastStep,
 			firstAngle,
 			lastAngle,
+			stepAngle,
 			toValue,
 			toIndex,
 			toAngle,
@@ -123,9 +123,14 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				pointerAngle +
 				360 * Math.round( ( start - pointerAngle ) / 360 );
 			// Take the turn that has this heading, or else the one that
-			// brings it closest to an end.
+			// brings it closest to an end. A heading that rounds to an end
+			// counts as within the range.
 			const outside = ( dialAngle: number ) =>
-				Math.max( firstAngle - dialAngle, dialAngle - lastAngle, 0 );
+				Math.max(
+					firstAngle - dialAngle - stepAngle / 2,
+					dialAngle - lastAngle - stepAngle / 2,
+					0
+				);
 			return [ nearest - 360, nearest + 360 ].reduce(
 				( best, candidate ) =>
 					outside( candidate ) < outside( best ) ? candidate : best,
@@ -147,13 +152,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// The value changes once the pointer moves or lifts, so a
 			// canceled press leaves it alone. The turn is chosen then too:
 			// focusing the dial below can make a paired field commit a value.
-			const { angle: pointerAngle, onDot } = getPointer( event, angle );
 			gesture.current = {
 				pointerId: event.pointerId,
-				pointerAngle,
+				clientX: event.clientX,
+				clientY: event.clientY,
 				dialAngle: null,
 				index: null,
-				onDot,
+				grabbedAt: getPointer( event.currentTarget, event, angle ).onDot
+					? angle
+					: null,
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
@@ -173,44 +180,41 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const isRelease = event.type === 'pointerup';
-			const { angle: pointerAngle, inside } = getPointer( event, angle );
-			if ( pointerAngle === null ) {
-				// There is no heading at the center. Pick one afresh when
-				// the pointer leaves it.
-				current.pointerAngle = null;
+			const pointer = getPointer( event.currentTarget, event, angle );
+			// A tap that has selected nothing is dropped when the pointer
+			// lifts outside the dial.
+			if ( isRelease && current.index === null && ! pointer.inside ) {
 				return;
 			}
-			if ( pointerAngle === current.pointerAngle ) {
-				// A pen reports changes in pressure as moves at the same
-				// point. They leave a pending tap alone.
-				if ( ! isRelease ) {
-					return;
-				}
-				// A tap that has selected nothing is dropped when the
-				// pointer lifts outside the dial.
-				if ( current.index === null && ! inside ) {
-					return;
-				}
+			const previous = getPointer( event.currentTarget, current, angle );
+			// A move that keeps the heading turns nothing, so it leaves a
+			// pending tap alone. A pen reports changes in pressure this way.
+			if ( ! isRelease && pointer.angle === previous.angle ) {
+				return;
+			}
+			current.clientX = event.clientX;
+			current.clientY = event.clientY;
+			if ( pointer.angle === null ) {
+				return;
 			}
 			let from = current.dialAngle;
 			if ( from === null ) {
+				// Start from the dot while it is still where the press took
+				// hold of it. Otherwise start from the heading of the press.
 				from =
-					current.onDot || current.pointerAngle === null
+					previous.angle === null || current.grabbedAt === angle
 						? angle
-						: getDialAngle( current.pointerAngle, angle );
+						: getDialAngle( previous.angle, angle );
 			}
-			const turned =
-				current.pointerAngle === null
-					? null
-					: modulo( pointerAngle - current.pointerAngle + 180, 360 ) -
-						180;
 			// A drag turns the dial the shorter way round, so the turn count
-			// carries across twelve o'clock. A move out of the center, or one
-			// that cuts across the dial, names a new heading.
+			// carries across twelve o'clock. A move that cuts across the dial
+			// names a new heading.
 			let dialAngle =
-				turned === null || Math.abs( turned ) > CUT_ACROSS
-					? getDialAngle( pointerAngle, from )
-					: from + turned;
+				previous.angle === null || crossesCenter( previous, pointer )
+					? getDialAngle( pointer.angle, from )
+					: from +
+						modulo( pointer.angle - previous.angle + 180, 360 ) -
+						180;
 			if ( ! wraps ) {
 				// Past an end, keep less than a turn. The dot then meets the
 				// pointer as soon as it comes back round to that end.
@@ -219,7 +223,6 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				dialAngle -= 360 * Math.trunc( beyond / 360 );
 			}
 			current.dialAngle = dialAngle;
-			current.pointerAngle = pointerAngle;
 			const nextIndex = fromAngle( dialAngle );
 			// Compare with the step this gesture last selected. The value
 			// prop can lag behind it while a parent has yet to update.
@@ -266,9 +269,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						className
 					) }
 					min={ toValue( 0 ) }
-					// Base UI hides the thumb when its range is empty, so a
-					// single selectable value still gets a range of one step.
-					max={ toValue( Math.max( lastStep, 1 ) ) }
+					max={ toValue( lastStep ) }
 					step={ step }
 					largeStep={ Number(
 						( largeStepCount * step ).toFixed( precision )

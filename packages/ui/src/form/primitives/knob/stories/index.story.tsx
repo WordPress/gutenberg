@@ -33,7 +33,7 @@ const DEGREES = {
  */
 export const WithNumberInput: Story = {
 	args: { format: DEGREES },
-	render: function GradientAngle( { onValueChange, name, ...args } ) {
+	render: function GradientAngle( { onValueChange, name, form, ...args } ) {
 		const [ angle, setAngle ] = useState( 135 );
 		const [ draft, setDraft ] = useState< string >();
 		return (
@@ -41,6 +41,7 @@ export const WithNumberInput: Story = {
 				<InputControl
 					label="Gradient angle"
 					name={ name }
+					form={ form }
 					type="number"
 					suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 					disabled={ args.disabled }
@@ -79,7 +80,7 @@ export const Disabled: Story = {
  */
 export const WithInheritedValue: Story = {
 	args: { min: -720, max: 720, format: DEGREES },
-	render: function Rotation( { onValueChange, name, ...args } ) {
+	render: function Rotation( { onValueChange, name, form, ...args } ) {
 		const inherited = 45;
 		const numberHelpId = useId();
 		const dialHelpId = useId();
@@ -91,6 +92,7 @@ export const WithInheritedValue: Story = {
 					<InputControl
 						label="Rotation"
 						name={ name }
+						form={ form }
 						type="number"
 						suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 						min={ args.min }

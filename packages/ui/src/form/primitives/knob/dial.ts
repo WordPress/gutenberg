@@ -87,6 +87,7 @@ export function getDial( {
 		lastStep,
 		firstAngle: toAngle( 0 ),
 		lastAngle: toAngle( lastStep ),
+		stepAngle: ( step / unitsPerTurn ) * 360,
 		toValue,
 		toIndex,
 		toAngle,
@@ -103,35 +104,56 @@ export const DOT_RADIUS = 4;
 // How far from the center of the dot a press still lands on it. The slack
 // around the dot allows for a fingertip.
 const DOT_REACH = 6;
+// The middle of the dial, where a pointer has no meaningful heading.
+const CENTER_RADIUS = 5;
 
-// Where the pointer is on the dial. `angle` is its clockwise angle from twelve
-// o'clock, between -180 and 180 degrees, or null at the center, which has no
-// meaningful angle. `onDot` says whether it is on the dot at `dialAngle`.
+// Where a position on the screen is on the dial. `x` and `y` are measured from
+// the center in the units the dial is drawn in. `angle` is the clockwise angle
+// from twelve o'clock, between -180 and 180 degrees, or null in the middle.
+// `onDot` says whether the position is on the dot at `dialAngle`.
 export function getPointer(
-	event: React.PointerEvent< HTMLElement >,
+	dial: HTMLElement,
+	{ clientX, clientY }: { clientX: number; clientY: number },
 	dialAngle: number
 ) {
-	const { left, top, width, height } =
-		event.currentTarget.getBoundingClientRect();
-	const x = event.clientX - left - width / 2;
-	const y = event.clientY - top - height / 2;
+	const { left, top, width, height } = dial.getBoundingClientRect();
+	const unit = Math.min( width, height ) / VIEW_SIZE;
+	const x = ( clientX - left - width / 2 ) / unit;
+	const y = ( clientY - top - height / 2 ) / unit;
 	const distance = Math.hypot( x, y );
-	const radius = Math.min( width, height ) / 2;
-	const unit = ( 2 * radius ) / VIEW_SIZE;
 	const heading = ( dialAngle * Math.PI ) / 180;
 	return {
+		x,
+		y,
 		angle:
-			distance < radius / 4
+			distance < CENTER_RADIUS
 				? null
 				: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
-		inside: distance <= radius,
+		inside: distance <= VIEW_SIZE / 2,
 		onDot:
 			Math.hypot(
-				x - DOT_OFFSET * unit * Math.sin( heading ),
-				y + DOT_OFFSET * unit * Math.cos( heading )
-			) <=
-			DOT_REACH * unit,
+				x - DOT_OFFSET * Math.sin( heading ),
+				y + DOT_OFFSET * Math.cos( heading )
+			) <= DOT_REACH,
 	};
+}
+
+type Point = { x: number; y: number };
+
+// Whether the straight path between two pointer positions passes through the
+// middle of the dial. The pointer then cut across the dial instead of going
+// around it, however few positions the browser reported on the way.
+export function crossesCenter( from: Point, to: Point ) {
+	const dx = to.x - from.x;
+	const dy = to.y - from.y;
+	const length = dx * dx + dy * dy;
+	const along =
+		length === 0
+			? 0
+			: clamp( -( from.x * dx + from.y * dy ) / length, 0, 1 );
+	return (
+		Math.hypot( from.x + along * dx, from.y + along * dy ) < CENTER_RADIUS
+	);
 }
 
 export function getStepChange(
