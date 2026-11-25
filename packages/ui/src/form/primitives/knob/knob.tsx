@@ -1,7 +1,13 @@
 import { Slider } from '@base-ui/react/slider';
 import clsx from 'clsx';
 import { useEvent, useMergeRefs } from '@wordpress/compose';
-import { flushSync, forwardRef, useRef, useState } from '@wordpress/element';
+import {
+	flushSync,
+	forwardRef,
+	useCallback,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
@@ -32,6 +38,7 @@ type Gesture = {
 	heading: number | null;
 	// The unsnapped position in steps, counted across turns and past stops.
 	position: number;
+	stepsPerTurn: number;
 	// The step the gesture last selected, or the step the dial showed when
 	// it began.
 	step: number;
@@ -85,6 +92,10 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const input = useRef< HTMLInputElement >( null );
 		const mergedInputRef = useMergeRefs( [ input, inputRef ] );
 		const gesture = useRef< Gesture | null >( null );
+		// A removed capture target can lose capture on the document instead.
+		const resetGestureOnThumbChange = useCallback( () => {
+			gesture.current = null;
+		}, [] );
 		const {
 			wraps,
 			stepsPerTurn: perTurn,
@@ -102,6 +113,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		// The step the dial shows, and where its dot points.
 		const shown = snap( shownValue );
 		const angle = toAngle( shown );
+		const selection = {
+			stepsPerTurn: perTurn,
+			reference: shownValue,
+			step: shown,
+			offStep: isEmpty || shown !== shownValue,
+		};
 
 		function select( next: number ) {
 			if ( value === undefined ) {
@@ -149,10 +166,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				gesture.current = {
 					pointerId: event.pointerId,
 					...pointer,
+					...selection,
 					position: turnsTo ?? shown,
-					reference: shownValue,
-					step: shown,
-					offStep: isEmpty || shown !== shownValue,
 				};
 				// A press on a heading names it. So does any press on an
 				// empty dial, which sets the value it shows.
@@ -193,6 +208,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				! input.current?.matches( ':enabled' )
 			) {
 				return;
+			}
+			// A unit change keeps the angle of the drag, including any
+			// distance past a stop. Report its next step in the new unit.
+			if ( current.stepsPerTurn !== perTurn ) {
+				current.position =
+					( current.position / current.stepsPerTurn ) * perTurn;
+				Object.assign( current, selection );
 			}
 			const previousStep = current.step;
 			const wasOffStep = current.offStep;
@@ -295,6 +317,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					} }
 				>
 					<Slider.Thumb
+						ref={ resetGestureOnThumbChange }
 						className={ styles.thumb }
 						style={ THUMB_STYLE }
 						data-empty={ isEmpty ? '' : undefined }

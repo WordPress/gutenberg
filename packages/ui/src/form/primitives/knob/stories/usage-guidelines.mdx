@@ -58,7 +58,7 @@ The dial follows these rules. Each one is a function of the press, the path of t
 4. Past an end of a bounded dial, the dot waits at that end until the pointer comes back round to it.
 5. A move straight through the middle of the dial has no way round. It selects the heading it lands on, as a press does, on the turn nearest to the value or to the step the gesture last selected. Positions inside the middle are skipped.
 6. The value changes while the pointer moves. Lifting the pointer ends the gesture and keeps the value, and so does a canceled gesture. A pen ends it when its tip lifts, even with another button held. To undo a change, turn back or use the input.
-7. A press moves focus to the dial before the gesture starts. A paired field that commits when it loses focus has then committed, and the press uses the value, the range, and the unit that result. If the field removes or replaces the pressed element, that press ends.
+7. A press moves focus to the dial before the gesture starts. A paired field that commits when it loses focus has then committed, and the press uses the value, the range, and the unit that result. If the unit changes during a drag, the drag keeps its angle. Removing or replacing the pressed element ends the gesture.
 8. An empty dial sets a value on its first press. A press on its dot sets the value the dot points to.
 
 Two of these rules are decisions that a review may question:

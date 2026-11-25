@@ -558,6 +558,68 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 	} );
 
+	it( 'keeps the angle when the number of steps per turn changes during a drag', async () => {
+		const onValueChange = vi.fn();
+		const quarterTurn = ( stepsPerTurn: number ) => (
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 2 * stepsPerTurn }
+					stepsPerTurn={ stepsPerTurn }
+					value={ stepsPerTurn / 4 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const { rerender } = await render( quarterTurn( 360 ) );
+		const dial = page.getByRole( 'group' );
+		const { at, bottom } = getPoints( dial );
+		const dot = at( 30, 20 );
+		await userEvent.pointer( {
+			target: dial,
+			coords: dot,
+			keys: '[MouseLeft>]',
+		} );
+		await rerender( quarterTurn( 100 ) );
+		await userEvent.pointer( [
+			{ target: dial, coords: bottom },
+			{ target: dial, coords: dot },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange.mock.calls ).toEqual( [ [ 50 ], [ 25 ] ] );
+	} );
+
+	it( 'ends the drag when a value change replaces the captured thumb', async () => {
+		const onValueChange = vi.fn();
+		function Rotation() {
+			const [ value, setValue ] = useState( 0 );
+			return (
+				<ThemeProvider isRoot>
+					<Knob
+						aria-label="Rotation"
+						render={ value ? <section /> : <div /> }
+						value={ value }
+						onValueChange={ ( next ) => {
+							onValueChange( next );
+							setValue( next );
+						} }
+					/>
+				</ThemeProvider>
+			);
+		}
+		await render( <Rotation /> );
+		const dial = page.getByRole( 'group' );
+		const { right, bottom, left } = getPoints( dial );
+		await userEvent.pointer( [
+			{ target: dial, coords: right, keys: '[MouseLeft>]' },
+			{ target: dial, coords: bottom },
+			'[/MouseLeft]',
+		] );
+		await dial.click( { position: left } );
+		expect( onValueChange.mock.calls ).toEqual( [ [ 90 ], [ 270 ] ] );
+	} );
+
 	it( 'stops turning once the pointer is no longer pressed, even if it stays captured', async () => {
 		const onValueChange = vi.fn();
 		await render(
