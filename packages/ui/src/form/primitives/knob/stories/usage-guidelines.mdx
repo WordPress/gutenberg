@@ -34,7 +34,9 @@ Set `min` and `max` together, in steps, when the number of turns matters. The ra
 
 ### Show other units
 
-The dial knows no units and no decimals. The control around it converts. When a unit divides a turn into whole steps, give the dial that many steps per turn: a field from 0 to 1 turn in steps of 0.01 pairs with `stepsPerTurn={ 100 }` and a range of 0 to 100, and its value is the dial's value divided by 100. When it does not, as with a hundredth of a radian, keep the dial in degrees and convert through the angle. A 40px dial cannot point more finely than about a degree in any case.
+For a field from 0 to 1 turn in increments of 0.01, use `stepsPerTurn={ 100 }` and a dial range of 0 to 100. Divide the dial value by 100 to get the field value. For increments of 0.1, use 10 steps per turn and divide by 10.
+
+A full turn contains a fractional number of hundredths of a radian. The example below keeps the dial in degrees for radians and lets the field keep its precision. It uses the field's displayed value and unit for the dial's `aria-valuetext`.
 
 <Canvas of={ KnobStories.WithUnits } />
 

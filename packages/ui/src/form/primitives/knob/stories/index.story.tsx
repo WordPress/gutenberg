@@ -14,6 +14,7 @@ const meta: Meta< typeof Knob > = {
 	component: Knob,
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+		stepsPerTurn: { control: false },
 		value: { control: false },
 	},
 };
@@ -56,6 +57,7 @@ export const WithNumberInput: Story = {
 				/>
 				<Knob
 					{ ...args }
+					stepsPerTurn={ 360 }
 					aria-label="Gradient angle dial"
 					value={ angle }
 					onValueChange={ ( next ) => {
@@ -115,6 +117,7 @@ export const WithInheritedValue: Story = {
 					/>
 					<Knob
 						{ ...args }
+						stepsPerTurn={ 360 }
 						aria-label="Rotation dial"
 						aria-describedby={ dialHelpId }
 						value={ rotation }
@@ -153,38 +156,15 @@ export const WithInheritedValue: Story = {
 	},
 };
 
-// How each unit shows a rotation, and how many steps the dial takes per turn
-// for it. Degrees, gradians, and hundredths of a turn divide a turn into whole
-// steps, so the dial counts in them. A hundredth of a radian does not, so the
-// dial stays in degrees for it.
 const UNITS = [
-	{
-		value: 'deg',
-		label: 'deg',
-		unitsPerTurn: 360,
-		step: 1,
-		stepsPerTurn: 360,
-	},
-	{
-		value: 'grad',
-		label: 'grad',
-		unitsPerTurn: 400,
-		step: 1,
-		stepsPerTurn: 400,
-	},
-	{
-		value: 'turn',
-		label: 'turn',
-		unitsPerTurn: 1,
-		step: 0.01,
-		stepsPerTurn: 100,
-	},
+	{ value: 'deg', label: 'deg', unitsPerTurn: 360, stepsPerUnit: 1 },
+	{ value: 'grad', label: 'grad', unitsPerTurn: 400, stepsPerUnit: 1 },
+	{ value: 'turn', label: 'turn', unitsPerTurn: 1, stepsPerUnit: 100 },
 	{
 		value: 'rad',
 		label: 'rad',
 		unitsPerTurn: 2 * Math.PI,
-		step: 0.01,
-		stepsPerTurn: 360,
+		stepsPerUnit: 100,
 	},
 ];
 
@@ -202,26 +182,19 @@ export const WithUnits: Story = {
 		// Keep the rotation in turns, so changing the unit never rounds it.
 		const [ turns, setTurns ] = useState( 0.25 );
 		const [ draft, setDraft ] = useState< string >();
-		// A number of turns in the chosen unit, on its step grid.
-		const inUnit = ( amount: number ) =>
-			Number(
-				(
-					Math.round( ( amount * unit.unitsPerTurn ) / unit.step ) *
-					unit.step
-				).toFixed( 2 )
-			);
-		// Two turns either way, rounded down to a whole number of steps so that
-		// zero stays selectable.
-		const limit = Number(
-			(
-				Math.floor( ( 2 * unit.unitsPerTurn ) / unit.step ) * unit.step
-			).toFixed( 2 )
-		);
-		// What the field shows for a number of turns: on the step grid, and
-		// within the limits.
-		const shownAs = ( amount: number ) =>
-			Math.min( limit, Math.max( -limit, inUnit( amount ) ) );
-		const rotation = shownAs( turns );
+		// Use the same steps for both controls when they divide a full turn.
+		// A turn contains a fractional number of hundredths of a radian, so
+		// the dial uses degrees in that case.
+		const fieldStepsPerTurn = unit.unitsPerTurn * unit.stepsPerUnit;
+		const dialStepsPerTurn = Number.isInteger( fieldStepsPerTurn )
+			? fieldStepsPerTurn
+			: 360;
+		const maxFieldSteps = Math.floor( 2 * fieldStepsPerTurn );
+		const fieldSteps = Math.round( turns * fieldStepsPerTurn );
+		const rotation =
+			Math.max( -maxFieldSteps, Math.min( maxFieldSteps, fieldSteps ) ) /
+			unit.stepsPerUnit;
+		const limit = maxFieldSteps / unit.stepsPerUnit;
 		return (
 			<Stack direction="row" gap="sm" align="flex-end">
 				<InputControl
@@ -229,7 +202,7 @@ export const WithUnits: Story = {
 					type="number"
 					min={ -limit }
 					max={ limit }
-					step={ unit.step }
+					step={ 1 / unit.stepsPerUnit }
 					value={ draft ?? rotation }
 					onChange={ ( { currentTarget } ) => {
 						setDraft( currentTarget.value );
@@ -260,15 +233,13 @@ export const WithUnits: Story = {
 				/>
 				<Knob
 					aria-label="Rotation dial"
-					min={ -2 * unit.stepsPerTurn }
-					max={ 2 * unit.stepsPerTurn }
-					stepsPerTurn={ unit.stepsPerTurn }
-					getAriaValueText={ ( _formatted, steps ) =>
-						`${ shownAs( steps / unit.stepsPerTurn ) } ${ unit.label }`
-					}
-					value={ turns * unit.stepsPerTurn }
+					min={ -2 * dialStepsPerTurn }
+					max={ 2 * dialStepsPerTurn }
+					stepsPerTurn={ dialStepsPerTurn }
+					aria-valuetext={ `${ rotation } ${ unit.label }` }
+					value={ turns * dialStepsPerTurn }
 					onValueChange={ ( steps ) =>
-						setTurns( steps / unit.stepsPerTurn )
+						setTurns( steps / dialStepsPerTurn )
 					}
 				/>
 			</Stack>
