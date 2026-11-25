@@ -180,12 +180,43 @@ export function isPatternInCategory(
 	return !! pattern.categories?.includes( category );
 }
 
-// The sources in the order they are offered, the default one first.
+/**
+ * The source for the patterns the current user made. Unlike the others it is
+ * not a place patterns come from, but a part of the site's own patterns.
+ */
+export const MY_PATTERNS_SOURCE = 'currentUser';
+
+// The sources in the order they are offered: from the farthest from the person
+// editing to the closest.
 const PATTERN_SOURCES = [
-	INSERTER_PATTERN_TYPES.theme,
 	INSERTER_PATTERN_TYPES.directory,
+	INSERTER_PATTERN_TYPES.theme,
 	INSERTER_PATTERN_TYPES.user,
+	MY_PATTERNS_SOURCE,
 ];
+
+/**
+ * Whether a pattern belongs to a source, and to the type selected within it.
+ *
+ * @param pattern    The pattern to check.
+ * @param source     The source, or anything else for all of them.
+ * @param syncFilter The type of pattern to keep, synced or not, if any.
+ * @return Whether the pattern belongs to the source.
+ */
+export function isPatternInSource(
+	pattern: BlockPattern,
+	source: string,
+	syncFilter?: string
+) {
+	return source === MY_PATTERNS_SOURCE
+		? ! isPatternFiltered(
+				pattern,
+				INSERTER_PATTERN_TYPES.user,
+				syncFilter,
+				INSERTER_AUTHOR_TYPES.currentUser
+			)
+		: ! isPatternFiltered( pattern, source, syncFilter );
+}
 
 /**
  * Returns the sources that have patterns, each with the categories it fills,
@@ -198,6 +229,10 @@ const PATTERN_SOURCES = [
  * The site's own patterns are the "user" source, so the category that stands
  * for them isn't listed again.
  *
+ * The current user's patterns are a source only while they are some of the
+ * site's patterns and not all of them. Otherwise the two sources would list
+ * the same, which is the case on every site with a single author.
+ *
  * @param patterns   The patterns that can be inserted.
  * @param categories The categories with patterns, of any source.
  * @return The categories of each source.
@@ -207,11 +242,20 @@ export function getCategoriesBySource(
 	categories: PatternCategory[]
 ): Map< string, PatternCategory[] > {
 	const categoriesBySource = new Map< string, PatternCategory[] >();
+	const sitePatternCount = patterns.filter( ( pattern ) =>
+		isPatternInSource( pattern, INSERTER_PATTERN_TYPES.user )
+	).length;
 	PATTERN_SOURCES.forEach( ( source ) => {
-		const sourcePatterns = patterns.filter(
-			( pattern ) => ! isPatternFiltered( pattern, source )
+		const sourcePatterns = patterns.filter( ( pattern ) =>
+			isPatternInSource( pattern, source )
 		);
 		if ( ! sourcePatterns.length ) {
+			return;
+		}
+		if (
+			source === MY_PATTERNS_SOURCE &&
+			sourcePatterns.length === sitePatternCount
+		) {
 			return;
 		}
 		categoriesBySource.set(

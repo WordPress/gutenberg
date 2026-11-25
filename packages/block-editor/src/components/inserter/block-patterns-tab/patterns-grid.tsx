@@ -22,10 +22,11 @@ import InserterNoResults from '../no-results';
 import {
 	allPatternsCategory,
 	getCategoriesBySource,
-	isPatternFiltered,
 	isPatternInCategory,
+	isPatternInSource,
 	INSERTER_PATTERN_TYPES,
 	INSERTER_SYNC_TYPES,
+	MY_PATTERNS_SOURCE,
 } from './utils';
 import type { BlockPattern } from '../../../store/types';
 import type { InsertPattern, PatternCategory } from '../types';
@@ -61,22 +62,34 @@ const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
 const MENU_EXCLUDED_FIELDS = [ 'category' ];
 const MENU_REQUIRED_FIELDS = [ 'source' ];
 
-// Where patterns come from, the default first. The patterns that themes and
-// plugins register are one source, whatever registered them.
+// Where patterns come from, from the farthest from the person editing to the
+// closest. The patterns that themes and plugins register are one source,
+// whatever registered them, and the default one. The last option is not a
+// place of its own: it is the part of the site's patterns that the current
+// user made.
 const getSourceOptions = () => [
-	{
-		value: INSERTER_PATTERN_TYPES.theme,
-		label: __( 'Theme & Plugins' ),
-	},
 	{
 		value: INSERTER_PATTERN_TYPES.directory,
 		label: __( 'Pattern Directory' ),
 	},
 	{
+		value: INSERTER_PATTERN_TYPES.theme,
+		label: __( 'Theme & Plugins' ),
+	},
+	{
 		value: INSERTER_PATTERN_TYPES.user,
-		label: __( 'User' ),
+		label: __( 'Site patterns' ),
+	},
+	{
+		value: MY_PATTERNS_SOURCE,
+		label: __( 'My patterns' ),
 	},
 ];
+
+// The sources whose patterns are made on the site, the only ones that can be
+// synced.
+const isSiteSource = ( source: string | undefined ) =>
+	source === INSERTER_PATTERN_TYPES.user || source === MY_PATTERNS_SOURCE;
 
 const NO_CATEGORIES: PatternCategory[] = [];
 
@@ -224,7 +237,7 @@ export default function PatternsGrid( {
 		? selectedCategory
 		: undefined;
 	// Only the patterns made on this site can be synced.
-	const hasTypes = source === INSERTER_PATTERN_TYPES.user;
+	const hasTypes = isSiteSource( source );
 	const syncStatus = hasTypes ? selectedType : undefined;
 
 	// The grid only shows what it is given: the filtering keeps the rules
@@ -232,7 +245,7 @@ export default function PatternsGrid( {
 	const patterns = useMemo( () => {
 		const inCategory = allPatterns.filter(
 			( pattern: BlockPattern ) =>
-				! isPatternFiltered(
+				isPatternInSource(
 					pattern,
 					source ?? 'all',
 					syncStatus ?? 'all'
@@ -410,7 +423,7 @@ export default function PatternsGrid( {
 			}
 			setSelectedCategory( nextCategory );
 			setSelectedType(
-				nextSource === INSERTER_PATTERN_TYPES.user
+				isSiteSource( nextSource )
 					? getFilterValue( nextView.filters, 'syncStatus' )
 					: undefined
 			);
