@@ -156,13 +156,7 @@ function UnforwardedMoreMenuItem(
 			);
 		} else {
 			// Preserve support for Dashicon slugs and custom icon components.
-			// The SVG of a component is out of reach, so its fill is defaulted
-			// in CSS instead.
-			prefix = (
-				<span className="editor-more-menu-item__prefix-icon">
-					<WCIcon icon={ icon } />
-				</span>
-			);
+			prefix = <WCIcon icon={ icon } />;
 		}
 	}
 	const itemShortcut = adaptShortcut( shortcut );
