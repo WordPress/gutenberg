@@ -64,7 +64,6 @@ export default function useInspectorControlsTabs(
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
-	// Keep this list in sync with the groups rendered by `StylesTab`.
 	const styleFills = [
 		...( useSlotFills( backgroundGroup.name ) || [] ),
 		...( useSlotFills( borderGroup.name ) || [] ),
