@@ -4,14 +4,21 @@ on:
     pull_request:
         paths:
             - 'packages/wp-build/**'
-            - 'packages/browserslist-config/package.json'
-            - 'packages/style-runtime/package.json'
-            - 'packages/theme-build-tools/package.json'
+            - 'packages/browserslist-config/**'
+            - 'packages/style-runtime/**'
+            - 'packages/theme-build-tools/**'
             - 'tools/validation/fixtures/wp-build-consumer/**'
             - 'tools/validation/pack-workspace-package.ts'
             - 'tools/validation/test-wp-build-consumer.sh'
             - '.github/workflows/wp-build-consumer.yml'
     workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 permissions: {}
 

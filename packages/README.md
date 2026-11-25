@@ -410,7 +410,7 @@ Ensure that the `build-types` directory will be included in the published packag
 
 WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required version of Node.js is specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
-When type-checking a published Node.js tool, use the `@types/node` major that matches its oldest supported Node.js major. Repository-only tools can use the development Node.js version. The [`@wordpress/build` consumer test](../.github/workflows/wp-build-consumer.yml) also builds a plugin on the exact minimum runtime to catch calls to APIs added later in the same major, including calls in JavaScript outside the type check.
+When type-checking a published Node.js tool, use the `@types/node` major that matches its oldest supported Node.js major, and add the package to the matching group in [`syncpack.config.mjs`](../syncpack.config.mjs). Repository-only tools can use the development Node.js version. The [`@wordpress/build` consumer test](../.github/workflows/wp-build-consumer.yml) also builds a small plugin on the exact minimum runtime. It catches calls to APIs added later in the same major on the code paths that build runs, including JavaScript outside the type check.
 
 ## Optimizing for bundlers
 
