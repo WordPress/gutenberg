@@ -23,28 +23,11 @@ import type {
 	ReferenceName,
 } from './types.ts';
 import {
-	BRAND_FOCUS_STEPS,
-	MINIMUM_NON_TEXT_CONTRAST,
-} from '../../semantic-color-contrast-pairs.ts';
-import {
 	BLACK,
 	WHITE,
 	CONTRAST_EPSILON,
 	MAX_BISECTION_ITERATIONS,
 } from './constants.ts';
-
-// Surface steps are swapped for darker ramps before exposing the public tokens.
-function getBrandSurfaceContrast( ramp: Ramp, mainDir: RampDirection ) {
-	const brandSurface = mainDir === 'lighter' ? ramp.surface1 : ramp.surface3;
-	const focusSteps = Object.keys(
-		BRAND_FOCUS_STEPS
-	) as ( keyof typeof BRAND_FOCUS_STEPS )[];
-	return Math.min(
-		...focusSteps.map( ( step ) =>
-			getContrast( ramp[ step ], brandSurface )
-		)
-	);
-}
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -261,20 +244,6 @@ function calculateRamp( {
 		rampResults[ stepName ] = getColorString( color );
 	}
 
-	// The brand surface depends on the fill seed. Check their relationship
-	// after both exist so seed bisection can resolve it without a cycle.
-	if ( neutralSurface ) {
-		const contrast = getBrandSurfaceContrast( rampResults, mainDir );
-		const deficit = Math.log(
-			adjustContrastTarget( MINIMUM_NON_TEXT_CONTRAST ) / contrast
-		);
-		if ( deficit > maxDeficit ) {
-			maxDeficit = deficit;
-			maxDeficitDirection = oppDir;
-			maxDeficitStep = 'bgFill1' as const;
-		}
-	}
-
 	return {
 		rampResults,
 		maxDeficit,
@@ -364,14 +333,6 @@ export function buildRamp(
 		} );
 	}
 
-	function meetsEmittedTargets( ramp: Ramp, candidate: PlainColorObject ) {
-		return (
-			getBrandSurfaceContrast( ramp, mainDir ) >=
-				MINIMUM_NON_TEXT_CONTRAST &&
-			getWarnings( ramp, candidate ).length === 0
-		);
-	}
-
 	let bestRamp = rampResults;
 
 	if (
@@ -379,15 +340,13 @@ export function buildRamp(
 		rescaleToFitContrastTargets &&
 		// A rounding reserve helps the numerical search. An already emitted
 		// primary ramp only needs to meet the actual contrast targets.
-		( ! neutralSurface || ! meetsEmittedTargets( rampResults, seed ) )
+		( ! neutralSurface || getWarnings( rampResults, seed ).length > 0 )
 	) {
 		const iterSteps = neutralSurface
 			? sortedSteps
 			: stepsForStep( maxDeficitStep!, config );
 
 		const seedL = get( seed, [ OKLCH, 'l' ] );
-		// Keep the passing sample closest to the supplied seed. The search can
-		// end on a farther or failing one.
 		let passing: { seed: PlainColorObject; ramp: Ramp } | undefined;
 
 		function getSeedForL( l: number ): PlainColorObject {
@@ -405,16 +364,14 @@ export function buildRamp(
 				pinLightness,
 			} );
 
+			// A passing primary sample ends the search. The refinement below
+			// then moves it back toward the supplied seed.
 			if (
 				neutralSurface &&
-				meetsEmittedTargets( iterationResults.rampResults, s ) &&
-				( ! passing ||
-					Math.abs( get( s, [ OKLCH, 'l' ] ) - seedL ) <
-						Math.abs(
-							get( passing.seed, [ OKLCH, 'l' ] ) - seedL
-						) )
+				getWarnings( iterationResults.rampResults, s ).length === 0
 			) {
 				passing = { seed: s, ramp: iterationResults.rampResults };
+				return 0;
 			}
 
 			// If the constraints start failing in the opposite direction to the original
@@ -443,14 +400,22 @@ export function buildRamp(
 		);
 
 		if ( passing ) {
-			// The search can stop on a passing seed far from the supplied one,
-			// because another step's deficit is close to zero there. Narrow the
-			// gap to the closest passing seed. Primary samples hold the full ramp.
+			// The first passing sample can be far from the supplied seed. Narrow
+			// the gap to the closest passing seed. Primary samples hold the full
+			// ramp.
 			let failingL = seedL;
 			let passingL = get( passing.seed, [ OKLCH, 'l' ] );
 			for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
 				const l = ( failingL + passingL ) / 2;
 				const candidate = getSeedForL( l );
+				// Stop once the midpoint emits the same seed as an end.
+				const emitted = getColorString( candidate );
+				if (
+					emitted === getColorString( passing.seed ) ||
+					emitted === getColorString( getSeedForL( failingL ) )
+				) {
+					break;
+				}
 				const { rampResults: ramp } = calculateRamp( {
 					seed: candidate,
 					sortedSteps,
@@ -460,7 +425,7 @@ export function buildRamp(
 					neutralSurface,
 					pinLightness,
 				} );
-				if ( meetsEmittedTargets( ramp, candidate ) ) {
+				if ( getWarnings( ramp, candidate ).length === 0 ) {
 					passing = { seed: candidate, ramp };
 					passingL = l;
 				} else {

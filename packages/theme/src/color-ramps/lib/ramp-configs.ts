@@ -332,37 +332,66 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 	},
 };
 
+// PRIMARY_RAMP: seed => surface2 => surface1, surface3 => bgFill1 => ...
+// The surfaces keep the lightness pinned from the background ramp, so the
+// fills, focus ring and brand text can use them as contrast references.
 export const PRIMARY_RAMP_CONFIG: RampConfig = {
 	...ACCENT_RAMP_CONFIG,
-	bgFill1: {
-		sameAsIfPossible: 'seed',
+	surface2: {
+		...ACCENT_RAMP_CONFIG.surface2,
 		contrast: {
-			reference: 'neutralSurface',
-			target: MINIMUM_NON_TEXT_CONTRAST,
-			followDirection: 'main',
+			...ACCENT_RAMP_CONFIG.surface2.contrast,
+			reference: 'seed',
 		},
 	},
-	bgFill2: withNeutralSurfaceTarget( 'bgFill2', MINIMUM_NON_TEXT_CONTRAST ),
-	stroke3: withNeutralSurfaceTarget( 'stroke3', MINIMUM_NON_TEXT_CONTRAST ),
-	fgSurface3: withNeutralSurfaceTarget( 'fgSurface3', MINIMUM_TEXT_CONTRAST ),
-	fgSurface4: withNeutralSurfaceTarget( 'fgSurface4', MINIMUM_TEXT_CONTRAST ),
+	bgFill1: withSurfaceTargets(
+		{
+			sameAsIfPossible: 'seed',
+			contrast: {
+				reference: 'neutralSurface',
+				target: MINIMUM_NON_TEXT_CONTRAST,
+				followDirection: 'main',
+			},
+		},
+		MINIMUM_NON_TEXT_CONTRAST
+	),
+	bgFill2: withSurfaceTargets(
+		ACCENT_RAMP_CONFIG.bgFill2,
+		MINIMUM_NON_TEXT_CONTRAST
+	),
+	stroke3: withSurfaceTargets(
+		ACCENT_RAMP_CONFIG.stroke3,
+		MINIMUM_NON_TEXT_CONTRAST
+	),
+	fgSurface3: withSurfaceTargets(
+		ACCENT_RAMP_CONFIG.fgSurface3,
+		MINIMUM_TEXT_CONTRAST
+	),
+	fgSurface4: withSurfaceTargets(
+		ACCENT_RAMP_CONFIG.fgSurface4,
+		MINIMUM_TEXT_CONTRAST
+	),
 };
 
-function withNeutralSurfaceTarget( step: keyof RampConfig, target: number ) {
-	const config = ACCENT_RAMP_CONFIG[ step ];
+function withSurfaceTargets(
+	config: RampStepConfig,
+	target: number
+): RampStepConfig {
 	return {
 		...config,
 		contrast: {
 			...config.contrast,
 			additionalReferences: [
-				{ reference: 'neutralSurface', target },
-				...( step === 'bgFill2'
-					? []
-					: ( [
-							{ reference: 'surface1', target },
-							{ reference: 'surface2', target },
-						] as const ) ),
-			] as const,
+				...( config.contrast.additionalReferences ?? [] ),
+				...(
+					[
+						'neutralSurface',
+						'surface1',
+						'surface2',
+						'surface3',
+					] as const
+				 ).map( ( reference ) => ( { reference, target } ) ),
+			],
 		},
 	};
 }

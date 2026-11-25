@@ -90,15 +90,22 @@ describe( 'accent focus contrast', () => {
 		).toBeUndefined();
 	} );
 
-	it( 'keeps the passing seed closest to the supplied one', () => {
-		const { ramp, warnings } = buildAccentRamp(
-			'primary',
-			'#fae95b',
-			buildBgRamp( '#e7fe44' )
-		);
-		expect( warnings ).toBeUndefined();
-		expect( ramp.bgFill1 ).toBe( '#958500' );
-	} );
+	it.each( [
+		[ '#ffffff', [ '#8d8d8d', '#8e8e8e', '#8f8f8f' ] ],
+		[ '#fcfcfc', [ '#a2a2a2', '#a3a3a3' ] ],
+	] )(
+		'gives neighboring seeds on background %s the same fill and text',
+		( background, seeds ) => {
+			const neutral = buildBgRamp( background );
+			const ramps = seeds.map(
+				( seed ) => buildAccentRamp( 'primary', seed, neutral ).ramp
+			);
+			for ( const ramp of ramps ) {
+				expect( ramp.bgFill1 ).toBe( ramps[ 0 ].bgFill1 );
+				expect( ramp.fgFill ).toBe( ramps[ 0 ].fgFill );
+			}
+		}
+	);
 
 	it( 'moves neighboring near-black seeds to the same nearby fill', () => {
 		const neutral = buildBgRamp( '#fcfcfc' );
