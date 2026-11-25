@@ -90,8 +90,15 @@ test.describe( 'Home preview', () => {
 		await admin.visitSiteEditor( { postType: 'wp_navigation' } );
 
 		await expect(
-			page.getByRole( 'button', { name: 'Add New' } )
+			page.getByRole( 'button', { name: 'Add New', exact: true } )
 		).toBeVisible();
+
+		// Wait for the canvas to finish loading before asserting that nothing
+		// is there to click. Had the home page been resolved, its overlay
+		// would only appear once the editor had loaded, so asserting earlier
+		// would pass even if it were.
+		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
+
 		await expect(
 			page.getByRole( 'button', { name: 'Edit', exact: true } )
 		).toHaveCount( 0 );

@@ -44,9 +44,11 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	} ) as string | undefined;
 
 	/*
-	 * A route that names no entity leaves the editor to resolve one, which it
-	 * does from the block templates only a block theme has. `undefined` while
-	 * the theme is still being read.
+	 * Whether the route names an entity — both a post type and a post — for the
+	 * editor to open. One that does not either leaves the editor to resolve the
+	 * home page (see `resolvesHomePage` below) or gives it nothing to open, and
+	 * either way the editor needs the block templates only a block theme has.
+	 * `isBlockTheme` is `undefined` while the theme is still being read.
 	 */
 	const hasEntity = !! ( canvas.postType && canvas.postId );
 	const isBlockTheme = useSelect(
@@ -72,7 +74,9 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	 * editor resolves, so there is nothing to edit.
 	 *
 	 * The records are the ones the editor loads for this canvas, so reading
-	 * them here costs no request of their own.
+	 * them here costs no request of their own. Only a block theme mounts the
+	 * editor, which is why the home page is resolved for no other: on a
+	 * classic theme nothing else would have fetched it.
 	 */
 	const resolvesHomePage = ! canvas.postType && ! canvas.postId;
 	const { editLink, isTrashed } = useSelect(
@@ -81,7 +85,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 			let postId: string | number | undefined = canvas.postId;
 
 			if ( resolvesHomePage ) {
-				if ( ! canvas.isPreview || ! isBlockTheme ) {
+				if ( ! isBlockTheme ) {
 					return { editLink: undefined, isTrashed: false };
 				}
 
@@ -108,13 +112,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				isTrashed: record?.status === 'trash',
 			};
 		},
-		[
-			canvas.postType,
-			canvas.postId,
-			canvas.isPreview,
-			resolvesHomePage,
-			isBlockTheme,
-		]
+		[ canvas.postType, canvas.postId, resolvesHomePage, isBlockTheme ]
 	);
 
 	/*
