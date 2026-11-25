@@ -330,6 +330,31 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(),
 			),
 
+			'inline_numeric_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => 0,
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_zero_degree_transform_rotate_style'    => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '0deg',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'rotate:0deg;',
+					'declarations' => array(
+						'rotate' => '0deg',
+					),
+				),
+			),
+
 			'inline_newline_transform_rotate_style'        => array(
 				'block_styles'    => array(
 					'transform' => array(
@@ -397,6 +422,77 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'transform' => array(
 						'translate' => array( 'x' => "10px\n" ),
 					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_valid_transform_scale_number_style'    => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => 1.2 ),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'scale:1.2;',
+					'declarations' => array(
+						'scale' => '1.2',
+					),
+				),
+			),
+
+			'inline_zero_transform_scale_number_style'     => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => 0 ),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'scale:0;',
+					'declarations' => array(
+						'scale' => '0',
+					),
+				),
+			),
+
+			'inline_valid_transform_scale_percent_style'   => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => '120%' ),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'scale:120%;',
+					'declarations' => array(
+						'scale' => '120%',
+					),
+				),
+			),
+
+			'inline_negative_transform_scale_style'        => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => -1 ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_list_transform_scale_style'            => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => '1.2 1.5' ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_function_transform_scale_style'        => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => 'var(--scale)' ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_scale_style'         => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => "1.2\n" ),
 				),
 				'options'         => null,
 				'expected_output' => array(),

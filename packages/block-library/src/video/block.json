@@ -111,7 +111,8 @@
 		},
 		"transform": {
 			"rotate": true,
-			"translate": true
+			"translate": true,
+			"scale": true
 		},
 		"dimensions": {
 			"minWidth": true,
