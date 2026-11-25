@@ -267,10 +267,10 @@ export function SuggestionActionButtons( {
 					isOpen
 					onConfirm={ confirmStaleApply }
 					onCancel={ dismissStaleDialog }
-					confirmButtonText={ __( 'Apply anyway' ) }
+					confirmButtonText={ __( 'Accept anyway' ) }
 				>
 					{ __(
-						'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+						'This block has changed since the suggestion was made. Accepting it will overwrite the newer edit. Continue?'
 					) }
 				</ConfirmDialog>
 			) }
@@ -423,7 +423,7 @@ export default function SuggestionActions( {
 				>
 					{ decision.decision === REJECTED
 						? __( 'Rejected' )
-						: __( 'Applied' ) }
+						: __( 'Accepted' ) }
 				</Text>
 			) }
 			{ ! isResolved && applyDisabledReason && (
