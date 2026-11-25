@@ -186,7 +186,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 					foreach ( $protected_params as $param ) {
 						if ( 'status' === $param ) {
-							if ( 'approve' !== $request[ $param ] ) {
+							// START CHANGE: Accept the array `status` from WordPress 7.2.
+							if ( array( 'approve' ) !== wp_parse_list( $request[ $param ] ) ) {
+								// END CHANGE.
 								$forbidden_params[] = $param;
 							}
 						} elseif ( 'type' === $param ) {
@@ -229,7 +231,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			foreach ( $protected_params as $param ) {
 				if ( 'status' === $param ) {
-					if ( 'approve' !== $request[ $param ] ) {
+					// START CHANGE: Accept the array `status` from WordPress 7.2.
+					if ( array( 'approve' ) !== wp_parse_list( $request[ $param ] ) ) {
+						// END CHANGE.
 						$forbidden_params[] = $param;
 					}
 				} elseif ( 'type' === $param ) {
@@ -504,7 +508,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
-		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
+		// START CHANGE: Only a moderator can attribute a comment to another user, who must be a member of the site.
+		if (
+			isset( $request['author'] ) &&
+			get_current_user_id() !== $request['author'] &&
+			! ( current_user_can( 'moderate_comments' ) && is_user_member_of_blog( $request['author'] ) )
+		) {
+			// END CHANGE.
 			return new WP_Error(
 				'rest_comment_invalid_author',
 				/* translators: %s: Request parameter. */

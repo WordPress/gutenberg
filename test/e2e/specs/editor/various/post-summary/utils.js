@@ -89,9 +89,12 @@ async function setPublishDate( page, { year, month, day, hours, minutes } ) {
 
 	await fillNumber( 'Year', year );
 	// The month comes before the day, which can't exceed the month's length.
-	await page
-		.getByRole( 'combobox', { name: 'Month' } )
-		.selectOption( String( month ).padStart( 2, '0' ) );
+	const monthName = new Intl.DateTimeFormat( 'en-US', {
+		month: 'long',
+		timeZone: 'UTC',
+	} ).format( Date.UTC( year, month - 1 ) );
+	await page.getByRole( 'combobox', { name: 'Month' } ).click();
+	await page.getByRole( 'option', { name: monthName, exact: true } ).click();
 	await fillNumber( 'Day', day );
 	await fillNumber( 'Hours', hours % 12 || 12 );
 	await fillNumber( 'Minutes', minutes );

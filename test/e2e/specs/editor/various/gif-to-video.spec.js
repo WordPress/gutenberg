@@ -297,16 +297,12 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			String( videoBlock.attributes.height )
 		);
 
-		// The <video> also needs an explicit (non-`auto`) aspect-ratio derived
-		// from those dimensions. The width/height attributes alone only yield
-		// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
-		// natural ratio while the poster/metadata load - during which the box
-		// height briefly blows up to tens of thousands of pixels before
-		// settling, reading as a duplicated image during the swap. An explicit
-		// ratio governs the height throughout the load and prevents that spike.
+		// The inline ratio holds the height while the poster and metadata load,
+		// and `auto` applies it to the content box so a border does not shrink
+		// the picture.
 		await expect( renderedVideo ).toHaveCSS(
 			'aspect-ratio',
-			`${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
+			`auto ${ videoBlock.attributes.width } / ${ videoBlock.attributes.height }`
 		);
 
 		// There is deliberately no transform back to an Image block; undo is

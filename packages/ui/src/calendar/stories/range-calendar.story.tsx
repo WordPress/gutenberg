@@ -1,3 +1,4 @@
+import { addDays } from 'date-fns';
 import { fn } from 'storybook/test';
 import { TZDate } from '@daypicker/react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -40,6 +41,37 @@ export default meta;
 type Story = StoryObj< typeof RangeCalendar >;
 
 export const Default: Story = {};
+
+/**
+ * Resize the container or change `numberOfMonths` to try the fluid layout.
+ * Hover dates to preview changes to the selected range.
+ * The range starts today to keep the today marker visible at every width.
+ */
+export const FluidWidth: Story = {
+	decorators: [
+		( Story ) => (
+			<div
+				style={ {
+					width: '100%',
+					resize: 'horizontal',
+					overflow: 'auto',
+					outline:
+						'1px solid var(--wpds-color-stroke-surface-neutral)',
+				} }
+			>
+				<Story />
+			</div>
+		),
+	],
+	args: {
+		defaultMonth: new Date(),
+		defaultValue: {
+			from: new Date(),
+			to: addDays( new Date(), 8 ),
+		},
+		resetOnSelect: false,
+	},
+};
 
 export const DisabledDates: Story = {
 	args: {

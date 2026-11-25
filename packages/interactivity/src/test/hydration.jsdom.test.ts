@@ -27,6 +27,78 @@ describe( 'hydrateRegions', () => {
 		vi.unstubAllGlobals();
 	} );
 
+	it( 'hydrates descendants of ignored HTML variants without evaluating their references', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', false );
+		const namespace = uniqueNamespace();
+		const nestedNamespace = uniqueNamespace();
+		const readHtml = vi.fn();
+		const renderHtml = vi.fn( () => asDangerousHTML( '<b>ignored</b>' ) );
+		const initialize = vi.fn();
+		const { state } = store( namespace, {
+			state: {
+				/** Text shared by the ordinary descendants and host bindings. */
+				label: 'hydrated',
+				/**
+				 * Records reference reads before returning an HTML function.
+				 *
+				 * @return The function that an ignored entry must never call.
+				 */
+				get html() {
+					readHtml();
+					return renderHtml;
+				},
+			},
+			actions: {
+				/** Updates descendants through their normal event handler. */
+				update() {
+					state.label = 'updated';
+				},
+			},
+		} );
+		store( nestedNamespace, {
+			actions: {
+				/** Records initialization within each ignored binding's content. */
+				initialize,
+			},
+		} );
+		const variants = [ '', '---id', '--suffix', '--suffix---id' ];
+		document.body.innerHTML = `<div data-wp-interactive="${ namespace }">${ variants
+			.map(
+				( variant ) =>
+					`<section ${ variant ? `data-wp-html${ variant }="state.html"` : '' } data-wp-bind--title="state.label"><button data-wp-on--click="actions.update">Update</button><span data-wp-text="state.label">static</span><div data-wp-interactive="${ nestedNamespace }" data-wp-init="actions.initialize"></div></section>`
+			)
+			.join( '' ) }<p data-wp-text="state.label">following</p></div>`;
+		const hosts = [ ...document.querySelectorAll( 'section' ) ];
+		const children = hosts.map( ( host ) => host.firstElementChild );
+
+		await act( () => hydrateRegions() );
+
+		expect(
+			hosts.map( ( host ) => host.querySelector( 'span' )!.textContent )
+		).toEqual( variants.map( () => 'hydrated' ) );
+		expect( initialize ).toHaveBeenCalledTimes( variants.length );
+		expect( readHtml ).not.toHaveBeenCalled();
+		expect( renderHtml ).not.toHaveBeenCalled();
+
+		await act( () => hosts[ 1 ].querySelector( 'button' )!.click() );
+
+		expect(
+			hosts.map( ( host ) => host.querySelector( 'span' )!.textContent )
+		).toEqual( variants.map( () => 'updated' ) );
+		expect( hosts.map( ( host ) => host.title ) ).toEqual(
+			variants.map( () => 'updated' )
+		);
+		expect( hosts.map( ( host ) => host.firstElementChild ) ).toEqual(
+			children
+		);
+		expect( document.querySelector( 'p' ) ).toHaveTextContent(
+			/^updated$/
+		);
+		expect( initialize ).toHaveBeenCalledTimes( variants.length );
+		expect( readHtml ).not.toHaveBeenCalled();
+		expect( renderHtml ).not.toHaveBeenCalled();
+	} );
+
 	it.each( [ false, true ] )(
 		'hydrates HTML fallback islands only outside an interactive region (inside: %s)',
 		async ( inside ) => {

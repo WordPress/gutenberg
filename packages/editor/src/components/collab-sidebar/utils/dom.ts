@@ -1,4 +1,10 @@
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+import { unlock } from '../../../lock-unlock';
 import type { NoteId } from './types';
+
+const { ownsSelection } = unlock< {
+	ownsSelection: ( element: HTMLElement ) => boolean;
+} >( richTextPrivateApis );
 
 /**
  * Build the CSS selector matching a note's in-content `core/note` marker in
@@ -63,13 +69,37 @@ export function getNoteAnchorRect(
 }
 
 /**
- * Whether focus is inside an element, in whichever document it lives.
+ * Whether one of the blocks holds focus. When the selected block supports
+ * `editableRoot`, the canvas is the editing host and holds focus itself, so
+ * the block of the editable owning the selection holds it.
  *
- * @param element Element to check.
- * @return True when the element contains the active element.
+ * @param ownerDocument The blocks' document.
+ * @param clientIds     Block client IDs.
+ * @return Whether one of the blocks holds focus.
  */
-export function hasFocusWithin( element: Element | null | undefined ): boolean {
-	return !! element?.contains( element.ownerDocument.activeElement );
+export function isFocusInBlocks(
+	ownerDocument: Document | null | undefined,
+	clientIds: string[]
+): boolean {
+	// A document keeps its active element and selection after losing focus.
+	if ( ! ownerDocument?.hasFocus() ) {
+		return false;
+	}
+	const anchorNode = ownerDocument.defaultView?.getSelection()?.anchorNode;
+	const anchor =
+		anchorNode?.nodeType === Node.ELEMENT_NODE
+			? ( anchorNode as Element )
+			: anchorNode?.parentElement;
+	const editable = anchor?.closest< HTMLElement >(
+		'[contenteditable="true"]'
+	);
+	const focusOwner =
+		editable && ownsSelection( editable )
+			? editable
+			: ownerDocument.activeElement;
+	const block =
+		focusOwner?.closest< HTMLElement >( '[data-block]' )?.dataset.block;
+	return !! block && clientIds.includes( block );
 }
 
 /**

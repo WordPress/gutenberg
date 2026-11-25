@@ -13,7 +13,6 @@ import {
 	Navigator,
 	__experimentalHeading as Heading,
 	Notice as WCNotice,
-	SelectControl as WCSelectControl,
 	Flex,
 	Button,
 	SearchControl,
@@ -24,9 +23,12 @@ import {
 	Menu,
 	Progress,
 	Select,
+	SelectControl,
+	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
+import { sprintf, __, _n, _x, isRTL } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	moreVertical,
 	next,
@@ -64,6 +66,8 @@ const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
 const MIN_WINDOW_HEIGHT = 500;
 
 function FontCollection( { slug }: { slug: string } ) {
+	useEnableWpCompatOverlaySlot();
+
 	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
@@ -129,12 +133,36 @@ function FontCollection( { slug }: { slug: string } ) {
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
 
-	const categories = [ DEFAULT_CATEGORY, ...collectionCategories ];
+	const categoryItems = [ DEFAULT_CATEGORY, ...collectionCategories ].map(
+		( category ) => ( { label: category.name, value: category.slug } )
+	);
+	const selectedCategoryItem =
+		categoryItems.find( ( item ) => item.value === filters.category ) ??
+		categoryItems[ 0 ];
 
 	const fonts = useMemo(
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
+
+	// Announce the number of results once the user searches or picks a
+	// category, as the list updates without any feedback for screen readers.
+	const hasFilters =
+		filters.search !== undefined || filters.category !== undefined;
+	useEffect( () => {
+		if ( ! hasFilters ) {
+			return;
+		}
+		speak(
+			fonts.length
+				? sprintf(
+						/* translators: %d: number of fonts found. */
+						_n( '%d font found.', '%d fonts found.', fonts.length ),
+						fonts.length
+					)
+				: __( 'No fonts found. Try with a different search term.' )
+		);
+	}, [ hasFilters, fonts ] );
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
@@ -358,21 +386,25 @@ function FontCollection( { slug }: { slug: string } ) {
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<WCSelectControl
+								<SelectControl
+									className="font-library__category"
 									label={ __( 'Category' ) }
-									value={ filters.category }
-									onChange={ handleCategoryFilter }
-								>
-									{ categories &&
-										categories.map( ( category ) => (
-											<option
-												value={ category.slug }
-												key={ category.slug }
-											>
-												{ category.name }
-											</option>
-										) ) }
-								</WCSelectControl>
+									items={ categoryItems }
+									value={ selectedCategoryItem }
+									itemToStringValue={ ( item ) =>
+										JSON.stringify( item.value )
+									}
+									onValueChange={ ( item ) => {
+										if (
+											item &&
+											item.value !== null &&
+											item.value !==
+												selectedCategoryItem.value
+										) {
+											handleCategoryFilter( item.value );
+										}
+									} }
+								/>
 							</HStack>
 
 							<Spacer margin={ 4 } />

@@ -527,7 +527,7 @@ _Returns_
 
 ### getPostEdits
 
-Returns any post values which have been changed in the editor but not yet been saved.
+Returns the post values which have been changed in the editor, including the transient `blocks` and `selection` edits, which are not fields of the saved post and so remain after a save. To check for unsaved changes, use `isEditedPostDirty()`; for the edits that will be saved, use `select( 'core' ).getEntityRecordNonTransientEdits()`.
 
 _Parameters_
 
@@ -535,7 +535,7 @@ _Parameters_
 
 _Returns_
 
-- `Object`: Object of key value pairs comprising unsaved edits.
+- `Object`: Object of key value pairs comprising the edits.
 
 ### getPostLockUser
 

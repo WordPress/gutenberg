@@ -22,6 +22,12 @@ const meta: Meta< StoryArgs > = {
 			notes: 'API and design may change.',
 		},
 	},
+	argTypes: {
+		tone: {
+			control: 'select',
+			options: [ 'neutral', 'brand', 'success', 'warning', 'error' ],
+		},
+	},
 	args: { value: 24, tone: 'neutral' },
 	render: ( { tone, ...args } ) => (
 		<Meter.Root { ...args }>
@@ -75,5 +81,56 @@ export const CustomValueFormat: Story = {
 				{ ( formattedValue ) => `${ formattedValue } of 10 GB used` }
 			</Meter.Value>
 		</Meter.Root>
+	),
+};
+
+/** Choose the tone and status text together, based on the measurement's meaning. */
+export const SemanticTones: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<Stack direction="column" gap="lg">
+			{ (
+				[
+					{
+						tone: 'success',
+						label: 'Password strength',
+						value: 85,
+						status: 'Strong',
+					},
+					{
+						tone: 'warning',
+						label: 'Storage used',
+						value: 85,
+						status: 'Almost full',
+					},
+					{
+						tone: 'error',
+						label: 'Storage used',
+						value: 100,
+						status: 'Full',
+					},
+				] as const
+			 ).map( ( { tone, label, value, status } ) => (
+				<Meter.Root
+					key={ tone }
+					value={ value }
+					getAriaValueText={ ( formattedValue ) =>
+						`${ formattedValue }. ${ status }`
+					}
+				>
+					<Stack justify="space-between" gap="sm">
+						<Meter.Label>{ label }</Meter.Label>
+						<Meter.Value>
+							{ ( formattedValue ) =>
+								`${ formattedValue } · ${ status }`
+							}
+						</Meter.Value>
+					</Stack>
+					<Meter.Track>
+						<Meter.Indicator tone={ tone } />
+					</Meter.Track>
+				</Meter.Root>
+			) ) }
+		</Stack>
 	),
 };

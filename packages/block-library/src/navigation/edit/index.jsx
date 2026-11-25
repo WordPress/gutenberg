@@ -357,12 +357,8 @@ function Navigation( {
 		await createNavigationMenu( '' );
 	};
 
-	const {
-		hasUncontrolledInnerBlocks,
-		uncontrolledInnerBlocks,
-		isInnerBlockSelected,
-		innerBlocks,
-	} = useInnerBlocks( clientId );
+	const { hasUncontrolledInnerBlocks, isInnerBlockSelected, innerBlocks } =
+		useInnerBlocks( clientId );
 
 	const {
 		replaceInnerBlocks,
@@ -1012,7 +1008,7 @@ function Navigation( {
 					>
 						<UnsavedInnerBlocks
 							createNavigationMenu={ createNavigationMenu }
-							blocks={ uncontrolledInnerBlocks }
+							blocks={ innerBlocks }
 							hasSelection={ isSelected || isInnerBlockSelected }
 						/>
 					</ResponsiveWrapper>

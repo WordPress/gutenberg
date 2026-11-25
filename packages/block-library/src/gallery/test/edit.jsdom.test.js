@@ -6,7 +6,7 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { createElement, useEffect } from '@wordpress/element';
 import {
 	initializeEditor,
@@ -46,6 +46,7 @@ const ASPECT_RATIO_SETTINGS = {
 					{ name: 'Square - 1:1', slug: 'square', ratio: '1' },
 					{ name: 'Wide - 16:9', slug: '16-9', ratio: '16/9' },
 				],
+				theme: [ { name: 'Avatar', slug: 'avatar', ratio: '1' } ],
 			},
 		},
 	},
@@ -62,6 +63,40 @@ function ViewportStateInitializer() {
 	}, [ setResponsiveEditing, setStyleStateViewport ] );
 
 	return createElement( 'div', useBlockProps() );
+}
+
+const MULTI_SELECTION_INITIALIZER = 'test/multi-selection-initializer';
+
+// Renders a button that selects every Gallery in the editor. The galleries must
+// be next to each other, since a multi-selection is a range of blocks.
+// Selecting from a click rather than on mount keeps the block toolbar from
+// opening while the editor is still being set up.
+function MultiSelectionInitializer() {
+	const { getBlockOrder, getBlockName } = useSelect( blockEditorStore );
+	const { multiSelect } = useDispatch( blockEditorStore );
+
+	function multiSelectGalleries() {
+		const clientIds = getBlockOrder().filter(
+			( id ) => getBlockName( id ) === 'core/gallery'
+		);
+		multiSelect( clientIds[ 0 ], clientIds[ clientIds.length - 1 ] );
+	}
+
+	return createElement(
+		'div',
+		useBlockProps(),
+		createElement(
+			'button',
+			{ type: 'button', onClick: multiSelectGalleries },
+			'Select galleries'
+		)
+	);
+}
+
+async function selectGalleries() {
+	await userEvent.click(
+		screen.getByRole( 'button', { name: 'Select galleries' } )
+	);
 }
 
 /**
@@ -87,6 +122,17 @@ describe( 'Gallery block', () => {
 				inserter: false,
 			},
 			edit: ViewportStateInitializer,
+			save: () => null,
+		} );
+		registerBlockType( MULTI_SELECTION_INITIALIZER, {
+			apiVersion: 3,
+			title: 'Multi-selection initializer',
+			category: 'text',
+			supports: {
+				html: false,
+				inserter: false,
+			},
+			edit: MultiSelectionInitializer,
 			save: () => null,
 		} );
 	} );
@@ -127,19 +173,22 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
 			// The attachment records never resolve in this environment, so
 			// there's nothing to sort by yet; Random doesn't need them. Custom
 			// is only choosable while Random is on, since that's all it does.
 			expect(
-				screen.getByRole( 'option', { name: 'Newest to oldest' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', {
+					name: 'Newest to oldest',
+				} )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 			expect(
-				screen.getByRole( 'option', { name: 'Random' } )
-			).toBeEnabled();
+				await screen.findByRole( 'option', { name: 'Random' } )
+			).not.toHaveAttribute( 'aria-disabled' );
 		} );
 
 		test( 'stores a random order for a static gallery and clears it when choosing the custom order', async () => {
@@ -149,19 +198,24 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			// The select is controlled from the `randomOrder` attribute, so
-			// its display value reflects the stored state after each change.
-			await userEvent.selectOptions( orderBy, 'random' );
-			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
+			await userEvent.click( orderBy );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeEnabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).not.toHaveAttribute( 'aria-disabled' );
 
-			await userEvent.selectOptions( orderBy, 'custom' );
-			expect( orderBy ).toHaveDisplayValue( 'Custom' );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Custom' );
+			await userEvent.click( orderBy );
 			expect(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			).toBeDisabled();
+				await screen.findByRole( 'option', { name: 'Custom' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		test( 'offers a random order but no custom order for a dynamic gallery', async () => {
@@ -175,10 +229,12 @@ describe( 'Gallery block', () => {
 			const orderBy = await screen.findByRole( 'combobox', {
 				name: 'Order by',
 			} );
-			expect( orderBy ).toHaveDisplayValue( 'Newest to oldest' );
+			expect( orderBy ).toHaveTextContent( 'Newest to oldest' );
+			await userEvent.click( orderBy );
 			expect(
 				screen.queryByRole( 'option', { name: 'Custom' } )
 			).not.toBeInTheDocument();
+			await userEvent.keyboard( '{Escape}' );
 			// The order lives in Settings; the Source panel is a plain
 			// PanelBody with no resettable items, hence no options menu.
 			expect(
@@ -188,11 +244,17 @@ describe( 'Gallery block', () => {
 				screen.queryByRole( 'button', { name: 'Source options' } )
 			).not.toBeInTheDocument();
 
-			await userEvent.selectOptions( orderBy, 'random' );
-			expect( orderBy ).toHaveDisplayValue( 'Random' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Random' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'Random' );
 
-			await userEvent.selectOptions( orderBy, 'title/asc' );
-			expect( orderBy ).toHaveDisplayValue( 'A → Z' );
+			await userEvent.click( orderBy );
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'A → Z' } )
+			);
+			expect( orderBy ).toHaveTextContent( 'A → Z' );
 		} );
 	} );
 
@@ -273,9 +335,14 @@ describe( 'Gallery block', () => {
 			);
 			await selectBlock( 'Block: Gallery' );
 
-			await userEvent.selectOptions(
-				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } ),
-				'16/9'
+			await userEvent.click(
+				await screen.findByRole( 'combobox', { name: 'Aspect ratio' } )
+			);
+			expect(
+				await screen.findByRole( 'option', { name: 'Avatar' } )
+			).toBeInTheDocument();
+			await userEvent.click(
+				await screen.findByRole( 'option', { name: 'Wide - 16:9' } )
 			);
 
 			// The ratio is rendered from the Gallery's own responsive CSS for
@@ -352,6 +419,89 @@ describe( 'Gallery block', () => {
 					name: 'Minimum column width',
 				} )
 			).toHaveDisplayValue( '10' );
+		} );
+	} );
+
+	describe( 'Multi-selection', () => {
+		test( 'only shows the settings that apply to every selected static gallery', async () => {
+			await setup(
+				[
+					createGallery( { linkTo: 'media' } ),
+					createGallery( { linkTo: 'media' } ),
+					createBlock( MULTI_SELECTION_INITIALIZER ),
+				],
+				ASPECT_RATIO_SETTINGS
+			);
+			await selectGalleries();
+
+			expect(
+				await screen.findByRole( 'slider', { name: 'Columns' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText( 'Crop images to fit' )
+			).toBeInTheDocument();
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Link' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Add' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Use attached images' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Order by' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Open images in new tab' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Aspect ratio' } )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'does not show the default settings while editing a viewport state', async () => {
+			await setup( [
+				createGallery(),
+				createGallery(),
+				createBlock( VIEWPORT_STATE_INITIALIZER ),
+				createBlock( MULTI_SELECTION_INITIALIZER ),
+			] );
+			await selectGalleries();
+
+			expect(
+				screen.queryByRole( 'slider', { name: 'Columns' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Crop images to fit' )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'does not offer to detach selected dynamic galleries', async () => {
+			await setup( [
+				createBlock( 'core/gallery', {
+					dynamicContent: { source: 'core/attached-media' },
+				} ),
+				createBlock( 'core/gallery', {
+					dynamicContent: { source: 'core/attached-media' },
+				} ),
+				createBlock( MULTI_SELECTION_INITIALIZER ),
+			] );
+			await selectGalleries();
+
+			expect(
+				await screen.findByLabelText( 'Crop images to fit' )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Detach' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Detach Gallery' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Order by' } )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

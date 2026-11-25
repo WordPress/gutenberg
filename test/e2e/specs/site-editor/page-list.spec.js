@@ -198,10 +198,10 @@ test.describe( 'Page List', () => {
 					const dateEl = page
 						.getByRole( 'button', { name: 'Edit Date' } )
 						.locator( '..' );
-					const date = new Date();
-					const yy = String( date.getFullYear() );
 
-					await expect( dateEl ).toContainText( yy );
+					// A recent date reads as "Today at 10:28 am" or "November
+					// 3 10:28 am", without the year, but always has the time.
+					await expect( dateEl ).toContainText( /\d{1,2}:\d{2}/ );
 				},
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
@@ -706,7 +706,7 @@ test.describe( 'Page List', () => {
 			// The picker should reflect the WP timezone (UTC-5), not the
 			// browser/system timezone.
 			await expect( year ).toHaveValue( '2026' );
-			await expect( month ).toHaveValue( '02' );
+			await expect( month ).toHaveText( 'February' );
 			await expect( day ).toHaveValue( '15' );
 			await expect( hours ).toHaveValue( '12' );
 			await expect( minutes ).toHaveValue( '30' );
@@ -720,7 +720,7 @@ test.describe( 'Page List', () => {
 				hours: 12,
 				minutes: 30,
 			} );
-			await expect( month ).toHaveValue( '03' );
+			await expect( month ).toHaveText( 'March' );
 			await expect( day ).toHaveValue( '20' );
 			await expect( hours ).toHaveValue( '12' );
 			await expect( minutes ).toHaveValue( '30' );

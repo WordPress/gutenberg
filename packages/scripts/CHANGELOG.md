@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 37.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+-   `start --hot`: Name the script and script module webpack configurations, so the dev client can tell the two compilations apart. Without the names, `--experimental-modules` reloaded the editor in a loop instead of applying Fast Refresh, and the generated asset files registered handles prefixed with `undefined-` ([#86031](https://github.com/WordPress/gutenberg/pull/86031)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
 ## 37.1.0 (2026-11-04)
 
 ### Internal

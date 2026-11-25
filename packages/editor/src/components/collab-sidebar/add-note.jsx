@@ -9,7 +9,7 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { hasFocusWithin } from './utils/dom';
+import { isFocusInBlocks } from './utils/dom';
 import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -45,8 +45,8 @@ export function AddNote( { clientIds, floating } ) {
 		if ( isSubmittingRef.current ) {
 			return;
 		}
-		// In the block, the caret events decide; dismissing here too would race them.
-		if ( hasFocusWithin( blockElement ) ) {
+		// In the form's blocks, the caret events decide; dismissing here too would race them.
+		if ( isFocusInBlocks( blockElement?.ownerDocument, clientIds ) ) {
 			return;
 		}
 

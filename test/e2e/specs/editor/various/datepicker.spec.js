@@ -49,9 +49,11 @@ TIMEZONES.forEach( ( timezone ) => {
 
 			// The row renders the date in the site timezone, so the wall time
 			// entered above must come back unshifted regardless of the
-			// browser timezone.
+			// browser timezone. As the browser timezone differs from the
+			// site's, the row reads the full date, followed by the site
+			// timezone.
 			await expect(
-				summary.getByText( `Mar 15, ${ lastYear } 10:00 am` )
+				summary.getByText( `March 15, ${ lastYear } 10:00 am` )
 			).toBeVisible();
 		} );
 
@@ -73,7 +75,7 @@ TIMEZONES.forEach( ( timezone ) => {
 			await page.keyboard.press( 'Escape' );
 
 			await expect(
-				summary.getByText( `Mar 15, ${ nextYear } 10:00 am` )
+				summary.getByText( `March 15, ${ nextYear } 10:00 am` )
 			).toBeVisible();
 		} );
 	} );

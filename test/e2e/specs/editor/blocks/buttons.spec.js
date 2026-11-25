@@ -252,7 +252,6 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noopener',
 							linkTarget: '_blank',
 						},
 					},
@@ -286,7 +285,7 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noopener nofollow',
+							rel: 'nofollow',
 							linkTarget: '_blank',
 						},
 					},
