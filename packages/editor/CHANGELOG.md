@@ -23,6 +23,7 @@
 -   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
 -   PostSchedule: Mark the posts of the month in the site's timezone, including posts at the first and last second of the month ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
 
 ## 16.0.0 (2026-10-20)
 
