@@ -89,6 +89,13 @@ describe( 'accent focus contrast', () => {
 		).toBeUndefined();
 	} );
 
+	it( 'keeps a stroke target when gamut mapping lowers the searched color', () => {
+		expect(
+			buildAccentRamp( 'primary', '#ff0000', buildBgRamp( '#595959' ) )
+				.warnings
+		).toBeUndefined();
+	} );
+
 	it( 'retains a primary ramp that already meets the focus constraints', () => {
 		const neutral = buildBgRamp( '#fcfcfc' );
 		expect( buildAccentRamp( 'primary', '#3858e9', neutral ) ).toEqual(

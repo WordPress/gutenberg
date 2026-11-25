@@ -231,11 +231,20 @@ function calculateRamp( {
 			maxDeficitStep = stepName;
 		}
 
+		// Gamut mapping can push an emitted color below its target. Use the
+		// endpoint instead when it still meets the actual targets.
+		const color =
+			neutralSurface &&
+			! meetsTargets( searchResults.color ) &&
+			meetsTargets( endpoint )
+				? endpoint
+				: searchResults.color;
+
 		// Store calculated color for future dependencies
-		calculatedColors.set( stepName, searchResults.color );
+		calculatedColors.set( stepName, color );
 
 		// Add to results
-		rampResults[ stepName ] = getColorString( searchResults.color );
+		rampResults[ stepName ] = getColorString( color );
 	}
 
 	// The brand surface depends on the fill seed. Check their relationship
