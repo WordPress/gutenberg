@@ -198,7 +198,7 @@ test.describe( 'Suggestion mode performance', () => {
 			await accept.waitFor();
 			const applied = page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'Suggestion applied.' );
+				.getByText( 'Suggestion accepted.' );
 
 			const start = Date.now();
 			await accept.click();

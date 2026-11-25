@@ -201,7 +201,7 @@ sequenceDiagram
 
     A->>P: Accept or Reject in the notes sidebar
     opt Attribute changed since capture
-        P-->>A: Confirm "Apply anyway?"
+        P-->>A: Confirm "Accept anyway?"
     end
     P->>R: PUT provisional status
     P->>B: Apply the operations
@@ -668,7 +668,7 @@ stateDiagram-v2
   P --> O: post saved without the anchor, by someone else
   P --> T: own anchor withdrawn (note collector)
   T --> P: redo brings the anchor back
-  A --> AU: Apply again
+  A --> AU: Accept again
   R --> RU: Reject again
   A --> P: Reopen
   R --> P: Reopen
@@ -789,9 +789,9 @@ In the notes sidebar, a suggestion thread renders:
 | pending | yes | Accept / Reject |
 | pending | no | Reject, with Accept disabled and "This suggestion is no longer in the post. Reject it to close the note." |
 | provisional | yes | Accept / Reject, and "{Name} accepted this suggestion, but the post was not saved." |
-| provisional | no | "Applied" (or "Rejected"), and "Save the post to keep this decision." |
-| `applied` / `rejected` | yes | "Applied, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Apply again, Reject again and Reopen |
-| `applied` / `rejected` | no | "Applied" (or "Rejected") |
+| provisional | no | "Accepted" (or "Rejected"), and "Save the post to keep this decision." |
+| `applied` / `rejected` | yes | "Accepted, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Accept again, Reject again and Reopen |
+| `applied` / `rejected` | no | "Accepted" (or "Rejected") |
 | `outdated` | no | "No longer applies - the text was removed." (the block was removed, or the block changed, for block suggestions), with Reopen |
 
 Reopen, from the card or the note's menu, writes `hold` and `pending` together, so a reopened suggestion offers its decision again. The note's menu offers neither Edit nor Delete on a suggestion. Trashing the note would leave its marker in the content with no card to decide it from, so Reject is the way to withdraw one; and the card states the proposal, so text written into the note itself would read as an ordinary note left behind once the suggestion is decided. With nothing left to offer, a pending suggestion's card shows no Actions button. Replies carry the discussion, and can still be edited and deleted.

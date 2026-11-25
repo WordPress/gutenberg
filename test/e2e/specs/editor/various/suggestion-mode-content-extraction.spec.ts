@@ -69,7 +69,7 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 			.locator( '.components-snackbar-list' )
 			.getByText(
 				action === 'Accept'
-					? 'Suggestion applied.'
+					? 'Suggestion accepted.'
 					: 'Suggestion rejected.'
 			)
 	).toBeVisible();

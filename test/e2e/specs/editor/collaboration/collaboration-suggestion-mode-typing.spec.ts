@@ -769,7 +769,7 @@ test.describe( 'Collaboration - Suggestion mode typing', () => {
 					await acceptButton.click();
 					await page
 						.locator( '.components-snackbar-list' )
-						.getByText( 'Suggestion applied.' )
+						.getByText( 'Suggestion accepted.' )
 						.waitFor();
 					return Date.now() - start;
 				} );

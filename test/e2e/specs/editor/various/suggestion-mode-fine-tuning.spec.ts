@@ -56,7 +56,7 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 			.locator( '.components-snackbar-list' )
 			.getByText(
 				action === 'Accept'
-					? 'Suggestion applied.'
+					? 'Suggestion accepted.'
 					: 'Suggestion rejected.'
 			)
 			.first()
@@ -219,7 +219,7 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		await decideSuggestion( page, 'Accept' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 		await expect( summary ).toContainText( 'Add: “ KEEPME”' );
 		await expect( summary ).not.toContainText( 'Change: text' );
