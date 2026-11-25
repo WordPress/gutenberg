@@ -57,6 +57,11 @@ The dial follows these rules. Each one is a function of the press, the path of t
 7. A press moves focus to the dial before the gesture starts. A paired field that commits when it loses focus has then committed, and the press uses the value, the range, and the unit that result.
 8. An empty dial sets a value on its first press. A press on its dot sets the value the dot points to.
 
+Two of these rules are decisions that a review may question:
+
+- **The value changes on press, not on release.** Native range inputs and the sliders in other libraries do the same. The ARIA Authoring Practices editors discussed it for sliders and concluded that moving the thumb on the down event [is not a WCAG failure](https://github.com/w3c/aria-practices/issues/2446#issuecomment-1232060863). Waiting for the release would make the dial behave unlike a slider.
+- **A pen that touches the dial again while its barrel button is still held starts no new gesture** until that button is released. The browser reports the second contact as a move, and the dial does not handle that case.
+
 ## Keyboard interaction
 
 Tab focuses the dial. Up and Down change the value by one step. Right and Left follow the reading direction of the WordPress locale. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to ten steps and is rounded to a whole number of steps. Home and End go to the first and last selectable values, and set the value even when the dial already shows that end for a value that is unset or outside the range. A wrapping dial continues past either end.
