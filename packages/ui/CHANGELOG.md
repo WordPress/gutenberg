@@ -11,12 +11,15 @@
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
+-   `Tabs`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, and draw the focus ring inside it. Default tabs give the background the same clearance on every side ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Bug Fixes
 
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Name the chips toolbar "Selected items" for any number of chips, so it translates correctly in languages that use the singular form for numbers other than one ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
 -   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 -   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#87256](https://github.com/WordPress/gutenberg/pull/87256)).
+-   `Tabs`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
+-   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Internal
 
