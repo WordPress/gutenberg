@@ -4,9 +4,12 @@
 
 ### Bug Fixes
 
+-   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 -   `EditorProvider`: Use the `post-only` rendering mode for templates, template parts, patterns and navigation menus with no template named around them, whatever mode the caller names, so the site editor no longer keeps the mode and the template of the last page on Home, Styles and Identity ([#87170](https://github.com/WordPress/gutenberg/pull/87170)).
+-   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
 
 ### Internal
 
