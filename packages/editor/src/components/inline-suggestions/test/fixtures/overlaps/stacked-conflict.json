@@ -1,0 +1,39 @@
+{
+	"name": "stacked-conflict",
+	"description": "A bolds a word; B, seeing it bold, removes bold and adds italic. Deltas apply in id order.",
+	"phase": "B",
+	"users": { "A": "overlap-anne", "B": "overlap-bob" },
+	"base": "word",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"kind": "format",
+			"range": [ 0, 4 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 0, 4 ],
+			"added": [ "core/italic" ],
+			"removed": [ "core/bold" ]
+		}
+	],
+	"expect": {
+		"all-accepted": "<i>word</i>",
+		"all-rejected": "word"
+	},
+	"cases": [
+		{
+			"decisions": { "A": "reject", "B": "accept" },
+			"published": "<i>word</i>"
+		},
+		{
+			"decisions": { "A": "accept", "B": "reject" },
+			"published": "<b>word</b>"
+		}
+	]
+}

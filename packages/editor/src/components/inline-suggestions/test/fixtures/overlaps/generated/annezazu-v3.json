@@ -1,0 +1,1079 @@
+{
+	"name": "annezazu-v3",
+	"phase": "current",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob",
+		"C": "overlap-carl"
+	},
+	"html": "Int<mark data-suggestion-id=\"{{id:C}}\" data-suggestion-type=\"del\" data-author=\"{{author:C}}\" class=\"wp-suggestion-del\">ro.</mark><mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"add\" data-author=\"{{author:A}}\" class=\"wp-suggestion-add\"><mark data-suggestion-id=\"{{id:C}}\" data-suggestion-type=\"del\" data-author=\"{{author:C}}\" class=\"wp-suggestion-del\"> Bright</mark> <mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"format\" data-author=\"{{author:B}}\" class=\"wp-suggestion-format\"><strong>red apples</strong></mark> fell.</mark>",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "red apples",
+				"afterHTML": "<strong>red apples</strong>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 10,
+						"added": [
+							{
+								"type": "core/bold"
+							}
+						],
+						"removed": []
+					}
+				]
+			}
+		},
+		{
+			"key": "C",
+			"author": "C",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "del"
+			}
+		}
+	],
+	"views": {
+		"displayed": "Intro. Bright <b>red apples</b> fell.",
+		"acceptedHTML": "Int <strong>red apples</strong> fell.",
+		"rejectedHTML": "Intro."
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B +C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "A", "B", "C" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+A +B -C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+A -B +C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "A", "C" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "+A -B -C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "+A +C +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "A", "C", "B" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+A +C -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "A", "C" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "+A -C +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+A -C -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "-A +C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": [ "B" ]
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "-A -C",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": [ "B" ]
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "Intro.",
+				"accepted": [],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "+B +A +C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "B", "A", "C" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+B +A -C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+B -A +C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "B", "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "+B -A -C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "+B +C +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "B", "C", "A" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+B +C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "B", "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "+B -C +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+B -C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "-B +A +C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "A", "C" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "-B +A -C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "-B -A +C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "-B -A -C",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "-B +C +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "C", "A" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "-B +C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "-B -C +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "-B -C -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "+C +A +B",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "C", "A", "B" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+C +A -B",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "C", "A" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "+C -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Int",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "+C +B +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int <b>red apples</b> fell.",
+				"accepted": [ "C", "B", "A" ],
+				"publishedHTML": "Int <strong>red apples</strong> fell."
+			},
+			{
+				"label": "+C +B -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C", "B" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "+C -B +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Int red apples fell.",
+				"accepted": [ "C", "A" ],
+				"publishedHTML": "Int red apples fell."
+			},
+			{
+				"label": "+C -B -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "accept",
+						"displayed": "Int <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Int red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Int",
+						"outdated": []
+					}
+				],
+				"published": "Int",
+				"accepted": [ "C" ],
+				"publishedHTML": "Int"
+			},
+			{
+				"label": "-C +A +B",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "-C +A -B",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "-C -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "Intro.",
+				"accepted": [],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "-C +B +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright <b>red apples</b> fell.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "Intro. Bright <strong>red apples</strong> fell."
+			},
+			{
+				"label": "-C +B -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Intro."
+			},
+			{
+				"label": "-C -B +A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					}
+				],
+				"published": "Intro. Bright red apples fell.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Intro. Bright red apples fell."
+			},
+			{
+				"label": "-C -B -A",
+				"steps": [
+					{
+						"key": "C",
+						"decision": "reject",
+						"displayed": "Intro. Bright <b>red apples</b> fell.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Intro. Bright red apples fell.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Intro.",
+						"outdated": []
+					}
+				],
+				"published": "Intro.",
+				"accepted": [],
+				"publishedHTML": "Intro."
+			}
+		]
+	}
+}

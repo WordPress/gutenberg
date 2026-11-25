@@ -1,0 +1,199 @@
+{
+	"name": "add-in-del",
+	"phase": "current",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob"
+	},
+	"html": "The <mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"del\" data-author=\"{{author:A}}\" class=\"wp-suggestion-del\">big </mark><mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"add\" data-author=\"{{author:B}}\" class=\"wp-suggestion-add\">small </mark><mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"del\" data-author=\"{{author:A}}\" class=\"wp-suggestion-del\">red </mark>fox.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "del"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		}
+	],
+	"views": {
+		"displayed": "The big small red fox.",
+		"acceptedHTML": "The small fox.",
+		"rejectedHTML": "The big red fox."
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The small fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The small fox.",
+						"outdated": []
+					}
+				],
+				"published": "The small fox.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "The small fox."
+			},
+			{
+				"label": "+A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The small fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The fox.",
+						"outdated": []
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "A" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "-A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The big small red fox.",
+				"accepted": [ "B" ],
+				"publishedHTML": "The big small red fox."
+			},
+			{
+				"label": "-A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The big red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The big red fox.",
+				"accepted": [],
+				"publishedHTML": "The big red fox."
+			},
+			{
+				"label": "+B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The small fox.",
+						"outdated": []
+					}
+				],
+				"published": "The small fox.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "The small fox."
+			},
+			{
+				"label": "+B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The big small red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The big small red fox.",
+				"accepted": [ "B" ],
+				"publishedHTML": "The big small red fox."
+			},
+			{
+				"label": "-B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The big red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "The fox.",
+						"outdated": []
+					}
+				],
+				"published": "The fox.",
+				"accepted": [ "A" ],
+				"publishedHTML": "The fox."
+			},
+			{
+				"label": "-B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "The big red fox.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "The big red fox.",
+						"outdated": []
+					}
+				],
+				"published": "The big red fox.",
+				"accepted": [],
+				"publishedHTML": "The big red fox."
+			}
+		]
+	}
+}

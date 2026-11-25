@@ -1,0 +1,199 @@
+{
+	"name": "two-deletions",
+	"phase": "A",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob"
+	},
+	"html": "<mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"del\" data-author=\"{{author:B}}\" class=\"wp-suggestion-del\">one </mark><mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"del\" data-author=\"{{author:A}}\" class=\"wp-suggestion-del\"><mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"del\" data-author=\"{{author:B}}\" class=\"wp-suggestion-del\">two</mark> three</mark>",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "del"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "del"
+			}
+		}
+	],
+	"views": {
+		"displayed": "one two three",
+		"acceptedHTML": "",
+		"rejectedHTML": "one two three"
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "one ",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "",
+						"outdated": []
+					}
+				],
+				"published": "",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": ""
+			},
+			{
+				"label": "+A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "one ",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "one ",
+						"outdated": []
+					}
+				],
+				"published": "one ",
+				"accepted": [ "A" ],
+				"publishedHTML": "one "
+			},
+			{
+				"label": "-A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": " three",
+						"outdated": []
+					}
+				],
+				"published": " three",
+				"accepted": [ "B" ],
+				"publishedHTML": " three"
+			},
+			{
+				"label": "-A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					}
+				],
+				"published": "one two three",
+				"accepted": [],
+				"publishedHTML": "one two three"
+			},
+			{
+				"label": "+B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": " three",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "",
+						"outdated": []
+					}
+				],
+				"published": "",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": ""
+			},
+			{
+				"label": "+B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": " three",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": " three",
+						"outdated": []
+					}
+				],
+				"published": " three",
+				"accepted": [ "B" ],
+				"publishedHTML": " three"
+			},
+			{
+				"label": "-B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "one ",
+						"outdated": []
+					}
+				],
+				"published": "one ",
+				"accepted": [ "A" ],
+				"publishedHTML": "one "
+			},
+			{
+				"label": "-B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "one two three",
+						"outdated": []
+					}
+				],
+				"published": "one two three",
+				"accepted": [],
+				"publishedHTML": "one two three"
+			}
+		]
+	}
+}
