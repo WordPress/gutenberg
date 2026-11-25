@@ -1287,6 +1287,10 @@ export const __unstableSplitSelection =
 
 		const lastBlock = clonedBlocks.pop();
 		const tailType = getBlockType( tail.name )!;
+		// Keep an empty tail that still holds inner blocks, like the nested
+		// list of the list item pasted into.
+		const keepTail =
+			! isUnmodifiedBlock( tail ) || tail.innerBlocks.length > 0;
 
 		if ( clonedBlocks.length ) {
 			output.push( ...clonedBlocks );
@@ -1320,11 +1324,11 @@ export const __unstableSplitSelection =
 				};
 			} else {
 				output.push( lastBlock );
-				if ( ! isUnmodifiedBlock( tail ) ) {
+				if ( keepTail ) {
 					output.push( tail );
 				}
 			}
-		} else if ( ! isUnmodifiedBlock( tail ) ) {
+		} else if ( keepTail ) {
 			output.push( tail );
 		}
 
