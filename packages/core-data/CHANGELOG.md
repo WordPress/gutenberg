@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Invalidate the loaded `wp_navigation` records when a page publish is received, so a Navigation block picks up the link that "Auto add new pages" appended on the server without a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).

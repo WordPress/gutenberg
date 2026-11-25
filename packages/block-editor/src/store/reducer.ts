@@ -699,18 +699,39 @@ const withBlockReset =
 			const fixedClientIds: string[] = [];
 			for ( const clientId of newState.controlledInnerBlocks ) {
 				const controlledOrder = newState.order.get( clientId )!;
-				const innerBlocks = controlledOrder.map(
-					( id ) => state!.tree.get( id ) as TreeBlock
+				// When the preserved sub-tree is unchanged, keep the previous
+				// entry so `getBlocks( clientId )` keeps its reference: the
+				// controller syncing those blocks to its entity would otherwise
+				// see a change it did not make and report it as an edit.
+				const previousEntry = state!.tree.get(
+					'controlled||' + clientId
 				);
+				const isUnchanged =
+					previousEntry?.innerBlocks.length ===
+						controlledOrder.length &&
+					controlledOrder.every(
+						( id, index ) =>
+							previousEntry.innerBlocks[ index ] ===
+							state!.tree.get( id )
+					);
+				const innerBlocks = isUnchanged
+					? previousEntry.innerBlocks
+					: controlledOrder.map(
+							( id ) => state!.tree.get( id ) as TreeBlock
+						);
 				const existingEntry = newState.tree.get( clientId );
-				if ( existingEntry ) {
+				// A preserved entry already has none, so it keeps its reference.
+				if ( existingEntry?.innerBlocks.length ) {
 					newState.tree.set( clientId, {
 						...existingEntry,
 						innerBlocks: [],
 					} );
 					fixedClientIds.push( clientId );
 				}
-				newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+				newState.tree.set(
+					'controlled||' + clientId,
+					isUnchanged ? previousEntry : { innerBlocks }
+				);
 				const preserveTreeEntry = ( blockId: string ) => {
 					const treeEntry = state!.tree.get( blockId );
 					if ( ! treeEntry ) {
