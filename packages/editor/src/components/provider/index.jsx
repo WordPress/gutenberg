@@ -212,7 +212,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
 
-				const _mode = getRenderingMode();
+				// A post rendered on its own is `post-only` from its first
+				// render. The store only catches up once the effect below
+				// dispatches, after paint, so reading it alone would render one
+				// frame in the mode of the last post, with its lock.
+				const _mode = renderedOnItsOwn
+					? 'post-only'
+					: getRenderingMode();
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
