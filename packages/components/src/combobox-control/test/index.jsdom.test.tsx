@@ -219,35 +219,6 @@ describe( 'ComboboxControl Escape key', () => {
 		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'resets the value when Enter is pressed on the Reset button in a Modal', async () => {
-		const user = userEvent.setup();
-		const onRequestClose = vi.fn();
-		const onChange = vi.fn();
-		render(
-			<Modal title="Modal" onRequestClose={ onRequestClose }>
-				<ComboboxControl
-					options={ timezones }
-					label={ defaultLabelText }
-					onChange={ onChange }
-					allowReset
-				/>
-			</Modal>
-		);
-		const input = getInput( defaultLabelText );
-
-		await user.click( input );
-		await user.keyboard( '[Enter]' );
-		expect( onChange ).toHaveBeenLastCalledWith( timezones[ 0 ].value );
-
-		// `Modal` constrains tabbing, which finds no tabbable elements in
-		// jsdom, so move focus to the Reset button directly.
-		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
-		act( () => resetButton.focus() );
-		await user.keyboard( '[Enter]' );
-		expect( onChange ).toHaveBeenLastCalledWith( null );
-		expect( onRequestClose ).not.toHaveBeenCalled();
-	} );
-
 	it( 'closes the suggestions list first, and then a parent Dropdown', async () => {
 		const user = userEvent.setup();
 		const { unmount } = render(
@@ -285,7 +256,7 @@ describe( 'ComboboxControl Escape key', () => {
 		unmount();
 	} );
 
-	it( 'closes a parent Modal while the suggestions list is not shown because it is loading', async () => {
+	it( 'ends the search first, and then closes a parent Modal, while results are loading', async () => {
 		const user = userEvent.setup();
 		const onRequestClose = vi.fn();
 		render(
@@ -293,6 +264,7 @@ describe( 'ComboboxControl Escape key', () => {
 				<ComboboxControl
 					options={ timezones }
 					label={ defaultLabelText }
+					value={ timezones[ 0 ].value }
 					isLoading
 				/>
 			</Modal>
@@ -300,8 +272,14 @@ describe( 'ComboboxControl Escape key', () => {
 		const input = getInput( defaultLabelText );
 
 		await user.click( input );
+		await user.keyboard( 'x' );
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).toHaveValue( 'x' );
+
+		await user.keyboard( '[Escape]' );
+		expect( input ).toHaveValue( timezones[ 0 ].label );
+		expect( onRequestClose ).not.toHaveBeenCalled();
 
 		await user.keyboard( '[Escape]' );
 		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );

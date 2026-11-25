@@ -209,12 +209,15 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					preventDefault = true;
 					break;
 				case 'Escape':
-					// Only consume Escape while the suggestions list is shown,
-					// so that a parent dialog (e.g. `Modal`, `Popover`) can
-					// close when the list is already collapsed. Also stop
+					// Only consume Escape while the control is expanded (the
+					// suggestions list is shown, or results are loading), so
+					// that a parent dialog (e.g. `Modal`, `Popover`) can close
+					// when the control is already collapsed. The first Escape
+					// always ends the search and restores the selected label,
+					// whether or not the results have arrived. Also stop
 					// propagation then, because some dialogs (e.g. the
 					// `@wordpress/ui` `Dialog`) do not check `defaultPrevented`.
-					if ( isSuggestionsListVisible ) {
+					if ( isExpanded ) {
 						preventDefault = true;
 						event.stopPropagation();
 					}
