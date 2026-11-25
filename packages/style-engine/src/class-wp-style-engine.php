@@ -902,13 +902,20 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * left out comes from other styles, and `translate` reads both. Any
 		 * invalid axis outputs nothing, and other keys are ignored.
 		 *
-		 * @param array $style_value      A single raw style value from $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 *
+		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_translate_css_declarations( $style_value, $style_definition ) {
-			if ( ! is_array( $style_value ) || ( ! isset( $style_value['x'] ) && ! isset( $style_value['y'] ) ) ) {
+			if (
+				! isset( $style_definition['property_keys']['default'] ) ||
+				! is_array( $style_value ) ||
+				( ! isset( $style_value['x'] ) && ! isset( $style_value['y'] ) )
+			) {
 				return array();
 			}
 
