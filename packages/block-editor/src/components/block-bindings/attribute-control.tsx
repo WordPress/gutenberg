@@ -121,7 +121,7 @@ export default function BlockBindingsAttributeControl( {
 		displayText =
 			// A found source has a name.
 			compatibleFields?.[ boundSourceName as string ]?.find( ( field ) =>
-				fastDeepEqual( field.args, args )
+				fastDeepEqual( field.args || { key: field.key }, args )
 			)?.label ||
 			source?.label ||
 			boundSourceName;
