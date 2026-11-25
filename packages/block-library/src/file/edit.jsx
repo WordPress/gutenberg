@@ -229,6 +229,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					<MediaControl
 						mediaId={ id }
 						mediaUrl={ href }
+						mediaType="file"
 						filename={ getFilename( href ) }
 						onSelect={ onSelectFile }
 						onError={ onUploadError }
