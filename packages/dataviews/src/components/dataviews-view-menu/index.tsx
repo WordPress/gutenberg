@@ -45,6 +45,14 @@ export interface ViewMenuProps {
 	showSort?: boolean;
 
 	/**
+	 * The size of the settings button: `compact` to sit next to
+	 * `DataViews.Search`, or `default` to sit next to a 40px control.
+	 *
+	 * @default 'compact'
+	 */
+	size?: 'compact' | 'default';
+
+	/**
 	 * Extra menu items, added after "Reset view". For example, a
 	 * `Menu.LinkItem` pointing to a help page.
 	 */
@@ -208,6 +216,7 @@ export default function DataViewsViewMenu( {
 	excludeFields,
 	requiredFields = [],
 	showSort = false,
+	size = 'compact',
 	children,
 }: ViewMenuProps ) {
 	const { fields, filters, onReset } = useContext( DataViewsContext );
@@ -313,7 +322,8 @@ export default function DataViewsViewMenu( {
 				render={
 					<Button
 						className="dataviews-view-menu__toggle"
-						size="compact"
+						__next40pxDefaultSize
+						size={ size }
 						icon={ settings }
 						label={ _x( 'View options', 'View is used as a noun' ) }
 					/>

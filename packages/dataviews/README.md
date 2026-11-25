@@ -627,6 +627,7 @@ Properties:
 -   `excludeFields`: `string[]`. Ids of fields to leave out of the menu, such as the one shown with `DataViews.FilterTabs`.
 -   `requiredFields`: `string[]`. Ids of fields that always filter by one value. Their group has no "All" item, and the view is expected to start with a filter for each of them.
 -   `showSort`: `boolean`. Whether the menu offers sorting. Defaults to `false`.
+-   `size`: `'compact' | 'default'`. The size of the settings button: `compact` to sit next to `DataViews.Search`, or `default` to sit next to a 40px control. Defaults to `compact`.
 -   `children`: React node. Extra menu items, rendered after "Reset view".
 
 #### `DataViews.FilterTabs`
