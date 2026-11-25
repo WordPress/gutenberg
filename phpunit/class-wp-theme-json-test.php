@@ -3396,6 +3396,45 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'transform', $css );
 	}
 
+	public function test_get_stylesheet_keeps_the_width_of_a_rotated_video() {
+		register_block_style(
+			'core/video',
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/video' => array(
+							'transform'  => array( 'rotate' => '4deg' ),
+							'@mobile'    => array(
+								'transform' => array( 'rotate' => '2deg' ),
+							),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-4deg' ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/video', 'tilted' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-video){rotate: 4deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-video.is-style-tilted){rotate: -4deg;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-video){rotate: 2deg;}}', $css );
+		$this->assertStringNotContainsString( 'fit-content', $css );
+	}
+
 	public function test_get_stylesheet_fits_rotated_blocks_to_their_content() {
 		register_block_style(
 			array( 'core/group', 'core/heading', 'core/paragraph' ),

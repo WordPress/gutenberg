@@ -112,7 +112,8 @@
 		"transform": {
 			"rotate": true,
 			"translate": true,
-			"scale": true
+			"scale": true,
+			"fitContent": false
 		},
 		"dimensions": {
 			"minWidth": true,

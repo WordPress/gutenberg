@@ -1767,18 +1767,21 @@ export const generateCustomProperties = (
  * @param selector     Block or block style variation selector.
  * @param declarations The node's declarations.
  * @param nodes        Nodes whose `dimensions.width` takes precedence.
+ * @param blockName    Block name, whose `transform.fitContent` support can opt out.
  * @return The ruleset, or an empty string.
  */
 function getRotationFitContentRuleset(
 	selector: string,
 	declarations: string[],
-	nodes: any[]
+	nodes: any[],
+	blockName: string
 ): string {
 	if (
 		! declarations.some( ( declaration ) =>
 			declaration.startsWith( 'rotate:' )
 		) ||
-		nodes.some( ( node ) => node?.dimensions?.width !== undefined )
+		nodes.some( ( node ) => node?.dimensions?.width !== undefined ) ||
+		getBlockSupport( blockName, 'transform.fitContent', true ) === false
 	) {
 		return '';
 	}
@@ -1975,7 +1978,8 @@ function renderStylesNode(
 		ruleset += getRotationFitContentRuleset(
 			effectiveSelector,
 			declarations,
-			[ sourceStyles ?? styles, ...( baseStyles ?? [] ) ]
+			[ sourceStyles ?? styles, ...( baseStyles ?? [] ) ],
+			name
 		);
 	}
 	if ( styles?.css ) {

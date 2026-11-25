@@ -2171,6 +2171,60 @@ describe( 'global styles renderer', () => {
 			expect( result ).not.toContain( 'scale' );
 		} );
 
+		it( 'keeps the width of a rotated block that opts out of fitting', () => {
+			mockedGetBlockSupport.mockImplementation(
+				( blockName, path, defaultValue ) =>
+					blockName === 'core/video' &&
+					path === 'transform.fitContent'
+						? false
+						: defaultValue
+			);
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/video': {
+							transform: { rotate: '4deg' },
+							'@mobile': {
+								transform: { rotate: '2deg' },
+							},
+							variations: {
+								tilted: {
+									transform: { rotate: '-4deg' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/video': {
+					selector: '.wp-block-video',
+					styleVariationSelectors: {
+						tilted: '.wp-block-video.is-style-tilted',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{ ...minimalStyleOptions, variationStyles: true }
+			);
+			mockedGetBlockSupport.mockReset();
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-video){rotate: 4deg;}' +
+					'@media (width <= 480px){:root :where(.wp-block-video){rotate: 2deg;}}' +
+					':root :where(.wp-block-video.is-style-tilted){rotate: -4deg;}'
+			);
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},

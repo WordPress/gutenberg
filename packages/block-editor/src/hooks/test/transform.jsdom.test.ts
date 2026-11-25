@@ -93,6 +93,16 @@ describe( 'transform serialization', () => {
 		).toBe( 'is-style-a has-rotation' );
 	} );
 
+	it( 'saves no has-rotation class for a block that keeps its width', () => {
+		registerTransformBlock( { rotate: true, fitContent: false } );
+
+		expect(
+			transformSupport.addSaveProps( {}, 'test/transform', {
+				style: { transform: { rotate: '15deg' } },
+			} ).className
+		).toBeUndefined();
+	} );
+
 	it( 'saves no has-rotation class for an invalid rotation', () => {
 		registerTransformBlock( { rotate: true } );
 

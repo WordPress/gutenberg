@@ -206,7 +206,12 @@ function addSaveProps(
 ) {
 	// Mirror of the skipped style in `addSaveProps()` of `./style`.
 	if (
-		shouldSkipSerialization( blockType, TRANSFORM_SUPPORT_KEY, 'rotate' )
+		shouldSkipSerialization( blockType, TRANSFORM_SUPPORT_KEY, 'rotate' ) ||
+		getBlockSupport(
+			blockType,
+			[ TRANSFORM_SUPPORT_KEY, 'fitContent' ],
+			true
+		) === false
 	) {
 		return props;
 	}

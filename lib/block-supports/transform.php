@@ -61,7 +61,14 @@ function gutenberg_apply_transform_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	return gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
+	$classes_and_styles = gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
+
+	// A block that keeps its width when rotated does not need the fit class.
+	if ( ! block_has_support( $block_type, array( 'transform', 'fitContent' ), true ) ) {
+		unset( $classes_and_styles['class'] );
+	}
+
+	return $classes_and_styles;
 }
 
 /**

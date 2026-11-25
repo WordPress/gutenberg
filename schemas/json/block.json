@@ -691,6 +691,11 @@
 							"description": "Allow blocks to define a uniform scale.",
 							"type": "boolean",
 							"default": false
+						},
+						"fitContent": {
+							"description": "Whether a rotated block shrinks to fit its content. A block that already fills its box, such as Video, can set it to `false` to keep its width.",
+							"type": "boolean",
+							"default": true
 						}
 					}
 				},

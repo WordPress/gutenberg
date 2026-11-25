@@ -193,6 +193,23 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_rotation_keeps_the_width_of_a_block_that_opts_out_of_fitting() {
+		$block_type = $this->register_transform_block(
+			array(
+				'rotate'     => true,
+				'fitContent' => false,
+			)
+		);
+
+		$this->assertSame(
+			array( 'style' => 'rotate:15deg;' ),
+			gutenberg_apply_transform_support(
+				$block_type,
+				array( 'style' => array( 'transform' => array( 'rotate' => '15deg' ) ) )
+			)
+		);
+	}
+
 	public function test_classes_and_styles_ignore_block_support() {
 		$this->assertSame(
 			array(

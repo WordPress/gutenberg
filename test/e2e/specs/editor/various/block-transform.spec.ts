@@ -79,6 +79,39 @@ test.describe( 'Transform block support', () => {
 		).toBe( true );
 	} );
 
+	test( 'keeps the width of a rotated video', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/video',
+			attributes: {
+				src: 'https://example.com/video.mp4',
+				caption: 'Caption',
+				style: { transform: { rotate: '4deg' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'After' },
+		} );
+
+		const editorVideo = editor.canvas.locator( 'figure.wp-block-video' );
+		await expect.poll( () => getRotate( editorVideo ) ).toBe( '4deg' );
+		await expect( editorVideo ).not.toHaveClass( /has-rotation/ );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const video = page.locator( 'figure.wp-block-video' );
+		expect( await getRotate( video ) ).toBe( '4deg' );
+		await expect( video ).not.toHaveClass( /has-rotation/ );
+		expect(
+			await video.evaluate(
+				( element: HTMLElement ) =>
+					element.offsetWidth ===
+					( element.nextElementSibling as HTMLElement ).offsetWidth
+			)
+		).toBe( true );
+	} );
+
 	test( 'saves only the axis a user sets over a Global Styles axis', async ( {
 		editor,
 		page,
