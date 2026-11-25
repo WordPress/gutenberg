@@ -99,6 +99,7 @@ describe( 'PasswordEdit', () => {
 	it( 'restores focus to the trigger button when the modal closes', () => {
 		render( <EditedPassword initial={ {} } /> );
 		const button = screen.getByRole( 'button', { name: 'Set password' } );
+		button.focus();
 		fireEvent.click( button );
 
 		expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();

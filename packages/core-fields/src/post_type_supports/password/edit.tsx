@@ -26,6 +26,7 @@ export default function PasswordEdit( {
 	const password = field.getValue( { item: data } ) || '';
 	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState( false );
 	const buttonRef = useRef< HTMLButtonElement >( null );
+	const triggerRef = useRef< HTMLButtonElement | null >( null );
 
 	const closeParentDropdown = () => {
 		const popover = buttonRef.current?.closest< HTMLElement >(
@@ -58,6 +59,20 @@ export default function PasswordEdit( {
 		};
 	}, [ isPasswordModalOpen ] );
 
+	// Restore focus to the parent dropdown toggle (e.g. "Edit Status") if the dropdown was closed.
+	useEffect( () => {
+		if ( ! isPasswordModalOpen && triggerRef.current ) {
+			const trigger = triggerRef.current;
+			triggerRef.current = null;
+			if (
+				! buttonRef.current ||
+				! document.contains( buttonRef.current )
+			) {
+				trigger.focus();
+			}
+		}
+	}, [ isPasswordModalOpen ] );
+
 	const passwordHelpId = useInstanceId(
 		PasswordEdit,
 		'fields-controls__password-help'
@@ -75,7 +90,18 @@ export default function PasswordEdit( {
 				__next40pxDefaultSize
 				variant="secondary"
 				aria-describedby={ String( passwordHelpId ) }
-				onClick={ () => setIsPasswordModalOpen( true ) }
+				onClick={ () => {
+					const popover = buttonRef.current?.closest(
+						'.components-popover'
+					);
+					if ( popover ) {
+						triggerRef.current =
+							document.querySelector< HTMLButtonElement >(
+								'.dataforms-layouts-panel__field-dropdown-anchor button[aria-expanded="true"], .components-dropdown button[aria-expanded="true"]'
+							);
+					}
+					setIsPasswordModalOpen( true );
+				} }
 			>
 				{ password ? __( 'Edit password' ) : __( 'Set password' ) }
 			</Button>

@@ -137,11 +137,11 @@ test.describe( 'Page List', () => {
 						);
 
 						if ( option !== 'Private' ) {
-							await page
-								.getByRole( 'checkbox', {
-									name: 'Password protected',
+							await expect(
+								page.getByRole( 'button', {
+									name: 'Set password',
 								} )
-								.check();
+							).toBeVisible();
 						}
 					}
 				},
