@@ -77,4 +77,37 @@ describe( 'SlugEdit', () => {
 		fireEvent.blur( input );
 		expect( input ).toHaveValue( 'my-post-title' );
 	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/28479.
+	it( 'targets the post-specific window from the editable permalink', () => {
+		render( <EditedSlug initial={ post } /> );
+		expect(
+			screen.getByRole( 'link', { name: /example\.com\/テスト\// } )
+		).toHaveAttribute( 'target', 'wp-post-1' );
+	} );
+
+	it( 'targets the post-specific window from the read-only permalink', () => {
+		const { _links, ...readOnlyPost } = post;
+		render( <EditedSlug initial={ readOnlyPost } /> );
+		expect(
+			screen.getByRole( 'link', { name: /example\.com/ } )
+		).toHaveAttribute( 'target', 'wp-post-1' );
+	} );
+
+	it( 'falls back to a plain new tab for an item with no ID', () => {
+		// Without an ID there is no window to name, and naming them all the
+		// same would make unrelated items replace each other.
+		const { id, ...withoutId } = post;
+		render( <EditedSlug initial={ withoutId } /> );
+		expect(
+			screen.getByRole( 'link', { name: /example\.com\/テスト\// } )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'still opens the documentation link in a plain new tab', () => {
+		render( <EditedSlug initial={ post } /> );
+		expect(
+			screen.getByRole( 'link', { name: /Learn more/ } )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
 } );

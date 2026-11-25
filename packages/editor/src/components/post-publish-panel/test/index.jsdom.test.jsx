@@ -18,6 +18,7 @@ describe( 'PostPublishPanel', () => {
 		} );
 
 		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			id: 123,
 			link: 'https://wordpress.local/sample-page/',
 		} );
 	} );
@@ -70,6 +71,28 @@ describe( 'PostPublishPanel', () => {
 		expect( screen.getByText( /is now live/ ) ).toBeInTheDocument();
 	} );
 
+	it( 'targets the post-specific window from both front-end links', () => {
+		// See https://github.com/WordPress/gutenberg/issues/28479.
+		vi.spyOn(
+			select( editorStore ),
+			'isCurrentPostPublished'
+		).mockReturnValue( true );
+		vi.spyOn( select( coreStore ), 'getPostType' ).mockReturnValue( {
+			labels: { singular_name: 'post', view_item: 'View Post' },
+		} );
+
+		render( <PostPublishPanel /> );
+
+		// The post title in the panel header.
+		expect(
+			screen.getByRole( 'link', { name: /no title/ } )
+		).toHaveAttribute( 'target', 'wp-post-123' );
+		// The "View Post" call to action.
+		expect(
+			screen.getByRole( 'link', { name: /View Post/ } )
+		).toHaveAttribute( 'target', 'wp-post-123' );
+	} );
+
 	it( 'should render the post-publish panel if the post is scheduled', () => {
 		vi.spyOn(
 			select( editorStore ),
@@ -96,8 +119,9 @@ describe( 'PostPublishPanel', () => {
 		render( <PostPublishPanel /> );
 		vi.useRealTimers();
 
+		// `Link` draws its new-tab indicator in CSS, so it adds no text content.
 		expect( screen.getByText( /is now scheduled/ ) ).toHaveTextContent(
-			'(no title)↗ is now scheduled. It will go live on March 15, 2030 10:00 am UTC+0.'
+			'(no title) is now scheduled. It will go live on March 15, 2030 10:00 am UTC+0.'
 		);
 	} );
 } );

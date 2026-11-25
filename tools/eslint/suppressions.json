@@ -9489,7 +9489,7 @@
 	},
 	"packages/editor/src/components/post-publish-panel/postpublish.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		},
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -9968,7 +9968,7 @@
 	},
 	"packages/editor/src/components/post-url/index.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		},
 		"gutenberg/use-typescript": {
 			"count": 1

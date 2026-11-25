@@ -4,7 +4,6 @@ import { useRef, useState, createInterpolateElement } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
-	ExternalLink,
 	Button,
 	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
@@ -15,7 +14,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { copy } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
+import { Link } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
+import { getPostViewWindowName } from '../../utils/post-view-window-name';
 
 /**
  * Renders the `PostURL` component.
@@ -33,6 +34,7 @@ import { store as editorStore } from '../../store';
 export default function PostURL( { onClose } ) {
 	const {
 		isEditable,
+		postId,
 		postSlug,
 		postLink,
 		permalinkPrefix,
@@ -52,6 +54,7 @@ export default function PostURL( { onClose } ) {
 				select( editorStore ).getEditedPostSlug()
 			),
 			viewPostLabel: postType?.labels?.view_item,
+			postId: post.id,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,
@@ -89,10 +92,11 @@ export default function PostURL( { onClose } ) {
 							{
 								span: <span id={ postUrlSlugDescriptionId } />,
 								a: (
-									<ExternalLink
+									<Link
 										href={ __(
 											'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
 										) }
+										openInNewTab
 									/>
 								),
 							}
@@ -171,10 +175,13 @@ export default function PostURL( { onClose } ) {
 								<span className="editor-post-url__permalink-visual-label">
 									{ __( 'Permalink:' ) }
 								</span>
-								<ExternalLink
+								<Link
 									className="editor-post-url__link"
 									href={ postLink }
-									target="_blank"
+									// Reuse one tab per post instead of
+									// spawning a new one on each click.
+									target={ getPostViewWindowName( postId ) }
+									openInNewTab
 								>
 									{ postSlug ? (
 										<>
@@ -192,18 +199,21 @@ export default function PostURL( { onClose } ) {
 										// Without a slug the post only has its plain permalink.
 										permalink
 									) }
-								</ExternalLink>
+								</Link>
 							</p>
 						</>
 					) }
 					{ ! isEditable && (
-						<ExternalLink
+						<Link
 							className="editor-post-url__link"
 							href={ postLink }
-							target="_blank"
+							// Reuse one tab per post instead of spawning a new
+							// one on each click.
+							target={ getPostViewWindowName( postId ) }
+							openInNewTab
 						>
 							{ postLink }
-						</ExternalLink>
+						</Link>
 					) }
 				</div>
 			</VStack>

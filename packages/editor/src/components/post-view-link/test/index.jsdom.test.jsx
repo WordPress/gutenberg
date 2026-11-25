@@ -11,6 +11,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 } ) );
 
 const DEFAULTS = {
+	postId: 123,
 	postType: { labels: { view_item: 'View Post' } },
 	permalink: 'https://example.com/sample/',
 	isPublished: true,
@@ -23,6 +24,7 @@ function setupUseSelectMock( overrides = {} ) {
 	const data = { ...DEFAULTS, ...overrides };
 	useSelect.mockImplementation( ( cb ) =>
 		cb( () => ( {
+			getCurrentPostId: () => data.postId,
 			getCurrentPostType: () => 'post',
 			getPostType: () => data.postType,
 			getPermalink: () => data.permalink,
@@ -44,6 +46,16 @@ describe( 'PostViewLink', () => {
 		setupUseSelectMock( { postType: {} } );
 		render( <PostViewLink /> );
 		expect( screen.getByLabelText( 'View post' ) ).toBeInTheDocument();
+	} );
+
+	it( 'targets the post-specific window so repeat clicks reuse one tab', () => {
+		// See https://github.com/WordPress/gutenberg/issues/28479.
+		setupUseSelectMock();
+		render( <PostViewLink /> );
+		expect( screen.getByLabelText( 'View Post' ) ).toHaveAttribute(
+			'target',
+			'wp-post-123'
+		);
 	} );
 
 	it( 'renders nothing if the post is not published', () => {

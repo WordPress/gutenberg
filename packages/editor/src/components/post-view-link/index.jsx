@@ -5,9 +5,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
+import { getPostViewWindowName } from '../../utils/post-view-window-name';
 
 export default function PostViewLink() {
-	const { hasLoaded, permalink, isPublished, label, showIconLabels } =
+	const { hasLoaded, permalink, isPublished, label, postId, showIconLabels } =
 		useSelect( ( select ) => {
 			// Grab post type to retrieve the view_item label.
 			const postTypeSlug = select( editorStore ).getCurrentPostType();
@@ -16,6 +17,7 @@ export default function PostViewLink() {
 
 			return {
 				permalink: select( editorStore ).getPermalink(),
+				postId: select( editorStore ).getCurrentPostId(),
 				isPublished: select( editorStore ).isCurrentPostPublished(),
 				label: postType?.labels?.view_item,
 				hasLoaded: !! postType,
@@ -33,7 +35,8 @@ export default function PostViewLink() {
 			icon={ external }
 			label={ label || __( 'View post' ) }
 			href={ permalink }
-			target="_blank"
+			// Reuse one tab per post instead of spawning a new one each click.
+			target={ getPostViewWindowName( postId ) }
 			showTooltip={ ! showIconLabels }
 			size="compact"
 		/>

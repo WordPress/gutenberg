@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Reuse one browser tab per post when opening its front end from the view button, the permalink, the post-publish panel or the command palette, instead of opening another tab on every click ([#28479](https://github.com/WordPress/gutenberg/issues/28479)).
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
@@ -28,6 +29,7 @@
 
 ### Internal
 
+-   PostURL and PostPublishPanel: Replace `ExternalLink` with `Link` from `@wordpress/ui`, which draws its new-tab indicator in CSS rather than as a `↗` character in the markup ([#28479](https://github.com/WordPress/gutenberg/issues/28479)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 
 ## 16.1.0 (2026-11-04)

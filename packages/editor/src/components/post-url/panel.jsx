@@ -9,6 +9,7 @@ import PostURLCheck from './check';
 import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
+import { getPostViewWindowName } from '../../utils/post-view-window-name';
 
 /**
  * Renders the `PostURLPanel` component.
@@ -100,10 +101,12 @@ function PostURLToggle( { isOpen, onClick } ) {
 }
 
 function FrontPageLink() {
-	const { postLink } = useSelect( ( select ) => {
+	const { postId, postLink } = useSelect( ( select ) => {
 		const { getCurrentPost } = select( editorStore );
+		const post = getCurrentPost();
 		return {
-			postLink: getCurrentPost()?.link,
+			postId: post?.id,
+			postLink: post?.link,
 		};
 	}, [] );
 
@@ -111,6 +114,8 @@ function FrontPageLink() {
 		<Link
 			className="editor-post-url__front-page-link"
 			href={ postLink }
+			// Reuse one tab per post instead of spawning a new one on each click.
+			target={ getPostViewWindowName( postId ) }
 			openInNewTab
 		>
 			{ postLink }

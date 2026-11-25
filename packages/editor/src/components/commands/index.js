@@ -23,6 +23,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { getPostViewWindowName } from '../../utils/post-view-window-name';
 import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -358,7 +359,12 @@ const getEditorCommandLoader = () =>
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						window.open( viewLink, '_blank' );
+						// Reuse one tab per post instead of spawning a new one
+						// on each click.
+						window.open(
+							viewLink,
+							getPostViewWindowName( getCurrentPostId() )
+						);
 					},
 				} );
 			}

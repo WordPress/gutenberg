@@ -8,6 +8,7 @@ import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
+import { getPostViewWindowName } from '../../shared/post-view-window-name';
 import type { PostWithSlug } from './types';
 import styles from './style.module.css';
 
@@ -54,6 +55,12 @@ const SlugEdit = ( {
 		isEditable && slug
 			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
 			: safeDecodeURIComponent( data.link || '' );
+	// Reuse one tab per post instead of spawning a new one on each click.
+	// Without an ID there is no window to name, and naming them all the same
+	// would make unrelated items replace each other, so fall back to a plain
+	// new tab, which `Link` gives an unnamed `openInNewTab` link.
+	const permalinkTarget =
+		data.id === undefined ? undefined : getPostViewWindowName( data.id );
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) => {
@@ -141,6 +148,7 @@ const SlugEdit = ( {
 						<Link
 							className={ styles[ 'help-link' ] }
 							href={ permalink }
+							target={ permalinkTarget }
 							openInNewTab
 						>
 							{ slug ? (
@@ -162,6 +170,7 @@ const SlugEdit = ( {
 				<Link
 					className={ styles[ 'help-link' ] }
 					href={ permalink }
+					target={ permalinkTarget }
 					openInNewTab
 				>
 					{ permalink }
