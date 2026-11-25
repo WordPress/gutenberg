@@ -2622,6 +2622,249 @@ describe( 'state', () => {
 					).toBeUndefined();
 				} );
 
+				it( 'keeps a typing run non-persistent across an ignored change to other blocks', () => {
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'container',
+									attributes: {},
+									innerBlocks: [
+										partial< Block >( {
+											clientId: 'clone-1',
+											attributes: {},
+											innerBlocks: [],
+										} ),
+									],
+								} ),
+							],
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// Another controller re-clones its own blocks between
+					// two keystrokes, as a copy of the same entity does when
+					// it cannot update its clones in place. That change is
+					// ignored by history, so it must not split the typing
+					// run either.
+					state = blocks( state, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'container',
+						blocks: [
+							partial< Block >( {
+								clientId: 'clone-2',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+					expect( state.lastBlockChangeHistoryMode ).toBe( 'ignore' );
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'ab' },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+					expect( state.lastBlockChangeHistoryMode ).toBeUndefined();
+				} );
+
+				it( 'keeps a typing run non-persistent across an ignored attribute update to another block', () => {
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'clone',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// A container duplicated from the same entity mirrors the
+					// keystroke onto its own clone, as a change ignored by
+					// history.
+					state = blocks( state, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'clone' ],
+						attributes: { clone: { content: 'a' } },
+						options: { uniqueByBlock: true },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'ab' },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+				} );
+
+				it( 'starts a persistent change after an ignored change replaces the edited block', () => {
+					const initialBlocks = [
+						partial< Block >( {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ),
+					];
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: initialBlocks,
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// An undo resets the blocks from the entity, bringing
+					// back the attributes from before the typing, so typing
+					// into the block again starts a new undo level.
+					state = blocks( state, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: initialBlocks,
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'starts a persistent change after an ignored change updates the edited block', () => {
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// An undo in a container updates its clones in place.
+					// The block is the same one, but its attributes now come
+					// from the entity, so typing into it again starts a new
+					// undo level.
+					state = blocks( state, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { kumquat: { content: '' } },
+						options: { uniqueByBlock: true },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+				} );
+
+				it( 'keeps typing in one block a single undo level after typing in another', () => {
+					let state = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'loquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: { content: 'a' },
+					} );
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'loquat' ],
+						attributes: { content: 'b' },
+					} );
+					expect( state.isPersistentChange ).toBe( true );
+
+					// Typing on in the second block, which history does not
+					// ignore, joins the undo level its first keystroke
+					// opened.
+					state = blocks( state, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'loquat' ],
+						attributes: { content: 'bc' },
+					} );
+					expect( state.isPersistentChange ).toBe( false );
+				} );
+
 				it( 'should retain reference for same state, same persistence', () => {
 					const original = deepFreeze(
 						blocks( undefined, {

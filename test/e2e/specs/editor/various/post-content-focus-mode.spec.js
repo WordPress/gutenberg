@@ -22,6 +22,7 @@ test.describe( 'Post Content focus mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.resetPreferences();
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'inserts blocks into Post Content from different selection states', async ( {
@@ -114,6 +115,116 @@ test.describe( 'Post Content focus mode', () => {
 				editor.canvas.getByText( 'Initial paragraph' )
 			).toBeVisible();
 		} );
+	} );
+
+	// Post Content is an inner block controller, so an undo that moves the
+	// caret between two of its blocks crosses the same controlled container.
+	// See https://github.com/WordPress/gutenberg/pull/82706.
+	test( 'undo moves the caret between blocks of the same Post Content', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		postContentFocusMode,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await postContentFocusMode.enableShowTemplate();
+
+		const postContentText = () => postContentFocusMode.getPostContentText();
+
+		// Edit the first block, then the second, leaving the caret in the
+		// second.
+		await postContentFocusMode.waitForPostContentVisible();
+		await editor.selectBlocks( editor.canvas.getByText( 'First' ) );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '-a' );
+		await expect.poll( postContentText ).toEqual( [ 'First-a', 'Second' ] );
+
+		await editor.selectBlocks( editor.canvas.getByText( 'Second' ) );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '-b' );
+		await expect
+			.poll( postContentText )
+			.toEqual( [ 'First-a', 'Second-b' ] );
+
+		// Each edit is an undo level of its own.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( postContentText ).toEqual( [ 'First-a', 'Second' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( postContentText ).toEqual( [ 'First', 'Second' ] );
+
+		// The caret was in the second block and has to follow the undo to
+		// the first one.
+		const selected = await page.evaluate( () => {
+			const { getSelectedBlockClientId, getBlockAttributes } =
+				window.wp.data.select( 'core/block-editor' );
+			const clientId = getSelectedBlockClientId();
+			return clientId
+				? getBlockAttributes( clientId )?.content?.toString?.()
+				: null;
+		} );
+		expect( selected ).toBe( 'First' );
+	} );
+
+	// The undo level that typing opens starts from the selection the last
+	// undo restored, so the next undo hands back that same selection, and
+	// has to restore it again.
+	// See https://github.com/WordPress/gutenberg/pull/82706.
+	test( 'undo moves the caret back on undo, type, undo', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		postContentFocusMode,
+		requestUtils,
+	} ) => {
+		// A saved paragraph, so no undo level can remove it.
+		const { id } = await requestUtils.createPost( {
+			content:
+				'<!-- wp:paragraph --><p>Hello world</p><!-- /wp:paragraph -->',
+		} );
+		await admin.editPost( id );
+		await postContentFocusMode.enableShowTemplate();
+
+		// Type after "Hello", then undo.
+		await editor.canvas.getByText( 'Hello world' ).click();
+		await page.keyboard.press( 'End' );
+		for ( let i = 0; i < ' world'.length; i++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+		await postContentFocusMode.waitForPostContentVisible();
+		await page.keyboard.type( '-a' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-a world' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello world' ] );
+
+		// Type again at the caret the undo restored, then undo again.
+		await page.keyboard.type( '-b' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-b world' ] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello world' ] );
+
+		// The caret is back after "Hello", not after the undone text.
+		await page.keyboard.type( '-c' );
+		await expect
+			.poll( () => postContentFocusMode.getPostContentText() )
+			.toEqual( [ 'Hello-c world' ] );
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/76101.
@@ -221,6 +332,52 @@ test.describe( 'Post Content focus mode', () => {
 					} )
 					.click();
 			} );
+		} );
+
+		// The template part is an inner block controller too, but it renders
+		// another entity, so a caret in it must not stop an undo in Post
+		// Content from moving the caret back.
+		// See https://github.com/WordPress/gutenberg/pull/82706.
+		test( 'undo moves the caret back into Post Content from Post Title', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			postContentFocusMode,
+			requestUtils,
+		} ) => {
+			// A saved paragraph, so no undo level can remove it.
+			const { id } = await requestUtils.createPost( {
+				content:
+					'<!-- wp:paragraph --><p>Initial content</p><!-- /wp:paragraph -->',
+			} );
+			await admin.editPost( id );
+			await postContentFocusMode.enableShowTemplate();
+
+			await editor.canvas.getByText( 'Initial content' ).click();
+			await page.keyboard.press( 'End' );
+			await postContentFocusMode.waitForPostContentVisible();
+			await page.keyboard.type( '-a' );
+			await expect
+				.poll( () => postContentFocusMode.getPostContentText() )
+				.toEqual( [ 'Initial content-a' ] );
+
+			// Move the caret to Post Title, in the same template part.
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', { name: 'Block: Title' } )
+			);
+			await expect
+				.poll( () => postContentFocusMode.getSelectedBlockName() )
+				.toBe( 'core/post-title' );
+
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect
+				.poll( () => postContentFocusMode.getPostContentText() )
+				.toEqual( [ 'Initial content' ] );
+
+			expect( await postContentFocusMode.getSelectedBlockName() ).toBe(
+				'core/paragraph'
+			);
 		} );
 
 		test( 'template part blocks outside post content are not editable', async ( {
@@ -367,6 +524,123 @@ test.describe( 'Post Content focus mode', () => {
 			} );
 		} );
 	} );
+
+	// The same post is rendered by two Post Content blocks, which are inner
+	// block controllers sharing one entity.
+	// See https://github.com/WordPress/gutenberg/issues/79096.
+	test.describe( 'duplicate Post Content instances', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'content-area',
+				title: 'Content Area',
+				content:
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+
+			// One Post Content at the template root, another nested inside a
+			// template part, both rendering the same post.
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'singular',
+				title: 'Singular',
+				content: [
+					'<!-- wp:template-part {"slug":"header","tagName":"header","theme":"emptytheme"} /-->',
+					'<!-- wp:post-content {"layout":{"inherit":true}} /-->',
+					'<!-- wp:template-part {"slug":"content-area","theme":"emptytheme"} /-->',
+				].join( '\n' ),
+			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
+			await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		} );
+
+		test( 'typing in one instance leaves the caret and selection in that instance', async ( {
+			admin,
+			editor,
+			page,
+			postContentFocusMode,
+		} ) => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Shared' },
+			} );
+			await postContentFocusMode.enableShowTemplate();
+
+			// Identify the Post Content at the template root, as opposed to
+			// the one nested inside the template part.
+			const { rootParagraph, nestedPostContent } = await page.evaluate(
+				() => {
+					const {
+						getBlocksByName,
+						getBlockOrder,
+						getBlockParents,
+						getBlockName,
+					} = window.wp.data.select( 'core/block-editor' );
+					const isNested = ( clientId ) =>
+						getBlockParents( clientId ).some(
+							( parent ) =>
+								getBlockName( parent ) === 'core/template-part'
+						);
+					const all = getBlocksByName( 'core/post-content' );
+					const root = all.find(
+						( clientId ) => ! isNested( clientId )
+					);
+					return {
+						rootParagraph: getBlockOrder( root )[ 0 ],
+						nestedPostContent: all.find( isNested ),
+					};
+				}
+			);
+
+			// Clear the selection so no block toolbar overlaps the paragraph.
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock();
+			} );
+			await editor.canvas
+				.locator( `[data-block="${ rootParagraph }"]` )
+				.click();
+
+			// Record every time the selection enters the nested instance.
+			// A steal is momentary — the canvas scrolls as soon as it
+			// happens, even if the selection later recovers — so asserting
+			// on the final selection alone misses it.
+			await page.evaluate( ( nestedClientId ) => {
+				const { getSelectedBlockClientId, getBlockParents } =
+					window.wp.data.select( 'core/block-editor' );
+				window.__selectionsInNestedInstance = [];
+				window.wp.data.subscribe( () => {
+					const selected = getSelectedBlockClientId();
+					if (
+						selected &&
+						getBlockParents( selected ).includes(
+							nestedClientId
+						) &&
+						window.__selectionsInNestedInstance.at( -1 ) !==
+							selected
+					) {
+						window.__selectionsInNestedInstance.push( selected );
+					}
+				} );
+			}, nestedPostContent );
+
+			await page.keyboard.press( 'End' );
+			await page.keyboard.type( ' edited' );
+
+			// The edit reaches both instances, since they render one post.
+			await expect(
+				editor.canvas.getByText( 'Shared edited' )
+			).toHaveCount( 2 );
+
+			// …and the selection never enters the nested instance.
+			expect(
+				await page.evaluate( () => window.__selectionsInNestedInstance )
+			).toEqual( [] );
+		} );
+	} );
 } );
 
 class PostContentFocusMode {
@@ -424,6 +698,56 @@ class PostContentFocusMode {
 				getBlockName( id )
 			);
 		} );
+	}
+
+	/**
+	 * Returns the content of Post Content's inner blocks.
+	 *
+	 * @return {string[]} The content of each block inside Post Content.
+	 */
+	async getPostContentText() {
+		return await this.page.evaluate( () => {
+			const { getBlocksByName, getBlockOrder, getBlockAttributes } =
+				window.wp.data.select( 'core/block-editor' );
+			const [ postContentId ] = getBlocksByName( 'core/post-content' );
+			return getBlockOrder( postContentId ).map( ( id ) =>
+				getBlockAttributes( id )?.content?.toString?.()
+			);
+		} );
+	}
+
+	/**
+	 * Returns the name of the selected block.
+	 *
+	 * @return {string|null} The selected block's name, or null.
+	 */
+	async getSelectedBlockName() {
+		return await this.page.evaluate( () => {
+			const { getSelectedBlockClientId, getBlockName } =
+				window.wp.data.select( 'core/block-editor' );
+			const clientId = getSelectedBlockClientId();
+			return clientId ? getBlockName( clientId ) : null;
+		} );
+	}
+
+	/**
+	 * Waits until the canvas counts Post Content as visible, which it reports
+	 * a moment after rendering. Until then, Post Content is neither selected
+	 * nor visible, so it reads the post asynchronously. When typing is
+	 * quickly undone, it then misses both edits: its blocks keep the typing
+	 * while the post no longer has it.
+	 */
+	async waitForPostContentVisible() {
+		await expect
+			.poll( () =>
+				this.page.evaluate( () => {
+					const { getBlocksByName, __unstableGetVisibleBlocks } =
+						window.wp.data.select( 'core/block-editor' );
+					const [ clientId ] = getBlocksByName( 'core/post-content' );
+					return __unstableGetVisibleBlocks().has( clientId );
+				} )
+			)
+			.toBe( true );
 	}
 
 	/**

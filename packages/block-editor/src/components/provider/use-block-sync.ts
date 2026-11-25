@@ -103,6 +103,33 @@ function restoreSelectionIds(
 }
 
 /**
+ * Returns whether two blocks are equal in every field other than their client
+ * ID, attributes and inner blocks. Only attributes are updated in place, so a
+ * change to any other field, such as the `innerContent` that the Custom HTML
+ * block edits, needs the blocks to be cloned again.
+ *
+ * @param block The block from the controlled value.
+ * @param clone Its clone in the block-editor store.
+ * @return Whether the blocks have the same fields.
+ */
+function hasSameFields( block: Block, clone: Block ): boolean {
+	for ( const key of new Set( [
+		...Object.keys( block ),
+		...Object.keys( clone ),
+	] ) as Set< keyof Block > ) {
+		if (
+			key !== 'clientId' &&
+			key !== 'attributes' &&
+			key !== 'innerBlocks' &&
+			block[ key ] !== clone[ key ]
+		) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * useBlockSync is a side effect which handles bidirectional sync between the
  * block-editor store and a controlling data source which provides blocks. This
  * is most commonly used by the BlockEditorProvider to synchronize the contents
@@ -156,10 +183,17 @@ export default function useBlockSync( {
 		resetSelection,
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
+		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
-		registry.select( blockEditorStore );
+	const {
+		getBlockName,
+		getBlocks,
+		getSelectionStart,
+		getSelectionEnd,
+		getBlockParents,
+		areInnerBlocksControlled,
+	} = registry.select( blockEditorStore );
 
 	const pendingChangesRef = useRef< {
 		incoming: Block[] | null;
@@ -236,6 +270,110 @@ export default function useBlockSync( {
 		}
 	};
 
+	// Whether the block-editor's current selection sits inside a *different*
+	// inner block controller of the same block type.
+	//
+	// Several controllers can render one entity — two Navigation blocks using
+	// the same menu, two Post Content blocks showing the same post. Each keeps
+	// private clones of that entity's blocks, but they all map the same
+	// external IDs, so each of them recognises the entity's selection as its
+	// own. A controller that finds the selection already sitting in another
+	// controller is therefore looking at a selection that belongs to a copy
+	// other than itself.
+	//
+	// The root controller is never one of several instances, and a selection
+	// held by the root block list belongs to no controller at all.
+	const isSelectionHeldByAnotherController = () => {
+		if ( clientId === null ) {
+			return false;
+		}
+
+		const currentStartClientId = getSelectionStart()?.clientId;
+		if ( ! currentStartClientId ) {
+			return false;
+		}
+
+		// One of our own clones, so the selection is already where it
+		// belongs and there is no need to walk the tree for it.
+		if (
+			idMappingRef.current.internalToExternal.has( currentStartClientId )
+		) {
+			return false;
+		}
+
+		// A selection anywhere inside this controller is in this copy, even
+		// one inside a controller nested in it, such as a synced pattern
+		// inside Post Content. Outside it, another copy is a controller of
+		// the same block type, such as a second Navigation block. One of
+		// another type, such as a Template Part around Post Title, renders
+		// another entity, and the root block list belongs to no controller.
+		// Two controllers of one type that render different entities, such
+		// as Template Parts on different slugs, count as copies too: telling
+		// them apart would need each controller to record its entity.
+		const parents = getBlockParents( currentStartClientId );
+		const blockName = getBlockName( clientId );
+		return (
+			! parents.includes( clientId ) &&
+			parents.some(
+				( parentId ) =>
+					areInnerBlocksControlled( parentId ) &&
+					getBlockName( parentId ) === blockName
+			)
+		);
+	};
+
+	// Whether the controlled value has the same structure as the clones
+	// already in the store: the same external IDs in the same order, all
+	// the way down, with nothing but attributes changed. A nested
+	// controller owns its own inner blocks, so those are left to it.
+	const hasSameStructure = ( blocks: Block[], clones: Block[] ): boolean =>
+		blocks.length === clones.length &&
+		blocks.every( ( block, index ) => {
+			const clone = clones[ index ];
+			return (
+				idMappingRef.current.internalToExternal.get(
+					clone.clientId
+				) === block.clientId &&
+				hasSameFields( block, clone ) &&
+				( areInnerBlocksControlled( clone.clientId ) ||
+					hasSameStructure( block.innerBlocks, clone.innerBlocks ) )
+			);
+		} );
+
+	// Collects, per clone, the attributes whose values differ from the
+	// controlled value. Only called once the structures are known to match.
+	const collectAttributeChanges = (
+		blocks: Block[],
+		clones: Block[],
+		changes: Record< string, Record< string, unknown > > = {}
+	) => {
+		blocks.forEach( ( block, index ) => {
+			const clone = clones[ index ];
+			const changed: Record< string, unknown > = {};
+			let hasChanged = false;
+			for ( const key of new Set( [
+				...Object.keys( block.attributes ),
+				...Object.keys( clone.attributes ),
+			] ) ) {
+				if ( block.attributes[ key ] !== clone.attributes[ key ] ) {
+					changed[ key ] = block.attributes[ key ];
+					hasChanged = true;
+				}
+			}
+			if ( hasChanged ) {
+				changes[ clone.clientId ] = changed;
+			}
+			if ( ! areInnerBlocksControlled( clone.clientId ) ) {
+				collectAttributeChanges(
+					block.innerBlocks,
+					clone.innerBlocks,
+					changes
+				);
+			}
+		} );
+		return changes;
+	};
+
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
@@ -245,6 +383,38 @@ export default function useBlockSync( {
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
 		if ( clientId ) {
+			// A value with the same structure as the current clones differs
+			// in attributes at most, as when the same entity is typed into
+			// through another container. Update the clones in place: the
+			// mapping, the mounted components and the selection all stay
+			// valid, and nothing is torn down between two keystrokes.
+			const clones = getBlocks( clientId );
+			if (
+				areInnerBlocksControlled( clientId ) &&
+				hasSameStructure( controlledBlocks, clones )
+			) {
+				const changes = collectAttributeChanges(
+					controlledBlocks,
+					clones
+				);
+				const changedClientIds = Object.keys( changes );
+				if ( changedClientIds.length ) {
+					if ( subscribedRef.current ) {
+						pendingChangesRef.current.incoming = clones;
+					}
+					__unstableMarkNextChangeAsNotPersistent( {
+						history: 'ignore',
+					} );
+					updateBlockAttributes( changedClientIds, changes, {
+						uniqueByBlock: true,
+					} );
+					// As after re-cloning, let an undo restore its recorded
+					// selection even if it is the one restored last time.
+					appliedSelectionRef.current = null;
+				}
+				return;
+			}
+
 			// Batch so that the controlled flag and block replacement
 			// are applied atomically — subscribers see a consistent state.
 			registry.batch( () => {
@@ -350,13 +520,20 @@ export default function useBlockSync( {
 			pendingChangesRef.current.outgoing = [];
 			setControlledBlocks();
 
-			// Restore selection from context if it targets our scope.
-			// Only done when blocks were reset from an external source
-			// (undo/redo, entity navigation) — NOT for outgoing changes,
-			// because dispatching resetSelection between keystrokes breaks
-			// the isUpdatingSameBlockAttribute chain and creates per-
-			// character undo levels.
-			restoreSelection();
+			// An edit made in another block rendering this same entity
+			// arrives here as an external change too, but that one must not
+			// move the selection: the caret is in the block being edited,
+			// and restoring would drag it — and the canvas — into this copy.
+			// See https://github.com/WordPress/gutenberg/issues/79096.
+			if ( ! isSelectionHeldByAnotherController() ) {
+				// Restore selection from context if it targets our scope.
+				// Only done when blocks were reset from an external source
+				// (undo/redo, entity navigation) — NOT for outgoing changes,
+				// because dispatching resetSelection between keystrokes
+				// breaks the isUpdatingSameBlockAttribute chain and creates
+				// per-character undo levels.
+				restoreSelection();
+			}
 		}
 	}, [ controlledBlocks, clientId ] );
 
@@ -366,8 +543,6 @@ export default function useBlockSync( {
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
 			__unstableIsLastBlockChangeIgnored,
-			areInnerBlocksControlled,
-			getBlockParents,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
