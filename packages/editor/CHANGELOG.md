@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Offer the reaction emoji from the `wp_note_reaction_emojis` filter, which lets a site add or remove emoji. Longer lists wrap into rows that scroll ([#84200](https://github.com/WordPress/gutenberg/pull/84200)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).

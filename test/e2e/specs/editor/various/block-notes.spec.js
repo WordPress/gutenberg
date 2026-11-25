@@ -1126,6 +1126,128 @@ test.describe( 'Block Notes', () => {
 			await trigger.focus();
 			await expect( trigger ).toHaveCSS( 'opacity', '1' );
 		} );
+
+		test.describe( 'Filtered emoji list', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-reaction-emojis'
+				);
+			} );
+
+			test( 'offers the emoji from the wp_note_reaction_emojis filter', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing filtered emoji' },
+					comment: 'Filtered emoji',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const menu = page.getByRole( 'menu', {
+					name: 'Add reaction',
+				} );
+				await expect(
+					menu.getByRole( 'menuitemcheckbox', { name: 'unicorn' } )
+				).toBeVisible();
+				await expect(
+					menu.getByRole( 'menuitemcheckbox', { name: 'eyes' } )
+				).toHaveCount( 0 );
+				await expect(
+					menu.getByRole( 'menuitemcheckbox' )
+				).toHaveCount( 7 );
+				await page.keyboard.press( 'Escape' );
+
+				// The REST API accepts the added emoji, and the pill renders it
+				// from its hex key with the filtered label.
+				await blockNoteUtils.addReactionToComment( 'unicorn' );
+				const reactionButton = page.getByRole( 'button', {
+					name: /unicorn/,
+				} );
+				await expect( reactionButton ).toContainText( '🦄' );
+				await expect( reactionButton ).toContainText( '1' );
+			} );
+		} );
+
+		test.describe( 'Long filtered emoji list', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'gutenberg-test-note-reaction-emojis-many'
+				);
+			} );
+
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-note-reaction-emojis-many'
+				);
+			} );
+
+			test( 'wraps the picker into rows that scroll', async ( {
+				page,
+				blockNoteUtils,
+			} ) => {
+				await blockNoteUtils.addBlockWithNote( {
+					type: 'core/paragraph',
+					attributes: { content: 'Testing many emoji' },
+					comment: 'Many emoji',
+				} );
+
+				await page
+					.getByRole( 'button', { name: 'Add reaction' } )
+					.click();
+				const menu = page.getByRole( 'menu', {
+					name: 'Add reaction',
+				} );
+				const items = menu.getByRole( 'menuitemcheckbox' );
+				await expect( items ).toHaveCount( 107 );
+
+				// Seven per row, so the default list keeps its single row.
+				const rowTops = await items.evaluateAll( ( elements ) =>
+					elements
+						.slice( 0, 8 )
+						.map(
+							( element ) => element.getBoundingClientRect().top
+						)
+				);
+				expect( new Set( rowTops.slice( 0, 7 ) ).size ).toBe( 1 );
+				expect( rowTops[ 7 ] ).toBeGreaterThan( rowTops[ 0 ] );
+
+				// The picker stays on screen and scrolls instead of growing.
+				const viewport = page.viewportSize();
+				const box = await menu.boundingBox();
+				expect( box.x ).toBeGreaterThanOrEqual( 0 );
+				expect( box.x + box.width ).toBeLessThanOrEqual(
+					viewport.width
+				);
+				expect( box.y + box.height ).toBeLessThanOrEqual(
+					viewport.height
+				);
+				expect(
+					await menu.evaluate(
+						( element ) =>
+							element.scrollHeight > element.clientHeight
+					)
+				).toBe( true );
+
+				// The last emoji can be scrolled to and picked.
+				const last = items.last();
+				await last.scrollIntoViewIfNeeded();
+				await expect( last ).toBeInViewport();
+				await last.click();
+				await expect(
+					page.getByRole( 'button', { name: /extra 100/ } )
+				).toContainText( '1' );
+			} );
+		} );
 	} );
 
 	test.describe( 'Multiple notes per block', () => {

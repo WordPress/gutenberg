@@ -72,8 +72,15 @@
 }
 
 .editor-collab-sidebar-panel__reaction-picker {
-	display: flex;
+	--editor-reaction-option-size: var(--wpds-dimension-size-lg);
+
+	display: grid;
+	grid-template-columns: repeat(var(--editor-reaction-picker-columns, 7), var(--editor-reaction-option-size));
 	gap: var(--wpds-dimension-gap-xs);
+	// Five rows, then the list scrolls.
+	max-block-size: calc(5 * var(--editor-reaction-option-size) + 4 * var(--wpds-dimension-gap-xs) + 2 * var(--wpds-dimension-padding-xs) + 2 * var(--wpds-border-width-xs));
+	overflow-y: auto;
+	overscroll-behavior: contain;
 	padding: var(--wpds-dimension-padding-xs);
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	border-radius: var(--wpds-border-radius-md);
