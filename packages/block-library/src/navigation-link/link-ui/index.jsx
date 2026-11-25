@@ -5,7 +5,11 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	LinkControl,
+	useBlockEditingMode,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	useMemo,
 	useState,
@@ -98,7 +102,31 @@ function UnforwardedLinkUI( props, ref ) {
 		]
 	);
 
+	const {
+		getBlockParentsByBlockName,
+		getClientIdsOfDescendants,
+		getBlockName,
+	} = useSelect( blockEditorStore );
+
 	const handlePageCreated = ( pageLink ) => {
+		// A Page List in the same Navigation already lists the new page, so
+		// don't add a link to it as well.
+		const [ navigationClientId ] = getBlockParentsByBlockName(
+			clientId,
+			'core/navigation',
+			true
+		);
+		const hasPageList =
+			navigationClientId &&
+			getClientIdsOfDescendants( navigationClientId ).some(
+				( descendantId ) =>
+					getBlockName( descendantId ) === 'core/page-list'
+			);
+		if ( hasPageList ) {
+			props.onClose();
+			return;
+		}
+
 		// Set the new page as the current link
 		props.onChange( pageLink );
 		// Return to main Link UI and focus the first focusable element

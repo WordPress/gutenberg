@@ -1355,6 +1355,60 @@ test.describe( 'Navigation block', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
+	// The Page List already lists the new page, so adding a link to it too
+	// would show the page twice.
+	// See https://github.com/WordPress/gutenberg/issues/87361.
+	test( 'does not add a link to a page created from the appender when the menu has a Page List', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+		navigation,
+	} ) => {
+		await admin.createNewPost();
+		const { id: menuId } = await requestUtils.createNavigationMenu( {
+			title: 'Page List',
+			content: '<!-- wp:page-list /-->',
+		} );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menuId },
+		} );
+
+		const navBlock = navigation.getNavBlock();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Page List',
+			} )
+		).toBeVisible();
+		await editor.selectBlocks( navBlock );
+		await navBlock.getByRole( 'button', { name: 'Add page' } ).click();
+
+		await expect( navigation.getLinkControlSearch() ).toBeFocused();
+		await page.getByRole( 'button', { name: 'Create page' } ).click();
+		await page.getByRole( 'textbox', { name: 'Title' } ).fill( 'Contact' );
+		await page.getByRole( 'button', { name: 'Create page' } ).click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Contact page created successfully.' } )
+		).toBeVisible();
+		await expect( navigation.getLinkPopover() ).toBeHidden();
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getBlocksByName( 'core/navigation-link' ).length
+				)
+			)
+			.toBe( 0 );
+
+		await requestUtils.deleteAllPages();
+	} );
+
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
 		admin,
 		page,
