@@ -1760,23 +1760,6 @@ export const generateCustomProperties = (
 };
 
 /**
- * Renders CSS rules for a single style node.
- *
- * The node renderer handles feature-level selectors, duotone declarations,
- * layout styles, base declarations, and custom CSS. State nodes are expanded
- * before rendering so ordering matches the PHP renderer.
- *
- * @param node                          Style node metadata and styles.
- * @param context                       Render context and feature flags.
- * @param context.tree                  Global styles tree.
- * @param context.useRootPaddingAlign   Whether root padding alignment is enabled.
- * @param context.disableLayoutStyles   Whether layout styles are disabled.
- * @param context.hasBlockGapSupport    Whether block gap support is enabled.
- * @param context.hasFallbackGapSupport Whether fallback gap support is enabled.
- * @param context.disableRootPadding    Whether root padding declarations are disabled.
- * @return Rendered CSS rules for the node.
- */
-/**
  * Returns a ruleset that fits a rotated block to its content, like the
  * `.has-rotation` rule in the block library common styles. Mirror of
  * `get_rotation_fit_content_ruleset()` in PHP.
@@ -1806,6 +1789,23 @@ function getRotationFitContentRuleset(
 	) }){width: fit-content;}`;
 }
 
+/**
+ * Renders CSS rules for a single style node.
+ *
+ * The node renderer handles feature-level selectors, duotone declarations,
+ * layout styles, base declarations, and custom CSS. State nodes are expanded
+ * before rendering so ordering matches the PHP renderer.
+ *
+ * @param node                          Style node metadata and styles.
+ * @param context                       Render context and feature flags.
+ * @param context.tree                  Global styles tree.
+ * @param context.useRootPaddingAlign   Whether root padding alignment is enabled.
+ * @param context.disableLayoutStyles   Whether layout styles are disabled.
+ * @param context.hasBlockGapSupport    Whether block gap support is enabled.
+ * @param context.hasFallbackGapSupport Whether fallback gap support is enabled.
+ * @param context.disableRootPadding    Whether root padding declarations are disabled.
+ * @return Rendered CSS rules for the node.
+ */
 function renderStylesNode(
 	node: StylesNode,
 	{
