@@ -10,6 +10,7 @@
 return array(
 	'type'          => 'text',
 	'label'         => __( 'Password' ),
+	'isValid'       => array( 'maxLength' => 255 ),
 	'enableSorting' => false,
 	'enableHiding'  => false,
 	'filterBy'      => false,
