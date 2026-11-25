@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use theme colors for sidebar surfaces, text, and dividers ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   Use theme colors for sidebar surfaces, text, and dividers ([#87426](https://github.com/WordPress/gutenberg/pull/87426)).
 
 ### Internal
 
