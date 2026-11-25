@@ -13,6 +13,7 @@ import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
 import { getDeviceType } from './viewport';
+import { unlock } from '../../lock-unlock';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -43,15 +44,6 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	} ) as string | undefined;
 
 	/*
-	 * Where clicking a previewed canvas goes, resolved the same way the editor
-	 * resolves anywhere else it sends you to edit an entity, and whether it
-	 * should go anywhere at all: a trashed entity has to be restored before it
-	 * can be edited.
-	 *
-	 * The record is the one the editor loads for this canvas, so reading it
-	 * here costs no request of its own.
-	 */
-	/*
 	 * A route that names no entity leaves the editor to resolve one, which it
 	 * does from the block templates only a block theme has. `undefined` while
 	 * the theme is still being read.
@@ -66,27 +58,60 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		[]
 	);
 
+	/*
+	 * Where clicking a previewed canvas goes, resolved the same way the editor
+	 * resolves anywhere else it sends you to edit an entity, and whether it
+	 * should go anywhere at all: a trashed entity has to be restored before it
+	 * can be edited.
+	 *
+	 * A route that names no entity previews whatever the editor resolves the
+	 * site's home page to — a static front page or the template that shows
+	 * the front page — so clicking it edits that, resolved the same way the
+	 * editor does.
+	 *
+	 * The records are the ones the editor loads for this canvas, so reading
+	 * them here costs no request of their own.
+	 */
 	const { editLink, isTrashed } = useSelect(
 		( select ) => {
-			if ( ! canvas.postType || ! canvas.postId ) {
+			let postType: string | undefined = canvas.postType;
+			let postId: string | number | undefined = canvas.postId;
+
+			if ( ! hasEntity ) {
+				if ( ! canvas.isPreview || ! isBlockTheme ) {
+					return { editLink: undefined, isTrashed: false };
+				}
+
+				const homePage = unlock( select( coreStore ) ).getHomePage() as
+					| { postType?: string; postId?: string | number }
+					| null
+					| undefined;
+				postType = homePage?.postType;
+				postId = homePage?.postId;
+			}
+
+			if ( ! postType || ! postId ) {
 				return { editLink: undefined, isTrashed: false };
 			}
 
 			const record = select( coreStore ).getEntityRecord(
 				'postType',
-				canvas.postType,
-				canvas.postId
+				postType,
+				postId
 			) as { status?: string } | undefined;
 
 			return {
-				editLink: select( bootStore ).getEntityLink(
-					canvas.postType,
-					canvas.postId
-				),
+				editLink: select( bootStore ).getEntityLink( postType, postId ),
 				isTrashed: record?.status === 'trash',
 			};
 		},
-		[ canvas.postType, canvas.postId ]
+		[
+			canvas.postType,
+			canvas.postId,
+			canvas.isPreview,
+			hasEntity,
+			isBlockTheme,
+		]
 	);
 
 	/*
