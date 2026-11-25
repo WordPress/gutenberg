@@ -28,6 +28,7 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import isFullyLockedBlock from '../block-lock/is-fully-locked-block';
 import { deviceTypeKey } from '../../store/private-keys';
 import { CanvasWindowContext } from '../iframe/canvas-window-context';
 import { useCurrentViewport } from '../block-visibility/use-block-visibility';
@@ -240,6 +241,7 @@ function Items( {
 				getBlockListSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
+				getBlockAttributes,
 			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
@@ -297,6 +299,16 @@ function Items( {
 					) ) &&
 				getBlockEditingMode( rootClientId ) !== 'disabled' &&
 				( ! templateLock || templateLock === 'contentOnly' ) &&
+				// With the block lock menu, a fully locked block takes no new
+				// inner blocks.
+				! (
+					window.__experimentalBlockLockMenu &&
+					rootClientId &&
+					isFullyLockedBlock(
+						getBlockName( rootClientId ),
+						getBlockAttributes( rootClientId )?.lock
+					)
+				) &&
 				hasAppender &&
 				! _isZoomOut();
 

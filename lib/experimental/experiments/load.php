@@ -29,6 +29,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-block-lock-menu',
+					'label'       => __( 'Block lock menu', 'gutenberg' ),
+					'description' => __( 'Replaces the block lock dialog with a lock menu in the block toolbar and List View. Locks movement, deletion and layout, for one or several blocks and every block inside them.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

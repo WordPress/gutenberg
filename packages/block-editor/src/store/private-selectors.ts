@@ -37,6 +37,10 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	LAYOUT_TEMPLATE_LOCKS,
+	STYLES_LOCK_EXCLUDED_BLOCKS,
+} from '../components/block-lock/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -1213,6 +1217,19 @@ export function isEditLockedBlock( state: State, clientId: string ) {
 }
 
 /**
+ * Returns whether the styles of a block are locked, which keeps the controls
+ * of its Styles tab from being changed. The rest of the block stays editable.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the styles of the block are locked.
+ */
+export function isStylesLockedBlock( state: State, clientId: string ) {
+	return !! getBlockAttributes( state, clientId )?.lock?.styles;
+}
+
+/**
  * Returns whether a block is locked to prevent moving.
  *
  * This selector only reasons about templateLock and block lock, not associated features
@@ -1293,7 +1310,152 @@ export function isLockedBlock( state: State, clientId: string ) {
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
-		isRemoveLockedBlock( state, clientId )
+		isRemoveLockedBlock( state, clientId ) ||
+		// The styles and layout locks are part of the lock menu, so they only
+		// count with that experiment, leaving the lock icons as they are
+		// without it.
+		( isBlockLockMenuEnabled() &&
+			( isStylesLockedBlock( state, clientId ) ||
+				isLayoutLockedBlock( state, clientId ) ) )
+	);
+}
+
+/**
+ * Returns whether the block lock menu experiment is enabled.
+ *
+ * @return Whether the experiment is enabled.
+ */
+function isBlockLockMenuEnabled() {
+	return (
+		typeof window !== 'undefined' && !! window.__experimentalBlockLockMenu
+	);
+}
+
+/**
+ * Returns whether the layout of a block is locked by its pattern: the block is
+ * an unsynced pattern section. The lock is the pattern's, so it is changed by
+ * editing or detaching the pattern, not from the lock controls. A pattern being
+ * edited is temporarily not a section, so it is not locked meanwhile.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout is locked by its pattern.
+ */
+export function isPatternLockedBlock( state: State, clientId: string ) {
+	return (
+		!! getBlockAttributes( state, clientId )?.metadata?.patternName &&
+		isSectionBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block is locked: the block's own
+ * `templateLock` is `all` or `contentOnly`, or it is an unsynced pattern
+ * section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout is locked.
+ */
+export function isLayoutLockedBlock( state: State, clientId: string ) {
+	return (
+		LAYOUT_TEMPLATE_LOCKS.includes(
+			getBlockAttributes( state, clientId )?.templateLock as string
+		) || isPatternLockedBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block can be locked: its block type
+ * has a `templateLock` attribute, or it is an unsynced pattern section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout can be locked.
+ */
+export function canLayoutLockBlock( state: State, clientId: string ) {
+	const blockName = getBlockName( state, clientId );
+	return (
+		( !! blockName &&
+			!! getBlockType( blockName )?.attributes?.templateLock ) ||
+		isPatternLockedBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the styles of a block can be locked. A synced pattern and a
+ * template part keep their styles in the pattern or the template part itself,
+ * so their styles can't be locked from the lock menu.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the styles of the block can be locked.
+ */
+export function canStylesLockBlock( state: State, clientId: string ) {
+	const blockName = getBlockName( state, clientId );
+	return !! blockName && ! STYLES_LOCK_EXCLUDED_BLOCKS.includes( blockName );
+}
+
+/**
+ * Returns how much of a block is locked. A block has up to four lock
+ * properties: movement, deletion and, where they can be locked, styles (its
+ * style controls) and layout.
+ *
+ * - `full`: every property the block supports is locked.
+ * - `partial`: some, but not all, of them are locked.
+ * - `none`: the block is not locked.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return The lock type of the block.
+ */
+export function getBlockLockType(
+	state: State,
+	clientId: string
+): 'none' | 'partial' | 'full' {
+	const locks = [
+		isMoveLockedBlock( state, clientId ),
+		isRemoveLockedBlock( state, clientId ),
+	];
+	if ( canStylesLockBlock( state, clientId ) ) {
+		locks.push( isStylesLockedBlock( state, clientId ) );
+	}
+	if ( canLayoutLockBlock( state, clientId ) ) {
+		locks.push( isLayoutLockedBlock( state, clientId ) );
+	}
+
+	if ( locks.every( Boolean ) ) {
+		return 'full';
+	}
+
+	if ( locks.some( Boolean ) ) {
+		return 'partial';
+	}
+
+	return 'none';
+}
+
+/**
+ * Returns whether a block has a lock of its own. The layout of a pattern is
+ * the pattern's, so it doesn't count.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block has a lock of its own.
+ */
+export function hasOwnBlockLock( state: State, clientId: string ): boolean {
+	return (
+		isMoveLockedBlock( state, clientId ) ||
+		isRemoveLockedBlock( state, clientId ) ||
+		isStylesLockedBlock( state, clientId ) ||
+		( isLayoutLockedBlock( state, clientId ) &&
+			! isPatternLockedBlock( state, clientId ) )
 	);
 }
 

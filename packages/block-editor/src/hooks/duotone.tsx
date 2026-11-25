@@ -20,6 +20,7 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	useSettings,
 } from '../components';
+import useIsStylesLocked from '../components/block-lock/use-is-styles-locked';
 import {
 	scopeSelector,
 	getDuotoneSlugFromPreset,
@@ -128,6 +129,9 @@ function DuotonePanelPure( {
 	const duotoneStyle = style?.color?.duotone as DuotoneValue | undefined;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
+	// A styles lock keeps the duotone filter, a style, from being changed in
+	// the toolbar. Its panel in the Styles tab is disabled with the tab.
+	const isStylesLocked = useIsStylesLocked( clientId );
 
 	const className = useSelect(
 		( select ) =>
@@ -197,42 +201,46 @@ function DuotonePanelPure( {
 					inheritedValue={ inheritedValue }
 				/>
 			</InspectorControls>
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
-				<DuotoneControl
-					duotonePalette={ duotonePalette }
-					colorPalette={ colorPalette }
-					disableCustomDuotone={ disableCustomDuotone }
-					disableCustomColors={ disableCustomColors }
-					value={ duotonePresetOrColors }
-					selectedSlug={ getDuotoneSlugFromPreset( duotoneStyle ) }
-					onChange={ ( newDuotone, index, slug ) => {
-						// A slug means a preset was picked out of the palette,
-						// so it identifies the choice exactly. Matching back by
-						// color would resolve to whichever preset holding those
-						// colors comes first, which is the wrong one whenever
-						// two presets share a pair.
-						const maybePreset = slug
-							? `var:preset|duotone|${ slug }`
-							: getDuotonePresetFromColors(
-									newDuotone,
-									duotonePalette
-								);
+			{ ! isStylesLocked && (
+				<BlockControls group="block" __experimentalShareWithChildBlocks>
+					<DuotoneControl
+						duotonePalette={ duotonePalette }
+						colorPalette={ colorPalette }
+						disableCustomDuotone={ disableCustomDuotone }
+						disableCustomColors={ disableCustomColors }
+						value={ duotonePresetOrColors }
+						selectedSlug={ getDuotoneSlugFromPreset(
+							duotoneStyle
+						) }
+						onChange={ ( newDuotone, index, slug ) => {
+							// A slug means a preset was picked out of the palette,
+							// so it identifies the choice exactly. Matching back by
+							// color would resolve to whichever preset holding those
+							// colors comes first, which is the wrong one whenever
+							// two presets share a pair.
+							const maybePreset = slug
+								? `var:preset|duotone|${ slug }`
+								: getDuotonePresetFromColors(
+										newDuotone,
+										duotonePalette
+									);
 
-						const newStyle = {
-							...style,
-							color: {
-								...style?.color,
-								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
-							},
-						};
-						setAttributes( {
-							style: cleanEmptyObject( newStyle ),
-						} );
-					} }
-					// @ts-expect-error `DuotoneControl` ignores `settings`.
-					settings={ settings }
-				/>
-			</BlockControls>
+							const newStyle = {
+								...style,
+								color: {
+									...style?.color,
+									duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+								},
+							};
+							setAttributes( {
+								style: cleanEmptyObject( newStyle ),
+							} );
+						} }
+						// @ts-expect-error `DuotoneControl` ignores `settings`.
+						settings={ settings }
+					/>
+				</BlockControls>
+			) }
 		</>
 	);
 }

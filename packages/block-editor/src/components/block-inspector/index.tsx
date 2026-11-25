@@ -21,6 +21,7 @@ import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+import DisabledWhenStylesLocked from '../block-lock/disabled-when-styles-locked';
 import BlockStyles from '../block-styles';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
@@ -53,6 +54,7 @@ import type {
 import type { BlockStyleState } from '../../hooks/types';
 
 function StyleInspectorSlots( {
+	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
@@ -60,40 +62,49 @@ function StyleInspectorSlots( {
 	return (
 		<>
 			<InspectorControls.Slot />
-			<InspectorControls.Slot
-				group="typography"
-				label={ __( 'Typography' ) }
-			/>
-			<InspectorControls.Slot
-				group="color"
-				label={ __( 'Color' ) }
-				className="color-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot
-				group="background"
-				label={ __( 'Background' ) }
-				className="background-block-support-panel__inner-wrapper"
-			/>
-			<InspectorControls.Slot group="layout" label={ __( 'Layout' ) } />
-			<InspectorControls.Slot
-				group="dimensions"
-				label={ __( 'Dimensions' ) }
-			/>
-			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
-			<InspectorControls.Slot
-				group="transform"
-				label={ _x(
-					'Transform',
-					'Visual transform styles such as rotate, move and scale'
-				) }
-			/>
-			<InspectorControls.Slot
-				group="elements"
-				label={ __( 'Elements' ) }
-				className="elements-block-support-panel__inner-wrapper"
-			/>
-			{ showPositionControls && <PositionControls /> }
-			<InspectorControls.Slot group="styles" />
+			{ /* The controls the Styles tab shows, which a styles lock locks. */ }
+			<DisabledWhenStylesLocked clientId={ clientId }>
+				<InspectorControls.Slot
+					group="typography"
+					label={ __( 'Typography' ) }
+				/>
+				<InspectorControls.Slot
+					group="color"
+					label={ __( 'Color' ) }
+					className="color-block-support-panel__inner-wrapper"
+				/>
+				<InspectorControls.Slot
+					group="background"
+					label={ __( 'Background' ) }
+					className="background-block-support-panel__inner-wrapper"
+				/>
+				<InspectorControls.Slot
+					group="layout"
+					label={ __( 'Layout' ) }
+				/>
+				<InspectorControls.Slot
+					group="dimensions"
+					label={ __( 'Dimensions' ) }
+				/>
+				<InspectorControls.Slot
+					group="border"
+					label={ __( 'Borders' ) }
+				/>
+				<InspectorControls.Slot
+					group="transform"
+					label={ _x(
+						'Transform',
+						'Visual transform styles such as rotate, move and scale'
+					) }
+				/>
+				<InspectorControls.Slot
+					group="elements"
+					label={ __( 'Elements' ) }
+					className="elements-block-support-panel__inner-wrapper"
+				/>
+				{ showPositionControls && <PositionControls /> }
+				<InspectorControls.Slot group="styles" />
+			</DisabledWhenStylesLocked>
 			{ showBindingsControls && (
 				<InspectorControls.Slot group="bindings" />
 			) }
@@ -593,13 +604,21 @@ const BlockInspectorSingleBlock = ( {
 			{ ! isEditingStyleState && ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
-						<BlockStyles clientId={ renderedBlockClientId } />
+						<DisabledWhenStylesLocked
+							clientId={ renderedBlockClientId }
+						>
+							<BlockStyles clientId={ renderedBlockClientId } />
+						</DisabledWhenStylesLocked>
 					) }
 					<ContentTab contentClientIds={ contentClientIds } />
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
-					{ ! isSectionBlock && <StyleInspectorSlots /> }
+					{ ! isSectionBlock && (
+						<StyleInspectorSlots
+							clientId={ renderedBlockClientId }
+						/>
+					) }
 				</>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }

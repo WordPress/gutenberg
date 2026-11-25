@@ -96,7 +96,8 @@
 	&.is-selected .components-button.has-icon {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block__menu:focus {
+	&.is-selected .block-editor-list-view-block__menu:focus,
+	&.is-selected .block-editor-list-view-block__lock:focus {
 		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
@@ -322,8 +323,36 @@
 
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
+	.block-editor-list-view-block__lock-cell,
 	.block-editor-list-view-block__contents-cell {
 		padding: 0;
+	}
+
+	.block-editor-list-view-block__lock-cell {
+		line-height: 0;
+		width: $button-size-small + $grid-unit-05;
+		vertical-align: middle;
+
+		> * {
+			opacity: 0;
+		}
+
+		// Focus from a click stays on the button after unlocking, so only
+		// keyboard focus keeps it shown once the pointer leaves the row.
+		&:hover,
+		&:has(:focus-visible),
+		&:has(.is-menu-open),
+		&.is-visible {
+			> * {
+				opacity: 1;
+			}
+		}
+
+		// A lock that also spans the empty options menu column stays in its
+		// own column, lined up with the locks of the other rows.
+		&[colspan="2"] {
+			padding-inline-end: $button-size-small + $grid-unit-05;
+		}
 	}
 
 	.block-editor-list-view-block__menu-cell,

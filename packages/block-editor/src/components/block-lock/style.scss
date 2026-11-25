@@ -80,3 +80,9 @@
 		margin-right: -$grid-unit-15 * 0.5;
 	}
 }
+
+// The controls of a block whose styles are locked stay visible, but read as
+// disabled.
+.block-editor-block-lock__styles-locked {
+	opacity: 0.5;
+}

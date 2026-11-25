@@ -12,6 +12,7 @@ import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
+import DisabledWhenStylesLocked from '../block-lock/disabled-when-styles-locked';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import type { InspectorControlsTabsProps } from './types';
@@ -204,13 +205,16 @@ export default function InspectorControlsTabs( {
 					<SettingsTab showAdvancedControls={ !! blockName } />
 				</WCTabs.TabPanel>
 				<WCTabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
-					<StylesTab
-						blockName={ blockName }
-						clientId={ clientId }
-						hasBlockStyles={ hasBlockStyles }
-						isSectionBlock={ isSectionBlock }
-						contentClientIds={ contentClientIds }
-					/>
+					{ /* A styles lock locks the controls of this tab only. */ }
+					<DisabledWhenStylesLocked clientId={ clientId }>
+						<StylesTab
+							blockName={ blockName }
+							clientId={ clientId }
+							hasBlockStyles={ hasBlockStyles }
+							isSectionBlock={ isSectionBlock }
+							contentClientIds={ contentClientIds }
+						/>
+					</DisabledWhenStylesLocked>
 				</WCTabs.TabPanel>
 			</WCTabs>
 		</div>

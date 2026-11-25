@@ -82,7 +82,8 @@ function ListViewBlockSelectButton(
 		[ clientId ]
 	);
 
-	const shouldShowLockIcon = isLocked;
+	// With the lock menu, the row shows the lock state in its own cell.
+	const shouldShowLockIcon = isLocked && ! window.__experimentalBlockLockMenu;
 	const images = useListViewImages( { clientId, isExpanded } );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.

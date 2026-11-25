@@ -6,6 +6,7 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import useIsStylesLocked from '../components/block-lock/use-is-styles-locked';
 import {
 	getStyleForState,
 	hasViewportBlockStyleState,
@@ -85,6 +86,8 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	const settings = useBlockSettings( blockName );
 	const hasTextAlignControl = settings?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
+	// A styles lock keeps the text alignment, a style, from being changed.
+	const isStylesLocked = useIsStylesLocked( clientId );
 	const { selectedState, isResponsiveEditing } = useSelect(
 		( select ) => {
 			const {
@@ -99,7 +102,11 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 		[ clientId ]
 	);
 
-	if ( ! hasTextAlignControl || blockEditingMode !== 'default' ) {
+	if (
+		! hasTextAlignControl ||
+		blockEditingMode !== 'default' ||
+		isStylesLocked
+	) {
 		return null;
 	}
 

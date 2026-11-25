@@ -67,6 +67,7 @@ export function PrivateBlockToolbar( {
 		showSlots,
 		showGroupButtons,
 		showLockButtons,
+		isInLockingSection,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
 		showStyleStateSlot,
@@ -159,6 +160,10 @@ export function PrivateBlockToolbar( {
 			showStyleStateSlot: ! _isZoomOut && _isEditingResponsiveStyleState,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
+			// With the lock menu, a block inside a pattern shows the
+			// pattern's lock, though its editing mode is content only.
+			isInLockingSection:
+				!! window.__experimentalBlockLockMenu && !! parentSection,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			canEdit: _canEditBlock,
@@ -235,7 +240,8 @@ export function PrivateBlockToolbar( {
 								) }
 							{ ! isPlaceholder &&
 								! isMultiToolbar &&
-								isDefaultEditingMode &&
+								( isDefaultEditingMode ||
+									isInLockingSection ) &&
 								showLockButtons && (
 									<BlockLockToolbar
 										clientId={ blockClientId }

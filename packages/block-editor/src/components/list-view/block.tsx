@@ -15,7 +15,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
@@ -39,6 +39,7 @@ import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
 import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
+import ListViewLockButton from './lock-button';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
@@ -127,6 +128,9 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		isInLockingSection,
+		canLock,
+		hasOwnLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -137,6 +141,9 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				getParentSectionBlock,
+				canLockBlockType,
+				hasOwnBlockLock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -154,6 +161,11 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				isInLockingSection:
+					!! window.__experimentalBlockLockMenu &&
+					!! getParentSectionBlock( clientId ),
+				canLock: canLockBlockType( getBlockName( clientId ) ),
+				hasOwnLock: hasOwnBlockLock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -574,6 +586,20 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
+	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
+	// With the lock menu, a block that can be locked has a lock button in its
+	// own cell, and so does a locked block or a block inside a pattern, whose
+	// lock it can't change. A pattern being edited is temporarily unlocked, so
+	// it shows none.
+	const hasLockCell =
+		isLockMenuEnabled &&
+		clientId !== editedSection &&
+		( canLock || isLocked || isInLockingSection );
+	// The lock of an unlocked block or pattern only shows while the pointer is
+	// over the row, or the button has keyboard focus.
+	const lockCellClassName = clsx( 'block-editor-list-view-block__lock-cell', {
+		'is-visible': hasOwnLock || isInLockingSection || isHovered,
+	} );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
@@ -587,7 +613,21 @@ function ListViewBlock( {
 	);
 
 	let colSpan;
-	if ( hasRenderedMovers ) {
+	let lockCellColSpan;
+	if ( isLockMenuEnabled ) {
+		// With the lock menu, the tree has four columns: the contents, the
+		// movers, the lock and the options menu. Every row spans all four, so
+		// the locks and the menus line up. A row without a menu, like one
+		// outside a pattern being edited, lets its lock span the menu column,
+		// keeping the lock in its own column.
+		const hasMenuCell = canShowBlockActions && !! BlockSettingsMenu;
+		lockCellColSpan = hasLockCell && ! hasMenuCell ? 2 : undefined;
+		const otherColumns =
+			( hasRenderedMovers ? 1 : 0 ) +
+			( hasLockCell ? ( lockCellColSpan ?? 1 ) : 0 ) +
+			( hasMenuCell ? 1 : 0 );
+		colSpan = 4 - otherColumns;
+	} else if ( hasRenderedMovers ) {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
@@ -733,6 +773,28 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasLockCell && (
+				<TreeGridCell
+					className={ lockCellClassName }
+					colSpan={ lockCellColSpan }
+					aria-selected={ !! isSelected }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						// List View updates rows that aren't selected when
+						// the browser is idle, which left the lock showing
+						// its previous state for a moment after a click. The
+						// lock updates right away instead.
+						<AsyncModeProvider value={ false }>
+							<ListViewLockButton
+								clientId={ clientId }
+								ref={ ref }
+								tabIndex={ tabIndex }
+								onFocus={ onFocus }
+							/>
+						</AsyncModeProvider>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

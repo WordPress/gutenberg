@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `lockOpen` and `lockDashed` icons, the open and partly locked counterparts of `lock` ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
+
 ### Enhancements
 
 -   `update`: redraw the icon as two curved arrows circling each other, so it reads as a cycle. The two straight diagonal arrows it carried read closer to a resize affordance ([#87088](https://github.com/WordPress/gutenberg/pull/87088)).

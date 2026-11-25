@@ -21,6 +21,7 @@ import type { ComponentType } from 'react';
 import type { BlockType, BlockVariation } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
+import useIsStylesLocked from '../components/block-lock/use-is-styles-locked';
 import { useSettings } from '../components/use-settings';
 import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -356,6 +357,10 @@ function LayoutPanelPure( {
 	clientId,
 }: LayoutPanelProps ) {
 	const settings = useBlockSettings( blockName );
+	// A styles lock keeps the layout styles, like the justification and the
+	// vertical alignment, from being changed in the toolbar. The Layout panel
+	// in the Styles tab is disabled with the tab.
+	const isStylesLocked = useIsStylesLocked( clientId );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
 	const {
@@ -645,7 +650,7 @@ function LayoutPanelPure( {
 					) }
 				</InspectorControls>
 			) }
-			{ ! inherit && layoutType && (
+			{ ! inherit && layoutType && ! isStylesLocked && (
 				<layoutType.toolBarControls
 					layout={ usedLayout }
 					onChange={ onChangeLayout }

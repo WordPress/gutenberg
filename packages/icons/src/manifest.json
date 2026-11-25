@@ -1070,6 +1070,18 @@
 		"dashicons": [ "dashicons-lock", "dashicons-lock-duplicate" ]
 	},
 	{
+		"slug": "lock-dashed",
+		"label": "Lock Dashed",
+		"filePath": "library/lock-dashed.svg",
+		"collections": [ "core" ]
+	},
+	{
+		"slug": "lock-open",
+		"label": "Lock Open",
+		"filePath": "library/lock-open.svg",
+		"collections": [ "core" ]
+	},
+	{
 		"slug": "login",
 		"label": "Login",
 		"filePath": "library/login.svg"

@@ -3070,6 +3070,58 @@ describe( 'selectors', () => {
 			).toBe( true );
 		} );
 
+		it( 'should deny blocks from being inserted into a fully locked block, with the block lock menu', () => {
+			const createState = ( blockLock?: Record< string, boolean > ) =>
+				partial< State >( {
+					blocks: {
+						byClientId: new Map(
+							Object.entries( {
+								block1: { name: 'core/test-block-b' },
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								block1: blockLock ? { lock: blockLock } : {},
+							} )
+						),
+						parents: new Map(),
+						order: new Map(),
+						blockEditingModes: new Map(),
+					},
+					blockListSettings: new Map(
+						Object.entries( { block1: {} } )
+					),
+					settings: {},
+				} );
+			const flags = window as typeof window & {
+				__experimentalBlockLockMenu?: boolean;
+			};
+			const originalFlag = flags.__experimentalBlockLockMenu;
+			flags.__experimentalBlockLockMenu = true;
+			try {
+				expect(
+					canInsertBlockType(
+						createState( {
+							styles: true,
+							move: true,
+							remove: true,
+						} ),
+						'core/test-block-c',
+						'block1'
+					)
+				).toBe( false );
+				expect(
+					canInsertBlockType(
+						createState( { styles: true } ),
+						'core/test-block-c',
+						'block1'
+					)
+				).toBe( true );
+			} finally {
+				flags.__experimentalBlockLockMenu = originalFlag;
+			}
+		} );
+
 		it( 'should deny blocks from being inserted into a block that does not allow inner blocks', () => {
 			const state = partial< State >( {
 				blocks: {

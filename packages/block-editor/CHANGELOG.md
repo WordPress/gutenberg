@@ -14,6 +14,10 @@
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 
+### Enhancements
+
+-   Block lock: Add a lock menu to the block settings menu, behind the block lock menu experiment. It locks styles, layout, movement and deletion for one or several blocks and every block inside them. The lock buttons of List View rows and the block toolbar lock or unlock a block in one click, and right-clicking them opens the lock menu ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
+
 ### Bug Fixes
 
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).

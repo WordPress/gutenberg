@@ -11,7 +11,11 @@ import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
 } from '../convert-to-group-buttons';
-import { BlockLockMenuItem, useBlockLock } from '../block-lock';
+import {
+	BlockLockMenuItem,
+	BlockLockSubmenu,
+	useBlockLock,
+} from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
@@ -33,6 +37,7 @@ const BlockSettingsMenuControlsSlot = ( {
 		isContentOnly,
 		canToggleSelectedBlocksVisibility,
 		canEdit,
+		canLockSelectedBlocks,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -41,6 +46,8 @@ const BlockSettingsMenuControlsSlot = ( {
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
 				canEditBlock,
+				canLockBlockType,
+				getBlockName,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
@@ -56,6 +63,11 @@ const BlockSettingsMenuControlsSlot = ( {
 					hasBlockSupport( block.name, 'visibility', true )
 				),
 				canEdit: canEditBlock( ids[ 0 ] ),
+				canLockSelectedBlocks:
+					ids.length > 0 &&
+					ids.every( ( id ) =>
+						canLockBlockType( getBlockName( id ) as string )
+					),
 			};
 		},
 		[ clientIds ]
@@ -63,8 +75,12 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
+	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
+	// The lock menu locks several blocks at once; the lock modal one block.
 	const showLockButton =
-		selectedClientIds.length === 1 && canLock && ! isContentOnly;
+		( isLockMenuEnabled
+			? canLockSelectedBlocks
+			: selectedClientIds.length === 1 && canLock ) && ! isContentOnly;
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
@@ -105,11 +121,17 @@ const BlockSettingsMenuControlsSlot = ( {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
-						{ canEdit && showLockButton && (
-							<BlockLockMenuItem
-								clientId={ selectedClientIds[ 0 ] }
-							/>
-						) }
+						{ ( canEdit || isLockMenuEnabled ) &&
+							showLockButton &&
+							( isLockMenuEnabled ? (
+								<BlockLockSubmenu
+									clientIds={ selectedClientIds }
+								/>
+							) : (
+								<BlockLockMenuItem
+									clientId={ selectedClientIds[ 0 ] }
+								/>
+							) ) }
 						{ canEdit && showRenameButton && (
 							<BlockRenameControl
 								clientId={ selectedClientIds[ 0 ] }
