@@ -130,7 +130,8 @@ function isLoadedRecord(
  * @param record      The record of changes; omit it to close the current undo
  *                    level.
  * @param isStaged    Whether to merge the changes into the current undo level
- *                    instead of opening a new one.
+ *                    instead of opening a new one. Staged changes made before
+ *                    the first undo level are not recorded.
  */
 export function recordEntityEdit(
 	undoManager: UndoManager,
@@ -149,6 +150,15 @@ export function recordEntityEdit(
 
 	if ( ! record ) {
 		undoManager.addRecord();
+		return;
+	}
+
+	// A staged edit merges into the level before it. Before the first level
+	// there is none: such an edit is part of the starting state, like a value
+	// a block sets on itself as it loads. Recording it would make it the first
+	// level of the history, and undoing that level would only make the block
+	// set the value again, as a new edit that discards every redo level.
+	if ( isStaged && ! undoManager.hasUndo() && ! undoManager.hasRedo() ) {
 		return;
 	}
 

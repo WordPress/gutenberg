@@ -353,6 +353,7 @@ describe( 'the entity sync interface', () => {
 			getEditedEntityRecord: () => ( { id: 1, title: 'Initial' } ),
 			getUndoManager: () => ( {
 				addRecord: vi.fn(),
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 			} ),
 		};
