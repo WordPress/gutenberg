@@ -366,6 +366,71 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'follows the path around the center when the browser combines pointer moves', async () => {
+		const onValueChange = vi.fn();
+		let pointerId = 0;
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 360 }
+					defaultValue={ 360 }
+					onPointerDown={ ( event ) => {
+						pointerId = event.pointerId;
+					} }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await userEvent.pointer( {
+			target: dial,
+			coords: at( 20, 14 ),
+			keys: '[MouseLeft>]',
+		} );
+		const { left, top } = dial.element().getBoundingClientRect();
+		const move = (
+			x: number,
+			y: number,
+			coalescedEvents?: PointerEvent[]
+		) => {
+			const point = at( x, y );
+			return new PointerEvent( 'pointermove', {
+				bubbles: true,
+				pointerId,
+				buttons: 1,
+				clientX: left + point.x,
+				clientY: top + point.y,
+				coalescedEvents,
+			} );
+		};
+		const thumb = page.getByRole( 'slider' ).element().parentElement!;
+		// The two segments stay outside the middle. A direct line from
+		// the press to the final point cuts through it.
+		thumb.dispatchEvent(
+			move( 26, 20, [ move( 24, 16 ), move( 26, 20 ) ] )
+		);
+		expect( onValueChange ).not.toHaveBeenCalled();
+		// Turn back past twelve o'clock to nine in one move. The field
+		// receives only the final step, even when several steps changed.
+		thumb.dispatchEvent(
+			move( 14, 20, [
+				move( 24, 16 ),
+				move( 20, 14 ),
+				move( 16, 16 ),
+				move( 14, 20 ),
+			] )
+		);
+		await userEvent.pointer( {
+			target: dial,
+			coords: at( 14, 20 ),
+			keys: '[/MouseLeft]',
+		} );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 270 );
+	} );
+
 	it( 'keeps the value when the middle is pressed, until the pointer turns', async () => {
 		const onValueChange = vi.fn();
 		await render(
@@ -463,6 +528,34 @@ describe( 'Knob', () => {
 		await dial.click( { position: right } );
 		expect( beforeCommit ).not.toHaveBeenCalled();
 		expect( afterCommit ).toHaveBeenCalledExactlyOnceWith( 1 );
+	} );
+
+	it( 'ends a press when the paired field replaces the pressed element on blur', async () => {
+		const onValueChange = vi.fn();
+		function Rotation() {
+			const [ replaced, setReplaced ] = useState( false );
+			return (
+				<ThemeProvider isRoot>
+					<input
+						aria-label="Rotation"
+						onBlur={ () => setReplaced( true ) }
+					/>
+					<Knob
+						aria-label="Rotation dial"
+						render={ replaced ? <section /> : <div /> }
+						onValueChange={ onValueChange }
+					/>
+				</ThemeProvider>
+			);
+		}
+		await render( <Rotation /> );
+		await page.getByRole( 'textbox' ).click();
+		const dial = page.getByRole( 'group' );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await dial.click( { position: right } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 	} );
 
 	it( 'stops turning once the pointer is no longer pressed, even if it stays captured', async () => {
@@ -679,26 +772,36 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '339' );
 	} );
 
-	it( 'keeps the value when the dot is pressed off its center', async () => {
-		const onValueChange = vi.fn();
-		await render(
-			<ThemeProvider isRoot>
-				<Knob
-					aria-label="Rotation"
-					min={ 0 }
-					max={ 360 }
-					defaultValue={ 360 }
-					onValueChange={ onValueChange }
-				/>
-			</ThemeProvider>
-		);
-		// One pixel left of the center of the dot, which sits at twelve o'clock.
-		const dial = page.getByRole( 'group' );
-		const { at } = getPoints( dial );
-		await dial.click( { position: at( 19, 10 ) } );
-		expect( onValueChange ).not.toHaveBeenCalled();
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '360' );
-	} );
+	it.each( [
+		{ stepsPerTurn: 360, min: 0, max: 360, value: 360 },
+		{
+			stepsPerTurn: Number.MAX_SAFE_INTEGER,
+			value: Number.MAX_SAFE_INTEGER - 1,
+		},
+	] )(
+		'keeps step $value when the dot is pressed off its center',
+		async ( { value, ...range } ) => {
+			const onValueChange = vi.fn();
+			await render(
+				<ThemeProvider isRoot>
+					<Knob
+						aria-label="Rotation"
+						{ ...range }
+						defaultValue={ value }
+						onValueChange={ onValueChange }
+					/>
+				</ThemeProvider>
+			);
+			// One pixel left of the center of the dot, which sits at twelve o'clock.
+			const dial = page.getByRole( 'group' );
+			const { at } = getPoints( dial );
+			await dial.click( { position: at( 19, 10 ) } );
+			expect( onValueChange ).not.toHaveBeenCalled();
+			await expect
+				.element( page.getByRole( 'slider' ) )
+				.toHaveValue( String( value ) );
+		}
+	);
 
 	it( 'reports a drag back to the start while a controlled value has not updated', async () => {
 		const onValueChange = vi.fn();

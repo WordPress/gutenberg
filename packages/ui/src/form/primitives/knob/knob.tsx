@@ -30,9 +30,8 @@ type Gesture = {
 	x: number;
 	y: number;
 	heading: number | null;
-	// The angle the gesture has turned the dial to, counted across turns and
-	// not limited to the range.
-	angle: number;
+	// The unsnapped position in steps, counted across turns and past stops.
+	position: number;
 	// The step the gesture last selected, or the step the dial showed when
 	// it began.
 	step: number;
@@ -40,7 +39,7 @@ type Gesture = {
 	// outside the range. A press or a move through the middle then selects
 	// its step even when it is the one the dial already shows.
 	offStep: boolean;
-	// The angle a press counts its turn from: the value as given, and then
+	// The value a press counts its turn from: the value as given, and then
 	// the step the gesture last selected.
 	reference: number;
 };
@@ -93,7 +92,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			last,
 			snap,
 			toAngle,
-			fromAngle,
+			toSteps,
 			press,
 		} = getDial( { min, max, stepsPerTurn } );
 		const largeStepCount = Math.max( 1, Math.round( largeStep ) );
@@ -116,14 +115,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		// behind while a parent has yet to update. `names` says that the
 		// pointer named this heading, by a press or a move through the
 		// middle, and did not just turn the dial.
-		function selectReached( current: Gesture, names: boolean ) {
-			const reached = fromAngle( current.angle );
+		function updateStep( current: Gesture, names: boolean ) {
+			const reached = snap( current.position );
 			if ( reached !== current.step || ( names && current.offStep ) ) {
 				current.step = reached;
 				current.offStep = false;
-				current.reference = toAngle( reached );
-				select( reached );
+				current.reference = reached;
+				return true;
 			}
+			return false;
 		}
 
 		// Starts a gesture from a press. It runs as an event callback so that
@@ -131,7 +131,10 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		// value, range, or handler a paired field committed on the way.
 		const startGesture = useEvent(
 			( dial: HTMLElement, event: React.PointerEvent ) => {
-				if ( ! input.current?.matches( ':enabled' ) ) {
+				if (
+					! dial.isConnected ||
+					! input.current?.matches( ':enabled' )
+				) {
 					return;
 				}
 				dial.setPointerCapture( event.pointerId );
@@ -139,22 +142,25 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				// A press on the dot, or in the middle where there is no
 				// heading, takes hold of the dial where it is. A press
 				// anywhere else turns it to that heading.
-				const reference = toAngle( shownValue );
 				const turnsTo =
 					pointer.heading === null || isOnDot( pointer, angle )
 						? null
-						: press( pointer.heading, reference );
+						: press( pointer.heading, shownValue );
 				gesture.current = {
 					pointerId: event.pointerId,
 					...pointer,
-					angle: turnsTo ?? angle,
-					reference,
+					position: turnsTo ?? shown,
+					reference: shownValue,
 					step: shown,
 					offStep: isEmpty || shown !== shownValue,
 				};
 				// A press on a heading names it. So does any press on an
 				// empty dial, which sets the value it shows.
-				selectReached( gesture.current, turnsTo !== null || isEmpty );
+				if (
+					updateStep( gesture.current, turnsTo !== null || isEmpty )
+				) {
+					select( gesture.current.step );
+				}
 			}
 		);
 
@@ -188,36 +194,47 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			) {
 				return;
 			}
-			// The gesture is over once the primary button or contact is up.
-			// A pen can keep the pointer captured with its other button.
-			if ( event.buttons % 2 === 0 ) {
-				gesture.current = null;
-				return;
+			const previousStep = current.step;
+			const wasOffStep = current.offStep;
+			const locate = measure( event.currentTarget );
+			// A browser can combine a curved path into one move. Its two
+			// endpoints alone can look like a shortcut through the middle.
+			const { nativeEvent } = event;
+			const coalesced = nativeEvent.getCoalescedEvents?.();
+			const samples = coalesced?.length ? coalesced : [ nativeEvent ];
+			for ( const sample of samples ) {
+				if ( sample.buttons % 2 === 0 ) {
+					// A pen can lift its tip while another button keeps it captured.
+					gesture.current = null;
+					break;
+				}
+				const pointer = locate( sample );
+				if ( pointer.heading === null ) {
+					continue;
+				}
+				const crossed =
+					current.heading !== null &&
+					crossesMiddle( current, pointer );
+				if ( crossed ) {
+					current.position = press(
+						pointer.heading,
+						current.reference
+					);
+				} else if ( current.heading !== null ) {
+					current.position += toSteps(
+						turnBetween( current.heading, pointer.heading )
+					);
+				}
+				Object.assign( current, pointer );
+				updateStep( current, crossed );
 			}
-			// The dial is measured on every move, because it can move on the
-			// page. Positions in its middle have no heading and are skipped.
-			const pointer = measure( event.currentTarget )( event );
-			if ( pointer.heading === null ) {
-				return;
+			// Report one value for the move even when it contained several samples.
+			if (
+				current.step !== previousStep ||
+				( wasOffStep && ! current.offStep )
+			) {
+				select( current.step );
 			}
-			// A move turns the dial as far as the pointer went round, the
-			// shorter way. The total keeps counting across twelve o'clock and
-			// past the ends, so the dot waits at an end until the pointer
-			// comes back. A move through the middle has no way round, so it
-			// selects the heading it lands on, like a press. The first
-			// heading after a press in the middle only starts the count.
-			const crossed =
-				current.heading !== null && crossesMiddle( current, pointer );
-			if ( crossed ) {
-				current.angle = press( pointer.heading, current.reference );
-			} else if ( current.heading !== null ) {
-				current.angle += turnBetween(
-					current.heading,
-					pointer.heading
-				);
-			}
-			Object.assign( current, pointer );
-			selectReached( current, crossed );
 		}
 
 		function handleKeyDown(

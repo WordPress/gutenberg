@@ -108,7 +108,7 @@ describe( 'getDial', () => {
 				check( 'a step is its own value', dial.snap( step ) === step );
 				check(
 					'an angle leads back to its step',
-					dial.fromAngle( dial.toAngle( step ) ) === step
+					dial.snap( dial.toSteps( dial.toAngle( step ) ) ) === step
 				);
 				// Any value within half a step shows as that step.
 				const nearby = step + ( random() - 0.5 ) * 0.98;
@@ -210,6 +210,13 @@ describe( 'press', () => {
 			heading: 45,
 			expected: 1,
 		},
+		// Six o'clock is half a step on either turn: 17.5 or 52.5.
+		{
+			config: { min: 0, max: 52, stepsPerTurn: 35 },
+			value: 52,
+			heading: 180,
+			expected: 18,
+		},
 		// Steps of a quarter turn, two turns either way.
 		{
 			config: { min: -8, max: 8, stepsPerTurn: 4 },
@@ -225,8 +232,9 @@ describe( 'press', () => {
 		'selects $expected for heading $heading from $value on $config',
 		( { config, value, heading, expected } ) => {
 			const dial = getDial( config );
-			const angle = dial.press( heading, dial.toAngle( value ) );
-			expect( dial.fromAngle( angle ) ).toBe( expected );
+			expect( dial.snap( dial.press( heading, value ) ) ).toBe(
+				expected
+			);
 		}
 	);
 
@@ -250,7 +258,8 @@ describe( 'press', () => {
 				last,
 				Math.max( first, dial.toAngle( value ) )
 			);
-			const angle = dial.press( heading, dial.toAngle( value ) );
+			const position = dial.press( heading, value );
+			const angle = dial.toAngle( position );
 			const check = ( rule: string, holds: boolean ) => {
 				if ( ! holds ) {
 					failures.push(
@@ -262,7 +271,7 @@ describe( 'press', () => {
 			};
 			check(
 				'selects a step of the dial',
-				isStep( dial, dial.fromAngle( angle ) )
+				isStep( dial, dial.snap( position ) )
 			);
 			check(
 				'has the pressed heading',
@@ -289,8 +298,17 @@ describe( 'press', () => {
 							Math.abs( angle - from ) - Math.min( ...fitting )
 						) < 1e-6
 					: Math.abs( toFirst - toLast ) < 1e-6 ||
-							dial.fromAngle( angle ) === nearerEnd
+							dial.snap( position ) === nearerEnd
 			);
+			if ( ! fitting.length ) {
+				check(
+					'keeps only the distance past the nearer end for a drag back',
+					Math.abs(
+						Math.max( first - angle, angle - last ) -
+							Math.min( toFirst, toLast )
+					) < 1e-6
+				);
+			}
 		}
 		expect( failures ).toEqual( [] );
 	} );
@@ -302,7 +320,7 @@ describe( 'press', () => {
 			const stepsPerTurn = 2 + Math.floor( random() * 2000 );
 			const dial = getDial( { stepsPerTurn } );
 			const heading = random() * 360 - 180;
-			const selected = dial.fromAngle(
+			const selected = dial.snap(
 				dial.press( heading, random() * 5000 )
 			);
 			// No step is further than half a step from any heading.

@@ -69,7 +69,8 @@ export type KnobProps = Omit<
 		stepsPerTurn?: number;
 		/**
 		 * The number of steps that Page Up, Page Down, and Shift with an
-		 * arrow key change the value by.
+		 * arrow key change the value by. The dial rounds this to the nearest
+		 * whole number, with a minimum of one.
 		 *
 		 * @default 10
 		 */

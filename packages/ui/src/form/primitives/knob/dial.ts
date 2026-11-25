@@ -7,9 +7,9 @@ function clamp( value: number, min: number, max: number ) {
 	return Math.max( min, Math.min( max, value ) );
 }
 
-// The dial counts in whole steps. A value is a number of steps, and a full turn
-// is `stepsPerTurn` of them, so the arithmetic stays in whole numbers. Units
-// such as radians or fractions of a turn belong to whatever shows the number.
+// The dial selects whole steps, with `stepsPerTurn` of them per turn. Pointer
+// positions can lie between steps. The paired input handles units such as
+// radians or fractions of a turn.
 //
 // Without bounds, the steps cover one turn and repeat: the last one is the step
 // before a full turn, which has the heading of zero. With bounds, the dial
@@ -29,14 +29,12 @@ export function getDial( {
 		stepsPerTurnProp > 1
 			? stepsPerTurnProp
 			: 360;
-	const stepAngle = 360 / stepsPerTurn;
+	const toSteps = ( degrees: number ) => ( degrees * stepsPerTurn ) / 360;
 	const wraps = min === undefined || max === undefined;
 	const first = wraps ? 0 : Math.ceil( min );
 	const last = wraps
 		? stepsPerTurn - 1
 		: Math.max( first, Math.floor( max ) );
-	const firstAngle = first * stepAngle;
-	const lastAngle = last * stepAngle;
 
 	// The step nearest to a value. A wrapping dial brings it into one turn,
 	// and a bounded dial stops at its ends.
@@ -49,37 +47,33 @@ export function getDial( {
 		);
 	};
 
-	// The dial angle that a press on `heading` selects, for a value that lies
-	// at `valueAngle`. A wrapping dial has one turn, so the heading is the
-	// answer. A bounded dial has the heading on several turns. It takes the
-	// one nearest to the value, so a press never moves the value by more than
-	// it has to. A turn has the heading when the step it rounds to is in the
-	// range. When the nearest turn does not, the press takes the turn that
-	// does, or else the one that comes closest to an end.
-	function press( heading: number, valueAngle: number ) {
+	// Return the unsnapped position in steps, including any distance past a
+	// stop. A subsequent drag then starts where the pointer actually is.
+	function press( heading: number, value: number ) {
+		const position = toSteps( heading );
 		if ( wraps ) {
-			return heading;
+			return position;
 		}
-		const nearest =
-			heading +
-			360 *
-				Math.round(
-					( clamp( valueAngle, firstAngle, lastAngle ) - heading ) /
-						360
-				);
-		// How far an angle lies beyond the range, or zero when the step it
-		// rounds to is in the range.
-		const outside = ( angle: number ) => {
-			const step = Math.round( angle / stepAngle );
+		const nearestTurn = Math.round(
+			( clamp( value, first, last ) - position ) / stepsPerTurn
+		);
+		// A heading rounds to the same step on every turn. Move that whole
+		// step between turns to decide which ones fit within the bounds.
+		const headingStep = Math.round( position );
+		const outside = ( turn: number ) => {
+			const offset = turn * stepsPerTurn;
+			const step = headingStep + offset;
+			const candidate = position + offset;
 			return step >= first && step <= last
 				? 0
-				: Math.max( firstAngle - angle, angle - lastAngle );
+				: Math.max( first - candidate, candidate - last );
 		};
-		return [ nearest - 360, nearest + 360 ].reduce(
+		const turn = [ nearestTurn - 1, nearestTurn + 1 ].reduce(
 			( best, candidate ) =>
 				outside( candidate ) < outside( best ) ? candidate : best,
-			nearest
+			nearestTurn
 		);
+		return position + turn * stepsPerTurn;
 	}
 
 	return {
@@ -88,8 +82,8 @@ export function getDial( {
 		first,
 		last,
 		snap,
-		toAngle: ( step: number ) => step * stepAngle,
-		fromAngle: ( angle: number ) => snap( angle / stepAngle ),
+		toAngle: ( step: number ) => ( step / stepsPerTurn ) * 360,
+		toSteps,
 		press,
 	};
 }
