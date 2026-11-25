@@ -45,6 +45,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { Stack, Field } from '@wordpress/ui';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
@@ -1086,8 +1087,7 @@ export default function Image( {
 			>
 				{ dimensionsControl }
 				{ showDimensionsControls &&
-					SIZED_LAYOUTS.includes( parentLayoutType ) &&
-					hasCustomSize && (
+					SIZED_LAYOUTS.includes( parentLayoutType ) && (
 						<ToolsPanelItem
 							label={ __( 'Image size' ) }
 							isShownByDefault
@@ -1100,9 +1100,23 @@ export default function Image( {
 							}
 							panelId={ clientId }
 						>
-							{ `${ activeWidth ?? 'auto' } × ${
-								activeHeight ?? 'auto'
-							}` }
+							{ hasCustomSize && (
+								<Stack direction="column" gap="xs">
+									<Field.VisualLabel>
+										{ __( 'Image size' ) }
+									</Field.VisualLabel>
+									{ sprintf(
+										// translators: 1: Width. 2: Height.
+										_x( '%1$s × %2$s', 'image dimensions' ),
+										activeWidth && activeWidth !== 'auto'
+											? activeWidth
+											: __( 'Auto' ),
+										activeHeight && activeHeight !== 'auto'
+											? activeHeight
+											: __( 'Auto' )
+									) }
+								</Stack>
+							) }
 						</ToolsPanelItem>
 					) }
 				{ ! hasSelectedStyleState && url && scale && (
