@@ -1,5 +1,6 @@
 export function modulo( value: number, period: number ) {
-	return ( ( value % period ) + period ) % period;
+	const remainder = value % period;
+	return remainder < 0 ? remainder + period : remainder;
 }
 
 function clamp( value: number, min: number, max: number ) {
@@ -25,7 +26,7 @@ export function getDial( {
 	const stepsPerTurn =
 		stepsPerTurnProp !== undefined &&
 		Number.isInteger( stepsPerTurnProp ) &&
-		stepsPerTurnProp > 0
+		stepsPerTurnProp > 1
 			? stepsPerTurnProp
 			: 360;
 	const stepAngle = 360 / stepsPerTurn;
@@ -48,18 +49,13 @@ export function getDial( {
 		);
 	};
 
-	// The angle of a value as given, before it snaps to a step. A bounded
-	// dial keeps it within its ends.
-	const exactAngle = ( value: number ) =>
-		( wraps ? value : clamp( value, first, last ) ) * stepAngle;
-
 	// The dial angle that a press on `heading` selects, for a value that lies
 	// at `valueAngle`. A wrapping dial has one turn, so the heading is the
 	// answer. A bounded dial has the heading on several turns. It takes the
 	// one nearest to the value, so a press never moves the value by more than
-	// it has to. When that turn does not have the heading, it takes the turn
-	// that does, or else the one that brings it closest to an end. A heading
-	// that rounds to an end counts as within the range.
+	// it has to. A turn has the heading when the step it rounds to is in the
+	// range. When the nearest turn does not, the press takes the turn that
+	// does, or else the one that comes closest to an end.
 	function press( heading: number, valueAngle: number ) {
 		if ( wraps ) {
 			return heading;
@@ -71,12 +67,14 @@ export function getDial( {
 					( clamp( valueAngle, firstAngle, lastAngle ) - heading ) /
 						360
 				);
-		const outside = ( angle: number ) =>
-			Math.max(
-				firstAngle - angle - stepAngle / 2,
-				angle - lastAngle - stepAngle / 2,
-				0
-			);
+		// How far an angle lies beyond the range, or zero when the step it
+		// rounds to is in the range.
+		const outside = ( angle: number ) => {
+			const step = Math.round( angle / stepAngle );
+			return step >= first && step <= last
+				? 0
+				: Math.max( firstAngle - angle, angle - lastAngle );
+		};
 		return [ nearest - 360, nearest + 360 ].reduce(
 			( best, candidate ) =>
 				outside( candidate ) < outside( best ) ? candidate : best,
@@ -92,7 +90,6 @@ export function getDial( {
 		snap,
 		toAngle: ( step: number ) => step * stepAngle,
 		fromAngle: ( angle: number ) => snap( angle / stepAngle ),
-		exactAngle,
 		press,
 	};
 }

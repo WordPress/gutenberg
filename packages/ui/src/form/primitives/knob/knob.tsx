@@ -33,8 +33,13 @@ type Gesture = {
 	// The angle the gesture has turned the dial to, counted across turns and
 	// not limited to the range.
 	angle: number;
-	// The step the gesture last selected, or null before it selects one.
-	step: number | null;
+	// The step the gesture last selected, or the step the dial showed when
+	// it began.
+	step: number;
+	// Whether the value is still off that step: unset, between two steps, or
+	// outside the range. A press or a move through the middle then selects
+	// its step even when it is the one the dial already shows.
+	offStep: boolean;
 	// The angle a press counts its turn from: the value as given, and then
 	// the step the gesture last selected.
 	reference: number;
@@ -89,7 +94,6 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			snap,
 			toAngle,
 			fromAngle,
-			exactAngle,
 			press,
 		} = getDial( { min, max, stepsPerTurn } );
 		const largeStepCount = Math.max( 1, Math.round( largeStep ) );
@@ -109,11 +113,14 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 
 		// Selects the step the gesture has reached, when it is a new one. The
 		// gesture remembers its own last step, because the value prop can lag
-		// behind while a parent has yet to update.
-		function selectReached( current: Gesture ) {
+		// behind while a parent has yet to update. `names` says that the
+		// pointer named this heading, by a press or a move through the
+		// middle, and did not just turn the dial.
+		function selectReached( current: Gesture, names: boolean ) {
 			const reached = fromAngle( current.angle );
-			if ( reached !== current.step ) {
+			if ( reached !== current.step || ( names && current.offStep ) ) {
 				current.step = reached;
+				current.offStep = false;
 				current.reference = toAngle( reached );
 				select( reached );
 			}
@@ -132,7 +139,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				// A press on the dot, or in the middle where there is no
 				// heading, takes hold of the dial where it is. A press
 				// anywhere else turns it to that heading.
-				const reference = exactAngle( shownValue );
+				const reference = toAngle( shownValue );
 				const turnsTo =
 					pointer.heading === null || isOnDot( pointer, angle )
 						? null
@@ -142,15 +149,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					...pointer,
 					angle: turnsTo ?? angle,
 					reference,
-					// The press selects its step unless the value is on it
-					// already. An empty dial has no value, and a press on a
-					// heading does not keep a value that lies between steps.
-					step:
-						isEmpty || ( turnsTo !== null && shown !== shownValue )
-							? null
-							: shown,
+					step: shown,
+					offStep: isEmpty || shown !== shownValue,
 				};
-				selectReached( gesture.current );
+				// A press on a heading names it. So does any press on an
+				// empty dial, which sets the value it shows.
+				selectReached( gesture.current, turnsTo !== null || isEmpty );
 			}
 		);
 
@@ -202,14 +206,18 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// comes back. A move through the middle has no way round, so it
 			// selects the heading it lands on, like a press. The first
 			// heading after a press in the middle only starts the count.
-			if ( current.heading !== null ) {
-				current.angle = crossesMiddle( current, pointer )
-					? press( pointer.heading, current.reference )
-					: current.angle +
-						turnBetween( current.heading, pointer.heading );
+			const crossed =
+				current.heading !== null && crossesMiddle( current, pointer );
+			if ( crossed ) {
+				current.angle = press( pointer.heading, current.reference );
+			} else if ( current.heading !== null ) {
+				current.angle += turnBetween(
+					current.heading,
+					pointer.heading
+				);
 			}
 			Object.assign( current, pointer );
-			selectReached( current );
+			selectReached( current, crossed );
 		}
 
 		function handleKeyDown(

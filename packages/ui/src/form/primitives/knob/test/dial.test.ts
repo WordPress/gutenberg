@@ -29,6 +29,8 @@ describe( 'getDial', () => {
 		{ config: { stepsPerTurn: 2 * Math.PI }, first: 0, last: 359 },
 		{ config: { stepsPerTurn: 0 }, first: 0, last: 359 },
 		{ config: { stepsPerTurn: -4 }, first: 0, last: 359 },
+		// A single step per turn would leave nothing to choose.
+		{ config: { stepsPerTurn: 1 }, first: 0, last: 359 },
 	] )( 'spans $first to $last for $config', ( { config, first, last } ) => {
 		const dial = getDial( config );
 		expect( [ dial.first, dial.last ] ).toEqual( [ first, last ] );
@@ -41,6 +43,12 @@ describe( 'getDial', () => {
 		{ config: {}, value: 359.6, step: 0 },
 		{ config: {}, value: 359.4, step: 359 },
 		{ config: { stepsPerTurn: 4 }, value: 3.6, step: 0 },
+		// A dial with as many steps as whole numbers allow still counts.
+		{
+			config: { stepsPerTurn: Number.MAX_SAFE_INTEGER },
+			value: 2,
+			step: 2,
+		},
 		// A bounded dial stops at its ends.
 		{ config: { min: -720, max: 720 }, value: 1000, step: 720 },
 		{ config: { min: -720, max: 720 }, value: -1000, step: -720 },
@@ -194,6 +202,14 @@ describe( 'press', () => {
 			heading: 32,
 			expected: 6,
 		},
+		// Half a step past the end rounds beyond it, so the turn before has
+		// the heading.
+		{
+			config: { min: 0, max: 4, stepsPerTurn: 4 },
+			value: 4,
+			heading: 45,
+			expected: 1,
+		},
 		// Steps of a quarter turn, two turns either way.
 		{
 			config: { min: -8, max: 8, stepsPerTurn: 4 },
@@ -209,7 +225,7 @@ describe( 'press', () => {
 		'selects $expected for heading $heading from $value on $config',
 		( { config, value, heading, expected } ) => {
 			const dial = getDial( config );
-			const angle = dial.press( heading, dial.exactAngle( value ) );
+			const angle = dial.press( heading, dial.toAngle( value ) );
 			expect( dial.fromAngle( angle ) ).toBe( expected );
 		}
 	);
@@ -229,8 +245,12 @@ describe( 'press', () => {
 			const last = dial.toAngle( dial.last );
 			const value = min - 5 + random() * ( steps + 10 );
 			const heading = random() * 360 - 180;
-			const from = dial.exactAngle( value );
-			const angle = dial.press( heading, from );
+			// The press counts from the value, kept within the range.
+			const from = Math.min(
+				last,
+				Math.max( first, dial.toAngle( value ) )
+			);
+			const angle = dial.press( heading, dial.toAngle( value ) );
 			const check = ( rule: string, holds: boolean ) => {
 				if ( ! holds ) {
 					failures.push(
@@ -249,15 +269,13 @@ describe( 'press', () => {
 				Math.abs( turnBetween( heading, angle ) ) < 1e-6
 			);
 			// How far each turn of the heading is from the value, for the
-			// turns that fit the range, give or take the half step that
-			// rounds to an end.
+			// turns whose nearest step is in the range.
 			const fitting = [ -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6 ]
 				.map( ( turn ) => heading + 360 * turn )
-				.filter(
-					( candidate ) =>
-						candidate >= first - stepAngle / 2 &&
-						candidate <= last + stepAngle / 2
-				)
+				.filter( ( candidate ) => {
+					const step = Math.round( candidate / stepAngle );
+					return step >= dial.first && step <= dial.last;
+				} )
 				.map( ( candidate ) => Math.abs( candidate - from ) );
 			// With no turn that fits, the dial stops at the end nearer to
 			// the heading. An exact tie may go either way.

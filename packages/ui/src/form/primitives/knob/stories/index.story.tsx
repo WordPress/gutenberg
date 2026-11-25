@@ -217,7 +217,11 @@ export const WithUnits: Story = {
 				Math.floor( ( 2 * unit.unitsPerTurn ) / unit.step ) * unit.step
 			).toFixed( 2 )
 		);
-		const rotation = Math.min( limit, Math.max( -limit, inUnit( turns ) ) );
+		// What the field shows for a number of turns: on the step grid, and
+		// within the limits.
+		const shownAs = ( amount: number ) =>
+			Math.min( limit, Math.max( -limit, inUnit( amount ) ) );
+		const rotation = shownAs( turns );
 		return (
 			<Stack direction="row" gap="sm" align="flex-end">
 				<InputControl
@@ -260,7 +264,7 @@ export const WithUnits: Story = {
 					max={ 2 * unit.stepsPerTurn }
 					stepsPerTurn={ unit.stepsPerTurn }
 					getAriaValueText={ ( _formatted, steps ) =>
-						`${ inUnit( steps / unit.stepsPerTurn ) } ${ unit.label }`
+						`${ shownAs( steps / unit.stepsPerTurn ) } ${ unit.label }`
 					}
 					value={ turns * unit.stepsPerTurn }
 					onValueChange={ ( steps ) =>

@@ -58,7 +58,7 @@ export type KnobProps = Omit<
 		 */
 		placeholder?: number;
 		/**
-		 * How many steps make a full clockwise turn. It is a whole number,
+		 * How many steps make a full clockwise turn. It is a whole number of at least 2,
 		 * and it sets what one step of the value means: a degree by default,
 		 * a gradian with 400, or a hundredth of a turn with 100. Zero points
 		 * up. The dial counts in whole steps only. Show other units, such as

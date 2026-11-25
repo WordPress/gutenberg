@@ -26,7 +26,7 @@ Both controls stay in the Tab order, so each needs its own name. Let the visible
 
 ## Choose the range
 
-The dial counts in whole steps. `stepsPerTurn` sets how many make a full turn, and so what one step of the value means: a degree with the default 360, a gradian with 400, or a hundredth of a turn with 100. Zero points up and a quarter of the steps points right.
+The dial counts in whole steps. `stepsPerTurn` sets how many make a full turn, at least 2, and so what one step of the value means: a degree with the default 360, a gradian with 400, or a hundredth of a turn with 100. Zero points up and a quarter of the steps points right.
 
 Without `min` and `max`, the dial covers one turn and wraps, as in the example above. One step past 359 returns to 0. Use this for a direction, such as a gradient angle.
 
@@ -50,7 +50,7 @@ A slider always has a number, so assistive technology reads the placeholder as t
 
 The dial follows these rules. Each one is a function of the press, the path of the pointer, and the value, so it can be tested without a browser.
 
-1. A press on a heading selects that heading at once, as a press on a slider's track does. A bounded dial takes the heading on the turn nearest to the value. A heading that rounds to an end of the range counts as on that turn. When no turn in the range has it, the press selects the nearer end. The press leaves the value on that step, even when the dial already pointed there with a value between two steps or outside the range.
+1. A press on a heading selects that heading at once, as a press on a slider's track does. A bounded dial takes the heading on the turn nearest to the value. A turn has the heading when the step it rounds to is in the range. When no turn has it, the press selects the nearer end. The press leaves the value on that step, even when the dial already pointed there with a value between two steps or outside the range.
 2. A press on the dot takes hold of it where it is. So does a press in the middle of the dial, which has no heading. The value then changes only when the pointer turns.
 3. A drag turns the dial as far as the pointer goes round, the shorter way. It keeps counting across twelve o'clock, which is how a bounded dial counts turns.
 4. Past an end of a bounded dial, the dot waits at that end until the pointer comes back round to it.

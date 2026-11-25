@@ -387,6 +387,33 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 	} );
 
+	it( 'leaves the value on the step a move through the middle lands on, as a press would', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Angle"
+					value={ 450 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { center, left, right } = getPoints( dial );
+		// Hold the middle, go to nine o'clock, then straight across to
+		// three. The dial points there already, but the value is 450.
+		await userEvent.pointer( [
+			{ target: dial, coords: center, keys: '[MouseLeft>]' },
+			{ target: dial, coords: left },
+		] );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await userEvent.pointer( [
+			{ target: dial, coords: right },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
 	it( 'leaves the value on the pressed step when it was between steps', async () => {
 		const onValueChange = vi.fn();
 		await render(
@@ -467,6 +494,19 @@ describe( 'Knob', () => {
 				buttons: 2,
 				clientX: face.left + right.x,
 				clientY: face.top + right.y,
+			} )
+		);
+		expect( onValueChange ).not.toHaveBeenCalled();
+		// The tip touches down again with the barrel button still held. The
+		// gesture has ended, so this move starts nothing.
+		dial.element().firstElementChild?.dispatchEvent(
+			new PointerEvent( 'pointermove', {
+				bubbles: true,
+				pointerId,
+				isPrimary: true,
+				buttons: 3,
+				clientX: face.left + face.width / 2,
+				clientY: face.top + face.height - 3,
 			} )
 		);
 		expect( onValueChange ).not.toHaveBeenCalled();
