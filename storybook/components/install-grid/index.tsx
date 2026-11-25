@@ -2,6 +2,16 @@ import { useState } from '@wordpress/element';
 import { Markdown, Source, Subheading } from '@storybook/addon-docs/blocks';
 import { ButtonLink } from '@wordpress/ui';
 import styles from './style.module.css';
+import anthropicLogo from './logos/anthropic.svg';
+import antigravityLogo from './logos/antigravity.svg';
+import claudeCodeLogo from './logos/claude-code.svg';
+import cursorLogo from './logos/cursor.svg';
+import jetbrainsLogo from './logos/jetbrains.svg';
+import openaiLogo from './logos/openai.svg';
+import opencodeLogo from './logos/opencode.svg';
+import raycastLogo from './logos/raycast.svg';
+import vscodeLogo from './logos/vscode.svg';
+import zedLogo from './logos/zed.svg';
 
 const PACKAGE_ARGS = [
 	'-y',
@@ -47,11 +57,11 @@ type ToolBase = {
 	steps: string[];
 };
 
-/** A tool shows either its favicon (from `domain`) or a text badge (`mark` and `color`). */
+/** A tool shows either its logo (an SVG file) or a text badge (`mark` and `color`). */
 type Tool = ToolBase &
 	(
-		| { domain: string; mark?: never; color?: never }
-		| { domain?: never; mark: string; color: string }
+		| { logo: string; mark?: never; color?: never }
+		| { logo?: never; mark: string; color: string }
 	);
 
 const CLI_ARGS = `wordpress-design-system -- npx ${ PACKAGE_ARGS.join( ' ' ) }`;
@@ -62,7 +72,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'claude-code',
 		label: 'Claude Code',
-		domain: 'claude.ai',
+		logo: claudeCodeLogo,
 		command: `claude mcp add ${ CLI_ARGS }`,
 		steps: [
 			'Open a terminal and run the command above. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) for more options.',
@@ -72,7 +82,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'codex',
 		label: 'OpenAI Codex',
-		domain: 'openai.com',
+		logo: openaiLogo,
 		command: `codex mcp add ${ CLI_ARGS }`,
 		steps: [
 			'Install the [Codex CLI](https://developers.openai.com/codex/cli) if you have not already.',
@@ -83,7 +93,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'cursor',
 		label: 'Cursor',
-		domain: 'cursor.com',
+		logo: cursorLogo,
 		file: '~/.cursor/mcp.json',
 		config: JSON_CONFIG,
 		install: {
@@ -99,7 +109,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'vscode',
 		label: 'VS Code',
-		domain: 'code.visualstudio.com',
+		logo: vscodeLogo,
 		file: '.vscode/mcp.json',
 		config: toJson( { servers: { [ SERVER_NAME ]: SERVER_ENTRY } } ),
 		install: { href: VSCODE_URL, label: 'Install in VS Code' },
@@ -111,7 +121,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'jetbrains',
 		label: 'JetBrains',
-		domain: 'jetbrains.com',
+		logo: jetbrainsLogo,
 		config: JSON_CONFIG,
 		steps: [
 			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add.',
@@ -122,7 +132,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'claude-desktop',
 		label: 'Claude Desktop',
-		domain: 'anthropic.com',
+		logo: anthropicLogo,
 		file: 'claude_desktop_config.json',
 		config: JSON_CONFIG,
 		steps: [
@@ -134,7 +144,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'antigravity',
 		label: 'Antigravity',
-		domain: 'antigravity.google',
+		logo: antigravityLogo,
 		file: '~/.gemini/config/mcp_config.json',
 		config: JSON_CONFIG,
 		steps: [
@@ -144,7 +154,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'opencode',
 		label: 'OpenCode',
-		domain: 'opencode.ai',
+		logo: opencodeLogo,
 		file: 'opencode.json',
 		config: toJson( {
 			mcp: {
@@ -164,7 +174,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'zed',
 		label: 'Zed',
-		domain: 'zed.dev',
+		logo: zedLogo,
 		file: 'settings.json',
 		config: toJson( {
 			context_servers: { [ SERVER_NAME ]: SERVER_ENTRY },
@@ -177,7 +187,7 @@ const TOOLS: Tool[] = [
 	{
 		id: 'raycast',
 		label: 'Raycast',
-		domain: 'raycast.com',
+		logo: raycastLogo,
 		config: toJson( SERVER_ENTRY ),
 		install: { href: RAYCAST_URL, label: 'Install in Raycast' },
 		steps: [
@@ -200,7 +210,7 @@ const TOOLS: Tool[] = [
 ];
 
 function ToolIcon( { tool }: { tool: Tool } ) {
-	if ( ! tool.domain ) {
+	if ( ! tool.logo ) {
 		return (
 			<span
 				className={ styles.mark }
@@ -214,7 +224,7 @@ function ToolIcon( { tool }: { tool: Tool } ) {
 	return (
 		<img
 			className={ styles.logo }
-			src={ `https://www.google.com/s2/favicons?domain=${ tool.domain }&sz=64` }
+			src={ tool.logo }
 			alt=""
 			width={ 32 }
 			height={ 32 }
