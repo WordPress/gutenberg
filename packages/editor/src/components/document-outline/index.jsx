@@ -110,23 +110,27 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { title, isTitleSupported, isTitleRendered } = useSelect(
-		( select ) => {
-			const { getEditedPostAttribute, getRenderingMode } =
-				select( editorStore );
+	const { title, isTitleSupported, isTitleRendered, postTitleClientId } =
+		useSelect( ( select ) => {
+			const {
+				getEditedPostAttribute,
+				getRenderingMode,
+				getPostBlocksByName,
+			} = unlock( select( editorStore ) );
 			const { getPostType } = select( coreStore );
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const postType = getPostType( postTypeSlug );
+			const isPostOnly = getRenderingMode() === 'post-only';
 			return {
 				title: getEditedPostAttribute( 'title' ),
 				isTitleSupported: postType?.supports?.title ?? false,
 				isTitleRendered:
-					getRenderingMode() === 'post-only' &&
-					! DESIGN_POST_TYPES.includes( postTypeSlug ),
+					isPostOnly && ! DESIGN_POST_TYPES.includes( postTypeSlug ),
+				postTitleClientId: isPostOnly
+					? undefined
+					: getPostBlocksByName( 'core/post-title' )[ 0 ],
 			};
-		},
-		[]
-	);
+		}, [] );
 	const blocks = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants, getBlock } =
 			select( blockEditorStore );
@@ -141,16 +145,18 @@ export default function DocumentOutline( {
 			return undefined;
 		}
 
-		const { getBlocksByName, getClientIdsOfDescendants } =
-			select( blockEditorStore );
-		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
+		const [ postContentClientId ] = unlock(
+			select( editorStore )
+		).getPostBlocksByName( 'core/post-content' );
 
 		// Do nothing if there's no post content block.
 		if ( ! postContentClientId ) {
 			return undefined;
 		}
 
-		return getClientIdsOfDescendants( postContentClientId );
+		return select( blockEditorStore ).getClientIdsOfDescendants(
+			postContentClientId
+		);
 	}, [] );
 
 	const prevHeadingLevelRef = useRef( 1 );
@@ -159,8 +165,9 @@ export default function DocumentOutline( {
 		() => computeOutlineHeadings( blocks ),
 		[ blocks ]
 	);
-	// Gives access to the canvas document, which may be an iframe.
-	const headingElement = useBlockElement( headings[ 0 ]?.clientId );
+	const canvasDocument = useBlockElement(
+		headings[ 0 ]?.clientId
+	)?.ownerDocument;
 
 	if ( headings.length < 1 ) {
 		return (
@@ -175,7 +182,8 @@ export default function DocumentOutline( {
 		);
 	}
 
-	const hasTitle = isTitleSupported && title && isTitleRendered;
+	const hasTitle =
+		isTitleSupported && title && ( isTitleRendered || postTitleClientId );
 	const countByLevel = headings.reduce(
 		( acc, heading ) => ( {
 			...acc,
@@ -199,9 +207,15 @@ export default function DocumentOutline( {
 						level={ __( 'Title' ) }
 						isValid
 						onSelect={ () => {
-							headingElement?.ownerDocument
-								.querySelector( '.editor-post-title__input' )
-								?.focus();
+							if ( postTitleClientId ) {
+								selectBlock( postTitleClientId );
+							} else {
+								canvasDocument
+									?.querySelector(
+										'.editor-post-title__input'
+									)
+									?.focus();
+							}
 							onSelect?.();
 						} }
 						href="#"
