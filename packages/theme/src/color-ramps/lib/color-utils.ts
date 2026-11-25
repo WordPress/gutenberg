@@ -7,6 +7,7 @@ import {
 	clone,
 	equals,
 	sRGB,
+	sRGB_Linear as sRGBLinear,
 	OKLCH,
 	type ColorObject,
 	type PlainColorObject,
@@ -75,12 +76,9 @@ function getRelativeLuminance( color: string | PlainColorObject ): number {
 }
 
 function computeRelativeLuminance( color: string | PlainColorObject ): number {
-	const [ red, green, blue ] = to( color, sRGB ).coords.map( ( channel ) => {
-		const value = channel ?? 0;
-		return value <= 0.04045
-			? value / 12.92
-			: ( ( value + 0.055 ) / 1.055 ) ** 2.4;
-	} );
+	const [ red, green, blue ] = to( color, sRGBLinear ).coords.map(
+		( channel ) => channel ?? 0
+	);
 	// Use WCAG's coefficients. Color.js uses more precise sRGB coefficients,
 	// which can accept a color pair just below WCAG's strict contrast threshold.
 	// https://www.w3.org/TR/WCAG22/#dfn-relative-luminance
