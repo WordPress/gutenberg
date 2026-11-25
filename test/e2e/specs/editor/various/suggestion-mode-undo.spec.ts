@@ -103,7 +103,7 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 			.locator( '.components-snackbar-list' )
 			.getByText(
 				action === 'Accept'
-					? 'Suggestion applied.'
+					? 'Suggestion accepted.'
 					: 'Suggestion rejected.'
 			)
 	).toBeVisible();
@@ -742,7 +742,7 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect( paragraph ).toHaveText( 'Hello world' );
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 
 		await pageUtils.pressKeys( 'primary+z' );
@@ -759,7 +759,7 @@ test.describe( 'Suggestion mode undo', () => {
 			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
 		).toBeVisible();
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeHidden();
 	} );
 
@@ -861,7 +861,7 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( note.status ).toBe( 'hold' );
 		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1035,7 +1035,7 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( note.status ).toBe( 'hold' );
 		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1088,7 +1088,7 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( note.status ).toBe( 'hold' );
 		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1181,7 +1181,7 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( note.status ).toBe( 'hold' );
 		expect( note.meta._wp_suggestion_status ).toBe( 'applied-unsaved' );
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 

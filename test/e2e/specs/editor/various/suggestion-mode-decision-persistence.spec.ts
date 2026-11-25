@@ -13,7 +13,7 @@
  * - decide, then save: the decision is final and the post reflects it.
  *
  * Notes left final with their marker still in the post (by an editor from
- * before the save pass) can be rescued with Apply again, Reject again or
+ * before the save pass) can be rescued with Accept again, Reject again or
  * Reopen.
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
@@ -71,7 +71,7 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 			.locator( '.components-snackbar-list' )
 			.getByText(
 				action === 'Accept'
-					? 'Suggestion applied.'
+					? 'Suggestion accepted.'
 					: 'Suggestion rejected.'
 			)
 	).toBeVisible();
@@ -668,7 +668,7 @@ test.describe( 'Suggestion mode decisions are provisional until the post is save
 			return postId;
 		}
 
-		test( 'Apply again lands the decision, and a save finalizes it', async ( {
+		test( 'Accept again lands the decision, and a save finalizes it', async ( {
 			editor,
 			page,
 			requestUtils,
@@ -681,19 +681,19 @@ test.describe( 'Suggestion mode decisions are provisional until the post is save
 			const sidebar = await openNotesSidebar( page );
 			await expect(
 				sidebar.getByText(
-					'Applied, but the change is not in the post.'
+					'Accepted, but the change is not in the post.'
 				)
 			).toBeVisible();
 			await expect(
 				sidebar.getByRole( 'button', { name: 'Reject again' } )
 			).toBeVisible();
 			await sidebar
-				.getByRole( 'button', { name: 'Apply again' } )
+				.getByRole( 'button', { name: 'Accept again' } )
 				.click();
 			await expect(
 				page
 					.locator( '.components-snackbar-list' )
-					.getByText( 'Suggestion applied.' )
+					.getByText( 'Suggestion accepted.' )
 			).toBeVisible();
 			await editor.saveDraft();
 

@@ -372,7 +372,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 			await expect(
 				page
 					.locator( '.components-snackbar-list' )
-					.getByText( 'Suggestion applied.' )
+					.getByText( 'Suggestion accepted.' )
 			).toBeVisible();
 			await expect
 				.poll( () => getEditedPostAttribute( page, 'featured_media' ) )
@@ -642,7 +642,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 			await expect(
 				page
 					.locator( '.components-snackbar-list' )
-					.getByText( 'Suggestion applied.' )
+					.getByText( 'Suggestion accepted.' )
 			).toBeVisible();
 			const [ created ] = await findTerms(
 				requestUtils,

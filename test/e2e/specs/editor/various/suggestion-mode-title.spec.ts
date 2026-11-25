@@ -173,7 +173,7 @@ test.describe( 'Suggestion mode: post title', () => {
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'Suggestion applied.' )
+				.getByText( 'Suggestion accepted.' )
 		).toBeVisible();
 
 		await expect

@@ -88,7 +88,7 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 			.locator( '.components-snackbar-list' )
 			.getByText(
 				action === 'Accept'
-					? 'Suggestion applied.'
+					? 'Suggestion accepted.'
 					: 'Suggestion rejected.'
 			)
 	).toBeVisible();
@@ -374,7 +374,7 @@ test.describe( 'Suggestion mode review flows', () => {
 
 		// The note stays as a record of the decision.
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -568,7 +568,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).toContain( 'Keep me' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -655,7 +655,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).toContain( 'Brand new suggested paragraph' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -739,7 +739,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		);
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1218,7 +1218,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).not.toContain( 'data-suggestion' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1303,7 +1303,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).not.toContain( 'data-suggestion' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1390,7 +1390,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		expect( serialized ).not.toContain( 'data-suggestion' );
 
 		await expect(
-			sidebar.getByText( 'Applied', { exact: true } )
+			sidebar.getByText( 'Accepted', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -1498,7 +1498,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'Suggestion applied.' )
+				.getByText( 'Suggestion accepted.' )
 		).toBeVisible();
 
 		// The addition landed: marker unwrapped, text kept.
@@ -1658,7 +1658,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		await expect(
 			page
 				.locator( '.components-snackbar-list' )
-				.getByText( 'Suggestion applied.' )
+				.getByText( 'Suggestion accepted.' )
 		).toBeVisible();
 
 		// The quote is the only block left, with no pending treatment and
