@@ -130,6 +130,23 @@ describe( 'accent focus contrast', () => {
 		expect( first ).toEqual( second );
 	} );
 
+	it( 'builds the same ramp for seeds that emit the same color', () => {
+		const neutral = buildBgRamp( '#ffffff' );
+		expect(
+			buildAccentRamp( 'primary', 'rgb(255 0 122.6)', neutral )
+		).toEqual( buildAccentRamp( 'primary', '#ff007b', neutral ) );
+	} );
+
+	it( 'keeps the tint of a stroke moved toward its endpoint', () => {
+		const { ramp, warnings } = buildAccentRamp(
+			'primary',
+			'#383800',
+			buildBgRamp( '#595959' )
+		);
+		expect( warnings ).toBeUndefined();
+		expect( ramp.stroke4 ).not.toBe( '#fff' );
+	} );
+
 	it( 'keeps a stroke target when gamut mapping lowers the searched color', () => {
 		expect(
 			buildAccentRamp( 'primary', '#ff0000', buildBgRamp( '#595959' ) )

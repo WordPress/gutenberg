@@ -1,4 +1,12 @@
-import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
+import {
+	clone,
+	get,
+	mix,
+	OKLab,
+	OKLCH,
+	set,
+	type PlainColorObject,
+} from 'colorjs.io/fn';
 import {
 	clampToGamut,
 	getContrast,
@@ -228,14 +236,28 @@ function calculateRamp( {
 		}
 
 		// Gamut mapping can push a color that reached its target below it once
-		// emitted. Use the endpoint instead when it still meets the targets.
-		const color =
+		// emitted. Move it toward the endpoint until it meets the targets.
+		let color = searchResults.color;
+		if (
 			neutralSurface &&
 			searchResults.reached &&
-			! meetsTargets( searchResults.color ) &&
+			! meetsTargets( color ) &&
 			meetsTargets( endpoint )
-				? endpoint
-				: searchResults.color;
+		) {
+			const towardEndpoint = ( amount: number ) =>
+				mix( searchResults.color, endpoint, amount, { space: OKLab } );
+			let low = 0;
+			let high = 1;
+			for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
+				const amount = ( low + high ) / 2;
+				if ( meetsTargets( towardEndpoint( amount ) ) ) {
+					high = amount;
+				} else {
+					low = amount;
+				}
+			}
+			color = towardEndpoint( high );
+		}
 
 		// Store calculated color for future dependencies
 		calculatedColors.set( stepName, color );
@@ -279,6 +301,10 @@ export function buildRamp(
 	let seed: PlainColorObject;
 	try {
 		seed = clampToGamut( parsedSeed );
+		// Seed trials for the primary ramp use emitted colors. Start from one.
+		if ( neutralSurface ) {
+			seed = clampToGamut( parseSeedColor( getColorString( seed ) ) );
+		}
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
