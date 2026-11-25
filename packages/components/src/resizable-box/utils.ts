@@ -23,12 +23,7 @@ export function toLocalDelta(
 	y: number
 ): { x: number; y: number } {
 	const determinant = matrix.a * matrix.d - matrix.b * matrix.c;
-	// Rounding can leave a flattened axis barely invertible.
-	const size = Math.max(
-		matrix.a * matrix.a + matrix.b * matrix.b,
-		matrix.c * matrix.c + matrix.d * matrix.d
-	);
-	if ( Math.abs( determinant ) <= 1e-6 * size ) {
+	if ( ! determinant ) {
 		return { x, y };
 	}
 	return {
@@ -154,10 +149,6 @@ export function getResizeStep(
 	};
 }
 
-// Without a transform, a handle never moves more than twice as far as the
-// box grows; see `measureGain`.
-const MAX_GAIN = 2;
-
 /**
  * Measures how far a handle moved on screen for a change in size, relative
  * to what `matrix` predicts. A transform origin at the box's centre, the
@@ -172,8 +163,7 @@ const MAX_GAIN = 2;
  * @param handleMove.x      Horizontal movement.
  * @param handleMove.y      Vertical movement.
  *
- * @return The gain, or `undefined` when the size barely changed or the handle
- * moved further than growth can explain.
+ * @return The gain, or `undefined` when the size barely changed.
  */
 export function measureGain(
 	matrix: LinearTransform,
@@ -184,20 +174,13 @@ export function measureGain(
 	const [ x, y ] = HANDLE_VECTORS[ direction ];
 	const localX = x * sizeChange.width;
 	const localY = y * sizeChange.height;
-	const local = Math.hypot( localX, localY );
 	const expectedX = matrix.a * localX + matrix.c * localY;
 	const expectedY = matrix.b * localX + matrix.d * localY;
-	const expected = Math.hypot( expectedX, expectedY );
-	if ( local < 1 || expected < 0.25 ) {
+	const length = expectedX * expectedX + expectedY * expectedY;
+	if ( length < 1 ) {
 		return undefined;
 	}
-	const gain =
-		( handleMove.x * expectedX + handleMove.y * expectedY ) /
-		( expected * expected );
-	// A moving transform origin can multiply the handle's movement by up to
-	// the inverse of the box's scale on screen. Far more is a layout shift.
-	const maxGain = MAX_GAIN / Math.min( 1, expected / local );
-	return Math.abs( gain ) <= maxGain ? gain : undefined;
+	return ( handleMove.x * expectedX + handleMove.y * expectedY ) / length;
 }
 
 const DOT_SCALE_PROPERTY = '--wp-components-resizable-box-handle-dot-scale';

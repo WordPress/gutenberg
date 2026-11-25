@@ -27,8 +27,9 @@ type TransformedDrag = {
 };
 
 // Below the minimum, the handle cannot follow the pointer, like one on a
-// block turned 180deg.
+// block turned 180deg. Above the maximum is a measuring glitch.
 const MIN_GAIN = 0.2;
+const MAX_GAIN = 2;
 const MAX_SETTLES = 10;
 
 /**
@@ -127,7 +128,7 @@ export class TransformAwareResizable extends Resizable {
 			);
 			if ( gain !== undefined && gain < MIN_GAIN ) {
 				drag.cannotFollow = true;
-			} else if ( gain !== undefined ) {
+			} else if ( gain !== undefined && gain <= MAX_GAIN ) {
 				drag.gain = gain;
 			}
 		}
