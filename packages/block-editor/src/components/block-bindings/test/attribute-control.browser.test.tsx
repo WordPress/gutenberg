@@ -11,6 +11,7 @@ import type { Mock } from 'vitest';
 import useBlockBindingsUtils from '../use-block-bindings-utils';
 import BlockBindingsAttributeControl from '../attribute-control';
 import type { Binding } from '../../../utils/block-bindings';
+import type { BlockBindingsField } from '../types';
 
 vi.mock( import( '@wordpress/data' ), { spy: true } );
 
@@ -32,11 +33,14 @@ const source = {
 	label: 'Post meta',
 };
 
-async function renderControl( binding?: Binding ) {
+async function renderControl(
+	binding?: Binding,
+	availableFields: BlockBindingsField[] = [ field ]
+) {
 	vi.mocked( useSelect ).mockImplementation(
 		( _mapSelect: unknown, dependencies?: unknown[] ) => {
 			if ( dependencies?.length === 3 ) {
-				return { [ source.name ]: [ field ] };
+				return { [ source.name ]: availableFields };
 			}
 			if ( dependencies?.length === 4 ) {
 				return {};
@@ -113,5 +117,33 @@ describe( 'BlockBindingsAttributeControl', () => {
 		expect( updateBlockBindings ).toHaveBeenCalledWith( {
 			content: undefined,
 		} );
+	} );
+
+	it( 'shows the selected legacy field label', async () => {
+		await renderControl(
+			{ source: source.name, args: { key: field.key } },
+			[ { key: field.key, label: field.label, type: field.type } ]
+		);
+		await expect
+			.element( page.getByRole( 'button', { name: /content/i } ) )
+			.toHaveTextContent( field.label );
+	} );
+
+	it( 'uses all explicit arguments to find the selected field label', async () => {
+		const fieldsWithSharedKey = [
+			{ ...field, args: { key: field.key, scope: 'title' } },
+			{
+				...field,
+				args: { key: field.key, scope: 'description' },
+				label: 'SEO description',
+			},
+		];
+		await renderControl(
+			{ source: source.name, args: fieldsWithSharedKey[ 1 ].args },
+			fieldsWithSharedKey
+		);
+		await expect
+			.element( page.getByRole( 'button', { name: /content/i } ) )
+			.toHaveTextContent( 'SEO description' );
 	} );
 } );

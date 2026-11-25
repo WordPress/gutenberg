@@ -6,7 +6,7 @@ import type { UserSettings } from './types';
 export const defaultSettings = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
 	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
-	spaceRegExp: /&nbsp;|&#160;/gi,
+	spaceRegExp: /&nbsp;|&#160;|[\u00A0\u2000-\u200A\u202F\u205F]/gi,
 	HTMLEntityRegExp: /&\S+?;/g,
 
 	// \u2014 = em-dash.
