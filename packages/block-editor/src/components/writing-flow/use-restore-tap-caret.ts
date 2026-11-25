@@ -82,8 +82,6 @@ export default function useRestoreTapCaret() {
 			}
 		}
 
-		const dbgEv = ( e: Event ) => dbg( e.type, ownerDocument, { data: ( e as InputEvent ).data, inputType: ( e as InputEvent ).inputType, defaultPrevented: e.defaultPrevented, wrapperCE: node.contentEditable } );
-		[ 'beforeinput', 'input', 'focusout', 'pointerdown', 'mousedown', 'pointerup', 'click', 'compositionstart', 'touchstart', 'touchend' ].forEach( ( t ) => ownerDocument.addEventListener( t, dbgEv, true ) );
 		dbg( 'mount', ownerDocument );
 		node.addEventListener( 'focusin', onFocusIn );
 		ownerDocument.addEventListener( 'pointerdown', forget, true );

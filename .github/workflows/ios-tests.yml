@@ -56,6 +56,11 @@ jobs:
         needs: build
         timeout-minutes: 100
         if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        # TEMP DEBUG: four jobs at once, for more runs per push.
+        strategy:
+            fail-fast: false
+            matrix:
+                shard: [ 1, 2, 3, 4 ]
         permissions:
             contents: read
 
@@ -108,7 +113,7 @@ jobs:
               uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ always() }}
               with:
-                  name: ios-test-results
+                  name: ios-test-results-${{ matrix.shard }}
                   path: |
                       test/ios/build/results-*.xcresult
                       test/ios/build/server-*.log
