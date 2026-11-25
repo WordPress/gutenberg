@@ -6,6 +6,7 @@
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
 -   Block Bindings: When a registered post meta field has no value, the `core/post-meta` source shows the block's saved content instead of the field label or key. An Image bound to such a field keeps its saved image ([#87389](https://github.com/WordPress/gutenberg/pull/87389)).
 
 ### Internal

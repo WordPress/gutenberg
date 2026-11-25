@@ -271,7 +271,7 @@ Renders a document outline component.
 _Parameters_
 
 - _props_ `Object`: Props.
-- _props.onSelect_ `Function`: Function to be called when an outline item is selected
+- _props.onSelect_ `[() => void]`: Function to be called when an outline item is selected
 - _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
 
 _Returns_
