@@ -19,7 +19,7 @@ describe( 'PostPublishPanel', () => {
 
 		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
 			id: 123,
-			link: 'https://wordpress.local/sample-page/',
+			link: `${ window.location.origin }/sample-page/`,
 		} );
 	} );
 
@@ -89,6 +89,24 @@ describe( 'PostPublishPanel', () => {
 		expect(
 			screen.getByRole( 'link', { name: /View Post/ } )
 		).toHaveAttribute( 'target', 'wp-post-123' );
+	} );
+
+	it( 'opens a plain new tab when the permalink points elsewhere', () => {
+		// See https://github.com/WordPress/gutenberg/issues/28479.
+		vi.spyOn(
+			select( editorStore ),
+			'isCurrentPostPublished'
+		).mockReturnValue( true );
+		vi.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			id: 123,
+			link: 'https://elsewhere.test/sample-page/',
+		} );
+
+		render( <PostPublishPanel /> );
+
+		expect(
+			screen.getByRole( 'link', { name: /no title/ } )
+		).toHaveAttribute( 'target', '_blank' );
 	} );
 
 	it( 'should render the post-publish panel if the post is scheduled', () => {

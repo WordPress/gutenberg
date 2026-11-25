@@ -16,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { Link } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
-import { getPostViewWindowName } from '../../utils/post-view-window-name';
+import { getPostViewTarget } from '../../utils/post-view-target';
 
 /**
  * Renders the `PostURL` component.
@@ -73,6 +73,7 @@ export default function PostURL( { onClose } ) {
 			type: 'snackbar',
 		} );
 	} );
+	const linkTarget = getPostViewTarget( postId, postLink );
 	const postUrlSlugDescriptionId =
 		'editor-post-url__slug-description-' + useInstanceId( PostURL );
 
@@ -178,7 +179,7 @@ export default function PostURL( { onClose } ) {
 								<Link
 									className="editor-post-url__link"
 									href={ postLink }
-									target={ getPostViewWindowName( postId ) }
+									target={ linkTarget }
 									openInNewTab
 								>
 									{ postSlug ? (
@@ -205,7 +206,7 @@ export default function PostURL( { onClose } ) {
 						<Link
 							className="editor-post-url__link"
 							href={ postLink }
-							target={ getPostViewWindowName( postId ) }
+							target={ linkTarget }
 							openInNewTab
 						>
 							{ postLink }

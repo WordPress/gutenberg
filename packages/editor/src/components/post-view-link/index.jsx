@@ -5,7 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
-import { getPostViewWindowName } from '../../utils/post-view-window-name';
+import { getPostViewTarget } from '../../utils/post-view-target';
 
 export default function PostViewLink() {
 	const { hasLoaded, permalink, isPublished, label, postId, showIconLabels } =
@@ -35,7 +35,7 @@ export default function PostViewLink() {
 			icon={ external }
 			label={ label || __( 'View post' ) }
 			href={ permalink }
-			target={ getPostViewWindowName( postId ) }
+			target={ getPostViewTarget( postId, permalink ) }
 			showTooltip={ ! showIconLabels }
 			size="compact"
 		/>

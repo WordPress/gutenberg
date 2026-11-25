@@ -13,7 +13,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 } ) );
 
 const POST_ID = 123;
-const POST_LINK = 'https://example.com/';
+const POST_LINK = `${ window.location.origin }/`;
 
 function setupUseSelectMock( { pageOnFront }: { pageOnFront?: number } = {} ) {
 	mockedUseSelect.mockImplementation( ( cb ) =>

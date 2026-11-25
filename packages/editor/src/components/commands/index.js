@@ -23,7 +23,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import { getPostViewWindowName } from '../../utils/post-view-window-name';
+import { getPostViewTarget } from '../../utils/post-view-target';
 import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -361,7 +361,7 @@ const getEditorCommandLoader = () =>
 						close();
 						window.open(
 							viewLink,
-							getPostViewWindowName( getCurrentPostId() )
+							getPostViewTarget( getCurrentPostId(), viewLink )
 						);
 					},
 				} );

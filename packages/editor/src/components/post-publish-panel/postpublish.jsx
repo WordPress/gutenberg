@@ -10,7 +10,7 @@ import { external } from '@wordpress/icons';
 import { Link, VisuallyHidden } from '@wordpress/ui';
 import { usePostScheduleLabel } from '../post-schedule/label';
 import { store as editorStore } from '../../store';
-import { getPostViewWindowName } from '../../utils/post-view-window-name';
+import { getPostViewTarget } from '../../utils/post-view-target';
 
 const POSTNAME = '%postname%';
 const PAGENAME = '%pagename%';
@@ -92,7 +92,7 @@ export default function PostPublishPanelPostpublish( {
 	const addLink = addQueryArgs( 'post-new.php', {
 		post_type: post.type,
 	} );
-	const linkTarget = getPostViewWindowName( post.id );
+	const linkTarget = getPostViewTarget( post.id, link );
 
 	const postLinkRef = useCallback(
 		( node ) => {

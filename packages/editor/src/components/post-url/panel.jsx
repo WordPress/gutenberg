@@ -9,7 +9,7 @@ import PostURLCheck from './check';
 import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
-import { getPostViewWindowName } from '../../utils/post-view-window-name';
+import { getPostViewTarget } from '../../utils/post-view-target';
 
 /**
  * Renders the `PostURLPanel` component.
@@ -114,7 +114,7 @@ function FrontPageLink() {
 		<Link
 			className="editor-post-url__front-page-link"
 			href={ postLink }
-			target={ getPostViewWindowName( postId ) }
+			target={ getPostViewTarget( postId, postLink ) }
 			openInNewTab
 		>
 			{ postLink }

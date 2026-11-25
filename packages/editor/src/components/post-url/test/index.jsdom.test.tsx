@@ -16,8 +16,8 @@ const DEFAULTS = {
 	isEditable: true,
 	postId: 123,
 	postSlug: 'sample-post',
-	postLink: 'https://example.com/sample-post/',
-	permalinkPrefix: 'https://example.com/',
+	postLink: `${ window.location.origin }/sample-post/`,
+	permalinkPrefix: `${ window.location.origin }/`,
 	permalinkSuffix: '/',
 };
 
@@ -59,6 +59,17 @@ describe( 'PostURL', () => {
 		expect(
 			screen.getByRole( 'link', { name: /sample-post/ } )
 		).toHaveAttribute( 'target', 'wp-post-123' );
+	} );
+
+	it( 'opens a plain new tab when the permalink points elsewhere', () => {
+		setupUseSelectMock( {
+			postLink: 'https://elsewhere.test/sample-post/',
+			permalinkPrefix: 'https://elsewhere.test/',
+		} );
+		render( <PostURL onClose={ () => {} } /> );
+		expect(
+			screen.getByRole( 'link', { name: /sample-post/ } )
+		).toHaveAttribute( 'target', '_blank' );
 	} );
 
 	it( 'still opens the documentation link in a plain new tab', () => {
