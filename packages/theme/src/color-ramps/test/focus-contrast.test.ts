@@ -121,6 +121,15 @@ describe( 'accent focus contrast', () => {
 		}
 	} );
 
+	it( 'gives seeds that move to the same emitted color the same ramp', () => {
+		const neutral = buildBgRamp( '#222524' );
+		const [ first, second ] = [ '#00f9f9', '#00fbfb' ].map(
+			( seed ) => buildAccentRamp( 'primary', seed, neutral ).ramp
+		);
+		expect( first.bgFill1 ).toBe( second.bgFill1 );
+		expect( first ).toEqual( second );
+	} );
+
 	it( 'keeps a stroke target when gamut mapping lowers the searched color', () => {
 		expect(
 			buildAccentRamp( 'primary', '#ff0000', buildBgRamp( '#595959' ) )

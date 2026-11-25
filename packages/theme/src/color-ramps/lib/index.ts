@@ -314,13 +314,17 @@ export function buildRamp(
 			pinLightness,
 		} );
 
-	function getWarnings( ramp: Ramp, candidate: PlainColorObject ) {
+	function getWarnings(
+		ramp: Ramp,
+		candidate: PlainColorObject,
+		steps = sortedSteps
+	) {
 		const emitted = {
 			...ramp,
 			seed: getColorString( candidate ),
 			neutralSurface: neutralSurfaceColor,
 		};
-		return sortedSteps.filter( ( stepName ) => {
+		return steps.filter( ( stepName ) => {
 			const { contrast } = config[ stepName ];
 			return (
 				! contrast.ignoreWhenAdjustingSeed &&
@@ -350,7 +354,14 @@ export function buildRamp(
 		let passing: { seed: PlainColorObject; ramp: Ramp } | undefined;
 
 		function getSeedForL( l: number ): PlainColorObject {
-			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
+			const color = clampToGamut(
+				set( clone( seed ), [ OKLCH, 'l' ], l )
+			);
+			// Primary trials use the emitted seed, so seeds that emit the same
+			// color produce the same ramp.
+			return neutralSurface
+				? clampToGamut( parseSeedColor( getColorString( color ) ) )
+				: color;
 		}
 
 		function getDeficitForSeed( s: PlainColorObject ): number {
@@ -400,38 +411,68 @@ export function buildRamp(
 		);
 
 		if ( passing ) {
+			const searched = passing;
 			// The first passing sample can be far from the supplied seed. Narrow
-			// the gap to the closest passing seed. Primary samples hold the full
-			// ramp.
-			let failingL = seedL;
-			let passingL = get( passing.seed, [ OKLCH, 'l' ] );
-			for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
-				const l = ( failingL + passingL ) / 2;
-				const candidate = getSeedForL( l );
-				// Stop once the midpoint emits the same seed as an end.
-				const emitted = getColorString( candidate );
-				if (
-					emitted === getColorString( passing.seed ) ||
-					emitted === getColorString( getSeedForL( failingL ) )
-				) {
-					break;
+			// the gap to the closest passing seed, checking only `steps`.
+			const refine = ( steps: ( keyof Ramp )[] ) => {
+				let closest = searched;
+				let failingL = seedL;
+				let passingL = get( closest.seed, [ OKLCH, 'l' ] );
+				let failingColor = getColorString( seed );
+				for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
+					const l = ( failingL + passingL ) / 2;
+					const candidate = getSeedForL( l );
+					// Trials emitting the same seed as an end produce its ramp.
+					const emitted = getColorString( candidate );
+					if (
+						emitted === failingColor ||
+						emitted === getColorString( closest.seed )
+					) {
+						break;
+					}
+					const { rampResults: ramp } = calculateRamp( {
+						seed: candidate,
+						sortedSteps: steps,
+						config,
+						mainDir,
+						oppDir,
+						neutralSurface,
+						pinLightness,
+					} );
+					if ( getWarnings( ramp, candidate, steps ).length === 0 ) {
+						closest = { seed: candidate, ramp };
+						passingL = l;
+					} else {
+						failingL = l;
+						failingColor = emitted;
+					}
 				}
-				const { rampResults: ramp } = calculateRamp( {
-					seed: candidate,
-					sortedSteps,
-					config,
-					mainDir,
-					oppDir,
-					neutralSurface,
-					pinLightness,
-				} );
-				if ( getWarnings( ramp, candidate ).length === 0 ) {
-					passing = { seed: candidate, ramp };
-					passingL = l;
-				} else {
-					failingL = l;
-				}
-			}
+				return closest;
+			};
+
+			// Refine only the steps that failed at the supplied seed, then
+			// check the complete ramp. Refine every step if that check fails.
+			const failedSteps = new Set(
+				getWarnings( rampResults, seed ).flatMap( ( step ) =>
+					stepsForStep( step, config )
+				)
+			);
+			const refined = refine(
+				sortedSteps.filter( ( step ) => failedSteps.has( step ) )
+			);
+			const { rampResults: refinedRamp } = calculateRamp( {
+				seed: refined.seed,
+				sortedSteps,
+				config,
+				mainDir,
+				oppDir,
+				neutralSurface,
+				pinLightness,
+			} );
+			passing =
+				getWarnings( refinedRamp, refined.seed ).length === 0
+					? { seed: refined.seed, ramp: refinedRamp }
+					: refine( sortedSteps );
 			bestRamp = passing.ramp;
 			seed = passing.seed;
 		} else {
