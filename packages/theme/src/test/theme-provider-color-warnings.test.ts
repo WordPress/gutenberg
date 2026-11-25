@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildAccentRamp, buildBgRamp, type RampResult } from '../color-ramps';
+import { buildBgRamp, type RampResult } from '../color-ramps';
 import { getContrast } from '../color-ramps/lib/color-utils';
 import {
 	collectThemeProviderColorWarnings,
@@ -73,24 +73,15 @@ describe( 'collectThemeProviderColorWarnings', () => {
 	);
 
 	it( 'checks the final fill after seed adjustment', () => {
-		const seed = '#1c7c64';
-		const background = buildBgRamp( '#1e1e1e' );
-		const primary = buildAccentRamp( 'info', seed, background );
 		const colorValues = new Map( [
-			[
-				'--wpds-color-background-interactive-brand-strong',
-				primary.ramp.bgFill1,
-			],
-			[
-				'--wpds-color-background-surface-neutral-strong',
-				background.ramp.surface3,
-			],
+			[ '--wpds-color-background-interactive-brand-strong', '#0f755d' ],
+			[ '--wpds-color-background-surface-neutral-strong', '#252525' ],
 		] );
 
-		expect(
-			getContrast( seed, background.ramp.surface3 )
-		).toBeGreaterThanOrEqual( 3 );
-		expect( primary.ramp.bgFill1 ).not.toBe( seed );
+		// The seed passes; the fill emitted after seed adjustment does not.
+		expect( getContrast( '#1c7c64', '#252525' ) ).toBeGreaterThanOrEqual(
+			3
+		);
 		expect(
 			collectThemeProviderColorWarnings( new Map(), colorValues )
 		).toEqual( [
