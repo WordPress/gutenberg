@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
