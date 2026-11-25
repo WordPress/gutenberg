@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	RichText,
@@ -15,6 +15,8 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	useCanEditEntity,
 	useToolsPanelDropdownMenuProps,
@@ -22,6 +24,86 @@ import {
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 const ELLIPSIS = '…';
+
+/*
+ * One more than the highest length the block offers, matching
+ * `block_core_post_excerpt_excerpt_length()`. The server generates the excerpt
+ * at this length and the block trims it to its own length, the same way the
+ * block is rendered on the front end.
+ */
+const GENERATED_EXCERPT_LENGTH = 101;
+
+/**
+ * Requests the excerpt the server generates at `GENERATED_EXCERPT_LENGTH`.
+ *
+ * `getEntityRecord` is deliberately not used here. It caches a single record by
+ * ID and context and ignores the rest of the query, so the response would
+ * overwrite the record the editor has loaded. Generated excerpts are therefore
+ * kept in state keyed by their request.
+ *
+ * Only `excerpt.rendered` is read, so the request asks for the least
+ * privileged context. In that context the REST API returns an empty excerpt
+ * for password protected posts, which callers therefore do not request.
+ *
+ * @param {string}           postType  Post type of the post to request.
+ * @param {number|string}    postId    ID of the post to request.
+ * @param {boolean}          isEnabled Whether an excerpt has to be generated.
+ * @param {string|undefined} modified  Changes whenever the stored post changes.
+ *
+ * @return {string|undefined} The generated excerpt, or `undefined` while the
+ *                            request is in flight.
+ */
+function useGeneratedExcerpt( postType, postId, isEnabled, modified ) {
+	const baseURL = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityConfig( 'postType', postType )
+				?.baseURL,
+		[ postType ]
+	);
+	const [ generatedExcerpts, setGeneratedExcerpts ] = useState( {} );
+
+	const key = isEnabled && baseURL ? `${ postId }|${ modified }` : undefined;
+	const isRequested = key !== undefined && key in generatedExcerpts;
+
+	/*
+	 * Blocks avoid effects, but this request cannot go through a store
+	 * resolver: as explained above, the core-data record cache ignores
+	 * `excerpt_length`. The request depends only on the post, not on any user
+	 * event, so an effect is the place to make it.
+	 */
+	useEffect( () => {
+		if ( key === undefined || isRequested ) {
+			return;
+		}
+
+		let isStale = false;
+
+		apiFetch( {
+			path: addQueryArgs( `${ baseURL }/${ postId }`, {
+				context: 'view',
+				_fields: 'excerpt',
+				excerpt_length: GENERATED_EXCERPT_LENGTH,
+			} ),
+		} )
+			.then( ( post ) => {
+				if ( ! isStale ) {
+					setGeneratedExcerpts( ( state ) => ( {
+						...state,
+						[ key ]: post?.excerpt?.rendered ?? '',
+					} ) );
+				}
+			} )
+			.catch( () => {
+				// Keep displaying the excerpt already loaded for the post.
+			} );
+
+		return () => {
+			isStale = true;
+		};
+	}, [ key, isRequested, baseURL, postId ] );
+
+	return key === undefined ? undefined : generatedExcerpts[ key ];
+}
 
 export default function PostExcerptEditor( props ) {
 	const {
@@ -34,11 +116,58 @@ export default function PostExcerptEditor( props ) {
 
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
-	const [
-		rawExcerpt,
-		setExcerpt,
-		{ rendered: renderedExcerpt, protected: isProtected } = {},
-	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	const [ rawExcerpt, setExcerpt, fullExcerpt ] = useEntityProp(
+		'postType',
+		postType,
+		'excerpt',
+		postId
+	);
+	const record = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+		[ postType, postId ]
+	);
+
+	/*
+	 * While a revision or a browser backup is displayed, `useEntityProp` reads
+	 * the excerpt from it instead of from the stored post.
+	 */
+	const isShowingRevision = !! fullExcerpt && fullExcerpt !== record?.excerpt;
+
+	/*
+	 * `excerpt_length` only changes the response for posts without a stored
+	 * excerpt: `wp_trim_excerpt()` returns a stored excerpt untouched and
+	 * applies the filter only while generating one from the post content.
+	 * Posts that have an excerpt therefore reuse the record the editor has
+	 * already loaded instead of spending a request on a response that cannot
+	 * differ. An excerpt that has been edited but not yet stored is displayed
+	 * as typed, so it does not need a generated excerpt either.
+	 * Password protected posts keep the excerpt loaded in the edit context,
+	 * since a request in the view context returns it empty.
+	 */
+	const needsGeneratedExcerpt =
+		! isShowingRevision &&
+		!! record &&
+		! fullExcerpt?.protected &&
+		! fullExcerpt?.raw?.trim() &&
+		! rawExcerpt?.trim();
+
+	const generatedExcerpt = useGeneratedExcerpt(
+		postType,
+		postId,
+		needsGeneratedExcerpt,
+		record?.modified_gmt
+	);
+
+	/*
+	 * While the request is in flight the excerpt already loaded for the post
+	 * is displayed, so that the block is never blank.
+	 */
+	const renderedExcerpt = needsGeneratedExcerpt
+		? ( generatedExcerpt ?? fullExcerpt?.rendered )
+		: fullExcerpt?.rendered;
+	const isProtected = fullExcerpt?.protected;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 

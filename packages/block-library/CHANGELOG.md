@@ -15,6 +15,7 @@
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
 -   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
+-   Post Excerpt: Generate the excerpt in the editor with the REST API's `excerpt_length` parameter, the same way the block is rendered on the front end, instead of filtering `excerpt_length` for every admin request ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 
 ### Internal
 
