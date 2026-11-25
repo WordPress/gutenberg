@@ -55,10 +55,8 @@ const SlugEdit = ( {
 		isEditable && slug
 			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
 			: safeDecodeURIComponent( data.link || '' );
-	// Reuse one tab per post instead of spawning a new one on each click.
-	// Without an ID there is no window to name, and naming them all the same
-	// would make unrelated items replace each other, so fall back to a plain
-	// new tab, which `Link` gives an unnamed `openInNewTab` link.
+	// Without an ID there is no window to name, and one shared name would make
+	// unrelated items replace each other, so fall back to a plain new tab.
 	const permalinkTarget =
 		data.id === undefined ? undefined : getPostViewWindowName( data.id );
 

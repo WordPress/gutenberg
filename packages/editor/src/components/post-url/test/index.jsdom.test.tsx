@@ -28,7 +28,6 @@ function setupUseSelectMock( overrides: Partial< typeof DEFAULTS > = {} ) {
 			getCurrentPost: () => ( {
 				id: data.postId,
 				link: data.postLink,
-				// The slug is only editable for a user who can publish.
 				_links: { 'wp:action-publish': true },
 			} ),
 			getCurrentPostType: () => 'post',

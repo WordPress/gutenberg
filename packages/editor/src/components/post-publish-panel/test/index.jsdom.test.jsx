@@ -83,11 +83,9 @@ describe( 'PostPublishPanel', () => {
 
 		render( <PostPublishPanel /> );
 
-		// The post title in the panel header.
 		expect(
 			screen.getByRole( 'link', { name: /no title/ } )
 		).toHaveAttribute( 'target', 'wp-post-123' );
-		// The "View Post" call to action.
 		expect(
 			screen.getByRole( 'link', { name: /View Post/ } )
 		).toHaveAttribute( 'target', 'wp-post-123' );
@@ -119,7 +117,6 @@ describe( 'PostPublishPanel', () => {
 		render( <PostPublishPanel /> );
 		vi.useRealTimers();
 
-		// `Link` draws its new-tab indicator in CSS, so it adds no text content.
 		expect( screen.getByText( /is now scheduled/ ) ).toHaveTextContent(
 			'(no title) is now scheduled. It will go live on March 15, 2030 10:00 am UTC+0.'
 		);

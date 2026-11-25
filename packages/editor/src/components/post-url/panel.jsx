@@ -114,7 +114,6 @@ function FrontPageLink() {
 		<Link
 			className="editor-post-url__front-page-link"
 			href={ postLink }
-			// Reuse one tab per post instead of spawning a new one on each click.
 			target={ getPostViewWindowName( postId ) }
 			openInNewTab
 		>

@@ -1,19 +1,9 @@
 /**
- * Returns the name of the browser window used to view a post on the front end.
+ * Returns the browser window name that front-end links to a post target, so
+ * that each post reuses one tab instead of opening another on every click.
  *
- * Front-end links in the editor (the view button, the permalink, the
- * post-publish panel and the command palette) all target this window, so that
- * the first click opens a tab and every later click reloads that same tab
- * instead of spawning another copy of the page. This mirrors the Classic
- * Editor, and the `wp-preview-{id}` window that the preview button reuses.
- *
- * The name is namespaced by post ID so that viewing a second post opens its own
- * tab rather than replacing the first one.
- *
- * `@wordpress/core-fields` keeps the same helper for the slug field it owns, in
- * `packages/core-fields/src/shared/post-view-window-name.ts`. The two must
- * return the same name for the same post, or a post would open in two tabs. A
- * test in each package pins the format.
+ * `@wordpress/core-fields` keeps the same helper for the slug field. Both must
+ * return the same name, or a post would open in two tabs.
  *
  * @see https://github.com/WordPress/gutenberg/issues/28479
  *

@@ -359,8 +359,6 @@ const getEditorCommandLoader = () =>
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						// Reuse one tab per post instead of spawning a new one
-						// on each click.
 						window.open(
 							viewLink,
 							getPostViewWindowName( getCurrentPostId() )

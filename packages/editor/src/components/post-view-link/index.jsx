@@ -35,7 +35,6 @@ export default function PostViewLink() {
 			icon={ external }
 			label={ label || __( 'View post' ) }
 			href={ permalink }
-			// Reuse one tab per post instead of spawning a new one each click.
 			target={ getPostViewWindowName( postId ) }
 			showTooltip={ ! showIconLabels }
 			size="compact"

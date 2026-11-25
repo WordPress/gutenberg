@@ -178,8 +178,6 @@ export default function PostURL( { onClose } ) {
 								<Link
 									className="editor-post-url__link"
 									href={ postLink }
-									// Reuse one tab per post instead of
-									// spawning a new one on each click.
 									target={ getPostViewWindowName( postId ) }
 									openInNewTab
 								>
@@ -207,8 +205,6 @@ export default function PostURL( { onClose } ) {
 						<Link
 							className="editor-post-url__link"
 							href={ postLink }
-							// Reuse one tab per post instead of spawning a new
-							// one on each click.
 							target={ getPostViewWindowName( postId ) }
 							openInNewTab
 						>

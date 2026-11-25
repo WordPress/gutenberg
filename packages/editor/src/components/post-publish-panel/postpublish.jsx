@@ -92,7 +92,6 @@ export default function PostPublishPanelPostpublish( {
 	const addLink = addQueryArgs( 'post-new.php', {
 		post_type: post.type,
 	} );
-	// Reuse one tab per post instead of spawning a new one on each click.
 	const linkTarget = getPostViewWindowName( post.id );
 
 	const postLinkRef = useCallback(

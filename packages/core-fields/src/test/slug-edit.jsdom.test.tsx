@@ -95,8 +95,6 @@ describe( 'SlugEdit', () => {
 	} );
 
 	it( 'falls back to a plain new tab for an item with no ID', () => {
-		// Without an ID there is no window to name, and naming them all the
-		// same would make unrelated items replace each other.
 		const { id, ...withoutId } = post;
 		render( <EditedSlug initial={ withoutId } /> );
 		expect(
