@@ -47,6 +47,13 @@ test.describe( 'Transform block support', () => {
 				{ name: 'core/paragraph', attributes: { content: 'Tilted' } },
 			],
 		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Level' },
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
 		await editor.openDocumentSettingsSidebar();
 		await showTransformControl( page, /Rotation/ );
 		await page
@@ -74,9 +81,51 @@ test.describe( 'Transform block support', () => {
 		expect(
 			await group.evaluate(
 				( element: HTMLElement ) =>
-					element.offsetWidth < element.parentElement!.offsetWidth
+					element.offsetWidth <
+					( element.nextElementSibling as HTMLElement ).offsetWidth
 			)
 		).toBe( true );
+	} );
+
+	test( 'keeps the grid size of a rotated grid item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'grid', columnCount: 2 } },
+			innerBlocks: [
+				{
+					name: 'core/heading',
+					attributes: {
+						content: 'Tilted',
+						style: { transform: { rotate: '4deg' } },
+					},
+				},
+				{ name: 'core/paragraph', attributes: { content: 'Level' } },
+			],
+		} );
+
+		const isSameWidthAsSibling = ( element: HTMLElement ) =>
+			element.offsetWidth ===
+			( element.nextElementSibling as HTMLElement ).offsetWidth;
+
+		const editorHeading = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await expect.poll( () => getRotate( editorHeading ) ).toBe( '4deg' );
+		await expect( editorHeading ).toHaveClass( /has-rotation/ );
+		expect( await editorHeading.evaluate( isSameWidthAsSibling ) ).toBe(
+			true
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const heading = page.getByRole( 'heading', { name: 'Tilted' } );
+		expect( await getRotate( heading ) ).toBe( '4deg' );
+		await expect( heading ).toHaveClass( /has-rotation/ );
+		expect( await heading.evaluate( isSameWidthAsSibling ) ).toBe( true );
 	} );
 
 	test( 'keeps the width of a rotated video', async ( { editor, page } ) => {

@@ -2027,14 +2027,15 @@ describe( 'global styles renderer', () => {
 				{ ...minimalStyleOptions, variationStyles: true }
 			);
 
-			const fitContent = '{width: fit-content;}';
+			const fitContent =
+				':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)){width: fit-content;}';
 			expect( result ).toEqual(
 				':root :where(.wp-block-group){rotate: 15deg;}' +
-					`:root :where(.wp-block-group:not(.alignwide):not(.alignfull))${ fitContent }` +
+					`:root :where(.wp-block-group${ fitContent }` +
 					'@media (width <= 480px){:root :where(.wp-block-group){rotate: 5deg;}' +
-					`:root :where(.wp-block-group:not(.alignwide):not(.alignfull))${ fitContent }}` +
+					`:root :where(.wp-block-group${ fitContent }}` +
 					':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}' +
-					`:root :where(.wp-block-group.is-style-tilted:not(.alignwide):not(.alignfull))${ fitContent }`
+					`:root :where(.wp-block-group.is-style-tilted${ fitContent }`
 			);
 		} );
 

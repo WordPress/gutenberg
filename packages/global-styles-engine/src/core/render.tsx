@@ -1761,7 +1761,8 @@ export const generateCustomProperties = (
 
 /**
  * Returns a ruleset that fits a rotated block to its content, like the
- * `.has-rotation` rule in the block library common styles. Mirror of
+ * `.has-rotation` rule in the block library common styles. Flex and grid
+ * children keep their layout's size. Mirror of
  * `get_rotation_fit_content_ruleset()` in PHP.
  *
  * @param selector     Block or block style variation selector.
@@ -1788,7 +1789,7 @@ function getRotationFitContentRuleset(
 
 	return `:root :where(${ appendToSelector(
 		selector,
-		':not(.alignwide):not(.alignfull)'
+		':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)'
 	) }){width: fit-content;}`;
 }
 

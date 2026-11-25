@@ -2806,7 +2806,8 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns a ruleset that fits a rotated block to its content, like the
-	 * `.has-rotation` rule in the block library common styles. Mirror of
+	 * `.has-rotation` rule in the block library common styles. Flex and grid
+	 * children keep their layout's size. Mirror of
 	 * `getRotationFitContentRuleset()` in the global styles engine.
 	 *
 	 * @since 7.3.0
@@ -2834,7 +2835,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return static::to_ruleset(
-			':root :where(' . static::append_to_selector( $selector, ':not(.alignwide):not(.alignfull)' ) . ')',
+			':root :where(' . static::append_to_selector( $selector, ':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)' ) . ')',
 			array(
 				array(
 					'name'  => 'width',

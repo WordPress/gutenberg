@@ -3489,11 +3489,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		unregister_block_style( 'core/heading', 'tilted' );
 		unregister_block_style( 'core/paragraph', 'tilted' );
 
-		$fit_content = '{width: fit-content;}';
-		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 15deg;}:root :where(.wp-block-group:not(.alignwide):not(.alignfull))' . $fit_content, $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 5deg;}:root :where(.wp-block-group:not(.alignwide):not(.alignfull))' . $fit_content . '}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}:root :where(.wp-block-group.is-style-tilted:not(.alignwide):not(.alignfull))' . $fit_content, $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(p.is-style-tilted){rotate: 5deg;}:root :where(p.is-style-tilted:not(.alignwide):not(.alignfull))' . $fit_content . '}', $css );
+		$fit_content = ':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)){width: fit-content;}';
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 15deg;}:root :where(.wp-block-group' . $fit_content, $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 5deg;}:root :where(.wp-block-group' . $fit_content . '}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}:root :where(.wp-block-group.is-style-tilted' . $fit_content, $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(p.is-style-tilted){rotate: 5deg;}:root :where(p.is-style-tilted' . $fit_content . '}', $css );
 		$this->assertStringNotContainsString( 'wp-block-heading:not(.alignwide)', $css );
 		$this->assertStringNotContainsString( '.wp-block-heading.is-style-tilted:not', $css );
 	}
