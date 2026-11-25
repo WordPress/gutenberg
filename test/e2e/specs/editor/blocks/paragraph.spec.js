@@ -70,7 +70,7 @@ test.describe( 'Paragraph', () => {
 		).toHaveCount( 0 );
 	} );
 
-	test( 'should type in an empty drop cap paragraph', async ( {
+	test( 'should type in an empty drop cap paragraph @webkit @firefox', async ( {
 		editor,
 		page,
 	} ) => {
