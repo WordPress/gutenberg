@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 -   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
+-   Open the "View revisions" action in the site editor revisions view instead of the `revision.php` screen. ([#81366](https://github.com/WordPress/gutenberg/pull/81366))
 
 ## 8.1.0 (2026-11-04)
 
