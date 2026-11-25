@@ -18,6 +18,7 @@ import {
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
+import DataViewsNarrowUI from '../components/dataviews-narrow-ui';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { DataViewsPagination } from '../components/dataviews-pagination';
@@ -279,6 +280,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	FiltersToggled: typeof FiltersToggled;
 	Layout: typeof DataViewsLayout;
 	LayoutSwitcher: typeof ViewTypeMenu;
+	NarrowUI: typeof DataViewsNarrowUI;
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
@@ -299,6 +301,7 @@ DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
 DataViewsSubComponents.Layout = DataViewsLayout;
 DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsSubComponents.NarrowUI = DataViewsNarrowUI;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;

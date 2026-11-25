@@ -1,0 +1,12 @@
+// The search takes the room left beside the settings button.
+.dataviews-narrow-ui__actions .dataviews-search {
+	flex: 1;
+}
+
+.dataviews-narrow-ui__footer {
+	box-sizing: border-box;
+	flex-shrink: 0;
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	background-color: inherit;
+}

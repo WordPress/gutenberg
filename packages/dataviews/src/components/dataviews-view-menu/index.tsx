@@ -7,17 +7,17 @@ import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
 } from '@wordpress/ui';
-import { OPERATOR_IS, SORTING_DIRECTIONS, sortLabels } from '../../constants';
+import {
+	OPERATOR_IS,
+	OPERATOR_IS_ANY,
+	SORTING_DIRECTIONS,
+	sortLabels,
+} from '../../constants';
 import type { NormalizedFilter } from '../../types';
+import getSelectionOperator from '../../utils/get-selection-operator';
 import setFieldFilter from '../../utils/set-field-filter';
 import DataViewsContext from '../dataviews-context';
-import { getMenuFilters } from './utils';
-
-/**
- * Above this number of filters, each one moves to its own submenu so the menu
- * stays short.
- */
-const MAX_INLINE_FILTERS = 2;
+import { getMenuFilters, MAX_INLINE_OPTIONS } from './utils';
 
 // Radio values that don't stand for one of the filter's options.
 const ALL = 'all';
@@ -32,8 +32,9 @@ export interface ViewMenuProps {
 	excludeFields?: string[];
 
 	/**
-	 * Ids of fields that always filter by one value. Their group has no "All"
-	 * item. The view is expected to start with a filter for each of them.
+	 * Ids of single-choice fields that always filter by one value. Their group
+	 * has no "All" item. The view is expected to start with a filter for each
+	 * of them.
 	 */
 	requiredFields?: string[];
 
@@ -128,6 +129,85 @@ function FilterRadioGroup( {
 	);
 }
 
+function FilterCheckboxGroup( {
+	filter,
+	showLabel,
+}: {
+	filter: NormalizedFilter;
+	showLabel: boolean;
+} ) {
+	const { view, onChangeView } = useContext( DataViewsContext );
+	const elements = filter.elements ?? [];
+	const activeFilter = view.filters?.find(
+		( { field, operator } ) =>
+			field === filter.field && operator === OPERATOR_IS_ANY
+	);
+	const activeValues: unknown[] = Array.isArray( activeFilter?.value )
+		? activeFilter.value
+		: [];
+
+	return (
+		<Menu.Group aria-label={ showLabel ? undefined : filter.name }>
+			{ showLabel && <Menu.GroupLabel>{ filter.name }</Menu.GroupLabel> }
+			{ elements.map( ( element, index ) => (
+				<Menu.CheckboxItem
+					key={ getOptionValue( index ) }
+					checked={ activeValues.includes( element.value ) }
+					onCheckedChange={ ( checked: boolean ) => {
+						const nextValues = checked
+							? [ ...activeValues, element.value ]
+							: activeValues.filter(
+									( value ) => value !== element.value
+								);
+						onChangeView(
+							setFieldFilter(
+								view,
+								filter.field,
+								// With nothing checked, the field isn't filtered.
+								nextValues.length > 0
+									? {
+											operator: OPERATOR_IS_ANY,
+											value: nextValues,
+										}
+									: undefined
+							)
+						);
+					} }
+				>
+					<Menu.ItemLabel>{ element.label }</Menu.ItemLabel>
+				</Menu.CheckboxItem>
+			) ) }
+		</Menu.Group>
+	);
+}
+
+/**
+ * The options of one filter, following the filter the field defines: radio
+ * items when it takes one value, checkboxes when it takes several.
+ */
+function FilterOptions( {
+	filter,
+	isRequired,
+	showLabel,
+}: {
+	filter: NormalizedFilter;
+	isRequired: boolean;
+	showLabel: boolean;
+} ) {
+	if ( getSelectionOperator( filter ) === OPERATOR_IS_ANY ) {
+		return (
+			<FilterCheckboxGroup filter={ filter } showLabel={ showLabel } />
+		);
+	}
+	return (
+		<FilterRadioGroup
+			filter={ filter }
+			isRequired={ isRequired }
+			showLabel={ showLabel }
+		/>
+	);
+}
+
 function SortFieldRadioGroup() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const sortableFields = fields.filter(
@@ -205,12 +285,14 @@ function SortDirectionRadioGroup() {
 }
 
 /**
- * A settings button that opens a menu with the options of the view: filters
- * with a short list of choices, sorting, "Reset view" and any extra items.
+ * A single settings button, in place of the filters and the view options
+ * buttons of the default UI. It opens a menu with the filters that have a
+ * short list of choices, sorting, "Reset view" and any extra items.
  *
  * It is meant for narrow, single-purpose panels, where the filters bar and the
- * view options popover of the default UI don't fit. It builds itself from the
- * fields and the view, and renders nothing when the menu would be empty.
+ * view options popover don't fit. It builds itself from the fields and the
+ * view, as the default UI does, and renders nothing when the menu would be
+ * empty.
  */
 export default function DataViewsViewMenu( {
 	excludeFields,
@@ -221,8 +303,10 @@ export default function DataViewsViewMenu( {
 }: ViewMenuProps ) {
 	const { fields, filters, onReset } = useContext( DataViewsContext );
 	const menuFilters = getMenuFilters( filters, fields, excludeFields );
-	const hasSort =
-		showSort && fields.some( ( field ) => field.enableSorting !== false );
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
+	const hasSort = showSort && sortableFields.length > 0;
 	const hasReset = onReset !== undefined;
 	const hasChildren = Children.toArray( children ).length > 0;
 
@@ -232,7 +316,14 @@ export default function DataViewsViewMenu( {
 
 	const sections: { key: string; content: ReactNode }[] = [];
 
-	if ( menuFilters.length > MAX_INLINE_FILTERS ) {
+	// With many options in all, each group moves to a submenu.
+	const optionCount =
+		menuFilters.reduce(
+			( count, filter ) => count + ( filter.elements?.length ?? 0 ),
+			0
+		) + ( hasSort ? sortableFields.length + SORTING_DIRECTIONS.length : 0 );
+
+	if ( optionCount > MAX_INLINE_OPTIONS ) {
 		sections.push( {
 			key: 'submenus',
 			content: (
@@ -243,7 +334,7 @@ export default function DataViewsViewMenu( {
 								<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
 							</Menu.SubmenuTrigger>
 							<Menu.Popup>
-								<FilterRadioGroup
+								<FilterOptions
 									filter={ filter }
 									isRequired={ requiredFields.includes(
 										filter.field
@@ -275,7 +366,7 @@ export default function DataViewsViewMenu( {
 			sections.push( {
 				key: `filter-${ filter.field }`,
 				content: (
-					<FilterRadioGroup
+					<FilterOptions
 						filter={ filter }
 						isRequired={ requiredFields.includes( filter.field ) }
 						showLabel

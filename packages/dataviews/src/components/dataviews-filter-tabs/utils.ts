@@ -1,26 +1,5 @@
 import { OPERATOR_IS, OPERATOR_IS_ANY } from '../../constants';
-import type { NormalizedFilter, Operator, Option, View } from '../../types';
-
-/**
- * Returns the operator the tabs filter with: `is` when the field holds one
- * value, or `isAny` when it holds a list of values (an item matches when the
- * list contains the tab's value). Fields that support neither can't be shown
- * as tabs.
- *
- * @param filter The filter of the field shown as tabs.
- * @return The operator, or `undefined` when the field can't be shown as tabs.
- */
-export function getFilterTabsOperator(
-	filter: NormalizedFilter
-): Operator | undefined {
-	if ( filter.operators.includes( OPERATOR_IS ) ) {
-		return OPERATOR_IS;
-	}
-	if ( filter.operators.includes( OPERATOR_IS_ANY ) ) {
-		return OPERATOR_IS_ANY;
-	}
-	return undefined;
-}
+import type { Option, View } from '../../types';
 
 /**
  * Returns which option the view currently filters the field by.

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `DataViews.ViewMenu` and `DataViews.FilterTabs`, two opt-in subcomponents to compose DataViews in narrow panels such as a sidebar: a settings menu with the filters that work as menu items, sorting and "Reset view", and one filter shown as minimal tabs. Both are also available in `DataViewsPicker`.
+-   Add `DataViews.NarrowUI`, an alternative to the default UI for narrow containers such as a sidebar, with a single settings button in place of the filters and the view options buttons. Its two parts are also available on their own: `DataViews.ViewMenu`, a settings menu with the filters that work as menu items, sorting and "Reset view", and `DataViews.FilterTabs`, one filter shown as minimal tabs.
 -   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
 

@@ -563,6 +563,7 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Pagination`
 -   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+-   `DataViews.NarrowUI`
 -   `DataViews.ViewMenu`
 -   `DataViews.FilterTabs`
 
@@ -599,33 +600,56 @@ const CustomLayout = () => {
 
 > You can render only the pieces you need, rearrange them freely, or combine them with custom components.
 
-### Narrow panels
+### Narrow UI
 
-Use `DataViews.ViewMenu` and `DataViews.FilterTabs` to compose DataViews in a narrow, single-purpose panel, such as a sidebar, where the filters bar and the view options popover of the default UI don't fit. Both are opt-in and only available through free composition.
+`DataViews.NarrowUI` is an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. It takes the same `data`, `fields` and `view` as any other DataViews, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons.
 
-A narrow panel is laid out in rows:
+Its rows, from top to bottom:
 
-1. Search and the settings button (`DataViews.ViewMenu`).
-2. Optionally, one filter as tabs (`DataViews.FilterTabs`), followed by the content.
-3. A footer provided by the consumer.
+1. Search and the settings button.
+2. Optionally, one field as tabs: the main way to browse the content, such as a category or a type.
+3. The content, in the layout of the view.
+4. The footer: the pagination, and any content passed as `footer`.
 
-Use tabs for the main way to browse the content, such as a category or a type, and leave that field out of the menu. Everything else goes in the menu, even when it is a single group.
+```jsx
+<DataViews
+	data={ data }
+	fields={ fields }
+	view={ view }
+	onChangeView={ onChangeView }
+	paginationInfo={ paginationInfo }
+	defaultLayouts={ { list: {} } }
+	onReset={ onReset }
+>
+	<DataViews.NarrowUI tabsField="type" />
+</DataViews>
+```
 
-DataViews suits a narrow panel when the list needs at least two of: sorting, pagination, previews or layouts, item actions or selection, several filters, saved views. For a simpler list, compose the same design system components directly.
+Properties:
+
+-   `search`: `boolean`. Whether the search input is shown. Defaults to `true`.
+-   `searchLabel`: `string`. The label of the search input.
+-   `tabsField`: `string`. The id of a field to show as tabs above the content. That field is left out of the settings menu.
+-   `showSort`: `boolean`. Whether the settings menu offers sorting. Defaults to `false`.
+-   `footer`: React node. Content for the last row, below the pagination.
+
+The narrow UI is made of two subcomponents, which are also available on their own for a container that needs its own search, footer or spacing.
 
 #### `DataViews.ViewMenu`
 
-A settings button that opens a menu built from the fields and the view. It renders nothing when the menu would be empty. The menu holds:
+A single settings button that opens a menu built from the fields and the view. It renders nothing when the menu would be empty. The menu holds:
 
--   **Filters.** One group of radio items per eligible filter, with an "All" item that removes the filter. A filter is eligible when its field has a fixed list of at most 8 `elements` (not `getElements`), supports the `is` operator and isn't locked. Other filters are left out: a menu doesn't suit dates, ranges, free text, long lists or a choice of operator. With more than two eligible filters, each one moves to a submenu.
--   **Sort.** The field to sort by and the order, when `showSort` is set.
+-   **Filters.** Each filter that is set by picking among a short, fixed list of options, shown as the field defines it: radio items with an "All" item when it takes one value (the `is` operator), or checkboxes when it takes several (`isAny`). A filter is left out when it needs another kind of control (a date, a number, free text), has more than 10 options, loads its options with `getElements`, or is locked.
+-   **Sort.** The field to sort by and the order, when `showSort` is set. It lists the fields with sorting enabled, as the view options do.
 -   **Reset view.** Calls `onReset`. It is hidden when `onReset` is `undefined` and disabled when it is `false`.
 -   **Extra items.** The `children`, such as a link to a help page.
+
+When the groups hold more than 10 options in all, each group moves to a submenu.
 
 Properties:
 
 -   `excludeFields`: `string[]`. Ids of fields to leave out of the menu, such as the one shown with `DataViews.FilterTabs`.
--   `requiredFields`: `string[]`. Ids of fields that always filter by one value. Their group has no "All" item, and the view is expected to start with a filter for each of them.
+-   `requiredFields`: `string[]`. Ids of single-choice fields that always filter by one value. Their group has no "All" item, and the view is expected to start with a filter for each of them.
 -   `showSort`: `boolean`. Whether the menu offers sorting. Defaults to `false`.
 -   `size`: `'compact' | 'default'`. The size of the settings button: `compact` to sit next to `DataViews.Search`, or `default` to sit next to a 40px control. Defaults to `compact`.
 -   `children`: React node. Extra menu items, rendered after "Reset view".
@@ -642,35 +666,6 @@ Properties:
 -   `allLabel`: `string`. The label of the tab that shows every item. Defaults to "All".
 -   `showAll`: `boolean`. Whether to add the "All" tab. Defaults to `true`. Without it, the view is expected to always filter by the field.
 -   `children`: React node. The content the tabs switch. Defaults to `<DataViews.Layout />`.
-
-#### example
-
-```jsx
-import DataViews from '@wordpress/dataviews';
-import { Stack } from '@wordpress/ui';
-
-const NarrowPanel = () => {
-	// Declare data, fields, etc.
-
-	return (
-		<DataViews
-			data={ data }
-			fields={ fields }
-			view={ view }
-			onChangeView={ onChangeView }
-			paginationInfo={ paginationInfo }
-			defaultLayouts={ { grid: {} } }
-			onReset={ onReset }
-		>
-			<Stack direction="row" gap="xs">
-				<DataViews.Search />
-				<DataViews.ViewMenu excludeFields={ [ 'category' ] } />
-			</Stack>
-			<DataViews.FilterTabs field="category" />
-		</DataViews>
-	);
-};
-```
 
 ### Accessibility considerations
 

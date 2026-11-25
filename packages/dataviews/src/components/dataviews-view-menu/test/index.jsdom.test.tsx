@@ -14,6 +14,7 @@ type Item = {
 	status: string;
 	author: string;
 	date: string;
+	tags: string[];
 };
 
 const data: Item[] = [
@@ -23,6 +24,7 @@ const data: Item[] = [
 		status: 'draft',
 		author: 'author-1',
 		date: '2025-01-15T09:00:00',
+		tags: [ 'news' ],
 	},
 ];
 
@@ -62,6 +64,17 @@ const fields: Field< Item >[] = [
 		id: 'date',
 		label: 'Date',
 		type: 'datetime',
+		enableSorting: false,
+	},
+	{
+		// Several values at once, as array fields are filtered by default.
+		id: 'tags',
+		label: 'Tags',
+		type: 'array',
+		elements: [
+			{ value: 'news', label: 'News' },
+			{ value: 'guides', label: 'Guides' },
+		],
 		enableSorting: false,
 	},
 ];
@@ -117,7 +130,15 @@ describe( 'DataViews.ViewMenu', () => {
 			)
 		).toEqual( [ 'All', 'Draft', 'Published' ] );
 		expect(
+			screen
+				.getAllByRole( 'menuitemcheckbox' )
+				.map( ( item ) => item.textContent )
+		).toEqual( [ 'News', 'Guides' ] );
+		expect(
 			screen.getByRole( 'group', { name: 'Status' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'group', { name: 'Tags' } )
 		).toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'group', { name: 'Author' } )
@@ -172,6 +193,50 @@ describe( 'DataViews.ViewMenu', () => {
 		);
 	} );
 
+	it( 'adds and removes values of a filter that takes several', async () => {
+		const user = userEvent.setup();
+		const { onChangeView } = renderViewMenu( {
+			view: {
+				...DEFAULT_VIEW,
+				filters: [
+					{ field: 'tags', operator: 'isAny', value: [ 'news' ] },
+				],
+			},
+		} );
+
+		await openMenu( user );
+
+		expect(
+			await screen.findByRole( 'menuitemcheckbox', { name: 'News' } )
+		).toBeChecked();
+
+		await user.click(
+			screen.getByRole( 'menuitemcheckbox', { name: 'Guides' } )
+		);
+
+		expect( onChangeView ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				page: 1,
+				filters: [
+					{
+						field: 'tags',
+						operator: 'isAny',
+						value: [ 'news', 'guides' ],
+					},
+				],
+			} )
+		);
+
+		// With its last value unchecked, the filter goes away.
+		await user.click(
+			screen.getByRole( 'menuitemcheckbox', { name: 'News' } )
+		);
+
+		expect( onChangeView ).toHaveBeenLastCalledWith(
+			expect.objectContaining( { filters: [] } )
+		);
+	} );
+
 	it( 'has no "All" option for a field that always needs a value', async () => {
 		const user = userEvent.setup();
 		renderViewMenu( { menuProps: { requiredFields: [ 'status' ] } } );
@@ -199,7 +264,9 @@ describe( 'DataViews.ViewMenu', () => {
 	} );
 
 	it( 'renders nothing when the menu would be empty', () => {
-		renderViewMenu( { menuProps: { excludeFields: [ 'status' ] } } );
+		renderViewMenu( {
+			menuProps: { excludeFields: [ 'status', 'tags' ] },
+		} );
 
 		expect(
 			screen.queryByRole( 'button', { name: 'View options' } )

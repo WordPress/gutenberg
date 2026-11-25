@@ -1,25 +1,34 @@
-import { OPERATOR_IS } from '../../constants';
+import getSelectionOperator from '../../utils/get-selection-operator';
 import type { NormalizedField, NormalizedFilter } from '../../types';
 
 /**
  * The longest list of options a filter can have and still be shown as menu
- * items. Longer lists need searching or scrolling, which a menu does not offer.
+ * items. It is the same limit after which the filters UI swaps its plain list
+ * of options for a searchable one, which a menu does not offer.
  */
-export const MAX_MENU_FILTER_ELEMENTS = 8;
+export const MAX_MENU_FILTER_ELEMENTS = 10;
 
 /**
- * Whether a filter can be shown in the view menu as a group of radio items.
+ * How many options the menu shows at once. With more, each group of options
+ * moves to its own submenu, so the menu stays short.
+ */
+export const MAX_INLINE_OPTIONS = 10;
+
+/**
+ * Whether a filter can be shown in the view menu as a group of menu items.
  *
- * A menu only holds what works as menu items, so a filter is eligible when:
+ * The menu follows the filter the field already defines, and only holds what
+ * works as menu items. A filter is eligible when:
  *
  * - its options are a fixed list (`elements`), not loaded on demand
  *   (`getElements`);
  * - the list is short (at most `MAX_MENU_FILTER_ELEMENTS` options);
- * - it supports choosing exactly one value (the `is` operator);
+ * - it is filtered by picking among those options: one of them (the `is`
+ *   operator, shown as radio items) or several (`isAny`, shown as checkboxes);
  * - the user can change it (it is not locked).
  *
- * Everything else (dates, ranges, free text, long or remote lists, filters that
- * only offer other operators) is left to the regular filters UI.
+ * Everything else (dates, numbers, free text, long or remote lists) needs a
+ * control a menu can't hold, and is left to the regular filters UI.
  *
  * @param filter The filter to check.
  * @return Whether the filter is eligible.
@@ -31,7 +40,7 @@ export function isMenuFilter( filter: NormalizedFilter ): boolean {
 		Array.isArray( filter.elements ) &&
 		filter.elements.length > 0 &&
 		filter.elements.length <= MAX_MENU_FILTER_ELEMENTS &&
-		filter.operators.includes( OPERATOR_IS )
+		getSelectionOperator( filter ) !== undefined
 	);
 }
 

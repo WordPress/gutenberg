@@ -13,11 +13,7 @@ import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
 import LargePageCountComponent from './large-page-count';
-import {
-	NarrowIneligibleFiltersComponent,
-	NarrowMediaComponent,
-	NarrowPatternsComponent,
-} from './narrow-panels';
+import NarrowUIComponent from './narrow-ui';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -358,46 +354,45 @@ export const LargePageCount = {
 	},
 };
 
-const narrowPanelArgTypes = {
-	containerHeight: {
-		control: false,
-		table: {
-			disable: true,
+/**
+ * An alternative to the default UI for narrow, single-purpose containers such
+ * as a sidebar, shown here at 350px. It takes the same data, fields and view,
+ * and replaces the filters and the view options buttons with a single settings
+ * button.
+ *
+ * The settings menu holds the filters that have a short list of choices (here
+ * "Is Planet" and "Categories"), sorting and "Reset view". Filters that need
+ * another kind of control, such as a date, a number or free text, are not part
+ * of the narrow UI. One field can be shown as tabs above the content.
+ */
+export const NarrowUI = {
+	render: NarrowUIComponent,
+	args: {
+		layout: 'list',
+		tabsField: 'type',
+		showSort: true,
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+		layout: {
+			control: 'select',
+			options: [ 'list', 'grid' ],
+			description: 'The layout of the content',
+		},
+		tabsField: {
+			control: 'select',
+			options: [ 'none', 'type', 'categories' ],
+			description:
+				'The field shown as tabs above the content. It is left out of the settings menu',
+		},
+		showSort: {
+			control: 'boolean',
+			description: 'Whether the settings menu offers sorting',
 		},
 	},
-};
-
-/**
- * A narrow, single-purpose panel such as the Patterns tab of the block
- * inserter, composed from `DataViews.Search`, `DataViews.ViewMenu` and
- * `DataViews.FilterTabs`. The pattern categories are the main way to browse,
- * so they are tabs; the secondary filters live in the menu behind the settings
- * button.
- */
-export const NarrowPatterns = {
-	name: 'Narrow · Patterns',
-	render: NarrowPatternsComponent,
-	argTypes: narrowPanelArgTypes,
-};
-
-/**
- * A narrow, single-purpose panel such as the Media tab of the block inserter.
- * The media type is shown as tabs with no "All" tab, and the menu holds the
- * source and the sorting.
- */
-export const NarrowMedia = {
-	name: 'Narrow · Media',
-	render: NarrowMediaComponent,
-	argTypes: narrowPanelArgTypes,
-};
-
-/**
- * `DataViews.ViewMenu` only holds what works as menu items: filters with a
- * short, fixed list of choices where one value is chosen at a time. Long lists,
- * dates, multiple choice and choices loaded on demand are left out of the menu.
- */
-export const NarrowIneligibleFilters = {
-	name: 'Narrow · Ineligible filters',
-	render: NarrowIneligibleFiltersComponent,
-	argTypes: narrowPanelArgTypes,
 };

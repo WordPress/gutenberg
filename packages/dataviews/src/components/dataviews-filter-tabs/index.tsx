@@ -3,10 +3,11 @@ import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { Tabs } from '@wordpress/ui';
 import { OPERATOR_IS } from '../../constants';
+import getSelectionOperator from '../../utils/get-selection-operator';
 import setFieldFilter from '../../utils/set-field-filter';
 import DataViewsContext from '../dataviews-context';
 import DataViewsLayout from '../dataviews-layout';
-import { getActiveOption, getFilterTabsOperator } from './utils';
+import { getActiveOption } from './utils';
 
 const ALL = 'all';
 const getTabValue = ( index: number ) => `option-${ index }`;
@@ -58,7 +59,7 @@ export default function DataViewsFilterTabs( {
 		useContext( DataViewsContext );
 	const content = children ?? <DataViewsLayout />;
 	const filter = filters.find( ( { field: id } ) => id === field );
-	const operator = filter ? getFilterTabsOperator( filter ) : undefined;
+	const operator = filter ? getSelectionOperator( filter ) : undefined;
 	const elements = filter?.elements ?? [];
 	const tabs = [
 		...( showAll

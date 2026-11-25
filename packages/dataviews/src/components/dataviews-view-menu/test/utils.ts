@@ -36,12 +36,23 @@ describe( 'isMenuFilter', () => {
 		expect( isMenuFilter( filter( 'status' ) ) ).toBe( true );
 	} );
 
-	it( 'accepts a list of 8 options and rejects a longer one', () => {
+	it( 'accepts a filter with a short fixed list where several values are chosen', () => {
 		expect(
-			isMenuFilter( filter( 'author', { elements: options( 8 ) } ) )
+			isMenuFilter(
+				filter( 'tags', {
+					singleSelection: false,
+					operators: [ 'isAny', 'isNone' ],
+				} )
+			)
+		).toBe( true );
+	} );
+
+	it( 'accepts a list of 10 options and rejects a longer one', () => {
+		expect(
+			isMenuFilter( filter( 'author', { elements: options( 10 ) } ) )
 		).toBe( true );
 		expect(
-			isMenuFilter( filter( 'author', { elements: options( 9 ) } ) )
+			isMenuFilter( filter( 'author', { elements: options( 11 ) } ) )
 		).toBe( false );
 	} );
 
@@ -68,12 +79,12 @@ describe( 'isMenuFilter', () => {
 		).toBe( false );
 	} );
 
-	it( 'rejects a filter that only supports choosing several values', () => {
+	it( 'rejects a filter that is not set by picking among its options', () => {
 		expect(
 			isMenuFilter(
 				filter( 'tags', {
 					singleSelection: false,
-					operators: [ 'isAny', 'isNone' ],
+					operators: [ 'isNone', 'isAll' ],
 				} )
 			)
 		).toBe( false );
