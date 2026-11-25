@@ -316,6 +316,65 @@ describe( 'block serializer', () => {
 					'<!-- /wp:freeform -->'
 			);
 		} );
+		it.each( [ false, true ] )(
+			'preserves Custom HTML fallback attributes when isInnerBlocks is %s',
+			( isInnerBlocks ) => {
+				registerBlockType( 'core/html', {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Custom HTML',
+					attributes: {
+						customAttribute: { type: 'string' },
+					},
+					save: () => null,
+				} );
+				setFreeformContentHandlerName( 'core/html' );
+				const block = createBlock(
+					'core/html',
+					{ customAttribute: 'Widget setting' },
+					[],
+					[ '<p>Widget content</p>' ]
+				);
+
+				expect( serializeBlock( block, { isInnerBlocks } ) ).toBe(
+					'<!-- wp:html {"customAttribute":"Widget setting"} -->\n' +
+						'<p>Widget content</p>\n<!-- /wp:html -->'
+				);
+			}
+		);
+		it.each( [
+			{},
+			{ customAttribute: 'Default setting' },
+			{ content: 'Local editor state' },
+		] )(
+			'keeps Custom HTML fallback content undelimited without persisted attributes: %j',
+			( attributes ) => {
+				registerBlockType( 'core/html', {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Custom HTML',
+					attributes: {
+						customAttribute: {
+							type: 'string',
+							default: 'Default setting',
+						},
+						content: { type: 'string', role: 'local' },
+					},
+					save: () => null,
+				} );
+				setFreeformContentHandlerName( 'core/html' );
+				const block = createBlock(
+					'core/html',
+					attributes,
+					[],
+					[ '<p>Widget content</p>' ]
+				);
+
+				expect( serializeBlock( block ) ).toBe(
+					'<p>Widget content</p>'
+				);
+			}
+		);
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
 				apiVersion: 3,
