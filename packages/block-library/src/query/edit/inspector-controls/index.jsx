@@ -68,7 +68,7 @@ export default function QueryInspectorControls( props ) {
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
-		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
+		const supportedTaxonomies = postTypesTaxonomiesMap?.[ newValue ];
 		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {

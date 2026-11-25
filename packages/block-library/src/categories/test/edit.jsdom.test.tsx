@@ -39,6 +39,14 @@ const publicTaxonomy = {
 	hierarchical: true,
 };
 
+const privateTaxonomy = {
+	name: 'Secret',
+	slug: 'secret',
+	visibility: { public: false },
+	hierarchical: false,
+	labels: { no_terms: 'No tags' },
+};
+
 const defaultAttributes = {
 	taxonomy: 'category',
 	displayAsDropdown: false,
@@ -58,8 +66,9 @@ let CategoriesEdit: ComponentType< {
 } >;
 
 let taxonomies: ( typeof publicTaxonomy )[] | null;
+let terms: unknown[] | null;
 
-function Edit() {
+function Edit( { taxonomy = 'category' }: { taxonomy?: string } ) {
 	return (
 		<SlotFillProvider>
 			<BlockEditContextProvider
@@ -70,7 +79,7 @@ function Edit() {
 				} }
 			>
 				<CategoriesEdit
-					attributes={ defaultAttributes }
+					attributes={ { ...defaultAttributes, taxonomy } }
 					className=""
 					setAttributes={ vi.fn() }
 					clientId="categories-test"
@@ -91,8 +100,9 @@ describe( 'Categories taxonomy setting', () => {
 
 	beforeEach( () => {
 		taxonomies = [];
+		terms = null;
 		vi.mocked( useEntityRecords ).mockImplementation( ( kind ) => {
-			const records = kind === 'root' ? taxonomies : null;
+			const records = kind === 'root' ? taxonomies : terms;
 			const isResolving = records === null;
 			return {
 				records,
@@ -151,5 +161,16 @@ describe( 'Categories taxonomy setting', () => {
 		expect(
 			screen.getByRole( 'menuitemcheckbox', { name: 'Taxonomy' } )
 		).toBeInTheDocument();
+	} );
+
+	test( 'shows the no terms label and Taxonomy for an empty taxonomy that is not public', () => {
+		taxonomies = [ publicTaxonomy, privateTaxonomy ];
+		terms = [];
+		render( <Edit taxonomy="secret" /> );
+
+		expect( screen.getByText( 'No tags' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'combobox', { name: 'Taxonomy' } )
+		).toHaveTextContent( 'secret (unavailable)' );
 	} );
 } );
