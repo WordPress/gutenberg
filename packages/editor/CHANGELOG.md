@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+-   Notes: Show a dot on each note thread with activity you have not seen, until you select the thread ([#85120](https://github.com/WordPress/gutenberg/pull/85120)).
 
 ### Bug Fixes
 

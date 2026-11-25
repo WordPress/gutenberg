@@ -2,6 +2,7 @@ import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useState,
 	useEffect,
@@ -55,6 +56,7 @@ import { focusNoteThread } from './utils/dom';
 import { getThreadLayout } from './utils/layout';
 import {
 	getLatestNoteActivity,
+	getUnseenNoteIds,
 	hasUnseenNoteActivity,
 	setNotesLastSeen,
 } from './utils/unseen';
@@ -65,6 +67,14 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
  */
 export const NoteDraftsContext = createContext();
+
+/**
+ * The note threads flagged as new for this editor session, and a way to unflag one.
+ */
+export const UnseenNotesContext = createContext( {
+	unseenNoteIds: new Set(),
+	markNoteSeen: () => {},
+} );
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -214,12 +224,17 @@ export function useNoteThreads( postId ) {
  * storing the newest `date_gmt` shown rather than the current time, which
  * keeps the comparison immune to clock skew.
  *
- * @param {Object}  options        Options.
- * @param {?number} options.postId Post the notes belong to.
- * @param {Array}   options.notes  Every note thread loaded for the post.
- * @return {boolean} Whether there is unseen activity.
+ * The threads that were unseen stay flagged for the session after that
+ * timestamp advances, until the user reads them.
+ *
+ * @param {Object}  options              Options.
+ * @param {?number} options.postId       Post the notes belong to.
+ * @param {Array}   options.notes        Every note thread loaded for the post.
+ * @param {Array}   options.flaggedNotes `useState` pair holding the flagged thread ids, owned by a component that outlives the sidebar.
+ * @return {{hasUnseenNotes: boolean, unseenNoteIds: Set<number>, markNoteSeen: (noteId: number) => void}} Whether there is unseen activity, the open threads to flag as new, and a way to unflag one.
  */
-export function useUnseenNotes( { postId, notes } ) {
+export function useUnseenNotes( { postId, notes, flaggedNotes } ) {
+	const [ flaggedNoteIds, setFlaggedNoteIds ] = flaggedNotes;
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { lastSeenByPost, currentUserId, hasLooked } = useSelect(
@@ -248,16 +263,45 @@ export function useUnseenNotes( { postId, notes } ) {
 	);
 	// Only open threads count. This reads the full list rather than
 	// `unresolvedNotes`, which drops threads whose block was deleted.
+	const openNotes = useMemo(
+		() => ( notes ?? [] ).filter( ( thread ) => thread.status === 'hold' ),
+		[ notes ]
+	);
 	const hasUnseenNotes = useMemo(
+		() => hasUnseenNoteActivity( openNotes, lastSeen, currentUserId ),
+		[ openNotes, lastSeen, currentUserId ]
+	);
+
+	// Collects the unseen threads before `lastSeen` advances past them.
+	useEffect( () => {
+		const ids = getUnseenNoteIds( openNotes, lastSeen, currentUserId );
+		setFlaggedNoteIds( ( current ) =>
+			ids.every( ( id ) => current.has( id ) )
+				? current
+				: new Set( [ ...current, ...ids ] )
+		);
+	}, [ openNotes, lastSeen, currentUserId, setFlaggedNoteIds ] );
+	// A flagged thread loses its dot once it's resolved or deleted.
+	const unseenNoteIds = useMemo(
 		() =>
-			hasUnseenNoteActivity(
-				( notes ?? [] ).filter(
-					( thread ) => thread.status === 'hold'
-				),
-				lastSeen,
-				currentUserId
+			new Set(
+				openNotes
+					.map( ( thread ) => thread.id )
+					.filter( ( id ) => flaggedNoteIds.has( id ) )
 			),
-		[ notes, lastSeen, currentUserId ]
+		[ openNotes, flaggedNoteIds ]
+	);
+	const markNoteSeen = useCallback(
+		( noteId ) =>
+			setFlaggedNoteIds( ( current ) => {
+				if ( ! current.has( noteId ) ) {
+					return current;
+				}
+				const next = new Set( current );
+				next.delete( noteId );
+				return next;
+			} ),
+		[ setFlaggedNoteIds ]
 	);
 
 	useEffect( () => {
@@ -288,7 +332,7 @@ export function useUnseenNotes( { postId, notes } ) {
 		setPreference,
 	] );
 
-	return hasUnseenNotes;
+	return { hasUnseenNotes, unseenNoteIds, markNoteSeen };
 }
 
 export function useNoteActions() {

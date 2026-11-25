@@ -153,6 +153,220 @@ test.describe( 'Notes: unseen badge', () => {
 		await expect( badge ).toBeHidden();
 	} );
 
+	test( 'flags each unseen thread until it is selected', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ content: 'A note to self' },
+			{ author: collaboratorId, content: 'First question' },
+			{ author: collaboratorId, content: 'Second question' },
+		] );
+		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		const ownThread = sidebar.getByRole( 'treeitem', {
+			name: /A note to self/,
+		} );
+		const firstThread = sidebar.getByRole( 'treeitem', {
+			name: /First question/,
+		} );
+		const secondThread = sidebar.getByRole( 'treeitem', {
+			name: /Second question/,
+		} );
+
+		// Opening the sidebar advances "last seen", but the flags stay.
+		await expect( firstThread ).toHaveAccessibleName( /, new activity$/ );
+		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
+		await expect( ownThread ).not.toHaveAccessibleName( /new activity/ );
+
+		// A 6px dot sits after the note's date and stays put on hover.
+		const dot = firstThread.locator(
+			'time + .editor-collab-sidebar-panel__unseen-dot'
+		);
+		await expect( dot ).toHaveCSS( 'width', '6px' );
+		await expect( dot ).toHaveCSS( 'height', '6px' );
+		await expect( dot ).toHaveText( '' );
+		await firstThread.hover();
+		await expect( dot ).toHaveCSS( 'width', '6px' );
+
+		await firstThread.click();
+		await expect( firstThread ).not.toHaveAccessibleName( /new activity/ );
+		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
+	} );
+
+	test( 'keeps the flags when the sidebar unmounts for the code editor', async ( {
+		admin,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ author: collaboratorId, content: 'First question' },
+		] );
+		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+		const thread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', { name: /First question/ } );
+		await expect( thread ).toHaveAccessibleName( /, new activity$/ );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+		await expect( thread ).toBeHidden();
+		await pageUtils.pressKeys( 'secondary+M' );
+		await expect( thread ).toHaveAccessibleName( /, new activity$/ );
+	} );
+
+	test( 'does not count a thread selected while notes are hidden', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ author: collaboratorId, content: 'First question' },
+		] );
+		await page.setViewportSize( { width: 1500, height: 900 } );
+		await admin.editPost( postId );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core', 'notesDisplayMode', 'hidden' )
+		);
+
+		// Selecting the block selects its thread, which is not on screen.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: /First question/ } )
+		).toHaveAccessibleName( /, new activity$/ );
+	} );
+
+	test( 'does not flag a reply to the open thread, or a resolved thread', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ author: collaboratorId, content: 'First question' },
+			{ author: collaboratorId, content: 'Second question' },
+		] );
+		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		const firstThread = sidebar.getByRole( 'treeitem', {
+			name: /First question/,
+		} );
+		const secondThread = sidebar.getByRole( 'treeitem', {
+			name: /Second question/,
+		} );
+		await firstThread.click();
+		await expect( firstThread ).not.toHaveAccessibleName( /new activity/ );
+		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
+
+		// The collaborator replies to the open thread and resolves the other.
+		const notes: { id: number; content: { rendered: string } }[] =
+			await requestUtils.rest( {
+				path: '/wp/v2/comments',
+				params: { post: postId, type: 'note', status: 'all' },
+			} );
+		const noteId = ( content: string ) =>
+			notes.find( ( note ) => note.content.rendered.includes( content ) )!
+				.id;
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/comments',
+			data: {
+				post: postId,
+				type: 'note',
+				status: 'hold',
+				content: 'A late reply',
+				author: collaboratorId,
+				parent: noteId( 'First question' ),
+			},
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/comments/${ noteId( 'Second question' ) }`,
+			data: { status: 'approved' },
+		} );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core' )
+				.invalidateResolutionForStoreSelector( 'getEntityRecords' )
+		);
+
+		await expect( firstThread.getByText( 'A late reply' ) ).toBeVisible();
+		await expect( firstThread ).not.toHaveAccessibleName( /new activity/ );
+		await expect( secondThread ).not.toHaveAccessibleName( /new activity/ );
+	} );
+
+	test( 'flags a minimized thread until it is expanded', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ author: collaboratorId, content: 'First question' },
+		] );
+		await page.setViewportSize( { width: 1500, height: 900 } );
+		await admin.editPost( postId );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core', 'notesDisplayMode', 'minimized' )
+		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close Settings' } )
+			.click();
+
+		const thread = page
+			.getByRole( 'region', { name: 'Notes' } )
+			.getByRole( 'treeitem', { name: /First question/ } );
+		// The name and date are hidden, so the dot sits on the avatar pill.
+		const getAvatarDotWidth = () =>
+			thread.evaluate(
+				( element ) => getComputedStyle( element, '::after' ).width
+			);
+		await expect( thread.locator( 'time' ) ).toBeHidden();
+		await expect.poll( getAvatarDotWidth ).toBe( '6px' );
+
+		// Selecting the block highlights the pill without expanding it.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( thread ).toHaveAccessibleName( /, new activity$/ );
+
+		await thread.click();
+		await expect( thread ).not.toHaveAccessibleName( /new activity/ );
+	} );
+
 	test( 'starting a note of your own does not clear the badge', async ( {
 		admin,
 		page,

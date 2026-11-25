@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getLatestNoteActivity,
+	getUnseenNoteIds,
 	hasUnseenNoteActivity,
 	setNotesLastSeen,
 } from '../utils/unseen';
@@ -77,6 +78,36 @@ describe( 'hasUnseenNoteActivity', () => {
 				ME
 			)
 		).toBe( false );
+	} );
+} );
+
+describe( 'getUnseenNoteIds', () => {
+	it( 'returns only the threads with unseen activity from others', () => {
+		expect(
+			getUnseenNoteIds(
+				[
+					makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
+					makeThread( {
+						id: 2,
+						author: ME,
+						date: '2026-08-01T10:00:00',
+						replies: [
+							makeThread( {
+								id: 3,
+								date: '2026-08-03T10:00:00',
+							} ),
+						],
+					} ),
+					makeThread( {
+						id: 4,
+						author: ME,
+						date: '2026-08-04T10:00:00',
+					} ),
+				],
+				'2026-08-02T10:00:00',
+				ME
+			)
+		).toEqual( [ 2 ] );
 	} );
 } );
 

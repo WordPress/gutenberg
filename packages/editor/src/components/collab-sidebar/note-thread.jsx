@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -21,6 +27,7 @@ import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
 import {
 	NoteDraftsContext,
+	UnseenNotesContext,
 	useNoteActions,
 	useNoteDraft,
 	usePickNote,
@@ -93,6 +100,8 @@ export function NoteThread( {
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
+	const { unseenNoteIds, markNoteSeen } = useContext( UnseenNotesContext );
+	const isUnseen = unseenNoteIds.has( note.id );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
@@ -105,6 +114,22 @@ export function NoteThread( {
 	const isKeyboardTabbingRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
+
+	// Selecting a thread reads it, unless it stays a minimized pill. A layout
+	// effect, so a reply arriving in the open thread never paints a dot.
+	useLayoutEffect( () => {
+		if ( ! isUnseen || ! isSelected ) {
+			return;
+		}
+		const isExpanded =
+			! isFloating ||
+			floatingRef.current
+				?.querySelector( '.editor-collab-sidebar-panel__note-body' )
+				?.checkVisibility();
+		if ( isExpanded ) {
+			markNoteSeen( note.id );
+		}
+	}, [ isUnseen, isSelected, hasFocus, isFloating, markNoteSeen, note.id ] );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -255,7 +280,7 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
+	let ariaLabel = !! note.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -266,6 +291,13 @@ export function NoteThread( {
 				__( 'Original block deleted. Note: %s' ),
 				noteExcerpt
 			);
+	if ( isUnseen ) {
+		ariaLabel = sprintf(
+			// translators: %s: note label, e.g. "Note: Fix the typo".
+			__( '%s, new activity' ),
+			ariaLabel
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -285,6 +317,7 @@ export function NoteThread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'has-focus': hasFocus,
+				'is-unseen': isUnseen,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -336,6 +369,7 @@ export function NoteThread( {
 				onDeleteNote={ handleDelete }
 				onResolve={ handleResolve }
 				isThreadResolved={ isThreadResolved }
+				isUnseen={ isUnseen }
 			/>
 			{ showAllReplies &&
 				allReplies.map( ( reply ) => (
