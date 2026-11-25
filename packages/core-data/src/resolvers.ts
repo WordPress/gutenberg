@@ -721,6 +721,43 @@ export const canUserEditEntityRecord =
 	};
 
 /**
+ * Requests the autosaves of a post from the REST API.
+ *
+ * @param resolveSelect Resolving selectors of the store.
+ * @param postType      The type of the parent post.
+ * @param postId        The id of the parent post.
+ * @param authorId      Optional. Limits the request to this author's autosave.
+ *
+ * @return The autosaves, or none if the post type does not support them.
+ */
+async function fetchAutosaves(
+	resolveSelect: CoreDataThunkArgs[ 'resolveSelect' ],
+	postType: string,
+	postId: number,
+	authorId?: number
+): Promise< Array< any > > {
+	if ( ! isSafeEntityKey( postId ) ) {
+		return [];
+	}
+
+	const postTypeObject = await resolveSelect.getPostType( postType );
+	if ( ! postTypeObject?.supports?.autosave ) {
+		return [];
+	}
+
+	const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+		postTypeObject;
+	const autosaves = await apiFetch< Array< any > >( {
+		path: addQueryArgs(
+			`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
+			{ context: 'edit', author: authorId }
+		),
+	} );
+
+	return autosaves ?? [];
+}
+
+/**
  * Request autosave data from the REST API.
  *
  * @param postType The type of the parent post.
@@ -729,42 +766,49 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType: string, postId: number ) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		if ( ! isSafeEntityKey( postId ) ) {
-			return;
-		}
+		const autosaves = await fetchAutosaves(
+			resolveSelect,
+			postType,
+			postId
+		);
 
-		const {
-			rest_base: restBase,
-			rest_namespace: restNamespace = 'wp/v2',
-			supports,
-			// Autosaves are requested for posts of an existing post type.
-		} = ( await resolveSelect.getPostType( postType ) )!;
-		if ( ! supports?.autosave ) {
-			return;
-		}
-
-		const autosaves = await apiFetch< Array< unknown > >( {
-			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
-		} );
-
-		if ( autosaves && autosaves.length ) {
+		if ( autosaves.length ) {
 			dispatch.receiveAutosaves( postId, autosaves );
 		}
 	};
 
 /**
- * Request autosave data from the REST API.
+ * Requests a single author's autosave from the REST API.
  *
- * This resolver exists to ensure the underlying autosaves are fetched via
- * `getAutosaves` when a call to the `getAutosave` selector is made.
+ * WordPress stores at most one autosave per author, so this avoids loading
+ * the autosaves of every author of the post.
  *
  * @param postType The type of the parent post.
  * @param postId   The id of the parent post.
+ * @param authorId The id of the autosave author.
  */
 export const getAutosave =
-	( postType: string, postId: number ) =>
-	async ( { resolveSelect }: CoreDataThunkArgs ) => {
-		await resolveSelect.getAutosaves( postType, postId );
+	( postType: string, postId: number, authorId?: number ) =>
+	async ( { dispatch, select, resolveSelect }: CoreDataThunkArgs ) => {
+		if ( authorId === undefined ) {
+			return;
+		}
+
+		const autosaves = await fetchAutosaves(
+			resolveSelect,
+			postType,
+			postId,
+			authorId
+		);
+
+		if ( autosaves.length ) {
+			// Keeps the autosaves already received for other authors.
+			const others = (
+				select.getAutosaves( postType, postId ) ?? []
+			).filter( ( autosave ) => autosave.author !== authorId );
+
+			dispatch.receiveAutosaves( postId, [ ...others, ...autosaves ] );
+		}
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =

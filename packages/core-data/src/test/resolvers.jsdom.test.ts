@@ -8,6 +8,7 @@ import {
 	getEmbedPreview,
 	canUser,
 	getAutosaves,
+	getAutosave,
 	getCurrentUser,
 	getFieldsConfig,
 	getEntityActionsConfig,
@@ -1158,6 +1159,81 @@ describe( 'getAutosaves', () => {
 		} );
 		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
 	} );
+} );
+
+describe( 'getAutosave', () => {
+	const AUTHOR_ID = 7;
+	const AUTOSAVE = { id: 99, author: AUTHOR_ID };
+	const OTHER_AUTOSAVE = { id: 100, author: 999 };
+	const postType = 'post';
+	const postId = 1;
+
+	const setUp = ( postTypeObject?: Record< string, unknown > ) => {
+		apiFetchMock.mockReset();
+		apiFetchMock.mockImplementation( () => [ AUTOSAVE ] );
+
+		return {
+			dispatch: Object.assign( vi.fn(), {
+				receiveAutosaves: vi.fn(),
+			} ),
+			select: Object.assign( vi.fn(), {
+				getAutosaves: vi.fn( () => [
+					{ ...AUTOSAVE, id: 98 },
+					OTHER_AUTOSAVE,
+				] ),
+			} ),
+			resolveSelect: Object.assign( vi.fn(), {
+				getPostType: vi.fn( () => postTypeObject ),
+			} ),
+		};
+	};
+
+	it( 'requests the autosave of the given author and keeps the others', async () => {
+		const args = setUp( {
+			rest_base: 'posts',
+			supports: { autosave: true },
+		} );
+
+		await getAutosave( postType, postId, AUTHOR_ID )( thunkArgs( args ) );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: `/wp/v2/posts/${ postId }/autosaves?context=edit&author=${ AUTHOR_ID }`,
+		} );
+		expect( args.dispatch.receiveAutosaves ).toHaveBeenCalledWith( postId, [
+			OTHER_AUTOSAVE,
+			AUTOSAVE,
+		] );
+	} );
+
+	it( 'does not fetch when the author is unknown', async () => {
+		const args = setUp();
+
+		await getAutosave( postType, postId, undefined )( thunkArgs( args ) );
+
+		expect( triggerFetch ).not.toHaveBeenCalled();
+		expect( args.resolveSelect.getPostType ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [
+		[ 'is unknown', undefined ],
+		[
+			'does not support autosaves',
+			{ rest_base: 'posts', supports: { autosave: false } },
+		],
+	] )(
+		'does not fetch when the post type %s',
+		async ( _, postTypeObject ) => {
+			const args = setUp( postTypeObject );
+
+			await getAutosave(
+				postType,
+				postId,
+				AUTHOR_ID
+			)( thunkArgs( args ) );
+
+			expect( triggerFetch ).not.toHaveBeenCalled();
+		}
+	);
 } );
 
 describe( 'getCurrentUser', () => {

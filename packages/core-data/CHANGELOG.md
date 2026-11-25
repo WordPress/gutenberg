@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `getAutosave`: Request the given author's autosave rather than resolving the whole collection through `getAutosaves`. WordPress stores one autosave per author and the selector only ever returns that author's, so on a post with many editors this fetches one record instead of all of them. `hasFetchedAutosaves` no longer reports on this request; use `hasFinishedResolution( 'getAutosave', [ postType, postId, authorId ] )` ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).

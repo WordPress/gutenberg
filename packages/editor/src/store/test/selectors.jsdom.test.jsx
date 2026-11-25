@@ -6,6 +6,7 @@ import {
 	describe,
 	expect,
 	it,
+	vi,
 } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
@@ -104,8 +105,11 @@ selectorNames.forEach( ( name ) => {
 				return state.getCurrentUser && state.getCurrentUser();
 			},
 
-			hasFetchedAutosaves() {
-				return state.hasFetchedAutosaves && state.hasFetchedAutosaves();
+			hasFinishedResolution( ...resolutionArgs ) {
+				return (
+					state.hasFinishedResolution &&
+					state.hasFinishedResolution( ...resolutionArgs )
+				);
 			},
 
 			getAutosave() {
@@ -1414,8 +1418,10 @@ describe( 'selectors', () => {
 				},
 				postAutosavingLock: {},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return false;
 				},
 				getAutosave() {
@@ -1423,6 +1429,34 @@ describe( 'selectors', () => {
 						title: 'sassel',
 					};
 				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the current user is not yet known', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				postAutosavingLock: {},
+				saving: {},
+				getCurrentUser() {},
+				// The resolver returns early without a user, which still
+				// counts as a finished resolution.
+				hasFinishedResolution() {
+					return true;
+				},
+				getAutosave() {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1444,8 +1478,10 @@ describe( 'selectors', () => {
 				},
 				postAutosavingLock: {},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1472,16 +1508,23 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
+				postType: 'post',
+				postId: 123,
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
-					return true;
+				getCurrentUser() {
+					return { id: 1 };
 				},
+				hasFinishedResolution: vi.fn( () => true ),
 				getAutosave() {},
 				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+			// The key the post editor preloads the autosave under.
+			expect( state.hasFinishedResolution ).toHaveBeenCalledWith(
+				'getAutosave',
+				[ 'post', 123, 1 ]
+			);
 		} );
 
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
@@ -1501,8 +1544,10 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1531,8 +1576,10 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1570,8 +1617,10 @@ describe( 'selectors', () => {
 							content: 'foo',
 						},
 						saving: {},
-						getCurrentUser() {},
-						hasFetchedAutosaves() {
+						getCurrentUser() {
+							return { id: 1 };
+						},
+						hasFinishedResolution() {
 							return true;
 						},
 						getAutosave() {
@@ -1613,8 +1662,10 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosaves() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {},

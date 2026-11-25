@@ -619,11 +619,16 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postId = getCurrentPostId( state );
-		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
-			postType,
-			postId
-		);
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
+		// Without a user nothing is requested, which is not the same as the
+		// user having no autosave.
+		const hasFetchedAutosave =
+			currentUserId !== undefined &&
+			select( coreStore ).hasFinishedResolution( 'getAutosave', [
+				postType,
+				postId,
+				currentUserId,
+			] );
 
 		// Disable reason - this line causes the side-effect of fetching the autosave
 		// via a resolver, moving below the return would result in the autosave never
