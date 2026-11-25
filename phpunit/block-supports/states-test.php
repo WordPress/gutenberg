@@ -2026,6 +2026,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
 				'@media (width <= 480px){.%s{rotate:0 !important;}}',
 			),
+			'image viewport' => array(
+				'core/image',
+				'<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>',
+				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
+				'@media (width <= 480px){.%s{rotate:0 !important;}}',
+			),
 		);
 	}
 
