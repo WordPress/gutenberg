@@ -106,11 +106,12 @@ function UnforwardedLinkUI( props, ref ) {
 		getBlockParentsByBlockName,
 		getClientIdsOfDescendants,
 		getBlockName,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 
 	const handlePageCreated = ( pageLink ) => {
-		// A Page List in the same Navigation already lists the new page, so
-		// don't add a link to it as well.
+		// A Page List of top-level pages in the same Navigation already lists
+		// the new page, so don't add a link to it as well.
 		const [ navigationClientId ] = getBlockParentsByBlockName(
 			clientId,
 			'core/navigation',
@@ -120,7 +121,8 @@ function UnforwardedLinkUI( props, ref ) {
 			navigationClientId &&
 			getClientIdsOfDescendants( navigationClientId ).some(
 				( descendantId ) =>
-					getBlockName( descendantId ) === 'core/page-list'
+					getBlockName( descendantId ) === 'core/page-list' &&
+					! getBlockAttributes( descendantId ).parentPageID
 			);
 		if ( hasPageList ) {
 			props.onClose();
