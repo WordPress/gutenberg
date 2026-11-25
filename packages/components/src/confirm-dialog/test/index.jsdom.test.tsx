@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfirmDialog } from '..';
 globalThis.wpVitest.mockMatchMedia();
@@ -223,6 +223,38 @@ describe( 'Confirm', () => {
 
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onConfirm ).toHaveBeenCalled();
+			} );
+
+			it( 'confirms from a child input only after IME composition ends', async () => {
+				const user = userEvent.setup();
+				const onConfirm = vi.fn();
+
+				render(
+					<ConfirmDialog onConfirm={ onConfirm }>
+						<input aria-label="Title" />
+					</ConfirmDialog>
+				);
+
+				const input = screen.getByRole( 'textbox', { name: 'Title' } );
+				await user.click( input );
+
+				fireEvent.compositionStart( input );
+				fireEvent.keyDown( input, {
+					key: 'Enter',
+					code: 'Enter',
+					isComposing: true,
+				} );
+
+				expect( onConfirm ).not.toHaveBeenCalled();
+				expect( input ).toHaveFocus();
+
+				fireEvent.compositionEnd( input );
+				await user.keyboard( '[Enter]' );
+
+				expect( onConfirm ).toHaveBeenCalledTimes( 1 );
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
 			} );
 
 			it( 'calls only the `onCancel` callback and not the `onConfirm` callback when the cancel button is submitted using the keyboard', async () => {
