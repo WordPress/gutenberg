@@ -2664,8 +2664,8 @@ test.describe( 'List (@firefox)', () => {
 			await page.keyboard.press( 'End' );
 			await pageUtils.pressKeys( 'primary+v' );
 
-			// The copied item's text joins "item 1.1", and its nested list
-			// comes along.
+			// The copied item has a nested list, so it is inserted whole after
+			// "item 1.1" instead of joining its text.
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/list',
@@ -2677,12 +2677,50 @@ test.describe( 'List (@firefox)', () => {
 									name: 'core/list',
 									innerBlocks: [
 										{
-											attributes: {
-												content: 'item 1.1item 2',
-											},
-											innerBlocks:
-												copiedList.innerBlocks[ 0 ]
-													.innerBlocks,
+											attributes: { content: 'item 1.1' },
+										},
+										...copiedList.innerBlocks,
+									],
+								},
+							],
+						},
+						{ attributes: { content: 'item 2' } },
+					],
+				},
+			] );
+		} );
+
+		// In Firefox, Playwright's click into "item 1" right after the drag
+		// selection leaves the paste unhandled, so the block is unchanged.
+		test( 'should keep both nested lists when pasting a copied item at the end of an item with its own nested list (-firefox)', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await dragFromItemToNestedItem( { editor, page } );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			await editor.canvas.getByText( 'item 1', { exact: true } ).click();
+			await page.keyboard.press( 'End' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			// The copied item is inserted whole, and the empty rest of
+			// "item 1" stays to hold its nested list: neither list is lost or
+			// joined with the other.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{ attributes: { content: 'item 1' }, innerBlocks: [] },
+						...copiedList.innerBlocks,
+						{
+							attributes: { content: '' },
+							innerBlocks: [
+								{
+									name: 'core/list',
+									innerBlocks: [
+										{
+											attributes: { content: 'item 1.1' },
 										},
 									],
 								},

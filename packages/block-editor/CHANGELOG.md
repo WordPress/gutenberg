@@ -76,7 +76,7 @@
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 -   Typography panel: "Reset all" also clears the link color that follows the text color ([#85376](https://github.com/WordPress/gutenberg/pull/85376)).
 -   Block Inspector: While a style state is edited, show the regular style panels for a template part instead of empty section style panels ([#86084](https://github.com/WordPress/gutenberg/pull/86084)).
--   Paste: Keep the nested list of a copied list item when pasting it into another list item, and paste into an empty list item instead of doing nothing ([#84115](https://github.com/WordPress/gutenberg/pull/84115)).
+-   Paste: Keep the nested lists of both list items when pasting a copied list item into another list item, and paste into an empty list item instead of doing nothing ([#84115](https://github.com/WordPress/gutenberg/pull/84115)).
 
 ### Internal
 
