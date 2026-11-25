@@ -141,9 +141,9 @@ function UnforwardedMoreMenuItem(
 			isValidElement< ComponentProps< 'svg' > >( icon ) &&
 			( icon.type === 'svg' || icon.type === SVG )
 		) {
-			// Plugin icons often leave out their fill, which the legacy
-			// `MenuItem` set to the text color. Default it as an attribute,
-			// which a fill the icon sets itself still overrides.
+			// Plugin icons often leave out their fill. Default it to the text
+			// color as an attribute, which a fill the icon sets itself still
+			// overrides.
 			prefix = (
 				<Menu.PrefixIcon
 					icon={
