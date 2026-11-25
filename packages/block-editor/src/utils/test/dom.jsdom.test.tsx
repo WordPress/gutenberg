@@ -7,9 +7,14 @@ import {
 import { VisuallyHidden } from '@wordpress/ui';
 import {
 	extendRectToTop,
+	getClearLine,
 	getElementBounds,
+	getLayoutFrame,
+	getLayoutRect,
 	isElementVisible,
 	isStyleRotated,
+	toClientRect,
+	toLayoutPoint,
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
 } from '../dom';
 
@@ -340,6 +345,33 @@ describe( 'dom', () => {
 			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
 
 			expect( extendRectToTop( rect, 220 ) ).toBe( rect );
+		} );
+	} );
+
+	describe( 'layout frame', () => {
+		it( 'measures untransformed blocks without DOMMatrix', () => {
+			const parent = document.createElement( 'div' );
+			const previous = document.createElement( 'div' );
+			const next = document.createElement( 'div' );
+			parent.append( previous, next );
+			document.body.appendChild( parent );
+			const frame = getLayoutFrame( parent );
+			const rect = previous.getBoundingClientRect();
+
+			expect( frame ).toBeNull();
+			expect( getLayoutRect( previous, frame ) ).toEqual( rect );
+			expect( toLayoutPoint( frame, 5, 7 ) ).toEqual( { x: 5, y: 7 } );
+			expect( toClientRect( frame, rect ) ).toBe( rect );
+			expect( getClearLine( previous, next, frame, rect ) ).toMatchObject(
+				{
+					left: rect.left,
+					top: rect.top,
+					width: rect.width,
+					height: rect.height,
+				}
+			);
+
+			parent.remove();
 		} );
 	} );
 } );

@@ -82,25 +82,25 @@
 		height: calc(1 * var(--wpds-border-width-focus));
 	}
 
-	// Interaction background and focus ring.
+	// Interaction background and focus ring. Horizontal tabs center a
+	// background one control tall, with the same clearance on every side.
 	&::before {
 		content: "";
 		position: absolute;
 		z-index: -1;
-		inset: var(--wpds-dimension-padding-md);
+		inset: calc((#{$grid-unit-60} - var(--wpds-dimension-size-md)) / 2);
 		pointer-events: none;
 		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	&:focus-visible::before {
 		@include outset-ring__focus();
-		outline-offset: 0;
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
 		&::before {
 			inset: 0;
-			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 
 		& .components-tab-panel__tabs-item-label {
