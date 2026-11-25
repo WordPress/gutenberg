@@ -40,7 +40,7 @@ export const LayoutCard = {
 		headingLevel: {
 			control: { type: 'select' },
 			description: 'The heading level of the card titles.',
-			options: [ undefined, 1, 2, 3, 4, 5, 6 ],
+			options: [ 1, 2, 3, 4, 5, 6 ],
 		},
 	},
 	args: {
