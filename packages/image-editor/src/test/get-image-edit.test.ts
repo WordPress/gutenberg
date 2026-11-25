@@ -393,10 +393,11 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 
 	it( 'swaps the sides on a quarter turn', () => {
 		const state = makeState( { image: BIG, rotation: 90 } );
-		const size = getOutputSize( state );
 
-		expect( size?.width ).toBeCloseTo( 10000, 6 );
-		expect( size?.height ).toBeCloseTo( 20000, 6 );
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 10000,
+			height: 20000,
+		} );
 	} );
 
 	it( 'takes the crop out of the image at its rotation', () => {
@@ -406,10 +407,54 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 			rotation: 90,
 			cropRect: { x: 0.25, y: 0, width: 0.5, height: 1 },
 		} );
-		const size = getOutputSize( state );
 
-		expect( size?.width ).toBeCloseTo( 5000, 6 );
-		expect( size?.height ).toBeCloseTo( 20000, 6 );
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 5000,
+			height: 20000,
+		} );
+	} );
+} );
+
+// The pan and zoom that `applyImageEdit` works out leave floating-point
+// noise in the read-back, such as a width of 1439.9999999999998 pixels.
+describe( 'reading an edit back removes floating-point noise', () => {
+	function stateOf( edit: ImageEdit ) {
+		const result = applyImageEdit( makeState(), edit );
+		if ( ! ( 'state' in result ) ) {
+			throw new Error( `Rejected: ${ result.rejected }` );
+		}
+		return result.state;
+	}
+
+	it( 'reads a crop of nine tenths as whole pixels', () => {
+		const state = stateOf( {
+			crop: { x: 0.05, y: 0.05, width: 0.9, height: 0.9 },
+		} );
+
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 1440,
+			height: 810,
+		} );
+	} );
+
+	it( 'reads a crop on the edge of the image as starting at 0', () => {
+		const state = stateOf( {
+			crop: { x: 0, y: 0, width: 0.5, height: 1 },
+		} );
+
+		expect( getImageEdit( state )?.crop ).toEqual( {
+			x: 0,
+			y: 0,
+			width: 0.5,
+			height: 1,
+		} );
+	} );
+
+	it( 'keeps a size that is not near whole pixels', () => {
+		const size = getOutputSize( stateOf( { rotation: 5 } ) );
+
+		expect( size?.width ).toBeCloseTo( 1389.9286, 3 );
+		expect( Number.isInteger( size?.width ) ).toBe( false );
 	} );
 } );
 
