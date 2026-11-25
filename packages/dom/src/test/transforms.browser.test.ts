@@ -65,13 +65,28 @@ describe( 'getViewportVectorTransform', () => {
 		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
 	} );
 
-	it( 'returns the exact identity for turns that cancel out', () => {
-		expect(
-			getViewportVectorTransform(
-				createNested( 'rotate: 45deg', 'rotate: -45deg' )
-			)
-		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
-	} );
+	it.each( [
+		[ [ '45deg', '-45deg' ] ],
+		[ [ '48deg', '-48deg' ] ],
+		[ [ '45deg', '-180deg', '135deg' ] ],
+	] )(
+		'returns the exact identity for turns %j that cancel out',
+		( turns ) => {
+			let element = document.body;
+			for ( const turn of turns ) {
+				const child = document.createElement( 'div' );
+				child.style.rotate = turn;
+				element.appendChild( child );
+				element = child;
+			}
+			expect( getViewportVectorTransform( element ) ).toEqual( {
+				a: 1,
+				b: 0,
+				c: 0,
+				d: 1,
+			} );
+		}
+	);
 
 	it( 'combines the element with its ancestors', () => {
 		expect(

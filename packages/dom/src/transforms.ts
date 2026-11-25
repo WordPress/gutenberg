@@ -16,11 +16,20 @@ type TransformStyle = Pick<
 
 const IDENTITY: LinearTransform = { a: 1, b: 0, c: 0, d: 1 };
 
-const ANGLE_UNITS: Record< string, number > = {
+// `DOMMatrix` takes degrees. The vector helpers work in radians, read with
+// these factors so that turns in the page cancel out exactly.
+const DEGREES_PER_UNIT: Record< string, number > = {
 	deg: 1,
 	grad: 0.9,
 	rad: 180 / Math.PI,
 	turn: 360,
+};
+
+const RADIANS_PER_UNIT: Record< string, number > = {
+	deg: Math.PI / 180,
+	grad: Math.PI / 200,
+	rad: 1,
+	turn: 2 * Math.PI,
 };
 
 function multiply( m: LinearTransform, n: LinearTransform ): LinearTransform {
@@ -32,11 +41,11 @@ function multiply( m: LinearTransform, n: LinearTransform ): LinearTransform {
 	};
 }
 
-function parseAngleInDegrees( value: string ): number {
+function parseAngle( value: string, units: Record< string, number > ): number {
 	const match = value.match(
 		/^(-?[\d.]+(?:e[+-]?\d+)?)(deg|grad|rad|turn)$/
 	);
-	return match ? parseFloat( match[ 1 ] ) * ANGLE_UNITS[ match[ 2 ] ] : NaN;
+	return match ? parseFloat( match[ 1 ] ) * units[ match[ 2 ] ] : NaN;
 }
 
 const ROTATE_AXES: Record< string, [ number, number, number ] > = {
@@ -50,14 +59,18 @@ const ROTATE_AXES: Record< string, [ number, number, number ] > = {
  * Splits a computed `rotate` value into its axis and angle.
  *
  * @param value Computed `rotate` value, other than `none`.
+ * @param units The angle per CSS unit, in the unit wanted.
  */
-function parseRotate( value: string ): [ number, number, number, number ] {
+function parseRotate(
+	value: string,
+	units: Record< string, number >
+): [ number, number, number, number ] {
 	const parts = value.trim().split( /\s+/ );
-	const degrees = parseAngleInDegrees( parts.pop()! );
+	const angle = parseAngle( parts.pop()!, units );
 	const [ x, y, z ] =
 		ROTATE_AXES[ parts.join( ' ' ) ] ??
 		parts.map( ( part ) => parseFloat( part ) );
-	return [ x, y, z, degrees ];
+	return [ x, y, z, angle ];
 }
 
 function parseScale( value: string ): [ number, number, number ] {
@@ -105,9 +118,8 @@ function getRotate( value: string ): LinearTransform3D {
 	if ( value === 'none' ) {
 		return IDENTITY_3D;
 	}
-	const [ x, y, z, degrees ] = parseRotate( value );
+	const [ x, y, z, angle ] = parseRotate( value, RADIANS_PER_UNIT );
 	const length = Math.hypot( x, y, z );
-	const angle = ( degrees * Math.PI ) / 180;
 	const [ ux, uy, uz ] = [ x / length, y / length, z / length ];
 	const cos = Math.cos( angle );
 	const sin = Math.sin( angle );
@@ -120,11 +132,18 @@ function getRotate( value: string ): LinearTransform3D {
 	if ( ! matrix.flat().every( Number.isFinite ) ) {
 		return IDENTITY_3D;
 	}
-	if ( degrees % 90 !== 0 ) {
+	// A turn in the page keeps the floating-point values of `Math.cos()` and
+	// `Math.sin()`, so turns that cancel out give the exact identity. A
+	// quarter turn out of the page drops the rounding error of the
+	// trigonometry and the axis length, so it flattens exactly, as it does in
+	// a serialized `matrix3d()`.
+	const quarters = ( 2 * angle ) / Math.PI;
+	if (
+		( ux === 0 && uy === 0 ) ||
+		Math.abs( quarters - Math.round( quarters ) ) > 1e-9
+	) {
 		return matrix;
 	}
-	// Drop the rounding error of the trigonometry and the axis length, so a
-	// quarter turn flattens exactly, as it does in a serialized `matrix3d()`.
 	return matrix.map( ( column ) =>
 		column.map( ( entry ) => Math.round( entry * 1e12 ) / 1e12 + 0 )
 	) as LinearTransform3D;
@@ -284,7 +303,9 @@ function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
 	}
 
 	if ( rotate !== 'none' ) {
-		matrix.rotateAxisAngleSelf( ...parseRotate( rotate ) );
+		matrix.rotateAxisAngleSelf(
+			...parseRotate( rotate, DEGREES_PER_UNIT )
+		);
 	}
 
 	if ( scale !== 'none' ) {

@@ -152,19 +152,30 @@ describe( 'getStyleLinearTransform', () => {
 	} );
 
 	it( 'reads a turn in the page without rounding it', () => {
-		const angle = Math.PI / 4;
-		expect(
-			getStyleLinearTransform( {
-				rotate: '45deg',
-				scale: 'none',
-				transform: 'none',
-			} )
-		).toEqual( {
-			a: Math.cos( angle ),
-			b: Math.sin( angle ),
-			c: -Math.sin( angle ),
-			d: Math.cos( angle ),
-		} );
+		const radiansPerUnit = {
+			deg: Math.PI / 180,
+			grad: Math.PI / 200,
+			rad: 1,
+			turn: 2 * Math.PI,
+		};
+		for ( const [ unit, factor ] of Object.entries( radiansPerUnit ) ) {
+			for ( let step = -16; step <= 16; step++ ) {
+				const value = ( step * 22.5 ) / factor / ( 180 / Math.PI );
+				const angle = value * factor;
+				const { a, b, c, d } = getStyleLinearTransform( {
+					rotate: `${ value }${ unit }`,
+					scale: 'none',
+					transform: 'none',
+				} );
+				// `+ 0` only folds a signed zero, which `===` ignores.
+				expect( [ a, b, c + 0, d ] ).toEqual( [
+					Math.cos( angle ),
+					Math.sin( angle ),
+					-Math.sin( angle ) + 0,
+					Math.cos( angle ),
+				] );
+			}
+		}
 	} );
 
 	it( 'reads every angle unit', () => {
