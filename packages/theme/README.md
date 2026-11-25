@@ -190,7 +190,7 @@ The callback reports failures from the generated ramp checks and a defined set o
 
 The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. Menus can use a solid brand fill to indicate keyboard focus, so a contrasting ring color alone is not enough. The primary ramp adjusts its seed when these constraints are not met, while retaining its text and active-state contrast targets. Brand text targets 4.5:1 on the three neutral surfaces and the brand surface. These checks use the final generated colors after seed adjustments. Unresolved pairs still produce warnings.
 
-For example, with the default primary `#3858e9` and background `#1e1e1e`, the primary fill adjusts to `#4468fa` so the brand fills and focus ring meet the checked 3:1 targets. The supplied primary seed remains available through the resolved provider settings and legacy admin color variables.
+For example, with the default primary `#3858e9` and background `#1e1e1e`, the primary fill adjusts to `#4367f8` so the brand fills and focus ring meet the checked 3:1 targets. The supplied primary seed remains available through the resolved provider settings and legacy admin color variables.
 
 ### TypeScript props and warnings
 
