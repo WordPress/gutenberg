@@ -7,6 +7,10 @@ import {
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
 } from '../waveform-utils';
+import type {
+	InitializedWaveformPlayer,
+	InitWaveformPlayerOptions,
+} from '../types';
 
 vi.mock( import( '../waveform-utils' ), () => ( {
 	applyWaveformPlayerStyles: vi.fn(),
@@ -23,17 +27,20 @@ vi.mock( import( '../waveform-utils' ), () => ( {
  * @param {Element} element The element passed to initWaveformPlayer.
  * @return {Object} The fake player.
  */
-function createFakePlayer( options, element ) {
+function createFakePlayer(
+	options: InitWaveformPlayerOptions,
+	element: Element
+) {
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
 	// The artist and artwork elements only exist when the track had an
 	// artist/player artwork when the player was created, mirroring the library markup.
-	let artistEl = null;
+	let artistEl: HTMLSpanElement | null = null;
 	if ( options.artist ) {
 		artistEl = document.createElement( 'span' );
 		artistEl.textContent = options.artist;
 	}
-	let artworkEl = null;
+	let artworkEl: HTMLImageElement | null = null;
 	if ( options.image && ! options.showPlayButtonArtwork ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
@@ -53,7 +60,7 @@ function createFakePlayer( options, element ) {
 		artistEl: artistEl || null,
 		artworkEl: artworkEl || null,
 		pause: vi.fn(),
-		syncArtist: vi.fn( ( artist ) => {
+		syncArtist: vi.fn( ( artist?: string ) => {
 			if ( ! artist ) {
 				instance.artistEl?.remove();
 				instance.artistEl = null;
@@ -66,7 +73,7 @@ function createFakePlayer( options, element ) {
 			instance.artistEl.textContent = artist;
 			instance.artistEl.style.display = '';
 		} ),
-		syncArtwork: vi.fn( ( image, imageAlt = '' ) => {
+		syncArtwork: vi.fn( ( image: string | null, imageAlt = '' ) => {
 			if ( ! image ) {
 				instance.artworkEl?.remove();
 				instance.artworkEl = null;
@@ -79,14 +86,21 @@ function createFakePlayer( options, element ) {
 			instance.artworkEl.src = image;
 			instance.artworkEl.alt = imageAlt || '';
 		} ),
-		loadTrack: vi.fn( async ( src, title, artist, trackOptions ) => {
-			titleEl.textContent = title;
-			instance.syncArtist( artist );
-			instance.syncArtwork(
-				trackOptions.artwork,
-				trackOptions.artworkAlt
-			);
-		} ),
+		loadTrack: vi.fn(
+			async (
+				_src: string,
+				title?: string,
+				artist?: string,
+				trackOptions: { artwork?: string; artworkAlt?: string } = {}
+			) => {
+				titleEl.textContent = title ?? '';
+				instance.syncArtist( artist );
+				instance.syncArtwork(
+					trackOptions.artwork ?? null,
+					trackOptions.artworkAlt
+				);
+			}
+		),
 	};
 
 	return {
@@ -99,17 +113,21 @@ function createFakePlayer( options, element ) {
 describe( 'WaveformPlayer', () => {
 	beforeEach( () => {
 		vi.useFakeTimers();
-		initWaveformPlayer.mockImplementation( ( element, options ) =>
-			createFakePlayer( options, element )
+		vi.mocked( initWaveformPlayer ).mockImplementation(
+			( element, options ) =>
+				createFakePlayer(
+					options,
+					element
+				) as unknown as InitializedWaveformPlayer
 		);
 	} );
 
 	afterEach( () => {
 		vi.runOnlyPendingTimers();
 		vi.useRealTimers();
-		applyWaveformPlayerStyles.mockReset();
-		initWaveformPlayer.mockReset();
-		setupPlayButtonArtwork.mockReset();
+		vi.mocked( applyWaveformPlayerStyles ).mockReset();
+		vi.mocked( initWaveformPlayer ).mockReset();
+		vi.mocked( setupPlayButtonArtwork ).mockReset();
 	} );
 
 	const baseProps = {
@@ -194,7 +212,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		expect( player.instance.artworkEl ).toBeNull();
 	} );
@@ -208,7 +226,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender(
 			<WaveformPlayer
@@ -232,7 +250,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender(
 			<WaveformPlayer
@@ -266,7 +284,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender(
 			<WaveformPlayer
@@ -301,7 +319,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender( <WaveformPlayer { ...baseProps } showPlayButtonArtwork /> );
 
@@ -311,13 +329,14 @@ describe( 'WaveformPlayer', () => {
 
 		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
 		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
-		expect( initWaveformPlayer.mock.calls[ 1 ][ 1 ] ).toEqual(
+		expect( vi.mocked( initWaveformPlayer ).mock.calls[ 1 ][ 1 ] ).toEqual(
 			expect.objectContaining( {
 				showPlayButtonArtwork: true,
 			} )
 		);
 		expect(
-			initWaveformPlayer.mock.results[ 1 ].value.instance.artworkEl
+			vi.mocked( initWaveformPlayer ).mock.results[ 1 ].value.instance
+				.artworkEl
 		).toBeNull();
 	} );
 
@@ -330,7 +349,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender( <WaveformPlayer { ...baseProps } color="#0000ff" /> );
 
@@ -357,7 +376,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender(
 			<WaveformPlayer { ...baseProps } backgroundColor="#aabbcc" />
@@ -389,7 +408,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender(
 			<WaveformPlayer
@@ -422,7 +441,8 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
+		const firstPlayer =
+			vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 		// No artwork element exists when the track started without an image.
 		expect( firstPlayer.instance.artworkEl ).toBeNull();
 
@@ -452,7 +472,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender( <WaveformPlayer { ...baseProps } image="" /> );
 
@@ -474,7 +494,8 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
+		const firstPlayer =
+			vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 		expect( firstPlayer.instance.artistEl ).toBeNull();
 
 		rerender( <WaveformPlayer { ...baseProps } artist="New Artist" /> );
@@ -493,7 +514,7 @@ describe( 'WaveformPlayer', () => {
 			vi.advanceTimersByTime( 100 );
 		} );
 
-		const player = initWaveformPlayer.mock.results[ 0 ].value;
+		const player = vi.mocked( initWaveformPlayer ).mock.results[ 0 ].value;
 
 		rerender( <WaveformPlayer { ...baseProps } artist="" /> );
 

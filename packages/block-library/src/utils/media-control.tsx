@@ -23,9 +23,15 @@ import {
 	reset as resetIcon,
 	video as videoIcon,
 } from '@wordpress/icons';
+import type { RefObject } from 'react';
 import { getFilename } from '@wordpress/url';
+import type {
+	MediaControlIndicatorProps,
+	MediaControlPreviewProps,
+	MediaControlProps,
+} from './types';
 
-const MEDIA_TYPE_ICONS = {
+const MEDIA_TYPE_ICONS: Record< string, typeof audioIcon > = {
 	audio: audioIcon,
 	video: videoIcon,
 };
@@ -33,12 +39,14 @@ const MEDIA_TYPE_ICONS = {
 /**
  * Focuses the toggle button.
  *
- * @param {Object} containerRef - ref object containing current element
+ * @param containerRef - ref object containing current element
  */
-const focusToggleButton = ( containerRef ) => {
+const focusToggleButton = (
+	containerRef: RefObject< HTMLDivElement | null >
+) => {
 	// Use requestAnimationFrame to ensure DOM updates are complete.
 	window.requestAnimationFrame( () => {
-		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		const [ toggleButton ] = focus.tabbable.find( containerRef.current! );
 		if ( ! toggleButton ) {
 			return;
 		}
@@ -51,12 +59,15 @@ const focusToggleButton = ( containerRef ) => {
  * MediaControlIndicator - The slot left of the label: a `+` when no media is
  * set, a thumbnail for an image, and an icon for any other media type.
  *
- * @param {Object} props
- * @param {string} props.url       Media URL
- * @param {string} props.mediaType Media type
- * @return {Element} Indicator component
+ * @param props
+ * @param props.url       Media URL
+ * @param props.mediaType Media type
+ * @return Indicator component
  */
-function MediaControlIndicator( { url, mediaType } ) {
+function MediaControlIndicator( {
+	url,
+	mediaType,
+}: MediaControlIndicatorProps ) {
 	if ( url && mediaType === 'image' ) {
 		return (
 			<span
@@ -66,7 +77,7 @@ function MediaControlIndicator( { url, mediaType } ) {
 		);
 	}
 
-	const typeIcon = MEDIA_TYPE_ICONS[ mediaType ] ?? fileIcon;
+	const typeIcon = MEDIA_TYPE_ICONS[ mediaType ?? '' ] ?? fileIcon;
 
 	return (
 		<span className="block-library-utils__media-control__inspector-icon-indicator">
@@ -94,7 +105,7 @@ export function MediaControlPreview( {
 	itemGroupProps,
 	className,
 	label,
-} ) {
+}: MediaControlPreviewProps ) {
 	return (
 		<ItemGroup { ...itemGroupProps } as="span">
 			<HStack justify="flex-start">
@@ -112,21 +123,21 @@ export function MediaControlPreview( {
 /**
  * MediaControl - Complete media selection control for inspector panels
  *
- * @param {Object}   props
- * @param {number}   props.mediaId               Media attachment ID
- * @param {string}   props.mediaUrl              Media URL
- * @param {string}   props.mediaType             Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
- * @param {string}   props.filename              Filename to display
- * @param {Array}    props.allowedTypes          Allowed media types
- * @param {Function} props.onSelect              Callback when media selected
- * @param {Function} props.onSelectURL           Callback when URL entered
- * @param {Function} props.onError               Error callback
- * @param {Function} props.onReset               Reset/remove callback
- * @param {boolean}  props.isUploading           Whether upload in progress
- * @param {string}   props.emptyLabel            Label when no media (default: 'Add media')
- * @param {boolean}  props.useFeaturedImage      Whether the featured image is in use
- * @param {Function} props.onToggleFeaturedImage Callback toggling the featured image
- * @return {Element} Media control component
+ * @param props
+ * @param props.mediaId               Media attachment ID
+ * @param props.mediaUrl              Media URL
+ * @param props.mediaType             Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
+ * @param props.filename              Filename to display
+ * @param props.allowedTypes          Allowed media types
+ * @param props.onSelect              Callback when media selected
+ * @param props.onSelectURL           Callback when URL entered
+ * @param props.onError               Error callback
+ * @param props.onReset               Reset/remove callback
+ * @param props.isUploading           Whether upload in progress
+ * @param props.emptyLabel            Label when no media (default: 'Add media')
+ * @param props.useFeaturedImage      Whether the featured image is in use
+ * @param props.onToggleFeaturedImage Callback toggling the featured image
+ * @return Media control component
  */
 export function MediaControl( {
 	mediaId,
@@ -142,10 +153,20 @@ export function MediaControl( {
 	emptyLabel = __( 'Media' ),
 	useFeaturedImage,
 	onToggleFeaturedImage,
-} ) {
+}: MediaControlProps ) {
 	const { getSettings } = useSelect( blockEditorStore );
-	const onFilesDrop = ( filesList ) => {
-		const { mediaUpload } = getSettings();
+	const onFilesDrop = ( filesList: File[] ) => {
+		const { mediaUpload } = getSettings() as {
+			mediaUpload?: ( options: {
+				allowedTypes?: string[];
+				filesList: File[];
+				onFileChange: (
+					files: Array< Record< string, unknown > >
+				) => void;
+				onError?: ( message: string ) => void;
+				multiple: boolean;
+			} ) => void;
+		};
 		if ( ! mediaUpload ) {
 			return;
 		}
@@ -159,7 +180,7 @@ export function MediaControl( {
 			multiple: false,
 		} );
 	};
-	const containerRef = useRef();
+	const containerRef = useRef< HTMLDivElement >( null );
 
 	return (
 		<div
@@ -184,7 +205,7 @@ export function MediaControl( {
 						className="block-library-utils__media-control__inspector-media-replace-title"
 						label={
 							mediaUrl
-								? getFilename( filename ) || emptyLabel
+								? getFilename( filename! ) || emptyLabel
 								: emptyLabel
 						}
 					/>
