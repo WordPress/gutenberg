@@ -246,13 +246,6 @@ export const BlockSwitcher = ( {
 	label,
 	text,
 }: BlockSwitcherProps ) => {
-	const isContiguous = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).areBlocksContiguous(
-				clientIds
-			),
-		[ clientIds ]
-	);
 	const isSingleBlock = clientIds.length === 1;
 
 	const blockSwitcherDescription = isSingleBlock
@@ -280,8 +273,6 @@ export const BlockSwitcher = ( {
 						icon={ children }
 						text={ text }
 						toggleProps={ {
-							// Only a single block or contiguous siblings can be transformed.
-							disabled: ! isContiguous,
 							description: blockSwitcherDescription,
 							...toggleProps,
 						} }

@@ -2831,6 +2831,14 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 			const normalizedBlocks = Array.isArray( blocks )
 				? blocks
 				: [ blocks ];
+			if (
+				! areBlocksContiguous(
+					state,
+					normalizedBlocks.map( ( block ) => block.clientId )
+				)
+			) {
+				return EMPTY_ARRAY;
+			}
 			const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 				buildScope: 'transform',
 			} );
@@ -2894,6 +2902,8 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 		) => [
 			getBlockTypes(),
 			state.preferences.insertUsage,
+			state.blocks.order,
+			state.blocks.parents,
 			...getInsertBlockTypeDependants( select )( state, rootClientId ),
 		]
 	)
@@ -3211,6 +3221,14 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				if ( ! blocks ) {
 					return EMPTY_ARRAY;
 				}
+				if (
+					! areBlocksContiguous(
+						state,
+						blocks.map( ( block ) => block.clientId )
+					)
+				) {
+					return EMPTY_ARRAY;
+				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
 				 * the `role` property of blocks' attributes for the transformation.
@@ -3247,7 +3265,14 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				state: State,
 				blocks: TreeBlock[],
 				rootClientId?: string | null
-			) => getAllowedPatternsDependants( select )( state, rootClientId )
+			) => [
+				state.blocks.order,
+				state.blocks.parents,
+				...getAllowedPatternsDependants( select )(
+					state,
+					rootClientId
+				),
+			]
 		)
 );
 

@@ -366,12 +366,24 @@ describe( 'selectors', () => {
 			} );
 			it( 'when a selected block has inner blocks', () => {
 				const blocks = partial< TreeBlock[] >( [
-					{ name: 'core/test-block-a', innerBlocks: [] },
 					{
+						clientId: 'block1',
+						name: 'core/test-block-a',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block2',
 						name: 'core/test-block-b',
-						innerBlocks: [ { name: 'some inner block' } ],
+						innerBlocks: [
+							{
+								clientId: 'inner-block',
+								name: 'some inner block',
+								innerBlocks: [],
+							},
+						],
 					},
 				] );
+				dispatch( store ).resetBlocks( blocks );
 				expect(
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -380,13 +392,22 @@ describe( 'selectors', () => {
 			} );
 			it( 'when a selected block has controlled inner blocks', () => {
 				const blocks = partial< TreeBlock[] >( [
-					{ name: 'core/test-block-a', innerBlocks: [] },
+					{
+						clientId: 'block1',
+						name: 'core/test-block-a',
+						innerBlocks: [],
+					},
 					{
 						name: 'core/test-block-b',
 						clientId: 'block2-clientId',
 						innerBlocks: [],
 					},
 				] );
+				dispatch( store ).resetBlocks( blocks );
+				dispatch( store ).setHasControlledInnerBlocks(
+					'block2-clientId',
+					true
+				);
 				expect(
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -422,10 +443,23 @@ describe( 'selectors', () => {
 			} );
 			it( 'when different multiple blocks are selected', () => {
 				const blocks = partial< TreeBlock[] >( [
-					{ name: 'core/test-block-b', innerBlocks: [] },
-					{ name: 'test/block-b', innerBlocks: [] },
-					{ name: 'some other block', innerBlocks: [] },
+					{
+						clientId: 'block1',
+						name: 'core/test-block-b',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block2',
+						name: 'test/block-b',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block3',
+						name: 'some other block',
+						innerBlocks: [],
+					},
 				] );
+				dispatch( store ).resetBlocks( blocks );
 				const patterns =
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -444,11 +478,28 @@ describe( 'selectors', () => {
 			} );
 			it( 'when multiple blocks are selected containing multiple times the same block', () => {
 				const blocks = partial< TreeBlock[] >( [
-					{ name: 'core/test-block-b', innerBlocks: [] },
-					{ name: 'some other block', innerBlocks: [] },
-					{ name: 'core/test-block-a', innerBlocks: [] },
-					{ name: 'core/test-block-b', innerBlocks: [] },
+					{
+						clientId: 'block1',
+						name: 'core/test-block-b',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block2',
+						name: 'some other block',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block3',
+						name: 'core/test-block-a',
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block4',
+						name: 'core/test-block-b',
+						innerBlocks: [],
+					},
 				] );
+				dispatch( store ).resetBlocks( blocks );
 				const patterns =
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
