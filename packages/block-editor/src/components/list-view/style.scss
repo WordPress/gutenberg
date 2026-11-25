@@ -447,9 +447,10 @@
 		white-space: nowrap;
 	}
 
+	// Invert the row's color pair so the badge stays distinct on any brand fill.
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: var(--wpds-color-background-surface-neutral);
-		color: var(--wpds-color-foreground-content-neutral);
+		background: var(--list-view-selected-color);
+		color: var(--list-view-selected-background);
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.3);
