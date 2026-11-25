@@ -110,22 +110,30 @@ function calculateRamp( {
 						`Reference color for step ${ stepName } not found: ${ reference }`
 					);
 				}
-				return { color, target };
+				return {
+					color,
+					target,
+					emitted: neutralSurface ? getColorString( color ) : '',
+				};
 			}
 		);
 
 		// The primary ramp keeps emitted colors that meet the actual targets.
 		// Other ramps keep a reserve for rounding.
-		const meetsTargets = ( candidate: PlainColorObject ) =>
-			references.every( ( { color, target } ) =>
-				neutralSurface
-					? getContrast(
-							getColorString( color ),
-							getColorString( candidate )
-						) >= target
-					: getContrast( color, candidate ) >=
+		const meetsTargets = ( candidate: PlainColorObject ) => {
+			if ( ! neutralSurface ) {
+				return references.every(
+					( { color, target } ) =>
+						getContrast( color, candidate ) >=
 						adjustContrastTarget( target )
+				);
+			}
+			const emittedCandidate = getColorString( candidate );
+			return references.every(
+				( { emitted, target } ) =>
+					getContrast( emitted, emittedCandidate ) >= target
 			);
+		};
 
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
