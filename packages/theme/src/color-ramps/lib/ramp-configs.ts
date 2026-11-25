@@ -334,64 +334,67 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 
 // PRIMARY_RAMP: seed => surface2 => surface1, surface3 => bgFill1 => ...
 // The surfaces keep the lightness pinned from the background ramp, so the
-// fills, focus ring and brand text can use them as contrast references.
-export const PRIMARY_RAMP_CONFIG: RampConfig = {
-	...ACCENT_RAMP_CONFIG,
-	surface2: {
-		...ACCENT_RAMP_CONFIG.surface2,
-		contrast: {
-			...ACCENT_RAMP_CONFIG.surface2.contrast,
-			reference: 'seed',
-		},
-	},
-	bgFill1: withSurfaceTargets(
-		{
-			sameAsIfPossible: 'seed',
-			contrast: {
-				reference: 'neutralSurface',
-				target: MINIMUM_NON_TEXT_CONTRAST,
-				followDirection: 'main',
-			},
-		},
-		MINIMUM_NON_TEXT_CONTRAST
-	),
-	bgFill2: withSurfaceTargets(
-		ACCENT_RAMP_CONFIG.bgFill2,
-		MINIMUM_NON_TEXT_CONTRAST
-	),
-	stroke3: withSurfaceTargets(
-		ACCENT_RAMP_CONFIG.stroke3,
-		MINIMUM_NON_TEXT_CONTRAST
-	),
-	fgSurface3: withSurfaceTargets(
-		ACCENT_RAMP_CONFIG.fgSurface3,
-		MINIMUM_TEXT_CONTRAST
-	),
-	fgSurface4: withSurfaceTargets(
-		ACCENT_RAMP_CONFIG.fgSurface4,
-		MINIMUM_TEXT_CONTRAST
-	),
-};
-
-function withSurfaceTargets(
-	config: RampStepConfig,
-	target: number
-): RampStepConfig {
-	return {
+// fills, focus ring and brand text can use the public brand surface as a
+// contrast reference. Before the elevation swap for darker ramps, that is
+// `surface1` for lighter ramps and `surface3` for darker ones.
+function createPrimaryRampConfig(
+	brandSurface: 'surface1' | 'surface3'
+): RampConfig {
+	const withSurfaceTargets = (
+		config: RampStepConfig,
+		target: number
+	): RampStepConfig => ( {
 		...config,
 		contrast: {
 			...config.contrast,
 			additionalReferences: [
 				...( config.contrast.additionalReferences ?? [] ),
-				...(
-					[
-						'neutralSurface',
-						'surface1',
-						'surface2',
-						'surface3',
-					] as const
-				 ).map( ( reference ) => ( { reference, target } ) ),
+				{ reference: 'neutralSurface', target },
+				{ reference: brandSurface, target },
 			],
 		},
+	} );
+
+	return {
+		...ACCENT_RAMP_CONFIG,
+		surface2: {
+			...ACCENT_RAMP_CONFIG.surface2,
+			contrast: {
+				...ACCENT_RAMP_CONFIG.surface2.contrast,
+				reference: 'seed',
+			},
+		},
+		bgFill1: withSurfaceTargets(
+			{
+				sameAsIfPossible: 'seed',
+				contrast: {
+					reference: 'neutralSurface',
+					target: MINIMUM_NON_TEXT_CONTRAST,
+					followDirection: 'main',
+				},
+			},
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		bgFill2: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.bgFill2,
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		stroke3: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.stroke3,
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		fgSurface3: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.fgSurface3,
+			MINIMUM_TEXT_CONTRAST
+		),
+		fgSurface4: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.fgSurface4,
+			MINIMUM_TEXT_CONTRAST
+		),
 	};
 }
+
+export const PRIMARY_RAMP_CONFIGS: Record< RampDirection, RampConfig > = {
+	lighter: createPrimaryRampConfig( 'surface1' ),
+	darker: createPrimaryRampConfig( 'surface3' ),
+};

@@ -69,6 +69,7 @@ describe( 'accent focus contrast', () => {
 	it.each( [
 		[ '#000000', '#3858e9', '#fff' ],
 		[ '#3f3f3f', '#8f8f8f', '#1e1e1e' ],
+		[ '#000000', '#5f5f5f', '#f2f2f2' ],
 	] )(
 		'keeps the brand fill and its text on background %s when primary %s already meets the targets',
 		( background, seed, text ) => {

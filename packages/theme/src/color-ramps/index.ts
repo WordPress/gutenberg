@@ -4,7 +4,7 @@ import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
 import {
 	BG_RAMP_CONFIG,
 	ACCENT_RAMP_CONFIG,
-	PRIMARY_RAMP_CONFIG,
+	PRIMARY_RAMP_CONFIGS,
 } from './lib/ramp-configs.ts';
 import type {
 	RampResult as InternalRampResult,
@@ -80,7 +80,7 @@ export function buildAccentRamp(
 				? next
 				: worst
 		);
-	return buildRamp( seed, PRIMARY_RAMP_CONFIG, {
+	return buildRamp( seed, PRIMARY_RAMP_CONFIGS[ bgRamp.direction ], {
 		...bgRampInfo,
 		neutralSurface,
 	} );

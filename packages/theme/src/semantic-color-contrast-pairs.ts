@@ -22,11 +22,11 @@ const brandSurfaces = [
 	'background.surface.brand',
 ] as const;
 
-export const BRAND_FOCUS_STEPS = {
-	stroke3: 'stroke.focus',
-	bgFill1: 'background.interactive.brand-strong',
-	bgFill2: 'background.interactive.brand-strong-active',
-} as const;
+const brandFocusTokens = [
+	'stroke.focus',
+	'background.interactive.brand-strong',
+	'background.interactive.brand-strong-active',
+] as const;
 
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	...brandSurfaces.flatMap( ( background ) =>
@@ -154,7 +154,7 @@ export const MINIMUM_NON_TEXT_CONTRAST = 3;
 // colors after seed adjustment.
 export const SEMANTIC_FOCUS_CONTRAST_PAIRS = brandSurfaces.flatMap(
 	( background ) =>
-		Object.values( BRAND_FOCUS_STEPS ).map( ( foreground ) => ( {
+		brandFocusTokens.map( ( foreground ) => ( {
 			background,
 			foreground,
 		} ) )
