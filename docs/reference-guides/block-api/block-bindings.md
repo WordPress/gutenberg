@@ -449,6 +449,8 @@ The `getValues` function retrieves values from the source when rendering a block
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
 
+`getValues` runs synchronously, so it can't fetch data. To show a value that comes from the server, see [Showing a server value in the editor](#showing-a-server-value-in-the-editor).
+
 Set `supportsCopy: true` only when the source handles copy requests. For copy requests, return the actual source values. Omit an attribute, or return `undefined` for it, when its value is unavailable and the editor displays a placeholder instead. This preserves the attribute's saved fallback in the copied block. Return genuine values even when they are empty, read-only, or equal to a field's key or label. In the example above, an empty stored date remains empty when copied, while missing or `null` meta omits the copied value; the display still falls back to today's date.
 
 #### setValues
@@ -522,6 +524,108 @@ There are a few examples in Core that can be used as reference.
 
 -   Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
 -   Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
+
+### Showing a server value in the editor
+
+The editor never runs `get_value_callback`. A source registered only in PHP shows its label in the editor, not its value. To show the value, expose it with a REST route, load it into a data store with a resolver, and read it from the store in `getValues`. The resolver fetches the value the first time the selector runs.
+
+This example shows the number of published posts. The PHP code registers the source and a REST route that returns the same value:
+
+```php
+function my_plugin_get_post_count() {
+	return (string) wp_count_posts()->publish;
+}
+
+add_action(
+	'init',
+	function () {
+		register_block_bindings_source(
+			'my-plugin/post-count',
+			array(
+				'label'              => __( 'Published posts', 'my-plugin' ),
+				'get_value_callback' => 'my_plugin_get_post_count',
+			)
+		);
+	}
+);
+
+add_action(
+	'rest_api_init',
+	function () {
+		register_rest_route(
+			'my-plugin/v1',
+			'/post-count',
+			array(
+				'methods'             => 'GET',
+				'callback'            => 'my_plugin_get_post_count',
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
+	}
+);
+```
+
+The JavaScript code, enqueued with the `enqueue_block_editor_assets` hook, registers the store and the editor half of the source:
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+import { registerBlockBindingsSource } from '@wordpress/blocks';
+import { createReduxStore, register } from '@wordpress/data';
+
+const store = createReduxStore( 'my-plugin/post-count', {
+	reducer( state = null, action ) {
+		if ( action.type === 'SET_POST_COUNT' ) {
+			return action.value;
+		}
+		return state;
+	},
+	actions: {
+		setPostCount( value ) {
+			return { type: 'SET_POST_COUNT', value };
+		},
+	},
+	selectors: {
+		getPostCount( state ) {
+			return state;
+		},
+	},
+	resolvers: {
+		getPostCount:
+			() =>
+			async ( { dispatch } ) => {
+				const value = await apiFetch( {
+					path: '/my-plugin/v1/post-count',
+				} );
+				dispatch.setPostCount( value );
+			},
+	},
+} );
+
+register( store );
+
+registerBlockBindingsSource( {
+	name: 'my-plugin/post-count',
+	getValues( { select, bindings } ) {
+		const value = select( store ).getPostCount();
+		if ( value === null ) {
+			return {};
+		}
+		return Object.fromEntries(
+			Object.keys( bindings ).map( ( attribute ) => [ attribute, value ] )
+		);
+	},
+} );
+```
+
+While the value loads, `getValues` returns an empty object, so the block shows its saved content. When the request finishes, the block shows the value. To try it, bind a paragraph to the source:
+
+```html
+<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"my-plugin/post-count"}}}} -->
+<p>Published posts</p>
+<!-- /wp:paragraph -->
+```
 
 ## Unregistering a source
 
