@@ -48,6 +48,8 @@ import type {
 	LayoutPanelProps,
 	LayoutTypeSwitcherProps,
 	ResponsiveLayoutStylesOptions,
+	BlockStyle,
+	BlockStyleState,
 } from './types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
@@ -348,6 +350,48 @@ export function getResponsiveLayoutStyles( {
 		.join( '' );
 }
 
+/**
+ * Returns the layout type a block uses. In a viewport state, a layout type set
+ * for that viewport takes precedence.
+ *
+ * @param options                    Options.
+ * @param options.layout             The block's layout attribute.
+ * @param options.style              The block's style attribute.
+ * @param options.layoutBlockSupport The block's layout support.
+ * @param options.defaultLayout      The layout used when the block has none.
+ * @param options.selectedState      The selected style state.
+ *
+ * @return The layout type name.
+ */
+export function getUsedLayoutType( {
+	layout,
+	style,
+	layoutBlockSupport,
+	defaultLayout,
+	selectedState,
+}: {
+	layout?: Layout;
+	style?: BlockStyle;
+	layoutBlockSupport: LayoutBlockSupport;
+	defaultLayout?: Layout;
+	selectedState?: BlockStyleState;
+} ): string {
+	const isViewportLayoutState =
+		hasViewportBlockStyleState( selectedState ) &&
+		! hasPseudoBlockStyleState( selectedState );
+	const stateLayout = isViewportLayoutState
+		? // A style state holds the layout it overrides.
+			( getStyleForState( style, selectedState )?.layout as
+				Layout | undefined )
+		: undefined;
+	const { type, default: { type: defaultType = 'default' } = {} } = {
+		...layoutBlockSupport,
+		...( layout || defaultLayout ),
+		...stateLayout,
+	};
+	return type || defaultType;
+}
+
 function LayoutPanelPure( {
 	layout,
 	style,
@@ -363,15 +407,50 @@ function LayoutPanelPure( {
 		activeBlockVariation,
 		selectedState,
 		isResponsiveEditing,
+		hasMixedLayoutTypes,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
+				getMultiSelectedBlockClientIds,
 				getSettings,
 				getSelectedBlockStyleState,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
+
+			// Hide the layout controls when the selected blocks use different
+			// layout types, as a change would apply to all of them. Controls
+			// only show when the selected blocks are all the same block type,
+			// so this block's layout support applies to each of them.
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+			let _hasMixedLayoutTypes = false;
+			if ( multiSelectedClientIds.includes( clientId ) ) {
+				const _layoutBlockSupport = getBlockSupport(
+					blockName,
+					layoutBlockSupportKey,
+					{}
+				) as LayoutBlockSupport;
+				const defaultLayout = {
+					...layoutSettings,
+					..._layoutBlockSupport,
+				}.default;
+				const layoutTypes = new Set(
+					multiSelectedClientIds.map( ( id: string ) => {
+						const attributes = getBlockAttributes( id ) || {};
+						return getUsedLayoutType( {
+							layout: attributes.layout,
+							style: attributes.style,
+							layoutBlockSupport: _layoutBlockSupport,
+							defaultLayout,
+							selectedState: getSelectedBlockStyleState( id ),
+						} );
+					} )
+				);
+				_hasMixedLayoutTypes = layoutTypes.size > 1;
+			}
+
 			return {
+				hasMixedLayoutTypes: _hasMixedLayoutTypes,
 				activeBlockVariation: select(
 					blocksStore
 				).getActiveBlockVariation(
@@ -384,7 +463,7 @@ function LayoutPanelPure( {
 				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
-		[ blockName, clientId ]
+		[ blockName, clientId, layoutSettings ]
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -440,7 +519,7 @@ function LayoutPanelPure( {
 		]
 	);
 
-	if ( blockEditingMode !== 'default' ) {
+	if ( blockEditingMode !== 'default' || hasMixedLayoutTypes ) {
 		return null;
 	}
 
@@ -489,9 +568,13 @@ function LayoutPanelPure( {
 		...layoutBlockSupport,
 		...usedLayout,
 	};
-	const { type, default: { type: defaultType = 'default' } = {} } =
-		blockSupportAndLayout;
-	const blockLayoutType = type || defaultType;
+	const blockLayoutType = getUsedLayoutType( {
+		layout,
+		style,
+		layoutBlockSupport,
+		defaultLayout: defaultBlockLayout,
+		selectedState,
+	} );
 
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
