@@ -182,7 +182,7 @@ export function getStyleLinearTransform(
 }
 
 /**
- * Whether the element's own planar transform keeps its edges parallel to its
+ * Whether the element's own transform keeps its edges parallel to its
  * parent's axes, including quarter turns.
  *
  * @param style The element's computed style.

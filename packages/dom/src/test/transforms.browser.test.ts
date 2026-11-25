@@ -75,22 +75,21 @@ describe( 'getViewportVectorTransform', () => {
 		).toEqual( { a: 0, b: 2, c: -2, d: 0 } );
 	} );
 
-	it( 'projects a turn out of the page the same way for vectors and points', () => {
+	it( 'projects a turn out of the page the way the browser paints it', () => {
 		const element = createNested(
 			'',
-			'rotate: x 60deg; transform-origin: 0 0;'
+			'height: 40px; rotate: x 60deg; transform-origin: 0 0;'
 		);
 		const point = getBorderBoxPointTransform( element )?.transformPoint( {
 			x: 0,
-			y: 20,
+			y: 40,
 		} );
-		expect( point?.y ).toBeCloseTo( 10 );
-		expect( round( getViewportVectorTransform( element ) ) ).toEqual( {
-			a: 1,
-			b: 0,
-			c: 0,
-			d: 0.5,
-		} );
+		const matrix = getViewportVectorTransform( element );
+		const paintedHeight = element.getBoundingClientRect().height;
+		expect( paintedHeight ).toBeCloseTo( 20 );
+		expect( point?.y ).toBeCloseTo( paintedHeight );
+		expect( matrix.d * element.offsetHeight ).toBeCloseTo( paintedHeight );
+		expect( round( matrix ) ).toEqual( { a: 1, b: 0, c: 0, d: 0.5 } );
 	} );
 
 	it.each( [
