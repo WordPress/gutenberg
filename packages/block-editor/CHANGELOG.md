@@ -27,7 +27,7 @@
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
 -   Block popover: Turn the resize handles and spacing visualizers with a rotated or scaled block ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
--   Block toolbar: Show the toolbar of a block inside a tilted container above the container, lined up with the selected block. A quarter turn keeps the toolbar in place ([#86885](https://github.com/WordPress/gutenberg/pull/86885)).
+-   Block toolbar: Show the toolbar of a block inside a tilted container above the container, lined up with the selected block. A quarter turn in the plane of the page keeps the toolbar in place ([#86885](https://github.com/WordPress/gutenberg/pull/86885)).
 -   In-between inserter: Insert in the gap under the pointer between the children of a rotated, moved or scaled container ([#86892](https://github.com/WordPress/gutenberg/pull/86892)).
 
 ### Internal

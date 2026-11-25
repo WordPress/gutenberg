@@ -136,6 +136,21 @@ describe( 'getStyleLinearTransform', () => {
 		}
 	);
 
+	it( 'applies the z part of `scale` between turns out of the page', () => {
+		// rotateY( 60deg ) sends x into z, scale stretches z by 3, and
+		// rotateX( 60deg ) brings it back as y: 3 * sin( 60deg ) ^ 2 = 2.25.
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: '2 1 3',
+					transform:
+						'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+				} )
+			)
+		).toEqual( { a: 1, b: 2.25, c: 0, d: 0.5 } );
+	} );
+
 	it( 'reads every angle unit', () => {
 		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
 			expect(
