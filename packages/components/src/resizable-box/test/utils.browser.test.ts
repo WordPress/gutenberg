@@ -29,6 +29,17 @@ describe( 'toLocalDelta', () => {
 		} );
 	} );
 
+	it( 'leaves the drag as is when rounding keeps one axis of an element', () => {
+		// A turn of 90deg out of the page leaves `d` at about 6e-17.
+		expect(
+			toLocalDelta(
+				{ a: 1, b: 0, c: 0, d: Math.cos( Math.PI / 2 ) },
+				3,
+				4
+			)
+		).toEqual( { x: 3, y: 4 } );
+	} );
+
 	it( 'leaves the drag as is when rounding keeps a flattened element invertible', () => {
 		expect(
 			toLocalDelta( { a: 0.5, b: 0.5, c: 0.5, d: 0.5 + 1e-16 }, 3, 4 )
@@ -151,6 +162,41 @@ describe( 'measureGain', () => {
 				{ x: -5, y: 5 }
 			)
 		).toBeCloseTo( 0.5 );
+	} );
+
+	it( 'measures a box seen nearly edge on', () => {
+		// Turned 89deg out of the page, 40px of growth moves the edge 0.7px.
+		const d = Math.cos( ( 89 * Math.PI ) / 180 );
+		expect(
+			measureGain(
+				{ a: 1, b: 0, c: 0, d },
+				'bottom',
+				{ width: 0, height: 40 },
+				{ x: 0, y: 40 * d * 3 }
+			)
+		).toBeCloseTo( 3 );
+	} );
+
+	it( 'keeps a gain above two for a box its own transform shortens', () => {
+		expect(
+			measureGain(
+				{ a: 1, b: 0, c: 0, d: 0.25 },
+				'bottom',
+				{ width: 0, height: 20 },
+				{ x: 0, y: 15 }
+			)
+		).toBeCloseTo( 3 );
+	} );
+
+	it( 'ignores a handle that a layout shift moved', () => {
+		expect(
+			measureGain(
+				rotation( 90 ),
+				'bottom',
+				{ width: 0, height: 1 },
+				{ x: -46, y: 0 }
+			)
+		).toBeUndefined();
 	} );
 
 	it( 'ignores a size that barely changed', () => {

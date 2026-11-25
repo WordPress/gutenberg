@@ -27,9 +27,7 @@ type TransformedDrag = {
 };
 
 // Below the minimum, the handle cannot follow the pointer, like one on a
-// block turned 180deg. There is no maximum: a box that its own transform
-// shortens grows by more than the matrix predicts, and a gain that is too high
-// only slows the handle until the next measurement.
+// block turned 180deg.
 const MIN_GAIN = 0.2;
 const MAX_SETTLES = 10;
 
