@@ -452,10 +452,6 @@
 		background: var(--list-view-selected-color);
 		color: var(--list-view-selected-background);
 	}
-	&.is-selected.is-synced .block-editor-list-view-block-select-button__anchor {
-		background: rgba($black, 0.3);
-		color: $white;
-	}
 
 	.block-editor-list-view-block-select-button__block-visibility,
 	.block-editor-list-view-block-select-button__lock,
