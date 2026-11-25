@@ -130,23 +130,6 @@ export type DataViewsProps< Item > = {
 	isItemClickable?: ( item: Item ) => boolean;
 
 	/**
-	 * Renders the UI for narrow, single-purpose containers, such as a
-	 * sidebar, in place of the default UI. It takes the same data, fields and
-	 * view, and shows a single settings button in place of the filters and
-	 * the view options buttons. It applies to any layout.
-	 *
-	 * Pass an object to adjust it:
-	 *
-	 * - `tabsField`: the id of a field to show as tabs above the content. It
-	 *   is left out of the settings menu.
-	 * - `showSort`: whether the settings menu offers sorting. Defaults to
-	 *   `true`.
-	 *
-	 * Ignored when `children` is passed.
-	 */
-	narrow?: boolean | { tabsField?: string; showSort?: boolean };
-
-	/**
 	 * Extra content rendered in the toolbar area, next to the view
 	 * configuration controls.
 	 */
@@ -521,6 +504,25 @@ export interface ViewActivity extends ViewBase {
 	};
 }
 
+/**
+ * Adjusts the UI for narrow containers of the grid layouts.
+ */
+export interface NarrowOptions {
+	/**
+	 * The id of a field to show as tabs above the content: the main way to
+	 * browse it, such as a category or a type. It is left out of the settings
+	 * menu.
+	 */
+	tabsField?: string;
+
+	/**
+	 * Whether the settings menu offers sorting.
+	 *
+	 * @default true
+	 */
+	showSort?: boolean;
+}
+
 export interface ViewGrid extends ViewBase {
 	/**
 	 * The layout discriminant: a grid view.
@@ -560,6 +562,14 @@ export interface ViewGrid extends ViewBase {
 		 * either way, so rows stay aligned. Defaults to `'cover'`.
 		 */
 		mediaFit?: MediaFit;
+
+		/**
+		 * Renders the UI for narrow, single-purpose containers, such as a
+		 * sidebar, in place of the default UI: a single settings button
+		 * replaces the filters and the view options buttons. It is meant
+		 * to be set by the consumer, not changed by the user.
+		 */
+		narrow?: boolean | NarrowOptions;
 	};
 }
 
@@ -595,6 +605,14 @@ export interface ViewPickerGrid extends ViewBase {
 		 * aligned. Defaults to `'cover'`.
 		 */
 		mediaFit?: MediaFit;
+
+		/**
+		 * Renders the UI for narrow, single-purpose containers, such as a
+		 * sidebar, in place of the default UI: a single settings button
+		 * replaces the filters and the view options buttons. It is meant
+		 * to be set by the consumer, not changed by the user.
+		 */
+		narrow?: boolean | NarrowOptions;
 	};
 }
 

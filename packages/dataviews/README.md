@@ -259,6 +259,7 @@ Properties:
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
 | `aspectRatio`  | ✓       |               | ✓      |              |        |            |
 | `mediaFit`     |         |               | ✓      | ✓            |        |            |
+| `narrow`       |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
@@ -277,6 +278,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `previewSize`: a `number` representing the size of the preview.
 -   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
 -   `mediaFit`: how the media field fills the preview box, either `'cover'` (crop it to fill) or `'contain'` (fit the whole media inside, letterboxing it so its own aspect ratio stays visible). The box keeps the shape set by `aspectRatio` either way, so rows stay aligned, and takes a neutral background under `'contain'` so a letterboxed preview still reads as a single item. Defaults to `'cover'`. To let users switch this themselves, pass `config={ { mediaFitControl: true } }` to `DataViews` or `DataViewsPicker`, which adds an "Original aspect ratio" toggle to the view options.
+-   `narrow`: `true`, or `{ tabsField?: string, showSort?: boolean }`. Renders the UI for narrow containers in place of the default UI, with a single settings button in place of the filters and the view options buttons. See [Narrow UI](#narrow-ui).
 
 `list` layout:
 
@@ -489,17 +491,6 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `narrow`: `boolean | { tabsField?: string, showSort?: boolean }`
-
-Renders the UI for narrow, single-purpose containers, such as a sidebar, in place of the default UI. It takes the same `data`, `fields` and `view`, and applies to any layout. See [Narrow UI](#narrow-ui).
-
-Pass an object to adjust it:
-
--   `tabsField`: the id of a field to show as tabs above the content. That field is left out of the settings menu.
--   `showSort`: whether the settings menu offers sorting. Defaults to `true`.
-
-It is ignored when `children` is passed.
-
 #### `config`: { perPageSizes: number[], mediaFitControl?: boolean }
 
 Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
@@ -612,29 +603,33 @@ const CustomLayout = () => {
 
 ### Narrow UI
 
-The `narrow` prop is an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. DataViews takes the same `data`, `fields` and `view`, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons. It is a property of the UI around the content, so it applies to the table, grid, list and activity layouts alike, and `header` is not rendered.
+The grid layout has a `narrow` option: an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. DataViews takes the same `data`, `fields` and `view`, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons. `header` is not rendered.
 
 Its rows, from top to bottom:
 
 1. Search and the settings button.
 2. Optionally, one field as tabs: the main way to browse the content, such as a category or a type.
-3. The content, in the layout of the view.
+3. The grid.
 4. The footer, with the pagination.
 
+It is set in the `layout` of the view, by the consumer:
+
 ```jsx
-<DataViews
-	data={ data }
-	fields={ fields }
-	view={ view }
-	onChangeView={ onChangeView }
-	paginationInfo={ paginationInfo }
-	defaultLayouts={ { grid: {} } }
-	onReset={ onReset }
-	narrow={ { tabsField: 'type' } }
-/>
+const view = {
+	type: 'grid',
+	layout: { narrow: { tabsField: 'type' } },
+	// ...
+};
 ```
 
-The narrow UI is made of two subcomponents. They are also available through free composition, for a container that needs its own search, footer or spacing.
+`narrow` is `true`, or an object to adjust it:
+
+-   `tabsField`: the id of a field to show as tabs above the content. That field is left out of the settings menu.
+-   `showSort`: whether the settings menu offers sorting. Defaults to `true`.
+
+The `pickerGrid` layout of `DataViewsPicker` has the same option. There, the footer keeps the selection, the pagination and the actions, with the actions on a line of their own.
+
+The option is ignored in free composition. The narrow UI is made of two subcomponents, which are also available there, for a container that needs its own search, footer or spacing.
 
 #### `DataViews.ViewMenu`
 

@@ -15,12 +15,3 @@
 	border-radius: 8px;
 	padding: 24px;
 }
-
-/* A frame the width of a sidebar, to show the narrow UI at its intended size. */
-.narrow-panel {
-	width: 350px;
-	height: 600px;
-	display: flex;
-	flex-direction: column;
-	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-}

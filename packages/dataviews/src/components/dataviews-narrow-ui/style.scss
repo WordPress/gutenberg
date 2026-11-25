@@ -2,3 +2,18 @@
 .dataviews-narrow-ui__actions .dataviews-search {
 	flex: 1;
 }
+
+// The picker's footer holds the selection, the pagination and the actions,
+// which don't fit on one line here: the actions take a line of their own.
+.dataviews-picker-wrapper.is-narrow .dataviews-footer {
+	flex-wrap: wrap;
+
+	.dataviews-picker-footer__actions {
+		flex-basis: 100%;
+
+		// The buttons sit in a row of their own, kept at the end of the line.
+		> * {
+			justify-content: flex-end;
+		}
+	}
+}

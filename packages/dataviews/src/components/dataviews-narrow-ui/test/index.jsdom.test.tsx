@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import DataViews from '../../../dataviews';
-import type { Field, View } from '../../../types';
+import DataViewsPicker from '../../../dataviews-picker';
+import type { Field, NarrowOptions, View } from '../../../types';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
@@ -54,33 +55,34 @@ const fields: Field< Item >[] = [
 	},
 ];
 
-const view: View = {
-	type: 'list',
+const getView = (
+	type: 'grid' | 'pickerGrid',
+	narrow?: boolean | NarrowOptions
+): View => ( {
+	type,
 	page: 1,
 	perPage: 10,
 	titleField: 'title',
 	filters: [],
-};
+	layout: { narrow },
+} );
 
-function renderDataViews(
-	narrow?: React.ComponentProps< typeof DataViews >[ 'narrow' ]
-) {
+function renderDataViews( narrow?: boolean | NarrowOptions ) {
 	render(
 		<DataViews
 			data={ data }
 			fields={ fields }
-			view={ view }
+			view={ getView( 'grid', narrow ) }
 			onChangeView={ vi.fn() }
 			paginationInfo={ { totalItems: data.length, totalPages: 1 } }
-			defaultLayouts={ { list: {} } }
+			defaultLayouts={ { grid: {} } }
 			getItemId={ ( item ) => item.id.toString() }
-			narrow={ narrow }
 		/>
 	);
 }
 
-describe( 'DataViews narrow UI', () => {
-	it( 'keeps the default UI without the `narrow` prop', async () => {
+describe( 'The `narrow` option of the grid layout', () => {
+	it( 'keeps the default UI when it is off', async () => {
 		renderDataViews();
 
 		expect(
@@ -132,5 +134,41 @@ describe( 'DataViews narrow UI', () => {
 		expect(
 			screen.queryByRole( 'group', { name: 'Type' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'applies to the grid of the picker, which keeps its own footer', async () => {
+		render(
+			<DataViewsPicker
+				data={ data }
+				fields={ fields }
+				view={ getView( 'pickerGrid', true ) }
+				onChangeView={ vi.fn() }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { pickerGrid: {} } }
+				getItemId={ ( item ) => item.id.toString() }
+				selection={ [] }
+				onChangeSelection={ vi.fn() }
+				actions={ [
+					{
+						id: 'confirm',
+						label: 'Confirm',
+						isPrimary: true,
+						supportsBulk: false,
+						callback: vi.fn(),
+					},
+				] }
+				itemListLabel="Space objects"
+			/>
+		);
+
+		expect(
+			await screen.findByRole( 'button', { name: 'View options' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Add filter' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Confirm' } )
+		).toBeInTheDocument();
 	} );
 } );

@@ -4,11 +4,6 @@ import { LAYOUT_LIST } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
-import {
-	getNarrowProp,
-	narrowFrameClassName,
-	type NarrowTabsField,
-} from './narrow';
 
 export const LayoutTableComponent = ( {
 	backgroundColor,
@@ -16,8 +11,6 @@ export const LayoutTableComponent = ( {
 	hasClickableItems = true,
 	groupBy = false,
 	groupByLabel = true,
-	narrow = false,
-	narrowTabsField = 'type',
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
 }: {
@@ -26,8 +19,6 @@ export const LayoutTableComponent = ( {
 	hasClickableItems?: boolean;
 	groupBy?: boolean;
 	groupByLabel?: boolean;
-	narrow?: boolean;
-	narrowTabsField?: NarrowTabsField;
 	perPageSizes?: number[];
 	showMedia?: boolean;
 } ) => {
@@ -65,9 +56,8 @@ export const LayoutTableComponent = ( {
 	}, [ view ] );
 	return (
 		<div
-			className={ narrow ? narrowFrameClassName : undefined }
 			style={ {
-				height: narrow ? undefined : '100%',
+				height: '100%',
 				maxWidth: fullWidth ? undefined : '400px',
 				'--wp-dataviews-color-background': backgroundColor,
 			} }
@@ -103,7 +93,6 @@ export const LayoutTableComponent = ( {
 				defaultLayouts={ {
 					[ LAYOUT_LIST ]: true,
 				} }
-				narrow={ getNarrowProp( narrow, narrowTabsField ) }
 				config={ { perPageSizes } }
 			/>
 		</div>

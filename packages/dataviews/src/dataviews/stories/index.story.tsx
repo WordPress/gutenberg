@@ -58,7 +58,6 @@ export default meta;
 export const LayoutTable = {
 	render: LayoutTableComponent,
 	args: {
-		...narrowArgs,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -66,7 +65,6 @@ export const LayoutTable = {
 		showMedia: true,
 	},
 	argTypes: {
-		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
@@ -156,7 +154,6 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
-		...narrowArgs,
 		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
@@ -165,7 +162,6 @@ export const LayoutList = {
 		showMedia: true,
 	},
 	argTypes: {
-		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',

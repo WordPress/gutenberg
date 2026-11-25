@@ -10,6 +10,7 @@ import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import deprecated from '@wordpress/deprecated';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
+import { LAYOUT_GRID } from '../constants';
 import {
 	Filters,
 	FiltersToggled,
@@ -18,7 +19,7 @@ import {
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
-import NarrowUI from '../components/dataviews-narrow-ui';
+import NarrowUI, { getNarrowOptions } from '../components/dataviews-narrow-ui';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { DataViewsPagination } from '../components/dataviews-pagination';
@@ -108,7 +109,6 @@ function DataViews< Item >( {
 	renderItemLink,
 	isItemClickable = defaultIsItemClickable,
 	header,
-	narrow = false,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
@@ -221,6 +221,12 @@ function DataViews< Item >( {
 		return null;
 	}
 
+	// The narrow UI is an option of the grid layout.
+	const narrowOptions =
+		view.type === LAYOUT_GRID
+			? getNarrowOptions( view.layout?.narrow )
+			: undefined;
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -256,15 +262,16 @@ function DataViews< Item >( {
 		>
 			<div
 				className={ clsx( 'dataviews-wrapper', {
-					'is-narrow': !! narrow && ! children,
+					'is-narrow': !! narrowOptions && ! children,
 				} ) }
 			>
 				{ children ??
-					( narrow ? (
+					( narrowOptions ? (
 						<NarrowUI
 							search={ search }
 							searchLabel={ searchLabel }
-							{ ...( typeof narrow === 'object' ? narrow : {} ) }
+							footer={ <DataViewsFooter /> }
+							{ ...narrowOptions }
 						/>
 					) : (
 						<DefaultUI
