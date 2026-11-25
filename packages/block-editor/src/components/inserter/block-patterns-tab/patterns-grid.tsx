@@ -8,14 +8,11 @@ import {
 } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { cloneBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { getScrollContainer } from '@wordpress/dom';
 import { DataViews } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-	Menu,
-	Stack,
-} from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 import BlockPreview from '../../block-preview';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { searchItems } from '../../../utils/search-ranking';
@@ -24,9 +21,9 @@ import MediaSearch from '../media-tab/media-search';
 import InserterNoResults from '../no-results';
 import {
 	allPatternsCategory,
+	getCategoriesBySource,
 	isPatternFiltered,
-	sitePatternsCategory,
-	starterPatternsCategory,
+	isPatternInCategory,
 	INSERTER_PATTERN_TYPES,
 	INSERTER_SYNC_TYPES,
 } from './utils';
@@ -59,8 +56,29 @@ const PATTERNS_PER_PAGE = 20;
 const GRID_LAYOUT = { previewSize: 230 } as const;
 const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
 
-// The categories are shown as tabs, so the menu leaves them out.
+// The categories are shown as tabs, so the menu leaves them out. A source is
+// always selected, so its group in the menu has no "All" option.
 const MENU_EXCLUDED_FIELDS = [ 'category' ];
+const MENU_REQUIRED_FIELDS = [ 'source' ];
+
+// Where patterns come from, the default first. The patterns that themes and
+// plugins register are one source, whatever registered them.
+const getSourceOptions = () => [
+	{
+		value: INSERTER_PATTERN_TYPES.theme,
+		label: __( 'Theme & Plugins' ),
+	},
+	{
+		value: INSERTER_PATTERN_TYPES.directory,
+		label: __( 'Pattern Directory' ),
+	},
+	{
+		value: INSERTER_PATTERN_TYPES.user,
+		label: __( 'User' ),
+	},
+];
+
+const NO_CATEGORIES: PatternCategory[] = [];
 
 type Filters = NonNullable< View[ 'filters' ] >;
 
@@ -68,35 +86,30 @@ const getFilterValue = ( filters: Filters | undefined, field: string ) =>
 	filters?.find( ( filter ) => filter.field === field )?.value;
 
 /**
- * Whether a pattern belongs to a category, including the ones that aren't
- * registered categories: "All", the site's own patterns, starter content and
- * the patterns left without a category.
+ * With a category selected, the inserted blocks keep only that category in
+ * their metadata, as the list this grid replaces did: pattern shuffling reads
+ * it to stay within the category the pattern was picked from.
  *
- * @param pattern    The pattern to check.
- * @param category   The name of the category, or none for "All".
- * @param categories The categories with patterns.
- * @return Whether the pattern belongs to the category.
+ * @param blocks   The blocks of the pattern.
+ * @param category The name of the selected category, or none for "All".
+ * @return The blocks to insert.
  */
-function isPatternInCategory(
-	pattern: BlockPattern,
-	category: string | undefined,
-	categories: PatternCategory[]
+function getBlocksForCategory(
+	blocks: Block[] | undefined,
+	category: string | undefined
 ) {
-	if ( ! category || category === allPatternsCategory.name ) {
-		return true;
+	if ( ! category ) {
+		return blocks ?? [];
 	}
-	if ( category === sitePatternsCategory.name ) {
-		return pattern.type === INSERTER_PATTERN_TYPES.user;
-	}
-	if ( category === starterPatternsCategory.name ) {
-		return !! pattern.blockTypes?.includes( 'core/post-content' );
-	}
-	if ( category === 'uncategorized' ) {
-		return ! pattern.categories?.some( ( name ) =>
-			categories.some( ( { name: available } ) => available === name )
-		);
-	}
-	return !! pattern.categories?.includes( category );
+	return ( blocks ?? [] ).map( ( block ) => {
+		const clonedBlock = cloneBlock( block );
+		const metadata = clonedBlock.attributes.metadata as
+			{ categories?: string[] } | undefined;
+		if ( metadata?.categories?.includes( category ) ) {
+			metadata.categories = [ category ];
+		}
+		return clonedBlock;
+	} );
 }
 
 function PatternPreview( {
@@ -106,23 +119,10 @@ function PatternPreview( {
 	pattern: BlockPattern;
 	category?: string;
 } ) {
-	// With a category selected, the dragged blocks keep only that category in
-	// their metadata, as the list this grid replaces did: pattern shuffling
-	// reads it to stay within the category the pattern was picked from.
-	const draggedBlocks = useMemo( () => {
-		if ( ! category ) {
-			return pattern.blocks ?? [];
-		}
-		return ( pattern.blocks ?? [] ).map( ( block ) => {
-			const clonedBlock = cloneBlock( block );
-			const metadata = clonedBlock.attributes.metadata as
-				{ categories?: string[] } | undefined;
-			if ( metadata?.categories?.includes( category ) ) {
-				metadata.categories = [ category ];
-			}
-			return clonedBlock;
-		} );
-	}, [ pattern.blocks, category ] );
+	const draggedBlocks = useMemo(
+		() => getBlocksForCategory( pattern.blocks, category ),
+		[ pattern.blocks, category ]
+	);
 
 	// The card's media area is the click-to-insert target (a DataViews click
 	// wrapper); the preview inside it is what gets dragged onto the canvas.
@@ -162,7 +162,11 @@ function PatternPreview( {
  * The Patterns tab body: one DataViews grid with the search and the settings
  * menu above, the pattern categories as tabs, and a pager below. It is composed
  * from the same DataViews sub-components as the Media tab, so the two tabs
- * browse alike.
+ * browse alike: a source is chosen in the menu, with one of them as the
+ * default, and the tabs are what that source holds.
+ *
+ * Everything shown is what is registered: the patterns and the categories that
+ * themes and plugins add reach the grid and the tabs with no further work.
  */
 export default function PatternsGrid( {
 	categories,
@@ -175,39 +179,64 @@ export default function PatternsGrid( {
 	const panelRef = useRef< HTMLDivElement >( null );
 	const [ search, setSearch ] = useState( '' );
 	const [ page, setPage ] = useState( 1 );
-	// Category, source and type, as the tabs and the menu write them.
-	const [ filters, setFilters ] = useState< Filters >( () =>
-		initialCategory && initialCategory.name !== allPatternsCategory.name
-			? [
-					{
-						field: 'category',
-						operator: 'isAny',
-						value: [ initialCategory.name ],
-					},
-				]
-			: []
+	// What the menu and the tabs last asked for. What is shown is worked out
+	// below, since a selection can stop being available.
+	const [ selectedSource, setSelectedSource ] = useState< string >(
+		INSERTER_PATTERN_TYPES.theme
 	);
-
-	const category: string | undefined = getFilterValue(
-		filters,
-		'category'
-	)?.[ 0 ];
-	const source: string = getFilterValue( filters, 'source' ) ?? 'all';
-	const syncStatus: string = getFilterValue( filters, 'syncStatus' ) ?? 'all';
+	const [ selectedCategory, setSelectedCategory ] = useState<
+		string | undefined
+	>( initialCategory?.name );
+	const [ selectedType, setSelectedType ] = useState< string >();
 
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
-		rootClientId,
-		category
+		rootClientId
 	);
+
+	// The sources with patterns, and the categories each of them fills. A
+	// source without patterns isn't offered, and a category shows as a tab only
+	// under the sources that have patterns in it, so no choice leads to an
+	// empty list.
+	const { sources, categoriesBySource } = useMemo( () => {
+		const bySource = getCategoriesBySource( allPatterns, categories );
+		return {
+			sources: getSourceOptions().filter( ( { value } ) =>
+				bySource.has( value )
+			),
+			categoriesBySource: bySource,
+		};
+	}, [ allPatterns, categories ] );
+
+	// The default source is "Theme & Plugins", or the first one with patterns.
+	const source: string | undefined = (
+		sources.find( ( { value } ) => value === selectedSource ) ??
+		sources[ 0 ]
+	)?.value;
+	const hasSources = sources.length > 1;
+	const tabCategories =
+		( source && categoriesBySource.get( source ) ) || NO_CATEGORIES;
+	// Without a category, or with one the source doesn't have, the tab is
+	// "All".
+	const category = tabCategories.some(
+		( { name } ) => name === selectedCategory
+	)
+		? selectedCategory
+		: undefined;
+	// Only the patterns made on this site can be synced.
+	const hasTypes = source === INSERTER_PATTERN_TYPES.user;
+	const syncStatus = hasTypes ? selectedType : undefined;
 
 	// The grid only shows what it is given: the filtering keeps the rules
 	// and the search ranking the inserter already had for patterns.
 	const patterns = useMemo( () => {
 		const inCategory = allPatterns.filter(
 			( pattern: BlockPattern ) =>
-				! isPatternFiltered( pattern, source, syncStatus ) &&
-				isPatternInCategory( pattern, category, categories )
+				! isPatternFiltered(
+					pattern,
+					source ?? 'all',
+					syncStatus ?? 'all'
+				) && isPatternInCategory( pattern, category, categories )
 		);
 		return search ? searchItems( inCategory, search ) : inCategory;
 	}, [ allPatterns, source, syncStatus, category, categories, search ] );
@@ -236,7 +265,35 @@ export default function PatternsGrid( {
 			page: currentPage,
 			perPage: PATTERNS_PER_PAGE,
 			search,
-			filters,
+			filters: [
+				...( hasSources && source
+					? [
+							{
+								field: 'source',
+								operator: 'is' as const,
+								value: source,
+							},
+						]
+					: [] ),
+				...( category
+					? [
+							{
+								field: 'category',
+								operator: 'isAny' as const,
+								value: [ category ],
+							},
+						]
+					: [] ),
+				...( syncStatus
+					? [
+							{
+								field: 'syncStatus',
+								operator: 'is' as const,
+								value: syncStatus,
+							},
+						]
+					: [] ),
+			],
 			fields: [],
 			titleField: 'title',
 			mediaField: 'preview',
@@ -244,7 +301,7 @@ export default function PatternsGrid( {
 			showMedia: true,
 			layout: GRID_LAYOUT,
 		} ),
-		[ currentPage, search, filters ]
+		[ currentPage, search, hasSources, source, category, syncStatus ]
 	);
 
 	const fields: Field< BlockPattern >[] = useMemo(
@@ -268,41 +325,29 @@ export default function PatternsGrid( {
 				enableGlobalSearch: false,
 				filterBy: false,
 			},
-			// The category, source and type are modelled as filters so they
-			// live in the view, where the tabs and the menu read and change
+			// The source, category and type are modelled as filters so they
+			// live in the view, where the menu and the tabs read and change
 			// them. The filtering itself happens above.
-			{
-				id: 'category',
-				label: __( 'Categories' ),
-				type: 'array',
-				getValue: ( { item } ) => item.categories ?? [],
-				elements: categories
-					.filter( ( { name } ) => name !== allPatternsCategory.name )
-					.map( ( { name, label } ) => ( { value: name, label } ) ),
-				filterBy: { operators: [ 'isAny' ] },
-				enableSorting: false,
-				enableGlobalSearch: false,
-			},
 			{
 				id: 'source',
 				label: __( 'Source' ),
 				type: 'text',
 				getValue: ( { item } ) => item.source ?? '',
-				elements: [
-					{
-						value: INSERTER_PATTERN_TYPES.directory,
-						label: __( 'Pattern Directory' ),
-					},
-					{
-						value: INSERTER_PATTERN_TYPES.theme,
-						label: __( 'Theme & Plugins' ),
-					},
-					{
-						value: INSERTER_PATTERN_TYPES.user,
-						label: __( 'User' ),
-					},
-				],
-				filterBy: { operators: [ 'is' ] },
+				elements: hasSources ? sources : undefined,
+				filterBy: hasSources ? { operators: [ 'is' ] } : false,
+				enableSorting: false,
+				enableGlobalSearch: false,
+			},
+			{
+				id: 'category',
+				label: __( 'Categories' ),
+				type: 'array',
+				getValue: ( { item } ) => item.categories ?? [],
+				elements: tabCategories.map( ( { name, label } ) => ( {
+					value: name,
+					label,
+				} ) ),
+				filterBy: { operators: [ 'isAny' ] },
 				enableSorting: false,
 				enableGlobalSearch: false,
 			},
@@ -311,22 +356,24 @@ export default function PatternsGrid( {
 				label: __( 'Type' ),
 				type: 'text',
 				getValue: ( { item } ) => item.syncStatus ?? '',
-				elements: [
-					{
-						value: INSERTER_SYNC_TYPES.full,
-						label: _x( 'Synced', 'patterns' ),
-					},
-					{
-						value: INSERTER_SYNC_TYPES.unsynced,
-						label: _x( 'Not synced', 'patterns' ),
-					},
-				],
-				filterBy: { operators: [ 'is' ] },
+				elements: hasTypes
+					? [
+							{
+								value: INSERTER_SYNC_TYPES.full,
+								label: _x( 'Synced', 'patterns' ),
+							},
+							{
+								value: INSERTER_SYNC_TYPES.unsynced,
+								label: _x( 'Not synced', 'patterns' ),
+							},
+						]
+					: undefined,
+				filterBy: hasTypes ? { operators: [ 'is' ] } : false,
 				enableSorting: false,
 				enableGlobalSearch: false,
 			},
 		],
-		[ categories, category ]
+		[ hasSources, sources, tabCategories, hasTypes, category ]
 	);
 
 	// Start from the top whenever the results change (another page, tab,
@@ -344,25 +391,31 @@ export default function PatternsGrid( {
 
 	const onChangeView = useCallback(
 		( nextView: View ) => {
-			let nextFilters = nextView.filters ?? [];
-			// Only patterns made on this site can be synced, so the type
-			// doesn't outlive a change to a source without them.
-			const nextSource = getFilterValue( nextView.filters, 'source' );
-			if (
-				nextSource !== source &&
-				( nextSource === INSERTER_PATTERN_TYPES.theme ||
-					nextSource === INSERTER_PATTERN_TYPES.directory )
-			) {
-				nextFilters = nextFilters.filter(
-					( filter ) => filter.field !== 'syncStatus'
-				);
-			}
-			setFilters( nextFilters );
-
-			const nextCategory: string | undefined = getFilterValue(
+			const nextSource: string | undefined =
+				getFilterValue( nextView.filters, 'source' ) ?? source;
+			// A category the next source doesn't have falls back to "All".
+			const requestedCategory: string | undefined = getFilterValue(
 				nextView.filters,
 				'category'
 			)?.[ 0 ];
+			const nextCategory = (
+				( nextSource && categoriesBySource.get( nextSource ) ) ||
+				NO_CATEGORIES
+			).some( ( { name } ) => name === requestedCategory )
+				? requestedCategory
+				: undefined;
+
+			if ( nextSource ) {
+				setSelectedSource( nextSource );
+			}
+			setSelectedCategory( nextCategory );
+			setSelectedType(
+				nextSource === INSERTER_PATTERN_TYPES.user
+					? getFilterValue( nextView.filters, 'syncStatus' )
+					: undefined
+			);
+			setPage( nextView.page ?? 1 );
+
 			if ( nextCategory !== category ) {
 				onSelectCategory(
 					categories.find(
@@ -372,24 +425,14 @@ export default function PatternsGrid( {
 					)
 				);
 			}
-
-			setPage( nextView.page ?? 1 );
 		},
-		[ source, category, categories, onSelectCategory ]
+		[ source, category, categories, categoriesBySource, onSelectCategory ]
 	);
 
 	const onChangeSearch = useCallback( ( value: string ) => {
 		setSearch( value );
 		setPage( 1 );
 	}, [] );
-
-	const onReset = useCallback( () => {
-		setFilters( [] );
-		setPage( 1 );
-		onSelectCategory(
-			categories.find( ( { name } ) => name === allPatternsCategory.name )
-		);
-	}, [ categories, onSelectCategory ] );
 
 	const showPagination = totalPages > 1;
 	const hasFooter = showPagination || !! footer;
@@ -409,10 +452,12 @@ export default function PatternsGrid( {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ ( pattern ) => pattern.name }
 				onClickItem={ ( pattern ) =>
-					onClickPattern( pattern, pattern.blocks )
+					onClickPattern(
+						pattern,
+						getBlocksForCategory( pattern.blocks, category )
+					)
 				}
 				empty={ <InserterNoResults /> }
-				onReset={ filters.length > 0 ? onReset : false }
 			>
 				<Stack
 					direction="row"
@@ -427,17 +472,9 @@ export default function PatternsGrid( {
 					/>
 					<DataViews.ViewMenu
 						excludeFields={ MENU_EXCLUDED_FIELDS }
+						requiredFields={ MENU_REQUIRED_FIELDS }
 						size="default"
-					>
-						<Menu.LinkItem
-							href={ __( 'https://wordpress.org/patterns/' ) }
-							openInNewTab
-						>
-							<Menu.ItemLabel>
-								{ __( 'About pattern sources' ) }
-							</Menu.ItemLabel>
-						</Menu.LinkItem>
-					</DataViews.ViewMenu>
+					/>
 				</Stack>
 				<DataViews.FilterTabs
 					field="category"
