@@ -1,5 +1,5 @@
+import { renderToString } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import * as children from './children';
 
 /**
  * A representation of a single node within a block's rich text value. If
@@ -53,6 +53,29 @@ export function getNamedNodeMapAsObject(
 }
 
 /**
+ * Given an iterable set of DOM nodes, returns equivalent block children.
+ * Ignores any non-element/text nodes included in set.
+ *
+ * @param domNodes Iterable set of DOM nodes to convert.
+ *
+ * @return Block node children equivalent to DOM nodes.
+ */
+function childrenFromDOM(
+	domNodes: NodeListOf< ChildNode > | NodeList
+): BlockNode[] {
+	const result: BlockNode[] = [];
+	for ( let i = 0; i < domNodes.length; i++ ) {
+		try {
+			result.push( fromDOM( domNodes[ i ] ) );
+		} catch {
+			// Simply ignore if DOM node could not be converted.
+		}
+	}
+
+	return result;
+}
+
+/**
  * Given a DOM Element or Text node, returns an equivalent block node. Throws
  * if passed any node type other than element or text.
  *
@@ -85,7 +108,7 @@ export function fromDOM( domNode: Node ): BlockNode {
 		type: domNode.nodeName.toLowerCase(),
 		props: {
 			...getNamedNodeMapAsObject( ( domNode as Element ).attributes ),
-			children: children.fromDOM( domNode.childNodes ),
+			children: childrenFromDOM( domNode.childNodes ),
 		},
 	};
 }
@@ -105,7 +128,7 @@ export function toHTML( node: BlockNode ): string {
 		link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 	} );
 
-	return children.toHTML( [ node ] as children.BlockChildren );
+	return renderToString( [ node ] as React.ReactNode );
 }
 
 /**
