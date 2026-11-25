@@ -16,13 +16,12 @@
 	overflow: hidden;
 	background-color: var(--wpds-color-background-surface-neutral-strong);
 
-	// The page has no footer under the editor, so the body would otherwise
-	// run to the bottom edge. Scoped to the route: the modal has its own
-	// footer supplying this gap.
-	.media-editor__body {
-		margin-bottom: 0;
-
-		@include break-small() {
+	// The page has no footer under the editor, so the canvas would otherwise
+	// run to the bottom edge. Set on the canvas column rather than the body,
+	// so the sidebar still runs to the bottom of the page. Scoped to the
+	// route: the modal has its own footer supplying this gap.
+	@include break-small() {
+		.media-editor__content {
 			margin-bottom: $grid-unit-30;
 		}
 	}

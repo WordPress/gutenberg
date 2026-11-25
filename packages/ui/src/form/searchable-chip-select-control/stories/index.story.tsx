@@ -184,6 +184,7 @@ export const Creatable: Story = {
 };
 
 export const WithCustomChipsAndItems: Story = {
+	tags: [ 'external-requests' ],
 	...SearchableChipSelectStories.WithCustomChipsAndItems,
 	args: {
 		...Default.args,

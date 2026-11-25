@@ -116,8 +116,9 @@ export function PageAttributesParent( {
 
 			const postTypeInfo = getPostType( postTypeSlug );
 
-			const postIsHierarchical =
-				postTypeInfo?.hierarchical && postTypeInfo.viewable;
+			// The server registers this field only for hierarchical post
+			// types, viewable or not, so require the same here.
+			const postIsHierarchical = postTypeInfo?.hierarchical ?? false;
 
 			const parentPost = pageId
 				? getEntityRecord< PostWithParent >(

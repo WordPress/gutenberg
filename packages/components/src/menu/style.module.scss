@@ -104,7 +104,7 @@
 		grid-template-columns: subgrid;
 	}
 
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	font-family: inherit;
 	font-weight: 400;
 	line-height: 20px;
@@ -271,7 +271,7 @@
 }
 
 .item-label {
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 20px;
 	color: inherit;
 }

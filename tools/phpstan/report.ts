@@ -14,13 +14,22 @@
  * and explains the most common of those: a baseline entry that no longer
  * matches, because the error it recorded was fixed.
  *
- * Usage: `npm run --workspace @wordpress/phpstan-tools report -- <report.json>`
+ * Usage: `npm run --workspace @wordpress/phpstan-tools report -- [--strict [--default-report <default-report.json>]] <report.json>`
  *
- * The report is the output of `phpstan analyse --error-format=json`.
+ * The report is the output of `phpstan analyse --error-format=json`. Pass
+ * `--strict` for the report of the analysis of the strict paths, with
+ * phpstan-strict.neon.dist, rather than that of phpstan.neon.dist.
+ *
+ * The analysis of the strict paths includes every rule of the other analysis,
+ * so an error at the lower rule level in a strict path is reported by both. Pass
+ * the report of phpstan.neon.dist as `--default-report` to leave out of the
+ * report of the strict paths the errors that it already reports, so that each
+ * is shown once.
  */
 
 import { appendFileSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 
 const {
 	GITHUB_REPOSITORY,
@@ -39,6 +48,95 @@ const {
 const REPOSITORY_ROOT =
 	GITHUB_WORKSPACE || resolve( import.meta.dirname, '../..' );
 const INVOCATION_DIRECTORY = INIT_CWD || process.cwd();
+
+/**
+ * What differs between the reports of the two analyses.
+ */
+interface Analysis {
+	/** Name of the analysis, used in annotation titles and summary headings. */
+	name: string;
+	/**
+	 * Paths of the baselines that the analysis loads, relative to the
+	 * repository root. The analysis of the strict paths also loads the
+	 * baseline of the other one.
+	 */
+	baselines: string[];
+	/** Name of the workflow step that runs the analysis. */
+	step: string;
+	/** Composer script that runs the analysis locally. */
+	script: string;
+	/** How to run the analysis in the local environment, after `script`. */
+	npmScript: string;
+	/** Composer script that fixes the analysis's errors marked as fixable. */
+	fixScript: string;
+	/** npm script that runs `fixScript` in the local environment. */
+	fixNpmScript: string;
+}
+
+const USAGE =
+	'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict [--default-report <default-report.json>]] <report.json>\n';
+
+let args: ReturnType< typeof parseArguments >;
+try {
+	args = parseArguments();
+} catch ( error ) {
+	// An unknown option, such as a mistyped `--strict`, rather than a report path.
+	process.stderr.write(
+		`${ error instanceof Error ? error.message : String( error ) }\n${ USAGE }`
+	);
+	process.exit( 2 );
+}
+if (
+	args.positionals.length !== 1 ||
+	( args.values[ 'default-report' ] !== undefined && ! args.values.strict )
+) {
+	process.stderr.write( USAGE );
+	process.exit( 2 );
+}
+
+/**
+ * Parses the command-line arguments, rejecting unknown options.
+ *
+ * @return The parsed arguments.
+ */
+function parseArguments() {
+	return parseArgs( {
+		options: {
+			strict: { type: 'boolean', default: false },
+			'default-report': { type: 'string' },
+		},
+		allowPositionals: true,
+	} );
+}
+
+const isStrict = args.values.strict;
+const REPORT_PATH = args.positionals[ 0 ];
+const DEFAULT_REPORT_PATH = args.values[ 'default-report' ];
+
+const ANALYSIS: Analysis = isStrict
+	? {
+			name: 'PHPStan (strict paths)',
+			baselines: [
+				'tools/phpstan/baseline-strict.neon',
+				'tools/phpstan/baseline.neon',
+			],
+			step: 'Run PHPStan on the strict paths',
+			script: 'composer phpstan:strict',
+			npmScript:
+				'`npm run typecheck:php:strict` in the local environment',
+			fixScript: 'composer phpstan:fix:strict',
+			fixNpmScript: 'npm run typecheck:php:fix:strict',
+		}
+	: {
+			name: 'PHPStan',
+			baselines: [ 'tools/phpstan/baseline.neon' ],
+			step: 'Run PHPStan',
+			script: 'composer phpstan:default',
+			npmScript:
+				'`npm run typecheck:php:default` in the local environment',
+			fixScript: 'composer phpstan:fix',
+			fixNpmScript: 'npm run typecheck:php:fix',
+		};
 
 /**
  * An error that PHPStan reported.
@@ -83,19 +181,46 @@ interface PhpstanReport {
 
 /**
  * Whether an error means a baseline entry records more occurrences of an error
- * than there are now, because some were fixed. `composer phpstan:fix` fixes
- * it.
+ * than there are now, because some were fixed. `composer phpstan:fix`, or
+ * `composer phpstan:fix:strict` for the strict paths, fixes it.
  *
  * @param error The error.
  * @return Whether the baseline entry is stale.
  */
 function isStaleBaselineEntry( error: PhpstanError ): boolean {
 	return (
-		error.identifier === 'ignore.unmatched' ||
+		( error.identifier === 'ignore.unmatched' &&
+			! isUnscopedIgnoreEntry( error ) ) ||
 		( error.identifier === 'ignore.count' &&
 			error.message.includes( ', but occurred only ' ) )
 	);
 }
+
+/**
+ * Whether an error is an entry in the `ignoreErrors` of phpstan.neon.dist that
+ * the analysis of the strict paths did not match. That is usually because the
+ * entry names no file, so that it applies to every file, while its error occurs
+ * only outside the strict paths. PHPStan marks it as fixable, but `--fix` would
+ * remove the entry, which the analysis of phpstan.neon.dist still needs.
+ *
+ * @param error The error.
+ * @return Whether the error is an unmatched entry of phpstan.neon.dist.
+ */
+function isUnscopedIgnoreEntry( error: PhpstanError ): boolean {
+	return (
+		isStrict &&
+		error.identifier === 'ignore.unmatched' &&
+		error.file === 'phpstan.neon.dist'
+	);
+}
+
+/*
+ * Replaces the tip of an unmatched entry of phpstan.neon.dist in the report of
+ * the strict paths. It is shown as plain text, in an annotation and in an HTML
+ * table cell, so it has no Markdown.
+ */
+const UNSCOPED_IGNORE_TIP =
+	'Do not remove this entry with --fix, since the other analysis still needs it. Give it a path naming the file its error occurs in, or reportUnmatched: false if it is a rule for every file.';
 
 /**
  * Whether an error means a baseline entry records fewer occurrences of an error
@@ -122,8 +247,7 @@ const ANNOTATION_LIMIT = 10;
 const SUMMARY_LIMIT = 500;
 
 // Added to the annotation of an error that PHPStan can fix itself, such as an out-of-date baseline entry.
-const FIX_HINT =
-	'This can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).';
+const FIX_HINT = `This can be fixed automatically by running \`${ ANALYSIS.fixScript }\` (or \`${ ANALYSIS.fixNpmScript }\`).`;
 
 /**
  * Escapes the message of a workflow command.
@@ -210,7 +334,11 @@ function readErrors( reportPath: string ): PhpstanError[] | null {
 		}
 	}
 
-	return errors;
+	return errors.map( ( error ) =>
+		isUnscopedIgnoreEntry( error )
+			? { ...error, fixable: false, tip: UNSCOPED_IGNORE_TIP }
+			: error
+	);
 }
 
 /**
@@ -222,7 +350,9 @@ function annotate( errors: PhpstanError[] ): void {
 	for ( const error of errors ) {
 		const properties = [
 			`title=${ escapeProperty(
-				error.identifier ? `PHPStan: ${ error.identifier }` : 'PHPStan'
+				error.identifier
+					? `${ ANALYSIS.name }: ${ error.identifier }`
+					: ANALYSIS.name
 			) }`,
 		];
 		if ( error.file ) {
@@ -269,32 +399,97 @@ function formatLocation( error: PhpstanError ): string {
 }
 
 /**
+ * Identifies an error, for matching it with the same error in another report.
+ *
+ * @param error The error.
+ * @return The key.
+ */
+function errorKey( error: PhpstanError ): string {
+	return JSON.stringify( [
+		error.file,
+		error.line,
+		error.identifier,
+		error.message,
+	] );
+}
+
+/**
+ * Leaves out the errors that the other analysis already reports, once for each
+ * time that it reports them.
+ *
+ * @param errors        The errors.
+ * @param defaultErrors The errors in the report of phpstan.neon.dist, or null if
+ *                      it could not be read, in which case none are left out.
+ * @return The errors that the other analysis does not report.
+ */
+function withoutReportedErrors(
+	errors: PhpstanError[],
+	defaultErrors: PhpstanError[] | null
+): PhpstanError[] {
+	const counts = new Map< string, number >();
+	for ( const error of defaultErrors ?? [] ) {
+		const key = errorKey( error );
+		counts.set( key, ( counts.get( key ) ?? 0 ) + 1 );
+	}
+	return errors.filter( ( error ) => {
+		const key = errorKey( error );
+		const count = counts.get( key ) ?? 0;
+		if ( count === 0 ) {
+			return true;
+		}
+		counts.set( key, count - 1 );
+		return false;
+	} );
+}
+
+/**
  * Builds the job summary.
  *
- * @param errors The errors.
+ * @param errors        The errors.
+ * @param omittedErrors The number of errors left out, since the other analysis
+ *                      reports them.
  * @return The summary as Markdown.
  */
-function buildSummary( errors: PhpstanError[] ): string {
+function buildSummary( errors: PhpstanError[], omittedErrors: number ): string {
+	const omitted =
+		omittedErrors > 0
+			? `${ omittedErrors } ${
+					omittedErrors === 1 ? 'error' : 'errors'
+				} that the analysis of \`phpstan.neon.dist\` also found ${
+					omittedErrors === 1 ? 'is' : 'are'
+				} listed only in its results.`
+			: null;
+
 	if ( errors.length === 0 ) {
-		return '## PHPStan\n\nNo errors were found.\n';
+		return omitted
+			? `## ${ ANALYSIS.name }\n\nNo other errors were found. ${ omitted }\n`
+			: `## ${ ANALYSIS.name }\n\nNo errors were found.\n`;
 	}
 
 	const sections = [
-		`## PHPStan found ${ errors.length } ${
-			errors.length === 1 ? 'error' : 'errors'
-		}`,
+		`## ${ ANALYSIS.name } found ${ errors.length } ${
+			omitted ? 'other ' : ''
+		}${ errors.length === 1 ? 'error' : 'errors' }`,
 	];
+	if ( omitted ) {
+		sections.push( omitted );
+	}
+
+	const baselines = ANALYSIS.baselines
+		.map( ( baseline ) => `\`${ baseline }\`` )
+		.join( ' or ' );
 
 	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
-			'### The baseline is out of date',
-			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all.'
+			'### An ignored error no longer occurs',
+			// PHPStan does not say which file an unmatched entry is in.
+			`An entry in ${ baselines }, or in the \`ignoreErrors\` of \`phpstan.neon.dist\`, records an error that now occurs fewer times, or not at all.`
 		);
 		sections.push(
 			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
-			'```bash\ncomposer phpstan:fix\n```',
+			`\`\`\`bash\n${ ANALYSIS.fixScript }\n\`\`\``,
 			'or, in the local environment:',
-			'```bash\nnpm run typecheck:php:fix\n```'
+			`\`\`\`bash\n${ ANALYSIS.fixNpmScript }\n\`\`\``
 		);
 		if (
 			errors.some(
@@ -316,7 +511,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.some( isExceededBaselineEntry ) ) {
 		sections.push(
 			'### A baselined error occurs more often',
-			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.'
+			`An entry in ${ baselines } records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.`
 		);
 	}
 
@@ -350,7 +545,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 
 	if ( errors.some( ( error ) => error.fixable ) ) {
 		sections.push(
-			'Errors marked with 🔧 can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).'
+			`Errors marked with 🔧 can be fixed automatically by running \`${ ANALYSIS.fixScript }\` (or \`${ ANALYSIS.fixNpmScript }\`).`
 		);
 	}
 
@@ -361,35 +556,41 @@ function buildSummary( errors: PhpstanError[] ): string {
 	}
 
 	sections.push(
-		'To run the analysis locally, run `npm run build` and then `composer phpstan`, or `npm run typecheck:php` in the local environment.'
+		`To run the analysis locally, run \`npm run build\` and then \`${ ANALYSIS.script }\`, or ${ ANALYSIS.npmScript }.`
 	);
 
 	return sections.join( '\n\n' ) + '\n';
 }
 
-const reportPath = process.argv[ 2 ];
-if ( ! reportPath ) {
-	process.stderr.write(
-		'Usage: npm run --workspace @wordpress/phpstan-tools report -- <report.json>\n'
-	);
-	process.exit( 2 );
-}
-
-const errors = readErrors( resolve( INVOCATION_DIRECTORY, reportPath ) );
+const errors = readErrors( resolve( INVOCATION_DIRECTORY, REPORT_PATH ) );
 if ( errors === null ) {
 	process.stdout.write(
-		'::error title=PHPStan did not complete::The report is missing or is not valid JSON, so the code was not checked. See the output of the previous step for the reason.\n'
+		`::error title=${ escapeProperty(
+			`${ ANALYSIS.name } did not complete`
+		) }::The report is missing or is not valid JSON, so the code was not checked. See the output of the “${ ANALYSIS.step }” step for the reason.\n`
 	);
 	if ( GITHUB_STEP_SUMMARY ) {
 		appendFileSync(
 			GITHUB_STEP_SUMMARY,
-			'## PHPStan did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “Run PHPStan” step for the reason, such as an error in the configuration.\n'
+			`## ${ ANALYSIS.name } did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “${ ANALYSIS.step }” step for the reason, such as an error in the configuration.\n`
 		);
 	}
 	process.exit( 1 );
 }
-annotate( errors );
+const reportedErrors =
+	DEFAULT_REPORT_PATH === undefined
+		? errors
+		: withoutReportedErrors(
+				errors,
+				readErrors(
+					resolve( INVOCATION_DIRECTORY, DEFAULT_REPORT_PATH )
+				)
+			);
+annotate( reportedErrors );
 if ( GITHUB_STEP_SUMMARY ) {
-	appendFileSync( GITHUB_STEP_SUMMARY, buildSummary( errors ) );
+	appendFileSync(
+		GITHUB_STEP_SUMMARY,
+		buildSummary( reportedErrors, errors.length - reportedErrors.length )
+	);
 }
-process.exitCode = errors.length > 0 ? 1 : 0;
+process.exitCode = reportedErrors.length > 0 ? 1 : 0;

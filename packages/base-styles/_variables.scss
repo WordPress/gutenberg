@@ -148,6 +148,7 @@ $block-padding: 14px; // Used to define space between block footprint and surrou
 $radius-block-ui: $radius-small;
 $shadow-popover: $elevation-x-small;
 $shadow-modal: $elevation-large;
+// stylelint-disable-next-line declaration-property-value-disallowed-list -- Alias kept until the font size variables are deprecated.
 $default-font-size: $font-size-medium;
 
 /**

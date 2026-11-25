@@ -250,7 +250,8 @@
 
 @mixin caption-style-theme() {
 	color: #555;
-	font-size: variables.$default-font-size;
+	// Block theme styles apply to content, not admin UI, so they do not use the design tokens.
+	font-size: 13px;
 	text-align: center;
 
 	.is-dark-theme & {
@@ -294,7 +295,7 @@
 	@include input-style__neutral();
 
 	@include break-small {
-		font-size: variables.$default-font-size;
+		font-size: wpds.var("--wpds-typography-font-size-md");
 		/* Override core line-height. To be reviewed. */
 		line-height: normal;
 	}
@@ -353,7 +354,7 @@
 	// Fonts smaller than 16px causes mobile safari to zoom.
 	font-size: variables.$mobile-text-min-font-size !important;
 	@include break-small {
-		font-size: variables.$default-font-size !important;
+		font-size: wpds.var("--wpds-typography-font-size-md") !important;
 	}
 
 	&:focus {

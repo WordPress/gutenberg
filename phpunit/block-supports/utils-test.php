@@ -34,6 +34,7 @@ class WP_Block_Supports_Utils_Test extends WP_UnitTestCase {
 				'border'     => array( 'width' => '2px' ),
 				'shadow'     => '1px 1px 1px #000',
 				'spacing'    => array( 'padding' => array( 'top' => '10px' ) ),
+				'transform'  => array( 'rotate' => '15deg' ),
 			),
 		);
 
@@ -43,7 +44,7 @@ class WP_Block_Supports_Utils_Test extends WP_UnitTestCase {
 				'supports'         => null,
 				'expected'         => array(
 					'class' => 'has-background has-contrast-background-color has-border-color has-accent-2-border-color',
-					'style' => 'background-image:linear-gradient(#000,#fff);border-width:2px;box-shadow:1px 1px 1px #000;padding-top:10px;',
+					'style' => 'background-image:linear-gradient(#000,#fff);border-width:2px;box-shadow:1px 1px 1px #000;padding-top:10px;rotate:15deg;',
 				),
 			),
 			'selected supports'    => array(
