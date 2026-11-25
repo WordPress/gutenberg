@@ -118,8 +118,7 @@ describe( 'WidgetHeader fit', () => {
 		expect( isInline() ).toBe( true );
 	} );
 
-	it( 'keeps focus on the infotip that appeared while the inline controls held focus', async () => {
-		const user = userEvent.setup();
+	it( 'collapses focused inline controls before the title clips, handing focus to the trigger', async () => {
 		const view = await render( <Tile width={ 600 } /> );
 		await screen.findByTestId( 'body' );
 		await waitFor( () => expect( isInline() ).toBe( true ) );
@@ -128,29 +127,53 @@ describe( 'WidgetHeader fit', () => {
 		radio.focus();
 		expect( radio ).toHaveFocus();
 
-		// Focus holds the inline presentation, so the title clips instead.
-		for ( let width = 600; width >= 240 && ! infotip(); width -= 10 ) {
+		// Focus does not hold the inline presentation: the controls collapse
+		// before the title clips, and focus follows to the trigger.
+		const clippedInline = [];
+		for ( let width = 600; width >= 240 && isInline(); width -= 4 ) {
+			await view.rerender( <Tile width={ width } /> );
+			await nextFrame();
+			if ( isInline() && titleClip() > 0.05 ) {
+				clippedInline.push( width );
+			}
+		}
+		expect( clippedInline ).toEqual( [] );
+		expect( isInline() ).toBe( false );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Widget controls' } )
+			).toHaveFocus()
+		);
+	} );
+
+	it( 'keeps focus on the infotip while the title regains its room', async () => {
+		const user = userEvent.setup();
+		const view = await render( <Tile width={ 600 } /> );
+		await screen.findByTestId( 'body' );
+		await waitFor( () => expect( isInline() ).toBe( true ) );
+
+		// Narrow the tile until even the collapsed header clips the title.
+		for ( let width = 600; width >= 120 && ! infotip(); width -= 10 ) {
 			await view.rerender( <Tile width={ width } /> );
 			await nextFrame();
 		}
 		const trigger = infotip() as HTMLElement;
 		expect( trigger ).toBeInTheDocument();
-		expect( isInline() ).toBe( true );
+		expect( isInline() ).toBe( false );
 
-		await user.tab( { shift: true } );
-		expect( trigger ).toHaveFocus();
+		await user.click( trigger );
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => expect( trigger ).toHaveFocus() );
 
-		// Leaving the inline form lets the controls collapse, which gives the
-		// title its room back; the focused infotip must survive that.
-		await waitFor( () => expect( isInline() ).toBe( false ) );
+		// The title fits again; the focused infotip must survive that.
+		await view.rerender( <Tile width={ 600 } /> );
 		await nextFrame();
+		await nextFrame();
+		expect( titleClip() ).toBeLessThanOrEqual( 0.05 );
 		expect( trigger ).toHaveFocus();
 
 		// Once focus moves on, the infotip leaves with the clip it explained.
 		await user.tab();
-		expect(
-			screen.getByRole( 'button', { name: 'Widget controls' } )
-		).toHaveFocus();
 		await waitFor( () => expect( infotip() ).not.toBeInTheDocument() );
 	} );
 } );

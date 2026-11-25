@@ -353,6 +353,112 @@ describe( 'WidgetAttributes presentation transitions', () => {
 		expect( await screen.findByRole( 'combobox' ) ).toBeInTheDocument();
 	} );
 
+	it( 'leaves focus alone when the inline controls collapse without it', async () => {
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		/* eslint-disable testing-library/no-node-access */
+		const header = document.querySelector( '.style-widget-header' )!;
+		const identity = document.querySelector( '.style-identity' )!;
+		const inline = document.querySelector( '.style-inline-controls' )!;
+		const persistent = document.querySelector(
+			'.style-persistent-controls'
+		)!;
+		/* eslint-enable testing-library/no-node-access */
+		notifyResize( persistent, 32 );
+		notifyResize( inline, 150 );
+		notifyResize( identity, 120 );
+		notifyResize( header, 600 );
+
+		const settings = screen.getByRole( 'button', {
+			name: 'Widget settings',
+		} );
+		act( () => settings.focus() );
+
+		// Space shrinks while focus is outside the inline controls: they
+		// collapse, and focus stays where the user left it.
+		notifyResize( header, 200 );
+		await screen.findByRole( 'button', { name: 'Widget controls' } );
+		expect( settings ).toHaveFocus();
+	} );
+
+	it( 'leaves focus alone after a focused inline field was hidden', async () => {
+		// A field shown only for one metric: hiding it while it has focus
+		// removes it without a blur event.
+		const types: WidgetType[] = [
+			{
+				...widgetTypes[ 0 ],
+				attributes: [
+					...widgetTypes[ 0 ].attributes!,
+					{
+						id: 'note',
+						label: 'Note',
+						type: 'text',
+						relevance: 'high',
+						isVisible: ( item ) =>
+							( item as { metric?: string } ).metric === 'views',
+					},
+				],
+			},
+		];
+		function VisibilityHarness( {
+			layout,
+		}: {
+			layout: DashboardWidget[];
+		} ) {
+			return (
+				<WidgetDashboard
+					layout={ layout }
+					onLayoutChange={ () => {} }
+					widgetTypes={ types }
+					resolveWidgetModule={ resolveWidgetModule }
+				/>
+			);
+		}
+
+		const { rerender } = render(
+			<VisibilityHarness layout={ initialLayout } />
+		);
+		await screen.findByTestId( 'metric' );
+
+		/* eslint-disable testing-library/no-node-access */
+		const header = document.querySelector( '.style-widget-header' )!;
+		const identity = document.querySelector( '.style-identity' )!;
+		const inline = document.querySelector( '.style-inline-controls' )!;
+		const persistent = document.querySelector(
+			'.style-persistent-controls'
+		)!;
+		/* eslint-enable testing-library/no-node-access */
+		notifyResize( persistent, 32 );
+		notifyResize( inline, 150 );
+		notifyResize( identity, 120 );
+		notifyResize( header, 600 );
+
+		act( () => screen.getByRole( 'textbox', { name: 'Note' } ).focus() );
+		rerender(
+			<VisibilityHarness
+				layout={ [
+					{
+						...initialLayout[ 0 ],
+						attributes: { metric: 'orders', label: 'Traffic' },
+					},
+				] }
+			/>
+		);
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Note' } )
+		).not.toBeInTheDocument();
+
+		const settings = screen.getByRole( 'button', {
+			name: 'Widget settings',
+		} );
+		act( () => settings.focus() );
+
+		notifyResize( header, 200 );
+		await screen.findByRole( 'button', { name: 'Widget controls' } );
+		expect( settings ).toHaveFocus();
+	} );
+
 	it( 'keeps the trigger focused after the visible Close action as well', async () => {
 		const user = userEvent.setup();
 		const { header } = await renderCollapsed();

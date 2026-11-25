@@ -101,9 +101,19 @@ export function WidgetAttributes( {
 	}, [ collapsed ] );
 
 	useEffect( () => {
-		if ( focusTrigger ) {
-			triggerRef.current?.focus();
-			setFocusTrigger( false );
+		if ( ! focusTrigger ) {
+			return;
+		}
+		setFocusTrigger( false );
+
+		// Hand focus over only if it dropped to the document with the inline
+		// controls. A focused field removed from the form (hidden by
+		// `isVisible`, say) never reports its blur, so the flag can be stale
+		// while the user is focused elsewhere; leave that focus alone.
+		const trigger = triggerRef.current;
+		const { activeElement, body } = trigger?.ownerDocument ?? document;
+		if ( trigger && ( ! activeElement || activeElement === body ) ) {
+			trigger.focus();
 		}
 	}, [ focusTrigger ] );
 
