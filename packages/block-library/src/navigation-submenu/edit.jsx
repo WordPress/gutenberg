@@ -96,7 +96,7 @@ export default function NavigationSubmenuEdit( {
 		allowTextUpdate: true,
 	} );
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlocks } =
 		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -285,8 +285,21 @@ export default function NavigationSubmenuEdit( {
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
 	function transformToLink() {
-		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
-		replaceBlock( clientId, newLinkBlock );
+		// The link keeps the submenu's client ID, so List View keeps the
+		// item's row and anything focused in it.
+		const newLinkBlock = {
+			...createBlock( 'core/navigation-link', attributes ),
+			clientId,
+		};
+		// Only a selected submenu passes focus on to the link. Otherwise the
+		// replacement would focus whichever block is selected, pulling focus
+		// out of List View when the last item is removed there.
+		replaceBlocks(
+			clientId,
+			newLinkBlock,
+			undefined,
+			isSelected ? 0 : null
+		);
 	}
 
 	useEffect( () => {
