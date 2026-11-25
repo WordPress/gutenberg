@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Image, Gallery: Include shortened alt text in the lightbox trigger button's accessible name to distinguish multiple lightboxes on a page, and render the label server-side so it is available before JavaScript runs.([#85458](https://github.com/WordPress/gutenberg/pull/85458))
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
