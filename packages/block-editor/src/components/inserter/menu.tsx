@@ -19,7 +19,6 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternCategoryPreviews } from './block-patterns-tab/pattern-category-previews';
 import { MediaTab } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
@@ -89,9 +88,6 @@ function InserterMenu(
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState<
 		PatternCategory | null | undefined
 	>( __experimentalInitialCategory );
-	const [ patternFilter, setPatternFilter ] = useState< string | undefined >(
-		'all'
-	);
 	const isLargeViewport = useViewportMatch( 'large' );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
@@ -201,18 +197,12 @@ function InserterMenu(
 	);
 
 	const onClickPatternCategory = useCallback(
-		( patternCategory: PatternCategory | undefined, filter?: string ) => {
+		( patternCategory: PatternCategory | undefined ) => {
 			setSelectedPatternCategory( patternCategory );
-			setPatternFilter( filter );
 			onPatternCategorySelection?.();
 		},
 		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
-
-	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		!! selectedPatternCategory;
 
 	const [ isScrolled, setIsScrolled ] = useState( false );
 	const blocksPanelRef = useRef< HTMLDivElement >( null );
@@ -243,7 +233,8 @@ function InserterMenu(
 	}, [] );
 
 	const inserterSearch = useMemo( () => {
-		if ( selectedTab === 'media' ) {
+		// The Patterns and Media tabs have a search of their own.
+		if ( selectedTab === 'media' || selectedTab === 'patterns' ) {
 			return null;
 		}
 
@@ -335,27 +326,13 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
-			>
-				{ showPatternPanel && (
-					<PatternCategoryPreviews
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						// The panel shows only with a category selected.
-						category={ selectedPatternCategory as PatternCategory }
-						// @ts-expect-error The previews ignore `patternFilter`.
-						patternFilter={ patternFilter }
-						showTitlesAsTooltip
-					/>
-				) }
-			</BlockPatternsTab>
+			/>
 		);
 	}, [
 		destinationRootClientId,
 		onInsertPattern,
 		onClickPatternCategory,
-		patternFilter,
 		selectedPatternCategory,
-		showPatternPanel,
 	] );
 
 	const mediaTab = useMemo( () => {
@@ -406,7 +383,6 @@ function InserterMenu(
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
-				'show-panel': showPatternPanel,
 				'is-zoom-out': isZoomOutMode,
 				'has-single-tab': hasSingleTab,
 			} ) }
@@ -444,9 +420,7 @@ function InserterMenu(
 										panelRef: patternsPanelRef,
 										panel: (
 											<>
-												{ inserterSearch }
 												{ selectedTab === 'patterns' &&
-													! delayedFilterValue &&
 													patternsTab }
 											</>
 										),
