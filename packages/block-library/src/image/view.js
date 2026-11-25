@@ -753,14 +753,29 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				const { imageRef } = state.selectedImage;
 				let {
 					naturalWidth,
 					naturalHeight,
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
-				} = state.selectedImage.imageRef;
-				let { x: screenPosX, y: screenPosY } =
-					state.selectedImage.imageRef.getBoundingClientRect();
+				} = imageRef;
+				// A transform turns, moves or scales the figure around its centre,
+				// which its bounding box keeps, so place the image from there.
+				const figure = imageRef.offsetParent ?? imageRef;
+				const figureRect = figure.getBoundingClientRect();
+				const figureCenterX = figureRect.x + figureRect.width / 2;
+				const figureCenterY = figureRect.y + figureRect.height / 2;
+				let screenPosX =
+					figureCenterX -
+					figure.offsetWidth / 2 +
+					figure.clientLeft +
+					imageRef.offsetLeft;
+				let screenPosY =
+					figureCenterY -
+					figure.offsetHeight / 2 +
+					figure.clientTop +
+					imageRef.offsetTop;
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
@@ -873,6 +888,17 @@ const { state, actions, callbacks } = store(
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
 
+				// A scale grows the figure around its centre, so the zoom starts
+				// from the scaled image.
+				const figureScale =
+					parseFloat( window.getComputedStyle( figure ).scale ) || 1;
+				screenPosX =
+					figureCenterX +
+					( screenPosX - figureCenterX ) * figureScale;
+				screenPosY =
+					figureCenterY +
+					( screenPosY - figureCenterY ) * figureScale;
+
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
 				// image in iOS Safari, perhaps due to an inconsistency in how browsers
@@ -893,7 +919,7 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-thumbnail-height: ${
 						hasCroppedSource ? thumbnailHeight : containerHeight
 					}px;
-					--wp--lightbox-scale: ${ containerScale };
+					--wp--lightbox-scale: ${ containerScale * figureScale };
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
