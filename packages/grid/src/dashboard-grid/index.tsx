@@ -26,6 +26,7 @@ import {
 import { GridItem } from './grid-item';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { measureContainer } from '../shared/measure-container';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -191,26 +192,26 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// effects before this one, so a tile mounted in the same commit
 		// would read the unmeasured one-column span and size. The update
 		// renders synchronously before paint, so no empty frame shows.
+		//
+		// It runs again once `gridRoot` is set, after the parent's mount
+		// effects, so a gap or size the parent sets on mount still counts.
 		useLayoutEffect( () => {
 			const node = measureRef.current;
 			if ( ! node ) {
 				return;
 			}
 			setHasMeasured( true );
-			const { width, height } = node.getBoundingClientRect();
+			const { width, height, columnGap } = measureContainer( node );
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
 			if ( height > 0 ) {
 				setContainerHeight( height );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( node ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
+			if ( columnGap !== null ) {
+				setGapPx( columnGap );
 			}
-		}, [] );
+		}, [ gridRoot ] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(

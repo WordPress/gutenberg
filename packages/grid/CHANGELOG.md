@@ -4,7 +4,8 @@
 
 ### Bug Fixes
 
--   `DashboardGrid` and `DashboardLanes` mount tiles after they measure their container, so a tile that reads its span or size when it mounts gets the measured column count instead of one column ([#86508](https://github.com/WordPress/gutenberg/pull/86508)).
+-   `DashboardGrid` and `DashboardLanes` mount tiles after they measure their container, so a tile that reads its span or size when it mounts gets the measured column count instead of one column. Tiles are not in the DOM in the surface's first commit, so a parent's mount effect or a ref callback on the surface no longer finds them, and server-rendered markup has no tiles ([#86508](https://github.com/WordPress/gutenberg/pull/86508)).
+-   `DashboardGrid` and `DashboardLanes` measure their content box when they mount, so a surface with padding or a border resolves the same column count at mount as after the ResizeObserver reports ([#86508](https://github.com/WordPress/gutenberg/pull/86508)).
 
 ### Internal
 

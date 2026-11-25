@@ -27,6 +27,7 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { measureContainer } from '../shared/measure-container';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -172,23 +173,23 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		// effects before this one, so a tile mounted in the same commit
 		// would read the unmeasured one-column span and size. The update
 		// renders synchronously before paint, so no empty frame shows.
+		//
+		// It runs again once `container` is set, after the parent's mount
+		// effects, so a gap or size the parent sets on mount still counts.
 		useLayoutEffect( () => {
 			const node = measureRef.current;
 			if ( ! node ) {
 				return;
 			}
 			setHasMeasured( true );
-			const { width } = node.getBoundingClientRect();
+			const { width, columnGap } = measureContainer( node );
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( node ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
+			if ( columnGap !== null ) {
+				setGapPx( columnGap );
 			}
-		}, [] );
+		}, [ container ] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(
