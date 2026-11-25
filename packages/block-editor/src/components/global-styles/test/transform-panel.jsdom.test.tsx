@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import TransformPanel, { getScaleAsNumber } from '../transform-panel';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -567,23 +568,116 @@ describe( 'TransformPanel scale', () => {
 		} );
 	} );
 
-	it( 'spins an empty field from the unscaled size', async () => {
+	function ControlledScalePanel( {
+		inheritedValue,
+		onChange,
+	}: {
+		inheritedValue?: { transform: { scale: number } };
+		onChange: ( value: unknown ) => void;
+	} ) {
+		const [ value, setValue ] = useState( {} );
+		return (
+			<TransformPanel
+				value={ value }
+				inheritedValue={ inheritedValue }
+				settings={ scaleSettings }
+				onChange={ ( nextValue ) => {
+					onChange( nextValue );
+					setValue( nextValue );
+				} }
+			/>
+		);
+	}
+
+	async function pressAndRecord(
+		user: ReturnType< typeof userEvent.setup >,
+		keys: string[],
+		onChange: ReturnType< typeof vi.fn >
+	) {
+		const input = screen.getByRole( 'spinbutton', { name: 'Scale' } );
+		const slider = screen.getByRole( 'slider', { name: 'Scale' } );
+		const stored = [];
+		for ( const key of keys ) {
+			await user.keyboard( key );
+			stored.push( onChange.mock.lastCall?.[ 0 ]?.transform?.scale );
+			expect( input ).toHaveValue( stored.at( -1 ) );
+			expect( slider ).toHaveValue( `${ stored.at( -1 ) }` );
+		}
+		return stored;
+	}
+
+	it.each( [
+		[ 'ArrowUp', '{ArrowUp}', [ 1.01, 1.02, 1.03 ] ],
+		[ 'ArrowDown', '{ArrowDown}', [ 0.99, 0.98, 0.97 ] ],
+		[ 'Shift+ArrowUp', '{Shift>}{ArrowUp}{/Shift}', [ 1.1, 1.2, 1.3 ] ],
+		[ 'Shift+ArrowDown', '{Shift>}{ArrowDown}{/Shift}', [ 0.9, 0.8, 0.7 ] ],
+	] )(
+		'steps %s from the unscaled size in an empty field',
+		async ( _key, key, expected ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			render( <ControlledScalePanel onChange={ onChange } /> );
+
+			await user.click(
+				screen.getByRole( 'spinbutton', { name: 'Scale' } )
+			);
+
+			expect(
+				await pressAndRecord( user, [ key, key, key ], onChange )
+			).toEqual( expected );
+		}
+	);
+
+	it( 'steps up then down from a typed scale', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render( <ControlledScalePanel onChange={ onChange } /> );
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'1.5'
+		);
+
+		expect(
+			await pressAndRecord(
+				user,
+				[
+					'{ArrowUp}',
+					'{ArrowUp}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+				],
+				onChange
+			)
+		).toEqual( [ 1.51, 1.52, 1.51, 1.5, 1.49 ] );
+	} );
+
+	it( 'steps up then down from an inherited scale', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
-			<TransformPanel
-				value={ {} }
-				settings={ scaleSettings }
+			<ControlledScalePanel
+				inheritedValue={ { transform: { scale: 1.2 } } }
 				onChange={ onChange }
 			/>
 		);
 
 		await user.click( screen.getByRole( 'spinbutton', { name: 'Scale' } ) );
-		await user.keyboard( '{ArrowUp}' );
 
-		expect( onChange ).toHaveBeenLastCalledWith( {
-			transform: { scale: 1.01 },
-		} );
+		expect(
+			await pressAndRecord(
+				user,
+				[
+					'{ArrowUp}',
+					'{ArrowUp}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+				],
+				onChange
+			)
+		).toEqual( [ 1.21, 1.22, 1.21, 1.2, 1.19 ] );
 	} );
 
 	it( 'starts the slider from the unscaled size', () => {

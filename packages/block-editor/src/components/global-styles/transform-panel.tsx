@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import {
 	__experimentalNumberControl as NumberControl,
 	RangeControl,
@@ -37,7 +38,13 @@ const ROTATE_UNIT_SETTINGS: UnitRangeSettings = {
 // Mirror of `WP_Style_Engine::VALID_SCALE_PATTERN` in PHP.
 const SCALE_PATTERN = /^((?:\d+(?:\.\d+)?|\.\d+))(%?)$/;
 
+type ScaleStateReducer = NonNullable<
+	ComponentProps< typeof NumberControl >[ '__unstableStateReducer' ]
+>;
+
 const SCALE_STEP = 0.01;
+// Mirror of NumberControl's default `shiftStep`.
+const SCALE_SHIFT_STEP = SCALE_STEP * 10;
 const SCALE_SLIDER_MAX = 3;
 // The slider stops at 3, but a typed scale may go up to 10.
 const SCALE_INPUT_MAX = 10;
@@ -202,24 +209,34 @@ export default function TransformPanel( {
 	const setScale = ( newValue: number | undefined ) => {
 		onChange( setImmutably( value, [ 'transform', 'scale' ], newValue ) );
 	};
-	const onScaleInputChange = (
-		newValue: string | undefined,
-		{ event }: { event: { type: string } }
-	) => {
+	const onScaleInputChange = ( newValue: string | undefined ) => {
 		// A cleared field removes the value, so an inherited scale shows again.
 		if ( newValue === undefined || newValue === '' ) {
 			setScale( undefined );
 			return;
 		}
-		let nextScale = Number( newValue );
+		const nextScale = Number( newValue );
 		if ( ! Number.isFinite( nextScale ) || nextScale < 0 ) {
 			return;
 		}
-		// An arrow key in an empty field starts from the unscaled size, not 0.
-		if ( scale === undefined && event.type === 'keydown' ) {
-			nextScale = nextScale > 0 ? 1 + nextScale : 1 - SCALE_STEP;
-		}
 		setScale( nextScale );
+	};
+	// An arrow key in an empty field spins from 0. Step from the unscaled size
+	// inside the field's own state instead, so the next press steps from there.
+	const stepFromUnscaled: ScaleStateReducer = ( state, action ) => {
+		if (
+			scale !== undefined ||
+			( action.type !== 'PRESS_UP' && action.type !== 'PRESS_DOWN' )
+		) {
+			return state;
+		}
+		const { event } = action.payload;
+		const step =
+			event && 'shiftKey' in event && event.shiftKey
+				? SCALE_SHIFT_STEP
+				: SCALE_STEP;
+		const next = action.type === 'PRESS_UP' ? 1 + step : 1 - step;
+		return { ...state, value: `${ parseFloat( next.toPrecision( 12 ) ) }` };
 	};
 	const hasScaleValue = () => value?.transform?.scale !== undefined;
 
@@ -317,6 +334,7 @@ export default function TransformPanel( {
 								spinControls="none"
 								placeholder="1"
 								onChange={ onScaleInputChange }
+								__unstableStateReducer={ stepFromUnscaled }
 							/>
 							<RangeControl
 								className="block-editor-global-styles-unit-range-control__slider"
