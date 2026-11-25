@@ -1,5 +1,6 @@
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
+import type { Ref } from 'react';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -38,6 +39,11 @@ export interface AttributesDropdownProps {
 	 * can hold the collapsed presentation while the user is inside it.
 	 */
 	onOpenChange: ( open: boolean ) => void;
+
+	/**
+	 * Trigger ref, for moving focus onto it when focused inline controls collapse.
+	 */
+	triggerRef?: Ref< HTMLButtonElement >;
 }
 
 /**
@@ -52,6 +58,7 @@ export function AttributesDropdown( {
 	data,
 	onChange,
 	onOpenChange,
+	triggerRef,
 }: AttributesDropdownProps ): React.ReactNode {
 	const form = useMemo< Form >(
 		() => ( {
@@ -64,6 +71,7 @@ export function AttributesDropdown( {
 	return (
 		<Popover.Root onOpenChange={ onOpenChange }>
 			<Popover.Trigger
+				ref={ triggerRef }
 				render={
 					<IconButton
 						icon={ settings }

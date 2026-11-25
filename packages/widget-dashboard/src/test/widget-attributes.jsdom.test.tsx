@@ -251,24 +251,16 @@ describe( 'WidgetAttributes fit', () => {
 		);
 	} );
 
-	it( 'locks the fit while the inline form has focus', async () => {
+	it( 'does not lock the fit while the inline form has focus', async () => {
 		const user = userEvent.setup();
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );
 
+		// Focused inline controls must still be able to collapse.
 		await user.click( screen.getAllByRole( 'combobox' )[ 0 ] );
 
 		expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
-			expect.objectContaining( { locked: true } )
-		);
-
-		// Focus leaves the inline form.
-		await user.click( screen.getByTestId( 'metric' ) );
-
-		await waitFor( () =>
-			expect( mockedUseInlineFit ).toHaveBeenLastCalledWith(
-				expect.objectContaining( { locked: false } )
-			)
+			expect.objectContaining( { locked: false } )
 		);
 	} );
 

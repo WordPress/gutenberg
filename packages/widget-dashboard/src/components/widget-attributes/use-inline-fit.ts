@@ -9,9 +9,9 @@ const EXPAND_BUFFER = 16;
 
 interface InlineFitOptions {
 	/**
-	 * Holds the current presentation while the user interacts with it (an
-	 * open dropdown, focus inside the inline form). Measurements keep
-	 * flowing; the pending transition applies when the hold releases.
+	 * Holds the collapsed presentation while the user interacts with it;
+	 * the expansion applies on release. Collapsing is never held, since
+	 * inline controls that no longer fit would be clipped.
 	 */
 	locked?: boolean;
 }
@@ -59,12 +59,11 @@ export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
 			? naturalSize + EXPAND_BUFFER > availableSize
 			: naturalSize > availableSize );
 
-	// The latch: while locked, the surface the user is interacting with
-	// must not be replaced under them, so the last unlocked decision holds.
-	// Releasing the lock lets the pending transition apply.
-	if ( ! locked && held !== computed ) {
-		setHeld( computed );
+	// The latch: a lock defers expansion, never collapse.
+	const collapsed = computed || ( locked && held );
+	if ( held !== collapsed ) {
+		setHeld( collapsed );
 	}
 
-	return { measureRef, collapsed: locked ? held : computed };
+	return { measureRef, collapsed };
 }
