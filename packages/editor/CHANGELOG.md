@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#81554](https://github.com/WordPress/gutenberg/pull/81554)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
