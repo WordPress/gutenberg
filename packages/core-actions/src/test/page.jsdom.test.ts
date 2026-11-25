@@ -1,9 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { createRegistry } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import page from '../page';
+import { unlock } from '../lock-unlock';
+
+// The editor store loads the viewport store, which reads the media queries.
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
 describe( 'page', () => {
 	it( 'maps the id of each page action to its JavaScript parts', () => {
 		expect( Object.keys( page ) ).toEqual( [
+			'quick-edit',
 			'set-as-homepage',
 			'set-as-posts-page',
 		] );
@@ -11,8 +18,66 @@ describe( 'page', () => {
 			// The data of the action, such as its id and label, is
 			// registered on the server.
 			expect( parts ).not.toHaveProperty( 'id' );
-			expect( 'RenderModal' in parts ).toBe( true );
+			expect( 'callback' in parts || 'RenderModal' in parts ).toBe(
+				true
+			);
 		}
+	} );
+
+	describe( 'quick-edit', () => {
+		const post = {
+			id: 1,
+			type: 'page',
+			status: 'draft' as const,
+			title: 'About',
+			content: '',
+		};
+		const action = page[ 'quick-edit' ];
+		const { isEligible } = action;
+		const callback = 'callback' in action ? action.callback : undefined;
+
+		function createRegistryWithEditor() {
+			const registry = createRegistry();
+			registry.register( editorStore );
+			return registry;
+		}
+
+		it( 'offers to quick edit the pages that are not in the trash', () => {
+			expect( isEligible?.( post ) ).toBe( true );
+			expect( isEligible?.( { ...post, status: 'trash' } ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'labels the action by the number of pages', () => {
+			const label = action.label as (
+				items: ( typeof post )[]
+			) => string;
+			expect( label( [ post ] ) ).toBe( 'Quick edit' );
+			expect( label( [ post, { ...post, id: 2 } ] ) ).toBe( 'Bulk edit' );
+		} );
+
+		it( 'opens the quick edit form with the opener of the screen', () => {
+			const registry = createRegistryWithEditor();
+			const opener = vi.fn();
+			unlock( registry.dispatch( editorStore ) ).setQuickEditOpener(
+				opener
+			);
+
+			callback?.( [ post, { ...post, id: 2 } ], { registry } );
+
+			expect( opener ).toHaveBeenCalledTimes( 1 );
+			expect( opener ).toHaveBeenCalledWith( {
+				postType: 'page',
+				postIds: [ 1, 2 ],
+			} );
+		} );
+
+		it( 'does nothing when the screen sets no opener', () => {
+			const registry = createRegistryWithEditor();
+
+			expect( () => callback?.( [ post ], { registry } ) ).not.toThrow();
+		} );
 	} );
 
 	it.each( [

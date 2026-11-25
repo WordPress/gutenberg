@@ -12,12 +12,14 @@ import {
 	currentlyPreviewingTheme,
 	isPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import useSetEntityNavigator from './use-set-entity-navigator';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 
 function AppLayout() {
 	useCommonCommands();
 	useSetCommandContext();
+	useSetEntityNavigator();
 
 	return <Layout />;
 }

@@ -1,17 +1,20 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import type { Action, View, SupportedLayouts } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useView, useViewConfig } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	store as editorStore,
+} from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
-import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
 import './style.scss';
 
@@ -118,15 +121,31 @@ function NavigationListView( {
 	} );
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
-	const editAction = useEditNavigationAction();
+	// The "Edit" action comes from the server, and opens the navigation menu
+	// with this navigator: it goes to the editor of the menu.
+	const { setEntityNavigator } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setEntityNavigator( ( { postId }: { postId: number | string } ) => {
+			navigate( { to: `/navigation/edit/${ postId }` } );
+		} );
+		return () => setEntityNavigator( undefined );
+	}, [ setEntityNavigator, navigate ] );
+
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType: NAVIGATION_POST_TYPE,
 		context: 'list',
 	} );
 
+	// Clicking a navigation menu only previews it, so the list shows the
+	// "Edit" action as a button.
 	const actions: Action< Post >[] = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ editAction, postTypeActions ]
+		() =>
+			postTypeActions.map( ( action ) =>
+				action.id === 'edit-post'
+					? { ...action, isPrimary: true }
+					: action
+			),
+		[ postTypeActions ]
 	);
 
 	const selection =

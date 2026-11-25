@@ -11,7 +11,6 @@ import { useView, useViewConfig } from '@wordpress/views';
 import AddNewTemplate from '../add-new-template';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -88,15 +87,12 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypeActions = usePostActions( {
+	// The "Edit" action comes from the server, first, and opens the template
+	// with the entity navigator the app sets, see `useSetEntityNavigator`.
+	const actions = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
 	} );
-	const editAction = useEditPostAction();
-	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
-	);
 
 	const onChangeView = useEvent( ( newView ) => {
 		updateView( newView );
