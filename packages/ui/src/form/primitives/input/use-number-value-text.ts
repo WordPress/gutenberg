@@ -8,8 +8,10 @@ function toValueText(
 }
 
 /**
- * VoiceOver reads a number input with a `max` as a percentage of its range,
- * unless it has an `aria-valuetext`.
+ * Works around VoiceOver on macOS, which reads a number input with a `max` as
+ * a percentage of its range unless it has an `aria-valuetext`.
+ *
+ * Remove this hook once VoiceOver reads such an input as its value.
  *
  * @param props The input's props that affect its value text.
  */
