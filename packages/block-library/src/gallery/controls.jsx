@@ -141,10 +141,7 @@ export default function GalleryControls( {
 		...( themeOptions || [] ),
 	];
 
-	// When several galleries are selected, only the settings stored as gallery
-	// attributes are shown. The others also update each gallery's images or
-	// inner blocks, which only happens for the first selected gallery. Random
-	// order is hidden too, so it's chosen per gallery.
+	// Hide aspect ratio for multi-selection because it doesn't work across multiple blocks.
 	const canSetAspectRatio =
 		! multiGallerySelection && aspectRatioOptions.length > 1;
 

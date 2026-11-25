@@ -461,6 +461,23 @@ describe( 'Gallery block', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		test( 'does not show the default settings while editing a viewport state', async () => {
+			await setup( [
+				createGallery(),
+				createGallery(),
+				createBlock( VIEWPORT_STATE_INITIALIZER ),
+				createBlock( MULTI_SELECTION_INITIALIZER ),
+			] );
+			await selectGalleries();
+
+			expect(
+				screen.queryByRole( 'slider', { name: 'Columns' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Crop images to fit' )
+			).not.toBeInTheDocument();
+		} );
+
 		test( 'does not offer to detach selected dynamic galleries', async () => {
 			await setup( [
 				createBlock( 'core/gallery', {
