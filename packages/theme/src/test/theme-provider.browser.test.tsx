@@ -20,6 +20,12 @@ import '../../prebuilt/css/design-tokens.css';
 // round-trip. Ramp generation itself is covered by the color-ramps tests.)
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
+const FOREGROUND_CONTENT_NEUTRAL = '--wpds-color-foreground-content-neutral';
+const FOREGROUND_NEUTRAL = '--wpds-color-foreground-interactive-neutral';
+const FOREGROUND_NEUTRAL_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-active';
+const FOREGROUND_NEUTRAL_WEAK_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-weak-active';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#007cba';
@@ -114,6 +120,29 @@ describe( 'ThemeProvider', () => {
 				readProp( child, '--wp-components-color-accent-inverted' )
 			)
 		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
+	it( 'maps active neutral foregrounds to a stronger scale step', async () => {
+		await render(
+			<ThemeProvider color={ { background: BACKGROUND } }>
+				<div data-testid="child">x</div>
+			</ThemeProvider>
+		);
+
+		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
+		const restingForeground = readProp( provider, FOREGROUND_NEUTRAL );
+		const activeForeground = readProp(
+			provider,
+			FOREGROUND_NEUTRAL_ACTIVE
+		);
+
+		expect( restingForeground ).toBe(
+			readProp( provider, FOREGROUND_CONTENT_NEUTRAL )
+		);
+		expect( activeForeground ).toBe(
+			readProp( provider, FOREGROUND_NEUTRAL_WEAK_ACTIVE )
+		);
+		expect( activeForeground ).not.toBe( restingForeground );
 	} );
 
 	it( 'does not define color tokens if neither customized nor inherited', async () => {
