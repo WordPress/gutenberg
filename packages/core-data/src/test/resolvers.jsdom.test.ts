@@ -417,6 +417,29 @@ describe( 'getEntityRecord', () => {
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
 	} );
+
+	it( 'does not load the entity configs without an entity name', async () => {
+		const resolveSelectWithoutName = {
+			getEntitiesConfig: vi.fn( () => ENTITIES ),
+		};
+
+		// A block reads a post field without a post type in its context.
+		await getEntityRecord(
+			'postType',
+			undefined as unknown as string
+		)(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithoutName,
+			} )
+		);
+
+		expect(
+			resolveSelectWithoutName.getEntitiesConfig
+		).not.toHaveBeenCalled();
+		expect( triggerFetch ).not.toHaveBeenCalled();
+	} );
 } );
 
 describe( 'getEntityRecords', () => {
