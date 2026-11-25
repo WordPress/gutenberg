@@ -15,8 +15,6 @@
 		opacity: 0;
 	}
 
-	// Only reveal the disabled button for keyboard focus, so it hides
-	// immediately after a mouse click on "Reset".
 	&:focus-visible {
 		opacity: 1;
 	}
