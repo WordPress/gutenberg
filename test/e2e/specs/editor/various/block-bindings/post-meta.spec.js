@@ -92,7 +92,7 @@ test.describe( 'Post Meta source', () => {
 				);
 			} );
 
-			test( 'should keep the saved content if the default value is not defined', async ( {
+			test( 'should show the field label as a placeholder if the default value is not defined', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -111,13 +111,19 @@ test.describe( 'Post Meta source', () => {
 						},
 					},
 				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await expect( paragraphBlock ).toHaveText( 'fallback content' );
+				const paragraphBlock = editor.canvas.locator(
+					'[data-type="core/paragraph"]'
+				);
+				await expect( paragraphBlock ).toBeEmpty();
+				await expect(
+					paragraphBlock.locator( '[data-rich-text-placeholder]' )
+				).toHaveAttribute(
+					'data-rich-text-placeholder',
+					'Field with only label'
+				);
 			} );
 
-			test( 'should keep the saved content if the field label is not defined', async ( {
+			test( 'should show the field key as a placeholder if the field label is not defined', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -136,38 +142,15 @@ test.describe( 'Post Meta source', () => {
 						},
 					},
 				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await expect( paragraphBlock ).toHaveText( 'fallback content' );
-			} );
-
-			test( 'should keep the saved image if the URL is bound to a field without a value', async ( {
-				editor,
-			} ) => {
-				const savedUrl = 'https://example.com/saved-image.jpg';
-				await editor.insertBlock( {
-					name: 'core/image',
-					attributes: {
-						url: savedUrl,
-						metadata: {
-							bindings: {
-								url: {
-									source: 'core/post-meta',
-									args: {
-										key: 'field_with_only_label',
-									},
-								},
-							},
-						},
-					},
-				} );
-				const imageBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Image',
-				} );
-				await expect( imageBlock.locator( 'img' ) ).toHaveAttribute(
-					'src',
-					savedUrl
+				const paragraphBlock = editor.canvas.locator(
+					'[data-type="core/paragraph"]'
+				);
+				await expect( paragraphBlock ).toBeEmpty();
+				await expect(
+					paragraphBlock.locator( '[data-rich-text-placeholder]' )
+				).toHaveAttribute(
+					'data-rich-text-placeholder',
+					'field_without_label_or_default'
 				);
 			} );
 		} );

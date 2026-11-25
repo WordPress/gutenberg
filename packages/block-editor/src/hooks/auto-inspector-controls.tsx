@@ -66,7 +66,6 @@ function AutoRegisterControls( {
 					}
 					const values = source.getValues( {
 						select,
-						clientId,
 						context: blockContext,
 						bindings: { [ attribute ]: binding },
 					} );
