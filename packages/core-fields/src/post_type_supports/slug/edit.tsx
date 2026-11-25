@@ -116,7 +116,9 @@ const SlugEdit = ( {
 							) }
 						</span>
 						<Link
-							href="https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink"
+							href={ __(
+								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+							) }
 							openInNewTab
 						>
 							{ __( 'Learn more' ) }

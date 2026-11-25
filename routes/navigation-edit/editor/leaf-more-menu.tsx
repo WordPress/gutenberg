@@ -4,6 +4,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -12,10 +13,24 @@ const POPOVER_PROPS = {
 
 export default function LeafMoreMenu( {
 	clientId,
+	updateExpansion,
+	setInsertedBlockClientId,
 	...props
 }: {
 	clientId: string;
+	updateExpansion: ( action: {
+		type: 'expand' | 'collapse';
+		clientIds: string[];
+	} ) => void;
+	setInsertedBlockClientId: ( clientId: string ) => void;
 } ) {
+	// Read from the global rather than imported, for the reason given in
+	// `content.tsx`: `@wordpress/block-library` loads with the lazily loaded
+	// editor assets, after this bundle initializes.
+	const { AddSubmenuItem } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
+
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -108,6 +123,14 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
+						<AddSubmenuItem
+							clientId={ clientId }
+							onClose={ onClose }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
 						{ canDuplicate && (
 							<MenuItem
 								onClick={ () => {

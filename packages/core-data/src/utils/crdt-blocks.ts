@@ -14,6 +14,8 @@ import {
 	asRichTextOffset,
 	createYMap,
 	richTextOffsetToHtmlIndex,
+	splitHtmlTag,
+	tokenizeHtml,
 	type HtmlStringIndex,
 	type YMapRecord,
 	type YMapWrap,
@@ -1179,9 +1181,14 @@ export function mergeRichTextUpdate(
 
 	const currentValueAsDelta = new Delta( blockYText.toDelta() );
 	const updatedValueAsDelta = new Delta( [ { insert: updatedValue } ] );
+	const diffOptions = {
+		tokenizer: tokenizeHtml,
+		splitToken: splitHtmlTag,
+	};
 	const deltaDiff = currentValueAsDelta.diffWithCursor(
 		updatedValueAsDelta,
-		htmlCursorIndex
+		htmlCursorIndex,
+		diffOptions
 	);
 
 	/**
@@ -1198,7 +1205,7 @@ export function mergeRichTextUpdate(
 		htmlCursorIndex === null ||
 		isDeltaVerificationMatch( blockYText, deltaDiff, updatedValue )
 			? deltaDiff
-			: currentValueAsDelta.diff( updatedValueAsDelta );
+			: currentValueAsDelta.diff( updatedValueAsDelta, diffOptions );
 
 	blockYText.applyDelta( safeDiff.ops );
 }

@@ -4,6 +4,31 @@
 
 ### Enhancements
 
+-   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
+-   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
+
+### Bug Fixes
+
+-   Hide the disabled filters "Reset" button right after it is clicked with a mouse; it is now only revealed for keyboard focus ([#87351](https://github.com/WordPress/gutenberg/pull/87351)).
+-   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Keep hiding empty badge fields in the `grid` and `pickerGrid` layouts with the updated `Badge` from `@wordpress/ui` ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
+-   Add a ring around the selection checkbox in the `grid` and `pickerGrid` layouts, so it stays visible on any preview ([#87223](https://github.com/WordPress/gutenberg/pull/87223)).
+-   List layout: The up and down arrow keys on an item's actions button move focus to the adjacent row when one item ID is a prefix of another, such as `1` and `12`, instead of jumping to the wrong row ([#84541](https://github.com/WordPress/gutenberg/pull/84541)).
+
+### Internal
+
+-   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 22.1.0 (2026-11-18)
+
+### Enhancements
+
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
