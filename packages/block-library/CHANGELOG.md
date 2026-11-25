@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Navigation: Add a Submenu Display setting to vertical menus, so submenus that open on click can unfold inline instead of floating over the items below them ([#NEW_PR](https://github.com/WordPress/gutenberg/pull/NEW_PR)).
+-   Navigation: Add a Submenu Display setting to vertical menus, so submenus that open on click can unfold inline instead of floating over the items below them ([#87343](https://github.com/WordPress/gutenberg/pull/87343)).
 
 ### Bug Fixes
 
