@@ -43,6 +43,7 @@ import {
 } from './suggest-post-edit-guard';
 import { interceptUndoRedo } from './undo-redo-interceptor';
 import attachMediaInPost from './utils/attach-media-in-post';
+import { serializeWithoutDeferredInsertions } from './utils/suggestion-deferred-insertions';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -348,10 +349,24 @@ export const savePost =
 			return;
 		}
 
-		const content = select.getEditedPostContent();
+		const previousRecord = select.getCurrentPost();
+		// An empty block added while suggesting is no suggestion yet, and
+		// saved it would be a plain block nobody can accept or reject.
+		const content =
+			( select.getEditorIntent() === EDITOR_INTENT_SUGGEST &&
+				serializeWithoutDeferredInsertions(
+					registry,
+					registry
+						.select( coreStore )
+						.getEditedEntityRecord(
+							'postType',
+							previousRecord.type,
+							previousRecord.id
+						)?.blocks
+				) ) ||
+			select.getEditedPostContent();
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
-		const previousRecord = select.getCurrentPost();
 		// Snapshotted alongside the content above, so that attaching media once
 		// the save finishes works from what was saved for the post itself.
 		const savedBlocks = select.getEditorBlocks();
