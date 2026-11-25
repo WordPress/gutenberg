@@ -133,7 +133,7 @@ describe( 'useThemeProviderStyles', () => {
 				result.current.themeProviderStyles[
 					'--wpds-color-background-interactive-brand-strong'
 				]
-			).toBe( '#1e90ff' );
+			).toBe( '#1089f7' );
 		} );
 
 		it( 'emits neutral interactive background state properties from the background ramp', () => {

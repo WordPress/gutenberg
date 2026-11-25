@@ -22,6 +22,7 @@ export default {
 		'foreground-interactive-brand-strong-active',
 	],
 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
+	'primary-surface1': [ 'background-surface-brand' ],
 	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
 	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
 	'primary-stroke3': [
@@ -34,7 +35,6 @@ export default {
 	],
 	'primary-stroke4': [ 'stroke-interactive-brand-active' ],
 	'primary-stroke1': [ 'stroke-surface-brand' ],
-	'primary-surface1': [ 'background-surface-brand' ],
 	'info-surface2': [ 'background-surface-info-weak' ],
 	'info-surface4': [ 'background-surface-info' ],
 	'info-fgSurface4': [ 'foreground-content-info' ],

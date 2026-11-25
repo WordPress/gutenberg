@@ -1,3 +1,7 @@
+import {
+	MINIMUM_NON_TEXT_CONTRAST,
+	MINIMUM_TEXT_CONTRAST,
+} from '../../semantic-color-contrast-pairs.ts';
 import type { RampStepConfig, RampConfig, RampDirection } from './types.ts';
 import type { TaperChromaOptions } from './taper-chroma.ts';
 
@@ -201,7 +205,7 @@ const BASE_RAMP_CONFIG: RampConfig = {
 	fgFill: {
 		contrast: {
 			reference: 'bgFill1',
-			additionalReferences: [ 'bgFill2' ],
+			additionalReferences: [ { reference: 'bgFill2', target: 4.5 } ],
 			followDirection: 'best',
 			target: 4.5,
 		},
@@ -327,3 +331,38 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 		taperChromaOptions: undefined,
 	},
 };
+
+export const PRIMARY_RAMP_CONFIG: RampConfig = {
+	...ACCENT_RAMP_CONFIG,
+	bgFill1: {
+		sameAsIfPossible: 'seed',
+		contrast: {
+			reference: 'neutralSurface',
+			target: MINIMUM_NON_TEXT_CONTRAST,
+			followDirection: 'main',
+		},
+	},
+	bgFill2: withNeutralSurfaceTarget( 'bgFill2', MINIMUM_NON_TEXT_CONTRAST ),
+	stroke3: withNeutralSurfaceTarget( 'stroke3', MINIMUM_NON_TEXT_CONTRAST ),
+	fgSurface3: withNeutralSurfaceTarget( 'fgSurface3', MINIMUM_TEXT_CONTRAST ),
+	fgSurface4: withNeutralSurfaceTarget( 'fgSurface4', MINIMUM_TEXT_CONTRAST ),
+};
+
+function withNeutralSurfaceTarget( step: keyof RampConfig, target: number ) {
+	const config = ACCENT_RAMP_CONFIG[ step ];
+	return {
+		...config,
+		contrast: {
+			...config.contrast,
+			additionalReferences: [
+				{ reference: 'neutralSurface', target },
+				...( step === 'bgFill2'
+					? []
+					: ( [
+							{ reference: 'surface1', target },
+							{ reference: 'surface2', target },
+						] as const ) ),
+			] as const,
+		},
+	};
+}

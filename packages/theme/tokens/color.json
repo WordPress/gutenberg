@@ -66,20 +66,6 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.043, 0, 0.439 ],
-						"hex": "#0b0070"
-					}
-				},
-				"fgSurface3": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.22, 0.345, 0.914 ],
-						"hex": "#3858e9"
-					}
-				},
 				"fgSurface2": {
 					"$value": {
 						"colorSpace": "srgb",
@@ -92,34 +78,6 @@
 						"colorSpace": "srgb",
 						"components": [ 0.514, 0.655, 1 ],
 						"hex": "#83a7ff"
-					}
-				},
-				"stroke3": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.22, 0.345, 0.914 ],
-						"hex": "#3858e9"
-					}
-				},
-				"stroke4": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.137, 0.212, 0.78 ],
-						"hex": "#2336c7"
-					}
-				},
-				"stroke2": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.612, 0.671, 0.824 ],
-						"hex": "#9cabd2"
-					}
-				},
-				"stroke1": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.69, 0.737, 0.859 ],
-						"hex": "#b0bcdb"
 					}
 				},
 				"bgFillDark": {
@@ -162,6 +120,48 @@
 						"colorSpace": "srgb",
 						"components": [ 0.922, 0.937, 0.98 ],
 						"hex": "#ebeffa"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.043, 0, 0.439 ],
+						"hex": "#0b0070"
+					}
+				},
+				"fgSurface3": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.22, 0.345, 0.914 ],
+						"hex": "#3858e9"
+					}
+				},
+				"stroke3": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.22, 0.345, 0.914 ],
+						"hex": "#3858e9"
+					}
+				},
+				"stroke4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.137, 0.212, 0.78 ],
+						"hex": "#2336c7"
+					}
+				},
+				"stroke2": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.612, 0.671, 0.824 ],
+						"hex": "#9cabd2"
+					}
+				},
+				"stroke1": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.69, 0.737, 0.859 ],
+						"hex": "#b0bcdb"
 					}
 				}
 			},
