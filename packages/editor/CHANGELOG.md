@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes: Enable notes on saved templates and template parts in the site editor, resolving the note's target post from the template record's `wp_id` ([#81548](https://github.com/WordPress/gutenberg/pull/81548)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
