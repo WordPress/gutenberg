@@ -14,6 +14,7 @@
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
 -   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
+-   Undo: Clicking below the content of an empty post no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 -   `PostTaxonomiesFlatTermSelector`, `PostTaxonomiesHierarchicalTermSelector`: Prevent saving the post while a new term is being created, so the term isn't left out of the saved post ([#87321](https://github.com/WordPress/gutenberg/pull/87321)).

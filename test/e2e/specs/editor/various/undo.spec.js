@@ -582,6 +582,41 @@ test.describe( 'undo', () => {
 			.toBe( false );
 	} );
 
+	test( 'should not create an undo level when clicking below the content of an empty post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		const canvasRect = await canvas.boundingBox();
+		await page.mouse.click(
+			canvasRect.x + canvasRect.width / 2,
+			canvasRect.y + canvasRect.height - 20
+		);
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/block-editor' ).getBlockCount()
+				)
+			)
+			.toBe( 1 );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
 	test( 'should immediately create an undo level on typing', async ( {
 		editor,
 		page,
