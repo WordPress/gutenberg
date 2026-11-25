@@ -3,9 +3,9 @@ import { useId, useMemo } from '@wordpress/element';
 import { BlockPreview, BlockEditorProvider } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { parse } from '@wordpress/blocks';
+import { useEditorAssets } from '@wordpress/lazy-editor/assets';
 import './style.scss';
 import { unlock } from '../../lock-unlock';
-import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useStylesId } from '../../hooks/use-styles-id';
 

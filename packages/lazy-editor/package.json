@@ -37,9 +37,17 @@
 			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
+		"./assets": {
+			"types": "./build-types/assets.d.ts",
+			"import": "./build-module/assets.mjs",
+			"default": "./build/assets.cjs"
+		},
 		"./package.json": "./package.json"
 	},
-	"wpScriptModuleExports": "./build-module/index.mjs",
+	"wpScriptModuleExports": {
+		".": "./build-module/index.mjs",
+		"./assets": "./build-module/assets.mjs"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/asset-loader": "file:../asset-loader",

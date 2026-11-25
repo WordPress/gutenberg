@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an `@wordpress/lazy-editor/assets` script module exporting `loadEditorAssets` and `useEditorAssets`. It imports none of the editor's scripts, so a page can load the editor assets with it before importing `@wordpress/lazy-editor`, which reads their globals as soon as it loads.
+
 ### Bug Fixes
 
 -   Show media upload progress in a snackbar while the editor is open ([#86999](https://github.com/WordPress/gutenberg/pull/86999)).
