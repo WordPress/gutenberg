@@ -1314,7 +1314,8 @@ export const getEntitiesConfig =
 	};
 
 /**
- * Requests the entity config for the given kind and name from the REST API.
+ * Waits for the loader that provides the entity config for the given kind and
+ * name, if there is one.
  *
  * @param kind Entity kind.
  * @param name Entity name.

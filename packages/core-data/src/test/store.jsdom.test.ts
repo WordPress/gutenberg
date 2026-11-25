@@ -159,6 +159,27 @@ describe( 'getEntityRecord', () => {
 	} );
 } );
 
+describe( 'getEntityConfig', () => {
+	let registry: ReturnType< typeof createRegistry >;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		apiFetchMock.mockReset();
+	} );
+
+	it( 'loads the site entity config with the setting labels', async () => {
+		apiFetchMock.mockResolvedValue( {
+			schema: { properties: { title: { title: 'Title' } } },
+		} );
+
+		await expect(
+			registry
+				.resolveSelect( coreDataStore )
+				.getEntityConfig( 'root', 'site' )
+		).resolves.toMatchObject( { meta: { labels: { title: 'Title' } } } );
+	} );
+} );
+
 describe( 'getEntityRecords', () => {
 	const POSTS = [
 		createTestPost( 1 ),

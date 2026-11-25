@@ -32,9 +32,7 @@ function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
 	return args as unknown as CoreDataThunkArgs;
 }
 
-function mockGetEntityConfig< T extends { kind: string; name: string } >(
-	configs: T[]
-) {
+function mockEntityConfig( configs: Array< { kind: string; name: string } > ) {
 	return vi.fn( ( kind: string, name: string ) =>
 		configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -67,7 +65,7 @@ describe( 'getEntityRecord', () => {
 		},
 	];
 	const registry = { batch: ( callback: () => void ) => callback() };
-	const resolveSelect = { getEntityConfig: mockGetEntityConfig( ENTITIES ) };
+	const resolveSelect = { getEntityConfig: mockEntityConfig( ENTITIES ) };
 
 	let dispatch: DispatchMock<
 		| 'receiveEntityRecords'
@@ -183,7 +181,7 @@ describe( 'getEntityRecord', () => {
 		];
 
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( ENTITIES_WITH_SYNC ),
+			getEntityConfig: mockEntityConfig( ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: vi.fn(),
 		};
 
@@ -223,7 +221,7 @@ describe( 'getEntityRecord', () => {
 			json: () => Promise.resolve( POST_RECORD ),
 		};
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( [
+			getEntityConfig: mockEntityConfig( [
 				{
 					name: 'post',
 					kind: 'postType',
@@ -271,7 +269,7 @@ describe( 'getEntityRecord', () => {
 		];
 
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( ENTITIES_WITH_SYNC ),
+			getEntityConfig: mockEntityConfig( ENTITIES_WITH_SYNC ),
 		};
 		const select = {
 			isCollaborationSupported: vi.fn( () => false ),
@@ -317,7 +315,7 @@ describe( 'getEntityRecord', () => {
 		];
 
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( ENTITIES_WITH_SYNC ),
+			getEntityConfig: mockEntityConfig( ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: vi.fn(),
 		};
 
@@ -362,7 +360,7 @@ describe( 'getEntityRecord', () => {
 		];
 
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( ENTITIES_WITH_SYNC ),
+			getEntityConfig: mockEntityConfig( ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: vi.fn(),
 		};
 
@@ -411,7 +409,7 @@ describe( 'getEntityRecord', () => {
 		];
 
 		const resolveSelectWithSync = {
-			getEntityConfig: mockGetEntityConfig( ENTITIES_WITH_SYNC ),
+			getEntityConfig: mockEntityConfig( ENTITIES_WITH_SYNC ),
 		};
 
 		apiFetchMock.mockImplementation( () => POST_RESPONSE );
@@ -460,7 +458,7 @@ describe( 'getEntityRecords', () => {
 		},
 	];
 	const registry = { batch: ( callback: () => void ) => callback() };
-	const resolveSelect = { getEntityConfig: mockGetEntityConfig( ENTITIES ) };
+	const resolveSelect = { getEntityConfig: mockEntityConfig( ENTITIES ) };
 
 	beforeEach( async () => {
 		apiFetchMock.mockReset();
@@ -762,7 +760,7 @@ describe( 'taxonomy pagination', () => {
 
 	it( 'should make paginated API calls with parse: false', async () => {
 		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( loadedTaxonomyEntities ),
+			getEntityConfig: mockEntityConfig( loadedTaxonomyEntities ),
 		};
 
 		apiFetchMock.mockResolvedValueOnce( [
@@ -783,7 +781,7 @@ describe( 'taxonomy pagination', () => {
 
 	it( 'should extract pagination metadata from headers', async () => {
 		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( loadedTaxonomyEntities ),
+			getEntityConfig: mockEntityConfig( loadedTaxonomyEntities ),
 		};
 
 		const mockResponse = {
@@ -881,7 +879,7 @@ describe( 'canUser', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
-	const resolveSelect = { getEntityConfig: mockGetEntityConfig( ENTITIES ) };
+	const resolveSelect = { getEntityConfig: mockEntityConfig( ENTITIES ) };
 
 	let dispatch: DispatchMock< 'receiveUserPermissions' >;
 	beforeEach( async () => {

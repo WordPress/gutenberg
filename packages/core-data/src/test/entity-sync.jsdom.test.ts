@@ -50,16 +50,6 @@ function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
 	return args as unknown as CoreDataThunkArgs;
 }
 
-function mockGetEntityConfig< T extends { kind: string; name: string } >(
-	configs: T[]
-) {
-	return vi.fn( ( kind: string, name: string ) =>
-		configs.find(
-			( config ) => config.kind === kind && config.name === name
-		)
-	);
-}
-
 /**
  * A fake manager that records every interface call.
  *
@@ -182,7 +172,7 @@ describe( 'the entity sync interface', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( [ POST_ENTITY ] ),
+			getEntityConfig: vi.fn( () => POST_ENTITY ),
 			getEditedEntityRecord: vi.fn( () =>
 				Promise.resolve( { ...POST_RECORD, title: 'Edited' } )
 			),
@@ -320,7 +310,7 @@ describe( 'the entity sync interface', () => {
 	describe( 'getEntityRecords', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
 		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( [ POST_ENTITY ] ),
+			getEntityConfig: vi.fn( () => POST_ENTITY ),
 		};
 
 		it( 'loads the collection when the whole collection is requested', async () => {
@@ -413,7 +403,7 @@ describe( 'the entity sync interface', () => {
 		const persistedRecord = { id: 10, title: 'Initial', meta: {} };
 		const select = { getRawEntityRecord: () => persistedRecord };
 		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( [ POST_ENTITY ] ),
+			getEntityConfig: vi.fn( () => POST_ENTITY ),
 		};
 
 		it( 'calls beforeSave and afterSave around a regular save', async () => {
@@ -565,7 +555,7 @@ describe( 'the entity sync interface', () => {
 	describe( 'deleteEntityRecord', () => {
 		it( 'unloads the deleted record', async () => {
 			const resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( [ POST_ENTITY ] ),
+				getEntityConfig: vi.fn( () => POST_ENTITY ),
 			};
 			apiFetchMock.mockImplementation( () => ( { deleted: true } ) );
 

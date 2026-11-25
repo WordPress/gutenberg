@@ -43,9 +43,7 @@ function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
 	return args as unknown as CoreDataThunkArgs;
 }
 
-function mockGetEntityConfig< T extends { kind: string; name: string } >(
-	configs: T[]
-) {
+function mockEntityConfig( configs: Array< { kind: string; name: string } > ) {
 	return vi.fn( ( kind: string, name: string ) =>
 		configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -657,9 +655,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => deletedRecord );
@@ -710,9 +706,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( entities ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( entities ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => {
@@ -742,9 +736,7 @@ describe( 'deleteEntityRecord', () => {
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( entities ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( entities ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => {
@@ -787,9 +779,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( vi.fn(), {
 			saveEntityRecord: vi.fn(),
 		} );
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -829,9 +819,7 @@ describe( 'saveEditedEntityRecord', () => {
 		const dispatch = Object.assign( vi.fn(), {
 			saveEntityRecord: vi.fn(),
 		} );
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		const updatedRecord = { ...item, menu: 10 };
@@ -878,9 +866,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -945,9 +931,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( entities ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( entities ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => {
@@ -969,9 +953,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( entities ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( entities ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => {
@@ -993,9 +975,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => post,
 		};
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		const updatedRecord = { ...post, id: 10 };
@@ -1107,7 +1087,7 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( configs ),
+				getEntityConfig: mockEntityConfig( configs ),
 			};
 			const updatedRecord = {
 				id: 10,
@@ -1194,7 +1174,7 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( configs ),
+				getEntityConfig: mockEntityConfig( configs ),
 			};
 			const updatedRecord = {
 				...persistedRecord,
@@ -1238,7 +1218,7 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => persistedRecord,
 			};
 			const resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( configs ),
+				getEntityConfig: mockEntityConfig( configs ),
 			};
 			const error = new Error( 'API error' );
 			apiFetchMock.mockRejectedValue( error );
@@ -1269,7 +1249,7 @@ describe( 'saveEntityRecord', () => {
 				getRawEntityRecord: () => undefined,
 			};
 			const resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( configs ),
+				getEntityConfig: mockEntityConfig( configs ),
 			};
 			const updatedRecord = {
 				id: 10,
@@ -1318,9 +1298,7 @@ describe( 'saveEntityRecord', () => {
 		const select = {
 			getRawEntityRecord: () => ( {} ),
 		};
-		const resolveSelect = {
-			getEntityConfig: mockGetEntityConfig( configs ),
-		};
+		const resolveSelect = { getEntityConfig: mockEntityConfig( configs ) };
 
 		// Provide response
 		apiFetchMock.mockImplementation( () => postType );
@@ -1399,7 +1377,7 @@ describe( 'saveEntityRecord', () => {
 				asSyncManager( syncManager )
 			);
 			resolveSelect = {
-				getEntityConfig: mockGetEntityConfig( [
+				getEntityConfig: mockEntityConfig( [
 					{
 						name: 'post',
 						kind: 'postType',
