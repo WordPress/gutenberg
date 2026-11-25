@@ -41,6 +41,7 @@ import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
+import { isRenderedOnItsOwn } from './template-around';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -58,15 +59,6 @@ const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_block',
 	'wp_navigation',
 	'wp_template_part',
-];
-
-/**
- * Post types that are never rendered inside a template, so whose only rendering
- * mode is `post-only`.
- */
-const POST_TYPES_WITHOUT_TEMPLATE = [
-	'wp_template',
-	...NON_CONTEXTUAL_POST_TYPES,
 ];
 
 /**
@@ -187,15 +179,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		__unstableTemplate: template,
 	} ) => {
 		const hasTemplate = !! template;
-		// A post that is never rendered inside a template has no other mode
-		// than `post-only`, whatever mode the caller names. Waiting for its
-		// template would wait forever, and leave the editor in the mode of the
-		// last post, such as a page shown inside its template before Home.
-		const neverHasTemplate = POST_TYPES_WITHOUT_TEMPLATE.includes(
-			post.type
-		);
+		// A post rendered on its own has no other mode than `post-only`,
+		// whatever mode the caller names. Waiting for a template would wait
+		// forever, and leave the editor in the mode of the last post, such as
+		// a page shown inside its template before Home.
+		const renderedOnItsOwn = isRenderedOnItsOwn( post, template );
 		const renderingMode =
-			requestedRenderingMode && neverHasTemplate
+			requestedRenderingMode && renderedOnItsOwn
 				? 'post-only'
 				: requestedRenderingMode;
 		const {
@@ -226,7 +216,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
-				const _defaultMode = neverHasTemplate
+				const _defaultMode = renderedOnItsOwn
 					? 'post-only'
 					: ( renderingMode ?? getDefaultRenderingMode( post.type ) );
 				/**
@@ -268,7 +258,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, neverHasTemplate, renderingMode ]
+			[ post.type, post.id, hasTemplate, renderedOnItsOwn, renderingMode ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
