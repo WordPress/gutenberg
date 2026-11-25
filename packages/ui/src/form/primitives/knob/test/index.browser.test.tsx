@@ -463,8 +463,97 @@ describe( 'Knob', () => {
 				step={ unitsPerTurn / 100 }
 			/>
 		);
+		// The last step is the upper limit itself, never a hair above it. The
+		// range input rounds what it shows, so read the value it reports.
+		const reported = () =>
+			Number( slider.element().getAttribute( 'aria-valuenow' ) );
 		await userEvent.keyboard( '{End}' );
-		await expect.poll( value ).toBeCloseTo( unitsPerTurn, 6 );
+		await expect.poll( reported ).toBe( unitsPerTurn );
+		// A limit that is truly short of a step keeps the step below it.
+		await rerender(
+			<Knob aria-label="Angle" min={ 0 } max={ 359.9999999995 } />
+		);
+		await userEvent.keyboard( '{End}' );
+		await expect.poll( value ).toBe( 359 );
+	} );
+
+	it( 'counts the turn from the exact value when it lies between two steps', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -720 }
+					max={ 720 }
+					value={ 269.9 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { right } = getPoints( dial );
+		// Three o'clock is 179.9 degrees back and 180.1 degrees on.
+		await dial.click( { position: right } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
+	it( 'takes the heading where the pointer lifts when a tap slips', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 180 }
+					defaultValue={ 90 }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		// Both points are in the gap of the range. The press is nearer to the
+		// upper end and the release, two pixels on, is nearer to the lower.
+		await userEvent.pointer( [
+			{ target: dial, coords: at( 3, 21 ), keys: '[MouseLeft>]' },
+			{ target: dial, coords: at( 3, 19 ) },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'counts a slipped tap from a value that arrives before the pointer lifts', async () => {
+		const onValueChange = vi.fn();
+		const { rerender } = await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -720 }
+					max={ 720 }
+					value={ 0 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await userEvent.pointer( [
+			{ target: dial, coords: at( 33, 6 ), keys: '[MouseLeft>]' },
+			// A slip that stays on the 43 degree heading of the press.
+			{ target: dial, coords: at( 33.1, 6.1 ) },
+		] );
+		await rerender(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -720 }
+					max={ 720 }
+					value={ 390 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		await userEvent.pointer( '[/MouseLeft]' );
+		// The 43 degree heading, on the turn nearest to 390.
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 403 );
 	} );
 
 	it( 'selects the heading under the pointer when a drag moves inward and then through the center', async () => {
