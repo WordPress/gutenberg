@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the WCAG sRGB luminance coefficients when checking generated colors against contrast thresholds ([#87174](https://github.com/WordPress/gutenberg/pull/87174)).
+
 ### Internal
 
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
