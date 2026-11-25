@@ -190,16 +190,16 @@
 			}
 
 			[data-orientation="horizontal"] & {
+				--_wp-ui-tabs-background-inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
+
 				padding-inline: var(--wpds-dimension-padding-lg);
 				height: 48px; /* TODO: use semantic size/height tokens when available */
 				scroll-margin: 24px;
 
-				/* Center a background one control tall in the tab, with the same
-				 * clearance on every side, so it stays clear of the selection
-				 * indicator. */
+				/* Leave space between the background and the selection indicator. */
 				&::after {
 					content: "";
-					inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
+					inset: var(--_wp-ui-tabs-background-inset);
 				}
 			}
 
@@ -215,9 +215,7 @@
 					/* Let the clip alone shape the outer corners. */
 					border-radius: 0;
 					clip-path: inset(calc(-1 * var(--_wp-ui-tabs-background-overhang)) round var(--wpds-border-radius-sm));
-					inset-block:
-						calc((48px - var(--wpds-dimension-size-md)) / 2 +
-						var(--_wp-ui-tabs-background-overhang));
+					inset-block: calc(var(--_wp-ui-tabs-background-inset) + var(--_wp-ui-tabs-background-overhang));
 					inset-inline: 0;
 					outline-offset:
 						calc(var(--_wp-ui-tabs-background-overhang) -
@@ -227,11 +225,11 @@
 
 			/* An SVG can paint past its viewport without making the list scroll.
 			 * Use the native outline when a custom render wraps or omits the SVG. */
-			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:has(> .focus-ring)::after {
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:has(> .tab-children > .focus-ring)::after {
 				outline: none;
 			}
 
-			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:not(:has(> .focus-ring))::after {
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:not(:has(> .tab-children > .focus-ring))::after {
 				border-radius: max(0px, var(--wpds-border-radius-sm) - var(--_wp-ui-tabs-background-overhang));
 			}
 
@@ -241,7 +239,7 @@
 				&::before {
 					content: "";
 					z-index: 0;
-					inset-block: calc((48px - var(--wpds-dimension-size-md)) / 2);
+					inset-block: var(--_wp-ui-tabs-background-inset);
 					inset-inline: 0;
 				}
 
@@ -265,23 +263,24 @@
 			display: none;
 			pointer-events: none;
 
-			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] .tab:focus-visible > & {
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] .tab:focus-visible > .tab-children > & {
 				display: block;
 				position: absolute;
 				inset-inline-start: 0;
-				top: calc((48px - var(--wpds-dimension-size-md)) / 2);
+				top: var(--_wp-ui-tabs-background-inset);
 				width: 100%;
-				height: var(--wpds-dimension-size-md);
+				height: calc(100% - 2 * var(--_wp-ui-tabs-background-inset));
+				container-type: size;
 				overflow: visible;
 			}
 
 			rect {
 				/* Clip the outer half of the stroke to draw it inside the background. */
-				x: calc(-1 * var(--wpds-dimension-padding-xs));
-				width: calc(100% + 2 * var(--wpds-dimension-padding-xs));
+				x: calc(-1 * var(--_wp-ui-tabs-background-overhang));
+				width: calc(100% + 2 * var(--_wp-ui-tabs-background-overhang));
 				height: 100%;
 				/* SVG clamps the two axes independently. Keep the corners circular. */
-				rx: min(var(--wpds-border-radius-sm), var(--wpds-dimension-size-md) / 2, 50% + var(--wpds-dimension-padding-xs));
+				rx: min(var(--wpds-border-radius-sm), 50cqh, 50% + var(--_wp-ui-tabs-background-overhang));
 				fill: none;
 				stroke: var(--focus-color, var(--wpds-color-stroke-focus));
 				stroke-width: calc(2 * var(--wpds-border-width-focus));
@@ -308,4 +307,9 @@
 			}
 		}
 	}
+}
+
+/* Unlayered theme rules for svg can expose idle rings or clip the stroke. */
+.tab .focus-ring {
+	all: revert-layer;
 }
