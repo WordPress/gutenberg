@@ -87,7 +87,7 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 
 /**
  * Returns a helper object that contains:
- * 1. An `options` object from the available post types, to be passed to a `SelectControl`.
+ * 1. An `options` object from the available post types, to be passed to a `SelectControl`, or `undefined` while they load.
  * 2. A helper map with available taxonomies per post type.
  * 3. A helper map with post format support per post type.
  *
@@ -114,7 +114,7 @@ export const usePostTypes = () => {
 	}, [ postTypes ] );
 	const postTypesSelectOptions = useMemo(
 		() =>
-			( postTypes || [] ).map( ( { labels, slug } ) => ( {
+			postTypes?.map( ( { labels, slug } ) => ( {
 				label: labels.singular_name,
 				value: slug,
 			} ) ),

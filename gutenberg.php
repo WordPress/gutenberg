@@ -72,3 +72,11 @@ function gutenberg_pre_init() {
 
 	require_once __DIR__ . '/lib/load.php';
 }
+
+add_action( 'init', function () {
+	register_taxonomy( 'custom', 'post', array( 'public' => false, 'show_in_rest' => 'true', 'label' => 'Custom' ) );
+	register_taxonomy( 'secret', 'post', array( 'label' => 'Secret', 'public' => false, 'show_in_rest' => true ) );
+	register_post_type( 'book', array( 'label' => 'Books', 'public' => true ) );
+}, 200 );
+
+add_filter( 'is_post_type_viewable', '__return_false' );

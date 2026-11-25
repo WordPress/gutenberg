@@ -122,22 +122,21 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const isPostTypeUnavailable =
-		postTypesSelectOptions.length > 0 &&
-		! postTypesSelectOptions.some( ( item ) => item.value === postType );
-	// A toggle can't show a saved post type that isn't among its options. Keep
-	// the dropdown after a replacement is chosen, so it isn't swapped for the
-	// toggle while it has focus.
-	const [ keepPostTypeSelect, setKeepPostTypeSelect ] = useState( false );
-	if ( isPostTypeUnavailable && ! keepPostTypeSelect ) {
-		setKeepPostTypeSelect( true );
-	}
-	const showPostTypeSelect =
-		postTypesSelectOptions.length > 2 || keepPostTypeSelect;
 	const postTypeItems = addUnavailableItem(
 		postTypesSelectOptions,
 		postType
 	);
+	const selectedPostType =
+		postTypeItems.find( ( item ) => item.value === postType ) ?? null;
+	// Keep the dropdown once shown, so choosing a post type doesn't swap it for
+	// the toggle while it has focus.
+	const [ showPostTypeSelect, setShowPostTypeSelect ] = useState( false );
+	if (
+		! showPostTypeSelect &&
+		( postTypeItems.length > 2 || selectedPostType?.disabled )
+	) {
+		setShowPostTypeSelect( true );
+	}
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
@@ -294,11 +293,7 @@ export default function QueryInspectorControls( props ) {
 							{ showPostTypeSelect ? (
 								<SelectControl
 									items={ postTypeItems }
-									value={
-										postTypeItems.find(
-											( item ) => item.value === postType
-										) ?? null
-									}
+									value={ selectedPostType }
 									label={ postTypeControlLabel }
 									onValueChange={ ( item ) => {
 										if ( item && item.value !== postType ) {
@@ -315,7 +310,7 @@ export default function QueryInspectorControls( props ) {
 									onChange={ onPostTypeChange }
 									help={ postTypeControlHelp }
 								>
-									{ postTypesSelectOptions.map(
+									{ postTypesSelectOptions?.map(
 										( option ) => (
 											<ToggleGroupControlOption
 												key={ option.value }

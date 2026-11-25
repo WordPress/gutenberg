@@ -54,7 +54,7 @@ export default function CategoriesEdit( {
 		taxonomySlug
 	);
 
-	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
+	const taxonomy = allTaxonomies?.find( ( t ) => t.slug === taxonomySlug );
 
 	const isHierarchicalTaxonomy =
 		! isResolvingTaxonomies && taxonomy?.hierarchical;
@@ -350,7 +350,7 @@ export default function CategoriesEdit( {
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (
-				<p>{ taxonomy.labels.no_terms }</p>
+				<p>{ taxonomy?.labels?.no_terms ?? __( 'No terms found.' ) }</p>
 			) }
 			{ ! isResolving &&
 				categories?.length > 0 &&
