@@ -6,23 +6,14 @@ import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
-import {
-	BOUNDED_SWEEP,
-	clamp,
-	getAngleOnTurn,
-	getPointerAngle,
-	getStepRange,
-	getStepChange,
-	modulo,
-} from './dial';
+import { clamp, getDial, getPointerAngle, getStepChange, modulo } from './dial';
 import type { KnobProps } from './types';
 import styles from './style.module.scss';
 
-type Drag = {
+type Gesture = {
 	pointerId: number;
 	pointerAngle: number | null;
 	dialAngle: number;
-	tapOrigin: { x: number; y: number } | null;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
@@ -30,21 +21,24 @@ type Drag = {
 const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
 
 /**
- * A rotary slider for choosing a single number. Click or tap a position on the
- * dial, drag around its center, or use the arrow keys. Give it an accessible
- * name with Field.Label, aria-label, or aria-labelledby.
+ * A dial for choosing an angle. It sits beside an input that shows the exact
+ * number and edits the same value. Click or tap a heading, drag around the
+ * center, or use the arrow keys.
+ *
+ * Without `min` and `max` the dial covers one turn and wraps. With both, it
+ * stops at the ends and counts the turns in between.
  */
 export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 	function UnforwardedKnob(
 		{
-			min = 0,
-			max = 100,
-			step: stepProp = 1,
-			largeStep = 10,
-			wrap = false,
+			min,
+			max,
+			step: stepProp,
+			largeStep,
 			unitsPerTurn,
 			value,
-			defaultValue = min,
+			defaultValue = 0,
+			placeholder = 0,
 			onValueChange,
 			onKeyDown,
 			inputRef,
@@ -63,60 +57,75 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			useState( defaultValue );
 		const input = useRef< HTMLInputElement >( null );
 		const mergedInputRef = useMergeRefs( [ input, inputRef ] );
-		const drag = useRef< Drag | null >( null );
-		const { step, precision, lastStep, toValue, toIndex } = getStepRange(
-			min,
-			max,
-			stepProp
+		const gesture = useRef< Gesture | null >( null );
+		const {
+			wraps,
+			step,
+			precision,
+			lastStep,
+			degreesPerStep,
+			firstAngle,
+			lastAngle,
+			toValue,
+			toIndex,
+			toAngle,
+		} = getDial( { min, max, step: stepProp, unitsPerTurn } );
+		const largeStepCount = Math.max(
+			1,
+			Math.round( ( largeStep ?? step * 10 ) / step )
 		);
-		const largeStepCount = Math.max( 1, Math.round( largeStep / step ) );
-		const index = clamp(
-			toIndex( value ?? uncontrolledValue ),
-			0,
-			lastStep
+		const isEmpty = value === null;
+		const index = toIndex(
+			value === undefined ? uncontrolledValue : ( value ?? placeholder )
 		);
-		const currentValue = toValue( index );
-		let minAngle = wrap ? 0 : -BOUNDED_SWEEP / 2;
-		let degreesPerStep = wrap
-			? 360 / ( lastStep + 1 )
-			: BOUNDED_SWEEP / Math.max( 1, lastStep );
-		const hasUnitsPerTurn =
-			unitsPerTurn !== undefined &&
-			Number.isFinite( unitsPerTurn ) &&
-			unitsPerTurn > 0;
-		if ( hasUnitsPerTurn ) {
-			minAngle = ( min / unitsPerTurn ) * 360;
-			degreesPerStep = ( step / unitsPerTurn ) * 360;
-		}
-		const maxAngle = minAngle + lastStep * degreesPerStep;
-		const angle = minAngle + index * degreesPerStep;
-		const tapBySide =
-			degreesPerStep >= 360 || ( degreesPerStep === 180 && lastStep > 1 );
-		// When the numeric cycle spans whole turns, wrapping preserves the heading.
-		const cycleInTurns = ( ( lastStep + 1 ) * degreesPerStep ) / 360;
-		const seamless =
-			wrap &&
-			Number.isInteger( Number( cycleInTurns.toPrecision( 15 ) ) );
+		const angle = toAngle( index );
 
-		function changeIndex( next: number ) {
-			const nextIndex = wrap
+		function selectIndex( next: number, evenIfUnchanged = false ) {
+			const nextIndex = wraps
 				? modulo( next, lastStep + 1 )
 				: clamp( next, 0, lastStep );
-			const nextValue = toValue( nextIndex );
-			if ( nextValue === currentValue ) {
+			if ( nextIndex === index && ! evenIfUnchanged ) {
 				return;
 			}
+			const nextValue = toValue( nextIndex );
 			if ( value === undefined ) {
 				setUncontrolledValue( nextValue );
 			}
 			onValueChange?.( nextValue );
 		}
 
+		function selectAngle( dialAngle: number, evenIfUnchanged = false ) {
+			const turned = wraps
+				? modulo( dialAngle, 360 )
+				: dialAngle - firstAngle;
+			selectIndex(
+				Math.round( turned / degreesPerStep ),
+				evenIfUnchanged
+			);
+		}
+
+		// The pointer names a heading. Take it on the turn nearest to `from`,
+		// so a click never moves the value by more than it has to.
+		function getDialAngle( pointerAngle: number, from: number ) {
+			const nearest =
+				pointerAngle +
+				360 * Math.round( ( from - pointerAngle ) / 360 );
+			if ( wraps ) {
+				return nearest;
+			}
+			return (
+				[ nearest, nearest - 360, nearest + 360 ].find(
+					( candidate ) =>
+						candidate >= firstAngle && candidate <= lastAngle
+				) ?? clamp( nearest, firstAngle, lastAngle )
+			);
+		}
+
 		function handlePointerDown(
 			event: React.PointerEvent< HTMLDivElement >
 		) {
 			if (
-				drag.current ||
+				gesture.current ||
 				! event.isPrimary ||
 				event.button !== 0 ||
 				! input.current?.matches( ':enabled' )
@@ -124,96 +133,63 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const pointerAngle = getPointerAngle( event );
-			drag.current = {
+			const dialAngle =
+				pointerAngle === null
+					? angle
+					: getDialAngle( pointerAngle, angle );
+			gesture.current = {
 				pointerId: event.pointerId,
 				pointerAngle,
-				tapOrigin: tapBySide
-					? { x: event.clientX, y: event.clientY }
-					: null,
-				dialAngle:
-					pointerAngle === null || tapBySide
-						? angle
-						: getAngleOnTurn(
-								pointerAngle,
-								angle,
-								minAngle,
-								maxAngle,
-								seamless,
-								degreesPerStep
-							),
+				dialAngle,
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
 			event.currentTarget.setPointerCapture( event.pointerId );
 			input.current.focus( { preventScroll: true } );
+			if ( pointerAngle !== null ) {
+				// An empty dial has no value yet, so picking the heading it
+				// already points to is still a choice.
+				selectAngle( dialAngle, isEmpty );
+			}
 		}
 
-		function updateFromPointer(
+		function handlePointerMove(
 			event: React.PointerEvent< HTMLDivElement >
 		) {
-			const gesture = drag.current;
+			const current = gesture.current;
 			if (
-				! gesture ||
-				gesture.pointerId !== event.pointerId ||
+				! current ||
+				current.pointerId !== event.pointerId ||
 				! input.current?.matches( ':enabled' )
 			) {
 				return;
 			}
 			const pointerAngle = getPointerAngle( event );
-			if ( gesture.tapOrigin ) {
-				// A whole step can lead back to the same heading. Tap either side
-				// to step, or start a drag from the current value after a small movement.
-				const distance = Math.hypot(
-					event.clientX - gesture.tapOrigin.x,
-					event.clientY - gesture.tapOrigin.y
-				);
-				if ( distance < 4 ) {
-					if (
-						event.type === 'pointerup' &&
-						pointerAngle !== null &&
-						Math.abs( pointerAngle ) < 180
-					) {
-						changeIndex( index + Math.sign( pointerAngle ) );
-					}
-					return;
-				}
-				gesture.tapOrigin = null;
-			}
 			if ( pointerAngle === null ) {
 				return;
 			}
-			let nextAngle;
-			if ( gesture.pointerAngle === null ) {
-				nextAngle = tapBySide
-					? gesture.dialAngle
-					: getAngleOnTurn(
-							pointerAngle,
-							gesture.dialAngle,
-							minAngle,
-							maxAngle,
-							seamless,
-							degreesPerStep
-						);
-			} else {
-				// Carry the turn count across twelve o'clock in either direction.
-				const delta = pointerAngle - gesture.pointerAngle;
-				nextAngle =
-					gesture.dialAngle + ( modulo( delta + 180, 360 ) - 180 );
-			}
-			gesture.dialAngle = wrap
+			const nextAngle =
+				current.pointerAngle === null
+					? getDialAngle( pointerAngle, current.dialAngle )
+					: // Add the shorter way round, so the turn count carries across twelve o'clock.
+						current.dialAngle +
+						modulo(
+							pointerAngle - current.pointerAngle + 180,
+							360
+						) -
+						180;
+			current.dialAngle = wraps
 				? nextAngle
-				: clamp( nextAngle, minAngle, maxAngle );
-			gesture.pointerAngle = pointerAngle;
-			changeIndex(
-				Math.round( ( gesture.dialAngle - minAngle ) / degreesPerStep )
-			);
+				: clamp( nextAngle, firstAngle, lastAngle );
+			current.pointerAngle = pointerAngle;
+			selectAngle( current.dialAngle );
 		}
 
 		function handleKeyDown(
 			event: React.KeyboardEvent< HTMLInputElement >
 		) {
 			onKeyDown?.( event );
-			if ( ! wrap || event.defaultPrevented ) {
+			if ( ! wraps || event.defaultPrevented ) {
 				return;
 			}
 			const next =
@@ -239,18 +215,19 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						styles.root,
 						className
 					) }
-					min={ min }
+					min={ toValue( 0 ) }
 					max={ toValue( lastStep ) }
 					step={ step }
 					largeStep={ Number(
 						( largeStepCount * step ).toFixed( precision )
 					) }
-					value={ currentValue }
-					onValueChange={ ( next ) => changeIndex( toIndex( next ) ) }
+					value={ toValue( index ) }
+					onValueChange={ ( next ) => selectIndex( toIndex( next ) ) }
 				>
 					<Slider.Thumb
 						className={ styles.thumb }
 						style={ THUMB_STYLE }
+						data-empty={ isEmpty ? '' : undefined }
 						inputRef={ mergedInputRef }
 						aria-label={ ariaLabel }
 						aria-labelledby={ ariaLabelledBy }
@@ -260,38 +237,32 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						tabIndex={ tabIndex }
 						onKeyDown={ handleKeyDown }
 						onPointerDown={ handlePointerDown }
-						onPointerMove={ updateFromPointer }
-						onPointerUp={ updateFromPointer }
+						onPointerMove={ handlePointerMove }
 						onLostPointerCapture={ ( event ) => {
-							if ( drag.current?.pointerId === event.pointerId ) {
-								drag.current = null;
+							if (
+								gesture.current?.pointerId === event.pointerId
+							) {
+								gesture.current = null;
 							}
 						} }
 					>
 						<svg
-							viewBox="0 0 32 32"
+							viewBox="0 0 40 40"
 							aria-hidden="true"
 							focusable="false"
 						>
 							<circle
-								cx="16"
-								cy="16"
-								r="15.5"
-								fill="none"
-								pathLength="360"
-								strokeDasharray={
-									! wrap && ! hasUnitsPerTurn
-										? `${ BOUNDED_SWEEP } 360`
-										: undefined
-								}
-								transform={ `rotate(${ -BOUNDED_SWEEP / 2 - 90 } 16 16)` }
+								className={ styles.outline }
+								cx="20"
+								cy="20"
+								r="19.5"
 							/>
 							<circle
-								cx="16"
-								cy="9"
-								r="4"
-								stroke="none"
-								transform={ `rotate(${ angle } 16 16)` }
+								className={ styles.indicator }
+								cx="20"
+								cy="10"
+								r={ isEmpty ? 3 : 4 }
+								transform={ `rotate(${ angle } 20 20)` }
 							/>
 						</svg>
 					</Slider.Thumb>

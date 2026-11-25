@@ -1,6 +1,3 @@
-// A gap at the bottom gives a bounded dial two distinct end stops.
-export const BOUNDED_SWEEP = 270;
-
 export function modulo( value: number, period: number ) {
 	return ( ( value % period ) + period ) % period;
 }
@@ -15,68 +12,70 @@ function decimalPlaces( value: number ) {
 	return Math.max( 0, fractionLength - Number( exponent ) );
 }
 
-export function getStepRange( min = 0, max = 100, stepProp = 1 ) {
-	const requestedStep =
-		Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
-	const span = max - min;
-	const spansRange = span > 0 && requestedStep >= span;
+function positive( value: number | undefined, fallback: number ) {
+	return value !== undefined && Number.isFinite( value ) && value > 0
+		? value
+		: fallback;
+}
+
+// Maps the selectable values to whole steps and to angles on the dial.
+//
+// Without bounds, the values cover one turn and repeat. Zero and a full turn
+// share a heading, so the last step is the one before a full turn. With bounds,
+// the steps start at `min` and the dial counts turns between `min` and `max`.
+export function getDial( {
+	min,
+	max,
+	step: stepProp,
+	unitsPerTurn: unitsPerTurnProp,
+}: {
+	min?: number;
+	max?: number;
+	step?: number;
+	unitsPerTurn?: number;
+} ) {
+	const unitsPerTurn = positive( unitsPerTurnProp, 360 );
+	const step = positive( stepProp, 1 );
+	const wraps = min === undefined || max === undefined;
+	const first = wraps ? 0 : min;
 	const precision = Math.min(
 		100,
-		Math.max(
-			decimalPlaces( min ),
-			decimalPlaces( spansRange ? max : requestedStep )
-		)
+		Math.max( decimalPlaces( first ), decimalPlaces( step ) )
 	);
-	const step = spansRange
-		? Number( span.toFixed( precision ) )
-		: requestedStep;
 	const toValue = ( index: number ) =>
-		Number( ( min + index * step ).toFixed( precision ) ) || 0;
-	const toIndex = ( value: number ) => Math.round( ( value - min ) / step );
-	const upperStep = Math.ceil( span / step );
-	const lastStep = toValue( upperStep ) <= max ? upperStep : upperStep - 1;
-	const snap = ( value: number ) =>
-		toValue( clamp( toIndex( value ), 0, lastStep ) );
-	return { step, precision, toValue, toIndex, lastStep, snap };
+		Number( ( first + index * step ).toFixed( precision ) ) || 0;
+	const upperStep = Math.ceil(
+		( wraps ? unitsPerTurn : max - first ) / step
+	);
+	const fits = wraps
+		? toValue( upperStep ) < unitsPerTurn
+		: toValue( upperStep ) <= max;
+	const lastStep = Math.max( 0, fits ? upperStep : upperStep - 1 );
+	const degreesPerStep = ( step / unitsPerTurn ) * 360;
+	const firstAngle = ( first / unitsPerTurn ) * 360;
+
+	return {
+		wraps,
+		step,
+		precision,
+		lastStep,
+		degreesPerStep,
+		firstAngle,
+		lastAngle: firstAngle + lastStep * degreesPerStep,
+		toValue,
+		toIndex: ( value: number ) =>
+			wraps
+				? modulo(
+						Math.round( modulo( value, unitsPerTurn ) / step ),
+						lastStep + 1
+					)
+				: clamp( Math.round( ( value - first ) / step ), 0, lastStep ),
+		toAngle: ( index: number ) => firstAngle + index * degreesPerStep,
+	};
 }
 
-export function getAngleOnTurn(
-	pointer: number,
-	current: number,
-	min: number,
-	max: number,
-	seamless: boolean,
-	degreesPerStep: number
-) {
-	const nearest = pointer + 360 * Math.round( ( current - pointer ) / 360 );
-	// A tap can move up to one turn. Compare actual step headings on either
-	// side, since a fractional number of steps per turn shifts their positions.
-	const reach =
-		Math.floor( Number( ( 360 / degreesPerStep ).toPrecision( 15 ) ) ) *
-		degreesPerStep;
-	const lower = seamless ? current - reach : Math.max( min, current - reach );
-	const upper = seamless ? current + reach : Math.min( max, current + reach );
-	let bestAngle = current;
-	let bestError = Infinity;
-	let bestSteps = Infinity;
-	for ( const turn of [ nearest, nearest - 360, nearest + 360 ] ) {
-		const angle = clamp( turn, lower, upper );
-		const steps = Math.round( ( angle - current ) / degreesPerStep );
-		const heading = current + steps * degreesPerStep;
-		const error = Math.abs( modulo( heading - pointer + 180, 360 ) - 180 );
-		if (
-			error < bestError - 1e-9 ||
-			( Math.abs( error - bestError ) <= 1e-9 &&
-				Math.abs( steps ) < bestSteps )
-		) {
-			bestAngle = angle;
-			bestError = error;
-			bestSteps = Math.abs( steps );
-		}
-	}
-	return bestAngle;
-}
-
+// The clockwise angle of the pointer from twelve o'clock, between -180 and 180
+// degrees.
 export function getPointerAngle( event: React.PointerEvent< HTMLElement > ) {
 	const { left, top, width, height } =
 		event.currentTarget.getBoundingClientRect();

@@ -75,7 +75,6 @@ const ALLOWLIST = {
 			'Dialog',
 			'Drawer',
 			'IconButton',
-			'Knob',
 			'Menu',
 			'Meter',
 			'Popover',

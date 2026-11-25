@@ -4,26 +4,15 @@ import { render } from 'vitest-browser-react';
 import { createRef } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import { ThemeProvider } from '../../../../utils/theme-provider';
-import { Field, Knob } from '../../../primitives';
+import { Field } from '../../../primitives';
+import { Knob } from '../index';
 
 describe( 'Knob', () => {
-	it( 'stops at the ends of a bounded range', async () => {
-		await render( <Knob aria-label="Opacity" defaultValue={ 99 } /> );
-		const slider = page.getByRole( 'slider', { name: 'Opacity' } );
-		await userEvent.tab();
-		await expect.element( slider ).toHaveFocus();
-		await userEvent.keyboard( '{ArrowUp}{ArrowUp}' );
-		await expect.element( slider ).toHaveValue( '100' );
-		await userEvent.keyboard( '{Home}{ArrowDown}' );
-		await expect.element( slider ).toHaveValue( '0' );
-	} );
-
 	it( 'wraps in both directions with small and large keyboard steps', async () => {
-		await render(
-			<Knob aria-label="Angle" max={ 359 } defaultValue={ 359 } wrap />
-		);
+		await render( <Knob aria-label="Angle" defaultValue={ 359 } /> );
 		const slider = page.getByRole( 'slider', { name: 'Angle' } );
 		await userEvent.tab();
+		await expect.element( slider ).toHaveFocus();
 		await userEvent.keyboard( '{ArrowUp}' );
 		await expect.element( slider ).toHaveValue( '0' );
 		await userEvent.keyboard( '{ArrowDown}' );
@@ -34,23 +23,57 @@ describe( 'Knob', () => {
 		await expect.element( slider ).toHaveValue( '359' );
 	} );
 
-	it( 'wraps over negative and fractional steps', async () => {
+	it( 'stops at the ends of a bounded range', async () => {
 		await render(
 			<Knob
-				aria-label="Offset"
-				min={ -0.2 }
-				max={ 0.1 }
-				step={ 0.1 }
-				defaultValue={ 0.1 }
-				wrap
+				aria-label="Rotation"
+				min={ -90 }
+				max={ 90 }
+				defaultValue={ 89 }
 			/>
 		);
-		const slider = page.getByRole( 'slider', { name: 'Offset' } );
+		const slider = page.getByRole( 'slider', { name: 'Rotation' } );
 		await userEvent.tab();
-		await userEvent.keyboard( '{ArrowUp}' );
-		await expect.element( slider ).toHaveValue( '-0.2' );
-		await userEvent.keyboard( '{ArrowDown}' );
-		await expect.element( slider ).toHaveValue( '0.1' );
+		await userEvent.keyboard( '{ArrowUp}{ArrowUp}' );
+		await expect.element( slider ).toHaveValue( '90' );
+		await userEvent.keyboard( '{Home}{ArrowDown}' );
+		await expect.element( slider ).toHaveValue( '-90' );
+	} );
+
+	it.each( [
+		{ value: 450, expected: '90' },
+		{ value: -45, expected: '315' },
+	] )(
+		'points a wrapping dial to the heading of $value without reporting a change',
+		async ( { value, expected } ) => {
+			const onValueChange = vi.fn();
+			await render(
+				<Knob
+					aria-label="Angle"
+					value={ value }
+					onValueChange={ onValueChange }
+				/>
+			);
+			await expect
+				.element( page.getByRole( 'slider' ) )
+				.toHaveValue( expected );
+			expect( onValueChange ).not.toHaveBeenCalled();
+		}
+	);
+
+	it( 'shows a value beyond a bounded range at the nearest end', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<Knob
+				aria-label="Rotation"
+				min={ -720 }
+				max={ 720 }
+				value={ 1000 }
+				onValueChange={ onValueChange }
+			/>
+		);
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '720' );
+		expect( onValueChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'reports exactly zero in the callback, native input, and form when stepping across zero', async () => {
@@ -63,6 +86,7 @@ describe( 'Knob', () => {
 					min={ -0.3 }
 					max={ 0.3 }
 					step={ 0.1 }
+					unitsPerTurn={ 1 }
 					defaultValue={ -0.1 }
 					onValueChange={ onValueChange }
 				/>
@@ -78,36 +102,47 @@ describe( 'Knob', () => {
 		expect( new FormData( form ).get( 'offset' ) ).toBe( '0' );
 	} );
 
-	it( 'moves at least one whole step with large-step keys in both directions', async () => {
-		await render(
-			<Knob aria-label="Opacity" step={ 25 } defaultValue={ 50 } />
-		);
-		const slider = page.getByRole( 'slider' );
-		await userEvent.tab();
-		await userEvent.keyboard( '{PageUp}' );
-		await expect.element( slider ).toHaveValue( '75' );
-		await userEvent.keyboard( '{Shift>}{ArrowDown}{/Shift}' );
-		await expect.element( slider ).toHaveValue( '50' );
-	} );
-
 	it.each( [
-		{ min: 1, max: 5 },
-		{ min: -0.2, max: 0.1 },
+		{
+			unit: 'gradians',
+			unitsPerTurn: 400,
+			step: 1,
+			quarter: '100',
+			last: '399',
+		},
+		{
+			unit: 'turns',
+			unitsPerTurn: 1,
+			step: 0.01,
+			quarter: '0.25',
+			last: '0.99',
+		},
+		{
+			unit: 'radians',
+			unitsPerTurn: 2 * Math.PI,
+			step: 0.01,
+			quarter: '1.57',
+			last: '6.28',
+		},
 	] )(
-		'lets both endpoints be selected when a step exceeds the whole range from $min to $max',
-		async ( { min, max } ) => {
+		'reads a quarter turn as $quarter $unit and wraps below zero to $last',
+		async ( { unitsPerTurn, step, quarter, last } ) => {
 			await render(
-				<Knob aria-label="Offset" min={ min } max={ max } step={ 10 } />
+				<ThemeProvider isRoot>
+					<Knob
+						aria-label="Angle"
+						unitsPerTurn={ unitsPerTurn }
+						step={ step }
+					/>
+				</ThemeProvider>
 			);
 			const slider = page.getByRole( 'slider' );
-			await userEvent.tab();
-			await userEvent.keyboard( '{End}' );
-			await expect.element( slider ).toHaveValue( String( max ) );
-			await expect
-				.element( slider )
-				.toHaveAttribute( 'max', String( max ) );
-			await userEvent.keyboard( '{ArrowDown}' );
-			await expect.element( slider ).toHaveValue( String( min ) );
+			const dial = page.getByRole( 'group' );
+			const { width, height } = dial.element().getBoundingClientRect();
+			await dial.click( { position: { x: width - 3, y: height / 2 } } );
+			await expect.element( slider ).toHaveValue( quarter );
+			await userEvent.keyboard( '{Home}{ArrowDown}' );
+			await expect.element( slider ).toHaveValue( last );
 		}
 	);
 
@@ -134,7 +169,7 @@ describe( 'Knob', () => {
 		await render(
 			<Field.Root>
 				<Field.Label>Gradient angle</Field.Label>
-				<Knob max={ 359 } defaultValue={ 359 } wrap />
+				<Knob defaultValue={ 359 } />
 			</Field.Root>
 		);
 		await userEvent.tab();
@@ -145,10 +180,10 @@ describe( 'Knob', () => {
 			.toHaveAttribute( 'data-touched' );
 	} );
 
-	it( 'selects the angle at the pointer without dragging', async () => {
+	it( 'selects the heading at the pointer without dragging', async () => {
 		await render(
 			<ThemeProvider isRoot>
-				<Knob aria-label="Angle" max={ 359 } wrap />
+				<Knob aria-label="Angle" />
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
@@ -158,6 +193,21 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
 		await dial.click( { position: { x: width / 2, y: 3 } } );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'follows a drag across twelve o’clock on a wrapping dial', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" defaultValue={ 180 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.dropTo( dial, {
+			sourcePosition: { x: width * 0.25, y: height * 0.25 },
+			targetPosition: { x: width * 0.75, y: height * 0.25 },
+		} );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '45' );
 	} );
 
 	it( 'shows keyboard focus around the native slider target in wp-admin', async () => {
@@ -193,7 +243,6 @@ describe( 'Knob', () => {
 						aria-label="Rotation"
 						min={ -720 }
 						max={ 720 }
-						unitsPerTurn={ 360 }
 						defaultValue={ from }
 					/>
 				</ThemeProvider>
@@ -260,139 +309,6 @@ describe( 'Knob', () => {
 		}
 	);
 
-	it( 'wraps at the end of a two-turn range', async () => {
-		await render(
-			<ThemeProvider isRoot>
-				<Knob
-					aria-label="Rotation"
-					max={ 719 }
-					unitsPerTurn={ 360 }
-					defaultValue={ 630 }
-					wrap
-				/>
-			</ThemeProvider>
-		);
-		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: 3, y: height / 2 } } );
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '630' );
-		await dial.dropTo( dial, {
-			sourcePosition: { x: 3, y: height / 2 },
-			targetPosition: { x: width / 2, y: 3 },
-		} );
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
-		await userEvent.keyboard( '{ArrowDown}' );
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '719' );
-	} );
-
-	it.each( [ 1, 0.5 ] )(
-		'taps by %s turns in either direction and counts a dragged turn once',
-		async ( step ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob
-						aria-label="Whole turns"
-						min={ -2 }
-						max={ 2 }
-						step={ step }
-						unitsPerTurn={ 1 }
-						defaultValue={ 0 }
-					/>
-				</ThemeProvider>
-			);
-			const slider = page.getByRole( 'slider' );
-			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			const left = { x: 3, y: height / 2 };
-			const right = { x: width - 3, y: height / 2 };
-			const top = { x: width / 2, y: 3 };
-			const bottom = { x: width / 2, y: height - 3 };
-			await dial.click( { position: left } );
-			await expect.element( slider ).toHaveValue( String( -step ) );
-			await dial.click( { position: right } );
-			await expect.element( slider ).toHaveValue( '0' );
-			await userEvent.pointer( [
-				{ target: dial, coords: right, keys: '[MouseLeft>]' },
-				...[ top, left, bottom, right ].map( ( coords ) => ( {
-					target: dial,
-					coords,
-				} ) ),
-				'[/MouseLeft]',
-			] );
-			await expect.element( slider ).toHaveValue( '-1' );
-		}
-	);
-
-	it( 'selects the clicked direction when the wrapping range ends partway through a turn', async () => {
-		await render(
-			<ThemeProvider isRoot>
-				<Knob
-					aria-label="Rotation"
-					max={ 500 }
-					unitsPerTurn={ 360 }
-					defaultValue={ 500 }
-					wrap
-				/>
-			</ThemeProvider>
-		);
-		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width / 2, y: height - 3 } } );
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
-	} );
-
-	it.each( [
-		{ x: 1, expected: '2.25' },
-		{ x: -1, expected: '0.75' },
-	] )(
-		'picks the reachable stepped heading on an adjacent turn at x=$x',
-		async ( { x, expected } ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob
-						aria-label="Rotation"
-						min={ 0 }
-						max={ 3 }
-						step={ 0.75 }
-						unitsPerTurn={ 1 }
-						defaultValue={ 1.5 }
-					/>
-				</ThemeProvider>
-			);
-			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			await dial.click( {
-				position: { x: x > 0 ? width - 3 : 3, y: height / 2 },
-			} );
-			await expect
-				.element( page.getByRole( 'slider' ) )
-				.toHaveValue( expected );
-		}
-	);
-
-	it.each( [
-		{ wrap: false, max: 100, expected: '100' },
-		{ wrap: true, max: 359, expected: '225' },
-	] )(
-		'drags through the bottom of the dial with wrap=$wrap',
-		async ( { wrap, max, expected } ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob aria-label="Value" max={ max } wrap={ wrap } />
-				</ThemeProvider>
-			);
-			const dial = page.getByRole( 'group' );
-			const { width, height } = dial.element().getBoundingClientRect();
-			await dial.dropTo( dial, {
-				sourcePosition: { x: width * 0.75, y: height * 0.75 },
-				targetPosition: { x: width * 0.25, y: height * 0.75 },
-			} );
-			await expect
-				.element( page.getByRole( 'slider' ) )
-				.toHaveValue( expected );
-		}
-	);
-
 	it( 'uses the field label, description, and name on the range input', async () => {
 		const ref = createRef< HTMLInputElement >();
 		await render(
@@ -453,17 +369,45 @@ describe( 'Knob', () => {
 		await expect.element( slider ).toHaveValue( '11' );
 	} );
 
+	it( 'reports the placeholder while empty and sets a value when its heading is clicked', async () => {
+		const onValueChange = vi.fn();
+		const { rerender } = await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					value={ null }
+					placeholder={ 90 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const slider = page.getByRole( 'slider' );
+		const dial = page.getByRole( 'group' );
+		await expect.element( slider ).toHaveValue( '90' );
+		expect( slider.element().closest( '[data-empty]' ) ).not.toBeNull();
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+		await rerender(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					value={ 90 }
+					placeholder={ 90 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		await expect.element( slider ).toHaveValue( '90' );
+		expect( slider.element().closest( '[data-empty]' ) ).toBeNull();
+	} );
+
 	it( 'ignores pointer input when the surrounding field is disabled', async () => {
 		const onValueChange = vi.fn();
 		await render(
 			<ThemeProvider isRoot>
 				<Field.Root disabled>
-					<Knob
-						aria-label="Angle"
-						max={ 359 }
-						wrap
-						onValueChange={ onValueChange }
-					/>
+					<Knob aria-label="Angle" onValueChange={ onValueChange } />
 				</Field.Root>
 			</ThemeProvider>
 		);
@@ -481,12 +425,7 @@ describe( 'Knob', () => {
 			<ThemeProvider isRoot>
 				<fieldset disabled>
 					<legend>Appearance</legend>
-					<Knob
-						aria-label="Angle"
-						max={ 359 }
-						wrap
-						onValueChange={ onValueChange }
-					/>
+					<Knob aria-label="Angle" onValueChange={ onValueChange } />
 				</fieldset>
 			</ThemeProvider>
 		);

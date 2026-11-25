@@ -1,8 +1,28 @@
 import type { Slider } from '@base-ui/react/slider';
 import type { ComponentProps } from '../../../utils/types';
 
+type KnobRange =
+	| {
+			/**
+			 * The lowest selectable value. Set it together with `max` to make
+			 * the dial stop at both ends and count turns in between. A range
+			 * from −720 to 720 degrees allows two turns in either direction.
+			 *
+			 * Without `min` and `max`, the dial covers one turn and wraps.
+			 */
+			min: number;
+			/**
+			 * The highest selectable value. Set it together with `min`.
+			 */
+			max: number;
+	  }
+	| { min?: undefined; max?: undefined };
+
 export type KnobProps = Omit<
 	ComponentProps< typeof Slider.Root< number > >,
+	| 'min'
+	| 'max'
+	| 'value'
 	| 'orientation'
 	| 'minStepsBetweenValues'
 	| 'thumbAlignment'
@@ -11,29 +31,43 @@ export type KnobProps = Omit<
 	| 'onValueCommitted'
 	| 'onKeyDown'
 > &
-	Pick<
-		Slider.Thumb.Props,
-		'inputRef' | 'getAriaValueText' | 'onKeyDown'
-	> & {
+	Pick< Slider.Thumb.Props, 'inputRef' | 'getAriaValueText' | 'onKeyDown' > &
+	KnobRange & {
 		/**
-		 * Whether to continue at the opposite end when passing the first or
-		 * last value. Both endpoints are selectable. For angles
-		 * in whole degrees, use `min={ 0 }`, `max={ 359 }`, and `wrap`.
+		 * The angle the dial points to (controlled). A wrapping dial shows a
+		 * value outside one turn at the same heading, so 450 points where 90
+		 * does. A bounded dial shows it at the nearest end.
 		 *
-		 * @default false
+		 * Pass `null` when no angle is set. The dial then points to
+		 * `placeholder` with a hollow dot.
+		 *
+		 * To render an uncontrolled dial, use the `defaultValue` prop instead.
 		 */
-		wrap?: boolean;
+		value?: number | null;
 		/**
-		 * Sets how many units one clockwise turn adds. Zero points up.
-		 * For rotation in degrees, use 360. The dial can count multiple turns
-		 * between `min` and `max`. Use a positive, finite number.
-		 * By default the entire range fits on the dial in one sweep.
-		 * Tap the left or right half to step when a step covers at least a full
-		 * turn, or when multiple values share two alternating headings.
+		 * Where the dial points while `value` is `null`, such as an inherited
+		 * angle. The slider reports this number until the user picks one.
+		 *
+		 * @default 0
+		 */
+		placeholder?: number;
+		/**
+		 * How many units a full clockwise turn adds. Zero points up. Use 360
+		 * for degrees, 400 for gradians, 1 for turns, and `2 * Math.PI` for
+		 * radians.
+		 *
+		 * @default 360
 		 */
 		unitsPerTurn?: number;
 		/**
-		 * Called with the new numeric value when the user adjusts the dial.
+		 * The amount that Page Up, Page Down, and Shift with an arrow key
+		 * change the value by.
+		 *
+		 * @default 10 × `step`
+		 */
+		largeStep?: number;
+		/**
+		 * Called with the new value when the user turns the dial.
 		 */
 		onValueChange?: ( value: number ) => void;
 	};

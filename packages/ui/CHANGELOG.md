@@ -25,6 +25,7 @@
 
 ### Internal
 
+-   Add an internal `Knob` dial for choosing an angle, built on the Base UI slider. It is not exported ([#86890](https://github.com/WordPress/gutenberg/pull/86890)).
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `tabbable` dependency to 6.5.2 ([#87239](https://github.com/WordPress/gutenberg/pull/87239)).
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).

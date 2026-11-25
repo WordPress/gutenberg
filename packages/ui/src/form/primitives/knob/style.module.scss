@@ -13,24 +13,16 @@
 			border-radius: 50%;
 			vertical-align: middle;
 
-			@media (pointer: coarse) {
-				inline-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-sm));
-			}
-
 			&:has(input:focus-visible) {
 				@include mixins.focus-ring();
 			}
 		}
 
 		.thumb {
-			display: grid;
-			place-items: center;
+			display: block;
 			inline-size: 100%;
 			block-size: 100%;
 			user-select: none;
-			fill: var(--wpds-color-background-thumb-brand);
-			stroke: var(--wpds-color-stroke-interactive-neutral);
-			stroke-width: var(--wpds-border-width-xs);
 
 			&:has(input:enabled) {
 				touch-action: none;
@@ -43,8 +35,8 @@
 
 			svg {
 				display: block;
-				inline-size: var(--wpds-dimension-size-md);
-				block-size: var(--wpds-dimension-size-md);
+				inline-size: 100%;
+				block-size: 100%;
 			}
 
 			/* Pointer positions belong to the dial. The range handles keyboard and AT input. */
@@ -52,27 +44,70 @@
 			svg {
 				pointer-events: none;
 			}
+		}
 
-			@media (forced-colors: none) {
-				&:has(input:enabled):is(:hover, :active) {
-					fill: var(--wpds-color-background-thumb-brand-active);
+		.outline {
+			fill: none;
+			stroke: var(--wpds-color-stroke-interactive-neutral);
+			stroke-width: var(--wpds-border-width-xs);
+		}
+
+		/* Each state sets `color`, which the filled and the hollow dot both use. */
+		.indicator {
+			color: var(--wpds-color-background-thumb-brand);
+			fill: currentColor;
+			stroke: none;
+			stroke-width: var(--wpds-border-width-sm);
+		}
+
+		/* A hollow dot marks a heading that is shown but not set. */
+		.thumb[data-empty] .indicator {
+			fill: none;
+			stroke: currentColor;
+		}
+
+		@media (forced-colors: none) {
+			.thumb:has(input:enabled):is(:hover, :active) {
+				.outline {
 					stroke: var(--wpds-color-stroke-interactive-neutral-active);
 				}
 
-				&:has(input:disabled) {
-					fill: var(--wpds-color-background-thumb-brand-disabled);
-					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
+				.indicator {
+					color: var(--wpds-color-background-thumb-brand-active);
 				}
 			}
 
-			@media (forced-colors: active) {
-				forced-color-adjust: none;
-				fill: Highlight;
-				stroke: ButtonText;
+			.thumb:has(input:disabled) {
+				.outline {
+					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
+				}
 
-				&:has(input:disabled) {
+				.indicator {
+					color: var(--wpds-color-background-thumb-brand-disabled);
+				}
+			}
+		}
+
+		@media (forced-colors: active) {
+			.thumb {
+				forced-color-adjust: none;
+			}
+
+			.outline {
+				stroke: ButtonText;
+			}
+
+			.indicator {
+				color: Highlight;
+			}
+
+			.thumb:has(input:disabled) {
+				.outline {
 					stroke: GrayText;
-					fill: GrayText;
+				}
+
+				.indicator {
+					color: GrayText;
 				}
 			}
 		}
