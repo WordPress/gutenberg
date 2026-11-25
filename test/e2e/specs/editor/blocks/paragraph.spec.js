@@ -70,6 +70,38 @@ test.describe( 'Paragraph', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'should type in an empty drop cap paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { dropCap: true },
+		} );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.type( 'bc' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { dropCap: true, content: 'abc' },
+			},
+		] );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'x' );
+		await page.keyboard.type( 'yz' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { dropCap: true, content: 'xyz' },
+			},
+		] );
+	} );
+
 	test.describe( 'Empty paragraph', () => {
 		test.use( {
 			// Make the viewport large enough so that a scrollbar isn't displayed.
