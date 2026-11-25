@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import { Input } from '../index';
@@ -31,10 +31,15 @@ describe( 'Input', () => {
 			);
 		} );
 
-		it( 'follows the value typed into an uncontrolled input', async () => {
+		it( 'follows the value of an uncontrolled input', async () => {
 			const user = userEvent.setup();
 
-			render( <Input type="number" max={ 23 } defaultValue={ 5 } /> );
+			render(
+				<form>
+					<Input type="number" max={ 23 } defaultValue={ 5 } />
+					<button type="reset">Reset</button>
+				</form>
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			expect( input ).toHaveAttribute( 'aria-valuetext', '5' );
@@ -44,6 +49,12 @@ describe( 'Input', () => {
 
 			await user.type( input, '12' );
 			expect( input ).toHaveAttribute( 'aria-valuetext', '12' );
+
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+			expect( input ).toHaveValue( 5 );
+			await waitFor( () =>
+				expect( input ).toHaveAttribute( 'aria-valuetext', '5' )
+			);
 		} );
 
 		it( 'keeps an aria-valuetext passed by the consumer', () => {

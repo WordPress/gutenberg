@@ -1,11 +1,18 @@
 import { Input as _Input } from '@base-ui/react/input';
 import clsx from 'clsx';
-import { forwardRef, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import styles from './style.module.css';
 import type { InputProps } from './types';
 import { InputLayout } from '../input-layout';
+
+function toValueText(
+	value: InputProps[ 'value' ] | InputProps[ 'defaultValue' ]
+) {
+	return value === undefined || value === null ? '' : String( value );
+}
 
 /**
  * A low-level primitive for an input field.
@@ -25,20 +32,44 @@ export const Input = forwardRef< HTMLElement, InputProps >(
 		},
 		ref
 	) {
-		const [ uncontrolledValue, setUncontrolledValue ] = useState(
-			restProps.defaultValue
-		);
-		const currentValue = restProps.value ?? uncontrolledValue;
-
 		// VoiceOver reads a number input with a `max` as a percentage of its
 		// range, unless it has an `aria-valuetext`.
-		const ariaValueText =
+		const needsValueText =
 			restProps.type === 'number' &&
-			currentValue !== undefined &&
-			currentValue !== null &&
-			String( currentValue ) !== ''
-				? String( currentValue )
-				: undefined;
+			restProps[ 'aria-valuetext' ] === undefined;
+		const tracksValue = needsValueText && restProps.value === undefined;
+
+		const inputRef = useRef< HTMLInputElement >( null );
+		const mergedRef = useMergeRefs( [ ref, inputRef ] );
+		const [ uncontrolledValue, setUncontrolledValue ] = useState( () =>
+			toValueText( restProps.defaultValue )
+		);
+
+		useEffect( () => {
+			const input = inputRef.current;
+			if ( ! tracksValue || ! input ) {
+				return;
+			}
+			setUncontrolledValue( input.value );
+
+			// A form reset restores the default value without an input event.
+			const onReset = ( event: Event ) => {
+				if ( event.target !== input.form ) {
+					return;
+				}
+				// `reset` fires before the form restores its values.
+				setTimeout( () => setUncontrolledValue( input.value ) );
+			};
+			const { ownerDocument } = input;
+			ownerDocument.addEventListener( 'reset', onReset );
+			return () => ownerDocument.removeEventListener( 'reset', onReset );
+		}, [ tracksValue ] );
+
+		const valueText = tracksValue
+			? uncontrolledValue
+			: toValueText( restProps.value );
+		const ariaValueText =
+			needsValueText && valueText !== '' ? valueText : undefined;
 
 		return (
 			<InputLayout
@@ -54,11 +85,13 @@ export const Input = forwardRef< HTMLElement, InputProps >(
 				suffix={ suffix }
 			>
 				<_Input
-					ref={ ref }
+					ref={ mergedRef }
 					className={ clsx( defenseStyles.input, styles.input ) }
 					aria-valuetext={ ariaValueText }
 					onValueChange={ ( value, eventDetails ) => {
-						setUncontrolledValue( value );
+						if ( tracksValue ) {
+							setUncontrolledValue( value );
+						}
 						onValueChange?.( value, eventDetails );
 					} }
 					{ ...restProps }
