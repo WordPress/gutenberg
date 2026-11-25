@@ -104,6 +104,7 @@ export const WithVisualAndBreadcrumbs: Story = {
  * technologies and the page title carries the accessible name.
  */
 export const WithImageVisual: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		title: 'Page title',
 		visual: (

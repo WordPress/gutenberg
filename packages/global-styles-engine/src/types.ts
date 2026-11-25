@@ -156,6 +156,8 @@ export interface TextShadowPreset extends BasePreset {
 }
 
 export interface TypographySettings {
+	customFontSize?: boolean;
+	lineHeight?: boolean;
 	fluid?: boolean | FluidTypographySettings;
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
@@ -301,6 +303,7 @@ export interface GlobalStylesStyles {
 	color?: {
 		background?: UnresolvedValue;
 		text?: UnresolvedValue;
+		gradient?: UnresolvedValue;
 	};
 	typography?: {
 		fontFamily?: UnresolvedValue;
@@ -371,7 +374,12 @@ export interface GlobalStylesStyles {
 			>;
 		}
 	>;
-	blocks?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
+	blocks?: Record<
+		string,
+		Omit< GlobalStylesStyles, 'blocks' > & {
+			':hover'?: Omit< GlobalStylesStyles, 'blocks' >;
+		}
+	>;
 	variations?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
 	css?: string;
 }

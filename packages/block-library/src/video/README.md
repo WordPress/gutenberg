@@ -45,6 +45,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `clientNavigation`: `true`
   - `interactive`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
+  - `rotate`: `true`
+  - `translate`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minWidth`: `true`
   - `minHeight`: `true`
@@ -54,6 +57,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **dimensions**: `.wp-block-video video`
+- **border**: `.wp-block-video video, .wp-block-video .components-placeholder`
 - **shadow**: `.wp-block-video video`
 - **filter**:
   - duotone: `.wp-block-video video`

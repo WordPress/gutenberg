@@ -305,6 +305,103 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_transform_rotate_style'          => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'rotate:-0.25turn;',
+					'declarations' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+			),
+
+			'inline_invalid_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '1 0 0 45deg',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => "45deg\n",
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_valid_transform_translate_style'       => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '-50%',
+							'y' => '1.5rem',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => '--wp--style--translate-x:-50%;--wp--style--translate-y:1.5rem;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+					'declarations' => array(
+						'--wp--style--translate-x' => '-50%',
+						'--wp--style--translate-y' => '1.5rem',
+						'translate'                => 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+					),
+				),
+			),
+
+			'inline_partial_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'y' => '10px',
+							'z' => '5px',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => '--wp--style--translate-y:10px;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);',
+					'declarations' => array(
+						'--wp--style--translate-y' => '10px',
+						'translate'                => 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+					),
+				),
+			),
+
+			'inline_invalid_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '10px',
+							'y' => 'calc(1px + 2px)',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array( 'x' => "10px\n" ),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(

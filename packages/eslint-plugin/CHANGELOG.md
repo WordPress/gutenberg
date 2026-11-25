@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 28.2.0 (2026-11-18)
 
 ### Enhancements
