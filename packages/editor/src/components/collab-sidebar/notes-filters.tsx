@@ -8,10 +8,20 @@ import {
 	Menu,
 	Stack,
 } from '@wordpress/ui';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
+import {
+	APPLIED,
+	REJECTED,
+	getDecision,
+	getSuggestionStatus,
+} from '../suggestion-mode/suggestion-status';
 
 const NOTE_STATUS_FILTERS = [ 'all', 'hold', 'approved' ] as const;
+const SUGGESTION_STATUS_FILTERS = [ 'accepted', 'rejected' ] as const;
 
-type NoteStatusFilter = ( typeof NOTE_STATUS_FILTERS )[ number ];
+type NoteStatusFilter =
+	| ( typeof NOTE_STATUS_FILTERS )[ number ]
+	| ( typeof SUGGESTION_STATUS_FILTERS )[ number ];
 
 type NotesFilterValues = {
 	search: string;
@@ -22,6 +32,7 @@ type Note = {
 	id: number;
 	author_name: string;
 	status: string;
+	meta?: { _wp_suggestion?: string; _wp_suggestion_status?: string };
 	content: { rendered: string };
 	reply?: Note[];
 };
@@ -33,6 +44,21 @@ export const DEFAULT_NOTES_FILTERS: NotesFilterValues = {
 
 export function hasActiveNotesFilters( filters: NotesFilterValues ) {
 	return filters.search.trim() !== '' || filters.status !== 'all';
+}
+
+function matchesStatus( thread: Note, status: NoteStatusFilter ) {
+	if ( status === 'all' ) {
+		return true;
+	}
+	if ( status === 'accepted' || status === 'rejected' ) {
+		// A decision counts before the post is saved, as the card shows it.
+		return (
+			!! thread.meta?._wp_suggestion &&
+			getDecision( getSuggestionStatus( thread ) ) ===
+				( status === 'accepted' ? APPLIED : REJECTED )
+		);
+	}
+	return thread.status === status;
 }
 
 // Keep the selected thread, so a note opened from the canvas still shows.
@@ -51,7 +77,7 @@ export function filterNotes< T extends Note >(
 		}
 		const threadNotes = [ thread, ...( thread.reply ?? [] ) ];
 		return (
-			( filters.status === 'all' || thread.status === filters.status ) &&
+			matchesStatus( thread, filters.status ) &&
 			( ! search ||
 				threadNotes.some(
 					( note ) =>
@@ -74,7 +100,12 @@ export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
 		all: __( 'All' ),
 		hold: __( 'Open' ),
 		approved: __( 'Resolved' ),
+		accepted: __( 'Accepted suggestions' ),
+		rejected: __( 'Rejected suggestions' ),
 	};
+	const statuses = isSuggestionModeEnabled()
+		? [ ...NOTE_STATUS_FILTERS, ...SUGGESTION_STATUS_FILTERS ]
+		: NOTE_STATUS_FILTERS;
 	const isStatusFiltered = filters.status !== 'all';
 
 	return (
@@ -120,7 +151,7 @@ export function NotesFilters( { filters, onChange }: NotesFiltersProps ) {
 						}
 					>
 						<Menu.GroupLabel>{ __( 'Status' ) }</Menu.GroupLabel>
-						{ NOTE_STATUS_FILTERS.map( ( status ) => (
+						{ statuses.map( ( status ) => (
 							<Menu.RadioItem key={ status } value={ status }>
 								<Menu.ItemLabel>
 									{ statusLabels[ status ] }

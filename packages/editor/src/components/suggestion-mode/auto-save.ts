@@ -68,6 +68,7 @@ import type { SuggestionMarker } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import { getBlockTreeVersion } from './block-tree-version';
 import { useSuggestionsProvider } from './provider';
+import { useHydratePostFieldProposals } from './post-field-proposal-hydration';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -288,6 +289,8 @@ export default function SuggestionAutoSave() {
 	const onUpdate = useEvent( updateSuggestion );
 	const onDelete = useEvent( deleteSuggestion );
 	const getProposals = useEvent( () => proposals );
+
+	useHydratePostFieldProposals( currentUserId );
 
 	// Per-clientId debounce timer.
 	const timersRef = useRef(

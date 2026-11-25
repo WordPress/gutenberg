@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -34,6 +40,13 @@ import {
 } from './utils/dom';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	findPostAttributeOps,
+	parseSuggestionPayload,
+} from '../suggestion-mode/operations';
+import { getPostFieldName } from '../suggestion-mode/post-field-labels';
+import { useTaxonomyNames } from '../suggestion-mode/use-taxonomy-names';
+import { usePostTitleElement } from '../post-title/title-element';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -91,6 +104,17 @@ export function NoteThread( {
 } ) {
 	const isFloating = !! floating;
 	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
+	const taxonomyNames = useTaxonomyNames();
+	// A post field suggestion (the title, the excerpt...) has no block by
+	// design; it is not an orphan.
+	const suggestionPayload = note.meta?._wp_suggestion;
+	const postFieldName = useMemo( () => {
+		const [ op ] = findPostAttributeOps(
+			parseSuggestionPayload( suggestionPayload )?.operations
+		);
+		return op ? getPostFieldName( op, taxonomyNames ) : null;
+	}, [ suggestionPayload, taxonomyNames ] );
+	const isPostSuggestion = postFieldName !== null;
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
@@ -98,6 +122,24 @@ export function NoteThread( {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
+	// A post field suggestion lines up with the post title, or with the top
+	// of the content when the canvas shows no title.
+	const titleElement = usePostTitleElement();
+	const firstBlockElement = useBlockElement(
+		useSelect(
+			( select ) =>
+				isPostSuggestion
+					? select( blockEditorStore ).getBlockOrder()[ 0 ]
+					: undefined,
+			[ isPostSuggestion ]
+		)
+	);
+	const postFieldAnchorElement = isPostSuggestion
+		? ( titleElement ??
+			firstBlockElement?.closest( '.is-root-container' ) ??
+			null )
+		: null;
+	const anchorElement = relatedBlockElement ?? postFieldAnchorElement;
 	const setBlockHighlight = useEvent( ( isHighlighted ) =>
 		toggleBlockHighlight( note.blockClientId, isHighlighted )
 	);
@@ -115,10 +157,10 @@ export function NoteThread( {
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {
-			registerThread( note.id, relatedBlockElement, floatingEl );
+			registerThread( note.id, anchorElement, floatingEl );
 		}
 		return () => unregisterThread?.( note.id );
-	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
+	}, [ anchorElement, note.id, registerThread, unregisterThread ] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
 	// when its floating position or height settles after `useFloatingBoard`
@@ -256,17 +298,27 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
+	let ariaLabel;
+	if ( isPostSuggestion ) {
+		ariaLabel = sprintf(
+			// translators: 1: post field name, e.g. "Post title". 2: note excerpt.
+			__( '%1$s note: %2$s' ),
+			postFieldName,
+			noteExcerpt
+		);
+	} else if ( note.blockClientId ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note: %s' ),
+			noteExcerpt
+		);
+	} else {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Original block deleted. Note: %s' ),
+			noteExcerpt
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -325,7 +377,12 @@ export function NoteThread( {
 			>
 				{ __( 'Add new reply' ) }
 			</Button>
-			{ ! note.blockClientId && (
+			{ isPostSuggestion && (
+				<p className="editor-collab-sidebar-panel__note-target">
+					{ postFieldName }
+				</p>
+			) }
+			{ ! note.blockClientId && ! isPostSuggestion && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
 				</p>

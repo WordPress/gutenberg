@@ -13,6 +13,11 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import {
+	unregisterSuggestionFormats,
+	registerSuggestionFormat,
+} from '../../inline-suggestions';
 import {
 	operationsFromMarker,
 	applyOperations,
@@ -851,6 +856,7 @@ describe( 'attribute proposals on the block marker', () => {
 	const PARAGRAPH = 'core/test-proposal-paragraph';
 
 	beforeAll( () => {
+		registerSuggestionFormat();
 		registerBlockType( PARAGRAPH, {
 			apiVersion: 3,
 			attributes: {
@@ -865,6 +871,7 @@ describe( 'attribute proposals on the block marker', () => {
 	} );
 
 	afterAll( () => {
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -1046,6 +1053,55 @@ describe( 'attribute proposals on the block marker', () => {
 		).toBe( 'persistent' );
 	} );
 
+	it( 'an inline decision leaves a co-resident attribute proposal in place', async () => {
+		const block = createBlock( PARAGRAPH, {
+			level: 2,
+			metadata: {
+				noteId: [ 9, 42 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 42,
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( block.clientId, {
+					content: RichTextData.fromHTMLString(
+						'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+					),
+				} );
+		} );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'inline-suggestion',
+							attribute: 'content',
+							suggestionType: 'add',
+						},
+					],
+				},
+			} );
+		} );
+
+		const after = attrs( registry, block.clientId );
+		expect( String( after.content ) ).toBe( 'Hello world' );
+		expect( after.metadata.suggestion.after ).toEqual( { level: 3 } );
+	} );
+
 	it( 'rejecting a move also drops the proposal that rode on it, since the note carried both', async () => {
 		const a = createBlock( PARAGRAPH, { content: 'A' } );
 		const moved = createBlock( PARAGRAPH, {
@@ -1098,6 +1154,286 @@ describe( 'attribute proposals on the block marker', () => {
 		const after = attrs( registry, moved.clientId );
 		expect( after.level ).toBe( 2 );
 		expect( after.metadata.suggestion ).toBeUndefined();
+	} );
+} );
+
+describe( 'rejectSuggestion (inline marker)', () => {
+	const PARAGRAPH = 'core/test-inline-paragraph';
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Inline Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * Stub core store whose `saveEntityRecord` is a thunk that resolves or
+	 * rejects on demand, so the comment-status round-trip can be failed
+	 * deterministically.
+	 */
+	function createStubCoreStore( { failSave }: { failSave?: boolean } ) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => async () => {
+					if ( failSave ) {
+						throw new Error( 'save failed' );
+					}
+					return { id: 9 };
+				},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( { failSave = false } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( { failSave } ) );
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		// Write the marked value directly so the attribute is a real
+		// RichTextData (as in the editor), bypassing string sanitization.
+		const markedValue = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: markedValue,
+			} );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'strips the marker and its text when the status save succeeds', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = attributesOf( registry, block.clientId )?.content;
+		expect( content.toHTMLString() ).toBe( 'Hello ' );
+	} );
+
+	it( 'rolls the attribute back when the status save fails', async () => {
+		// Before the fix, reject rewrote the attribute BEFORE the comment
+		// save; a server failure then left the marker stripped from content
+		// while the comment stayed unresolved ('hold') — the suggestion
+		// silently vanished for every viewer but still counted as pending.
+		const { registry, block, getProvider } = setup( { failSave: true } );
+		const before = attributesOf(
+			registry,
+			block.clientId
+		)?.content.toHTMLString();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		const content = attributesOf( registry, block.clientId )?.content;
+		// The marker (and its proposed text) is restored.
+		expect( content.toHTMLString() ).toBe( before );
+		expect( content.toHTMLString() ).toContain( 'data-suggestion-id="9"' );
+		// And the failure is surfaced.
+		const notices = registry.select( noticesStore ).getNotices();
+		expect( notices.some( ( notice ) => notice.status === 'error' ) ).toBe(
+			true
+		);
+	} );
+} );
+
+describe( 'inline decisions find the marker by its id', () => {
+	const PARAGRAPH = 'core/test-located-paragraph';
+	const MARKED =
+		'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>';
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'rich-text', source: 'rich-text' },
+				citation: { type: 'rich-text', source: 'rich-text' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Located Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup( blocks: any[] ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	const rich = ( html: string ) => RichTextData.fromHTMLString( html );
+	const payload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'applies a suggestion whose block has no link to the note', async () => {
+		// A transform drops `metadata.noteId` and keeps the marked text.
+		const block = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( { commentId: 9, payload } );
+		} );
+
+		expect(
+			attributesOf( registry, block.clientId ).content.toHTMLString()
+		).toBe( 'Hello world' );
+	} );
+
+	it( 'rejects a suggestion whose marker moved into another block', async () => {
+		// The link stays on one block while a merge carries the marked
+		// text into another.
+		const holder = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const linked = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ holder, linked ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: linked.clientId,
+				payload,
+			} );
+		} );
+
+		expect(
+			attributesOf( registry, holder.clientId ).content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			attributesOf( registry, linked.clientId ).content.toHTMLString()
+		).toBe( 'Plain' );
+	} );
+
+	it( 'applies a suggestion whose marker is in another attribute', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			citation: rich( MARKED ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload,
+			} );
+		} );
+
+		const attributes = attributesOf( registry, block.clientId );
+		expect( attributes.citation.toHTMLString() ).toBe( 'Hello world' );
+		expect( attributes.content.toHTMLString() ).toBe( 'Plain' );
 	} );
 } );
 
@@ -1692,6 +2028,161 @@ describe( 'grouped structural decisions (block replacement)', () => {
 	} );
 } );
 
+describe( 'review decisions and undo history', () => {
+	const PARAGRAPH = 'core/test-decision-paragraph';
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Decision Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup() {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: RichTextData.fromHTMLString(
+					'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+				),
+			} );
+		// Close the setup writes as a normal undo level so the assertions
+		// below observe the decision's own history mode, not a leftover.
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'commits an applied suggestion as a persistent change', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The proposed text is committed...
+		expect(
+			attributesOf( registry, block.clientId )?.content.toHTMLString()
+		).toBe( 'Hello world' );
+		/*
+		 * ...as a PERSISTENT change. Hiding the decision from undo also hides
+		 * it from the entity: a non-persistent block change reaches the parent
+		 * through `onInput`, which never writes `content`, so the post would
+		 * never go dirty and the applied text would be gone on reload. The
+		 * undo half of F-18 is handled by reopening the note instead, in
+		 * `SuggestionNoteGC`.
+		 */
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'commits a rejected suggestion as a persistent change', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		expect(
+			attributesOf( registry, block.clientId )?.content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'records a decided suggestion so its note can be reopened', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The note collector reads this to spot a marker an undo put back.
+		expect( getSuggestionsResolvedThisSession( registry ).has( '9' ) ).toBe(
+			true
+		);
+	} );
+} );
+
 describe( 'withdrawn suggestions and failed applies', () => {
 	const PARAGRAPH = 'core/test-withdraw-paragraph';
 
@@ -2064,6 +2555,7 @@ describe( 'decisions record a provisional status first', () => {
 	const BLOCK = 'core/test-order-paragraph';
 
 	beforeAll( () => {
+		registerSuggestionFormat();
 		registerBlockType( BLOCK, {
 			apiVersion: 3,
 			attributes: {
@@ -2078,6 +2570,7 @@ describe( 'decisions record a provisional status first', () => {
 	} );
 
 	afterAll( () => {
+		unregisterSuggestionFormats();
 		getBlockTypes().forEach( ( block ) =>
 			unregisterBlockType( block.name )
 		);
@@ -2145,6 +2638,25 @@ describe( 'decisions record a provisional status first', () => {
 		};
 	}
 
+	const marked = () => {
+		const block = createBlock( BLOCK, { metadata: { noteId: [ 9 ] } } );
+		block.attributes.content = RichTextData.fromHTMLString(
+			'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+		);
+		return block;
+	};
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: BLOCK,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
 	const proposedLevel = () =>
 		createBlock( BLOCK, {
 			content: 'Title',
@@ -2180,6 +2692,36 @@ describe( 'decisions record a provisional status first', () => {
 		baseRevision: null,
 		operations: [ { type: 'block-remove', clientId, blockName: BLOCK } ],
 	} );
+
+	it.each( [
+		[ 'applySuggestion', 'applied-unsaved', 'Hello world' ],
+		[ 'rejectSuggestion', 'rejected-unsaved', 'Hello ' ],
+	] as const )(
+		'%s writes %s while the inline marker is still in the content',
+		async ( action, status, result ) => {
+			const block = marked();
+			const harness = setup( block );
+
+			await act( async () => {
+				await harness.getProvider()[ action ]( {
+					commentId: 9,
+					clientId: block.clientId,
+					payload: inlinePayload,
+				} );
+			} );
+
+			expect( harness.saves ).toHaveLength( 1 );
+			expect( harness.saves[ 0 ].record ).toEqual( {
+				id: 9,
+				status: 'hold',
+				meta: { _wp_suggestion_status: status },
+			} );
+			expect( String( harness.saves[ 0 ].attributes.content ) ).toContain(
+				'data-suggestion-id="9"'
+			);
+			expect( String( harness.attributes().content ) ).toBe( result );
+		}
+	);
 
 	it( 'writes the status before landing an attribute proposal', async () => {
 		const block = proposedLevel();
@@ -2217,6 +2759,7 @@ describe( 'decisions record a provisional status first', () => {
 	} );
 
 	it.each( [
+		[ 'an inline addition', marked, () => inlinePayload ],
 		[ 'an attribute proposal', proposedLevel, () => levelPayload ],
 		[
 			'a block removal',

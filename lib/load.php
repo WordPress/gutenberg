@@ -90,9 +90,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-7.1/query-block.php';
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
-	// The suggestion meta registration and REST controller are always loaded:
-	// both are inert without suggestion data, which only the experiment-gated
-	// editor UI creates. The user-facing feature is gated in JS.
+	// Suggestion mode is always loaded and gates itself on the
+	// `gutenberg-suggestion-mode` experiment: without it REST refuses
+	// suggestion writes and the save pass does not run. The render filters
+	// are not gated, so a proposal already in a post's content stays hidden
+	// from visitors whatever the experiment says.
 	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
 
 	// WordPress 7.2 compat.
@@ -107,6 +109,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
+	require __DIR__ . '/compat/wordpress-7.2/suggestion-status.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-marker-processor.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-block-scanner.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-content.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-suggestion-reconciler.php';
+	require __DIR__ . '/compat/wordpress-7.2/suggestion-reconciliation.php';
 	require __DIR__ . '/compat/wordpress-7.2/entity-utils.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/entity-fields-api.php';

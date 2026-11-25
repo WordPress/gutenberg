@@ -38,17 +38,34 @@ export function getThreadLayout( {
 	// but its marker can sit above theirs. Sort by measured top so the
 	// sweep's assumption holds and cards never displace past their markers.
 	// Threads without a rect keep their relative order; they are skipped
-	// below and never receive a position.
+	// below and never receive a position. So is a thread whose card has not
+	// been measured yet: sweeping it as zero-height would drop the card after
+	// it onto its anchor, on top of the card it was supposed to clear, and an
+	// unplaced card sits out the hit test (see `FloatingContainer`) until the
+	// ResizeObserver reports and the next sweep places it.
 	const orderedThreads = threads.toSorted(
 		( a, b ) =>
 			( blockRects[ a.id ]?.top ?? Number.MAX_VALUE ) -
 			( blockRects[ b.id ]?.top ?? Number.MAX_VALUE )
 	);
 
-	const anchorIndex = Math.max(
-		0,
-		orderedThreads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	// The sweep runs outward from the selected thread so its card stays put
+	// while its neighbours give way. A thread whose anchor has not been
+	// measured yet cannot hold that role: rect-less threads sort last, so
+	// fall back to the first thread that does have a rect rather than
+	// abandoning the whole board — leaving every card unpositioned stacks
+	// them all at the panel's origin.
+	let anchorIndex = orderedThreads.findIndex(
+		( thread ) => thread.id === selectedNoteId
 	);
+	if (
+		anchorIndex < 0 ||
+		! blockRects[ orderedThreads[ anchorIndex ]?.id ]
+	) {
+		anchorIndex = orderedThreads.findIndex(
+			( thread ) => !! blockRects[ thread.id ]
+		);
+	}
 
 	const anchorThread = orderedThreads[ anchorIndex ];
 	const anchorRect = anchorThread && blockRects[ anchorThread.id ];
@@ -69,7 +86,7 @@ export function getThreadLayout( {
 	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 
@@ -95,7 +112,7 @@ export function getThreadLayout( {
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
 		const thread = orderedThreads[ i ];
 		const threadRect = blockRects[ thread.id ];
-		if ( ! threadRect ) {
+		if ( ! threadRect || heights[ thread.id ] === undefined ) {
 			continue;
 		}
 

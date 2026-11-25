@@ -5,7 +5,6 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
-	findSuggestionRange,
 	isSuggestionFormat,
 	suggestionMarkerListsAt,
 	suggestionMarkersIn,
@@ -14,6 +13,7 @@ import { classifyOverlap } from './overlap';
 import type { OverlapBlocking, OverlapReason } from './overlap';
 import {
 	buildSuggestionMarkerAttributes,
+	findAdditionRange,
 	formatsAdditionRunToExtend,
 	insertInlineAddition,
 	growInlineAddition,
@@ -609,7 +609,7 @@ export function applyEditPlan(
 				break;
 			}
 			case 'grow-add': {
-				const range = findSuggestionRange( result, action.id! );
+				const range = findAdditionRange( result, action.id! );
 				if ( ! range ) {
 					break;
 				}

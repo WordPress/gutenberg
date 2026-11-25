@@ -4,8 +4,9 @@
  * 1. `withSuggestionOverlay` HOC: pass-through outside Suggest intent for a
  *    block with no proposal; in Suggest intent, diversion of `setAttributes`
  *    into the block's `metadata.suggestion.after`, rendering the proposal
- *    merged over the live attributes in every intent, and clearing the
- *    marker when the proposal returns to the live value.
+ *    merged over the live attributes in every intent, clearing the marker
+ *    when the proposal returns to the live value, and handing text/format
+ *    edits off to the marker path instead.
  * 2. `withSuggestionBlockClassName`: the bracket class for a proposal and
  *    the structural classes for structural markers.
  */
@@ -23,6 +24,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { RichTextData } from '@wordpress/rich-text';
 import withSuggestionOverlay, {
 	structuralMarkerClass,
 	withSuggestionBlockClassName,
@@ -33,6 +35,10 @@ import {
 	useSuggestionSession,
 	useSuggestionSessionActions,
 } from '../suggestion-session';
+import {
+	registerSuggestionFormat,
+	unregisterSuggestionFormats,
+} from '../../inline-suggestions';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -256,6 +262,151 @@ describe( 'withSuggestionOverlay', () => {
 		const before = seq();
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
 		expect( seq() ).toBeGreaterThan( before );
+	} );
+
+	it( 'hands a text edit off to the content reconciler instead of the marker', () => {
+		const setAttributes = vi.fn();
+		const handler = vi.fn();
+
+		// Registers a content handler so `requestContentSuggestion` takes
+		// ownership of the edit, standing in for the mounted reconciler.
+		function RegisterContentHandler() {
+			const { registerContentHandler } = useSuggestionSession();
+			useEffect(
+				() => registerContentHandler( handler ),
+				[ registerContentHandler ]
+			);
+			return null;
+		}
+
+		// Paragraph content is always `RichTextData` in the editor; the
+		// planner declines plain strings. `createBlock` would sanitize the
+		// wrapper away for this test block's string attribute, so it is
+		// written to the store directly.
+		const block = createBlock( HOC_BLOCK, { content: 'Hello' } );
+		const registry = createTestRegistry( 'suggest', [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: RichTextData.fromHTMLString( 'Hello' ),
+			} );
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<RegisterContentHandler />
+					<Connected
+						clientId={ block.clientId }
+						setAttributes={ setAttributes }
+					/>
+				</SuggestionSessionProvider>
+			</RegistryProvider>
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		// The reconciler receives the block, the pre-edit value, and a marker
+		// plan whose actions all open a fresh note.
+		expect( handler ).toHaveBeenCalledTimes( 1 );
+		const request = handler.mock.calls[ 0 ][ 0 ];
+		expect( request ).toEqual(
+			expect.objectContaining( {
+				clientId: block.clientId,
+				blockName: HOC_BLOCK,
+			} )
+		);
+		expect( String( request.prevContent ) ).toBe( 'Hello' );
+		expect( request.plan.actions.length ).toBeGreaterThan( 0 );
+		expect(
+			request.plan.actions.every( ( action: any ) => action.newNote )
+		).toBe( true );
+
+		// The reconciler took ownership: the edit is neither written through
+		// nor diverted into a proposal, so the block still shows its original
+		// value (the reconciler writes the marker itself, out of band).
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ) ).toBeUndefined();
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+	} );
+
+	it( 'declines an edit that would bury a live marker under a proposal', () => {
+		// A proposal is marker-free by construction and renders in place of
+		// the block's live value, so capturing one for an attribute that
+		// still holds a marker hides that marker while its note keeps
+		// describing it - the block would carry both representations of a
+		// pending change at once (#73411, F-09). The edit is declined instead.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion-del" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			const setAttributes = vi.fn();
+			const block = createBlock( HOC_BLOCK, { content: marked } );
+			const { registry } = renderWithProviders(
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ setAttributes }
+				/>,
+				{ intent: 'suggest', blocks: [ block ] }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			// No proposal, and the block was not written through either:
+			// the marker and its note are left exactly as they were.
+			expect( markerOf( registry, block.clientId ) ).toBeUndefined();
+			expect( setAttributes ).not.toHaveBeenCalled();
+			// The user is told why, rather than the edit vanishing silently.
+			// (The intent switch itself announces a snackbar, hence the find.)
+			const refusal = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) =>
+					notice.content.includes( 'overlaps a pending suggestion' )
+				);
+			expect( refusal ).toBeDefined();
+			expect( refusal!.status ).toBe( 'warning' );
+		} finally {
+			unregisterSuggestionFormats();
+		}
+	} );
+
+	it( 'proposes only the changed attribute on a block whose content holds a marker', () => {
+		// An attribute suggestion that leaves the marked attribute alone (a
+		// heading level change on a block whose content holds someone's
+		// marker) still becomes a proposal - it neither hides the marker nor
+		// competes with it - and the proposal names only that attribute, so
+		// the marked content is never replayed on accept.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion-del" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			const block = createBlock( HOC_BLOCK, {
+				content: marked,
+				level: 2,
+			} );
+			const { registry } = renderWithProviders(
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ vi.fn() }
+				/>,
+				{ intent: 'suggest', blocks: [ block ] }
+			);
+
+			fireEvent.click(
+				screen.getByRole( 'button', { name: 'edit level' } )
+			);
+
+			expect( markerOf( registry, block.clientId ).after ).toEqual( {
+				level: 3,
+			} );
+			// The block renders the proposed level over its still-marked
+			// content: the proposal covers one attribute, not the whole block.
+			expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'wp-suggestion'
+			);
+		} finally {
+			unregisterSuggestionFormats();
+		}
 	} );
 
 	it( 'evaluates updater functions against the proposal, including updates before a render', () => {
@@ -516,7 +667,7 @@ describe( 'withSuggestionOverlay', () => {
 				suggestion: { type: 'pending-attributes', after: { level: 3 } },
 			},
 		} );
-		renderWithProviders(
+		const { registry } = renderWithProviders(
 			<Connected
 				clientId={ block.clientId }
 				setAttributes={ setAttributes }
@@ -525,11 +676,19 @@ describe( 'withSuggestionOverlay', () => {
 		);
 
 		// The level is proposed: the author must decide the suggestion
-		// first, so the write is refused.
+		// first, so the write is refused and explained.
 		fireEvent.click(
 			screen.getByRole( 'button', { name: 'reset level' } )
 		);
 		expect( setAttributes ).not.toHaveBeenCalled();
+		expect(
+			registry
+				.select( noticesStore )
+				.getNotices()
+				.some( ( notice ) =>
+					notice.content.includes( 'overlaps a pending suggestion' )
+				)
+		).toBe( true );
 
 		// Content is not proposed: the edit lands as usual.
 		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );

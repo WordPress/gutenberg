@@ -346,6 +346,39 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [ { label: 'Add:', value: '“new text”' } ] );
 	} );
 
+	it( 'names the formatting an added text carries', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: 'new text',
+				textBeforeHTML: 'new text',
+				textAfterHTML:
+					'<strong>new</strong> <a href="https://example.org/">text</a>',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add:', value: '“new text”' },
+			{ label: 'Add formatting:', value: 'bold, link' },
+			{ label: 'Link:', value: 'https://example.org/' },
+		] );
+	} );
+
+	it( 'leaves out formatting an added text inherits', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+				text: 'new text',
+				textBeforeHTML: '<strong>new text</strong>',
+				textAfterHTML: '<strong>new text</strong>',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Add:', value: '“new text”' } ] );
+	} );
+
 	it( 'summarizes an inline-suggestion del op as "Delete: <text>"', () => {
 		const lines = summarizeOperations( [
 			{
@@ -358,6 +391,33 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [
 			{ label: 'Delete:', value: '“old text”' },
 		] );
+	} );
+
+	it( 'summarizes a type-over as one Replace line', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					text: 'my',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Replace:', value: '“your” → “my”' } ] );
+	} );
+
+	it( 'summarizes a type-over whose new text was backspaced away as Delete', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+					deletedText: 'your',
+				},
+			] )
+		).toEqual( [ { label: 'Delete:', value: '“your”' } ] );
 	} );
 
 	it( 'summarizes an inline-suggestion format op with its direction', () => {
@@ -990,5 +1050,33 @@ describe( 'summarizeOperations', () => {
 				},
 			] )
 		).toEqual( [ { label: 'Change:', value: 'style' } ] );
+	} );
+
+	it( 'summarizes a post title suggestion as before and after', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: 'Old title',
+					after: 'New title',
+				},
+			] )
+		).toEqual( [
+			{ label: 'Title:', value: '“Old title” → “New title”' },
+		] );
+	} );
+
+	it( 'quotes only the proposed title when the post had none', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'post-attribute-set',
+					attribute: 'title',
+					before: '',
+					after: 'Fresh title',
+				},
+			] )
+		).toEqual( [ { label: 'Title:', value: '“Fresh title”' } ] );
 	} );
 } );

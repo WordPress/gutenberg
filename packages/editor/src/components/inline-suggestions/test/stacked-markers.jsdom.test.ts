@@ -26,6 +26,7 @@ import {
 	wrapSuggestionMarker,
 } from '../operations';
 import { resolveInlineSuggestion } from '../resolution';
+import { settleInsertedSuggestionMarkers } from '../strip-markers';
 
 const mark = (
 	kind: 'add' | 'del' | 'format',
@@ -178,6 +179,12 @@ describe( 'stacked markers', () => {
 			} );
 			expect( effect.value.toHTMLString() ).toBe( base().toHTMLString() );
 			expect( effect.affected.get( '10' ) ).toBe( 'shrunk' );
+		} );
+
+		it( 'drops another author’s nested text when settling, even inside one’s own', () => {
+			// Anne's own addition with Bob's nested in it, settled for Anne.
+			const { value } = settleInsertedSuggestionMarkers( nested(), 10 );
+			expect( value.toHTMLString() ).toBe( 'The quick fox.' );
 		} );
 	} );
 

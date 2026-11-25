@@ -1,14 +1,28 @@
 /**
- * Suggestion mode attribute-proposal HOC.
+ * Suggest-mode attribute-proposal HOC.
  *
- * Captures block edits made in Suggest intent: attribute changes route
- * through `wrappedSetAttributes` into the block's own
- * `metadata.suggestion.after` (see `marker.ts`): a persistent change the
+ * With inline markers as the primary suggestion surface, this HOC covers the
+ * edits that markers don't: primitive attribute changes (heading level,
+ * alignment) and the rare content edit the marker path can't resolve
+ * unambiguously. Those route through `wrappedSetAttributes` into the block's
+ * own `metadata.suggestion.after` (see `marker.ts`): a persistent change the
  * undo stack owns, saved with the post and synced to peers, while the live
  * attributes stay at the baseline until Accept. Auto-save reads the marker to
- * build the suggestion's operations. The HOC also renders the pending
- * proposal merged over the live attributes, and the visual treatment for
- * proposals and structural markers.
+ * build the suggestion's operations.
+ *
+ * A proposal and inline markers are mutually exclusive per attribute: a
+ * proposal is marker-free by construction, so it renders in place of, and
+ * hides, any marker living in that attribute. An edit that would do that is
+ * declined at this seam rather than captured (`notifyEditRefused`), which is
+ * what keeps a block from carrying both representations at once.
+ *
+ * Text and formatting edits never become proposals: typing, deletion, cut,
+ * and single-line paste are caught on `beforeinput`/`cut`/`paste` by the
+ * suggestion keyboards, and the remaining seams (committed IME composition,
+ * autocorrect, drag-drop, multi-line paste, format toggles) are diverted to
+ * inline markers by `maybeHandleFormatEdit` / `maybeHandleContentEdit` before
+ * the proposal path runs. See #77867 for the original overlay tradeoff and
+ * #73411 for the marker migration.
  */
 import clsx from 'clsx';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -38,9 +52,69 @@ import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
 import {
+	planFormatMarkers,
+	planEditMarkers,
+	hasSuggestionMarkers,
+	stripSuggestionMarkersFromAttributes,
+} from '../inline-suggestions';
+import {
 	isPartOfPendingInsertion,
 	isPartOfPendingInsertionCached,
 } from './store-interceptor';
+import { notifyEditRefused } from './refuse-edit';
+
+/**
+ * True for plain strings and for objects that stringify to a meaningful HTML
+ * form (the rich-text package's `RichTextData` is the case we care about).
+ * Duck-typed against `toString` rather than `instanceof RichTextData` so we
+ * don't take a hard dependency on the rich-text package's internal class.
+ *
+ * @param value Candidate attribute value.
+ * @return True when `String( value )` will produce useful HTML.
+ */
+function isStringLike( value: any ): boolean {
+	if ( typeof value === 'string' ) {
+		return true;
+	}
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof value.toString === 'function' &&
+		value.toString !== Object.prototype.toString
+	);
+}
+
+/**
+ * Would turning this edit into a proposal hide a marker that is currently
+ * rendering?
+ *
+ * A proposal stores marker-free values (see
+ * `stripSuggestionMarkersFromAttributes`) and renders them in place of the
+ * block's live values, so a proposal for an attribute whose live value
+ * carries a `<mark class="wp-suggestion-<kind>">` suppresses every marker in it: the
+ * earlier suggestion's note survives in the sidebar describing text the
+ * reviewer can no longer see, and the block ends up carrying both
+ * representations of a pending change at once (#73411, finding F-09).
+ *
+ * Compared per attribute rather than per block: an attribute-only suggestion
+ * (heading level, alignment) on a block whose `content` holds a marker touches
+ * neither the marked value nor its rendering, and still becomes a proposal.
+ *
+ * @param nextAttributes Attributes the block is trying to set.
+ * @param prevAttributes The block's current attributes.
+ * @return True when the proposal would strip a live marker.
+ */
+function proposalWouldHideMarkers(
+	nextAttributes: Record< string, any > | null | undefined,
+	prevAttributes: Record< string, any > | null | undefined
+): boolean {
+	for ( const key of Object.keys( nextAttributes ?? {} ) ) {
+		if ( hasSuggestionMarkers( prevAttributes?.[ key ] ) ) {
+			return true;
+		}
+	}
+	return false;
+}
 
 /**
  * The block's live attributes. `BlockListBlock` hands `BlockEdit` the
@@ -86,10 +160,14 @@ function SuggestingBlockEdit( {
 	BlockEdit: any;
 	props: any;
 } ) {
-	const { clientId, setAttributes } = props;
+	const { clientId, name, setAttributes } = props;
 	const attributes = useLiveAttributes( clientId, props.attributes );
-	const { isDeferredInsertion, noteHistoryCapture } =
-		useSuggestionSessionActions();
+	const {
+		requestFormatSuggestion,
+		requestContentSuggestion,
+		isDeferredInsertion,
+		noteHistoryCapture,
+	} = useSuggestionSessionActions();
 
 	// Registry handle for the write-through check below; the live block
 	// state is read at call time, not render time, so a block that was
@@ -108,8 +186,9 @@ function SuggestingBlockEdit( {
 		attributesRef.current = attributes;
 	}, [ attributes ] );
 
-	// The suggester's user id, recorded on a fresh marker. Defaults to `null`
-	// for anonymous / pre-collab edits.
+	// The suggester's user id, forwarded to `maybeHandleContentEdit` so a
+	// reconciled text edit opens its note under the right author. Defaults to
+	// `null` for anonymous / pre-collab edits.
 	const { authorId } = useSelect( ( select ) => {
 		const core = select( coreStore );
 		return { authorId: core?.getCurrentUser?.()?.id ?? null };
@@ -137,6 +216,127 @@ function SuggestingBlockEdit( {
 		mergedAttributesRef.current = mergedAttributes;
 	}, [ mergedAttributes ] );
 
+	// Detect a formatting-only edit (bold/italic/link toggled over a run, the
+	// text unchanged) and hand it to the single-mount format handler, which
+	// creates the note and writes a `format` marker to the live block instead
+	// of routing the edit into the overlay diff. A format toggle arrives here
+	// as a fresh `content` value with no earlier DOM event to intercept
+	// (unlike typing, which the addition keyboard catches on `beforeinput`),
+	// so this per-block `setAttributes` seam is the one point that covers every
+	// source — toolbar button, keyboard shortcut, and the link popover alike.
+	// Returns true only when the handler took ownership; with no handler
+	// registered (isolated unit tests) it returns false and the edit falls
+	// through to the overlay path.
+	const maybeHandleFormatEdit = useCallback(
+		(
+			nextAttributes: Record< string, any >,
+			prevAttributes: Record< string, any > | null | undefined
+		) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			// `authorId` lets the planner recognise the suggester's own
+			// pending `format` marker on the run and extend it instead of
+			// opening a second suggestion over the same words.
+			const plan = planFormatMarkers( prevContent, nextContent, {
+				authorId,
+			} );
+			if ( plan.kind !== 'format' && plan.kind !== 'unrecorded' ) {
+				return false;
+			}
+			// `prevContent` rides along so the handler can re-validate the
+			// live block content against the snapshot the plan was diffed
+			// from before (and after) its async note round trip.
+			return requestFormatSuggestion( {
+				clientId,
+				blockName: name,
+				prevContent,
+				nextContent,
+				plan,
+			} );
+		},
+		[ clientId, name, authorId, requestFormatSuggestion ]
+	);
+
+	// Detect a text edit that reaches the block as a whole new `content` value
+	// with no `beforeinput` for the typing/deletion keyboards to catch (a
+	// committed IME composition, autocorrect, drag-drop, multi-line paste) and
+	// hand it to the single-mount content reconciler, which turns it into inline
+	// markers instead of an overlay diff. Only plans this converter can fully
+	// execute — every action opens a fresh note (`insert-add`/`wrap-del`) — are
+	// handed off; edits that grow or remove an existing marker, or that the diff
+	// can't resolve unambiguously, return false and fall through to the overlay
+	// path below. Returns true only when the reconciler took ownership; with no
+	// handler registered (isolated unit tests) `requestContentSuggestion` returns
+	// false and the edit falls through.
+	const maybeHandleContentEdit = useCallback(
+		(
+			nextAttributes: Record< string, any >,
+			prevAttributes: Record< string, any > | null | undefined
+		) => {
+			if (
+				! nextAttributes ||
+				! Object.prototype.hasOwnProperty.call(
+					nextAttributes,
+					'content'
+				)
+			) {
+				return false;
+			}
+			const prevContent = prevAttributes?.content;
+			const nextContent = nextAttributes.content;
+			if (
+				! isStringLike( prevContent ) ||
+				! isStringLike( nextContent )
+			) {
+				return false;
+			}
+			const plan = planEditMarkers( prevContent, nextContent, {
+				authorId,
+			} );
+			const actions = plan?.actions ?? [];
+			if ( actions.length === 0 ) {
+				return false;
+			}
+			/*
+			 * Only plans this seam can carry out end to end. Every action
+			 * either opens its own note (`newNote`) or grows a marker that
+			 * already has one (`grow-add`) — a `grow-add` is a revision of an
+			 * existing proposal, so it needs no note work at all. An action
+			 * that would retire a note (`remove-add`) is left to the paths that
+			 * own that cleanup.
+			 */
+			if (
+				! actions.every(
+					( action ) => action.newNote || action.type === 'grow-add'
+				)
+			) {
+				return false;
+			}
+			return requestContentSuggestion( {
+				clientId,
+				blockName: name,
+				prevContent,
+				plan,
+			} );
+		},
+		[ clientId, name, authorId, requestContentSuggestion ]
+	);
+
 	const wrappedSetAttributes = useCallback(
 		(
 			nextAttributes:
@@ -147,7 +347,8 @@ function SuggestingBlockEdit( {
 		) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
-			 * the real attributes instead of a proposal:
+			 * the real attributes instead of the overlay and the marker
+			 * reconcilers:
 			 * - A deferred insertion (an empty default block the interceptor
 			 *   hasn't registered yet) receives its first content this way,
 			 *   which is what triggers the interceptor to register the whole
@@ -184,6 +385,34 @@ function SuggestingBlockEdit( {
 				typeof nextAttributes === 'function'
 					? nextAttributes( mergedAttributesRef.current )
 					: nextAttributes;
+			// A formatting-only change becomes a live `format` marker rather
+			// than a proposal; everything else (text edits, primitive
+			// attribute changes) still routes to the proposal below.
+			// The block-editor store holds the live value RichText renders (a
+			// format-suggestion block keeps no proposal), so the block's
+			// current attributes are the "before" side of the format diff.
+			if ( maybeHandleFormatEdit( updates, attributesRef.current ) ) {
+				return;
+			}
+			// A text edit that surfaced as a fresh `content` value (not caught
+			// by the typing/deletion keyboards) becomes inline markers too, so
+			// it never reaches the proposal path.
+			if ( maybeHandleContentEdit( updates, attributesRef.current ) ) {
+				return;
+			}
+			/*
+			 * Last stop before the proposal: an edit that would bury a live
+			 * marker under a clean whole-attribute value is declined
+			 * instead. The keyboards decline the gestures they own before the
+			 * browser applies them; this covers every other way an edit can
+			 * reach a marked attribute (a format toggle over a marked run, a
+			 * paste or IME commit the marker plan can't resolve), so the
+			 * invariant holds however the edit arrived.
+			 */
+			if ( proposalWouldHideMarkers( updates, attributesRef.current ) ) {
+				notifyEditRefused( registry );
+				return;
+			}
 			mergedAttributesRef.current = {
 				...mergedAttributesRef.current,
 				...updates,
@@ -192,12 +421,13 @@ function SuggestingBlockEdit( {
 			 * The proposal is written into the block's own marker, as a normal
 			 * persistent change: it is the user's edit, so Ctrl+Z withdraws
 			 * it, it saves with the post, and it syncs to peers. The live
-			 * attributes stay at the baseline.
+			 * attributes stay at the baseline. Values are marker-stripped so
+			 * accepting later can never resurrect another suggestion's mark.
 			 */
 			const { metadata } = withProposedAttributes( {
 				metadata: attributesRef.current?.metadata,
 				liveAttributes: attributesRef.current ?? {},
-				changes: updates,
+				changes: stripSuggestionMarkersFromAttributes( updates ),
 				authorId,
 			} );
 			// Keep `attributesRef` ahead of the render so a second write in
@@ -212,6 +442,8 @@ function SuggestingBlockEdit( {
 			clientId,
 			authorId,
 			noteHistoryCapture,
+			maybeHandleFormatEdit,
+			maybeHandleContentEdit,
 			isDeferredInsertion,
 			setAttributes,
 			registry,
@@ -249,6 +481,7 @@ function ProposedBlockEdit( {
 } ) {
 	const { clientId, setAttributes } = props;
 	const attributes = useLiveAttributes( clientId, props.attributes );
+	const registry = useRegistry();
 	const marker = readSuggestionMarker( attributes );
 	// Every author's proposal on the block, later notes on top.
 	const after = useMemo( () => displayedProposal( marker ), [ marker ] );
@@ -278,13 +511,14 @@ function ProposedBlockEdit( {
 					if (
 						Object.prototype.hasOwnProperty.call( proposed, key )
 					) {
+						notifyEditRefused( registry );
 						return;
 					}
 				}
 			}
 			setAttributes( nextAttributes );
 		},
-		[ setAttributes ]
+		[ registry, setAttributes ]
 	);
 	return (
 		<BlockEdit

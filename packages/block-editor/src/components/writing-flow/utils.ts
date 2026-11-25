@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	serialize,
@@ -17,6 +18,24 @@ import { store as blockEditorStore } from '../../store';
 export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
 
 /**
+ * Serialize blocks for the clipboard. Every way of copying whole blocks goes
+ * through here, so the `blockEditor.copiedBlocks` filter is the last chance
+ * for a feature to keep document-scoped data off the clipboard. Anything
+ * that identifies a block by an id that is only meaningful inside this post
+ * - a note id, a suggestion marker - is meaningless (and actively misleading)
+ * once the blocks are pasted somewhere else, and the clipboard is the one
+ * path out of the editor that cannot be intercepted at the far end.
+ *
+ * @param blocks Blocks being copied.
+ * @return The serialized blocks.
+ */
+export function serializeCopiedBlocks( blocks: Block[] ): string {
+	return serialize(
+		applyFilters( 'blockEditor.copiedBlocks', blocks ) as Block[]
+	);
+}
+
+/**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
  *
@@ -29,7 +48,7 @@ export function setClipboardBlocks(
 	blocks: Block[],
 	registry: DataRegistry
 ) {
-	let _blocks: Block | Block[] = blocks;
+	let _blocks: Block[] = blocks;
 
 	const [ firstBlock ] = blocks;
 
@@ -53,16 +72,18 @@ export function setClipboardBlocks(
 
 			if ( wrapperBlockName ) {
 				// A named wrapper block exists, so it has attributes.
-				_blocks = createBlock(
-					wrapperBlockName,
-					getBlockAttributes( wrapperBlockClientId! )!,
-					_blocks
-				);
+				_blocks = [
+					createBlock(
+						wrapperBlockName,
+						getBlockAttributes( wrapperBlockClientId! )!,
+						_blocks
+					),
+				];
 			}
 		}
 	}
 
-	const serialized = serialize( _blocks );
+	const serialized = serializeCopiedBlocks( _blocks );
 
 	// Copy and cut events carry clipboard data.
 	event.clipboardData!.setData( 'text/plain', toPlainText( serialized ) );

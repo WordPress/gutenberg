@@ -361,6 +361,34 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
+	/**
+	 * A status the request sets is validated as before: an undecided
+	 * suggestion cannot be created resolved.
+	 */
+	public function test_create_suggestion_note_with_explicit_resolved_status_is_refused(): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'author'  => self::$author_id,
+					'type'    => 'note',
+					'status'  => 'approved',
+					'meta'    => array(
+						'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+					),
+				)
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_suggestion_pending', rest_get_server()->dispatch( $request ), 409 );
+	}
+
 	public function test_cannot_create_with_non_valid_comment_type() {
 		wp_set_current_user( self::$admin_id );
 		$post_id = self::factory()->post->create();
@@ -1380,6 +1408,74 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that the text an inline operation records when it is decided is
+	 * stored as bounded text, as given, for a user without `unfiltered_html`.
+	 */
+	public function test_suggestion_payload_decided_text_is_bounded(): void {
+		$author_id = self::$author_id;
+		$this->assertIsInt( $author_id );
+		wp_set_current_user( $author_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$this->assertIsInt( $comment_id );
+
+		$operation = array(
+			'type'           => 'inline-suggestion',
+			'attribute'      => 'content',
+			'suggestionType' => 'replace',
+		);
+		$payload   = (string) wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array_merge(
+						$operation,
+						array(
+							'decidedText'        => ' a < b',
+							'decidedDeletedText' => str_repeat( 'é', 1500 ),
+						)
+					),
+					array_merge(
+						$operation,
+						array(
+							'decidedText'        => array( 'not text' ),
+							'decidedDeletedText' => '',
+						)
+					),
+				),
+			)
+		);
+
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertIsString( $stored );
+		$decoded = json_decode( $stored, true );
+		$this->assertIsArray( $decoded );
+		$this->assertSame(
+			array(
+				array_merge(
+					$operation,
+					array(
+						'decidedText'        => ' a < b',
+						'decidedDeletedText' => str_repeat( 'é', 1000 ),
+					)
+				),
+				$operation,
+			),
+			$decoded['operations'],
+			'Decided text is kept as typed, cut to its limit, and dropped when it is not text.'
+		);
+	}
+
+	/**
 	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
 	 * the same freedom they have in post content.
 	 */
@@ -1558,7 +1654,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				array(
 					'status' => 'approved',
 					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
+						'_wp_suggestion_status' => 'applied-unsaved',
 					),
 				)
 			)
@@ -1566,7 +1662,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$response = rest_get_server()->dispatch( $request );
 		// Core maps `edit_comment` to `edit_post` on the parent post, which
-		// the editor holds; the update succeeds with a 200 status.
+		// the editor holds; the update succeeds with a 200 status. The status
+		// is the provisional one an editor writes: only a post save makes it
+		// final.
 		$this->assertSame( 200, $response->get_status() );
 	}
 
@@ -1595,7 +1693,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			wp_json_encode(
 				array(
 					'meta' => array(
-						'_wp_suggestion_status' => 'rejected',
+						'_wp_suggestion_status' => 'rejected-unsaved',
 					),
 				)
 			)
@@ -1670,7 +1768,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				array(
 					'status' => 'approved',
 					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
+						'_wp_suggestion_status' => 'applied-unsaved',
 					),
 				)
 			)

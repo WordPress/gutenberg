@@ -11,11 +11,13 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
 import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
+import { findInlineMarker } from './anchor-index';
 import { createProposedTerms } from './create-proposed-terms';
 import { getAttributeApplyRefusal, getPostApplyRefusal } from './apply-refusal';
 import {
@@ -26,9 +28,25 @@ import {
 } from './marker';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import {
+	formatDeltaFromOriginal,
+	rebaseFormatDelta,
+	sanitizeFormatDelta,
+	rebaseFormatOriginal,
+	resolveInlineSuggestion,
+} from '../inline-suggestions';
+import type {
+	FormatDelta,
+	FormatRevision,
+	InlineSuggestionType,
+	ResolutionEffect,
+} from '../inline-suggestions';
+import {
+	INLINE_OP_TYPE,
 	applyOperations,
 	applyPostOperations,
 	findBlockByNoteId,
+	findGroupId,
+	findInlineOp,
 	findPostAttributeOps,
 	findStructuralOp,
 	parseSuggestionPayload,
@@ -37,8 +55,13 @@ import {
 } from './operations';
 import type { BlockPlan, PlanStep, SuggestionPayload } from './operations';
 import { withDecisionInFlight } from './decision-state';
+import { snapshotDecidedPayload } from './decision-snapshot';
 import { useSuggestionStore } from './suggestion-store';
-import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
+import {
+	getSuggestionStatus,
+	isFinalStatus,
+	isPendingStatus,
+} from './suggestion-status';
 import type { SuggestionDecision } from './suggestion-status';
 
 /**
@@ -49,6 +72,51 @@ import type { SuggestionDecision } from './suggestion-status';
  * @return Partial attributes for `updateBlockAttributes`, or null when the
  * block proposes nothing.
  */
+/**
+ * The inline suggestion type a payload's op names, defaulting to a deletion
+ * as the decision paths always have.
+ *
+ * @param inlineOp The payload's inline op.
+ * @return Inline suggestion type.
+ */
+function inlineTypeOf( inlineOp: any ): InlineSuggestionType {
+	return [ 'add', 'replace', 'format' ].includes( inlineOp?.suggestionType )
+		? inlineOp.suggestionType
+		: 'del';
+}
+
+/*
+ * Rebased originals of formatting changes, per registry, from the moment a
+ * decision computes them. The note write that persists one is a round trip,
+ * and a reject of that change must not restore the stale original meanwhile.
+ * Every note's decision hook shares this, as each `Note` has its own hook.
+ */
+const rebasedOriginals = new WeakMap< object, Map< string, string > >();
+
+function rebasedOriginalsOf( registry: object ) {
+	let originals = rebasedOriginals.get( registry );
+	if ( ! originals ) {
+		originals = new Map();
+		rebasedOriginals.set( registry, originals );
+	}
+	return originals;
+}
+
+/*
+ * Revised deltas of formatting changes, per registry, from the moment a
+ * decision computes them, for the same reason as `rebasedOriginals`.
+ */
+const revisedDeltas = new WeakMap< object, Map< string, FormatDelta > >();
+
+function revisedDeltasOf( registry: object ) {
+	let deltas = revisedDeltas.get( registry );
+	if ( ! deltas ) {
+		deltas = new Map();
+		revisedDeltas.set( registry, deltas );
+	}
+	return deltas;
+}
+
 function clearProposedAttributes(
 	currentAttributes: Record< string, any > | null | undefined
 ) {
@@ -177,6 +245,40 @@ export function useSuggestionDecisions() {
 	);
 
 	/**
+	 * Where an inline suggestion's marker is. The marker is found by its id
+	 * wherever it sits: a merge or a transform leaves it in a block that
+	 * `metadata.noteId` does not link, or under another attribute name. The
+	 * linked block and the payload's attribute are tried first, and are the
+	 * answer when the content holds no marker for the note.
+	 *
+	 * @param clientId  Block client id, if the caller resolved one.
+	 * @param commentId Comment id.
+	 * @param attribute Attribute the payload names.
+	 * @return The block and attribute to decide on, or undefined.
+	 */
+	const resolveInlineTarget = useCallback(
+		(
+			clientId: string | undefined,
+			commentId: number | string,
+			attribute: string
+		) => {
+			const linked = resolveTarget( clientId, commentId );
+			return (
+				findInlineMarker(
+					{
+						getClientIdsWithDescendants:
+							selectClientIdsWithDescendants,
+						getBlockAttributes: selectBlockAttributes,
+					},
+					commentId,
+					{ clientId: linked, attribute }
+				) ?? ( linked ? { clientId: linked, attribute } : undefined )
+			);
+		},
+		[ resolveTarget, selectClientIdsWithDescendants, selectBlockAttributes ]
+	);
+
+	/**
 	 * Record a decision, then make its change to the content.
 	 *
 	 * The provisional status is written first, for every kind of suggestion:
@@ -208,7 +310,22 @@ export function useSuggestionDecisions() {
 				return false;
 			};
 			try {
-				await store.setProvisionalDecision( commentId, decision );
+				// The server keeps the payload of a note with a final
+				// status as it is, so deciding one again records nothing.
+				const note = store.getNote( commentId );
+				await store.setProvisionalDecision(
+					commentId,
+					decision,
+					isFinalStatus( getSuggestionStatus( note ) )
+						? null
+						: snapshotDecidedPayload(
+								registry.select( blockEditorStore ),
+								commentId,
+								parseSuggestionPayload(
+									note?.meta?._wp_suggestion
+								)
+							)
+				);
 			} catch ( error: any ) {
 				return fail( error );
 			}
@@ -226,7 +343,185 @@ export function useSuggestionDecisions() {
 			}
 			return true;
 		},
-		[ store, createNotice ]
+		[ store, createNotice, registry ]
+	);
+
+	/**
+	 * Follow up a landed inline decision on the suggestions it touched.
+	 *
+	 * - Suggestions it emptied (the deletions and formatting changes inside
+	 *   a rejected addition) are announced. Their notes are left to the save
+	 *   pass, which marks another author's note outdated, and to the note
+	 *   collector, which trashes the reviewer's own.
+	 * - A formatting change that lost characters (a deletion inside it was
+	 *   accepted) gets its recorded original and proposed run rebased, or
+	 *   rejecting it later would put the deleted words back.
+	 * - A formatting change whose original no longer matched its run kept
+	 *   its proposed formatting; say so.
+	 *
+	 * @param effect The decision's effect.
+	 */
+	/*
+	 * A formatting change's recorded original as the note has it now. An
+	 * accepted deletion inside the change rebases it on the note, and the
+	 * payload a caller holds may predate that write.
+	 */
+	const liveBeforeHTML = useCallback(
+		( commentId: number | string, inlineOp: any ) => {
+			const rebased = rebasedOriginalsOf( registry ).get(
+				String( commentId )
+			);
+			if ( rebased !== undefined ) {
+				return rebased;
+			}
+			const live = findInlineOp(
+				parseSuggestionPayload(
+					store.getNote( commentId )?.meta?._wp_suggestion
+				)?.operations
+			);
+			return typeof live?.beforeHTML === 'string'
+				? live.beforeHTML
+				: inlineOp.beforeHTML;
+		},
+		[ store, registry ]
+	);
+
+	/*
+	 * The delta of each formatting change in a value, as its note has it now:
+	 * a decision's revision, the payload's `delta`, or for a note written
+	 * before deltas, one derived from its recorded original.
+	 */
+	const formatDeltasFor = useCallback(
+		( value: any ) => ( formatId: string ) => {
+			const revised = revisedDeltasOf( registry ).get( formatId );
+			if ( revised ) {
+				return revised;
+			}
+			const op = findInlineOp(
+				parseSuggestionPayload(
+					store.getNote( Number( formatId ) )?.meta?._wp_suggestion
+				)?.operations
+			);
+			if ( op?.suggestionType !== 'format' ) {
+				return null;
+			}
+			if ( Array.isArray( op.delta ) ) {
+				return sanitizeFormatDelta( op.delta );
+			}
+			const original =
+				rebasedOriginalsOf( registry ).get( formatId ) ?? op.beforeHTML;
+			return typeof original === 'string'
+				? formatDeltaFromOriginal( value, formatId, original )
+				: null;
+		},
+		[ store, registry ]
+	);
+
+	/*
+	 * Write a formatting change's revised payload to its note, keeping the
+	 * revision locally until the write lands.
+	 */
+	const reviseFormatNote = useCallback(
+		( formatId: string, revise: ( op: any ) => any ) => {
+			const noteId = Number( formatId );
+			const formatPayload = parseSuggestionPayload(
+				store.getNote( noteId )?.meta?._wp_suggestion
+			);
+			if ( ! formatPayload ) {
+				return;
+			}
+			const index = formatPayload.operations.findIndex(
+				( op: any ) =>
+					op.type === INLINE_OP_TYPE && op.suggestionType === 'format'
+			);
+			if ( index === -1 ) {
+				return;
+			}
+			const revised = revise( formatPayload.operations[ index ] );
+			const operations = formatPayload.operations.slice();
+			operations[ index ] = revised;
+			if ( typeof revised.beforeHTML === 'string' ) {
+				rebasedOriginalsOf( registry ).set(
+					formatId,
+					revised.beforeHTML
+				);
+			}
+			if ( Array.isArray( revised.delta ) ) {
+				revisedDeltasOf( registry ).set( formatId, revised.delta );
+			}
+			store
+				.updateNote( noteId, { ...formatPayload, operations } )
+				.catch( () => {
+					// The note keeps what it had; a later decision on that
+					// change reads the local revision until reload.
+				} );
+		},
+		[ store, registry ]
+	);
+
+	const reportResolution = useCallback(
+		( effect: ResolutionEffect ) => {
+			let emptied = 0;
+			for ( const change of effect.affected.values() ) {
+				if ( change === 'emptied' ) {
+					emptied++;
+				}
+			}
+			if ( emptied ) {
+				speak(
+					sprintf(
+						/* translators: %d: number of suggestions. */
+						_n(
+							'%d suggestion on this text is now outdated.',
+							'%d suggestions on this text are now outdated.',
+							emptied
+						),
+						emptied
+					)
+				);
+			}
+			if ( effect.restored === false ) {
+				createNotice(
+					'warning',
+					__( 'The original formatting could not be restored.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+			}
+			for ( const [ formatId, offsets ] of effect.formatRemovals ) {
+				reviseFormatNote( formatId, ( op: any ) => ( {
+					...op,
+					...( typeof op.beforeHTML === 'string' && {
+						beforeHTML: rebaseFormatOriginal(
+							rebasedOriginalsOf( registry ).get( formatId ) ??
+								op.beforeHTML,
+							offsets
+						),
+					} ),
+					...( typeof op.afterHTML === 'string' && {
+						afterHTML: rebaseFormatOriginal(
+							op.afterHTML,
+							offsets
+						),
+					} ),
+					...( Array.isArray(
+						revisedDeltasOf( registry ).get( formatId ) ?? op.delta
+					) && {
+						delta: rebaseFormatDelta(
+							revisedDeltasOf( registry ).get( formatId ) ??
+								op.delta,
+							offsets
+						),
+					} ),
+				} ) );
+			}
+			for ( const [ formatId, revision ] of effect.formatRevisions ) {
+				reviseFormatNote( formatId, ( op: any ): any => ( {
+					...op,
+					...( revision as FormatRevision ),
+				} ) );
+			}
+		},
+		[ createNotice, registry, reviseFormatNote ]
 	);
 
 	/**
@@ -330,7 +625,12 @@ export function useSuggestionDecisions() {
 				);
 			}
 
-			const targetClientId = resolveTarget( clientId, commentId );
+			const inlineOp = findInlineOp( payload.operations );
+			const inlineTarget = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
+				: undefined;
+			const targetClientId =
+				inlineTarget?.clientId ?? resolveTarget( clientId, commentId );
 
 			if ( ! targetClientId ) {
 				createNotice(
@@ -373,6 +673,57 @@ export function useSuggestionDecisions() {
 			};
 
 			const failureMessage = __( 'Failed to save suggestion status.' );
+
+			// Inline suggestions live as a suggestion marker in a
+			// single rich-text attribute. Apply resolves the marker by comment
+			// id and rewrites that one attribute: a deletion drops the marked
+			// text with its marker; an addition unwraps the marker so the
+			// proposed text becomes permanent. The write bypasses the
+			// Suggestion mode interceptor so it lands on the live block
+			// instead of being reverted into the overlay.
+			if ( inlineOp && inlineTarget ) {
+				const attributeKey = inlineTarget.attribute;
+				/*
+				 * Accepting a deletion removes its characters, which can
+				 * shrink or empty other suggestions nested with it; the
+				 * effect says which, for `reportResolution` once the decision
+				 * has landed.
+				 */
+				let effect: ResolutionEffect | undefined;
+				const landed = await decide(
+					commentId,
+					'applied',
+					() => {
+						effect = resolveInlineSuggestion(
+							selectBlockAttributes( targetClientId )?.[
+								attributeKey
+							],
+							{
+								id: commentId,
+								suggestionType: inlineTypeOf( inlineOp ),
+								decision: 'accept',
+								formatDeltas: formatDeltasFor(
+									selectBlockAttributes( targetClientId )?.[
+										attributeKey
+									]
+								),
+							}
+						);
+						// The same block can hold a pending attribute proposal
+						// in its marker; this write touches only the marked
+						// attribute, so that proposal stays where it is (F-14).
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes( targetClientId, {
+							[ attributeKey ]: effect.value,
+						} );
+					},
+					failureMessage
+				);
+				if ( landed && effect ) {
+					reportResolution( effect );
+				}
+				return landed;
+			}
 
 			// Structural ops (block-remove, block-insert-after, block-move)
 			// mutate the tree rather than a single block's attributes, so they
@@ -472,11 +823,14 @@ export function useSuggestionDecisions() {
 			updateBlockAttributes,
 			selectBlockAttributes,
 			resolveTarget,
+			resolveInlineTarget,
 			runPlan,
 			createNotice,
 			requestInterceptorBypass,
 			clearPostFieldProposals,
 			registry,
+			reportResolution,
+			formatDeltasFor,
 		]
 	);
 
@@ -520,6 +874,64 @@ export function useSuggestionDecisions() {
 					() => clearPostFieldProposals( rejectedPostOps, commentId ),
 					failureMessage
 				);
+			}
+
+			// Inline suggestions: reject restores the block's pre-suggestion
+			// content for the marked attribute — a deletion keeps the text and
+			// drops the marker, an addition removes the proposed text with its
+			// marker. Resolve the target the way apply does (the metadata link
+			// may be absent on a fresh load) and bypass the interceptor so the
+			// change lands on the live block.
+			const inlineOp = findInlineOp( payload?.operations );
+			const located = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
+				: undefined;
+			if ( inlineOp && located ) {
+				const inlineTarget = located.clientId;
+				const attributeKey = located.attribute;
+				/*
+				 * Rejecting an addition removes its text, and with it every
+				 * suggestion nested in it. Rejecting a formatting change
+				 * restores the original captured at suggest time
+				 * (`beforeHTML`), character by character.
+				 */
+				let effect: ResolutionEffect | undefined;
+				const landed = await decide(
+					commentId,
+					'rejected',
+					() => {
+						effect = resolveInlineSuggestion(
+							selectBlockAttributes( inlineTarget )?.[
+								attributeKey
+							],
+							{
+								id: commentId,
+								suggestionType: inlineTypeOf( inlineOp ),
+								decision: 'reject',
+								beforeHTML: liveBeforeHTML(
+									commentId,
+									inlineOp
+								),
+								formatDeltas: formatDeltasFor(
+									selectBlockAttributes( inlineTarget )?.[
+										attributeKey
+									]
+								),
+							}
+						);
+						// As on the apply path: a co-resident attribute
+						// proposal lives in the marker and survives this.
+						requestInterceptorBypass( inlineTarget );
+						updateBlockAttributes( inlineTarget, {
+							[ attributeKey ]: effect.value,
+						} );
+					},
+					failureMessage
+				);
+				if ( landed && effect ) {
+					reportResolution( effect );
+				}
+				return landed;
 			}
 
 			// A structural op undoes its live-block change (see
@@ -583,11 +995,15 @@ export function useSuggestionDecisions() {
 		[
 			decide,
 			selectBlockAttributes,
+			resolveInlineTarget,
 			runPlan,
 			updateBlockAttributes,
 			requestInterceptorBypass,
 			clearPostFieldProposals,
 			registry,
+			reportResolution,
+			liveBeforeHTML,
+			formatDeltasFor,
 		]
 	);
 
@@ -598,7 +1014,8 @@ export function useSuggestionDecisions() {
 	 * A `replaceBlocks` — the block switcher's transform, "Group", a paste
 	 * over a selection — is captured as a removal plus an insertion, and the
 	 * interceptor stamps both halves with a shared `metadata.suggestion
-	 * .groupId`. They are one logical change: accepting the insertion alone
+	 * .groupId`. A deletion across blocks is grouped the same way: the
+	 * rewritten first block and the removed ones. They are one logical change: accepting the insertion alone
 	 * leaves the original block behind as a duplicate, and rejecting it alone
 	 * leaves a hole where the original used to be. The group is resolved from
 	 * the live tree rather than from the payload so it survives a reload,
@@ -619,7 +1036,7 @@ export function useSuggestionDecisions() {
 			commentId: number | string;
 			payload?: SuggestionPayload | null;
 		} ) => {
-			const groupId = findStructuralOp( payload?.operations )?.groupId;
+			const groupId = findGroupId( payload?.operations );
 			if ( ! groupId ) {
 				return [];
 			}
@@ -651,8 +1068,7 @@ export function useSuggestionDecisions() {
 						comment?.meta?._wp_suggestion
 					);
 					if (
-						findStructuralOp( partnerPayload?.operations )
-							?.groupId !== groupId
+						findGroupId( partnerPayload?.operations ) !== groupId
 					) {
 						continue;
 					}

@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { hasNotesSupport } from '../suggestion-mode/gate';
 import { createBoardStore } from './board-store';
 import {
 	getNoteIdsFromMetadata,
@@ -45,6 +46,7 @@ import {
 } from './utils/note-selection';
 import { focusNoteThread } from './utils/dom';
 import { getThreadLayout } from './utils/layout';
+import { isOpenPostFieldSuggestion } from './utils/post-field-suggestion';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -53,19 +55,35 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  */
 export const NoteDraftsContext = createContext();
 
-export function useNoteThreads( postId ) {
-	const queryArgs = {
+/**
+ * Query that loads every note thread on a post, replies included. Exported so
+ * code outside the sidebar can read the same cached list synchronously with
+ * `select( coreStore ).getEntityRecords()` — a queried list is only found under
+ * the exact query it was fetched with.
+ *
+ * @param {number} postId Post id.
+ * @return {Object} Query arguments for the `root`/`comment` entity.
+ */
+export function getNoteThreadsQuery( postId ) {
+	return {
 		post: postId,
 		type: 'note',
 		status: 'all',
 		per_page: -1,
 	};
+}
+
+export function useNoteThreads( postId ) {
+	const queryArgs = getNoteThreadsQuery( postId );
+	// The request is refused for a post type without notes, such as a
+	// synced pattern opened from a post.
+	const supportsNotes = useSelect( hasNotesSupport, [] );
 
 	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		{ enabled: supportsNotes && !! postId && typeof postId === 'number' }
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
@@ -174,16 +192,33 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
+		// Open post field suggestions (the title, the excerpt...) have no
+		// block by design. They lead the unresolved notes, since the fields
+		// sit above the content.
+		const postFieldSuggestions = [];
 		// Orphans: root threads without a linked block. They stay with the
 		// active notes (above the "Resolved" separator) since they may still
 		// need attention even though their associated block is gone.
-		const orphans = rootThreads.filter(
-			( thread ) => ! thread.blockClientId
-		);
+		const orphans = [];
+		for ( const thread of rootThreads ) {
+			if ( thread.blockClientId ) {
+				continue;
+			}
+			if ( isOpenPostFieldSuggestion( thread ) ) {
+				postFieldSuggestions.push( thread );
+			} else {
+				orphans.push( thread );
+			}
+		}
 
 		return {
-			notes: [ ...unresolved, ...orphans, ...resolved ],
-			unresolvedNotes: unresolved,
+			notes: [
+				...postFieldSuggestions,
+				...unresolved,
+				...orphans,
+				...resolved,
+			],
+			unresolvedNotes: [ ...postFieldSuggestions, ...unresolved ],
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
@@ -428,13 +463,19 @@ export function useNoteActions() {
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
-				// First, update the thread status.
+				// First, update the thread status. Reopening a suggestion also
+				// puts its decision back to pending, or it would still read as
+				// decided and offer no Accept or Reject.
 				await saveEntityRecord(
 					'root',
 					'comment',
 					{
 						id,
 						status,
+						...( status === 'hold' &&
+							note.meta?._wp_suggestion && {
+								meta: { _wp_suggestion_status: 'pending' },
+							} ),
 					},
 					{
 						throwOnError: true,
