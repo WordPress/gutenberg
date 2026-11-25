@@ -11,6 +11,7 @@ import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { store as editorStore } from '../../store';
 import SwapTemplateButton, { SwapTemplateModal } from './swap-template-button';
 import ResetDefaultTemplate from './reset-default-template';
@@ -68,6 +69,7 @@ export default function BlockThemeControl() {
 
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const [ activeModal, setActiveModal ] = useState( null );
+	const lockedProps = useLockedPostSettingProps();
 
 	if ( ! hasResolved ) {
 		return null;
@@ -100,12 +102,15 @@ export default function BlockThemeControl() {
 			<PostPanelRow label={ __( 'Template' ) } ref={ setPopoverAnchor }>
 				<Menu.Root modal={ false }>
 					<Menu.Trigger
+						disabled={ !! lockedProps.disabled }
 						render={
 							<Button
 								size="compact"
 								variant="tertiary"
 								tooltipPosition="middle left"
 								label={ __( 'Template options' ) }
+								aria-label={ __( 'Template options' ) }
+								{ ...lockedProps }
 							/>
 						}
 					>

@@ -1,23 +1,9 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
+import { checkSupport } from './check-support';
 
-function checkSupport( supports = {}, key ) {
-	// Check for top-level support keys.
-	if ( supports[ key ] !== undefined ) {
-		return !! supports[ key ];
-	}
-
-	const [ topKey, subKey ] = key.split( '.' );
-	// Try to unwrap sub-properties from the superfluous array.
-	const [ subProperties ] = Array.isArray( supports[ topKey ] )
-		? supports[ topKey ]
-		: [];
-
-	return Array.isArray( subProperties )
-		? subProperties.includes( subKey )
-		: !! subProperties?.[ subKey ];
-}
+export { checkSupport };
 
 /**
  * A component which renders its own children only if the current editor post

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as a button in the editor top bar that names the current mode, and as an Edit / Suggest menu in the editor options, for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit) and +X (Suggest) on Windows, ⌘⌥⇧Z/X on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
