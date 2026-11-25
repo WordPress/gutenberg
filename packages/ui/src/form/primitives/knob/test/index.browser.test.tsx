@@ -189,16 +189,16 @@ describe( 'Knob', () => {
 	);
 
 	it.each( [
-		{ key: 'Home', value: null, expected: 0 },
-		{ key: 'End', value: 900, expected: 720 },
+		{ key: 'Home', value: null, min: -0.5, expected: 0 },
+		{ key: 'End', value: 900, min: 0, expected: 720 },
 	] )(
 		'selects the end with $key when the dial shows it for a value of $value',
-		async ( { key, value, expected } ) => {
+		async ( { key, value, min, expected } ) => {
 			const onValueChange = vi.fn();
 			await render(
 				<Knob
 					aria-label="Rotation"
-					min={ 0 }
+					min={ min }
 					max={ 720 }
 					value={ value }
 					onValueChange={ onValueChange }

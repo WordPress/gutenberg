@@ -236,7 +236,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				end === shown &&
 				( isEmpty || shown !== shownValue )
 			) {
-				select( end );
+				select( shown );
 				return;
 			}
 			if ( ! wraps ) {
