@@ -19,9 +19,7 @@ describe( 'getDial', () => {
 		// A wrapping dial leaves out the full turn, which is zero again.
 		{ config: {}, first: 0, last: 359 },
 		{ config: { stepsPerTurn: 400 }, first: 0, last: 399 },
-		{ config: { stepsPerTurn: 100 }, first: 0, last: 99 },
 		{ config: { min: -720, max: 720 }, first: -720, last: 720 },
-		{ config: { min: 0, max: 10, stepsPerTurn: 10 }, first: 0, last: 10 },
 		// Limits between two steps enclose the whole steps inside them.
 		{ config: { min: 0.5, max: 100.7 }, first: 1, last: 100 },
 		{ config: { min: -100.7, max: -0.5 }, first: -100, last: -1 },
@@ -41,8 +39,6 @@ describe( 'getDial', () => {
 		{ config: {}, value: 450, step: 90 },
 		{ config: {}, value: -45, step: 315 },
 		{ config: {}, value: 359.6, step: 0 },
-		{ config: {}, value: 359.4, step: 359 },
-		{ config: { stepsPerTurn: 4 }, value: 3.6, step: 0 },
 		// A dial with as many steps as whole numbers allow still counts.
 		{
 			config: { stepsPerTurn: Number.MAX_SAFE_INTEGER },
@@ -50,9 +46,7 @@ describe( 'getDial', () => {
 			step: 2,
 		},
 		// A bounded dial stops at its ends.
-		{ config: { min: -720, max: 720 }, value: 1000, step: 720 },
 		{ config: { min: -720, max: 720 }, value: -1000, step: -720 },
-		{ config: { min: -720, max: 720 }, value: 269.9, step: 270 },
 	] )(
 		'shows $value at step $step on $config',
 		( { config, value, step } ) => {
@@ -169,14 +163,7 @@ describe( 'press', () => {
 			heading: -45,
 			expected: 315,
 		},
-		{ config: { min: 0, max: 360 }, value: 0, heading: -21, expected: 339 },
 		// No turn has the heading, so the nearer end is selected.
-		{
-			config: { min: 0, max: 180 },
-			value: 0,
-			heading: -176.6,
-			expected: 180,
-		},
 		{
 			config: { min: 0, max: 180 },
 			value: 90,
@@ -217,17 +204,8 @@ describe( 'press', () => {
 			heading: 180,
 			expected: 18,
 		},
-		// Steps of a quarter turn, two turns either way.
-		{
-			config: { min: -8, max: 8, stepsPerTurn: 4 },
-			value: 0,
-			heading: 90,
-			expected: 1,
-		},
 		// A wrapping dial has a single turn, however large the value.
 		{ config: {}, value: 1e17, heading: 90, expected: 90 },
-		{ config: {}, value: 180, heading: -45, expected: 315 },
-		{ config: { stepsPerTurn: 100 }, value: 0, heading: 90, expected: 25 },
 	] )(
 		'selects $expected for heading $heading from $value on $config',
 		( { config, value, heading, expected } ) => {

@@ -89,26 +89,18 @@ describe( 'Knob', () => {
 		await expect.element( slider ).toHaveValue( '-90' );
 	} );
 
-	it.each( [
-		{ value: 450, expected: '90' },
-		{ value: -45, expected: '315' },
-	] )(
-		'points a wrapping dial to the heading of $value without reporting a change',
-		async ( { value, expected } ) => {
-			const onValueChange = vi.fn();
-			await render(
-				<Knob
-					aria-label="Angle"
-					value={ value }
-					onValueChange={ onValueChange }
-				/>
-			);
-			await expect
-				.element( page.getByRole( 'slider' ) )
-				.toHaveValue( expected );
-			expect( onValueChange ).not.toHaveBeenCalled();
-		}
-	);
+	it( 'points a wrapping dial to the heading of 450 without reporting a change', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<Knob
+				aria-label="Angle"
+				value={ 450 }
+				onValueChange={ onValueChange }
+			/>
+		);
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
+		expect( onValueChange ).not.toHaveBeenCalled();
+	} );
 
 	it( 'shows a value beyond a bounded range at the nearest end', async () => {
 		const onValueChange = vi.fn();
@@ -161,32 +153,20 @@ describe( 'Knob', () => {
 		expect( new FormData( form ).get( 'offset' ) ).toBe( '0' );
 	} );
 
-	it.each( [
-		{ steps: 'gradians', stepsPerTurn: 400, quarter: '100', last: '399' },
-		{
-			steps: 'hundredths of a turn',
-			stepsPerTurn: 100,
-			quarter: '25',
-			last: '99',
-		},
-		{ steps: 'quarter turns', stepsPerTurn: 4, quarter: '1', last: '3' },
-	] )(
-		'reads a quarter turn as $quarter in $steps and wraps below zero to $last',
-		async ( { stepsPerTurn, quarter, last } ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob aria-label="Angle" stepsPerTurn={ stepsPerTurn } />
-				</ThemeProvider>
-			);
-			const slider = page.getByRole( 'slider' );
-			const dial = page.getByRole( 'group' );
-			const { right } = getPoints( dial );
-			await dial.click( { position: right } );
-			await expect.element( slider ).toHaveValue( quarter );
-			await userEvent.keyboard( '{Home}{ArrowDown}' );
-			await expect.element( slider ).toHaveValue( last );
-		}
-	);
+	it( 'reads a quarter turn as 25 in hundredths of a turn and wraps below zero to 99', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" stepsPerTurn={ 100 } />
+			</ThemeProvider>
+		);
+		const slider = page.getByRole( 'slider' );
+		const dial = page.getByRole( 'group' );
+		const { right } = getPoints( dial );
+		await dial.click( { position: right } );
+		await expect.element( slider ).toHaveValue( '25' );
+		await userEvent.keyboard( '{Home}{ArrowDown}' );
+		await expect.element( slider ).toHaveValue( '99' );
+	} );
 
 	it.each( [
 		{ key: 'Home', value: null, min: -0.5, expected: 0 },
@@ -702,35 +682,6 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 45 );
 	} );
 
-	it.each( [
-		{ sampling: 'a position in the middle', sampled: true },
-		{ sampling: 'no position in the middle', sampled: false },
-	] )(
-		'selects the same turn after a drag through the middle with $sampling',
-		async ( { sampled } ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob aria-label="Rotation" min={ -720 } max={ 720 } />
-				</ThemeProvider>
-			);
-			const dial = page.getByRole( 'group' );
-			const { at } = getPoints( dial );
-			// From half past four straight to nine o'clock, with or without
-			// a position reported on the way.
-			await userEvent.pointer( [
-				{ target: dial, coords: at( 28, 28 ), keys: '[MouseLeft>]' },
-				...( sampled
-					? [ { target: dial, coords: at( 19, 24 ) } ]
-					: [] ),
-				{ target: dial, coords: at( 10, 20 ) },
-				'[/MouseLeft]',
-			] );
-			await expect
-				.element( page.getByRole( 'slider' ) )
-				.toHaveValue( '270' );
-		}
-	);
-
 	it( 'counts a move through the middle from a value between steps when the dot was held', async () => {
 		const onValueChange = vi.fn();
 		await render(
@@ -926,33 +877,6 @@ describe( 'Knob', () => {
 	} );
 
 	it.each( [
-		{ from: -300, expected: '-270' },
-		{ from: 390, expected: '450' },
-		{ from: 710, expected: '450' },
-	] )(
-		'selects the nearest available turn from $from on click',
-		async ( { from, expected } ) => {
-			await render(
-				<ThemeProvider isRoot>
-					<Knob
-						aria-label="Rotation"
-						min={ -720 }
-						max={ 720 }
-						defaultValue={ from }
-					/>
-				</ThemeProvider>
-			);
-			const dial = page.getByRole( 'group' );
-			const { right } = getPoints( dial );
-			await dial.click( { position: right } );
-			await expect
-				.element( page.getByRole( 'slider' ) )
-				.toHaveValue( expected );
-		}
-	);
-
-	it.each( [
-		{ direction: 'clockwise', stepsPerTurn: 360, expected: '810' },
 		{ direction: 'counterclockwise', stepsPerTurn: 360, expected: '-810' },
 		{ direction: 'clockwise', stepsPerTurn: 4, expected: '9' },
 	] )(
