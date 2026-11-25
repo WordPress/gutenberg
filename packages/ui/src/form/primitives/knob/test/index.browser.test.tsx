@@ -196,6 +196,28 @@ describe( 'Knob', () => {
 		}
 	);
 
+	it.each( [
+		{ key: 'Home', value: null, expected: 0 },
+		{ key: 'End', value: 900, expected: 720 },
+	] )(
+		'selects the end with $key when the dial shows it for a value of $value',
+		async ( { key, value, expected } ) => {
+			const onValueChange = vi.fn();
+			await render(
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 720 }
+					value={ value }
+					onValueChange={ onValueChange }
+				/>
+			);
+			await userEvent.tab();
+			await userEvent.keyboard( `{${ key }}` );
+			expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( expected );
+		}
+	);
+
 	it( 'lets a consumer cancel a slider key before its value changes', async () => {
 		const onValueChange = vi.fn();
 		const onKeyDown = vi.fn( ( event: React.KeyboardEvent ) =>
@@ -515,6 +537,30 @@ describe( 'Knob', () => {
 				.toHaveValue( '270' );
 		}
 	);
+
+	it( 'selects the same turn after a move through the middle as a press on that heading would', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -720 }
+					max={ 720 }
+					defaultValue={ 227 }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		// Press on the rim just past the dot, a little over half a turn from
+		// where the move lands. From 227, that heading is nearer at 47 than
+		// at 407.
+		await userEvent.pointer( [
+			{ target: dial, coords: at( 8, 31 ), keys: '[MouseLeft>]' },
+			{ target: dial, coords: at( 33, 8 ) },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '47' );
+	} );
 
 	it( 'selects the heading under the pointer when a drag past the end crosses the center', async () => {
 		await render(

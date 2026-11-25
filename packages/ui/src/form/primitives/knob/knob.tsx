@@ -203,7 +203,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// heading after a press in the middle only starts the count.
 			if ( current.heading !== null ) {
 				current.angle = crossesMiddle( current, pointer )
-					? press( pointer.heading, current.angle )
+					? press(
+							pointer.heading,
+							// Count the turn as a press would: from the step
+							// the gesture last selected, or else from the
+							// value.
+							current.index === null
+								? exactAngle( shownValue )
+								: toAngle( current.index )
+						)
 					: current.angle +
 						turnBetween( current.heading, pointer.heading );
 			}
@@ -215,7 +223,22 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			event: React.KeyboardEvent< HTMLInputElement >
 		) {
 			onKeyDown?.( event );
-			if ( ! wraps || event.defaultPrevented ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			// Home and End select an end even when the dial already shows it
+			// for a value that is unset or outside the range. The slider
+			// sees no change there, so it reports none.
+			const end = event.key === 'End' ? lastStep : 0;
+			if (
+				( event.key === 'Home' || event.key === 'End' ) &&
+				end === index &&
+				( isEmpty || toValue( index ) !== shownValue )
+			) {
+				select( end );
+				return;
+			}
+			if ( ! wraps ) {
 				return;
 			}
 			const next =

@@ -90,6 +90,18 @@ describe( 'getDial', () => {
 		},
 		// Decimal bounds whose difference is inexact still end on `max`.
 		{ config: { min: 350.1, max: 359.9, step: 0.1 }, last: 359.9 },
+		// An inexact step that lands a hair below the limit still ends on it.
+		{
+			config: {
+				min: -2 * Math.PI,
+				max: 0,
+				step: ( 2 * Math.PI ) / 75,
+				unitsPerTurn: 2 * Math.PI,
+			},
+			last: 0,
+		},
+		// Far from zero, a limit short of a step still keeps the step below.
+		{ config: { min: 1e14, max: 1e14 + 99.875 }, last: 1e14 + 99 },
 		// An upper limit off the step grid keeps the step below it.
 		{ config: { min: 0, max: 100, step: 30 }, last: 90 },
 		{ config: { min: 0, max: 359.9999999995 }, last: 359 },
@@ -155,6 +167,35 @@ describe( 'getDial', () => {
 					`${ describeConfig( config ) }: ${ dial.lastStep } steps to ${ dial.toValue(
 						dial.lastStep
 					) }, expected ${ count } to ${ expected }`
+				);
+			}
+		}
+		expect( failures ).toEqual( [] );
+	} );
+
+	it( 'ends exactly on a limit that inexact steps reach, for generated ranges', () => {
+		const random = createRandom( 6 );
+		const failures: string[] = [];
+		for ( let run = 0; run < 3000; run++ ) {
+			const unitsPerTurn = UNITS[ Math.floor( random() * UNITS.length ) ];
+			const step = unitsPerTurn / ( 3 + Math.floor( random() * 500 ) );
+			const first = Math.floor( random() * 2000 ) - 1000;
+			const count = 2 + Math.floor( random() * 2000 );
+			const config = {
+				unitsPerTurn,
+				step,
+				min: first * step,
+				max: ( first + count ) * step,
+			};
+			const dial = getDial( config );
+			if (
+				dial.lastStep !== count ||
+				dial.toValue( dial.lastStep ) !== config.max
+			) {
+				failures.push(
+					`${ describeConfig( config ) }: ${ dial.lastStep } steps to ${ dial.toValue(
+						dial.lastStep
+					) }, expected ${ count }`
 				);
 			}
 		}
@@ -326,6 +367,13 @@ describe( 'press', () => {
 					);
 				}
 			};
+			const selected = dial.fromAngle( angle );
+			check(
+				'selects a step of the dial',
+				Number.isInteger( selected ) &&
+					selected >= 0 &&
+					selected <= dial.lastStep
+			);
 			check(
 				'has the pressed heading',
 				Math.abs( turnBetween( heading, angle ) ) < 1e-6
@@ -376,6 +424,9 @@ describe( 'press', () => {
 				modulo( selected + 1, dial.lastStep + 1 ),
 			];
 			if (
+				! Number.isInteger( selected ) ||
+				selected < 0 ||
+				selected > dial.lastStep ||
 				neighbors.some(
 					( other ) => distance( other ) < distance( selected ) - 1e-6
 				)
