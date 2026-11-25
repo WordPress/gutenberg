@@ -616,6 +616,74 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should only paste block style classes of styles the block has', async ( {
+		pageUtils,
+		editor,
+		page,
+		context,
+	} ) => {
+		// Grant clipboard access for copying and pasting styles between blocks.
+		await context.grantPermissions( [
+			'clipboard-read',
+			'clipboard-write',
+		] );
+
+		// The Quote block has a "Plain" style, the Paragraph block has none.
+		await editor.insertBlock( {
+			name: 'core/quote',
+			attributes: { className: 'is-style-plain custom-class' },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Quote' },
+				},
+			],
+		} );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', {
+				name: 'Copy Styles',
+			} )
+			.click();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph' },
+		} );
+		await pageUtils.pressKeys( 'primaryAlt+v' );
+
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Another quote' },
+				},
+			],
+		} );
+		await pageUtils.pressKeys( 'primaryAlt+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/quote',
+				attributes: { className: 'is-style-plain custom-class' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph',
+					className: 'custom-class',
+				},
+			},
+			{
+				name: 'core/quote',
+				attributes: { className: 'is-style-plain custom-class' },
+			},
+		] );
+	} );
+
 	test( 'should link selection on internal paste', async ( {
 		pageUtils,
 		editor,

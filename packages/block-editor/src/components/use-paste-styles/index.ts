@@ -1,6 +1,6 @@
 import { useCallback } from '@wordpress/element';
-import { getBlockType, parse } from '@wordpress/blocks';
-import type { Block, BlockType } from '@wordpress/blocks';
+import { getBlockType, parse, store as blocksStore } from '@wordpress/blocks';
+import type { Block, BlockStyle, BlockType } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
@@ -69,15 +69,49 @@ const STYLE_ATTRIBUTES: Record<
 };
 
 /**
+ * Removes the block style classes (`is-style-{name}`) that don't match a
+ * style of the target block. Pasting them would apply a style the block
+ * doesn't have, which its Styles panel can't show or remove. Other classes
+ * are kept.
+ *
+ * @param className   The class names being pasted.
+ * @param blockStyles The styles of the target block.
+ * @return The class names without unknown block style classes.
+ */
+function removeUnknownBlockStyleClasses(
+	className: unknown,
+	blockStyles: BlockStyle[] | undefined
+): unknown {
+	if ( typeof className !== 'string' ) {
+		return className;
+	}
+
+	const classNames = className
+		.split( ' ' )
+		.filter(
+			( name ) =>
+				!! name &&
+				( ! name.startsWith( 'is-style-' ) ||
+					!! blockStyles?.some(
+						( style ) => `is-style-${ style.name }` === name
+					) )
+		);
+
+	return classNames.length ? classNames.join( ' ' ) : undefined;
+}
+
+/**
  * Get the "style attributes" from a given block to a target block.
  *
- * @param sourceBlock The source block.
- * @param targetBlock The target block.
+ * @param sourceBlock    The source block.
+ * @param targetBlock    The target block.
+ * @param getBlockStyles Returns the styles of a block type.
  * @return the filtered attributes object.
  */
 function getStyleAttributes(
 	sourceBlock: Block,
-	targetBlock: Block
+	targetBlock: Block,
+	getBlockStyles: ( name: string ) => BlockStyle[] | undefined
 ): Record< string, unknown > {
 	return Object.entries( STYLE_ATTRIBUTES ).reduce(
 		(
@@ -91,7 +125,12 @@ function getStyleAttributes(
 			) {
 				// Override attributes that are not present in the block to their defaults.
 				attributes[ attributeKey ] =
-					sourceBlock.attributes[ attributeKey ];
+					attributeKey === 'className'
+						? removeUnknownBlockStyleClasses(
+								sourceBlock.attributes.className,
+								getBlockStyles( targetBlock.name )
+							)
+						: sourceBlock.attributes[ attributeKey ];
 			}
 			return attributes;
 		},
@@ -105,6 +144,7 @@ function getStyleAttributes(
  * @param targetBlocks          The target blocks to be updated.
  * @param sourceBlocks          The source blocks to get th style attributes from.
  * @param updateBlockAttributes The function to update the attributes.
+ * @param getBlockStyles        Returns the styles of a block type.
  */
 function recursivelyUpdateBlockAttributes(
 	targetBlocks: Block[],
@@ -112,7 +152,8 @@ function recursivelyUpdateBlockAttributes(
 	updateBlockAttributes: (
 		clientId: string,
 		attributes: Record< string, unknown >
-	) => void
+	) => void,
+	getBlockStyles: ( name: string ) => BlockStyle[] | undefined
 ) {
 	for (
 		let index = 0;
@@ -121,13 +162,18 @@ function recursivelyUpdateBlockAttributes(
 	) {
 		updateBlockAttributes(
 			targetBlocks[ index ].clientId,
-			getStyleAttributes( sourceBlocks[ index ], targetBlocks[ index ] )
+			getStyleAttributes(
+				sourceBlocks[ index ],
+				targetBlocks[ index ],
+				getBlockStyles
+			)
 		);
 
 		recursivelyUpdateBlockAttributes(
 			targetBlocks[ index ].innerBlocks,
 			sourceBlocks[ index ].innerBlocks,
-			updateBlockAttributes
+			updateBlockAttributes,
+			getBlockStyles
 		);
 	}
 }
@@ -187,6 +233,7 @@ export default function usePasteStyles() {
 			}
 
 			const copiedBlocks = parse( html );
+			const { getBlockStyles } = registry.select( blocksStore );
 
 			if ( copiedBlocks.length === 1 ) {
 				// Apply styles of the block to all the target blocks.
@@ -194,7 +241,8 @@ export default function usePasteStyles() {
 					recursivelyUpdateBlockAttributes(
 						targetBlocks,
 						targetBlocks.map( () => copiedBlocks[ 0 ] ),
-						updateBlockAttributes
+						updateBlockAttributes,
+						getBlockStyles
 					);
 				} );
 			} else {
@@ -202,7 +250,8 @@ export default function usePasteStyles() {
 					recursivelyUpdateBlockAttributes(
 						targetBlocks,
 						copiedBlocks,
-						updateBlockAttributes
+						updateBlockAttributes,
+						getBlockStyles
 					);
 				} );
 			}
@@ -230,7 +279,7 @@ export default function usePasteStyles() {
 			}
 		},
 		[
-			registry.batch,
+			registry,
 			updateBlockAttributes,
 			createSuccessNotice,
 			createWarningNotice,
