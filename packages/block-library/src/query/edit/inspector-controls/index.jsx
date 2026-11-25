@@ -32,7 +32,7 @@ import {
 	useOrderByOptions,
 } from '../../utils';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
-import { withUnavailableItem } from '../../../utils/with-unavailable-item';
+import { addUnavailableItem } from '../../../utils/add-unavailable-item';
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
@@ -128,7 +128,7 @@ export default function QueryInspectorControls( props ) {
 	// A toggle can't show a saved post type that isn't among its options.
 	const showPostTypeSelect =
 		postTypesSelectOptions.length > 2 || isPostTypeUnavailable;
-	const postTypeItems = withUnavailableItem(
+	const postTypeItems = addUnavailableItem(
 		postTypesSelectOptions,
 		postType
 	);

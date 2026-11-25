@@ -20,7 +20,7 @@ import { useDispatch } from '@wordpress/data';
 import { SelectControl, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { withUnavailableItem } from '../utils/with-unavailable-item';
+import { addUnavailableItem } from '../utils/add-unavailable-item';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -46,7 +46,7 @@ export default function CategoriesEdit( {
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
-	const taxonomyItems = withUnavailableItem(
+	const taxonomyItems = addUnavailableItem(
 		taxonomies?.map( ( t ) => ( {
 			label: t.name,
 			value: t.slug,

@@ -21,7 +21,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { withUnavailableItem } from '../utils/with-unavailable-item';
+import { addUnavailableItem } from '../utils/add-unavailable-item';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
@@ -87,7 +87,7 @@ export default function PostNavigationLinkEdit( {
 			label: __( 'Unfiltered' ),
 			value: '',
 		},
-		...withUnavailableItem(
+		...addUnavailableItem(
 			taxonomies
 				?.filter(
 					( { visibility } ) => !! visibility?.publicly_queryable

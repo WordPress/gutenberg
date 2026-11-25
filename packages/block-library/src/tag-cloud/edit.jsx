@@ -23,7 +23,7 @@ import { useDisabled } from '@wordpress/compose';
 import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
-import { withUnavailableItem } from '../utils/with-unavailable-item';
+import { addUnavailableItem } from '../utils/add-unavailable-item';
 
 /**
  * Minimum number of tags a user can show using this block.
@@ -73,7 +73,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			value: '',
 			disabled: true,
 		},
-		...withUnavailableItem(
+		...addUnavailableItem(
 			taxonomies
 				?.filter( ( tax ) => !! tax.show_cloud )
 				.map( ( item ) => {

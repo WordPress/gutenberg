@@ -15,7 +15,7 @@ type SelectItem = {
  * @param savedValue The value saved in the block's attributes.
  * @return The items, starting with the saved value when it's missing.
  */
-export function withUnavailableItem(
+export function addUnavailableItem(
 	items: SelectItem[] | undefined,
 	savedValue: string | undefined
 ): SelectItem[] {
