@@ -1266,9 +1266,6 @@ export const __unstableSplitSelection =
 					...head.attributes,
 					...headType.merge!( head.attributes, first.attributes ),
 				},
-				// Keep the merged block's inner blocks, like the nested list
-				// of a pasted list item.
-				innerBlocks: [ ...head.innerBlocks, ...first.innerBlocks ],
 			};
 			output.push( head );
 			selection = {
@@ -1307,7 +1304,6 @@ export const __unstableSplitSelection =
 						...tail.attributes,
 						...tailType.merge!( last.attributes, tail.attributes ),
 					},
-					innerBlocks: [ ...last.innerBlocks, ...tail.innerBlocks ],
 				} );
 				output.push( ...lastBlocks );
 				selection = {
