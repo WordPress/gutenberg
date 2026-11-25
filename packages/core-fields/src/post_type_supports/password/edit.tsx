@@ -1,13 +1,16 @@
-import { useState } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 import clsx from 'clsx';
-import { CheckboxControl, InputControl, Stack } from '@wordpress/ui';
 import type { PostWithPassword } from './types';
+import PostPasswordModal from './post-password-modal';
 import styles from './style.module.css';
 
 /*
- * The password control, laid out with `Stack` and built from `CheckboxControl` and `InputControl` of
- * `@wordpress/ui`.
+ * The password control, laid out with `Stack` and `Button` of
+ * `@wordpress/ui` and `@wordpress/components`, opening a modal to set or edit the password.
  */
 export default function PasswordEdit( {
 	data,
@@ -20,45 +23,82 @@ export default function PasswordEdit( {
 		getValue: ( args: { item: PostWithPassword } ) => string | undefined;
 	};
 } ) {
-	const [ showPassword, setShowPassword ] = useState(
-		!! field.getValue( { item: data } )
-	);
+	const password = field.getValue( { item: data } ) || '';
+	const [ isPasswordModalOpen, setIsPasswordModalOpen ] = useState( false );
+	const buttonRef = useRef< HTMLButtonElement >( null );
 
-	const handleTogglePassword = ( value: boolean ) => {
-		setShowPassword( value );
-		if ( ! value ) {
-			onChange( { password: '' } );
-		}
+	const closeParentDropdown = () => {
+		const popover = buttonRef.current?.closest< HTMLElement >(
+			'.components-popover'
+		);
+		const closeButton = popover?.querySelector< HTMLButtonElement >(
+			'.dataforms-layouts-panel__dropdown-header button, button[aria-label="Close"]'
+		);
+		closeButton?.click();
 	};
+
+	// Hide the parent popover while the modal is open so it does not cover or show behind the modal.
+	useEffect( () => {
+		if ( ! isPasswordModalOpen ) {
+			return;
+		}
+
+		const popover = buttonRef.current?.closest< HTMLElement >(
+			'.components-popover'
+		);
+		if ( ! popover ) {
+			return;
+		}
+
+		const originalVisibility = popover.style.visibility;
+		popover.style.visibility = 'hidden';
+
+		return () => {
+			popover.style.visibility = originalVisibility;
+		};
+	}, [ isPasswordModalOpen ] );
+
+	const passwordHelpId = useInstanceId(
+		PasswordEdit,
+		'fields-controls__password-help'
+	);
 
 	return (
 		<Stack
-			render={ <fieldset /> }
 			direction="column"
-			gap="lg"
+			gap="xs"
 			// The editors style the control by this class name.
 			className={ clsx( 'fields-controls__password', styles.password ) }
 		>
-			<CheckboxControl
-				label={ __( 'Password protected' ) }
-				description={ __(
-					'Only visible to those who know the password'
-				) }
-				checked={ showPassword }
-				onCheckedChange={ handleTogglePassword }
-			/>
-			{ showPassword && (
-				<InputControl
-					label={ __( 'Password' ) }
-					onValueChange={ ( value ) =>
-						onChange( {
-							password: value,
-						} )
-					}
-					value={ field.getValue( { item: data } ) || '' }
-					placeholder={ __( 'Use a secure password' ) }
-					type="text"
-					maxLength={ 255 }
+			<Button
+				ref={ buttonRef }
+				__next40pxDefaultSize
+				variant="secondary"
+				aria-describedby={ String( passwordHelpId ) }
+				onClick={ () => setIsPasswordModalOpen( true ) }
+			>
+				{ password ? __( 'Edit password' ) : __( 'Set password' ) }
+			</Button>
+			<p id={ String( passwordHelpId ) } className={ styles.help }>
+				{ __( 'Only visible to those who know the password.' ) }
+			</p>
+			{ isPasswordModalOpen && (
+				<PostPasswordModal
+					initialPassword={ password }
+					onSave={ ( newPassword ) => {
+						onChange( { password: newPassword } );
+						closeParentDropdown();
+						setIsPasswordModalOpen( false );
+					} }
+					onRemove={ () => {
+						onChange( { password: '' } );
+						closeParentDropdown();
+						setIsPasswordModalOpen( false );
+					} }
+					onClose={ () => {
+						closeParentDropdown();
+						setIsPasswordModalOpen( false );
+					} }
 				/>
 			) }
 		</Stack>

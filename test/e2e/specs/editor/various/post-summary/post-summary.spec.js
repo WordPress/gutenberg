@@ -316,18 +316,15 @@ test.describe( 'Post Summary', () => {
 				.getByRole( 'button', { name: 'Edit Status' } )
 				.click();
 			await expect(
-				page.getByRole( 'checkbox', { name: 'Password protected' } )
-			).toBeChecked();
-			await expect(
-				page.getByRole( 'textbox', { name: 'Password' } )
-			).toHaveValue( 'enchilada' );
+				page.getByRole( 'button', { name: 'Edit password' } )
+			).toBeVisible();
 
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
 			// The password field is not visible for private posts, and making
 			// a post private also clears its password.
 			await expect(
-				page.getByRole( 'checkbox', { name: 'Password protected' } )
+				page.getByRole( 'button', { name: 'Edit password' } )
 			).toBeHidden();
 			await expect
 				.poll( () =>
@@ -338,6 +335,140 @@ test.describe( 'Post Summary', () => {
 					)
 				)
 				.toBe( '' );
+		} );
+
+		test( 'can set, edit, and remove a password', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.canvas
+				.locator( 'role=textbox[name="Add title"i]' )
+				.type( 'Password Protected Post' );
+
+			const summary = await openPostSummary( { editor, page } );
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+
+			await page.getByRole( 'button', { name: 'Set password' } ).click();
+
+			const modal = page.getByRole( 'dialog', { name: 'Set password' } );
+			await expect( modal ).toBeVisible();
+
+			await modal
+				.getByRole( 'textbox', { name: 'Password' } )
+				.fill( 'secret123' );
+			await modal
+				.getByRole( 'button', { name: 'Save password' } )
+				.click();
+
+			await expect( modal ).toBeHidden();
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', { name: 'Edit password' } )
+			).toBeVisible();
+
+			await editor.saveDraft();
+			await page.reload();
+
+			const reloadedSummary = await openPostSummary( { editor, page } );
+			await reloadedSummary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', { name: 'Edit password' } )
+			).toBeVisible();
+
+			await page.getByRole( 'button', { name: 'Edit password' } ).click();
+			const editModal = page.getByRole( 'dialog', {
+				name: 'Edit password',
+			} );
+			await expect( editModal ).toBeVisible();
+			await expect(
+				editModal.getByRole( 'textbox', { name: 'Password' } )
+			).toHaveValue( 'secret123' );
+
+			await editModal
+				.getByRole( 'button', { name: 'Remove password' } )
+				.click();
+			await expect( editModal ).toBeHidden();
+
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', { name: 'Set password' } )
+			).toBeVisible();
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'password' )
+					)
+				)
+				.toBe( '' );
+		} );
+
+		test( 'validates password length and restores focus on cancel and esc', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			const summary = await openPostSummary( { editor, page } );
+			await summary
+				.getByRole( 'button', { name: 'Edit Status' } )
+				.click();
+
+			const setPasswordButton = page.getByRole( 'button', {
+				name: 'Set password',
+			} );
+			await setPasswordButton.click();
+			const modal = page.getByRole( 'dialog', { name: 'Set password' } );
+			await expect( modal ).toBeVisible();
+
+			const editStatusButton = summary.getByRole( 'button', {
+				name: 'Edit Status',
+			} );
+
+			// Test Cancel focus restoration.
+			await modal.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect( modal ).toBeHidden();
+			await expect( editStatusButton ).toBeFocused();
+
+			// Open again and test Esc focus restoration.
+			await editStatusButton.click();
+			await setPasswordButton.click();
+			await expect( modal ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( modal ).toBeHidden();
+			await expect( editStatusButton ).toBeFocused();
+
+			// Open again and test 256 char validation.
+			await editStatusButton.click();
+			await setPasswordButton.click();
+			await expect( modal ).toBeVisible();
+
+			await modal
+				.getByRole( 'textbox', { name: 'Password' } )
+				.fill( 'a'.repeat( 256 ) );
+			await modal
+				.getByRole( 'button', { name: 'Save password' } )
+				.click();
+
+			await expect(
+				modal.getByText( "Password can't exceed 255 characters." )
+			).toBeVisible();
+			await expect( modal ).toBeVisible();
+
+			await modal.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect( modal ).toBeHidden();
+			await expect( editStatusButton ).toBeFocused();
 		} );
 	} );
 

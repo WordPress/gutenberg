@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Post password: Change password protection UI to a button and dialog flow with validation ([#67034](https://github.com/WordPress/gutenberg/pull/67034)).
+
 ### New Features
 
 - New package holding the fields WordPress core registers on the server for the Entity fields API: the default fields of every post type, derived from its supports, and the `page`, `wp_template`, `wp_template_part`, `wp_block`, `attachment`, and `root_site` field collections, with the script modules of their JavaScript parts ([#84696](https://github.com/WordPress/gutenberg/pull/84696)).
