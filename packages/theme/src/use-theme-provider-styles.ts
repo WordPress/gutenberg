@@ -193,13 +193,14 @@ function generateStyles( {
 		].flat()
 	);
 	// The legacy accent keeps the seed even when the semantic brand fill moves.
+	// Prefer white: the darker legacy accent states only increase its contrast.
 	const accent = styles[ '--wp-admin-theme-color' ];
 	const onFill = styles[ '--wpds-color-foreground-interactive-brand-strong' ];
 	if ( getContrast( accent, onFill ) < MINIMUM_TEXT_CONTRAST ) {
 		styles[ '--wp-components-color-accent-inverted' ] =
-			getContrast( accent, '#000' ) >= MINIMUM_TEXT_CONTRAST
-				? '#000'
-				: '#fff';
+			getContrast( accent, '#fff' ) >= MINIMUM_TEXT_CONTRAST
+				? '#fff'
+				: '#000';
 	}
 	return styles;
 }
