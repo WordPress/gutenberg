@@ -635,11 +635,11 @@ The option is ignored in free composition. The narrow UI is made of two subcompo
 
 A single settings button that opens a menu built from the fields and the view. It renders nothing when the menu would be empty. The menu holds:
 
--   **Filters.** Each filter that is set by picking among a short, fixed list of options, shown as the field defines it: radio items with an "All" item when it takes one value (the `is` operator), or checkboxes when it takes several (`isAny`). A filter is left out when it needs another kind of control (a date, a number, free text), has more than 10 options, loads its options with `getElements`, or is locked.
+-   **Filters.** Each filter that is set by picking among a fixed list of options, shown as the field defines it: radio items with an "All" item when it takes one value (the `is` operator), or checkboxes when it takes several (`isAny`). The length of the list doesn't count, so a list that plugins add to never drops out of the menu. A filter is left out when it needs another kind of control (a date, a number, free text), loads its options with `getElements`, or is locked.
 -   **Sort.** The field to sort by and the order, when `showSort` is set. It lists the fields with sorting enabled, as the view options do.
 -   **Extra items.** The `children`, such as a link to a help page.
 
-When the groups hold more than 10 options in all, each group moves to a submenu.
+When the groups hold more than 10 options in all, each group moves to a submenu, which scrolls when its list is long.
 
 The menu has no "Reset view" item. `onReset` is meant for saved views and comes with the "modified" indicator of the view options button, which the settings button doesn't have. A consumer that needs one can add it through `children`.
 

@@ -48,14 +48,11 @@ const fields: Field< Item >[] = [
 		enableSorting: false,
 	},
 	{
-		// Too many options for a menu.
+		// Options loaded on demand, which a menu can't list.
 		id: 'author',
 		label: 'Author',
 		type: 'text',
-		elements: Array.from( { length: 12 }, ( _author, index ) => ( {
-			value: `author-${ index }`,
-			label: `Author ${ index }`,
-		} ) ),
+		getElements: async () => [ { value: 'author-1', label: 'Author 1' } ],
 		filterBy: { operators: [ 'is' ] },
 		enableSorting: false,
 	},
@@ -245,6 +242,55 @@ describe( 'DataViews.ViewMenu', () => {
 				( item ) => item.textContent
 			)
 		).toEqual( [ 'Draft', 'Published' ] );
+	} );
+
+	it( 'keeps a long list of options, in a submenu', async () => {
+		const user = userEvent.setup();
+		// As many options as plugins care to register.
+		const sources = Array.from( { length: 14 }, ( _source, index ) => ( {
+			value: `source-${ index }`,
+			label: `Source ${ index }`,
+		} ) );
+		render(
+			<DataViews
+				data={ data }
+				fields={ [
+					...fields,
+					{
+						id: 'source',
+						label: 'Source',
+						type: 'text',
+						getValue: () => 'source-0',
+						elements: sources,
+						filterBy: { operators: [ 'is' ] },
+						enableSorting: false,
+					},
+				] }
+				view={ {
+					...DEFAULT_VIEW,
+					filters: [
+						{ field: 'source', operator: 'is', value: 'source-0' },
+					],
+				} }
+				onChangeView={ vi.fn() }
+				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+				defaultLayouts={ { list: {} } }
+				getItemId={ ( item ) => item.id.toString() }
+			>
+				<DataViews.ViewMenu requiredFields={ [ 'source' ] } />
+			</DataViews>
+		);
+
+		await openMenu( user );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Source' } )
+		);
+
+		const options = await screen.findAllByRole( 'menuitemradio', {
+			name: /^Source/,
+		} );
+		expect( options ).toHaveLength( 14 );
+		expect( options[ 0 ] ).toBeChecked();
 	} );
 
 	it( 'renders nothing when the menu would be empty', () => {

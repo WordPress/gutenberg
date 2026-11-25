@@ -287,7 +287,7 @@ function SortDirectionRadioGroup() {
 /**
  * A single settings button, in place of the filters and the view options
  * buttons of the default UI. It opens a menu with the filters that have a
- * short list of choices, sorting and any extra items.
+ * fixed list of choices, sorting and any extra items.
  *
  * It is meant for narrow, single-purpose panels, where the filters bar and the
  * view options popover don't fit. It builds itself from the fields and the

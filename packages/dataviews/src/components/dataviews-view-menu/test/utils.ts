@@ -32,11 +32,11 @@ const field = ( id: string ) =>
 	( { id, label: id } ) as NormalizedField< Item >;
 
 describe( 'isMenuFilter', () => {
-	it( 'accepts a filter with a short fixed list where one value is chosen', () => {
+	it( 'accepts a filter with a fixed list where one value is chosen', () => {
 		expect( isMenuFilter( filter( 'status' ) ) ).toBe( true );
 	} );
 
-	it( 'accepts a filter with a short fixed list where several values are chosen', () => {
+	it( 'accepts a filter with a fixed list where several values are chosen', () => {
 		expect(
 			isMenuFilter(
 				filter( 'tags', {
@@ -47,13 +47,13 @@ describe( 'isMenuFilter', () => {
 		).toBe( true );
 	} );
 
-	it( 'accepts a list of 10 options and rejects a longer one', () => {
+	it( 'accepts a fixed list however long, and rejects an empty one', () => {
 		expect(
-			isMenuFilter( filter( 'author', { elements: options( 10 ) } ) )
+			isMenuFilter( filter( 'author', { elements: options( 40 ) } ) )
 		).toBe( true );
-		expect(
-			isMenuFilter( filter( 'author', { elements: options( 11 ) } ) )
-		).toBe( false );
+		expect( isMenuFilter( filter( 'author', { elements: [] } ) ) ).toBe(
+			false
+		);
 	} );
 
 	it( 'rejects a filter that has no list of options, such as a date', () => {
@@ -100,7 +100,7 @@ describe( 'isMenuFilter', () => {
 describe( 'getMenuFilters', () => {
 	it( 'keeps the eligible filters in the order their fields were declared', () => {
 		const filters = [
-			filter( 'author', { elements: options( 12 ) } ),
+			filter( 'author', { isLocked: true } ),
 			filter( 'source' ),
 			filter( 'type' ),
 		];
