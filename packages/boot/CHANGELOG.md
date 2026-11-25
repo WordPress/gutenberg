@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
+-   Keep the sidebar's Dashboard link label in the admin color scheme's neutral color when the link has focus. Before, the scheme's link color made the label hard to read on the dark sidebar ([#87419](https://github.com/WordPress/gutenberg/pull/87419)).
 
 ## 0.27.0 (2026-11-18)
 
