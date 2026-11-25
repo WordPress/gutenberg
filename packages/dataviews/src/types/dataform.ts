@@ -451,12 +451,24 @@ export type FormField = {
 	layout?: Layout;
 
 	/**
+	 * Settings passed to the field's `Edit` control as its `config`, merged
+	 * over the settings of the field's own edit configuration. Lets a form
+	 * ask a control for a variant without changing the field.
+	 */
+	config?: FormFieldConfig;
+
+	/**
 	 * Child fields, for layouts that group fields together
 	 * (panel, card, row, details). Each child is a form field
 	 * or a plain field id.
 	 */
 	children?: Array< FormField | string >;
 };
+
+/**
+ * Settings a form field passes to its field's `Edit` control.
+ */
+export type FormFieldConfig = Record< string, unknown >;
 
 /**
  * The normalized version of {@link FormField}, with the layout resolved
@@ -482,6 +494,11 @@ export type NormalizedFormField = {
 	 * A description overriding the field's own description.
 	 */
 	description?: string;
+
+	/**
+	 * Settings passed to the field's `Edit` control as its `config`.
+	 */
+	config?: FormFieldConfig;
 
 	/**
 	 * Child fields, for layouts that group fields together.

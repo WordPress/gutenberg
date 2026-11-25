@@ -6,6 +6,7 @@
 
 -   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
+-   `DataForm`: a form field can pass settings to its field's `Edit` control through a new `config` property, so one form can ask a control for a variant without changing the field ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
 
 ### Bug Fixes
 

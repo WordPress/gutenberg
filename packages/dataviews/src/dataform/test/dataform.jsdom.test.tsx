@@ -133,6 +133,57 @@ describe( 'DataForm component', () => {
 			}
 		);
 
+		it( 'passes the form field config to the edit control', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							Edit: ( { config } ) => (
+								<span>
+									Variant: { String( config?.variant ) }
+								</span>
+							),
+						},
+					] }
+					form={ {
+						fields: [
+							{ id: 'title', config: { variant: 'compact' } },
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect( screen.getByText( 'Variant: compact' ) ).toBeVisible();
+		} );
+
+		it( 'merges the form field config over the field edit config', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'notes',
+							label: 'Notes',
+							type: 'text',
+							Edit: { control: 'textarea', rows: 2 },
+						},
+					] }
+					form={ {
+						fields: [ { id: 'notes', config: { rows: 7 } } ],
+					} }
+					data={ { notes: '' } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Notes' } )
+			).toHaveAttribute( 'rows', '7' );
+		} );
+
 		it( 'keeps an editable field without an edit control hidden', () => {
 			render(
 				<Dataform
@@ -403,6 +454,37 @@ describe( 'DataForm component', () => {
 				await user.click( button );
 				expect( field.edit() ).toBeInTheDocument();
 			}
+		} );
+
+		it( 'passes the form field config to the edit control in the panel', async () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							Edit: ( { config } ) => (
+								<span>
+									Variant: { String( config?.variant ) }
+								</span>
+							),
+						},
+					] }
+					form={ {
+						layout: { type: 'panel' },
+						fields: [
+							{ id: 'title', config: { variant: 'compact' } },
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			await user.click( fieldsSelector.title.view() );
+
+			expect( screen.getByText( 'Variant: compact' ) ).toBeVisible();
 		} );
 
 		it( 'should use dropdown panel type by default', async () => {

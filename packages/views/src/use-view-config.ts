@@ -16,7 +16,7 @@ import { unlock } from './lock-unlock';
  *                                             (mapped to the REST API `_fields`
  *                                             parameter). When omitted, the full
  *                                             config is requested.
- * @return {Object} An object containing the `default_view`, `default_layouts`, `view_list`, and `form` configuration for the entity.
+ * @return {Object} An object containing the `default_view`, `default_layouts`, `view_list`, `form`, and `quick_edit_form` configuration for the entity.
  */
 export function useViewConfig( {
 	kind,
@@ -31,6 +31,7 @@ export function useViewConfig( {
 	default_layouts: SupportedLayouts | undefined;
 	view_list: Array< any > | undefined;
 	form: Form | undefined;
+	quick_edit_form: Form | undefined;
 } {
 	// Sort fields so the cache key is independent of the order callers list
 	// them; `['title','author']` and `['author','title']` request the same data.

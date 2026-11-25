@@ -41,7 +41,7 @@ describe( 'SlugEdit', () => {
 		render( <EditedSlug initial={ post } /> );
 		expect( screen.getByRole( 'textbox' ) ).toHaveValue( 'テスト' );
 		expect(
-			screen.getByRole( 'link', { name: /example\.com\/テスト\// } )
+			screen.getByText( 'https://example.com/テスト/' )
 		).toBeInTheDocument();
 	} );
 

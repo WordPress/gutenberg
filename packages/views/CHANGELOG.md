@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useViewConfig` returns the `quick_edit_form` configuration, the form of the quick edit drawer. A field a plugin adds to `form` is added to the end of it ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).

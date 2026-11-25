@@ -16,7 +16,7 @@
 		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
 		height: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$grid-unit-20 * 2});
-		max-width: 400px;
+		max-width: var(--wpds-dimension-surface-width-sm);
 		border-radius: $radius-large;
 		position: relative;
 		animation-name: none;
@@ -64,7 +64,17 @@
 
 		.dataforms-layouts__wrapper {
 			flex: 1;
-			padding: 0 $grid-unit-30 $grid-unit-05; // Horizontal + bottom space for focus ring
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
+
+	.dataviews-action-modal__quick-edit-panels {
+		flex-shrink: 0;
+		padding-top: $grid-unit-20;
+		border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+
+		.dataforms-layouts__wrapper {
+			padding: 0 $grid-unit-30;
 		}
 	}
 
