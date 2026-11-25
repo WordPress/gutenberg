@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Notes: Truncate a collapsed long note to the text that fits, rather than clipping it with CSS. What "Show more" hides is now out of the tab order and out of the accessibility tree, the cut is marked with an ellipsis, the toggle carries `aria-expanded` and `aria-controls`, and expanding moves the reading position to the start of the note instead of leaving it below the text ([#81459](https://github.com/WordPress/gutenberg/pull/81459)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 
