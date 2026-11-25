@@ -17,7 +17,7 @@ type TransformStyle = Pick<
 const IDENTITY: LinearTransform = { a: 1, b: 0, c: 0, d: 1 };
 
 // `DOMMatrix` takes degrees. The vector helpers work in radians, read with
-// these factors so that turns in the page cancel out exactly.
+// the same factors as the ResizableBox helpers always used.
 const DEGREES_PER_UNIT: Record< string, number > = {
 	deg: 1,
 	grad: 0.9,
@@ -132,11 +132,10 @@ function getRotate( value: string ): LinearTransform3D {
 	if ( ! matrix.flat().every( Number.isFinite ) ) {
 		return IDENTITY_3D;
 	}
-	// A turn in the page keeps the floating-point values of `Math.cos()` and
-	// `Math.sin()`, so turns that cancel out give the exact identity. A
-	// quarter turn out of the page drops the rounding error of the
-	// trigonometry and the axis length, so it flattens exactly, as it does in
-	// a serialized `matrix3d()`.
+	// A turn in the page keeps the values of `Math.cos()` and `Math.sin()`
+	// unrounded, as the ResizableBox helpers always read it. A quarter turn
+	// out of the page drops the rounding error of the trigonometry and the
+	// axis length, so an axis it turns edge on flattens to exactly zero.
 	const quarters = ( 2 * angle ) / Math.PI;
 	if (
 		( ux === 0 && uy === 0 ) ||
