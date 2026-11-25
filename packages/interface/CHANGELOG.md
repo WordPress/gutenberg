@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use the strong neutral content color for complementary area headings ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   Use the strong neutral content color for complementary area headings ([#87424](https://github.com/WordPress/gutenberg/pull/87424)).
 
 ### Internal
 

@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Use the strong neutral content color for `Text` heading variants and overlay titles ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   Use the strong neutral content color for `Text` heading variants and overlay titles ([#87424](https://github.com/WordPress/gutenberg/pull/87424)).
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).

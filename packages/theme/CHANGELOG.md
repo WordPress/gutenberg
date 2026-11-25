@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `--wpds-color-foreground-content-neutral-strong` for headings and other high-emphasis text ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other high-emphasis text ([#87424](https://github.com/WordPress/gutenberg/pull/87424)).
 
 ### Enhancements
 
