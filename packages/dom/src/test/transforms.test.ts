@@ -26,6 +26,8 @@ describe( 'isStyleTransformAxisAligned', () => {
 		[ '200grad', 'none', 'none' ],
 		[ '3.14159rad', 'none', 'none' ],
 		[ 'x 30deg', 'none', 'none' ],
+		[ '0 0 -1 90deg', 'none', 'none' ],
+		[ '0 0 0 45deg', 'none', 'none' ],
 		[ 'none', '2 0.5', 'none' ],
 		[ 'none', 'none', 'matrix(1, 0, 0, 1, 40, 20)' ],
 		[ 'none', 'none', 'matrix(1.5, 0, 0, 0.5, 0, 0)' ],
@@ -46,6 +48,12 @@ describe( 'isStyleTransformAxisAligned', () => {
 		[ '-0.1rad', 'none', 'none' ],
 		[ 'z 45deg', 'none', 'none' ],
 		[ '1 1 0 45deg', 'none', 'none' ],
+		[ '0 0 -1 45deg', 'none', 'none' ],
+		[
+			'x 60deg',
+			'none',
+			'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+		],
 		[ '45deg', '2 3', 'none' ],
 		[ 'none', 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
 		[ 'none', 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
@@ -97,6 +105,19 @@ describe( 'getStyleLinearTransform', () => {
 				} )
 			)
 		).toEqual( { a: 1, b: 0, c: 0, d: 0.5 } );
+	} );
+
+	it( 'combines `rotate` and a 3D `transform` before flattening', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: 'none',
+					transform:
+						'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+				} )
+			)
+		).toEqual( { a: 0.5, b: 0.75, c: 0, d: 0.5 } );
 	} );
 
 	it( 'reads every angle unit', () => {

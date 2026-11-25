@@ -47,7 +47,7 @@ Private exports:
 ## dom
 
 Private exports:
-- `isStyleTransformAxisAligned`: whether an element's own transform keeps its edges parallel to its parent's axes.
+- `isStyleTransformAxisAligned`: whether a computed style's transform keeps the element's edges parallel to its parent's axes.
 - `getViewportVectorTransform`: maps movements and directions from an element's axes to the viewport, including ancestor transforms.
 - `getBorderBoxPointTransform`: maps a point on an element's border box to where its own transform paints it.
 

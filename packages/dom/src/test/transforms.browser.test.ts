@@ -93,19 +93,18 @@ describe( 'getViewportVectorTransform', () => {
 		} );
 	} );
 
-	it( 'reads the rotate property and a rotate3d transform alike', () => {
-		expect(
-			round(
-				getViewportVectorTransform(
-					createNested( 'rotate: 1 1 0 45deg' )
-				)
-			)
-		).toEqual(
-			round(
-				getViewportVectorTransform(
-					createNested( 'transform: rotate3d(1, 1, 0, 45deg)' )
-				)
-			)
-		);
-	} );
+	it.each( [
+		'rotate: 1 1 0 45deg',
+		'rotate: x 60deg; transform: rotateY(60deg)',
+		'rotate: 30deg; scale: 2 1 3; transform: rotateX(45deg)',
+	] )(
+		'matches the linear part of the border-box point transform for %s',
+		( style ) => {
+			const element = createNested( '', style );
+			const { a, b, c, d } = getBorderBoxPointTransform( element )!;
+			expect( round( getViewportVectorTransform( element ) ) ).toEqual(
+				round( { a, b, c, d } )
+			);
+		}
+	);
 } );

@@ -60,47 +60,76 @@ function parseRotate( value: string ): [ number, number, number, number ] {
 	return [ x, y, z, degrees ];
 }
 
-/**
- * Reads the computed `rotate` property. A turn out of the page is projected
- * onto it, the same way the 2D part of a `rotate3d()` transform is.
- *
- * @param value Computed `rotate` value.
- */
-function getRotate( value: string ): LinearTransform {
-	if ( value === 'none' ) {
-		return IDENTITY;
-	}
-	const [ x, y, z, degrees ] = parseRotate( value );
-	const length = Math.hypot( x, y, z );
-	const angle = ( degrees * Math.PI ) / 180;
-	const cos = Math.cos( angle );
-	const sin = Math.sin( angle );
-	const [ ux, uy, uz ] = [ x / length, y / length, z / length ];
-	const matrix = {
-		a: cos + ux * ux * ( 1 - cos ),
-		b: ux * uy * ( 1 - cos ) + uz * sin,
-		c: ux * uy * ( 1 - cos ) - uz * sin,
-		d: cos + uy * uy * ( 1 - cos ),
-	};
-	return Object.values( matrix ).every( Number.isFinite ) ? matrix : IDENTITY;
-}
-
-function parseScale( value: string ): [ number, number ] {
-	const [ x, y = x ] = value
+function parseScale( value: string ): [ number, number, number ] {
+	const [ x, y = x, z = 1 ] = value
 		.trim()
 		.split( /\s+/ )
 		.map( ( part ) =>
 			part.endsWith( '%' ) ? parseFloat( part ) / 100 : parseFloat( part )
 		);
-	return [ x, y ];
+	return [ x, y, z ];
 }
 
-function getScale( value: string ): LinearTransform {
-	const [ x, y ] = parseScale( value );
-	if ( ! Number.isFinite( x ) || ! Number.isFinite( y ) ) {
-		return IDENTITY;
+type Vector3 = [ number, number, number ];
+
+/**
+ * A 3D linear transform, as the images of the x, y and z axes.
+ */
+type LinearTransform3D = [ Vector3, Vector3, Vector3 ];
+
+const IDENTITY_3D: LinearTransform3D = [
+	[ 1, 0, 0 ],
+	[ 0, 1, 0 ],
+	[ 0, 0, 1 ],
+];
+
+/**
+ * Applies `m` after `n`.
+ *
+ * @param m The outer transform.
+ * @param n The inner transform.
+ */
+function multiply3D(
+	m: LinearTransform3D,
+	n: LinearTransform3D
+): LinearTransform3D {
+	return n.map(
+		( [ x, y, z ] ) =>
+			[ 0, 1, 2 ].map(
+				( i ) => m[ 0 ][ i ] * x + m[ 1 ][ i ] * y + m[ 2 ][ i ] * z
+			) as Vector3
+	) as LinearTransform3D;
+}
+
+function getRotate( value: string ): LinearTransform3D {
+	if ( value === 'none' ) {
+		return IDENTITY_3D;
 	}
-	return { a: x, b: 0, c: 0, d: y };
+	const [ x, y, z, degrees ] = parseRotate( value );
+	const length = Math.hypot( x, y, z );
+	const angle = ( degrees * Math.PI ) / 180;
+	const [ ux, uy, uz ] = [ x / length, y / length, z / length ];
+	const cos = Math.cos( angle );
+	const sin = Math.sin( angle );
+	const t = 1 - cos;
+	const matrix: LinearTransform3D = [
+		[ cos + ux * ux * t, ux * uy * t + uz * sin, ux * uz * t - uy * sin ],
+		[ ux * uy * t - uz * sin, cos + uy * uy * t, uy * uz * t + ux * sin ],
+		[ ux * uz * t + uy * sin, uy * uz * t - ux * sin, cos + uz * uz * t ],
+	];
+	return matrix.flat().every( Number.isFinite ) ? matrix : IDENTITY_3D;
+}
+
+function getScale( value: string ): LinearTransform3D {
+	const [ x, y, z ] = parseScale( value );
+	if ( ! [ x, y, z ].every( Number.isFinite ) ) {
+		return IDENTITY_3D;
+	}
+	return [
+		[ x, 0, 0 ],
+		[ 0, y, 0 ],
+		[ 0, 0, z ],
+	];
 }
 
 /**
@@ -109,21 +138,30 @@ function getScale( value: string ): LinearTransform {
  *
  * @param value Computed `transform` value.
  */
-function getTransform( value: string ): LinearTransform {
+function getTransform( value: string ): LinearTransform3D {
 	const match = value.match( /^matrix(3d)?\((.+)\)$/ );
 	if ( ! match ) {
-		return IDENTITY;
+		return IDENTITY_3D;
 	}
-	const numbers = match[ 2 ].split( ',' ).map( parseFloat );
-	const [ a, b, c, d ] = match[ 1 ]
-		? [ numbers[ 0 ], numbers[ 1 ], numbers[ 4 ], numbers[ 5 ] ]
-		: numbers;
-	return { a, b, c, d };
+	const n = match[ 2 ].split( ',' ).map( parseFloat );
+	if ( ! match[ 1 ] ) {
+		return [
+			[ n[ 0 ], n[ 1 ], 0 ],
+			[ n[ 2 ], n[ 3 ], 0 ],
+			[ 0, 0, 1 ],
+		];
+	}
+	return [
+		[ n[ 0 ], n[ 1 ], n[ 2 ] ],
+		[ n[ 4 ], n[ 5 ], n[ 6 ] ],
+		[ n[ 8 ], n[ 9 ], n[ 10 ] ],
+	];
 }
 
 /**
  * Maps 2D directions and deltas from an element's axes to its parent's axes.
- * Translation and transform origin only affect positions.
+ * Translation and transform origin only affect positions. The element's own
+ * properties combine in 3D before the result is flattened onto the page.
  *
  * @param style The element's computed style.
  *
@@ -133,9 +171,14 @@ export function getStyleLinearTransform(
 	style: TransformStyle
 ): LinearTransform {
 	// CSS applies `rotate`, then `scale`, then `transform`.
-	let matrix = getRotate( style.rotate || 'none' );
-	matrix = multiply( matrix, getScale( style.scale || 'none' ) );
-	return multiply( matrix, getTransform( style.transform || 'none' ) );
+	const [ [ a, b ], [ c, d ] ] = multiply3D(
+		multiply3D(
+			getRotate( style.rotate || 'none' ),
+			getScale( style.scale || 'none' )
+		),
+		getTransform( style.transform || 'none' )
+	);
+	return { a, b, c, d };
 }
 
 /**
@@ -155,7 +198,7 @@ export function isStyleTransformAxisAligned( style: TransformStyle ): boolean {
 /**
  * Maps 2D directions and distances from the element's local axes to its
  * document's viewport axes. Includes ancestor transforms, and projects turns
- * out of the page onto it.
+ * out of the page onto it, as `getBorderBoxPointTransform` does.
  *
  * @param element The element to measure.
  */
@@ -234,8 +277,7 @@ function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
 	}
 
 	if ( scale !== 'none' ) {
-		const [ x, y ] = parseScale( scale );
-		matrix.scaleSelf( x, y );
+		matrix.scaleSelf( ...parseScale( scale ) );
 	}
 
 	if ( transform !== 'none' ) {
