@@ -5,7 +5,6 @@ import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { MediaCategoryPanel } from './media-panel';
 import MediaLibraryButton from './media-library-button';
-import SourceMenu from './source-menu';
 import InserterNoResults from '../no-results';
 import type { MediaCategory, MediaType } from './types';
 
@@ -24,8 +23,8 @@ const LIBRARY_SOURCE = 'media-library';
 const DEFAULT_MEDIA_TYPE: MediaType = 'image';
 
 /**
- * The inserter's Media tab: one search, a source menu, and a tab per media
- * type when browsing the library. The selection resolves to a single
+ * The inserter's Media tab: one search, a menu to choose the source, and a tab
+ * per media type when browsing the library. The selection resolves to a single
  * registered category, which the panel below fetches and renders.
  */
 function MediaTab( {
@@ -120,12 +119,28 @@ function MediaTab( {
 		sources[ 0 ];
 	const isLibrary = activeSource?.name === LIBRARY_SOURCE;
 
-	const mediaTypes = isLibrary
-		? libraryCategories.map( ( category ) => ( {
-				value: category.mediaType,
-				label: category.label,
-			} ) )
-		: [];
+	const mediaTypes = useMemo(
+		() =>
+			isLibrary
+				? libraryCategories.map( ( category ) => ( {
+						value: category.mediaType,
+						label: category.label,
+					} ) )
+				: [],
+		[ isLibrary, libraryCategories ]
+	);
+
+	const resetView = useCallback( () => {
+		setSourceName( LIBRARY_SOURCE );
+		setMediaType( DEFAULT_MEDIA_TYPE );
+	}, [] );
+	// With a single source there is nothing to go back to but a tab.
+	let onReset: ( () => void ) | false | undefined;
+	if ( sources.length > 1 ) {
+		const isDefaultView =
+			sourceName === LIBRARY_SOURCE && mediaType === DEFAULT_MEDIA_TYPE;
+		onReset = isDefaultView ? false : resetView;
+	}
 
 	const category = isLibrary
 		? ( libraryCategories.find(
@@ -150,15 +165,10 @@ function MediaTab( {
 			mediaTypes={ mediaTypes }
 			mediaType={ category.mediaType }
 			onChangeMediaType={ setMediaType }
-			sourceMenu={
-				sources.length > 1 ? (
-					<SourceMenu
-						sources={ sources }
-						value={ activeSource.name }
-						onChange={ setSourceName }
-					/>
-				) : undefined
-			}
+			sources={ sources }
+			source={ activeSource.name }
+			onChangeSource={ setSourceName }
+			onReset={ onReset }
 			footer={
 				<MediaLibraryButton
 					label={ __( 'Open Media Library' ) }
