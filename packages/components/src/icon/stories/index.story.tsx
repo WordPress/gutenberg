@@ -31,14 +31,13 @@ Default.args = {
  * When `icon` is a function, it will be passed the `size` prop and any other additional props.
  */
 export const WithAFunction = Template.bind( {} );
-WithAFunction.tags = [ 'external-requests' ];
 WithAFunction.args = {
 	...Default.args,
 	icon: ( { size }: { size?: number } ) => (
 		<img
 			width={ size }
 			height={ size }
-			src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+			src="wordpress-wmark.svg"
 			alt="WordPress"
 		/>
 	),
@@ -52,7 +51,7 @@ WithAFunction.parameters = {
     <img
       width={ size }
       height={ size }
-      src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+      src="wordpress-wmark.svg"
       alt="WordPress"
     />
   ) }
