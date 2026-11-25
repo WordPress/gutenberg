@@ -151,6 +151,22 @@ describe( 'getStyleLinearTransform', () => {
 		).toEqual( { a: 1, b: 2.25, c: 0, d: 0.5 } );
 	} );
 
+	it( 'reads a turn in the page without rounding it', () => {
+		const angle = Math.PI / 4;
+		expect(
+			getStyleLinearTransform( {
+				rotate: '45deg',
+				scale: 'none',
+				transform: 'none',
+			} )
+		).toEqual( {
+			a: Math.cos( angle ),
+			b: Math.sin( angle ),
+			c: -Math.sin( angle ),
+			d: Math.cos( angle ),
+		} );
+	} );
+
 	it( 'reads every angle unit', () => {
 		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
 			expect(

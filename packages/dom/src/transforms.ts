@@ -120,6 +120,9 @@ function getRotate( value: string ): LinearTransform3D {
 	if ( ! matrix.flat().every( Number.isFinite ) ) {
 		return IDENTITY_3D;
 	}
+	if ( degrees % 90 !== 0 ) {
+		return matrix;
+	}
 	// Drop the rounding error of the trigonometry and the axis length, so a
 	// quarter turn flattens exactly, as it does in a serialized `matrix3d()`.
 	return matrix.map( ( column ) =>

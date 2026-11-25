@@ -65,6 +65,14 @@ describe( 'getViewportVectorTransform', () => {
 		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
 	} );
 
+	it( 'returns the exact identity for turns that cancel out', () => {
+		expect(
+			getViewportVectorTransform(
+				createNested( 'rotate: 45deg', 'rotate: -45deg' )
+			)
+		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	} );
+
 	it( 'combines the element with its ancestors', () => {
 		expect(
 			round(
