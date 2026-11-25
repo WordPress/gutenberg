@@ -874,13 +874,20 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * Lists, functions such as `calc()` or `var()`, and bare numbers are rejected.
 		 *
-		 * @param string $style_value      A single raw style value from $block_styles array.
-		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 *
+		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_angle_css_declarations( $style_value, $style_definition ) {
-			if ( ! is_string( $style_value ) || ! preg_match( static::VALID_ANGLE_PATTERN, $style_value ) ) {
+			if (
+				! isset( $style_definition['property_keys']['default'] ) ||
+				! is_string( $style_value ) ||
+				! preg_match( static::VALID_ANGLE_PATTERN, $style_value )
+			) {
 				return array();
 			}
 
