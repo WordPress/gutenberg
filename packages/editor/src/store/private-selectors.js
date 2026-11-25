@@ -695,3 +695,14 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns whether the list view was open when the inserter replaced it.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is hidden behind the inserter.
+ */
+export function isListViewHiddenByInserter( state ) {
+	return state.listViewHiddenByInserter;
+}

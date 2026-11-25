@@ -363,9 +363,31 @@ export function blockInserterPanel( state = false, action ) {
 export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
-			return action.value ? false : state;
+			if ( action.value ) {
+				return false;
+			}
+			return action.restoreListView || state;
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether the list view was open when the inserter replaced
+ * it, so that it can be reopened once the inserter closes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Whether the list view is hidden behind the inserter.
+ */
+export function listViewHiddenByInserter( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return !! action.value && ( state || action.isListViewOpened );
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return false;
 	}
 	return state;
 }
@@ -545,6 +567,7 @@ export default combineReducers( {
 	blockInserterPanel,
 	inserterSidebarToggleRef,
 	listViewPanel,
+	listViewHiddenByInserter,
 	listViewToggleRef,
 	publishSidebarActive,
 	stylesPath,
