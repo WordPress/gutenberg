@@ -1156,7 +1156,7 @@ export function selectNote( noteId, options = { focus: false } ) {
  * Sets the current editor intent.
  *
  * The intent represents the user's editing purpose: directly editing content
- * (`edit`), or suggesting changes that the author can apply or reject
+ * (`edit`), or suggesting changes that the author can accept or reject
  * (`suggest`).
  *
  * The intent is *session-scoped* — held in the editor reducer (not the
