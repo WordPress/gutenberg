@@ -26,7 +26,6 @@ import {
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
-import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import {
@@ -372,6 +371,9 @@ function RichTextWrapper(
 		]
 	);
 
+	// When the field last changed, or 0 after a format change.
+	const lastChangeRef = useRef( 0 );
+
 	const {
 		value,
 		getValue,
@@ -381,7 +383,16 @@ function RichTextWrapper(
 		[ getDomPositionKey ]: getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange: adjustedOnChange,
+		onChange( newValue, meta ) {
+			// Typing goes into one undo level until a second without typing or
+			// a format change, after which the next change starts a new one.
+			if ( Date.now() - lastChangeRef.current >= 1000 ) {
+				__unstableMarkLastChangeAsPersistent();
+			}
+			adjustedOnChange( newValue, meta );
+			lastChangeRef.current =
+				meta.__unstableText === value.text ? 0 : Date.now();
+		},
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -539,12 +550,6 @@ function RichTextWrapper(
 		ariaOwns,
 		ariaActiveDescendant,
 	] );
-
-	useMarkPersistent( {
-		html: adjustedValue,
-		value,
-		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
-	} );
 
 	const [ keyboardShortcuts ] = useState( () => new Set() );
 	const [ inputEvents ] = useState( () => new Set() );
