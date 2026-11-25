@@ -8,6 +8,9 @@ import { ensureView, viewToQuery } from './view-utils';
  */
 export const route = {
 	beforeLoad: async ( { params }: { params: { type: string } } ) => {
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 		try {
 			const postType = await resolveSelect( coreStore ).getPostType(
 				params.type

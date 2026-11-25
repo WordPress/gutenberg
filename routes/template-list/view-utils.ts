@@ -1,7 +1,6 @@
 import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import type { View, Field, SupportedLayouts } from '@wordpress/dataviews';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type { Template } from './types';
@@ -88,6 +87,9 @@ export async function ensureView(
  */
 export async function loadTemplateFields(): Promise< Field< Template >[] > {
 	try {
+		// Imported here: this module loads before the editor assets that
+		// bring `wp-editor`, and a static import would read its global then.
+		const { store: editorStore } = await import( '@wordpress/editor' );
 		return await unlock( resolveSelect( editorStore ) ).getEntityFields(
 			'postType',
 			TEMPLATE_POST_TYPE

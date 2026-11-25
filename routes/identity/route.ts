@@ -14,6 +14,11 @@ const VIEW_CONFIG_FIELDS = 'form';
  * Route configuration for the site identity.
  */
 export const route = {
+	async beforeLoad() {
+		// The content reads `wp.mediaUtils`, one of the editor assets, as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
+	},
 	title: () => _x( 'Identity', 'site identity' ),
 	async canvas() {
 		return {

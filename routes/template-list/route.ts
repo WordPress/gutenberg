@@ -11,6 +11,9 @@ import type { Template } from './types';
  */
 export const route = {
 	async beforeLoad() {
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 		// Block themes and classic themes shipping a `theme.json` file opt in
 		// automatically, other classic themes have to call
 		// `add_theme_support( 'block-templates' )`.

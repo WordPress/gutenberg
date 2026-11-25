@@ -15,6 +15,9 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 export const route = {
 	async beforeLoad() {
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 		// Only block themes render `wp_navigation` posts. Classic themes manage
 		// their menus through Appearance > Menus instead.
 		const theme = await resolveSelect( coreStore ).getCurrentTheme();

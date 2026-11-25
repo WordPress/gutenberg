@@ -2,7 +2,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { store as editorStore } from '@wordpress/editor';
 import { notFound } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
@@ -46,6 +45,9 @@ export const route = {
 		if ( ! window?.__experimentalMediaEditor ) {
 			throw notFound();
 		}
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 
 		const attachmentId = getAttachmentId( params.id );
 
@@ -67,6 +69,9 @@ export const route = {
 		// Resolve the fields and the form the stage renders. A failure is not
 		// fatal: the stage reports a failure to load the fields, and the editor
 		// falls back to its default form, so neither blocks the route.
+		// Imported here: this module loads before the editor assets that bring
+		// `wp-editor`, and a static import would read its global then.
+		const { store: editorStore } = await import( '@wordpress/editor' );
 		await Promise.all( [
 			unlock( resolveSelect( editorStore ) )
 				.getEntityFields( 'postType', 'attachment' )
