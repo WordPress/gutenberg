@@ -138,16 +138,21 @@ function UnforwardedMoreMenuItem(
 	let prefix: ReactNode;
 	if ( icon ) {
 		// Preserve support for Dashicon slugs and custom icon components.
-		prefix =
-			isValidElement< ComponentProps< 'svg' > >( icon ) &&
-			( icon.type === 'svg' || icon.type === SVG ) ? (
-				<Menu.PrefixIcon
-					icon={ icon }
-					className={ icon.props.className }
-				/>
-			) : (
-				<WCIcon icon={ icon } />
-			);
+		// The wrapper lets an icon without its own fill follow the text color,
+		// as it did in the legacy `MenuItem`.
+		prefix = (
+			<span className="editor-more-menu-item__prefix">
+				{ isValidElement< ComponentProps< 'svg' > >( icon ) &&
+				( icon.type === 'svg' || icon.type === SVG ) ? (
+					<Menu.PrefixIcon
+						icon={ icon }
+						className={ icon.props.className }
+					/>
+				) : (
+					<WCIcon icon={ icon } />
+				) }
+			</span>
+		);
 	}
 	const itemShortcut = adaptShortcut( shortcut );
 	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets

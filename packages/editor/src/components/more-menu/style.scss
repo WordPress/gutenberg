@@ -6,3 +6,13 @@
 	// label.
 	width: var(--wpds-dimension-surface-width-sm);
 }
+
+// Plugin icons often leave out their fill, which the legacy `MenuItem` set to
+// the text color. Without it, they stay black on a highlighted item.
+.editor-more-menu-item__prefix {
+	display: contents;
+
+	svg {
+		fill: currentColor;
+	}
+}
