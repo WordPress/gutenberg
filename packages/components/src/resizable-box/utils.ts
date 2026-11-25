@@ -23,7 +23,13 @@ export function toLocalDelta(
 	y: number
 ): { x: number; y: number } {
 	const determinant = matrix.a * matrix.d - matrix.b * matrix.c;
-	if ( ! determinant ) {
+	// Rounding can leave a flattened element barely invertible.
+	if (
+		Math.abs( determinant ) <=
+		1e-6 *
+			Math.hypot( matrix.a, matrix.b ) *
+			Math.hypot( matrix.c, matrix.d )
+	) {
 		return { x, y };
 	}
 	return {

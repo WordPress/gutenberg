@@ -34,15 +34,24 @@ async function dragBottomHandle(
 		await nextFrame();
 	}
 	window.dispatchEvent( new MouseEvent( 'mouseup', end ) );
+	const after = handle.getBoundingClientRect();
+	return {
+		x: after.x + after.width / 2 - end.clientX,
+		y: after.y + after.height / 2 - end.clientY,
+	};
 }
 
-async function renderBox( style?: React.CSSProperties ) {
+async function renderBox(
+	style?: React.CSSProperties,
+	boxStyle?: React.CSSProperties
+) {
 	const onResizeStop = vi.fn();
 	const { container } = await render(
 		<div style={ { padding: 200, ...style } }>
 			<ResizableBox
 				defaultSize={ { width: 200, height: 200 } }
 				onResizeStop={ onResizeStop }
+				style={ boxStyle }
 			/>
 		</div>
 	);
@@ -66,5 +75,14 @@ describe( 'TransformAwareResizable', () => {
 		expect(
 			Math.abs( onResizeStop.mock.calls[ 0 ][ 3 ].height - 100 )
 		).toBeLessThanOrEqual( 2 );
+	} );
+
+	it( 'keeps the handle under the pointer when a turn out of the page shortens the box', async () => {
+		const { container, onResizeStop } = await renderBox( undefined, {
+			rotate: 'x 80deg',
+		} );
+		const offset = await dragBottomHandle( container, 0, 8 );
+		expect( onResizeStop ).toHaveBeenCalledTimes( 1 );
+		expect( Math.abs( offset.y ) ).toBeLessThanOrEqual( 1 );
 	} );
 } );

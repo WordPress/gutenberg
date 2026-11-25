@@ -95,7 +95,7 @@ describe( 'getViewportVectorTransform', () => {
 	it.each( [
 		'rotate: 1 1 0 45deg',
 		'rotate: x 60deg; transform: rotateY(60deg)',
-		'rotate: 30deg; scale: 2 1 3; transform: rotateX(45deg)',
+		'rotate: x 60deg; scale: 2 1 3; transform: rotateY(60deg)',
 	] )(
 		'matches the linear part of the border-box point transform without perspective for %s',
 		( style ) => {

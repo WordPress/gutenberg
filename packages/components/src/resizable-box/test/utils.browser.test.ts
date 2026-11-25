@@ -28,6 +28,12 @@ describe( 'toLocalDelta', () => {
 			y: 4,
 		} );
 	} );
+
+	it( 'leaves the drag as is when rounding keeps a flattened element invertible', () => {
+		expect(
+			toLocalDelta( { a: 0.5, b: 0.5, c: 0.5, d: 0.5 + 1e-16 }, 3, 4 )
+		).toEqual( { x: 3, y: 4 } );
+	} );
 } );
 
 const IDENTITY = { a: 1, b: 0, c: 0, d: 1 };
