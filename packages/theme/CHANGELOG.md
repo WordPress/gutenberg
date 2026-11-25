@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Preserve saturated background colors in neighboring surfaces and neutral strokes, including page and menu dividers ([#87175](https://github.com/WordPress/gutenberg/pull/87175)).
 
 ### Bug Fixes
