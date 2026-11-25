@@ -1,8 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 
 .block-editor-block-card {
-	color: $gray-900;
+	color: var(--wpds-color-foreground-content-neutral);
 	padding: $grid-unit-20;
 
 	&.is-parent {

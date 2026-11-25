@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use theme colors for sidebar surfaces, text, and dividers ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
