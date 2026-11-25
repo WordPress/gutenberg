@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `getAdminThemeColors`: Adjust the Blue and Sunrise background colors so the admin sidebar matches the Core color schemes again ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   `getAdminThemeColors`: Adjust the Blue and Sunrise background colors so the admin sidebar matches the Core color schemes again ([#87420](https://github.com/WordPress/gutenberg/pull/87420)).
 
 ### Internal
 
