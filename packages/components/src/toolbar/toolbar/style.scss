@@ -52,9 +52,10 @@
 			border-radius: $radius-small;
 			height: $grid-unit-40;
 
-			// Position the focus rectangle.
-			left: $grid-unit-10;
-			right: $grid-unit-10;
+			// Position the focus rectangle. Offsets are measured from the
+			// padding box, so subtract the button's reserved border.
+			left: $grid-unit-10 - $border-width;
+			right: $grid-unit-10 - $border-width;
 			z-index: -1;
 
 			// Animate in.

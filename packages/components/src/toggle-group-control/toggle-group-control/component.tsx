@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
+import { Tooltip } from '@wordpress/ui';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import BaseControl, { useBaseControlProps } from '../../base-control';
@@ -72,22 +73,24 @@ function UnconnectedToggleGroupControl(
 
 	return (
 		<BaseControl { ...baseControlProps }>
-			<MainControl
-				{ ...otherProps }
-				{ ...controlProps }
-				setSelectedElement={ setSelectedElement }
-				className={ classes }
-				isAdaptiveWidth={ isAdaptiveWidth }
-				// `label` is used for `aria-label` on the inner control.
-				// This is separate from the visual label rendered by `BaseControl`.
-				label={ label }
-				onChange={ onChange }
-				ref={ refs }
-				value={ value }
-				disabled={ disabled }
-			>
-				{ children }
-			</MainControl>
+			<Tooltip.Provider>
+				<MainControl
+					{ ...otherProps }
+					{ ...controlProps }
+					setSelectedElement={ setSelectedElement }
+					className={ classes }
+					isAdaptiveWidth={ isAdaptiveWidth }
+					// `label` is used for `aria-label` on the inner control.
+					// This is separate from the visual label rendered by `BaseControl`.
+					label={ label }
+					onChange={ onChange }
+					ref={ refs }
+					value={ value }
+					disabled={ disabled }
+				>
+					{ children }
+				</MainControl>
+			</Tooltip.Provider>
 		</BaseControl>
 	);
 }
@@ -101,9 +104,8 @@ function UnconnectedToggleGroupControl(
  * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
  * use `Tabs` from `@wordpress/ui` instead.
  *
- * Only use this control when you know for sure the labels of items inside won't
- * wrap. For items with longer labels, you can consider a `SelectControl` or a
- * `CustomSelectControl` component instead.
+ * Only use this control when you know the labels won't wrap. For items with
+ * longer labels, consider `SelectControl` from `@wordpress/ui`.
  *
  * ```jsx
  * import {

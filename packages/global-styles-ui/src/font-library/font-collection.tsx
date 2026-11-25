@@ -27,7 +27,8 @@ import {
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
+import { sprintf, __, _n, _x, isRTL } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	moreVertical,
 	next,
@@ -143,6 +144,25 @@ function FontCollection( { slug }: { slug: string } ) {
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
+
+	// Announce the number of results once the user searches or picks a
+	// category, as the list updates without any feedback for screen readers.
+	const hasFilters =
+		filters.search !== undefined || filters.category !== undefined;
+	useEffect( () => {
+		if ( ! hasFilters ) {
+			return;
+		}
+		speak(
+			fonts.length
+				? sprintf(
+						/* translators: %d: number of fonts found. */
+						_n( '%d font found.', '%d fonts found.', fonts.length ),
+						fonts.length
+					)
+				: __( 'No fonts found. Try with a different search term.' )
+		);
+	}, [ hasFilters, fonts ] );
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.

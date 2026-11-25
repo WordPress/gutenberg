@@ -58,6 +58,7 @@ Default.parameters = {
 Default.args = {};
 
 export const Image = Template.bind( {} );
+Image.tags = [ 'external-requests' ];
 Image.args = {
 	url: 'https://i0.wp.com/themes.svn.wordpress.org/twentytwenty/1.3/screenshot.png?w=572&strip=al',
 };

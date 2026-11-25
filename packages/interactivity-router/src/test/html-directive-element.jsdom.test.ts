@@ -112,7 +112,7 @@ describe( 'closestHtmlDirectiveElement', () => {
 		outer.setAttribute( 'data-wp-interactive', 'test' );
 		outer.setAttribute( 'data-wp-html', 'state.outer' );
 		outer.innerHTML =
-			'<div data-wp-html---inner="state.inner"><div data-wp-html="state.ignored" data-wp-text--suffix="state.text"><span></span></div></div>';
+			'<div data-wp-html="state.inner"><div data-wp-html="state.ignored" data-wp-text--suffix="state.text"><span></span></div></div>';
 		const inner = outer.firstElementChild!;
 		const yielding = inner.firstElementChild!;
 		const child = yielding.firstElementChild!;
@@ -120,6 +120,60 @@ describe( 'closestHtmlDirectiveElement', () => {
 		expect( closestHtmlDirectiveElement( inner ) ).toBe( inner );
 		expect( closestHtmlDirectiveElement( yielding ) ).toBe( inner );
 		expect( closestHtmlDirectiveElement( child ) ).toBe( inner );
+	} );
+
+	it( 'agrees with conversion on ignored entries and hosts without hiding an outer owner', () => {
+		const cases = [
+			[ 'div', 'data-wp-html---id' ],
+			[ 'div', 'data-wp-html--suffix' ],
+			[ 'div', 'data-wp-html--suffix---id' ],
+			...[
+				'area',
+				'base',
+				'basefont',
+				'bgsound',
+				'br',
+				'col',
+				'embed',
+				'frame',
+				'hr',
+				'img',
+				'input',
+				'keygen',
+				'link',
+				'meta',
+				'param',
+				'source',
+				'track',
+				'wbr',
+				'textarea',
+				'title',
+				'script',
+				'style',
+				'iframe',
+				'xmp',
+				'noembed',
+				'noframes',
+			].map( ( tag ) => [ tag, 'data-wp-html' ] ),
+		];
+		for ( const [ tag, attribute ] of cases ) {
+			const island = document.createElement( 'section' );
+			island.setAttribute( 'data-wp-interactive', 'test' );
+			const target = document.createElement( tag );
+			target.setAttribute( attribute, 'state.ignored' );
+			// As in the conflict agreement test, a comment records whether
+			// conversion traverses content rather than making it opaque.
+			const marker = document.createComment( 'ordinary content' );
+			target.append( marker );
+			island.append( target );
+
+			toVdom( island );
+			expect( marker.parentNode ).toBeNull();
+			expect( closestHtmlDirectiveElement( target ) ).toBeNull();
+
+			island.setAttribute( 'data-wp-html', 'state.outer' );
+			expect( closestHtmlDirectiveElement( target ) ).toBe( island );
+		}
 	} );
 
 	it( 'does not classify an HTML ancestor outside a descendant interactive region', () => {

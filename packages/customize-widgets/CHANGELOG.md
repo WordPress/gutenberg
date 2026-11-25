@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Use matching theme-aware colors for header buttons, including the inserter and disabled pressed controls ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
