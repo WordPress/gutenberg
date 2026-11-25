@@ -37,6 +37,11 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a summary.',
 		},
+		headingLevel: {
+			control: { type: 'select' },
+			description: 'The heading level of the card titles.',
+			options: [ undefined, 1, 2, 3, 4, 5, 6 ],
+		},
 	},
 	args: {
 		withHeader: true,

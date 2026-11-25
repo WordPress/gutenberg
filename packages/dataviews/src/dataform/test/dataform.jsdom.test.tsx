@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
@@ -967,6 +967,84 @@ describe( 'DataForm component', () => {
 				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 				container.querySelector( '.dataforms-layouts-card__field' )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'wraps the toggle of a collapsible card in a heading when headingLevel is set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: { type: 'card', headingLevel: 3 },
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 3,
+				name: /main card/i,
+			} );
+			expect(
+				within( heading ).getByRole( 'button', { name: /main card/i } )
+			).toBeVisible();
+		} );
+
+		it( 'renders the title of a static card as a heading when headingLevel is set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: {
+							type: 'card',
+							isCollapsible: false,
+							headingLevel: 2,
+						},
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'heading', { level: 2, name: 'Main card' } )
+			).toBeVisible();
+		} );
+
+		it( 'does not render a heading when headingLevel is not set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: { type: 'card' },
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect( screen.queryByRole( 'heading' ) ).not.toBeInTheDocument();
 		} );
 
 		const fieldsWithRequiredTitle = fields.map( ( field ) =>

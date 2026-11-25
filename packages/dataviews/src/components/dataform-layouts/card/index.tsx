@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import {
 	useCallback,
 	useContext,
@@ -85,6 +86,7 @@ function HeaderContent< Item >( {
 	isOpen,
 	touched,
 	validity,
+	titleRender,
 }: {
 	data: Item;
 	fields: NormalizedField< Item >[];
@@ -93,6 +95,7 @@ function HeaderContent< Item >( {
 	isOpen: boolean;
 	touched: boolean;
 	validity: FieldLayoutProps< Item >[ 'validity' ];
+	titleRender?: ComponentProps< typeof Card.Title >[ 'render' ];
 } ) {
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
@@ -109,7 +112,7 @@ function HeaderContent< Item >( {
 			justify="space-between"
 			className="dataforms-layouts-card__field-header-content"
 		>
-			<Card.Title>{ label }</Card.Title>
+			<Card.Title render={ titleRender }>{ label }</Card.Title>
 			{ ( hasBadge || hasSummary ) && (
 				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
 					{ hasBadge && <ValidationBadge validity={ validity } /> }
@@ -294,6 +297,12 @@ export default function FormCardField< Item >( {
 		/>
 	);
 
+	const HeadingTag =
+		layout.withHeader && layout.headingLevel
+			? ( `h${ layout.headingLevel }` as const )
+			: undefined;
+	const heading = HeadingTag ? <HeadingTag /> : undefined;
+
 	const headerContent = (
 		<HeaderContent
 			data={ data }
@@ -303,6 +312,9 @@ export default function FormCardField< Item >( {
 			isOpen={ isCollapsible ? !! isOpen : true }
 			touched={ touched }
 			validity={ validity }
+			// A collapsible card's heading wraps its toggle, so only a static
+			// card renders its title as the heading.
+			titleRender={ isCollapsible ? undefined : heading }
 		/>
 	);
 
@@ -314,7 +326,7 @@ export default function FormCardField< Item >( {
 				onOpenChange={ handleOpenChange }
 				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header render={ heading }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content
