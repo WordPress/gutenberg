@@ -32,11 +32,18 @@ export function usePostScheduleLabel( { full = false } = {} ) {
 	);
 
 	return full
-		? getFullPostScheduleLabel( date )
+		? getFullPostScheduleLabel( date, { isFloating } )
 		: getPostScheduleLabel( date, { isFloating } );
 }
 
-export function getFullPostScheduleLabel( dateAttribute ) {
+export function getFullPostScheduleLabel(
+	dateAttribute,
+	{ isFloating = false } = {}
+) {
+	if ( isFloating ) {
+		return __( 'Immediately' );
+	}
+
 	const date = getDate( dateAttribute );
 
 	const timezoneAbbreviation = getTimezoneAbbreviation();

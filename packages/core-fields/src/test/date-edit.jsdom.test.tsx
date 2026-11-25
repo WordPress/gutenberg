@@ -27,6 +27,32 @@ const field = {
 
 // The control reads the saved post from the `core` store; a stand-in avoids
 // the resolvers' requests.
+// A stand-in that also records the queries the calendar makes for the posts
+// it marks.
+function createRecordingRegistry( queriedMonths: MonthBounds[] ) {
+	const store = createReduxStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getEntityRecord: () => ( { status: 'draft' } ),
+			getEntityRecords: (
+				state: unknown,
+				kind: string,
+				name: string,
+				query: MonthBounds
+			) => {
+				queriedMonths.push( {
+					after: query.after,
+					before: query.before,
+				} );
+				return [];
+			},
+		},
+	} );
+	const registry = createRegistry();
+	registry.register( store );
+	return registry;
+}
+
 function createTestRegistry( savedStatus: string ) {
 	const store = createReduxStore( 'core', {
 		reducer: ( state = {} ) => state,
@@ -246,26 +272,7 @@ describe( 'DateEdit', () => {
 	} );
 	it( 'marks the posts of the month the date moves to', async () => {
 		const queriedMonths: MonthBounds[] = [];
-		const store = createReduxStore( 'core', {
-			reducer: ( state = {} ) => state,
-			selectors: {
-				getEntityRecord: () => ( { status: 'draft' } ),
-				getEntityRecords: (
-					state: unknown,
-					kind: string,
-					name: string,
-					query: MonthBounds
-				) => {
-					queriedMonths.push( {
-						after: query.after,
-						before: query.before,
-					} );
-					return [];
-				},
-			},
-		} );
-		const registry = createRegistry();
-		registry.register( store );
+		const registry = createRecordingRegistry( queriedMonths );
 		const data = {
 			id: 1,
 			type: 'post',
@@ -328,30 +335,6 @@ describe( 'DateEdit', () => {
 			} );
 		}
 
-		function createRecordingRegistry( queriedMonths: MonthBounds[] ) {
-			const store = createReduxStore( 'core', {
-				reducer: ( state = {} ) => state,
-				selectors: {
-					getEntityRecord: () => ( { status: 'draft' } ),
-					getEntityRecords: (
-						state: unknown,
-						kind: string,
-						name: string,
-						query: MonthBounds
-					) => {
-						queriedMonths.push( {
-							after: query.after,
-							before: query.before,
-						} );
-						return [];
-					},
-				},
-			} );
-			const registry = createRegistry();
-			registry.register( store );
-			return registry;
-		}
-
 		const data = {
 			id: 1,
 			type: 'post',
@@ -411,6 +394,67 @@ describe( 'DateEdit', () => {
 			expect( queriedMonths.at( -1 ) ).toEqual( {
 				after: '2026-09-30T23:59:59',
 				before: '2026-11-01T00:00:00',
+			} );
+		} );
+	} );
+
+	describe( 'with a floating date', () => {
+		afterEach( () => {
+			vi.useRealTimers();
+		} );
+
+		function atNovember() {
+			vi.useFakeTimers( { toFake: [ 'Date' ] } );
+			vi.setSystemTime( new Date( '2026-11-23T10:00:00Z' ) );
+		}
+
+		const data = {
+			id: 1,
+			type: 'post',
+			status: 'draft',
+			date: '2022-04-28T15:30:00',
+			modified: '2022-04-28T15:30:00',
+		};
+
+		it( 'shows now, not the date the draft was last saved', async () => {
+			atNovember();
+			render(
+				<RegistryProvider value={ createTestRegistry( 'draft' ) }>
+					<DateEdit
+						data={ data }
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</RegistryProvider>
+			);
+			expect(
+				await screen.findByRole( 'button', {
+					name: /November 23, 2026\. Selected/,
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: /April 28, 2022/ } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( "marks the posts of today's month", async () => {
+			atNovember();
+			const queriedMonths: MonthBounds[] = [];
+			render(
+				<RegistryProvider
+					value={ createRecordingRegistry( queriedMonths ) }
+				>
+					<DateEdit
+						data={ data }
+						field={ field }
+						onChange={ () => {} }
+					/>
+				</RegistryProvider>
+			);
+			await screen.findByRole( 'button', { name: 'Reset' } );
+			expect( queriedMonths.at( -1 ) ).toEqual( {
+				after: '2026-10-31T23:59:59',
+				before: '2026-12-01T00:00:00',
 			} );
 		} );
 	} );

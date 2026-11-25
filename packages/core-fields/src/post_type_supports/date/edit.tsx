@@ -73,17 +73,42 @@ export default function DateEdit( {
 }: DataFormControlProps< Item > ) {
 	const value = field.getValue( { item: data } ) ?? undefined;
 
+	// The saved status, not the edited one: a status picked in the same form
+	// doesn't change whether the date floats until the post is saved.
+	const savedStatus = useSelect(
+		( select ) => {
+			if ( ! data.type || ! data.id ) {
+				return undefined;
+			}
+			const saved: { status?: string } | undefined = select(
+				coreStore
+			).getEntityRecord( 'postType', data.type, data.id );
+			return saved?.status;
+		},
+		[ data.type, data.id ]
+	);
+	const isFloating = isDateFloating( {
+		...data,
+		status: savedStatus ?? data.status,
+	} );
+
+	// A floating date is the time of the last save, no date of the post's
+	// own: the control shows now, as the summary reads "Immediately".
+	const displayedValue = isFloating ? undefined : value;
+
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		value ? new Date( value ) : getSiteMonth()
+		displayedValue ? new Date( displayedValue ) : getSiteMonth()
 	);
 
 	// The calendar moves to the month of a new date, from the Month and Year
 	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
 	// markers come from the month on screen.
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( value !== prevValue ) {
-		setPrevValue( value );
-		setPreviewedMonth( value ? new Date( value ) : getSiteMonth() );
+	const [ prevValue, setPrevValue ] = useState( displayedValue );
+	if ( displayedValue !== prevValue ) {
+		setPrevValue( displayedValue );
+		setPreviewedMonth(
+			displayedValue ? new Date( displayedValue ) : getSiteMonth()
+		);
 	}
 
 	// Mark the days with published and scheduled posts of the same type.
@@ -112,27 +137,9 @@ export default function DateEdit( {
 		[ otherPosts ]
 	);
 
-	// The saved status, not the edited one: a status picked in the same form
-	// doesn't change whether the date floats until the post is saved.
-	const savedStatus = useSelect(
-		( select ) => {
-			if ( ! data.type || ! data.id ) {
-				return undefined;
-			}
-			const saved: { status?: string } | undefined = select(
-				coreStore
-			).getEntityRecord( 'postType', data.type, data.id );
-			return saved?.status;
-		},
-		[ data.type, data.id ]
-	);
 	// Reset is available whenever there is a date, so there is nothing to
 	// reset only once the date is `null`: the post takes its date on save.
 	const isReset = ! value;
-	const isFloating = isDateFloating( {
-		...data,
-		status: savedStatus ?? data.status,
-	} );
 
 	// Only DataViews filters pass an operator. A filter picks a date to compare
 	// against, so resetting the post date means nothing there.
@@ -179,7 +186,7 @@ export default function DateEdit( {
 				{ field.label }
 			</Fieldset.Legend>
 			<DateTimePicker
-				currentDate={ value }
+				currentDate={ displayedValue }
 				onChange={ onPick }
 				is12Hour={ is12HourTime() }
 				dateOrder={
