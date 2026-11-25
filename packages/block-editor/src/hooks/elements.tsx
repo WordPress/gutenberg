@@ -110,14 +110,16 @@ export function ElementsEdit( {
 
 	// Text and background color failures are reported by the Typography and
 	// Background panels, which own those selections.
-	const enableContrastChecking =
-		!! value?.elements?.link?.color?.text &&
+	const supportsContrastChecking =
 		settings?.color?.link &&
 		false !==
 			getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'enableContrastChecker',
 			] );
+	// Only check once the block has its own link color.
+	const enableContrastChecking =
+		supportsContrastChecking && !! value?.elements?.link?.color?.text;
 
 	const contrastWarning = useBlockColorContrastWarning( {
 		clientId,
@@ -152,7 +154,12 @@ export function ElementsEdit( {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			label={ label }
-			contrastWarning={ contrastWarning }
+			// An empty warning keeps the notice's space reserved whenever the
+			// block supports contrast checking, so the color popover doesn't
+			// resize and jump when the first link color is picked.
+			contrastWarning={
+				supportsContrastChecking ? ( contrastWarning ?? '' ) : undefined
+			}
 			inheritedValue={ inheritedValue }
 		/>
 	);
