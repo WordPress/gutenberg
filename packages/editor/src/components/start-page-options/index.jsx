@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { Stack, Tabs, Text } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -26,9 +26,12 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { getPopulatedCategories, searchItems } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	getPopulatedCategories,
+	searchItems,
+	usePatternsPaging,
+	BlockPatternsPaging,
+} = unlock( blockEditorPrivateApis );
 
 const ALL_PATTERNS_CATEGORY = {
 	name: 'allPatterns',
@@ -123,7 +126,12 @@ function useStartPatternCategories( startPatterns ) {
 	}, [ startPatterns, registeredCategories, userCategories ] );
 }
 
-function PatternSelection( { blockPatterns, onChoosePattern } ) {
+function PatternSelection( {
+	blockPatterns,
+	category,
+	searchValue,
+	onChoosePattern,
+} ) {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
@@ -133,18 +141,32 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 			postId: getCurrentPostId(),
 		};
 	}, [] );
+	// Every preview mounts an iframe, so only render a page of them at once.
+	const scrollContainerRef = useRef();
+	const pagingProps = usePatternsPaging(
+		blockPatterns,
+		category,
+		scrollContainerRef,
+		searchValue
+	);
 	return (
-		<BlockPatternsList
-			blockPatterns={ blockPatterns }
-			onClickPattern={ ( _pattern, blocks ) => {
-				editEntityRecord( 'postType', postType, postId, {
-					blocks,
-					content: ( { blocks: blocksForSerialization = [] } ) =>
-						__unstableSerializeAndClean( blocksForSerialization ),
-				} );
-				onChoosePattern();
-			} }
-		/>
+		<>
+			<BlockPatternsList
+				ref={ scrollContainerRef }
+				blockPatterns={ pagingProps.categoryPatterns }
+				onClickPattern={ ( _pattern, blocks ) => {
+					editEntityRecord( 'postType', postType, postId, {
+						blocks,
+						content: ( { blocks: blocksForSerialization = [] } ) =>
+							__unstableSerializeAndClean(
+								blocksForSerialization
+							),
+					} );
+					onChoosePattern();
+				} }
+			/>
+			<BlockPatternsPaging { ...pagingProps } />
+		</>
 	);
 }
 
@@ -240,6 +262,8 @@ function StartPageOptionsModal( { onClose } ) {
 							{ filteredStartPatterns.length > 0 ? (
 								<PatternSelection
 									blockPatterns={ filteredStartPatterns }
+									category={ activeCategory }
+									searchValue={ searchValue }
 									onChoosePattern={ handleClose }
 								/>
 							) : (
@@ -257,6 +281,8 @@ function StartPageOptionsModal( { onClose } ) {
 				<div className="editor-start-page-options__modal-content">
 					<PatternSelection
 						blockPatterns={ filteredStartPatterns }
+						category={ activeCategory }
+						searchValue={ searchValue }
 						onChoosePattern={ handleClose }
 					/>
 				</div>

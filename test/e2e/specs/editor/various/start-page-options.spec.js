@@ -91,3 +91,82 @@ test.describe( 'Start page options', () => {
 		] );
 	} );
 } );
+
+test.describe( 'Start page options with many patterns', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-many-starter-page-patterns'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-many-starter-page-patterns'
+		);
+	} );
+
+	test( 'renders one page of patterns at a time', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await admin.createNewPost( { postType: 'page' } );
+
+		const modal = page.getByRole( 'dialog', { name: 'Choose a pattern' } );
+		await expect( modal ).toBeVisible();
+
+		// Only the first 20 of the 60 patterns are rendered, each with its
+		// own preview iframe.
+		const patterns = modal.getByRole( 'option' );
+		await expect( modal.getByText( '60 items' ) ).toBeVisible();
+		await expect( modal.getByText( '1 of 3' ) ).toBeVisible();
+		await expect( patterns ).toHaveCount( 20 );
+		await expect( patterns.first() ).toHaveText( 'Starter page 01' );
+		await expect( modal.locator( 'iframe' ) ).toHaveCount( 20 );
+
+		await modal.getByRole( 'button', { name: 'Next page' } ).click();
+		await expect( modal.getByText( '2 of 3' ) ).toBeVisible();
+		await expect( patterns ).toHaveCount( 20 );
+		await expect( patterns.first() ).toHaveText( 'Starter page 21' );
+
+		// Changing the category goes back to the first page.
+		await modal.getByRole( 'tab', { name: 'Test Portfolio' } ).click();
+		await expect( modal.getByText( '25 items' ) ).toBeVisible();
+		await expect( modal.getByText( '1 of 2' ) ).toBeVisible();
+		await expect( patterns.first() ).toHaveText( 'Starter page 31' );
+
+		await modal.getByRole( 'button', { name: 'Last page' } ).click();
+		await expect( patterns ).toHaveText( [
+			'Starter page 51',
+			'Starter page 52',
+			'Starter page 53',
+			'Starter page 54',
+			'Starter page 55',
+		] );
+
+		// Searching goes back to the first page.
+		await modal
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Starter' );
+		await expect( modal.getByText( '1 of 2' ) ).toBeVisible();
+		await expect( patterns.first() ).toHaveText( 'Starter page 31' );
+
+		// After changing the page, the keyboard reaches the first pattern of
+		// the new page, which can be chosen.
+		await modal.getByRole( 'button', { name: 'Next page' } ).click();
+		await expect( patterns.first() ).toHaveText( 'Starter page 51' );
+		await pageUtils.pressKeys( 'shift+Tab', { times: 3 } );
+		await expect( patterns.first() ).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect( modal ).toBeHidden();
+		await expect
+			.poll(
+				async () => ( await editor.getBlocks() )[ 0 ]?.innerBlocks[ 0 ]
+			)
+			.toMatchObject( {
+				name: 'core/heading',
+				attributes: { content: 'Starter page 51' },
+			} );
+	} );
+} );
