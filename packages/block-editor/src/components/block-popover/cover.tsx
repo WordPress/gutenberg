@@ -9,7 +9,7 @@ import { PrivateBlockPopover } from '.';
 import { unlock } from '../../lock-unlock';
 import type { BlockPopoverCoverProps } from './types';
 
-const { getViewportLinearTransform } =
+const { getViewportVectorTransform } =
 	unlock< DOMPrivateApis >( domPrivateApis );
 
 function BlockPopoverCover(
@@ -62,14 +62,14 @@ function CoverContainer( {
 	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
 	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
 	const [ matrix, setMatrix ] = useState( () =>
-		getViewportLinearTransform( selectedElement )
+		getViewportVectorTransform( selectedElement )
 	);
 
 	useEffect( () => {
 		const update = () => {
 			setWidth( selectedElement.offsetWidth );
 			setHeight( selectedElement.offsetHeight );
-			setMatrix( getViewportLinearTransform( selectedElement ) );
+			setMatrix( getViewportVectorTransform( selectedElement ) );
 		};
 		const resizeObserver = new window.ResizeObserver( update );
 		resizeObserver.observe( selectedElement, { box: 'border-box' } );

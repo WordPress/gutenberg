@@ -9,6 +9,11 @@ type LinearTransform = {
 	d: number;
 };
 
+type TransformStyle = Pick<
+	CSSStyleDeclaration,
+	'rotate' | 'scale' | 'transform'
+>;
+
 const IDENTITY: LinearTransform = { a: 1, b: 0, c: 0, d: 1 };
 
 const ANGLE_UNITS: Record< string, number > = {
@@ -98,7 +103,7 @@ function getTransform( value: string ): LinearTransform {
  * @return The linear transform from the element's axes to its parent's.
  */
 export function getStyleLinearTransform(
-	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
+	style: TransformStyle
 ): LinearTransform {
 	// CSS applies `rotate`, then `scale`, then `transform`.
 	let matrix = getRotate( style.rotate || 'none' );
@@ -107,15 +112,27 @@ export function getStyleLinearTransform(
 }
 
 /**
- * Returns how an element and its ancestors rotate and scale it on screen.
- * Translation is left out, since it moves the element without changing
- * which way its edges face.
+ * Whether the element's own planar transform keeps its edges parallel to its
+ * parent's axes, including quarter turns.
+ *
+ * @param style The element's computed style.
+ */
+export function isStyleTransformAxisAligned( style: TransformStyle ): boolean {
+	const { a, b, c, d } = getStyleLinearTransform( style );
+	return (
+		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
+		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 )
+	);
+}
+
+/**
+ * Maps 2D directions and distances from the element's local axes to its
+ * document's viewport axes. Includes ancestor transforms. Only in-plane
+ * rotations from the individual CSS `rotate` property contribute.
  *
  * @param element The element to measure.
- *
- * @return The linear transform from the element's axes to its document's viewport axes.
  */
-export function getViewportLinearTransform(
+export function getViewportVectorTransform(
 	element: Element
 ): LinearTransform {
 	const view = element.ownerDocument.defaultView;
@@ -220,12 +237,14 @@ function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
 }
 
 /**
- * Returns the element's own transform about its border-box origin, including
- * translation. Returns undefined for an untransformed or unmeasurable element.
+ * Maps a local border-box point to its painted position within the same box's
+ * coordinate system. Includes translation and transform origin, and projects
+ * out-of-plane rotations onto the x/y plane. Ancestor transforms are applied
+ * separately by the caller. Returns undefined when there is no usable transform.
  *
  * @param element Element whose border box is measured.
  */
-export function getElementBoxTransform( element: Element ) {
+export function getBorderBoxPointTransform( element: Element ) {
 	const view = element.ownerDocument.defaultView;
 
 	if ( ! view || ! ( 'offsetWidth' in element ) ) {

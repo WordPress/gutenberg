@@ -1,8 +1,8 @@
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
-	getElementBoxTransform,
-	getStyleLinearTransform,
-	getViewportLinearTransform,
+	getBorderBoxPointTransform,
+	getViewportVectorTransform,
+	isStyleTransformAxisAligned,
 } from './transforms';
 
 const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -11,9 +11,9 @@ const { lock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 );
 
 const lockedApis = {
-	getElementBoxTransform,
-	getStyleLinearTransform,
-	getViewportLinearTransform,
+	getBorderBoxPointTransform,
+	getViewportVectorTransform,
+	isStyleTransformAxisAligned,
 };
 
 export type DOMPrivateApis = typeof lockedApis;

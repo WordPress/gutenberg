@@ -12,7 +12,7 @@ import type { ForwardedRef, RefObject } from 'react';
 import ResizeTooltip from './resize-tooltip';
 import { TransformAwareResizable } from './transform-aware-resizable';
 import {
-	getViewportLinearTransform,
+	getViewportVectorTransform,
 	getTransformedHandleStyles,
 } from './utils';
 import type { LinearTransform } from './utils';
@@ -120,7 +120,7 @@ function useHandleStyles(
 		if ( ! element ) {
 			return;
 		}
-		const next = getViewportLinearTransform( element );
+		const next = getViewportVectorTransform( element );
 		setMatrix( ( current ) =>
 			isSameTransform( current, next ) ? current : next
 		);

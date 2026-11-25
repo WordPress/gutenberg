@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+	getBorderBoxPointTransform,
 	getStyleLinearTransform,
-	getViewportLinearTransform,
+	getViewportVectorTransform,
 } from '../transforms';
 
 function createNested( outerStyle: string, innerStyle = '' ) {
@@ -23,14 +24,14 @@ function round( matrix: Record< string, number > ) {
 	);
 }
 
-describe( 'getViewportLinearTransform', () => {
+describe( 'getViewportVectorTransform', () => {
 	afterEach( () => {
 		document.body.innerHTML = '';
 	} );
 
 	it( 'returns the identity for an untransformed element', () => {
 		expect(
-			round( getViewportLinearTransform( createNested( '' ) ) )
+			round( getViewportVectorTransform( createNested( '' ) ) )
 		).toEqual( {
 			a: 1,
 			b: 0,
@@ -42,21 +43,21 @@ describe( 'getViewportLinearTransform', () => {
 	it( 'reads the rotate property', () => {
 		expect(
 			round(
-				getViewportLinearTransform( createNested( 'rotate: 90deg' ) )
+				getViewportVectorTransform( createNested( 'rotate: 90deg' ) )
 			)
 		).toEqual( { a: 0, b: 1, c: -1, d: 0 } );
 	} );
 
 	it( 'reads the scale property', () => {
 		expect(
-			round( getViewportLinearTransform( createNested( 'scale: 2 3' ) ) )
+			round( getViewportVectorTransform( createNested( 'scale: 2 3' ) ) )
 		).toEqual( { a: 2, b: 0, c: 0, d: 3 } );
 	} );
 
 	it( 'ignores translation', () => {
 		expect(
 			round(
-				getViewportLinearTransform(
+				getViewportVectorTransform(
 					createNested(
 						'translate: 40px 10px; transform: translateX(20px)'
 					)
@@ -68,19 +69,29 @@ describe( 'getViewportLinearTransform', () => {
 	it( 'combines the element with its ancestors', () => {
 		expect(
 			round(
-				getViewportLinearTransform(
+				getViewportVectorTransform(
 					createNested( 'rotate: 45deg', 'rotate: 45deg; scale: 2' )
 				)
 			)
 		).toEqual( { a: 0, b: 2, c: -2, d: 0 } );
 	} );
 
-	it( 'ignores a rotation that tilts the element out of the page', () => {
-		expect(
-			round(
-				getViewportLinearTransform( createNested( 'rotate: x 30deg' ) )
-			)
-		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	it( 'keeps movement in plane and projects border-box points for an x-axis rotation', () => {
+		const element = createNested(
+			'',
+			'rotate: x 60deg; transform-origin: 0 0;'
+		);
+		const point = getBorderBoxPointTransform( element )?.transformPoint( {
+			x: 0,
+			y: 20,
+		} );
+		expect( point?.y ).toBeCloseTo( 10 );
+		expect( round( getViewportVectorTransform( element ) ) ).toEqual( {
+			a: 1,
+			b: 0,
+			c: 0,
+			d: 1,
+		} );
 	} );
 } );
 

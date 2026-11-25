@@ -46,9 +46,11 @@ Private exports:
 
 ## dom
 
-- `getStyleLinearTransform` maps 2D directions and deltas from an element's local axes to its parent's axes using its computed style.
-- `getViewportLinearTransform` includes the transforms of the element's ancestors to map those directions and deltas to its document's viewport axes.
-- `getElementBoxTransform` returns the element's own transform for border-box points. It accounts for translation and transform origin when locating insertion gaps.
+- Use `isStyleTransformAxisAligned( style )` to check whether the element's own in-plane transform keeps its edges parallel to its parent's axes. The block toolbar uses this to find a tilted ancestor.
+- Use `getViewportVectorTransform( element )` for movement and orientation. It combines the element's and its ancestors' linear transforms. Translation and transform origin do not affect a movement vector.
+- Use `getBorderBoxPointTransform( element )` to locate a point on the element's own transformed border box. It includes translation and transform origin. The inserter combines this matrix with ancestor transforms to locate insertion gaps.
+
+For example, given `rotate: x 60deg` and `transform-origin: 0 0` on an otherwise untransformed element, the vector helper ignores the out-of-plane `rotate` and preserves a vertical delta of 20 pixels. The point helper projects the border-box point `(0, 20)` to `(0, 10)`.
 
 ## commands
 

@@ -4,7 +4,7 @@ import {
 } from '@wordpress/dom';
 import { unlock } from '../lock-unlock';
 
-const { getElementBoxTransform, getStyleLinearTransform } =
+const { getBorderBoxPointTransform, isStyleTransformAxisAligned } =
 	unlock< DOMPrivateApis >( domPrivateApis );
 
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
@@ -101,24 +101,6 @@ export function getBlockClientId( node: Node | null ) {
 }
 
 /**
- * Returns whether a computed style rotates or skews an element, so that its
- * edges are no longer parallel to the viewport. Translating and scaling keep
- * them parallel, so they don't count.
- *
- * @param style The computed style of the element.
- * @return Whether the element is rotated or skewed.
- */
-export function isStyleRotated(
-	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
-) {
-	const { a, b, c, d } = getStyleLinearTransform( style );
-	const isAxisAligned =
-		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
-		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 );
-	return ! isAxisAligned;
-}
-
-/**
  * Returns the outermost block element containing the given element that is
  * rotated or skewed, if any.
  *
@@ -134,7 +116,9 @@ export function getOutermostRotatedAncestorBlock( element: Element ) {
 	let rotatedAncestor: Element | undefined;
 	let ancestor = element.parentElement?.closest( BLOCK_SELECTOR );
 	while ( ancestor ) {
-		if ( isStyleRotated( view.getComputedStyle( ancestor ) ) ) {
+		if (
+			! isStyleTransformAxisAligned( view.getComputedStyle( ancestor ) )
+		) {
 			rotatedAncestor = ancestor;
 		}
 		ancestor = ancestor.parentElement?.closest( BLOCK_SELECTOR );
@@ -185,7 +169,7 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
  */
 export function getLayoutFrame( element: Element | null ): DOMMatrix | null {
 	for ( let current = element; current; current = current.parentElement ) {
-		const transform = getElementBoxTransform( current );
+		const transform = getBorderBoxPointTransform( current );
 
 		if ( ! transform ) {
 			continue;
@@ -220,7 +204,7 @@ export function getLayoutRect(
 	frame = getLayoutFrame( element.parentElement )
 ) {
 	const rect = element.getBoundingClientRect();
-	const transform = getElementBoxTransform( element );
+	const transform = getBorderBoxPointTransform( element );
 
 	if ( ! transform && ! frame ) {
 		return rect;
@@ -318,7 +302,7 @@ export function extendRectToTop( rect: DOMRect, top: number ) {
  */
 function getPaintedCorners( element: Element, frame: DOMMatrix | null ) {
 	const { x, y, width, height } = getLayoutRect( element, frame );
-	const transform = getElementBoxTransform( element );
+	const transform = getBorderBoxPointTransform( element );
 	const corners = [
 		[ 0, 0 ],
 		[ width, 0 ],

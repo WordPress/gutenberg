@@ -4,9 +4,9 @@ import {
 } from '@wordpress/dom';
 import { unlock } from '../lock-unlock';
 
-export const getViewportLinearTransform: DOMPrivateApis[ 'getViewportLinearTransform' ] =
-	unlock< DOMPrivateApis >( domPrivateApis ).getViewportLinearTransform;
-export type LinearTransform = ReturnType< typeof getViewportLinearTransform >;
+export const getViewportVectorTransform: DOMPrivateApis[ 'getViewportVectorTransform' ] =
+	unlock< DOMPrivateApis >( domPrivateApis ).getViewportVectorTransform;
+export type LinearTransform = ReturnType< typeof getViewportVectorTransform >;
 
 /**
  * Maps a pointer movement on screen into an element's own axes.

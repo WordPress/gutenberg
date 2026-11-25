@@ -3,7 +3,7 @@ import type { MouseEvent, TouchEvent } from 'react';
 import {
 	getHandleVector,
 	getResizeStep,
-	getViewportLinearTransform,
+	getViewportVectorTransform,
 	isIdentity,
 	measureGain,
 	toLocalDelta,
@@ -61,7 +61,7 @@ export class TransformAwareResizable extends Resizable {
 		if ( ! this.resizable || ( this.props.scale ?? 1 ) !== 1 ) {
 			return;
 		}
-		const matrix = getViewportLinearTransform( this.resizable );
+		const matrix = getViewportVectorTransform( this.resizable );
 		if ( ! isIdentity( matrix ) ) {
 			this.transformedDrag = {
 				matrix,
