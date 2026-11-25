@@ -2313,6 +2313,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/html/test/preview.jsdom.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/html/test/utils.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

@@ -41,6 +41,9 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 				styles={ styles }
 				title={ __( 'Custom HTML Preview' ) }
 				tabIndex={ -1 }
+				// Match the canvas body so editor styles that target
+				// `.editor-styles-wrapper` also apply in the preview.
+				type="editor-styles-wrapper"
 			/>
 			{ /*
 				An overlay is added when the block is not selected in order to register click events.
