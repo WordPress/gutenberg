@@ -9,6 +9,7 @@ type KnobRange =
 			 * from −720 to 720 degrees allows two turns in either direction.
 			 *
 			 * Without `min` and `max`, the dial covers one turn and wraps.
+			 * A bounded range needs room for at least two steps.
 			 */
 			min: number;
 			/**

@@ -218,7 +218,12 @@ export const WithUnits: Story = {
 					value={ draft ?? rotation }
 					onChange={ ( { currentTarget } ) => {
 						setDraft( currentTarget.value );
-						if ( currentTarget.value !== '' ) {
+						// Skip a value the step does not allow, so the field
+						// never rounds away part of the rotation it keeps.
+						if (
+							currentTarget.value !== '' &&
+							currentTarget.validity.valid
+						) {
 							setTurns(
 								currentTarget.valueAsNumber / unit.unitsPerTurn
 							);

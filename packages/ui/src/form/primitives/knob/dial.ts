@@ -35,14 +35,18 @@ export function getDial( {
 	unitsPerTurn?: number;
 } ) {
 	const unitsPerTurn = positive( unitsPerTurnProp, 360 );
-	// By default, the largest power of ten that gives a turn at least 100
-	// steps: 1 for degrees and gradians, 0.01 for radians and turns.
-	const step = positive(
-		stepProp,
-		10 ** Math.floor( Math.log10( unitsPerTurn / 100 ) )
-	);
 	const wraps = min === undefined || max === undefined;
 	const first = wraps ? 0 : min;
+	const span = wraps ? unitsPerTurn : max - first;
+	// By default, the largest power of ten that gives a turn at least 100
+	// steps: 1 for degrees and gradians, 0.01 for radians and turns.
+	const defaultStep = 10 ** Math.floor( Math.log10( unitsPerTurn / 100 ) );
+	const requestedStep = positive( stepProp, defaultStep );
+	// A step too small to count falls back to the default.
+	const step =
+		span / requestedStep <= Number.MAX_SAFE_INTEGER
+			? requestedStep
+			: defaultStep;
 	const precision = Math.min(
 		100,
 		Math.max( decimalPlaces( first ), decimalPlaces( step ) )
@@ -51,10 +55,7 @@ export function getDial( {
 		Number( ( first + index * step ).toFixed( precision ) ) || 0;
 	// Division can land a hair above a whole number, so step back from the
 	// first candidate to the last step that fits. Two tries cover the error.
-	let lastStep = Math.max(
-		0,
-		Math.ceil( ( wraps ? unitsPerTurn : max - first ) / step )
-	);
+	let lastStep = Math.max( 0, Math.ceil( span / step ) );
 	for ( let tries = 0; tries < 2 && lastStep > 0; tries++ ) {
 		const fits = wraps
 			? toValue( lastStep ) < unitsPerTurn

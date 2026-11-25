@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { createRef } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import { ThemeProvider } from '../../../../utils/theme-provider';
 import { Field } from '../../../primitives';
@@ -113,7 +113,8 @@ describe( 'Knob', () => {
 		{
 			unit: 'turns',
 			unitsPerTurn: 1,
-			step: 0.01,
+			// Turns get a step of 0.01 when none is set.
+			step: undefined,
 			quarter: '0.25',
 			last: '0.99',
 		},
@@ -226,20 +227,6 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 	} );
 
-	it( 'gives turns a fractional step when none is set', async () => {
-		await render(
-			<ThemeProvider isRoot>
-				<Knob aria-label="Rotation" unitsPerTurn={ 1 } />
-			</ThemeProvider>
-		);
-		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
-		await expect
-			.element( page.getByRole( 'slider' ) )
-			.toHaveValue( '0.25' );
-	} );
-
 	it( 'selects zero when a tap is nearer to it than to the last coarse step', async () => {
 		await render(
 			<ThemeProvider isRoot>
@@ -345,9 +332,96 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 0 );
 	} );
 
-	it( 'renders when the step is too small to count', async () => {
+	it( 'uses the default step when the given step is too small to count', async () => {
 		await render( <Knob aria-label="Angle" step={ 1e-14 } /> );
-		await expect.element( page.getByRole( 'slider' ) ).toBeInTheDocument();
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowUp}' );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '1' );
+	} );
+
+	it( 'selects the end when a tap lands on the dot just past it', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -360 }
+					max={ 30 }
+					step={ 5 }
+					value={ null }
+					placeholder={ 30 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		// Inside the dot, two degrees clockwise of the 30 degree stop.
+		await page.getByRole( 'group' ).click( { position: { x: 25, y: 12 } } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 30 );
+	} );
+
+	it( 'counts the turn from a value that a paired field commits when it loses focus', async () => {
+		function Rotation() {
+			const [ rotation, setRotation ] = useState( 0 );
+			const [ draft, setDraft ] = useState< string >();
+			return (
+				<ThemeProvider isRoot>
+					<input
+						aria-label="Rotation"
+						type="number"
+						value={ draft ?? rotation }
+						onChange={ ( event ) => setDraft( event.target.value ) }
+						onBlur={ () => {
+							if ( draft !== undefined ) {
+								setRotation( Number( draft ) );
+								setDraft( undefined );
+							}
+						} }
+					/>
+					<Knob
+						aria-label="Rotation dial"
+						min={ -720 }
+						max={ 720 }
+						value={ rotation }
+						onValueChange={ setRotation }
+					/>
+				</ThemeProvider>
+			);
+		}
+		await render( <Rotation /> );
+		await page.getByRole( 'spinbutton' ).fill( '390' );
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '450' );
+	} );
+
+	it( 'selects the heading under the pointer when a drag past the end crosses the center', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 360 }
+					defaultValue={ 360 }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		const top = { x: width / 2, y: 3 };
+		const right = { x: width - 3, y: height / 2 };
+		const bottom = { x: width / 2, y: height - 3 };
+		const left = { x: 3, y: height / 2 };
+		const center = { x: width / 2, y: height / 2 };
+		await userEvent.pointer( [
+			{ target: dial, coords: top, keys: '[MouseLeft>]' },
+			...[ right, bottom, left, center, right ].map( ( coords ) => ( {
+				target: dial,
+				coords,
+			} ) ),
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
 	} );
 
 	it( 'selects the heading under the pointer after a fast drag skips the center', async () => {
