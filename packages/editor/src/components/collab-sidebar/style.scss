@@ -3,6 +3,18 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
+@mixin unseen-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: $radius-round;
+	background: var(--wp-admin-theme-color, #3858e9);
+
+	@media (forced-colors: active) {
+		forced-color-adjust: none;
+		background: Highlight;
+	}
+}
+
 // Threads collapse to avatar pills, showing the author on hover or focus.
 // Selecting the block only highlights its thread; focusing it expands it.
 @mixin minimized-threads {
@@ -24,6 +36,15 @@
 
 		&:not(:hover, :focus-within) .editor-collab-sidebar-panel__user-info {
 			display: none;
+		}
+
+		// The dot after the date is hidden with it, so flag the avatar.
+		&.is-unseen:not(:hover, :focus-within)::after {
+			content: "";
+			position: absolute;
+			top: $grid-unit-05;
+			right: $grid-unit-05;
+			@include unseen-dot;
 		}
 	}
 }
@@ -284,15 +305,7 @@
 // Marks a thread with unseen activity, after its first note's date.
 .editor-collab-sidebar-panel__unseen-dot {
 	flex-shrink: 0;
-	width: $grid-unit-10;
-	height: $grid-unit-10;
-	border-radius: $radius-round;
-	background: var(--wp-admin-theme-color, #3858e9);
-
-	@media (forced-colors: active) {
-		forced-color-adjust: none;
-		background: Highlight;
-	}
+	@include unseen-dot;
 }
 
 // Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).

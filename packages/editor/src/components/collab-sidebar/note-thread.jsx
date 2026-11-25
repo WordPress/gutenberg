@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -94,7 +100,8 @@ export function NoteThread( {
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
-	const isUnseen = useContext( UnseenNotesContext ).has( note.id );
+	const { unseenNoteIds, markNoteSeen } = useContext( UnseenNotesContext );
+	const isUnseen = unseenNoteIds.has( note.id );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
@@ -107,6 +114,22 @@ export function NoteThread( {
 	const isKeyboardTabbingRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
+
+	// Selecting a thread reads it, unless it stays a minimized pill. A layout
+	// effect, so a reply arriving in the open thread never paints a dot.
+	useLayoutEffect( () => {
+		if ( ! isUnseen || ! isSelected ) {
+			return;
+		}
+		const isExpanded =
+			! isFloating ||
+			floatingRef.current
+				?.querySelector( '.editor-collab-sidebar-panel__note-body' )
+				?.checkVisibility();
+		if ( isExpanded ) {
+			markNoteSeen( note.id );
+		}
+	}, [ isUnseen, isSelected, hasFocus, isFloating, markNoteSeen, note.id ] );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -294,6 +317,7 @@ export function NoteThread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'has-focus': hasFocus,
+				'is-unseen': isUnseen,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"

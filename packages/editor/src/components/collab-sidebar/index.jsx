@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -35,7 +35,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
 
-function NotesSidebar( { postId, drafts } ) {
+function NotesSidebar( { postId, drafts, flaggedNotes } ) {
 	const sidebarRef = useRef( null );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
@@ -67,10 +67,15 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const { hasUnseenNotes, unseenNoteIds } = useUnseenNotes( {
+	const { hasUnseenNotes, unseenNoteIds, markNoteSeen } = useUnseenNotes( {
 		postId,
 		notes,
+		flaggedNotes,
 	} );
+	const unseenNotes = useMemo(
+		() => ( { unseenNoteIds, markNoteSeen } ),
+		[ unseenNoteIds, markNoteSeen ]
+	);
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -203,7 +208,7 @@ function NotesSidebar( { postId, drafts } ) {
 						/>
 					) }
 					<NoteDraftsContext.Provider value={ drafts }>
-						<UnseenNotesContext.Provider value={ unseenNoteIds }>
+						<UnseenNotesContext.Provider value={ unseenNotes }>
 							<Notes
 								notes={ notes }
 								sidebarRef={ sidebarRef }
@@ -223,9 +228,7 @@ function NotesSidebar( { postId, drafts } ) {
 						} ) }
 					>
 						<NoteDraftsContext.Provider value={ drafts }>
-							<UnseenNotesContext.Provider
-								value={ unseenNoteIds }
-							>
+							<UnseenNotesContext.Provider value={ unseenNotes }>
 								<Notes
 									notes={ unresolvedNotes }
 									sidebarRef={ sidebarRef }
@@ -242,6 +245,9 @@ function NotesSidebar( { postId, drafts } ) {
 
 export default function NotesSidebarContainer() {
 	const [ drafts ] = useState( () => new Map() );
+	// Here so the flags outlive the sidebar, which unmounts in the code
+	// editor, distraction free and revisions.
+	const flaggedNotes = useState( () => new Set() );
 	const { postId, editorMode, revisionsMode, isDistractionFree } = useSelect(
 		( select ) => {
 			const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
@@ -274,7 +280,11 @@ export default function NotesSidebarContainer() {
 			{ isDistractionFree ? (
 				<AddNoteMenuItem isDistractionFree />
 			) : (
-				<NotesSidebar postId={ postId } drafts={ drafts } />
+				<NotesSidebar
+					postId={ postId }
+					drafts={ drafts }
+					flaggedNotes={ flaggedNotes }
+				/>
 			) }
 		</PostTypeSupportCheck>
 	);
