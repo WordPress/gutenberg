@@ -87,6 +87,7 @@ export default function GalleryControls( {
 	updateInnerImages,
 	appliedSort,
 	setAppliedSort,
+	multiGallerySelection,
 } ) {
 	const {
 		navigationButtonType,
@@ -140,10 +141,17 @@ export default function GalleryControls( {
 		...( themeOptions || [] ),
 	];
 
+	// When several galleries are selected, only the settings stored as gallery
+	// attributes are shown. The others also update each gallery's images or
+	// inner blocks, which only happens for the first selected gallery. Random
+	// order is hidden too, so it's chosen per gallery.
+	const canSetAspectRatio =
+		! multiGallerySelection && aspectRatioOptions.length > 1;
+
 	// Columns and crop to fit are Flex-only, so a Gallery in another layout has
 	// viewport settings to show only when aspect ratios are available. Without
 	// this the viewport Settings panel would render empty.
-	const hasViewportSettings = isFlexLayout || aspectRatioOptions.length > 1;
+	const hasViewportSettings = isFlexLayout || canSetAspectRatio;
 	if ( isViewportStyleState && ! hasViewportSettings ) {
 		return null;
 	}
@@ -188,7 +196,6 @@ export default function GalleryControls( {
 		)
 			? appliedSort.order
 			: null;
-	const canSortImages = hasSortableImages( innerBlockImages, mediaById );
 
 	// State that drives counts/size options should reflect the dynamic media
 	// when the gallery is in dynamic mode.
@@ -214,10 +221,24 @@ export default function GalleryControls( {
 		);
 	}
 
+	// The multi-selection settings can all be hidden, e.g. for galleries in a
+	// grid layout without a lightbox. Without this the panel would render empty.
+	if (
+		multiGallerySelection &&
+		! isFlexLayout &&
+		! ( lightboxSetting?.allowEditing && hasLightboxImages )
+	) {
+		return null;
+	}
+
+	const canSortImages = hasSortableImages( innerBlockImages, mediaById );
+
 	const imageSizeOptions = getImageSizeOptions(
 		isDynamic ? dynamic.dynamicMedia : Array.from( mediaById.values() ),
 		imageSizes
 	);
+	const canSetResolution =
+		! multiGallerySelection && imageSizeOptions.length > 0;
 
 	function selectRandomOrder() {
 		setAttributes( { randomOrder: true } );
@@ -377,19 +398,25 @@ export default function GalleryControls( {
 			setGallerySettings( {
 				columns: undefined,
 				imageCrop: undefined,
-				aspectRatio: undefined,
+				...( ! multiGallerySelection && { aspectRatio: undefined } ),
 			} );
 			return;
 		}
 
 		setAttributes( {
 			navigationButtonType: 'icon',
-			randomOrder: false,
+			...( ! multiGallerySelection && { randomOrder: false } ),
 			...( isFlexLayout && {
 				columns: undefined,
 				imageCrop: true,
 			} ),
 		} );
+
+		// The remaining settings also update the gallery's images or inner
+		// blocks, so they're hidden and not reset for a multi-selection.
+		if ( multiGallerySelection ) {
+			return;
+		}
 
 		setAspectRatio( 'auto' );
 
@@ -407,6 +434,7 @@ export default function GalleryControls( {
 	}
 
 	const hasLinkTo = linkTo && linkTo !== 'none';
+	const canSetLinkTarget = ! multiGallerySelection && hasLinkTo;
 
 	return (
 		<ToolsPanel
@@ -440,7 +468,7 @@ export default function GalleryControls( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ ! isViewportStyleState && (
+			{ ! isViewportStyleState && ! multiGallerySelection && (
 				// "Random" is stored in both modes. Beyond that, a
 				// dynamic gallery's order is a stored query setting,
 				// while a static gallery's orders are one-off actions.
@@ -485,7 +513,7 @@ export default function GalleryControls( {
 					) }
 				</ToolsPanelItem>
 			) }
-			{ ! isViewportStyleState && imageSizeOptions.length > 0 && (
+			{ ! isViewportStyleState && canSetResolution && (
 				<ToolsPanelItem
 					isShownByDefault
 					label={ __( 'Resolution' ) }
@@ -513,7 +541,7 @@ export default function GalleryControls( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ ! isViewportStyleState && hasLinkTo && (
+			{ ! isViewportStyleState && canSetLinkTarget && (
 				<ToolsPanelItem
 					isShownByDefault
 					label={ __( 'Open images in new tab' ) }
@@ -527,7 +555,7 @@ export default function GalleryControls( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ aspectRatioOptions.length > 1 && (
+			{ canSetAspectRatio && (
 				<ToolsPanelItem
 					hasValue={ () =>
 						isViewportStyleState
