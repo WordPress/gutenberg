@@ -11,289 +11,115 @@ function createRandom( seed: number ) {
 	};
 }
 
-type Config = {
-	min?: number;
-	max?: number;
-	step?: number;
-	unitsPerTurn?: number;
-};
-
-const UNITS = [ 360, 400, 1, 2 * Math.PI ];
-const WHOLE_STEPS = [ 1, 0.5, 0.1, 5, 15 ];
-const FRACTION_STEPS = [ 0.01, 0.001, 0.05, 0.25 ];
-
-// A dial in one of the supported units. Its step is a decimal, an exact
-// fraction of a turn, or the default. Its range wraps, or is bounded by whole
-// steps, by whole turns, or by an upper limit that is off the step grid.
-function createConfig( random: () => number ): Required< Config > | Config {
-	const pick = < T >( items: T[] ) =>
-		items[ Math.floor( random() * items.length ) ];
-	const unitsPerTurn = pick( UNITS );
-	const decimal =
-		unitsPerTurn > 100 ? pick( WHOLE_STEPS ) : pick( FRACTION_STEPS );
-	const step = pick( [
-		undefined,
-		decimal,
-		unitsPerTurn / ( 3 + Math.floor( random() * 500 ) ),
-	] );
-	const size = step ?? ( unitsPerTurn > 100 ? 1 : 0.01 );
-	switch ( Math.floor( random() * 4 ) ) {
-		case 0:
-			return { unitsPerTurn, step };
-		case 1: {
-			const first = Math.floor( random() * 4000 ) - 2000;
-			const steps = 2 + Math.floor( random() * 4000 );
-			return {
-				unitsPerTurn,
-				step,
-				min: first * size,
-				max: ( first + steps ) * size,
-			};
-		}
-		case 2: {
-			const turns = 1 + Math.floor( random() * 3 );
-			return {
-				unitsPerTurn,
-				step,
-				min: -turns * unitsPerTurn,
-				max: turns * unitsPerTurn,
-			};
-		}
-		default:
-			return {
-				unitsPerTurn,
-				step,
-				min: 0,
-				max: size * ( 2.5 + random() * 500 ),
-			};
-	}
-}
-
-const describeConfig = ( config: Config ) => JSON.stringify( config );
+const isStep = ( dial: ReturnType< typeof getDial >, step: number ) =>
+	Number.isInteger( step ) && step >= dial.first && step <= dial.last;
 
 describe( 'getDial', () => {
 	it.each( [
-		{ config: {}, last: 359 },
-		{ config: { unitsPerTurn: 400 }, last: 399 },
-		{ config: { unitsPerTurn: 1 }, last: 0.99 },
-		{ config: { unitsPerTurn: 2 * Math.PI }, last: 6.28 },
-		{ config: { step: 100 }, last: 300 },
-		// The steps divide the turn only approximately.
-		{ config: { unitsPerTurn: 2.1, step: 0.3 }, last: 1.8 },
-		// A very fine step still leaves out the full turn.
-		{ config: { step: 1e-8 }, last: 359.99999999 },
-		// A step too small to count, or as large as the turn, falls back.
-		{ config: { step: 1e-14 }, last: 359 },
-		{ config: { step: 360 }, last: 359 },
-		{ config: { min: -720, max: 720 }, last: 720 },
-		{
-			config: { min: -0.3, max: 0.3, step: 0.1, unitsPerTurn: 1 },
-			last: 0.3,
-		},
-		// Decimal bounds whose difference is inexact still end on `max`.
-		{ config: { min: 350.1, max: 359.9, step: 0.1 }, last: 359.9 },
-		// An inexact step that lands a hair below the limit still ends on it.
-		{
-			config: {
-				min: -2 * Math.PI,
-				max: 0,
-				step: ( 2 * Math.PI ) / 75,
-				unitsPerTurn: 2 * Math.PI,
-			},
-			last: 0,
-		},
-		// Far from zero, a limit short of a step still keeps the step below.
-		{ config: { min: 1e14, max: 1e14 + 99.875 }, last: 1e14 + 99 },
-		// An upper limit off the step grid keeps the step below it.
-		{ config: { min: 0, max: 100, step: 30 }, last: 90 },
-		{ config: { min: 0, max: 359.9999999995 }, last: 359 },
-		// An inexact step that fits a whole number of times ends on the limit.
-		{
-			config: {
-				min: 0,
-				max: 2 * Math.PI,
-				step: ( 2 * Math.PI ) / 100,
-				unitsPerTurn: 2 * Math.PI,
-			},
-			last: 2 * Math.PI,
-		},
-	] )( 'ends at $last for $config', ( { config, last } ) => {
+		// A wrapping dial leaves out the full turn, which is zero again.
+		{ config: {}, first: 0, last: 359 },
+		{ config: { stepsPerTurn: 400 }, first: 0, last: 399 },
+		{ config: { stepsPerTurn: 100 }, first: 0, last: 99 },
+		{ config: { min: -720, max: 720 }, first: -720, last: 720 },
+		{ config: { min: 0, max: 10, stepsPerTurn: 10 }, first: 0, last: 10 },
+		// Limits between two steps enclose the whole steps inside them.
+		{ config: { min: 0.5, max: 100.7 }, first: 1, last: 100 },
+		{ config: { min: -100.7, max: -0.5 }, first: -100, last: -1 },
+		// Steps per turn that are not a whole, positive number fall back.
+		{ config: { stepsPerTurn: 2 * Math.PI }, first: 0, last: 359 },
+		{ config: { stepsPerTurn: 0 }, first: 0, last: 359 },
+		{ config: { stepsPerTurn: -4 }, first: 0, last: 359 },
+	] )( 'spans $first to $last for $config', ( { config, first, last } ) => {
 		const dial = getDial( config );
-		expect( dial.toValue( dial.lastStep ) ).toBe( last );
+		expect( [ dial.first, dial.last ] ).toEqual( [ first, last ] );
 	} );
 
-	it( 'reports exactly zero for a step that lands on it, whatever the rounding of the range', () => {
-		const random = createRandom( 7 );
-		const failures: string[] = [];
-		// A decimal range whose lower limit carries rounding error.
-		const noisy = getDial( {
-			min: -3 * 0.1,
-			max: 0.3,
-			step: 0.01,
-			unitsPerTurn: 1,
-		} );
-		if ( ! Object.is( noisy.toValue( noisy.toIndex( 0 ) ), 0 ) ) {
-			failures.push(
-				`-3 * 0.1 to 0.3: ${ noisy.toValue( noisy.toIndex( 0 ) ) }`
-			);
+	it.each( [
+		// A wrapping dial brings a value into one turn.
+		{ config: {}, value: 450, step: 90 },
+		{ config: {}, value: -45, step: 315 },
+		{ config: {}, value: 359.6, step: 0 },
+		{ config: {}, value: 359.4, step: 359 },
+		{ config: { stepsPerTurn: 4 }, value: 3.6, step: 0 },
+		// A bounded dial stops at its ends.
+		{ config: { min: -720, max: 720 }, value: 1000, step: 720 },
+		{ config: { min: -720, max: 720 }, value: -1000, step: -720 },
+		{ config: { min: -720, max: 720 }, value: 269.9, step: 270 },
+	] )(
+		'shows $value at step $step on $config',
+		( { config, value, step } ) => {
+			expect( getDial( config ).snap( value ) ).toBe( step );
 		}
-		for ( let run = 0; run < 3000; run++ ) {
-			// Whole turns either side of zero, in steps that are an inexact
-			// fraction of a turn. Zero is then a whole number of steps from
-			// the lower limit, but the arithmetic does not land on it.
-			const unitsPerTurn = UNITS[ Math.floor( random() * UNITS.length ) ];
-			const perTurn = 3 + Math.floor( random() * 500 );
-			const turns = 1 + Math.floor( random() * 3 );
-			const dial = getDial( {
-				unitsPerTurn,
-				step: unitsPerTurn / perTurn,
-				min: -turns * unitsPerTurn,
-				max: turns * unitsPerTurn,
-			} );
-			const atZero = dial.toValue( turns * perTurn );
-			if ( ! Object.is( atZero, 0 ) ) {
-				failures.push(
-					`${ unitsPerTurn } per turn in ${ perTurn } steps, ${ turns } turns either way: ${ atZero }`
-				);
-			}
-		}
-		expect( failures ).toEqual( [] );
-	} );
+	);
 
 	it( 'never reports negative zero', () => {
-		const dial = getDial( {
-			min: -0.3,
-			max: 0.3,
-			step: 0.1,
-			unitsPerTurn: 1,
-		} );
-		expect( Object.is( dial.toValue( 3 ), 0 ) ).toBe( true );
+		expect( Object.is( getDial( {} ).snap( -0.4 ), 0 ) ).toBe( true );
+		expect( Object.is( getDial( {} ).snap( -360 ), 0 ) ).toBe( true );
+		expect(
+			Object.is( getDial( { min: -3, max: 3 } ).snap( -0.2 ), 0 )
+		).toBe( true );
 	} );
 
-	it( 'snaps a wrapping value to the nearer of the last step and zero', () => {
-		const dial = getDial( { step: 100 } );
-		expect( dial.toValue( dial.toIndex( 340 ) ) ).toBe( 0 );
-		expect( dial.toValue( dial.toIndex( 329 ) ) ).toBe( 300 );
-		expect( dial.toValue( dial.toIndex( -45 ) ) ).toBe( 300 );
-		expect( getDial( {} ).toValue( getDial( {} ).toIndex( 450 ) ) ).toBe(
-			90
-		);
-	} );
-
-	it( 'counts the steps of generated decimal ranges exactly', () => {
-		const random = createRandom( 5 );
-		const failures: string[] = [];
-		for ( let run = 0; run < 3000; run++ ) {
-			// Whole numbers of thousandths, so the expected count is exact.
-			const places = Math.floor( random() * 3 );
-			const scale = 10 ** places;
-			const stepUnits = [ 1, 2, 5, 25 ][ Math.floor( random() * 4 ) ];
-			const firstUnits = Math.floor( random() * 8000 ) - 4000;
-			const count = 2 + Math.floor( random() * 3000 );
-			// Some limits stop short of the next step.
-			const extraUnits = Math.floor( random() * stepUnits );
-			const config = {
-				min: firstUnits / scale,
-				max: ( firstUnits + count * stepUnits + extraUnits ) / scale,
-				step: stepUnits / scale,
-			};
-			const dial = getDial( config );
-			const expected = ( firstUnits + count * stepUnits ) / scale;
-			if (
-				dial.lastStep !== count ||
-				dial.toValue( dial.lastStep ) !== expected
-			) {
-				failures.push(
-					`${ describeConfig( config ) }: ${ dial.lastStep } steps to ${ dial.toValue(
-						dial.lastStep
-					) }, expected ${ count } to ${ expected }`
-				);
-			}
-		}
-		expect( failures ).toEqual( [] );
-	} );
-
-	it( 'ends exactly on a limit that inexact steps reach, for generated ranges', () => {
-		const random = createRandom( 6 );
-		const failures: string[] = [];
-		for ( let run = 0; run < 3000; run++ ) {
-			const unitsPerTurn = UNITS[ Math.floor( random() * UNITS.length ) ];
-			const step = unitsPerTurn / ( 3 + Math.floor( random() * 500 ) );
-			const first = Math.floor( random() * 2000 ) - 1000;
-			const count = 2 + Math.floor( random() * 2000 );
-			const config = {
-				unitsPerTurn,
-				step,
-				min: first * step,
-				max: ( first + count ) * step,
-			};
-			const dial = getDial( config );
-			if (
-				dial.lastStep !== count ||
-				dial.toValue( dial.lastStep ) !== config.max
-			) {
-				failures.push(
-					`${ describeConfig( config ) }: ${ dial.lastStep } steps to ${ dial.toValue(
-						dial.lastStep
-					) }, expected ${ count }`
-				);
-			}
-		}
-		expect( failures ).toEqual( [] );
-	} );
-
-	it( 'keeps every step distinct, in order, and within the range for generated dials', () => {
+	it( 'keeps every step whole, in range, and at its own angle, for generated dials', () => {
 		const random = createRandom( 1 );
 		const failures: string[] = [];
 		for ( let run = 0; run < 3000; run++ ) {
-			const config = createConfig( random );
-			const dial = getDial( config );
-			const { lastStep } = dial;
-			const top = dial.toValue( lastStep );
-			// The limit a step may reach: the full turn, which a wrapping
-			// dial leaves out, or `max`.
-			const limit = config.max ?? config.unitsPerTurn ?? 360;
+			const stepsPerTurn = 2 + Math.floor( random() * 2000 );
+			const wraps = random() < 0.4;
+			const min = Math.floor( random() * 8000 ) - 4000;
+			const max = min + 1 + Math.floor( random() * 8000 );
+			const dial = getDial(
+				wraps ? { stepsPerTurn } : { stepsPerTurn, min, max }
+			);
 			const check = ( rule: string, holds: boolean ) => {
 				if ( ! holds ) {
-					failures.push( `${ rule }: ${ describeConfig( config ) }` );
+					failures.push(
+						`${ rule }: ${ stepsPerTurn } per turn, ${
+							wraps ? 'wrapping' : `${ min } to ${ max }`
+						}`
+					);
 				}
 			};
-			check( 'has at least two steps', lastStep >= 1 );
 			check(
-				'ends within the range',
-				config.max === undefined ? top < limit : top <= limit
-			);
-			check(
-				'ends within a step of the limit',
-				limit - top <= dial.step * ( 1 + 1e-9 )
+				'has the expected ends',
+				wraps
+					? dial.first === 0 && dial.last === stepsPerTurn - 1
+					: dial.first === min && dial.last === max
 			);
 			const sampled = [
-				0,
-				1,
-				lastStep - 1,
-				lastStep,
-				Math.floor( random() * ( lastStep + 1 ) ),
-				Math.floor( random() * ( lastStep + 1 ) ),
+				dial.first,
+				dial.first + 1,
+				dial.last - 1,
+				dial.last,
+				dial.first +
+					Math.floor( random() * ( dial.last - dial.first + 1 ) ),
+				dial.first +
+					Math.floor( random() * ( dial.last - dial.first + 1 ) ),
 			];
-			for ( const index of sampled ) {
-				const value = dial.toValue( index );
-				check(
-					'never reports negative zero',
-					! Object.is( value, -0 )
-				);
-				check(
-					'a value leads back to its step',
-					dial.toIndex( value ) === index
-				);
+			for ( const step of sampled ) {
+				check( 'a step is its own value', dial.snap( step ) === step );
 				check(
 					'an angle leads back to its step',
-					dial.fromAngle( dial.toAngle( index ) ) === index
+					dial.fromAngle( dial.toAngle( step ) ) === step
 				);
+				// Any value within half a step shows as that step.
+				const nearby = step + ( random() - 0.5 ) * 0.98;
 				check(
-					'steps increase',
-					index === 0 || value > dial.toValue( index - 1 )
+					'a nearby value snaps to it',
+					dial.snap( nearby ) === step
 				);
 			}
+			// Any value at all shows as a step of the dial.
+			const anywhere = ( random() - 0.5 ) * 1e7;
+			check(
+				'every value shows as a step',
+				isStep( dial, dial.snap( anywhere ) )
+			);
+			check(
+				'a full turn has the heading of zero',
+				Math.abs( turnBetween( 0, dial.toAngle( stepsPerTurn ) ) ) <
+					1e-9
+			);
 		}
 		expect( failures ).toEqual( [] );
 	} );
@@ -363,27 +189,28 @@ describe( 'press', () => {
 			expected: 390,
 		},
 		{
-			config: { min: -360, max: 30, step: 5 },
-			value: 30,
+			config: { min: -72, max: 6, stepsPerTurn: 72 },
+			value: 6,
 			heading: 32,
-			expected: 30,
+			expected: 6,
 		},
-		// An end at zero is exactly zero in a fractional unit.
+		// Steps of a quarter turn, two turns either way.
 		{
-			config: { min: -1.1, max: 0, unitsPerTurn: 1 },
+			config: { min: -8, max: 8, stepsPerTurn: 4 },
 			value: 0,
-			heading: 0,
-			expected: 0,
+			heading: 90,
+			expected: 1,
 		},
 		// A wrapping dial has a single turn, however large the value.
 		{ config: {}, value: 1e17, heading: 90, expected: 90 },
 		{ config: {}, value: 180, heading: -45, expected: 315 },
+		{ config: { stepsPerTurn: 100 }, value: 0, heading: 90, expected: 25 },
 	] )(
 		'selects $expected for heading $heading from $value on $config',
 		( { config, value, heading, expected } ) => {
 			const dial = getDial( config );
 			const angle = dial.press( heading, dial.exactAngle( value ) );
-			expect( dial.toValue( dial.fromAngle( angle ) ) ).toBe( expected );
+			expect( dial.fromAngle( angle ) ).toBe( expected );
 		}
 	);
 
@@ -391,28 +218,31 @@ describe( 'press', () => {
 		const random = createRandom( 2 );
 		const failures: string[] = [];
 		for ( let run = 0; run < 3000; run++ ) {
-			const steps = 2 + Math.floor( random() * 1500 );
-			const min = Math.floor( random() * 1500 ) - 750;
-			const dial = getDial( { min, max: min + steps } );
-			const first = dial.toAngle( 0 );
-			const last = dial.toAngle( dial.lastStep );
-			const value = min - 50 + random() * ( steps + 100 );
+			const stepsPerTurn = [ 360, 400, 100, 72, 12, 4 ][
+				Math.floor( random() * 6 )
+			];
+			const stepAngle = 360 / stepsPerTurn;
+			const steps = 1 + Math.floor( random() * 4 * stepsPerTurn );
+			const min = Math.floor( ( random() - 0.5 ) * 4 * stepsPerTurn );
+			const dial = getDial( { min, max: min + steps, stepsPerTurn } );
+			const first = dial.toAngle( dial.first );
+			const last = dial.toAngle( dial.last );
+			const value = min - 5 + random() * ( steps + 10 );
 			const heading = random() * 360 - 180;
 			const from = dial.exactAngle( value );
 			const angle = dial.press( heading, from );
 			const check = ( rule: string, holds: boolean ) => {
 				if ( ! holds ) {
 					failures.push(
-						`${ rule }: ${ min } to ${ min + steps }, value ${ value }, heading ${ heading }`
+						`${ rule }: ${ stepsPerTurn } per turn, ${ min } to ${
+							min + steps
+						}, value ${ value }, heading ${ heading }`
 					);
 				}
 			};
-			const selected = dial.fromAngle( angle );
 			check(
 				'selects a step of the dial',
-				Number.isInteger( selected ) &&
-					selected >= 0 &&
-					selected <= dial.lastStep
+				isStep( dial, dial.fromAngle( angle ) )
 			);
 			check(
 				'has the pressed heading',
@@ -425,14 +255,15 @@ describe( 'press', () => {
 				.map( ( turn ) => heading + 360 * turn )
 				.filter(
 					( candidate ) =>
-						candidate >= first - 0.5 && candidate <= last + 0.5
+						candidate >= first - stepAngle / 2 &&
+						candidate <= last + stepAngle / 2
 				)
 				.map( ( candidate ) => Math.abs( candidate - from ) );
 			// With no turn that fits, the dial stops at the end nearer to
 			// the heading. An exact tie may go either way.
 			const toFirst = Math.abs( turnBetween( heading, first ) );
 			const toLast = Math.abs( turnBetween( heading, last ) );
-			const nearerEnd = toFirst < toLast ? 0 : dial.lastStep;
+			const nearerEnd = toFirst < toLast ? dial.first : dial.last;
 			check(
 				'takes the nearest turn that fits, or else the nearer end',
 				fitting.length
@@ -450,29 +281,22 @@ describe( 'press', () => {
 		const random = createRandom( 3 );
 		const failures: string[] = [];
 		for ( let run = 0; run < 3000; run++ ) {
-			const unitsPerTurn = UNITS[ Math.floor( random() * UNITS.length ) ];
-			const step = unitsPerTurn / ( 3 + Math.floor( random() * 500 ) );
-			const dial = getDial( { unitsPerTurn, step } );
+			const stepsPerTurn = 2 + Math.floor( random() * 2000 );
+			const dial = getDial( { stepsPerTurn } );
 			const heading = random() * 360 - 180;
 			const selected = dial.fromAngle(
 				dial.press( heading, random() * 5000 )
 			);
-			const distance = ( index: number ) =>
-				Math.abs( turnBetween( heading, dial.toAngle( index ) ) );
-			const neighbors = [
-				modulo( selected - 1, dial.lastStep + 1 ),
-				modulo( selected + 1, dial.lastStep + 1 ),
-			];
+			// No step is further than half a step from any heading.
+			const away = Math.abs(
+				turnBetween( heading, dial.toAngle( selected ) )
+			);
 			if (
-				! Number.isInteger( selected ) ||
-				selected < 0 ||
-				selected > dial.lastStep ||
-				neighbors.some(
-					( other ) => distance( other ) < distance( selected ) - 1e-6
-				)
+				! isStep( dial, selected ) ||
+				! ( away <= 180 / stepsPerTurn + 1e-9 )
 			) {
 				failures.push(
-					`${ unitsPerTurn } per turn, step ${ step }, heading ${ heading }`
+					`${ stepsPerTurn } per turn, heading ${ heading }: step ${ selected }`
 				);
 			}
 		}

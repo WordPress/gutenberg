@@ -6,113 +6,52 @@ function clamp( value: number, min: number, max: number ) {
 	return Math.max( min, Math.min( max, value ) );
 }
 
-function decimalPlaces( value: number ) {
-	const [ coefficient, exponent ] = value.toExponential().split( 'e' );
-	const fractionLength = coefficient.split( '.' )[ 1 ]?.length ?? 0;
-	return Math.max( 0, fractionLength - Number( exponent ) );
-}
-
-function positive( value: number | undefined, fallback: number ) {
-	return value !== undefined && Number.isFinite( value ) && value > 0
-		? value
-		: fallback;
-}
-
-// Maps the selectable values to whole steps and to angles on the dial.
+// The dial counts in whole steps. A value is a number of steps, and a full turn
+// is `stepsPerTurn` of them, so the arithmetic stays in whole numbers. Units
+// such as radians or fractions of a turn belong to whatever shows the number.
 //
-// Without bounds, the values cover one turn and repeat. Zero and a full turn
-// share a heading, so the last step is the one before a full turn. With bounds,
-// the steps start at `min` and the dial counts turns between `min` and `max`.
+// Without bounds, the steps cover one turn and repeat: the last one is the step
+// before a full turn, which has the heading of zero. With bounds, the dial
+// counts turns between the whole steps that `min` and `max` enclose.
 export function getDial( {
 	min,
 	max,
-	step: stepProp,
-	unitsPerTurn: unitsPerTurnProp,
+	stepsPerTurn: stepsPerTurnProp,
 }: {
 	min?: number;
 	max?: number;
-	step?: number;
-	unitsPerTurn?: number;
+	stepsPerTurn?: number;
 } ) {
-	const unitsPerTurn = positive( unitsPerTurnProp, 360 );
+	const stepsPerTurn =
+		stepsPerTurnProp !== undefined &&
+		Number.isInteger( stepsPerTurnProp ) &&
+		stepsPerTurnProp > 0
+			? stepsPerTurnProp
+			: 360;
+	const stepAngle = 360 / stepsPerTurn;
 	const wraps = min === undefined || max === undefined;
-	const first = wraps ? 0 : min;
-	const span = wraps ? unitsPerTurn : max - first;
-	// By default, the largest power of ten that gives a turn at least 100
-	// steps: 1 for degrees and gradians, 0.01 for radians and turns.
-	const defaultStep = 10 ** Math.floor( Math.log10( unitsPerTurn / 100 ) );
-	const requestedStep = positive( stepProp, defaultStep );
-	// A step too small to count, or too large to leave a second value, falls
-	// back to the default.
-	const step =
-		requestedStep < span && span / requestedStep <= Number.MAX_SAFE_INTEGER
-			? requestedStep
-			: defaultStep;
-	const precision = Math.min(
-		100,
-		Math.max( decimalPlaces( first ), decimalPlaces( step ) )
-	);
-	// The rounding error that the arithmetic below can carry. It stays far
-	// below a step, so a limit that is truly short of one is not mistaken
-	// for a limit that a step reaches.
-	const limit = wraps ? unitsPerTurn : max;
-	const slack = Math.min(
-		8 *
-			Number.EPSILON *
-			Math.max( Math.abs( first ), Math.abs( limit ), step ),
-		step / 1e6
-	);
-	// The value of a step, rounded as the dial reports it. A step that lands
-	// on zero within the slack is zero itself.
-	const reach = ( index: number ) => {
-		const value = Number( ( first + index * step ).toFixed( precision ) );
-		return Math.abs( value ) <= slack ? 0 : value;
+	const first = wraps ? 0 : Math.ceil( min );
+	const last = wraps
+		? stepsPerTurn - 1
+		: Math.max( first, Math.floor( max ) );
+	const firstAngle = first * stepAngle;
+	const lastAngle = last * stepAngle;
+
+	// The step nearest to a value. A wrapping dial brings it into one turn,
+	// and a bounded dial stops at its ends.
+	const snap = ( value: number ) => {
+		const step = Math.round( value );
+		return (
+			( wraps
+				? modulo( step, stepsPerTurn )
+				: clamp( step, first, last ) ) || 0
+		);
 	};
-	// Count the steps that fit. The nearest whole count is right unless its
-	// step goes past the limit, in which case the step before it is the last.
-	// A step that lands on the limit within the slack counts as reaching it.
-	// A wrapping dial leaves out the full turn, which has the heading of
-	// zero.
-	let lastStep = Math.max( 0, Math.round( span / step ) );
-	if (
-		lastStep > 0 &&
-		( wraps
-			? limit - reach( lastStep ) <= slack
-			: reach( lastStep ) - limit > slack )
-	) {
-		lastStep--;
-	}
-	// A last step that lands on `max` within the slack is `max` itself.
-	const lastValue =
-		! wraps && Math.abs( reach( lastStep ) - limit ) <= slack
-			? limit
-			: reach( lastStep );
-	const toValue = ( index: number ) =>
-		( index === lastStep ? lastValue : reach( index ) ) || 0;
-	// Angles come from the rounded values, so an end at zero is exactly zero.
-	const toAngle = ( index: number ) =>
-		( toValue( index ) / unitsPerTurn ) * 360;
-
-	function toIndex( value: number ) {
-		if ( ! wraps ) {
-			return clamp( Math.round( ( value - first ) / step ), 0, lastStep );
-		}
-		const turned = modulo( value, unitsPerTurn );
-		const index = Math.min( Math.round( turned / step ), lastStep );
-		// Past the last step, zero can be the nearer neighbor.
-		return unitsPerTurn - turned < turned - toValue( index ) ? 0 : index;
-	}
-
-	const firstAngle = toAngle( 0 );
-	const lastAngle = toAngle( lastStep );
-	const stepAngle = ( step / unitsPerTurn ) * 360;
 
 	// The angle of a value as given, before it snaps to a step. A bounded
 	// dial keeps it within its ends.
 	const exactAngle = ( value: number ) =>
-		wraps
-			? ( value / unitsPerTurn ) * 360
-			: clamp( ( value / unitsPerTurn ) * 360, firstAngle, lastAngle );
+		( wraps ? value : clamp( value, first, last ) ) * stepAngle;
 
 	// The dial angle that a press on `heading` selects, for a value that lies
 	// at `valueAngle`. A wrapping dial has one turn, so the heading is the
@@ -147,14 +86,12 @@ export function getDial( {
 
 	return {
 		wraps,
-		step,
-		precision,
-		lastStep,
-		toValue,
-		toIndex,
-		toAngle,
-		fromAngle: ( angle: number ) =>
-			toIndex( ( angle / 360 ) * unitsPerTurn ),
+		stepsPerTurn,
+		first,
+		last,
+		snap,
+		toAngle: ( step: number ) => step * stepAngle,
+		fromAngle: ( angle: number ) => snap( angle / stepAngle ),
 		exactAngle,
 		press,
 	};

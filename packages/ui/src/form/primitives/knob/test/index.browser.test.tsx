@@ -125,6 +125,18 @@ describe( 'Knob', () => {
 		expect( onValueChange ).not.toHaveBeenCalled();
 	} );
 
+	it( 'moves at least one step with the large-step keys', async () => {
+		await render(
+			<Knob aria-label="Angle" largeStep={ 0.2 } defaultValue={ 50 } />
+		);
+		const slider = page.getByRole( 'slider' );
+		await userEvent.tab();
+		await userEvent.keyboard( '{PageUp}' );
+		await expect.element( slider ).toHaveValue( '51' );
+		await userEvent.keyboard( '{Shift>}{ArrowDown}{/Shift}' );
+		await expect.element( slider ).toHaveValue( '50' );
+	} );
+
 	it( 'reports exactly zero in the callback, native input, and form when stepping across zero', async () => {
 		const onValueChange = vi.fn();
 		await render(
@@ -132,11 +144,9 @@ describe( 'Knob', () => {
 				<Knob
 					aria-label="Offset"
 					name="offset"
-					min={ -0.3 }
-					max={ 0.3 }
-					step={ 0.1 }
-					unitsPerTurn={ 1 }
-					defaultValue={ -0.1 }
+					min={ -3 }
+					max={ 3 }
+					defaultValue={ -1 }
 					onValueChange={ onValueChange }
 				/>
 			</form>
@@ -152,38 +162,20 @@ describe( 'Knob', () => {
 	} );
 
 	it.each( [
+		{ steps: 'gradians', stepsPerTurn: 400, quarter: '100', last: '399' },
 		{
-			unit: 'gradians',
-			unitsPerTurn: 400,
-			step: 1,
-			quarter: '100',
-			last: '399',
+			steps: 'hundredths of a turn',
+			stepsPerTurn: 100,
+			quarter: '25',
+			last: '99',
 		},
-		{
-			unit: 'turns',
-			unitsPerTurn: 1,
-			// Turns get a step of 0.01 when none is set.
-			step: undefined,
-			quarter: '0.25',
-			last: '0.99',
-		},
-		{
-			unit: 'radians',
-			unitsPerTurn: 2 * Math.PI,
-			step: 0.01,
-			quarter: '1.57',
-			last: '6.28',
-		},
+		{ steps: 'quarter turns', stepsPerTurn: 4, quarter: '1', last: '3' },
 	] )(
-		'reads a quarter turn as $quarter $unit and wraps below zero to $last',
-		async ( { unitsPerTurn, step, quarter, last } ) => {
+		'reads a quarter turn as $quarter in $steps and wraps below zero to $last',
+		async ( { stepsPerTurn, quarter, last } ) => {
 			await render(
 				<ThemeProvider isRoot>
-					<Knob
-						aria-label="Angle"
-						unitsPerTurn={ unitsPerTurn }
-						step={ step }
-					/>
+					<Knob aria-label="Angle" stepsPerTurn={ stepsPerTurn } />
 				</ThemeProvider>
 			);
 			const slider = page.getByRole( 'slider' );
@@ -284,20 +276,21 @@ describe( 'Knob', () => {
 			<ThemeProvider isRoot>
 				<Knob
 					aria-label="Rotation"
-					min={ -360 }
-					max={ 30 }
-					step={ 5 }
+					min={ -72 }
+					max={ 6 }
+					stepsPerTurn={ 72 }
 					value={ null }
-					placeholder={ 30 }
+					placeholder={ 6 }
 					onValueChange={ onValueChange }
 				/>
 			</ThemeProvider>
 		);
-		// Inside the dot, two degrees clockwise of the 30 degree stop.
+		// Steps of five degrees. Inside the dot, two degrees clockwise of the
+		// stop at step 6, which is 30 degrees.
 		const dial = page.getByRole( 'group' );
 		const { at } = getPoints( dial );
 		await dial.click( { position: at( 25, 12 ) } );
-		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 30 );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 6 );
 	} );
 
 	it( 'counts the turn from a value that a paired field commits when it loses focus', async () => {
@@ -412,24 +405,26 @@ describe( 'Knob', () => {
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
 	} );
 
-	it( 'uses the unit and the callback that a paired field commits as it loses focus', async () => {
+	it( 'uses the steps per turn and the callback that a paired field commits as it loses focus', async () => {
 		const beforeCommit = vi.fn();
 		const afterCommit = vi.fn();
 		function Rotation() {
-			const [ inTurns, setInTurns ] = useState( false );
+			const [ inQuarters, setInQuarters ] = useState( false );
 			return (
 				<ThemeProvider isRoot>
 					<input
 						aria-label="Rotation"
-						onBlur={ () => setInTurns( true ) }
+						onBlur={ () => setInQuarters( true ) }
 					/>
 					<Knob
 						aria-label="Rotation dial"
-						min={ inTurns ? -2 : -720 }
-						max={ inTurns ? 2 : 720 }
-						unitsPerTurn={ inTurns ? 1 : 360 }
+						min={ inQuarters ? -8 : -720 }
+						max={ inQuarters ? 8 : 720 }
+						stepsPerTurn={ inQuarters ? 4 : 360 }
 						value={ 0 }
-						onValueChange={ inTurns ? afterCommit : beforeCommit }
+						onValueChange={
+							inQuarters ? afterCommit : beforeCommit
+						}
 					/>
 				</ThemeProvider>
 			);
@@ -440,7 +435,7 @@ describe( 'Knob', () => {
 		const { right } = getPoints( dial );
 		await dial.click( { position: right } );
 		expect( beforeCommit ).not.toHaveBeenCalled();
-		expect( afterCommit ).toHaveBeenCalledExactlyOnceWith( 0.25 );
+		expect( afterCommit ).toHaveBeenCalledExactlyOnceWith( 1 );
 	} );
 
 	it( 'stops turning once the pointer is no longer pressed, even if it stays captured', async () => {
@@ -749,30 +744,19 @@ describe( 'Knob', () => {
 	);
 
 	it.each( [
-		{ direction: 'clockwise', unitsPerTurn: 360, step: 1, expected: '810' },
-		{
-			direction: 'counterclockwise',
-			unitsPerTurn: 360,
-			step: 1,
-			expected: '-810',
-		},
-		{
-			direction: 'clockwise',
-			unitsPerTurn: 1,
-			step: 0.25,
-			expected: '2.25',
-		},
+		{ direction: 'clockwise', stepsPerTurn: 360, expected: '810' },
+		{ direction: 'counterclockwise', stepsPerTurn: 360, expected: '-810' },
+		{ direction: 'clockwise', stepsPerTurn: 4, expected: '9' },
 	] )(
-		'counts two full turns and a quarter $direction at $unitsPerTurn units per turn during one drag',
-		async ( { direction, unitsPerTurn, step, expected } ) => {
+		'counts two full turns and a quarter $direction at $stepsPerTurn steps per turn during one drag',
+		async ( { direction, stepsPerTurn, expected } ) => {
 			await render(
 				<ThemeProvider isRoot>
 					<Knob
 						aria-label="Rotation"
-						min={ -3 * unitsPerTurn }
-						max={ 3 * unitsPerTurn }
-						unitsPerTurn={ unitsPerTurn }
-						step={ step }
+						min={ -3 * stepsPerTurn }
+						max={ 3 * stepsPerTurn }
+						stepsPerTurn={ stepsPerTurn }
 						defaultValue={ 0 }
 					/>
 				</ThemeProvider>

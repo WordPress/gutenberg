@@ -97,7 +97,6 @@ export const WithInheritedValue: Story = {
 						suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 						min={ args.min }
 						max={ args.max }
-						step={ args.step }
 						disabled={ args.disabled }
 						aria-describedby={ numberHelpId }
 						placeholder={ String( inherited ) }
@@ -154,17 +153,47 @@ export const WithInheritedValue: Story = {
 	},
 };
 
+// How each unit shows a rotation, and how many steps the dial takes per turn
+// for it. Degrees, gradians, and hundredths of a turn divide a turn into whole
+// steps, so the dial counts in them. A hundredth of a radian does not, so the
+// dial stays in degrees for it.
 const UNITS = [
-	{ value: 'deg', label: 'deg', unitsPerTurn: 360, step: 1 },
-	{ value: 'grad', label: 'grad', unitsPerTurn: 400, step: 1 },
-	{ value: 'rad', label: 'rad', unitsPerTurn: 2 * Math.PI, step: 0.01 },
-	{ value: 'turn', label: 'turn', unitsPerTurn: 1, step: 0.01 },
+	{
+		value: 'deg',
+		label: 'deg',
+		unitsPerTurn: 360,
+		step: 1,
+		stepsPerTurn: 360,
+	},
+	{
+		value: 'grad',
+		label: 'grad',
+		unitsPerTurn: 400,
+		step: 1,
+		stepsPerTurn: 400,
+	},
+	{
+		value: 'turn',
+		label: 'turn',
+		unitsPerTurn: 1,
+		step: 0.01,
+		stepsPerTurn: 100,
+	},
+	{
+		value: 'rad',
+		label: 'rad',
+		unitsPerTurn: 2 * Math.PI,
+		step: 0.01,
+		stepsPerTurn: 360,
+	},
 ];
 
 /**
- * `unitsPerTurn` sets how many units make a full turn, so the dial needs no
- * unit of its own. A quarter turn clockwise reads 90 in degrees, 100 in
- * gradians, 1.57 in radians, and 0.25 in turns.
+ * The dial counts in whole steps of a turn and knows no units. The control
+ * around it converts: it keeps the rotation in turns, shows it in the chosen
+ * unit, and gives the dial as many steps per turn as that unit needs. A quarter
+ * turn clockwise reads 90 in degrees, 100 in gradians, 0.25 in turns, and 1.57
+ * in radians.
  */
 export const WithUnits: Story = {
 	parameters: { controls: { disable: true } },
@@ -173,6 +202,14 @@ export const WithUnits: Story = {
 		// Keep the rotation in turns, so changing the unit never rounds it.
 		const [ turns, setTurns ] = useState( 0.25 );
 		const [ draft, setDraft ] = useState< string >();
+		// A number of turns in the chosen unit, on its step grid.
+		const inUnit = ( amount: number ) =>
+			Number(
+				(
+					Math.round( ( amount * unit.unitsPerTurn ) / unit.step ) *
+					unit.step
+				).toFixed( 2 )
+			);
 		// Two turns either way, rounded down to a whole number of steps so that
 		// zero stays selectable.
 		const limit = Number(
@@ -180,14 +217,7 @@ export const WithUnits: Story = {
 				Math.floor( ( 2 * unit.unitsPerTurn ) / unit.step ) * unit.step
 			).toFixed( 2 )
 		);
-		// Show the rotation on the step grid of the chosen unit, within its
-		// limits, so the field always holds a value it accepts.
-		const steps = Math.round( ( turns * unit.unitsPerTurn ) / unit.step );
-		const rotation = Number(
-			Math.min( limit, Math.max( -limit, steps * unit.step ) ).toFixed(
-				2
-			)
-		);
+		const rotation = Math.min( limit, Math.max( -limit, inUnit( turns ) ) );
 		return (
 			<Stack direction="row" gap="sm" align="flex-end">
 				<InputControl
@@ -226,16 +256,15 @@ export const WithUnits: Story = {
 				/>
 				<Knob
 					aria-label="Rotation dial"
-					min={ -limit }
-					max={ limit }
-					step={ unit.step }
-					unitsPerTurn={ unit.unitsPerTurn }
-					getAriaValueText={ ( formatted ) =>
-						`${ formatted } ${ unit.label }`
+					min={ -2 * unit.stepsPerTurn }
+					max={ 2 * unit.stepsPerTurn }
+					stepsPerTurn={ unit.stepsPerTurn }
+					getAriaValueText={ ( _formatted, steps ) =>
+						`${ inUnit( steps / unit.stepsPerTurn ) } ${ unit.label }`
 					}
-					value={ rotation }
-					onValueChange={ ( next ) =>
-						setTurns( next / unit.unitsPerTurn )
+					value={ turns * unit.stepsPerTurn }
+					onValueChange={ ( steps ) =>
+						setTurns( steps / unit.stepsPerTurn )
 					}
 				/>
 			</Stack>

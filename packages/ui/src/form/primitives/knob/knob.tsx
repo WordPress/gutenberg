@@ -34,7 +34,7 @@ type Gesture = {
 	// not limited to the range.
 	angle: number;
 	// The step the gesture last selected, or null before it selects one.
-	index: number | null;
+	step: number | null;
 	// The angle a press counts its turn from: the value as given, and then
 	// the step the gesture last selected.
 	reference: number;
@@ -57,9 +57,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		{
 			min,
 			max,
-			step: stepProp,
-			largeStep,
-			unitsPerTurn,
+			largeStep = 10,
+			stepsPerTurn,
 			value,
 			defaultValue = 0,
 			placeholder = 0,
@@ -84,31 +83,28 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const gesture = useRef< Gesture | null >( null );
 		const {
 			wraps,
-			step,
-			precision,
-			lastStep,
-			toValue,
-			toIndex,
+			stepsPerTurn: perTurn,
+			first,
+			last,
+			snap,
 			toAngle,
 			fromAngle,
 			exactAngle,
 			press,
-		} = getDial( { min, max, step: stepProp, unitsPerTurn } );
-		const largeStepCount = Math.max(
-			1,
-			Math.round( ( largeStep ?? step * 10 ) / step )
-		);
+		} = getDial( { min, max, stepsPerTurn } );
+		const largeStepCount = Math.max( 1, Math.round( largeStep ) );
 		const isEmpty = value === null;
 		const shownValue =
 			value === undefined ? uncontrolledValue : ( value ?? placeholder );
-		const index = toIndex( shownValue );
-		const angle = toAngle( index );
-		function select( nextIndex: number ) {
-			const nextValue = toValue( nextIndex );
+		// The step the dial shows, and where its dot points.
+		const shown = snap( shownValue );
+		const angle = toAngle( shown );
+
+		function select( next: number ) {
 			if ( value === undefined ) {
-				setUncontrolledValue( nextValue );
+				setUncontrolledValue( next );
 			}
-			onValueChange?.( nextValue );
+			onValueChange?.( next );
 		}
 
 		// Selects the step the gesture has reached, when it is a new one. The
@@ -116,8 +112,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		// behind while a parent has yet to update.
 		function selectReached( current: Gesture ) {
 			const reached = fromAngle( current.angle );
-			if ( reached !== current.index ) {
-				current.index = reached;
+			if ( reached !== current.step ) {
+				current.step = reached;
 				current.reference = toAngle( reached );
 				select( reached );
 			}
@@ -149,11 +145,10 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					// The press selects its step unless the value is on it
 					// already. An empty dial has no value, and a press on a
 					// heading does not keep a value that lies between steps.
-					index:
-						isEmpty ||
-						( turnsTo !== null && toValue( index ) !== shownValue )
+					step:
+						isEmpty || ( turnsTo !== null && shown !== shownValue )
 							? null
-							: index,
+							: shown,
 				};
 				selectReached( gesture.current );
 			}
@@ -227,11 +222,11 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// Home and End select an end even when the dial already shows it
 			// for a value that is unset or outside the range. The slider
 			// sees no change there, so it reports none.
-			const end = event.key === 'End' ? lastStep : 0;
+			const end = event.key === 'End' ? last : first;
 			if (
 				( event.key === 'Home' || event.key === 'End' ) &&
-				end === index &&
-				( isEmpty || toValue( index ) !== shownValue )
+				end === shown &&
+				( isEmpty || shown !== shownValue )
 			) {
 				select( end );
 				return;
@@ -240,13 +235,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const next =
-				index + getStepChange( event, largeStepCount, isRTL() );
-			if ( next < 0 || next > lastStep ) {
+				shown + getStepChange( event, largeStepCount, isRTL() );
+			if ( next < first || next > last ) {
 				event.preventDefault();
 				event.stopPropagation();
 				// Let the range report the wrapped value through Base UI's field handling.
 				const range = event.currentTarget;
-				range.valueAsNumber = toValue( modulo( next, lastStep + 1 ) );
+				range.valueAsNumber = modulo( next, perTurn );
 				range.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 			}
 		}
@@ -262,17 +257,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						styles.root,
 						className
 					) }
-					min={ toValue( 0 ) }
-					max={ toValue( lastStep ) }
-					step={ step }
-					largeStep={ Number(
-						( largeStepCount * step ).toFixed( precision )
-					) }
-					value={ toValue( index ) }
+					min={ first }
+					max={ last }
+					step={ 1 }
+					largeStep={ largeStepCount }
+					value={ shown }
 					onValueChange={ ( next ) => {
-						const nextIndex = toIndex( next );
-						if ( nextIndex !== index ) {
-							select( nextIndex );
+						const nextStep = snap( next );
+						if ( nextStep !== shown ) {
+							select( nextStep );
 						}
 					} }
 				>
