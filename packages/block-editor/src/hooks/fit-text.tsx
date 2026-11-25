@@ -13,6 +13,7 @@ const EMPTY_OBJECT: FitTextBlockState = {};
 const MIN_FONT_SIZE_FOR_WARNING = 12;
 import { optimizeFitText } from '../utils/fit-text-utils';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
@@ -33,6 +34,8 @@ interface FitTextBlockState {
 	blockAttributes?: BlockAttributes | null;
 	parentId?: string | null;
 	blockMode?: string;
+	editorStyles?: unknown;
+	styleOverrides?: unknown;
 }
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
@@ -86,22 +89,37 @@ function useFitText( { fitText, name, clientId }: UseFitTextProps ) {
 	// Monitor block attribute changes, parent changes, and block mode.
 	// Any attribute or parent change may change the available space.
 	// Block mode is needed to disable fit text when in HTML editing mode.
-	const { blockAttributes, parentId, blockMode } = useSelect(
+	// Editor styles (including global styles and style variations) and style
+	// overrides are monitored because they can change the block's computed
+	// font without changing its size, which the ResizeObserver can't detect.
+	const {
+		blockAttributes,
+		parentId,
+		blockMode,
+		editorStyles,
+		styleOverrides,
+	} = useSelect(
 		( select ): FitTextBlockState => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return EMPTY_OBJECT;
 			}
-			const _blockMode =
-				select( blockEditorStore ).getBlockMode( clientId );
+			const {
+				getBlockMode,
+				getBlockAttributes,
+				getBlockRootClientId,
+				getSettings,
+				getStyleOverrides,
+			} = unlock( select( blockEditorStore ) );
+			const _blockMode = getBlockMode( clientId );
 			if ( _blockMode === 'html' ) {
 				return { blockMode: _blockMode };
 			}
 			return {
-				blockAttributes:
-					select( blockEditorStore ).getBlockAttributes( clientId ),
-				parentId:
-					select( blockEditorStore ).getBlockRootClientId( clientId ),
+				blockAttributes: getBlockAttributes( clientId ),
+				parentId: getBlockRootClientId( clientId ),
 				blockMode: _blockMode,
+				editorStyles: getSettings().styles,
+				styleOverrides: getStyleOverrides(),
 			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
@@ -173,6 +191,11 @@ function useFitText( { fitText, name, clientId }: UseFitTextProps ) {
 			resizeObserver.observe( currentElement );
 		}
 
+		// Recalculate once web fonts finish loading: a newly applied font
+		// family is usually measured with a fallback font first.
+		const fontFaceSet = currentElement.ownerDocument?.fonts;
+		fontFaceSet?.addEventListener?.( 'loadingdone', applyFitText );
+
 		// Cleanup function
 		return () => {
 			// Cancel pending async operations
@@ -190,6 +213,8 @@ function useFitText( { fitText, name, clientId }: UseFitTextProps ) {
 				resizeObserver.disconnect();
 			}
 
+			fontFaceSet?.removeEventListener?.( 'loadingdone', applyFitText );
+
 			currentElement.style.removeProperty( 'font-size' );
 		};
 	}, [
@@ -202,7 +227,7 @@ function useFitText( { fitText, name, clientId }: UseFitTextProps ) {
 		blockMode,
 	] );
 
-	// Trigger fit text recalculation when content changes
+	// Trigger fit text recalculation when content or styles change
 	useEffect( () => {
 		if (
 			fitText &&
@@ -222,6 +247,8 @@ function useFitText( { fitText, name, clientId }: UseFitTextProps ) {
 		return undefined;
 	}, [
 		blockAttributes,
+		editorStyles,
+		styleOverrides,
 		fitText,
 		applyFitText,
 		blockElement,
