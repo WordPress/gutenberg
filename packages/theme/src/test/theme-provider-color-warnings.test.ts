@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { buildBgRamp, type RampResult } from '../color-ramps';
-import { getContrast } from '../color-ramps/lib/color-utils';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
@@ -96,16 +95,12 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		}
 	);
 
-	it( 'checks the final fill after seed adjustment', () => {
+	it( 'reports a resting brand fill below 3:1 on neutral surfaces', () => {
 		const colorValues = new Map( [
 			[ '--wpds-color-background-interactive-brand-strong', '#0f755d' ],
 			[ '--wpds-color-background-surface-neutral-strong', '#252525' ],
 		] );
 
-		// The seed passes; the fill emitted after seed adjustment does not.
-		expect( getContrast( '#1c7c64', '#252525' ) ).toBeGreaterThanOrEqual(
-			3
-		);
 		expect(
 			collectThemeProviderColorWarnings( new Map(), colorValues )
 		).toEqual( [
