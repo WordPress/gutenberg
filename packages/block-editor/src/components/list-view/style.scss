@@ -447,10 +447,11 @@
 		white-space: nowrap;
 	}
 
-	// Invert the row's color pair so the badge stays distinct on any brand fill.
+	// Invert the brand colors so the badge stands out from the selected row.
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: var(--list-view-selected-color);
-		color: var(--list-view-selected-background);
+		background: var(--wpds-color-foreground-interactive-brand-strong);
+		/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Without design tokens the badge is white, and the admin color can be too light for text. */
+		color: var(--wpds-color-background-interactive-brand-strong, $gray-800);
 	}
 
 	.block-editor-list-view-block-select-button__block-visibility,
