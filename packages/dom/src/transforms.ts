@@ -198,7 +198,8 @@ export function isStyleTransformAxisAligned( style: TransformStyle ): boolean {
 /**
  * Maps 2D directions and distances from the element's local axes to its
  * document's viewport axes. Includes ancestor transforms, and projects turns
- * out of the page onto it, as `getBorderBoxPointTransform` does.
+ * out of the page onto it, as `getBorderBoxPointTransform` does when there is
+ * no perspective.
  *
  * @param element The element to measure.
  */

@@ -98,7 +98,7 @@ describe( 'getViewportVectorTransform', () => {
 		'rotate: x 60deg; transform: rotateY(60deg)',
 		'rotate: 30deg; scale: 2 1 3; transform: rotateX(45deg)',
 	] )(
-		'matches the linear part of the border-box point transform for %s',
+		'matches the linear part of the border-box point transform without perspective for %s',
 		( style ) => {
 			const element = createNested( '', style );
 			const { a, b, c, d } = getBorderBoxPointTransform( element )!;
