@@ -125,9 +125,15 @@ export default function QueryInspectorControls( props ) {
 	const isPostTypeUnavailable =
 		postTypesSelectOptions.length > 0 &&
 		! postTypesSelectOptions.some( ( item ) => item.value === postType );
-	// A toggle can't show a saved post type that isn't among its options.
+	// A toggle can't show a saved post type that isn't among its options. Keep
+	// the dropdown after a replacement is chosen, so it isn't swapped for the
+	// toggle while it has focus.
+	const [ keepPostTypeSelect, setKeepPostTypeSelect ] = useState( false );
+	if ( isPostTypeUnavailable && ! keepPostTypeSelect ) {
+		setKeepPostTypeSelect( true );
+	}
 	const showPostTypeSelect =
-		postTypesSelectOptions.length > 2 || isPostTypeUnavailable;
+		postTypesSelectOptions.length > 2 || keepPostTypeSelect;
 	const postTypeItems = addUnavailableItem(
 		postTypesSelectOptions,
 		postType
