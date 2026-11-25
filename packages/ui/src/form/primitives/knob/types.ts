@@ -48,7 +48,8 @@ export type KnobProps = Omit<
 		value?: number | null;
 		/**
 		 * Where the dial points while `value` is `null`, such as an inherited
-		 * angle. The slider reports this number until the user picks one.
+		 * angle. The dial shows it at the nearest step, and the slider reports
+		 * that step until the user picks a value.
 		 *
 		 * @default 0
 		 */

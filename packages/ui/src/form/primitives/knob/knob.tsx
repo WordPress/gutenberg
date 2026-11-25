@@ -20,6 +20,10 @@ type Gesture = {
 // range input inside the dial so its focus target matches what is on screen.
 const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
 
+// The largest turn, in degrees, that one pointer move can add. A larger jump
+// means the pointer cut across the dial instead of going around it.
+const CUT_ACROSS = 120;
+
 /**
  * A dial for choosing an angle. It sits beside an input that shows the exact
  * number and edits the same value. Click or tap a heading, drag around the
@@ -156,16 +160,26 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				current.pointerAngle = null;
 				return;
 			}
-			let dialAngle =
+			// A pen reports changes in pressure as moves at the same point.
+			// They leave a pending tap alone.
+			if (
+				event.type === 'pointermove' &&
+				pointerAngle === current.pointerAngle
+			) {
+				return;
+			}
+			const turned =
 				current.pointerAngle === null
-					? getDialAngle( pointerAngle, current.dialAngle )
-					: // Add the shorter way round, so the turn count carries across twelve o'clock.
-						current.dialAngle +
-						modulo(
-							pointerAngle - current.pointerAngle + 180,
-							360
-						) -
+					? null
+					: modulo( pointerAngle - current.pointerAngle + 180, 360 ) -
 						180;
+			// A drag turns the dial the shorter way round, so the turn count
+			// carries across twelve o'clock. A move out of the center, or one
+			// that cuts across the dial, names a new heading.
+			let dialAngle =
+				turned === null || Math.abs( turned ) > CUT_ACROSS
+					? getDialAngle( pointerAngle, current.dialAngle )
+					: current.dialAngle + turned;
 			if ( ! wraps ) {
 				// Past an end, keep less than a turn. The dot then meets the
 				// pointer as soon as it comes back round to that end.
@@ -214,7 +228,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						className
 					) }
 					min={ toValue( 0 ) }
-					max={ toValue( lastStep ) }
+					// Base UI hides the thumb when its range is empty, so a
+					// single selectable value still gets a range of one step.
+					max={ toValue( Math.max( lastStep, 1 ) ) }
 					step={ step }
 					largeStep={ Number(
 						( largeStepCount * step ).toFixed( precision )

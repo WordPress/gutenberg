@@ -159,8 +159,9 @@ describe( 'Knob', () => {
 			/>
 		);
 		await userEvent.tab();
-		await userEvent.keyboard( '{ArrowUp}{PageUp}{End}' );
-		expect( onKeyDown ).toHaveBeenCalledTimes( 3 );
+		// Arrow Down from zero takes the path that wraps to the last step.
+		await userEvent.keyboard( '{ArrowUp}{PageUp}{End}{ArrowDown}' );
+		expect( onKeyDown ).toHaveBeenCalledTimes( 4 );
 		expect( onValueChange ).not.toHaveBeenCalled();
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
@@ -214,11 +215,12 @@ describe( 'Knob', () => {
 		);
 		const dial = page.getByRole( 'group' );
 		const { width, height } = dial.element().getBoundingClientRect();
-		await userEvent.pointer( {
-			target: dial,
-			coords: { x: width - 3, y: height / 2 },
-			keys: '[MouseLeft>]',
-		} );
+		const right = { x: width - 3, y: height / 2 };
+		await userEvent.pointer( [
+			{ target: dial, coords: right, keys: '[MouseLeft>]' },
+			// A pen reports changes in pressure as moves at the same point.
+			{ target: dial, coords: right },
+		] );
 		expect( onValueChange ).not.toHaveBeenCalled();
 		await userEvent.pointer( '[/MouseLeft]' );
 		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
@@ -298,6 +300,74 @@ describe( 'Knob', () => {
 			'[/MouseLeft]',
 		] );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '90' );
+	} );
+
+	it( 'keeps an explicit zero when its heading is tapped at the end of a fractional range', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -1.1 }
+					max={ 0 }
+					unitsPerTurn={ 1 }
+					defaultValue={ 0 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width / 2, y: 3 } } );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'stays visible and selectable when the range holds a single value', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 0.5 }
+					value={ null }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		expect(
+			dial.element().querySelector( 'svg' )?.getBoundingClientRect().width
+		).toBe( width );
+		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 0 );
+	} );
+
+	it( 'renders when the step is too small to count', async () => {
+		await render( <Knob aria-label="Angle" step={ 1e-14 } /> );
+		await expect.element( page.getByRole( 'slider' ) ).toBeInTheDocument();
+	} );
+
+	it( 'selects the heading under the pointer after a fast drag skips the center', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" min={ 0 } max={ 360 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await userEvent.pointer( [
+			{
+				target: dial,
+				coords: { x: width / 2, y: 3 },
+				keys: '[MouseLeft>]',
+			},
+			{ target: dial, coords: { x: width / 2, y: height - 3 } },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
 	} );
 
 	it( 'selects the heading under the pointer after a drag crosses the center', async () => {

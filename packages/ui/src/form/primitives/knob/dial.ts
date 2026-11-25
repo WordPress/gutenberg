@@ -49,22 +49,24 @@ export function getDial( {
 	);
 	const toValue = ( index: number ) =>
 		Number( ( first + index * step ).toFixed( precision ) ) || 0;
-	// Division can land a hair above a whole number, so count down from the
-	// first candidate to the last step that fits.
+	// Division can land a hair above a whole number, so step back from the
+	// first candidate to the last step that fits. Two tries cover the error.
 	let lastStep = Math.max(
 		0,
 		Math.ceil( ( wraps ? unitsPerTurn : max - first ) / step )
 	);
-	while (
-		lastStep > 0 &&
-		( wraps
-			? toValue( lastStep ) >= unitsPerTurn
-			: toValue( lastStep ) > max )
-	) {
+	for ( let tries = 0; tries < 2 && lastStep > 0; tries++ ) {
+		const fits = wraps
+			? toValue( lastStep ) < unitsPerTurn
+			: toValue( lastStep ) <= max;
+		if ( fits ) {
+			break;
+		}
 		lastStep--;
 	}
-	const degreesPerStep = ( step / unitsPerTurn ) * 360;
-	const firstAngle = ( first / unitsPerTurn ) * 360;
+	// Angles come from the rounded values, so an end at zero is exactly zero.
+	const toAngle = ( index: number ) =>
+		( toValue( index ) / unitsPerTurn ) * 360;
 
 	function toIndex( value: number ) {
 		if ( ! wraps ) {
@@ -81,11 +83,11 @@ export function getDial( {
 		step,
 		precision,
 		lastStep,
-		firstAngle,
-		lastAngle: firstAngle + lastStep * degreesPerStep,
+		firstAngle: toAngle( 0 ),
+		lastAngle: toAngle( lastStep ),
 		toValue,
 		toIndex,
-		toAngle: ( index: number ) => firstAngle + index * degreesPerStep,
+		toAngle,
 		fromAngle: ( angle: number ) =>
 			toIndex( ( angle / 360 ) * unitsPerTurn ),
 	};

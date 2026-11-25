@@ -54,6 +54,7 @@ export const Empty: Story = {
 		value: null,
 		placeholder: 45,
 		format: DEGREES,
+		getAriaValueText: ( formatted ) => `${ formatted }, inherited`,
 	},
 };
 
@@ -124,6 +125,7 @@ export const WithInheritedValue: Story = {
 						suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
 						min={ args.min }
 						max={ args.max }
+						step={ args.step }
 						disabled={ args.disabled }
 						aria-describedby={ numberHelpId }
 						placeholder={ String( inherited ) }
