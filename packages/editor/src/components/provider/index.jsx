@@ -46,7 +46,11 @@ import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 import {
 	SuggestionSessionProvider,
 	SuggestionAutoSave,
+	SuggestionStoreInterceptor,
+	SuggestionUndoGuard,
+	registerSuggestionOverlayFilter,
 	isSuggestionModeEnabled,
+	MoveGhostsProvider,
 } from '../suggestion-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
@@ -54,12 +58,33 @@ const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { PrivateEntityProvider } = unlock( coreDataPrivateApis );
 
 /*
- * With the experiment off the overlay context (and its block-tree
+ * Register the suggestion overlay filters once when the editor provider
+ * module loads, but only when the Suggestion Mode experiment is on — the
+ * filters add per-block work (context lookups, store subscriptions) for
+ * every user otherwise. The flag is written by PHP before any editor script
+ * evaluates, so a module-scope check is safe.
+ */
+if ( isSuggestionModeEnabled() ) {
+	registerSuggestionOverlayFilter();
+}
+
+/*
+ * With the experiment off the suggestion session (and its block-tree
  * subscriptions) never mounts; consumers fall back to the context default,
  * which is inert.
  */
 const MaybeSuggestionSessionProvider = isSuggestionModeEnabled()
 	? SuggestionSessionProvider
+	: Fragment;
+
+/*
+ * Computes the document-wide pending-move ghost index once per store change
+ * and shares it over context, so the per-block class-name HOC reads its slice
+ * instead of every block scanning the whole tree (N x O(N)). Move ghosts
+ * render in every intent, so this is gated on the experiment only.
+ */
+const MaybeMoveGhostsProvider = isSuggestionModeEnabled()
+	? MoveGhostsProvider
 	: Fragment;
 
 const noop = () => {};
@@ -476,31 +501,37 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							useSubRegistry={ false }
 						>
 							<MaybeSuggestionSessionProvider>
-								{ children }
-								{ ! settings.isPreviewMode && (
-									<>
-										<PatternsMenuItems />
-										<TemplatePartMenuItems />
-										{ mode === 'template-locked' && (
-											<DisableNonPageContentBlocks />
-										) }
-										{ type === 'wp_navigation' && (
-											<NavigationBlockEditingMode />
-										) }
-										<EditorKeyboardShortcutsRegister />
-										<EditorKeyboardShortcuts />
-										<KeyboardShortcutHelpModal />
-										<BlockRemovalWarnings />
-										<StartPageOptions />
-										<StartTemplateOptions />
-										<PatternRenameModal />
-										<PatternDuplicateModal />
-										{ isSuggestionModeEnabled() && (
-											<SuggestionAutoSave />
-										) }
-										<MediaEditorModalMount />
-									</>
-								) }
+								<MaybeMoveGhostsProvider>
+									{ children }
+									{ ! settings.isPreviewMode && (
+										<>
+											<PatternsMenuItems />
+											<TemplatePartMenuItems />
+											{ mode === 'template-locked' && (
+												<DisableNonPageContentBlocks />
+											) }
+											{ type === 'wp_navigation' && (
+												<NavigationBlockEditingMode />
+											) }
+											<EditorKeyboardShortcutsRegister />
+											<EditorKeyboardShortcuts />
+											<KeyboardShortcutHelpModal />
+											<BlockRemovalWarnings />
+											<StartPageOptions />
+											<StartTemplateOptions />
+											<PatternRenameModal />
+											<PatternDuplicateModal />
+											{ isSuggestionModeEnabled() && (
+												<>
+													<SuggestionStoreInterceptor />
+													<SuggestionUndoGuard />
+													<SuggestionAutoSave />
+												</>
+											) }
+											<MediaEditorModalMount />
+										</>
+									) }
+								</MaybeMoveGhostsProvider>
 							</MaybeSuggestionSessionProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
