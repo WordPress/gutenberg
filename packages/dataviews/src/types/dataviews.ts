@@ -130,6 +130,23 @@ export type DataViewsProps< Item > = {
 	isItemClickable?: ( item: Item ) => boolean;
 
 	/**
+	 * Renders the UI for narrow, single-purpose containers, such as a
+	 * sidebar, in place of the default UI. It takes the same data, fields and
+	 * view, and shows a single settings button in place of the filters and
+	 * the view options buttons. It applies to any layout.
+	 *
+	 * Pass an object to adjust it:
+	 *
+	 * - `tabsField`: the id of a field to show as tabs above the content. It
+	 *   is left out of the settings menu.
+	 * - `showSort`: whether the settings menu offers sorting. Defaults to
+	 *   `true`.
+	 *
+	 * Ignored when `children` is passed.
+	 */
+	narrow?: boolean | { tabsField?: string; showSort?: boolean };
+
+	/**
 	 * Extra content rendered in the toolbar area, next to the view
 	 * configuration controls.
 	 */

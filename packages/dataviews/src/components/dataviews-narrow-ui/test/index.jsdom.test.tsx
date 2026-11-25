@@ -62,33 +62,64 @@ const view: View = {
 	filters: [],
 };
 
-describe( 'DataViews.NarrowUI', () => {
-	it( 'shows one field as tabs and the other filters in a single settings menu', async () => {
+function renderDataViews(
+	narrow?: React.ComponentProps< typeof DataViews >[ 'narrow' ]
+) {
+	render(
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ vi.fn() }
+			paginationInfo={ { totalItems: data.length, totalPages: 1 } }
+			defaultLayouts={ { list: {} } }
+			getItemId={ ( item ) => item.id.toString() }
+			narrow={ narrow }
+		/>
+	);
+}
+
+describe( 'DataViews narrow UI', () => {
+	it( 'keeps the default UI without the `narrow` prop', async () => {
+		renderDataViews();
+
+		expect(
+			await screen.findByRole( 'button', { name: 'Add filter' } )
+		).toBeInTheDocument();
+		expect( screen.queryByRole( 'tab' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'replaces the filters and view options buttons with a single settings menu', async () => {
 		const user = userEvent.setup();
-		render(
-			<DataViews
-				data={ data }
-				fields={ fields }
-				view={ view }
-				onChangeView={ vi.fn() }
-				paginationInfo={ { totalItems: data.length, totalPages: 1 } }
-				defaultLayouts={ { list: {} } }
-				getItemId={ ( item ) => item.id.toString() }
-			>
-				<DataViews.NarrowUI tabsField="type" />
-			</DataViews>
-		);
+		renderDataViews( true );
 
 		expect( screen.getByRole( 'searchbox' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Add filter' } )
+		).not.toBeInTheDocument();
+		expect( screen.queryByRole( 'tab' ) ).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'View options' } )
+		);
+
+		expect(
+			await screen.findByRole( 'group', { name: 'Type' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'group', { name: 'Status' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows one field as tabs and leaves it out of the settings menu', async () => {
+		const user = userEvent.setup();
+		renderDataViews( { tabsField: 'type' } );
+
 		expect(
 			( await screen.findAllByRole( 'tab' ) ).map(
 				( tab ) => tab.textContent
 			)
 		).toEqual( [ 'All', 'Planet', 'Satellite' ] );
-		// The default UI's two buttons are replaced by one.
-		expect(
-			screen.queryByRole( 'button', { name: 'Add filter' } )
-		).not.toBeInTheDocument();
 
 		await user.click(
 			screen.getByRole( 'button', { name: 'View options' } )

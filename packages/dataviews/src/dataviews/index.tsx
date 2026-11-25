@@ -18,7 +18,7 @@ import {
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
 import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
-import DataViewsNarrowUI from '../components/dataviews-narrow-ui';
+import NarrowUI from '../components/dataviews-narrow-ui';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { DataViewsPagination } from '../components/dataviews-pagination';
@@ -108,6 +108,7 @@ function DataViews< Item >( {
 	renderItemLink,
 	isItemClickable = defaultIsItemClickable,
 	header,
+	narrow = false,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
@@ -253,14 +254,25 @@ function DataViews< Item >( {
 				intersectionObserver,
 			} }
 		>
-			<div className="dataviews-wrapper">
-				{ children ?? (
-					<DefaultUI
-						header={ header }
-						search={ search }
-						searchLabel={ searchLabel }
-					/>
-				) }
+			<div
+				className={ clsx( 'dataviews-wrapper', {
+					'is-narrow': !! narrow && ! children,
+				} ) }
+			>
+				{ children ??
+					( narrow ? (
+						<NarrowUI
+							search={ search }
+							searchLabel={ searchLabel }
+							{ ...( typeof narrow === 'object' ? narrow : {} ) }
+						/>
+					) : (
+						<DefaultUI
+							header={ header }
+							search={ search }
+							searchLabel={ searchLabel }
+						/>
+					) ) }
 			</div>
 		</DataViewsContext.Provider>
 	);
@@ -280,7 +292,6 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	FiltersToggled: typeof FiltersToggled;
 	Layout: typeof DataViewsLayout;
 	LayoutSwitcher: typeof ViewTypeMenu;
-	NarrowUI: typeof DataViewsNarrowUI;
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
@@ -301,7 +312,6 @@ DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
 DataViewsSubComponents.Layout = DataViewsLayout;
 DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
-DataViewsSubComponents.NarrowUI = DataViewsNarrowUI;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;

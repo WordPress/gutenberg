@@ -13,7 +13,7 @@ import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
 import LargePageCountComponent from './large-page-count';
-import NarrowUIComponent from './narrow-ui';
+import { narrowArgs, narrowArgTypes } from './narrow';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -58,6 +58,7 @@ export default meta;
 export const LayoutTable = {
 	render: LayoutTableComponent,
 	args: {
+		...narrowArgs,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -65,6 +66,7 @@ export const LayoutTable = {
 		showMedia: true,
 	},
 	argTypes: {
+		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
@@ -101,6 +103,7 @@ export const LayoutGrid = {
 	},
 	render: LayoutGridComponent,
 	args: {
+		...narrowArgs,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -110,6 +113,7 @@ export const LayoutGrid = {
 		showMedia: true,
 	},
 	argTypes: {
+		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
@@ -152,6 +156,7 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
+		...narrowArgs,
 		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
@@ -160,6 +165,7 @@ export const LayoutList = {
 		showMedia: true,
 	},
 	argTypes: {
+		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
@@ -350,49 +356,6 @@ export const LargePageCount = {
 			control: 'number',
 			description:
 				'Number of items the dataset reports. At 20 per page, the default makes 72,652 pages',
-		},
-	},
-};
-
-/**
- * An alternative to the default UI for narrow, single-purpose containers such
- * as a sidebar, shown here at 350px. It takes the same data, fields and view,
- * and replaces the filters and the view options buttons with a single settings
- * button.
- *
- * The settings menu holds the filters that have a short list of choices (here
- * "Is Planet" and "Categories"), sorting and "Reset view". Filters that need
- * another kind of control, such as a date, a number or free text, are not part
- * of the narrow UI. One field can be shown as tabs above the content.
- */
-export const NarrowUI = {
-	render: NarrowUIComponent,
-	args: {
-		layout: 'list',
-		tabsField: 'type',
-		showSort: true,
-	},
-	argTypes: {
-		containerHeight: {
-			control: false,
-			table: {
-				disable: true,
-			},
-		},
-		layout: {
-			control: 'select',
-			options: [ 'list', 'grid' ],
-			description: 'The layout of the content',
-		},
-		tabsField: {
-			control: 'select',
-			options: [ 'none', 'type', 'categories' ],
-			description:
-				'The field shown as tabs above the content. It is left out of the settings menu',
-		},
-		showSort: {
-			control: 'boolean',
-			description: 'Whether the settings menu offers sorting',
 		},
 	},
 };

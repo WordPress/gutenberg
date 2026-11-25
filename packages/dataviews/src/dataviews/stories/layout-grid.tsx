@@ -4,6 +4,11 @@ import { LAYOUT_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { MediaFit, View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
+import {
+	getNarrowProp,
+	narrowFrameClassName,
+	type NarrowTabsField,
+} from './narrow';
 
 export const LayoutTableComponent = ( {
 	backgroundColor,
@@ -12,6 +17,8 @@ export const LayoutTableComponent = ( {
 	groupByLabel = true,
 	mediaFit = 'cover',
 	mediaFitControl = true,
+	narrow = false,
+	narrowTabsField = 'type',
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
 }: {
@@ -21,6 +28,8 @@ export const LayoutTableComponent = ( {
 	groupByLabel?: boolean;
 	mediaFit?: MediaFit;
 	mediaFitControl?: boolean;
+	narrow?: boolean;
+	narrowTabsField?: NarrowTabsField;
 	perPageSizes?: number[];
 	showMedia?: boolean;
 } ) => {
@@ -62,8 +71,9 @@ export const LayoutTableComponent = ( {
 	}, [ view ] );
 	return (
 		<div
+			className={ narrow ? narrowFrameClassName : undefined }
 			style={ {
-				height: '100%',
+				height: narrow ? undefined : '100%',
 				'--wp-dataviews-color-background': backgroundColor,
 			} }
 		>
@@ -98,6 +108,7 @@ export const LayoutTableComponent = ( {
 				defaultLayouts={ {
 					[ LAYOUT_GRID ]: true,
 				} }
+				narrow={ getNarrowProp( narrow, narrowTabsField ) }
 				config={ { perPageSizes, mediaFitControl } }
 			/>
 		</div>

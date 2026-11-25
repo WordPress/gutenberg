@@ -489,6 +489,17 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
+#### `narrow`: `boolean | { tabsField?: string, showSort?: boolean }`
+
+Renders the UI for narrow, single-purpose containers, such as a sidebar, in place of the default UI. It takes the same `data`, `fields` and `view`, and applies to any layout. See [Narrow UI](#narrow-ui).
+
+Pass an object to adjust it:
+
+-   `tabsField`: the id of a field to show as tabs above the content. That field is left out of the settings menu.
+-   `showSort`: whether the settings menu offers sorting. Defaults to `true`.
+
+It is ignored when `children` is passed.
+
 #### `config`: { perPageSizes: number[], mediaFitControl?: boolean }
 
 Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
@@ -563,7 +574,6 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Pagination`
 -   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
--   `DataViews.NarrowUI`
 -   `DataViews.ViewMenu`
 -   `DataViews.FilterTabs`
 
@@ -602,14 +612,14 @@ const CustomLayout = () => {
 
 ### Narrow UI
 
-`DataViews.NarrowUI` is an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. It takes the same `data`, `fields` and `view` as any other DataViews, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons.
+The `narrow` prop is an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. DataViews takes the same `data`, `fields` and `view`, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons. It is a property of the UI around the content, so it applies to the table, grid, list and activity layouts alike, and `header` is not rendered.
 
 Its rows, from top to bottom:
 
 1. Search and the settings button.
 2. Optionally, one field as tabs: the main way to browse the content, such as a category or a type.
 3. The content, in the layout of the view.
-4. The footer: the pagination, and any content passed as `footer`.
+4. The footer, with the pagination.
 
 ```jsx
 <DataViews
@@ -618,22 +628,13 @@ Its rows, from top to bottom:
 	view={ view }
 	onChangeView={ onChangeView }
 	paginationInfo={ paginationInfo }
-	defaultLayouts={ { list: {} } }
+	defaultLayouts={ { grid: {} } }
 	onReset={ onReset }
->
-	<DataViews.NarrowUI tabsField="type" />
-</DataViews>
+	narrow={ { tabsField: 'type' } }
+/>
 ```
 
-Properties:
-
--   `search`: `boolean`. Whether the search input is shown. Defaults to `true`.
--   `searchLabel`: `string`. The label of the search input.
--   `tabsField`: `string`. The id of a field to show as tabs above the content. That field is left out of the settings menu.
--   `showSort`: `boolean`. Whether the settings menu offers sorting. Defaults to `false`.
--   `footer`: React node. Content for the last row, below the pagination.
-
-The narrow UI is made of two subcomponents, which are also available on their own for a container that needs its own search, footer or spacing.
+The narrow UI is made of two subcomponents. They are also available through free composition, for a container that needs its own search, footer or spacing.
 
 #### `DataViews.ViewMenu`
 
