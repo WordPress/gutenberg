@@ -55,6 +55,9 @@
 			"style": true,
 			"width": true
 		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		},
@@ -72,6 +75,7 @@
 	],
 	"selectors": {
 		"border": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder",
+		"shadow": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder",
 		"filter": {
 			"duotone": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder__illustration, .wp-block-site-logo .components-placeholder::before"
 		}
