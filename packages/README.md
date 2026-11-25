@@ -113,7 +113,7 @@ When creating a new package, you need to provide at least the following. Package
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 1. `CHANGELOG.md` file containing at least:
 
-    ```
+    ```md
     <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
     ## Unreleased
@@ -267,9 +267,13 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
+Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries are optional for trivial changes or work with no consumer impact, such as tests and behavior-preserving refactors. Put new entries under `## Unreleased` at the top of the file, creating the heading if needed.
 
-Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
+### Writing concise entries
+
+-   Prefer one short sentence naming the affected API or component and what changed for consumers.
+-   Omit descriptions of behavior that remains unchanged and internal implementation details. Avoid repeating the same change across subsections.
+-   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
 ### Changelog Entry Format
 

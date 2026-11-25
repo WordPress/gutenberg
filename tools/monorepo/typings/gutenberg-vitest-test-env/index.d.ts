@@ -11,7 +11,6 @@ interface GutenbergVitestMatchers< R > {
 	toHaveLoggedWith: ( ...args: unknown[] ) => R;
 	toHaveWarned: () => R;
 	toHaveWarnedWith: ( ...args: unknown[] ) => R;
-	toMatchDiffSnapshot: ( expected: unknown ) => R;
 }
 
 interface GutenbergVitestEnvironment {

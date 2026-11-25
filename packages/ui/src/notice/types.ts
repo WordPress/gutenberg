@@ -2,12 +2,44 @@ import type { ReactNode } from 'react';
 import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
 import type { ButtonProps } from '../button/types';
+import type { ButtonLinkProps } from '../button-link/types';
 import type { IconButtonProps } from '../icon-button/types';
 import type { LinkProps } from '../link/types';
 
 export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
 
+export interface ListProps extends ComponentProps< 'div' > {
+	/**
+	 * Where to render the live regions. Defaults to the list itself. Use a
+	 * container outside the app, such as its document body, for notifications
+	 * that should still be announced when a modal hides the app. An explicit
+	 * spokenMessage can announce through aria-hidden ancestors. Notices inside
+	 * an HTML hidden subtree and notices with politeness="off" stay silent.
+	 */
+	liveRegionContainer?: HTMLElement | null;
+	/**
+	 * Notices to display. Keep the list mounted when there are no notices.
+	 */
+	children?: ReactNode;
+}
+
 export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
+	/**
+	 * Announcement urgency inside `Notice.List`, independent of visual intent.
+	 * Use `assertive` for time-sensitive updates or `off` to skip announcements.
+	 * Has no effect outside a list.
+	 *
+	 * @default 'polite'
+	 */
+	politeness?: 'polite' | 'assertive' | 'off';
+
+	/**
+	 * Message announced inside `Notice.List`. Defaults to the plaintext title and
+	 * description, excluding actions. Use `politeness="off"` to skip announcements.
+	 * Has no effect outside a list.
+	 */
+	spokenMessage?: string;
+
 	/**
 	 * The semantic intent of the notice, communicating its meaning through color.
 	 * Available intents: neutral, info, warning, success, and error.
@@ -83,6 +115,16 @@ export interface ActionButtonProps extends Omit<
 }
 
 export interface ActionLinkProps extends Omit< LinkProps, 'variant' | 'tone' > {
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}
+
+export interface ActionButtonLinkProps extends Omit<
+	ButtonLinkProps,
+	'size' | 'tone'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */

@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'File type', 'gutenberg' ),
+	'label'         => __( 'File type' ),
 	// Sorting is disabled until the REST API supports ordering by
 	// `mime_type`, see https://core.trac.wordpress.org/ticket/64073.
 	'enableSorting' => false,

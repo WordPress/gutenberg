@@ -6,7 +6,7 @@ import {
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, isBlockElementOutsideFields } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -73,8 +73,13 @@ function extractSelectionEndNode(
 		isSelectionForward( selection ) &&
 		isTripleClick
 	) {
-		// A node at offset 0 of a forward selection has a parent.
-		return ( focusNode!.previousSibling ?? focusNode!.parentElement )!;
+		// Return the node before the focus node. Its parent may still be in
+		// the next block (e.g. a list item's rich text), so walk up.
+		let node = focusNode!;
+		while ( ! node.previousSibling && node.parentNode ) {
+			node = node.parentNode;
+		}
+		return node.previousSibling ?? node;
 	}
 
 	return focusNode!.childNodes[ focusOffset ];
@@ -116,7 +121,6 @@ export default function useSelectionObserver() {
 		isMultiSelecting,
 		getSelectionStart,
 		getSelectionEnd,
-		getSelectedBlockClientId,
 		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
@@ -188,7 +192,12 @@ export default function useSelectionObserver() {
 					( event as MouseEvent ).shiftKey &&
 					event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					const collapsedClientId = getBlockClientId( startNode );
+					// Not the start node: a caret between blocks (e.g. left
+					// where a replaced block was) is in no block, while the
+					// start node is the block next to it.
+					const collapsedClientId = getBlockClientId(
+						selection.anchorNode
+					);
 
 					// If the block supports an editable root, keep (or make)
 					// the wrapper contentEditable so the native selection can
@@ -197,14 +206,13 @@ export default function useSelectionObserver() {
 					if (
 						! isMultiSelecting() &&
 						collapsedClientId &&
-						// Only keep the wrapper editable when the collapsed
-						// selection is in the block that is actually selected.
-						// A stale native selection may linger in a previously
-						// selected editable root block (e.g. Firefox does not
-						// always move it), which must not re-enable the wrapper
-						// after another block has been selected.
-						collapsedClientId === getSelectedBlockClientId() &&
-						canHostEditableRoot( collapsedClientId )
+						canHostEditableRoot( collapsedClientId ) &&
+						// Not when a press on a block's own element, such as a
+						// list item's bullet, focused it: WebKit then leaves
+						// the caret in the nearest text.
+						! isBlockElementOutsideFields(
+							ownerDocument.activeElement
+						)
 					) {
 						setContentEditableWrapper( node, true );
 
@@ -336,7 +344,7 @@ export default function useSelectionObserver() {
 							// selection (also through a focused editing host).
 							// It may be temporarily non-editable while a drag
 							// that started outside it is in progress (see
-							// rich-text's preventFocusCapture).
+							// usePreventFocusCapture).
 							( richTextElement.contentEditable !== 'true' ||
 								( ownerDocument.activeElement !==
 									richTextElement &&

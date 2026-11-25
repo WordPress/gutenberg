@@ -7,21 +7,6 @@ let colorComputationNode: HTMLDivElement;
 extend( [ namesPlugin ] );
 
 /**
- * Generating a CSS compliant rgba() color value.
- *
- * @param hexValue The hex value to convert to rgba().
- * @param alpha    The alpha value for opacity.
- * @return The converted rgba() color value.
- *
- * @example
- * rgba( '#000000', 0.5 )
- * // rgba(0, 0, 0, 0.5)
- */
-export function rgba( hexValue = '', alpha = 1 ) {
-	return colord( hexValue ).alpha( alpha ).toRgbString();
-}
-
-/**
  * @return The HTML element for color computation.
  */
 function getColorComputationNode() {

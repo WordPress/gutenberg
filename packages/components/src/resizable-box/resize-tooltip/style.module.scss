@@ -29,7 +29,7 @@
 	position: relative;
 }
 
-// Match the previous Emotion `&&&` specificity so label styles continue to
+// Preserve the established specificity so label styles continue to
 // override Text / consumer typography.
 .label-text.label-text.label-text {
 	color: $components-color-foreground-inverted;

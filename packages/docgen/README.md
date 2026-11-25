@@ -41,11 +41,11 @@ This command will generate a file named `entry-point-api.md` containing all the 
 - **--use-token** `(String)`: This options allows you to customize the string between the tokens. For example, `--use-token my-api` will look up for the start token <code>&lt;!-- START TOKEN(my-api) --&gt;</code> and the end token <code>&lt;!-- END TOKEN(my-api) --&gt;</code>. Depends on `--to-token`.
 - **--debug**: Run in debug mode, which outputs some intermediate files useful for debugging.
 
-### Babel Configuration
+### Supported syntax
 
-`@wordpress/docgen` follows the default [project-wide configuration of Babel](https://babeljs.io/docs/en/next/config-files#project-wide-configuration). Like Babel, it will automatically search for a `babel.config.json` file, or an equivalent one using the [supported extensions](https://babeljs.io/docs/en/next/config-files#supported-file-extensions), in the project root directory.
+`@wordpress/docgen` supports JavaScript, JSX, and TypeScript without configuration. TypeScript parsing follows the `.ts`, `.tsx`, `.mts`, and `.cts` file extensions. JSX is supported in JavaScript and `.tsx` files.
 
-JSX and TypeScript are supported without a Babel configuration. TypeScript parsing follows the `.ts`, `.tsx`, `.mts`, and `.cts` file extensions. Use a Babel configuration for other syntax extensions.
+Project Babel configuration is not loaded. Custom Babel parser plugins are not supported. Convert sources that require them, such as Flow, to JavaScript or TypeScript before generating documentation.
 
 ## Examples
 

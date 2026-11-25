@@ -80,7 +80,8 @@ function PostURLToggle( { isOpen, onClick } ) {
 			slug: select( editorStore ).getEditedPostSlug(),
 		};
 	}, [] );
-	const decodedSlug = safeDecodeURIComponent( slug );
+	// A draft without a slug or a title has no slug yet.
+	const decodedSlug = safeDecodeURIComponent( slug ) || __( 'None' );
 	return (
 		<Button
 			size="compact"

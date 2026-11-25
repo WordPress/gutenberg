@@ -6,7 +6,7 @@ import {
 	getEvaluate,
 	type DirectiveEntry,
 } from '../hooks';
-import { warn, kebabToCamelCase } from '../utils';
+import { warn, kebabToCamelCase, getOwnProperty } from '../utils';
 import { getScope } from '../scopes';
 import { proxifyContext, proxifyState } from '../proxies';
 import { PENDING_GETTER } from '../proxies/state';
@@ -36,13 +36,16 @@ const evaluateItemKey = (
 ) => {
 	// Construct a client context with the item. Note that accessing the item
 	// prop is not reactive, as this simulated context is not proxified.
-	const clientContextWithItem = {
-		...inheritedValue.client,
-		[ namespace ]: {
-			...inheritedValue.client[ namespace ],
-			[ itemProp ]: item,
-		},
-	};
+	const clientContextWithItem = Object.assign(
+		Object.create( null ),
+		inheritedValue.client,
+		{
+			[ namespace ]: {
+				...getOwnProperty( inheritedValue.client, namespace ),
+				[ itemProp ]: item,
+			},
+		}
+	);
 
 	// Scope must contain the client and the server contexts.
 	const scope = {
@@ -96,7 +99,7 @@ const useItemContexts = function* (
 						// value is set in the `wp-each` directive later on.
 						[ itemProp ]: undefined,
 					} ),
-					inheritedValue.client[ namespace ]
+					getOwnProperty( inheritedValue.client, namespace )
 				)
 			);
 		}
@@ -170,11 +173,15 @@ directive(
 
 		for ( const [ item, itemContext, key ] of itemContexts ) {
 			const mergedContext = {
-				client: {
-					...inheritedValue.client,
-					[ namespace ]: itemContext,
-				},
-				server: { ...inheritedValue.server },
+				client: Object.assign(
+					Object.create( null ),
+					inheritedValue.client,
+					{ [ namespace ]: itemContext }
+				),
+				server: Object.assign(
+					Object.create( null ),
+					inheritedValue.server
+				),
 			};
 
 			// Sets the item after proxifying the context.

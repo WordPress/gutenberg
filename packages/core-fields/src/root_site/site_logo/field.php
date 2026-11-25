@@ -8,7 +8,7 @@
 
 return array(
 	'type'        => 'media',
-	'label'       => __( 'Site Logo', 'gutenberg' ),
-	'description' => __( "Displays in your site's layout via the Site Logo block.", 'gutenberg' ),
-	'placeholder' => __( 'Choose logo', 'gutenberg' ),
+	'label'       => __( 'Site Logo' ),
+	'description' => __( "Displays in your site's layout via the Site Logo block." ),
+	'placeholder' => __( 'Choose logo' ),
 );

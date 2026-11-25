@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';

@@ -119,11 +119,11 @@ test.describe( 'Push to Global Styles button', () => {
 			page.getByRole( 'button', { name: 'Apply globally' } )
 		).toBeDisabled();
 
-		// Navigate to Styles -> Blocks -> Heading -> Typography.
+		// Navigate to Styles -> Blocks & Elements -> Heading -> Typography.
 		await page
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
-		await page.getByRole( 'button', { name: 'Blocks' } ).click();
+		await page.getByRole( 'button', { name: 'Blocks & Elements' } ).click();
 		await settingsPanel
 			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();

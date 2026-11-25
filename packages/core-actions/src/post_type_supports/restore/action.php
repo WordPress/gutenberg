@@ -8,7 +8,7 @@
  */
 
 return array(
-	'label'        => __( 'Restore', 'gutenberg' ),
+	'label'        => __( 'Restore' ),
 	'isPrimary'    => true,
 	'supportsBulk' => true,
 );

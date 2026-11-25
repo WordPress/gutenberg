@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 28.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `use-recommended-components`: Recommend the WordPress UI select controls instead of legacy `SelectControl` and `CustomSelectControl` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
+-   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui` ([#86352](https://github.com/WordPress/gutenberg/pull/86352)).
+-   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 28.1.0 (2026-11-04)
+
+### Enhancements
+
+-   `use-recommended-components`: Flag `CustomGradientPicker` from `@wordpress/components` in favor of `GradientPicker` with `clearable={ false }` ([#85953](https://github.com/WordPress/gutenberg/pull/85953)).
+-   `use-recommended-components`: Recommend `getWpCompatOverlaySlot` from `@wordpress/ui` ([#85835](https://github.com/WordPress/gutenberg/pull/85835)).
+-   `use-recommended-components`: Link directly to Storybook migration guides in lint messages ([#85752](https://github.com/WordPress/gutenberg/pull/85752)).
+-   `use-recommended-components`: Link to the `ProgressBar` migration guide in lint messages and rule documentation ([#85520](https://github.com/WordPress/gutenberg/pull/85520)).
+-   `use-recommended-components`: Update the deprecation message for `TabbableContainer` to mention the `useConstrainedTabbing` hook from `@wordpress/compose` ([#85521](https://github.com/WordPress/gutenberg/pull/85521)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+
+## 28.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -15,6 +51,10 @@
 ### Bug Fixes
 
 -   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
+
+### Internal
+
+-   Remove the unused `@eslint-community/eslint-plugin-eslint-comments` dependency ([#85102](https://github.com/WordPress/gutenberg/pull/85102)).
 
 ## 27.1.0 (2026-10-07)
 

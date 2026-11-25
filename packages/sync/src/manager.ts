@@ -7,6 +7,7 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 import { logPerformanceTiming, passThru } from './performance';
+import { createDeferredUpdateQueue } from './deferred-updates';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -46,6 +47,11 @@ interface CollectionState {
 
 interface EntityState {
 	awareness?: Awareness;
+	/**
+	 * Whether local updates can wait in the queue. This is safe only when every
+	 * provider applies the queue before it applies a remote update.
+	 */
+	canDeferUpdates: boolean;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
@@ -80,6 +86,12 @@ export function createSyncManager( debug = false ): SyncManager {
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
+	// Local updates that are kept off the typing hot path (#79964).
+	const deferredUpdates = createDeferredUpdateQueue(
+		( { objectType, objectId, changes, origin, options } ) =>
+			updateCRDTDoc( objectType, objectId, changes, origin, options )
+	);
+
 	/**
 	 * The undo history of the loaded entities. Each entity has its own undo
 	 * manager, in which Yjs tracks the changes to its document, so core-data
@@ -91,7 +103,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 */
 	const undoManager: SyncUndoManager = {
 		undo( objectType: ObjectType, objectId: ObjectID ): boolean {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 
 			// An unloaded entity has no undo manager, so its levels move
 			// nothing.
@@ -103,7 +115,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 
 		redo( objectType: ObjectType, objectId: ObjectID ): boolean {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 
 			const entityState = entityStates.get(
 				getEntityId( objectType, objectId )
@@ -125,14 +137,14 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 
 		stopCapturing(): void {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			entityStates.forEach( ( entityState ) =>
 				entityState.undoManager.stopCapturing()
 			);
 		},
 
 		clearRedo(): void {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			entityStates.forEach( ( entityState ) =>
 				entityState.undoManager.clearRedo()
 			);
@@ -308,6 +320,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		const entityState: EntityState = {
 			awareness,
+			canDeferUpdates: false,
 			handlers,
 			objectId,
 			objectType,
@@ -328,6 +341,7 @@ export function createSyncManager( debug = false ): SyncManager {
 					objectId,
 					ydoc,
 					awareness,
+					flushLocalUpdates: deferredUpdates.flush,
 					Y,
 				} );
 
@@ -347,6 +361,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
+		entityState.canDeferUpdates = providerResults.every(
+			( result ) => true === result.supportsDeferredUpdates
+		);
+
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
@@ -360,6 +378,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
+
 		hasObserversAttached = true;
 	}
 
@@ -468,6 +487,7 @@ export function createSyncManager( debug = false ): SyncManager {
 					objectType,
 					objectId: null,
 					ydoc,
+					flushLocalUpdates: deferredUpdates.flush,
 					Y,
 				} );
 
@@ -722,50 +742,13 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 	}
 
-	/*
-	 * Local updates deferred off the typing hot path (#79964). They are held
-	 * in a queue, rather than closed over in their timeouts, so that reads of
-	 * the document (snapshots, persistence) can flush them synchronously
-	 * instead of waiting out the scheduled timeout.
-	 */
-	const pendingCRDTDocUpdates: Array< Parameters< typeof updateCRDTDoc > > =
-		[];
-	let isFlushingCRDTDocUpdates = false;
-
-	function flushPendingCRDTDocUpdates(): void {
-		// Applying an update can ask for a flush itself (closing an undo
-		// level flushes first). The updates already queued keep their order
-		// by letting the outer flush finish them.
-		if ( isFlushingCRDTDocUpdates ) {
-			return;
-		}
-
-		isFlushingCRDTDocUpdates = true;
-
-		try {
-			while ( pendingCRDTDocUpdates.length > 0 ) {
-				const args = pendingCRDTDocUpdates.shift();
-
-				if ( args ) {
-					updateCRDTDoc( ...args );
-				}
-			}
-		} finally {
-			isFlushingCRDTDocUpdates = false;
-		}
-	}
-
-	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
-	function deferUpdateCRDTDoc(
-		...args: Parameters< typeof updateCRDTDoc >
-	): void {
-		pendingCRDTDocUpdates.push( args );
-		setTimeout( flushPendingCRDTDocUpdates, 0 );
-	}
-
 	// Apply local changes to the CRDT doc, synchronously when a remote peer is
 	// present so the change lands before a remote update can race it (#78756),
 	// otherwise deferred off the typing hot path (#79964).
+	//
+	// A remote update can still arrive while a local update is deferred, for
+	// example after a dropped connection. Deferring is safe only when every
+	// provider calls `flushLocalUpdates` before it applies a remote update.
 	function updateOrDefer(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
@@ -773,19 +756,30 @@ export function createSyncManager( debug = false ): SyncManager {
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
 	): void {
+		const entityState = entityStates.get(
+			getEntityId( objectType, objectId )
+		);
+
 		// `getStates()` counts the local client, so > 1 means a remote peer.
 		const hasRemotePeers =
-			( getAwareness( objectType, objectId )?.getStates().size ?? 0 ) > 1;
+			( entityState?.awareness?.getStates().size ?? 0 ) > 1;
+		const canDefer = entityState?.canDeferUpdates ?? true;
 
-		if ( hasRemotePeers ) {
+		if ( hasRemotePeers || ! canDefer ) {
 			// Apply any updates queued while editing alone first, so changes
 			// are never applied out of order.
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			updateCRDTDoc( objectType, objectId, changes, origin, options );
 			return;
 		}
 
-		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );
+		deferredUpdates.defer( {
+			objectType,
+			objectId,
+			changes,
+			origin,
+			options,
+		} );
 	}
 
 	/**
@@ -814,7 +808,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Apply deferred updates so the snapshot reflects every change issued
 		// before it, including changes made in the same tick.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return encodeDocSnapshot( entityState.ydoc );
 	}
@@ -845,7 +839,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Compare against the settled document, with no deferred updates
 		// pending.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return docContainsSnapshot( entityState.ydoc, encodedSnapshot );
 	}
@@ -909,7 +903,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Local updates may be deferred when editing alone. Apply them so
 		// they are included in the serialized document.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}

@@ -3,6 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
+import '@wordpress/theme/design-tokens.css';
 import SearchControl from '..';
 
 function ControlledSearchControl( {

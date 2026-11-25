@@ -1,6 +1,6 @@
 import {
 	createSlotFill,
-	Popover,
+	Popover as WCPopover,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { useState, useLayoutEffect } from '@wordpress/element';
@@ -96,7 +96,7 @@ export function ListViewContentPopover( {
 	// is set opening a nest popover triggers the `onFocusOutside` of this popover and closes it.
 	// Is there a solution that has no trade-offs?
 	return (
-		<Popover
+		<WCPopover
 			{ ...( popoverProps ?? {} ) }
 			className="block-editor-inspector-list-view-content-popover"
 			anchor={ anchorElement }
@@ -105,6 +105,6 @@ export function ListViewContentPopover( {
 			<div style={ { width: '280px' } }>
 				<Slot />
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

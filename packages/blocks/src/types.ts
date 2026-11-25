@@ -212,6 +212,7 @@ export interface BlockAttribute {
 	role?: string;
 	__experimentalRole?: string;
 	query?: Record< string, BlockAttribute >;
+	items?: BlockAttribute;
 	enum?: unknown[];
 	multiline?: string;
 	__unstablePreserveWhiteSpace?: boolean;
@@ -302,6 +303,18 @@ export interface BlockFilesTransform extends BlockTransformBase {
 		files: File[],
 		onChange?: ( id: string, attributes: Record< string, unknown > ) => void
 	) => Block | Block[];
+}
+
+/**
+ * A transform triggered by typing text that matches a pattern.
+ */
+export interface BlockInputTransform extends BlockTransformBase {
+	type: 'input';
+	/**
+	 * The pattern the whole text has to match for the transform to apply.
+	 */
+	regExp: RegExp;
+	transform: () => Block | Block[];
 }
 
 /**
@@ -419,6 +432,7 @@ export type BlockTransform<
 	| BlockBlockTransform< Attributes >
 	| BlockEnterTransform
 	| BlockFilesTransform
+	| BlockInputTransform
 	| BlockPrefixTransform
 	| BlockRawTransform
 	| BlockShortcodeTransform;
@@ -1520,6 +1534,29 @@ export interface BlockEditProps<
 	 * Context values inherited from ancestor blocks.
 	 */
 	context: Record< string, unknown >;
+	/**
+	 * Inserts blocks after this block. Undefined when the block is locked
+	 * against insertion.
+	 */
+	insertBlocksAfter?: ( blocks: Block | Block[] ) => void;
+	/**
+	 * Merges this block with the previous block, or the next block if
+	 * `forward` is true. Undefined when the block cannot be removed.
+	 */
+	mergeBlocks?: ( forward: boolean ) => void;
+	/**
+	 * Replaces this block, selecting the block at `indexToSelect`.
+	 * Undefined when the block cannot be removed.
+	 */
+	onReplace?: (
+		blocks: Block | Block[],
+		indexToSelect?: number | null,
+		initialPosition?: 0 | -1 | null
+	) => void;
+	/**
+	 * Removes this block. Undefined when the block cannot be removed.
+	 */
+	onRemove?: () => void;
 }
 
 /**

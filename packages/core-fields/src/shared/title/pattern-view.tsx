@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { Icon, lockSmall } from '@wordpress/icons';
+import { Icon, lock } from '@wordpress/icons';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 import { BaseTitleView } from './view';
 import styles from './style.module.css';
@@ -31,7 +31,7 @@ export default function PatternTitleView( {
 					<VisuallyHidden>{ lockMessage }</VisuallyHidden>
 					<Tooltip.Root>
 						<Tooltip.Trigger
-							render={ <Icon icon={ lockSmall } size={ 24 } /> }
+							render={ <Icon icon={ lock } size={ 24 } /> }
 						/>
 						<Tooltip.Popup>{ lockMessage }</Tooltip.Popup>
 					</Tooltip.Root>

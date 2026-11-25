@@ -1,11 +1,18 @@
 import clsx from 'clsx';
 import { Spinner as WCSpinner } from '@wordpress/components';
+import { useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
+import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
-import { hasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import {
+	BulkActionToolbar,
+	hasAPossibleBulkAction,
+	useSomeItemHasAPossibleBulkAction,
+} from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -24,6 +31,14 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
+	const selectionCheckboxRef = useRef< HTMLSpanElement >( null );
+	// The toolbar keeps its selection checkbox but removes the controls
+	// that act on the selection, so move focus to the checkbox when an
+	// interaction in the toolbar removes them.
+	const focusAfterToggle = useBulkActionsFocus( {
+		isShown: selection.length > 0 || isActionInProgress,
+	} );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -47,7 +62,8 @@ function ViewGrid< Item >( {
 		selectionMode: 'multi',
 		shouldSelectOnClick: false,
 	} );
-	if ( ! hasData ) {
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -77,6 +93,20 @@ function ViewGrid< Item >( {
 	};
 	return (
 		<>
+			{ ( hasBulkActions || isActionInProgress ) && (
+				<div
+					className="dataviews-view-grid__bulk-actions-header"
+					inert={ inertValue( !! isLoading ) }
+				>
+					<BulkActionToolbar
+						selectionCheckboxRef={ selectionCheckboxRef }
+						onActionInProgressChange={ setIsActionInProgress }
+						onClearSelection={ () =>
+							focusAfterToggle( selectionCheckboxRef )
+						}
+					/>
+				</div>
+			) }
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (

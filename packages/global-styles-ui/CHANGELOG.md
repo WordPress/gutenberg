@@ -2,18 +2,54 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show the Transform panel on block screens for blocks that support a rotation ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
+## 2.2.0 (2026-11-18)
+
+### Enhancements
+
+-   Add TypeScript declarations for package consumers ([#86354](https://github.com/WordPress/gutenberg/pull/86354)).
+-   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
+
+### Bug Fixes
+
+-   Font Library: Announce the number of fonts found to screen readers when searching or filtering a font collection ([#86856](https://github.com/WordPress/gutenberg/pull/86856)).
+-   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
+-   Font size presets: Keep a preset's `size` in sync with `fluid.max` when the Maximum is edited with custom fluid values on ([#86277](https://github.com/WordPress/gutenberg/pull/86277)).
+-   Font Library: Ignore leading and trailing spaces in the font search ([#76871](https://github.com/WordPress/gutenberg/pull/76871)).
+
+## 2.1.0 (2026-11-04)
+
+### Enhancements
+
+-   Element screens: add an "Overridden by" list of the block types whose own styles override the element, linking to each block's screen ([#84671](https://github.com/WordPress/gutenberg/pull/84671)).
+-   Show icons for elements in the Blocks & Elements list, and rename Input, Select and Button (element) to Form input, Form select and Form button ([#85363](https://github.com/WordPress/gutenberg/pull/85363)).
+
+## 2.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Enhancements
 
+-   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Show the selected state, such as hover, in the link and button element previews. For the states only links match, such as visited, the button sample is a link, like a Button block on the site ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
 -   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
 
 ### Bug Fixes
 
 -   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+
+### Internal
+
+-   Remove unused color preview, variation hook wrapper, and back-navigation wrapper ([#85093](https://github.com/WordPress/gutenberg/pull/85093)).
 
 ## 1.24.0 (2026-10-07)
 

@@ -75,10 +75,18 @@ export interface ColorGradientSetting extends ColorGradientControlProps {
 }
 
 /**
- * Props of `ColorGradientSettingsDropdown`.
+ * Props of `ColorGradientSettingsDropdown`. Each item sets its own class name,
+ * reset filter and content.
  */
 export interface ColorGradientSettingsDropdownProps
-	extends ColorGradientOptions, Partial< ToolsPanelItemProps > {
+	extends
+		ColorGradientOptions,
+		Partial<
+			Omit<
+				ToolsPanelItemProps,
+				'className' | 'resetAllFilter' | 'children'
+			>
+		> {
 	settings: ColorGradientSetting[];
 }
 

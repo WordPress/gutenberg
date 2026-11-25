@@ -36,9 +36,3 @@ export const ICONS = {
 };
 
 export const MIN_BORDER_RADIUS_VALUE = 0;
-
-export const MAX_BORDER_RADIUS_VALUES = {
-	px: 100,
-	em: 20,
-	rem: 20,
-};

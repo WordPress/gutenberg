@@ -2,7 +2,8 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
-import styles from './style.module.css';
+import { getItemPopupWidthClassName } from '../utils/css/item-popup';
+import styles from './style.module.scss';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { useMenuContext } from './context';
@@ -12,7 +13,7 @@ import type { PopupProps } from './types';
  * Renders the floating menu popup.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
-	{ children, className, portal, positioner, ...props },
+	{ children, className, portal, positioner, width = 'sm', ...props },
 	ref
 ) {
 	const { isSubmenu } = useMenuContext();
@@ -22,6 +23,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 			ref={ ref }
 			className={ clsx(
 				styles.popup,
+				getItemPopupWidthClassName( width ),
 				isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
 				className
 			) }

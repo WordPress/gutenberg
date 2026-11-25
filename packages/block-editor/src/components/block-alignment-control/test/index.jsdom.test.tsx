@@ -2,9 +2,15 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import BlockAlignmentUI from '../ui';
 import { LayoutProvider } from '../../block-list/layout';
 import { BlockEditorProvider } from '../../provider';
+import { BlockEditContextProvider } from '../../block-edit/context';
 import type { Layout } from '../../../layouts/types';
 
 describe( 'BlockAlignmentUI', () => {
@@ -369,6 +375,149 @@ describe( 'BlockAlignmentUI on a theme without layout support', () => {
 		await openMenuWithAlignWide( false );
 
 		expect( menuItems() ).toEqual( [
+			'None',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
+	} );
+} );
+
+describe( 'BlockAlignmentUI constraint', () => {
+	const controls = [ 'left', 'center', 'right', 'wide', 'full' ];
+	const onChange = vi.fn();
+	const onSelect = vi.fn();
+	const constraint = {
+		description: 'Its layout limits widths',
+		action: { label: 'Select Group', onClick: onSelect },
+	};
+
+	afterEach( () => {
+		onChange.mockClear();
+		onSelect.mockClear();
+	} );
+
+	async function openMenu() {
+		const user = userEvent.setup();
+		renderWithTheme(
+			<BlockAlignmentUI
+				onChange={ onChange }
+				controls={ controls }
+				constraint={ constraint }
+			/>
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+		return user;
+	}
+
+	test( 'explains the constraint as the action description', async () => {
+		await openMenu();
+
+		// Hung off the item rather than a group heading, so it reads as one
+		// thing with the action that resolves it.
+		expect(
+			screen.getByRole( 'menuitem', { name: /Select Group/ } )
+		).toHaveTextContent( constraint.description );
+	} );
+
+	test( 'offers the action as a command, not an alignment choice', async () => {
+		await openMenu();
+
+		// `menuitem`, not `menuitemradio`, so it is not announced as an
+		// alignment option alongside the real ones.
+		expect(
+			screen.getByRole( 'menuitem', { name: /Select Group/ } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'menuitemradio', { name: /Select Group/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	test( 'runs the action without changing the alignment', async () => {
+		const user = await openMenu();
+
+		await user.click(
+			screen.getByRole( 'menuitem', { name: /Select Group/ } )
+		);
+
+		expect( onSelect ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'BlockAlignmentUI under a parent with an uneditable layout', () => {
+	const controls = [ 'left', 'center', 'right', 'wide', 'full' ];
+
+	afterEach( () => {
+		unregisterBlockType( 'test/locked-parent' );
+		unregisterBlockType( 'test/child' );
+	} );
+
+	async function menuItemsFor( layoutSupport?: Record< string, unknown > ) {
+		registerBlockType( 'test/locked-parent', {
+			title: 'Locked parent',
+			apiVersion: 3,
+			attributes: {},
+			category: 'text',
+			supports: layoutSupport ? { layout: layoutSupport } : {},
+		} );
+		registerBlockType( 'test/child', {
+			title: 'Child',
+			apiVersion: 3,
+			attributes: {},
+			category: 'text',
+		} );
+		const child = createBlock( 'test/child' );
+		const parent = createBlock( 'test/locked-parent', {}, [ child ] );
+		const user = userEvent.setup();
+		render(
+			<BlockEditorProvider
+				value={ [ parent ] }
+				settings={ {
+					__experimentalFeatures: { layout: THEME_LAYOUT },
+				} }
+			>
+				<BlockEditContextProvider
+					value={ {
+						name: 'test/child',
+						isSelected: false,
+						clientId: child.clientId,
+					} }
+				>
+					<BlockAlignmentUI
+						onChange={ vi.fn() }
+						controls={ controls }
+					/>
+				</BlockEditContextProvider>
+			</BlockEditorProvider>
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Align block' } )
+		);
+		return screen
+			.getAllByRole( 'menuitemradio' )
+			.map( ( item ) => item.textContent );
+	}
+
+	test( 'lists unavailable alignments while the layout is editable', async () => {
+		expect( await menuItemsFor( { allowEditing: true } ) ).toContain(
+			'Wide widthNot available'
+		);
+	} );
+
+	test( 'omits unavailable alignments when the parent has no layout support', async () => {
+		expect( await menuItemsFor( undefined ) ).toEqual( [
+			'None',
+			'Align left',
+			'Align center',
+			'Align right',
+		] );
+	} );
+
+	test( 'omits unavailable alignments when the layout is not editable', async () => {
+		expect( await menuItemsFor( { allowEditing: false } ) ).toEqual( [
 			'None',
 			'Align left',
 			'Align center',

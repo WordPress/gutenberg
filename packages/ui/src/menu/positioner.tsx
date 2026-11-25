@@ -4,7 +4,7 @@ import { forwardRef, useCallback, useRef, useState } from '@wordpress/element';
 import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
 import { ITEM_POPUP_POSITIONER_PROPS } from '../form/primitives/constants';
 import resetStyles from '../utils/css/resets.module.css';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import { useMenuContext } from './context';
 import type { PositionerProps } from './types';
 

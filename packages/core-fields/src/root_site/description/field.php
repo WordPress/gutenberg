@@ -8,6 +8,6 @@
 
 return array(
 	'type'        => 'text',
-	'label'       => __( 'Site Tagline', 'gutenberg' ),
-	'description' => __( "In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block.", 'gutenberg' ),
+	'label'       => __( 'Site Tagline' ),
+	'description' => __( "In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block." ),
 );

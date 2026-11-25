@@ -14,7 +14,7 @@
 		{ "path": "../../packages/components/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/primitives" },
+		{ "path": "../../packages/primitives/tsconfig.build.json" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	],

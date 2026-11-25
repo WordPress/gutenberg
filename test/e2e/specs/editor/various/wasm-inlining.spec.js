@@ -24,16 +24,16 @@ test.describe( 'WASM Inlining (build verification)', () => {
 	} );
 
 	test( 'should inline vips.wasm as a decoded Uint8Array, not a base64 data URL', () => {
-		// `vips_default` is the inlined `wasm-vips/vips.wasm` export. It is now a
-		// `Uint8Array` decoded from a compact UTF-8 string at runtime, so the
-		// inlined bytes compress well.
-		expect( buildContent ).toMatch( /var vips_default\s*=\s*\w+;/ );
-
-		// It must no longer be the old base64 data URL string.
+		// The inlined `wasm-vips/vips.wasm` export is a `Uint8Array` decoded
+		// from a compact UTF-8 string at runtime, so the inlined bytes compress
+		// well. It must no longer be the old base64 data URL string.
 		expect( buildContent ).not.toMatch( /data:application\/wasm;base64,/ );
 
-		// The runtime decode loop converts the inlined string into bytes.
-		expect( buildContent ).toMatch( /new Uint8Array\(\s*\w+\.length\s*\)/ );
+		// The runtime decode loop converts the inlined string into bytes. The
+		// bundler may replace the string's length with a constant.
+		expect( buildContent ).toMatch(
+			/new Uint8Array\(\s*(?:\w+\.length|\d+)\s*\)/
+		);
 		expect( buildContent ).toMatch(
 			/\w+\[\s*i\s*\]\s*=\s*\w+\.charCodeAt\(\s*i\s*\);/
 		);

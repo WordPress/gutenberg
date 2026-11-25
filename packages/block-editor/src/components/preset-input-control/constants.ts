@@ -31,4 +31,10 @@ export const CUSTOM_VALUE_SETTINGS: CustomValueSettings = {
 	svmax: { max: 100, steps: 1 },
 	lvmax: { max: 100, steps: 1 },
 	dvmax: { max: 100, steps: 1 },
+	cqw: { max: 100, steps: 1 },
+	cqh: { max: 100, steps: 1 },
+	cqi: { max: 100, steps: 1 },
+	cqb: { max: 100, steps: 1 },
+	cqmin: { max: 100, steps: 1 },
+	cqmax: { max: 100, steps: 1 },
 };

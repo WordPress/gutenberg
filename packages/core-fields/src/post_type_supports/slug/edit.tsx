@@ -1,15 +1,14 @@
 import { Button } from '@wordpress/components';
-import { copySmall } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithSlug } from './types';
-import { getSlug } from './utils';
 import styles from './style.module.css';
 
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
@@ -17,8 +16,7 @@ const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 /*
  * The slug control, laid out with `Stack` and built with `InputControl`, `InputLayout`, and `Link` from
  * `@wordpress/ui`, as `use-recommended-components` asks, and styled with a
- * CSS module. It keeps the first slug in state rather than in a ref read
- * during render.
+ * CSS module.
  */
 const SlugEdit = ( {
 	field,
@@ -34,7 +32,14 @@ const SlugEdit = ( {
 } ) => {
 	const { id } = field;
 
-	const slug = field.getValue( { item: data } ) || getSlug( data );
+	// Decoded, and falls back to the slug derived from the title, as the
+	// classic PostURL panel does.
+	const value = field.getValue( { item: data } ) ?? '';
+	// An empty slug falls back to the one derived from the title, which would
+	// refill the field. Keep it empty while the user types.
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+	const slugOnFocusRef = useRef< string | undefined >( undefined );
+	const slug = forceEmptyField ? '' : value;
 	const permalinkTemplate = data.permalink_template || '';
 	const [ permalinkPrefix, permalinkSuffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX
@@ -43,19 +48,20 @@ const SlugEdit = ( {
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( permalinkTemplate ) &&
 		hasActionLink( data, 'wp:action-publish' );
-	// The slug the post had first, shown and restored while the slug is
-	// emptied.
-	const [ originalSlug ] = useState( slug );
-	const slugToDisplay = slug || originalSlug;
-	const permalink = isEditable
-		? `${ permalinkPrefix }${ slugToDisplay }${ permalinkSuffix }`
-		: safeDecodeURIComponent( data.link || '' );
+	// A post without a slug or a title has no pretty permalink yet, so use its
+	// plain one (`?p=ID`).
+	const permalink =
+		isEditable && slug
+			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
+			: safeDecodeURIComponent( data.link || '' );
 
 	const onChangeControl = useCallback(
-		( newValue?: string ) =>
+		( newValue?: string ) => {
 			onChange( {
 				[ id ]: newValue,
-			} ),
+			} );
+			setForceEmptyField( ! newValue );
+		},
 		[ id, onChange ]
 	);
 
@@ -94,7 +100,7 @@ const SlugEdit = ( {
 							<InputLayout.Slot padding="minimal">
 								<Button
 									size="small"
-									icon={ copySmall }
+									icon={ copy }
 									ref={ copyButtonRef }
 									label={ __( 'Copy' ) }
 								/>
@@ -109,10 +115,24 @@ const SlugEdit = ( {
 						onValueChange={ ( newValue ) => {
 							onChangeControl( newValue );
 						} }
-						onBlur={ () => {
-							if ( slug === '' ) {
-								onChangeControl( originalSlug );
+						onFocus={ ( event ) => {
+							slugOnFocusRef.current = event.target.value;
+						} }
+						onBlur={ ( event ) => {
+							// Only clean a slug the user changed. An untouched
+							// slug came from the server, and cleaning it would
+							// strip characters `sanitize_title` kept, such as
+							// emoji. Without a slug the field shows the one
+							// derived from the title, and saving it would stop
+							// the slug from following the title.
+							if (
+								event.target.value !== slugOnFocusRef.current
+							) {
+								onChange( {
+									[ id ]: cleanForSlug( event.target.value ),
+								} );
 							}
+							setForceEmptyField( false );
 						} }
 						aria-describedby={ postUrlSlugDescriptionId }
 					/>
@@ -123,11 +143,17 @@ const SlugEdit = ( {
 							href={ permalink }
 							openInNewTab
 						>
-							<span>{ permalinkPrefix }</span>
-							<span className={ styles[ 'help-slug' ] }>
-								{ slugToDisplay }
-							</span>
-							<span>{ permalinkSuffix }</span>
+							{ slug ? (
+								<>
+									<span>{ permalinkPrefix }</span>
+									<span className={ styles[ 'help-slug' ] }>
+										{ slug }
+									</span>
+									<span>{ permalinkSuffix }</span>
+								</>
+							) : (
+								permalink
+							) }
 						</Link>
 					</div>
 				</Stack>

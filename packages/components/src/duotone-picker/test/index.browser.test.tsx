@@ -356,4 +356,191 @@ describe( 'DuotonePicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 	} );
+
+	describe( 'unset option', () => {
+		const DUOTONES = [ { name: 'A', slug: 'a', colors: COLORS_A } ];
+
+		it( 'should call onChange with "unset" when the unset option is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'option', { name: 'Unset' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( 'unset' );
+		} );
+
+		it( 'should call onChange with undefined when the selected unset option is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value="unset"
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'option', { name: 'Unset' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+
+		it( 'should not render the unset option when the `unsetable` prop is false', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					onChange={ vi.fn() }
+					unsetable={ false }
+					disableCustomDuotone
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'option', { name: 'Unset' } )
+			).not.toBeInTheDocument();
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 1 );
+		} );
+	} );
+
+	describe( 'clear button', () => {
+		it( 'should call onChange with undefined when clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+
+		it( 'should be disabled when there is no value', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					onChange={ vi.fn() }
+					disableCustomDuotone
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Clear' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should not render when the `clearable` prop is false', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ vi.fn() }
+					clearable={ false }
+					disableCustomDuotone
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Clear' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'custom duotone controls', () => {
+		const getControlPoints = () =>
+			screen.queryAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+
+		it( 'should render the custom duotone bar and color pickers by default', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect( getControlPoints() ).toHaveLength( 2 );
+			expect(
+				screen.getByRole( 'button', { name: 'Shadows' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Highlights' } )
+			).toBeVisible();
+		} );
+
+		it( 'should not render the custom duotone bar or color pickers when the `disableCustomDuotone` prop is true', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ vi.fn() }
+					disableCustomDuotone
+				/>
+			);
+
+			expect( getControlPoints() ).toHaveLength( 0 );
+			expect(
+				screen.queryByRole( 'button', { name: 'Shadows' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Highlights' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render the custom duotone bar but keep the color pickers when the `disableCustomColors` prop is true', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ vi.fn() }
+					disableCustomColors
+				/>
+			);
+
+			expect( getControlPoints() ).toHaveLength( 0 );
+			expect(
+				screen.getByRole( 'button', { name: 'Shadows' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'button', { name: 'Highlights' } )
+			).toBeVisible();
+		} );
+	} );
 } );

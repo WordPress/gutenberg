@@ -13,7 +13,7 @@
 		background: $gray-100;
 		border-radius: $radius-x-small;
 
-		// Preserve the specificity of the previous Emotion component selectors.
+		// Preserve the established specificity for InputControl overrides.
 		:global(
 			.components-input-control__input.components-input-control__input.components-input-control__input.components-input-control__input
 		) {

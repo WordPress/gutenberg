@@ -420,6 +420,11 @@ function gutenberg_send_document_isolation_policy_header(): bool {
 		return false;
 	}
 
+	// Core only loads the media frame pipeline on screens its own function isolated.
+	if ( function_exists( 'wp_send_document_isolation_policy_header' ) ) {
+		return wp_send_document_isolation_policy_header();
+	}
+
 	header( 'Document-Isolation-Policy: isolate-and-credentialless' );
 
 	return true;

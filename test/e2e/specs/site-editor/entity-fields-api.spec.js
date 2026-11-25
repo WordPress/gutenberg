@@ -166,11 +166,11 @@ test.describe( 'Entity fields API', () => {
 
 		// The update makes the field sortable.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'combobox', { name: 'Sort by' } ).click();
 		await expect(
-			page
-				.getByLabel( 'Sort by' )
-				.locator( 'option', { hasText: 'Comments' } )
-		).toHaveCount( 1 );
+			page.getByRole( 'option', { name: 'Comments', exact: true } )
+		).toBeVisible();
+		await page.keyboard.press( 'Escape' );
 		await page.keyboard.press( 'Escape' );
 	} );
 

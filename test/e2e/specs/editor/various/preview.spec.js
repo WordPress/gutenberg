@@ -309,7 +309,7 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

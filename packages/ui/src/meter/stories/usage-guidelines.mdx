@@ -40,6 +40,10 @@ Meter has no indeterminate state. If the measurement is unknown, show that in te
 
 The indicator uses a neutral tone by default. Use `tone="brand"` for a brand-colored indicator. Only the indicator changes color; the track, label, and value keep their own colors.
 
-Tones do not indicate success, warning, or error, and Meter does not change color at thresholds. Provide visible status text when a quantity needs interpretation. Native meter attributes such as `low`, `high`, and `optimum` are not supported.
+Use `success`, `warning`, or `error` to communicate the interpretation of a measurement. Choose the tone using rules appropriate to your application. For example, high password strength can mean success, while high storage usage can mean warning or error. Meter does not choose a tone automatically or change color at thresholds. Native meter attributes such as `low`, `high`, and `optimum` are not supported.
+
+Provide visible status text alongside the color, and include the same information in `getAriaValueText`. A warning color alone does not explain what needs attention.
+
+<Canvas of={ MeterStories.SemanticTones } />
 
 <Canvas of={ MeterStories.Brand } />

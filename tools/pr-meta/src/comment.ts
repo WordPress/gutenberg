@@ -161,7 +161,10 @@ function parseAttributes(
 	const attributes: Pick< ParsedSection, 'sha' | 'runUrl' > = {};
 
 	for ( const pair of raw.trim().split( /\s+/ ).filter( Boolean ) ) {
-		const [ key, value ] = pair.split( '=' );
+		/* Split at the first `=` only: a run link can carry a query string. */
+		const separator = pair.indexOf( '=' );
+		const key = separator < 0 ? pair : pair.slice( 0, separator );
+		const value = separator < 0 ? undefined : pair.slice( separator + 1 );
 		if ( key === 'sha' ) {
 			attributes.sha = safeSha( value );
 		} else if ( key === 'run' ) {

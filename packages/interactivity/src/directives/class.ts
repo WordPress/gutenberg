@@ -18,7 +18,11 @@ directive(
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
-			const currentClass = element.props.class || '';
+			// `data-wp-bind--class` can set a value that isn't a string.
+			const currentClass =
+				typeof element.props.class === 'string'
+					? element.props.class
+					: '';
 			const classFinder = new RegExp(
 				`(^|\\s)${ className }(\\s|$)`,
 				'g'

@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
@@ -11,6 +12,10 @@
 	touch-action: none;
 	width: 100%;
 	min-height: 40px;
+
+	&:where(.is-compact) {
+		min-height: 32px;
+	}
 }
 
 // Private prop values. Reset each instance to prevent inherited values leaking in.
@@ -23,6 +28,11 @@
 	color: var(--_wp-components-range-control-color);
 	height: 30px;
 	min-height: 30px;
+}
+
+// Static tokens do not follow admin color schemes outside a ThemeProvider.
+.default-color {
+	color: $components-color-accent;
 }
 
 .before-icon,
@@ -58,7 +68,7 @@
 	margin-top: 13px;
 	top: 0;
 	border-radius: $radius-full;
-	background: var(--_wp-components-range-control-rail-color);
+	background: var(--_wp-components-range-control-rail-color, var(--wpds-color-background-track-neutral));
 
 	&:where(.is-disabled) {
 		background: $components-color-gray-100;
@@ -182,16 +192,8 @@
 		0 4px 4px rgba(0, 0, 0, 0.01);
 	@include thumb-color;
 
-	&:where(.is-focused)::before {
-		content: " ";
-		position: absolute;
-		background-color: $components-color-accent;
-		opacity: 0.4;
-		border-radius: $radius-round;
-		height: 20px;
-		width: 20px;
-		top: -4px;
-		left: -4px; /* stylelint-disable-line logical-css/require-logical-properties -- Preserve the existing physical offset alongside RTL positioning. */
+	&:where(.is-focused) {
+		@include outset-ring__focus();
 	}
 }
 
@@ -260,11 +262,6 @@
 	:where(.root.is-rtl) & {
 		margin-right: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
 	}
-
-	@at-root input[type="number"]#{&} {
-		height: 30px;
-		min-height: 30px;
-	}
 }
 .action-right {
 	display: block;
@@ -305,8 +302,5 @@
 		&:where(.is-disabled) {
 			background: GrayText;
 		}
-	}
-	.thumb:where(.is-focused)::before {
-		background: GrayText;
 	}
 }

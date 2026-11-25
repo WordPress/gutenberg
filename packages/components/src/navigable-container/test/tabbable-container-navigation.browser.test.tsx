@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { logged } from '@wordpress/deprecated';
 import { TabbableContainer } from '../tabbable';
 import type { TabbableContainerProps } from '../types';
 
@@ -29,6 +30,13 @@ const getTabbableContainerTabbables = () => [
 	screen.getByText( 'Item 3' ),
 	screen.getByRole( 'link', { name: 'Item 4' } ),
 ];
+
+const DEPRECATION_MESSAGE =
+	'wp.components.TabbableContainer is deprecated since version 7.3 and will be removed in version 7.5. Note: For focus trapping, consider the useConstrainedTabbing hook from @wordpress/compose.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 describe( 'TabbableContainer navigation', () => {
 	it( 'moves focus on its tabbable children by using the tab key', async () => {
