@@ -416,7 +416,7 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 } );
 
 // The pan and zoom that `applyImageEdit` works out leave floating-point
-// noise in the read-back, such as a width of 1439.9999999999998 pixels.
+// noise, such as a width of 1439.9999999999998 pixels.
 describe( 'reading an edit back removes floating-point noise', () => {
 	function stateOf( edit: ImageEdit ) {
 		const result = applyImageEdit( makeState(), edit );
