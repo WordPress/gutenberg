@@ -8,21 +8,24 @@ describe( 'post-meta bindings', () => {
 	let context, select, selectReturn;
 
 	beforeAll( () => {
-		const getEditedEntityRecord = ( kind, type, id ) => ( {
-			meta:
-				id === 123
-					? {
-							movie_field: 'Test Movie Value',
-							_protected_field: 'Protected field value',
-						}
-					: {},
-		} );
+		// Like core-data, return `false` for a record that hasn't loaded.
+		const getEditedEntityRecord = ( kind, type, id ) =>
+			id === 123 && {
+				meta: {
+					movie_field: 'Test Movie Value',
+					_protected_field: 'Protected field value',
+				},
+			};
 
 		const getEditorSettings = () => ( {
 			enableCustomFields: false,
 		} );
 
+		const getBlockAttributes = ( clientId ) =>
+			clientId === 'block-1' ? { content: 'Saved content' } : null;
+
 		selectReturn = {
+			getBlockAttributes,
 			getEditedEntityRecord,
 			getEditorSettings,
 		};
@@ -70,9 +73,10 @@ describe( 'post-meta bindings', () => {
 				expect( values.content ).toBe( 'Movie field default value' );
 			} );
 
-			it( 'should fall back to the field label if the meta default value is not defined', () => {
+			it( 'should return the saved content if the meta default value is not defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
+					clientId: 'block-1',
 					context,
 					bindings: {
 						content: {
@@ -81,12 +85,13 @@ describe( 'post-meta bindings', () => {
 					},
 				} );
 
-				expect( values.content ).toBe( 'Field With Label Only' );
+				expect( values.content ).toBe( 'Saved content' );
 			} );
 
-			it( 'should fall back to the field key if the field label is not defined', () => {
+			it( 'should return the saved content if the field label is not defined', () => {
 				const values = postMetaBindings.getValues( {
 					select,
+					clientId: 'block-1',
 					context,
 					bindings: {
 						content: {
@@ -95,9 +100,7 @@ describe( 'post-meta bindings', () => {
 					},
 				} );
 
-				expect( values.content ).toBe(
-					'field_without_label_or_default'
-				);
+				expect( values.content ).toBe( 'Saved content' );
 			} );
 		} );
 
@@ -147,6 +150,21 @@ describe( 'post-meta bindings', () => {
 				} );
 
 				expect( values.content ).toBe( 'Test Movie Value' );
+			} );
+
+			it( 'should return the saved content if the post has not loaded yet', () => {
+				const values = postMetaBindings.getValues( {
+					select,
+					clientId: 'block-1',
+					context: { postType: 'movie', postId: 456 },
+					bindings: {
+						content: {
+							args: { key: 'movie_field' },
+						},
+					},
+				} );
+
+				expect( values.content ).toBe( 'Saved content' );
 			} );
 
 			it( 'should fall back to the key when meta field is not accessible', () => {

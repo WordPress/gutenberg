@@ -1,3 +1,4 @@
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -6,7 +7,7 @@ import { unlock } from '../lock-unlock';
  * Gets a list of post meta fields with their values and labels
  * to be consumed in the needed callbacks.
  * If the value is not available based on context, like in templates,
- * it falls back to the default value, label, or key.
+ * it falls back to the default value, or the block's saved attribute.
  *
  * @param {Object} select  The select function from the data store.
  * @param {Object} context The context provided.
@@ -49,7 +50,7 @@ function getPostMetaFields( select, context ) {
 	return metaFields;
 }
 
-function getValue( { select, context, args } ) {
+function getValue( { select, context, args, clientId, attributeName } ) {
 	const metaFields = getPostMetaFields( select, context );
 	const metaField = metaFields.find(
 		( field ) => field.args.key === args.key
@@ -60,10 +61,15 @@ function getValue( { select, context, args } ) {
 		return args.key;
 	}
 
+	const savedValue =
+		select( blockEditorStore ).getBlockAttributes( clientId )?.[
+			attributeName
+		];
+
 	// Without a postId, we cannot look up a meta value.
 	if ( ! context?.postId ) {
 		// Return the default value for the meta field if available.
-		return metaField.default || metaField.label || args.key;
+		return metaField.default || savedValue;
 	}
 
 	const { getEditedEntityRecord } = select( coreDataStore );
@@ -73,7 +79,7 @@ function getValue( { select, context, args } ) {
 		context?.postId
 	).meta;
 
-	return entityMetaValues?.[ args.key ] ?? metaField?.label ?? args.key;
+	return entityMetaValues?.[ args.key ] ?? savedValue;
 }
 
 /**
@@ -81,13 +87,15 @@ function getValue( { select, context, args } ) {
  */
 export default {
 	name: 'core/post-meta',
-	getValues( { select, context, bindings } ) {
+	getValues( { select, clientId, context, bindings } ) {
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
 			newValues[ attributeName ] = getValue( {
 				select,
 				context,
 				args: binding.args,
+				clientId,
+				attributeName,
 			} );
 		}
 		return newValues;
