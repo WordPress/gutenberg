@@ -80,6 +80,8 @@ describe( 'getDial', () => {
 		{ config: { step: 100 }, last: 300 },
 		// The steps divide the turn only approximately.
 		{ config: { unitsPerTurn: 2.1, step: 0.3 }, last: 1.8 },
+		// A very fine step still leaves out the full turn.
+		{ config: { step: 1e-8 }, last: 359.99999999 },
 		// A step too small to count, or as large as the turn, falls back.
 		{ config: { step: 1e-14 }, last: 359 },
 		{ config: { step: 360 }, last: 359 },
@@ -118,6 +120,44 @@ describe( 'getDial', () => {
 	] )( 'ends at $last for $config', ( { config, last } ) => {
 		const dial = getDial( config );
 		expect( dial.toValue( dial.lastStep ) ).toBe( last );
+	} );
+
+	it( 'reports exactly zero for a step that lands on it, whatever the rounding of the range', () => {
+		const random = createRandom( 7 );
+		const failures: string[] = [];
+		// A decimal range whose lower limit carries rounding error.
+		const noisy = getDial( {
+			min: -3 * 0.1,
+			max: 0.3,
+			step: 0.01,
+			unitsPerTurn: 1,
+		} );
+		if ( ! Object.is( noisy.toValue( noisy.toIndex( 0 ) ), 0 ) ) {
+			failures.push(
+				`-3 * 0.1 to 0.3: ${ noisy.toValue( noisy.toIndex( 0 ) ) }`
+			);
+		}
+		for ( let run = 0; run < 3000; run++ ) {
+			// Whole turns either side of zero, in steps that are an inexact
+			// fraction of a turn. Zero is then a whole number of steps from
+			// the lower limit, but the arithmetic does not land on it.
+			const unitsPerTurn = UNITS[ Math.floor( random() * UNITS.length ) ];
+			const perTurn = 3 + Math.floor( random() * 500 );
+			const turns = 1 + Math.floor( random() * 3 );
+			const dial = getDial( {
+				unitsPerTurn,
+				step: unitsPerTurn / perTurn,
+				min: -turns * unitsPerTurn,
+				max: turns * unitsPerTurn,
+			} );
+			const atZero = dial.toValue( turns * perTurn );
+			if ( ! Object.is( atZero, 0 ) ) {
+				failures.push(
+					`${ unitsPerTurn } per turn in ${ perTurn } steps, ${ turns } turns either way: ${ atZero }`
+				);
+			}
+		}
+		expect( failures ).toEqual( [] );
 	} );
 
 	it( 'never reports negative zero', () => {
@@ -474,9 +514,10 @@ describe( 'turnBetween', () => {
 				}
 			}
 			const turned = position - start;
+			// Written so that a count that is not a number fails too.
 			if (
-				Math.abs( fine - turned ) > 1e-6 ||
-				Math.abs( coarse - turned ) > 1e-6
+				! ( Math.abs( fine - turned ) <= 1e-6 ) ||
+				! ( Math.abs( coarse - turned ) <= 1e-6 )
 			) {
 				failures.push(
 					`from ${ start }: turned ${ turned }, counted ${ fine } and ${ coarse }`

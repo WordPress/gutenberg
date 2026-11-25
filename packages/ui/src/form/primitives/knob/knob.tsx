@@ -35,6 +35,9 @@ type Gesture = {
 	angle: number;
 	// The step the gesture last selected, or null before it selects one.
 	index: number | null;
+	// The angle a press counts its turn from: the value as given, and then
+	// the step the gesture last selected.
+	reference: number;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
@@ -115,6 +118,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			const reached = fromAngle( current.angle );
 			if ( reached !== current.index ) {
 				current.index = reached;
+				current.reference = toAngle( reached );
 				select( reached );
 			}
 		}
@@ -132,14 +136,16 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				// A press on the dot, or in the middle where there is no
 				// heading, takes hold of the dial where it is. A press
 				// anywhere else turns it to that heading.
+				const reference = exactAngle( shownValue );
 				const turnsTo =
 					pointer.heading === null || isOnDot( pointer, angle )
 						? null
-						: press( pointer.heading, exactAngle( shownValue ) );
+						: press( pointer.heading, reference );
 				gesture.current = {
 					pointerId: event.pointerId,
 					...pointer,
 					angle: turnsTo ?? angle,
+					reference,
 					// The press selects its step unless the value is on it
 					// already. An empty dial has no value, and a press on a
 					// heading does not keep a value that lies between steps.
@@ -203,15 +209,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// heading after a press in the middle only starts the count.
 			if ( current.heading !== null ) {
 				current.angle = crossesMiddle( current, pointer )
-					? press(
-							pointer.heading,
-							// Count the turn as a press would: from the step
-							// the gesture last selected, or else from the
-							// value.
-							current.index === null
-								? exactAngle( shownValue )
-								: toAngle( current.index )
-						)
+					? press( pointer.heading, current.reference )
 					: current.angle +
 						turnBetween( current.heading, pointer.heading );
 			}

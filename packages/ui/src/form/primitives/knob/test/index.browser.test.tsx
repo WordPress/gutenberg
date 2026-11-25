@@ -538,6 +538,31 @@ describe( 'Knob', () => {
 		}
 	);
 
+	it( 'counts a move through the middle from a value between steps when the dot was held', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ -720 }
+					max={ 720 }
+					value={ 269.9 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at, right } = getPoints( dial );
+		// Hold the dot at nine o'clock, then go straight across to three.
+		// A press there selects 90, the turn nearer to 269.9.
+		await userEvent.pointer( [
+			{ target: dial, coords: at( 10, 20 ), keys: '[MouseLeft>]' },
+			{ target: dial, coords: right },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 90 );
+	} );
+
 	it( 'selects the same turn after a move through the middle as a press on that heading would', async () => {
 		await render(
 			<ThemeProvider isRoot>
