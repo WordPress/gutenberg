@@ -30,8 +30,10 @@ function TableOfContents(
 					icon={ info }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
-					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Details' ) }
+					label={
+						/* translators: button label text should, if possible, be under 16 characters. */
+						__( 'Details' )
+					}
 					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
 				/>

@@ -20,8 +20,10 @@ function InlineToolbar( {
 		>
 			<NavigableToolbar
 				className="block-editor-rich-text__inline-format-toolbar-group"
-				/* translators: accessibility text for the inline format toolbar */
-				aria-label={ __( 'Format tools' ) }
+				aria-label={
+					/* translators: accessibility text for the inline format toolbar */
+					__( 'Format tools' )
+				}
 			>
 				<ToolbarGroup>
 					<FormatToolbar />

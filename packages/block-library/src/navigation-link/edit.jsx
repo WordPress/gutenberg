@@ -56,24 +56,29 @@ function getMissingText( type ) {
 
 	switch ( type ) {
 		case 'post':
-			/* translators: label for missing post in navigation link block */
-			missingText = __( 'Select post' );
+			missingText =
+				/* translators: label for missing post in navigation link block */
+				__( 'Select post' );
 			break;
 		case 'page':
-			/* translators: label for missing page in navigation link block */
-			missingText = __( 'Select page' );
+			missingText =
+				/* translators: label for missing page in navigation link block */
+				__( 'Select page' );
 			break;
 		case 'category':
-			/* translators: label for missing category in navigation link block */
-			missingText = __( 'Select category' );
+			missingText =
+				/* translators: label for missing category in navigation link block */
+				__( 'Select category' );
 			break;
 		case 'tag':
-			/* translators: label for missing tag in navigation link block */
-			missingText = __( 'Select tag' );
+			missingText =
+				/* translators: label for missing tag in navigation link block */
+				__( 'Select tag' );
 			break;
 		default:
-			/* translators: label for missing values in navigation link block */
-			missingText = __( 'Add link' );
+			missingText =
+				/* translators: label for missing values in navigation link block */
+				__( 'Add link' );
 	}
 
 	return missingText;

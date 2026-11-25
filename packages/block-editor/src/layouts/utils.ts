@@ -112,12 +112,18 @@ export function getAlignmentsInfo( layout: Layout ): AlignmentsInfo {
 		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax|cqw|cqh|cqi|cqb|cqmin|cqmax)?$/i;
 	// `test` reads a missing size as 'undefined', which never matches.
 	if ( sizeRegex.test( contentSize! ) && type === 'constrained' ) {
-		// translators: %s: container size (i.e. 600px etc)
-		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize! );
+		alignmentInfo.none = sprintf(
+			/* translators: %s: container size (i.e. 600px etc) */
+			__( 'Max %s wide' ),
+			contentSize!
+		);
 	}
 	if ( sizeRegex.test( wideSize! ) ) {
-		// translators: %s: container size (i.e. 600px etc)
-		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize! );
+		alignmentInfo.wide = sprintf(
+			/* translators: %s: container size (i.e. 600px etc) */
+			__( 'Max %s wide' ),
+			wideSize!
+		);
 	}
 	return alignmentInfo;
 }

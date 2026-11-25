@@ -82,12 +82,15 @@ function getFormattedDate(
 ): string {
 	let formattedDate: string;
 
-	/* translators: Date format for upcoming events on the dashboard. Include the day of the week. See https://www.php.net/manual/datetime.format.php */
-	const singleDayEvent = __( 'l, M j, Y' );
-	/* translators: Date string for upcoming events. 1: Month, 2: Starting day, 3: Ending day, 4: Year. */
-	const multipleDayEvent = __( '%1$s %2$d–%3$d, %4$d' );
-	/* translators: Date string for upcoming events. 1: Starting month, 2: Starting day, 3: Ending month, 4: Ending day, 5: Ending year. */
-	const multipleMonthEvent = __( '%1$s %2$d – %3$s %4$d, %5$d' );
+	const singleDayEvent =
+		/* translators: Date format for upcoming events on the dashboard. Include the day of the week. See https://www.php.net/manual/datetime.format.php */
+		__( 'l, M j, Y' );
+	const multipleDayEvent =
+		/* translators: Date string for upcoming events. 1: Month, 2: Starting day, 3: Ending day, 4: Year. */
+		__( '%1$s %2$d–%3$d, %4$d' );
+	const multipleMonthEvent =
+		/* translators: Date string for upcoming events. 1: Starting month, 2: Starting day, 3: Ending month, 4: Ending day, 5: Ending year. */
+		__( '%1$s %2$d – %3$s %4$d, %5$d' );
 
 	if (
 		! endDate ||
@@ -275,8 +278,11 @@ export function EventsList( {
 	const locationLabel = location?.trim();
 	const emptyTitle = () => {
 		if ( locationLabel ) {
-			/* translators: %s: selected location label. */
-			return sprintf( __( 'No events near %s' ), locationLabel );
+			return sprintf(
+				/* translators: %s: selected location label. */
+				__( 'No events near %s' ),
+				locationLabel
+			);
 		}
 		return __( 'No events near you' );
 	};

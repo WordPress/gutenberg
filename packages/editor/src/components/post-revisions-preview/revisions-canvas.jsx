@@ -113,14 +113,23 @@ const REVISION_DIFF_STYLES = `
 function getDiffStatusLabel( status, blockTitle ) {
 	switch ( status ) {
 		case 'added':
-			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Added block: %s' ), blockTitle );
+			return sprintf(
+				/* translators: %s: block type name e.g. "Paragraph" */
+				__( 'Added block: %s' ),
+				blockTitle
+			);
 		case 'removed':
-			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Removed block: %s' ), blockTitle );
+			return sprintf(
+				/* translators: %s: block type name e.g. "Paragraph" */
+				__( 'Removed block: %s' ),
+				blockTitle
+			);
 		case 'modified':
-			// translators: %s: block type name e.g. "Paragraph"
-			return sprintf( __( 'Modified block: %s' ), blockTitle );
+			return sprintf(
+				/* translators: %s: block type name e.g. "Paragraph" */
+				__( 'Modified block: %s' ),
+				blockTitle
+			);
 	}
 }
 

@@ -38,8 +38,9 @@ const setAsPostsPage: ActionScriptParts< BasePost > = {
 		);
 	},
 	RenderModal: ( { items, closeModal } ) => {
-		// translators: Button label to confirm setting the specified page as the posts page.
-		const submitLabel = __( 'Set posts page' );
+		const submitLabel =
+			/* translators: Button label to confirm setting the specified page as the posts page. */
+			__( 'Set posts page' );
 
 		return (
 			<SetSitePageModal

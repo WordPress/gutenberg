@@ -63,8 +63,9 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 
 	const isWideViewport = useViewportMatch( 'wide' );
 
-	/* translators: accessibility text for the editor toolbar */
-	const toolbarAriaLabel = __( 'Document tools' );
+	const toolbarAriaLabel =
+		/* translators: accessibility text for the editor toolbar */
+		__( 'Document tools' );
 
 	const toggleListView = useCallback(
 		() => setIsListViewOpened( ! isListViewOpen ),
@@ -76,11 +77,9 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		[ isInserterOpened, setIsInserterOpened ]
 	);
 
-	/* translators: button label text should, if possible, be under 16 characters. */
-	const longLabel = _x(
-		'Block Inserter',
-		'Generic label for block inserter button'
-	);
+	const longLabel =
+		/* translators: button label text should, if possible, be under 16 characters. */
+		_x( 'Block Inserter', 'Generic label for block inserter button' );
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
 
 	return (
@@ -133,8 +132,10 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 								icon={ listView }
 								disabled={ disableBlockTools }
 								isPressed={ isListViewOpen }
-								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ __( 'Document Overview' ) }
+								label={
+									/* translators: button label text should, if possible, be under 16 characters. */
+									__( 'Document Overview' )
+								}
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }

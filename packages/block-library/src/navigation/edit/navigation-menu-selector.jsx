@@ -18,8 +18,11 @@ import useNavigationMenu from '../use-navigation-menu';
 
 function buildMenuLabel( title, id, status ) {
 	if ( ! title ) {
-		/* translators: %s: the index of the menu in the list of menus. */
-		return sprintf( __( '(no title %s)' ), id );
+		return sprintf(
+			/* translators: %s: the index of the menu in the list of menus. */
+			__( '(no title %s)' ),
+			id
+		);
 	}
 
 	if ( status === 'publish' ) {
@@ -41,8 +44,8 @@ function NavigationMenuSelector( {
 	onCreateNew,
 	actionLabel,
 } ) {
-	/* translators: %s: The name of a menu. */
-	const createActionLabel = __( "Create from '%s'" );
+	const createActionLabel =
+		/* translators: %s: The name of a menu. */ __( "Create from '%s'" );
 
 	const [ isUpdatingMenuRef, setIsUpdatingMenuRef ] = useState( false );
 

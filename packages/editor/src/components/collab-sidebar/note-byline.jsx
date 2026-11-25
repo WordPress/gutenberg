@@ -72,8 +72,10 @@ export function NoteByline( { avatar, name, date, userId } ) {
 			<img
 				src={ avatar || currentUserAvatar }
 				className="editor-collab-sidebar-panel__user-avatar"
-				// translators: alt text for user avatar image
-				alt={ __( 'User avatar' ) }
+				alt={
+					/* translators: alt text for user avatar image */
+					__( 'User avatar' )
+				}
 				width={ 32 }
 				height={ 32 }
 				style={ {

@@ -37,8 +37,11 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 		return describedBy;
 	}
 
-	// translators: %s: The selected option.
-	return sprintf( __( 'Currently selected: %s' ), currentName );
+	return sprintf(
+		/* translators: %s: The selected option. */
+		__( 'Currently selected: %s' ),
+		currentName
+	);
 }
 
 /**

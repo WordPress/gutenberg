@@ -188,8 +188,11 @@ const EmbedEdit = ( props ) => {
 		);
 	}
 
-	// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-	const label = sprintf( __( '%s URL' ), title );
+	const label = sprintf(
+		/* translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists */
+		__( '%s URL' ),
+		title
+	);
 
 	// No preview, or we can't embed the current URL, or we've clicked the edit button.
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;

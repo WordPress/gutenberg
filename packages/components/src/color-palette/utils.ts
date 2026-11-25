@@ -62,8 +62,10 @@ export const extractColorNameFromCurrentValue = (
 		}
 	}
 
-	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
-	return __( 'Custom' );
+	return (
+		/* translators: shown when the user has picked a custom color (i.e not in the palette of colors). */
+		__( 'Custom' )
+	);
 };
 
 // The PaletteObject type has a `colors` property (an array of ColorObject),

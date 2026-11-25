@@ -41,15 +41,13 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			content = contentStructure;
 		}
 
-		/*
-		 * translators: If your word count is based on single characters (e.g. East Asian characters),
-		 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-		 * Do not translate into your own language.
-		 */
-		const wordCountType = _x(
-			'words',
-			'Word count type. Do not translate!'
-		);
+		const wordCountType =
+			/*
+			 * translators: If your word count is based on single characters (e.g. East Asian characters),
+			 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+			 * Do not translate into your own language.
+			 */
+			_x( 'words', 'Word count type. Do not translate!' );
 
 		const totalWords = wordCount( content || '', wordCountType );
 
@@ -68,11 +66,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				if ( minMinutes === maxMinutes ) {
 					maxMinutes = maxMinutes + 1;
 				}
-				// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
-				const rangeLabel = _x(
-					'%1$s–%2$s minutes',
-					'Range of minutes to read'
-				);
+				const rangeLabel =
+					/* translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post. */
+					_x( '%1$s–%2$s minutes', 'Range of minutes to read' );
 				return sprintf( rangeLabel, minMinutes, maxMinutes );
 			}
 			const minutesToRead = Math.max(

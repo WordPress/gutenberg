@@ -126,8 +126,10 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<ToggleControl
-					/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
-					label={ __( 'Play inline' ) }
+					label={
+						/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
+						__( 'Play inline' )
+					}
 					onChange={ toggleFactory.playsInline }
 					checked={ !! playsInline }
 					disabled={ autoplay }

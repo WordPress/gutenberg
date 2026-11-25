@@ -20,15 +20,27 @@ export function toggleFormat(
 	if ( getActiveFormat( value, format.type ) ) {
 		// For screen readers, will announce if formatting control is disabled.
 		if ( format.title ) {
-			// translators: %s: title of the formatting control
-			speak( sprintf( __( '%s removed.' ), format.title ), 'assertive' );
+			speak(
+				sprintf(
+					/* translators: %s: title of the formatting control */
+					__( '%s removed.' ),
+					format.title
+				),
+				'assertive'
+			);
 		}
 		return removeFormat( value, format.type );
 	}
 	// For screen readers, will announce if formatting control is enabled.
 	if ( format.title ) {
-		// translators: %s: title of the formatting control
-		speak( sprintf( __( '%s applied.' ), format.title ), 'assertive' );
+		speak(
+			sprintf(
+				/* translators: %s: title of the formatting control */
+				__( '%s applied.' ),
+				format.title
+			),
+			'assertive'
+		);
 	}
 	return applyFormat( value, format );
 }

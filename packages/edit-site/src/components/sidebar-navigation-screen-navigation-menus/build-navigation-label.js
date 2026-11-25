@@ -4,8 +4,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 export default function buildNavigationLabel( title, id, status ) {
 	if ( ! title?.rendered ) {
-		/* translators: %s: the index of the menu in the list of menus. */
-		return sprintf( __( '(no title %s)' ), id );
+		return sprintf(
+			/* translators: %s: the index of the menu in the list of menus. */
+			__( '(no title %s)' ),
+			id
+		);
 	}
 
 	if ( status === 'publish' ) {

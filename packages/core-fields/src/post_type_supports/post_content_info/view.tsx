@@ -26,15 +26,13 @@ export default function PostContentInfoView( {
 		content = item.content( item );
 	}
 
-	/*
-	 * translators: If your word count is based on single characters (e.g. East Asian characters),
-	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-	 * Do not translate into your own language.
-	 */
-	const wordCountType = _x(
-		'words',
-		'Word count type. Do not translate!'
-	) as Strategy;
+	const wordCountType =
+		/*
+		 * translators: If your word count is based on single characters (e.g. East Asian characters),
+		 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+		 * Do not translate into your own language.
+		 */
+		_x( 'words', 'Word count type. Do not translate!' ) as Strategy;
 	const wordsCounted = useMemo(
 		() => ( content ? wordCount( content, wordCountType ) : 0 ),
 		[ content, wordCountType ]

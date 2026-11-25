@@ -202,8 +202,10 @@ export function PrivateBlockToolbar( {
 			focusEditorOnEscape
 			shouldUseKeyboardFocusShortcut={ ! isPlaceholder }
 			className={ classes }
-			/* translators: accessibility text for the block toolbar */
-			aria-label={ __( 'Block tools' ) }
+			aria-label={
+				/* translators: accessibility text for the block toolbar */
+				__( 'Block tools' )
+			}
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
 			variant={ variant === 'toolbar' ? undefined : variant }
 			focusOnMount={ focusOnMount }

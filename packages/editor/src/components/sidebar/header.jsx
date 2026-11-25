@@ -24,16 +24,19 @@ export default function SidebarHeader() {
 	} else if ( postTypeLabel ) {
 		documentLabel = decodeEntities( postTypeLabel );
 	} else {
-		// translators: Default label for the Document sidebar tab, not selected.
-		documentLabel = _x( 'Document', 'noun, panel' );
+		documentLabel =
+			/* translators: Default label for the Document sidebar tab, not selected. */
+			_x( 'Document', 'noun, panel' );
 	}
 
 	return (
 		<Tabs.List activateOnFocus={ false }>
 			<Tabs.Tab value={ sidebars.document }>{ documentLabel }</Tabs.Tab>
 			<Tabs.Tab value={ sidebars.block }>
-				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
-				{ __( 'Block' ) }
+				{
+					/* translators: Text label for the Block Settings Sidebar tab. */
+					__( 'Block' )
+				}
 			</Tabs.Tab>
 		</Tabs.List>
 	);

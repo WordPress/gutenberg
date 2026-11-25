@@ -51,8 +51,10 @@ const FormatToolbar = () => {
 							{ ( toggleProps ) => (
 								<DropdownMenu
 									icon={ chevronDown }
-									/* translators: button label text should, if possible, be under 16 characters. */
-									label={ __( 'More' ) }
+									label={
+										/* translators: button label text should, if possible, be under 16 characters. */
+										__( 'More' )
+									}
 									toggleProps={ {
 										...toggleProps,
 										className: clsx(

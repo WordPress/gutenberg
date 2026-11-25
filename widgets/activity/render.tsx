@@ -53,12 +53,18 @@ function formatGroupDate( dateStr: string ): string {
 	const currentYear = dateI18n( 'Y', now );
 
 	if ( dateStr.slice( 0, 4 ) === currentYear ) {
-		/* translators: Date format for dashboard activity group header (current year), see https://www.php.net/manual/datetime.format.php */
-		return dateI18n( __( 'M jS' ), dateStr );
+		return dateI18n(
+			/* translators: Date format for dashboard activity group header (current year), see https://www.php.net/manual/datetime.format.php */
+			__( 'M jS' ),
+			dateStr
+		);
 	}
 
-	/* translators: Date format for dashboard activity group header (different year), see https://www.php.net/manual/datetime.format.php */
-	return dateI18n( __( 'M jS Y' ), dateStr );
+	return dateI18n(
+		/* translators: Date format for dashboard activity group header (different year), see https://www.php.net/manual/datetime.format.php */
+		__( 'M jS Y' ),
+		dateStr
+	);
 }
 
 /*
@@ -106,8 +112,11 @@ const FIELDS: Field< ActivityEvent >[] = [
 		getValue: ( { item } ) => item.datetime,
 		render: ( { item } ) => (
 			<span>
-				{ /* translators: Time format for activity stream, see https://www.php.net/manual/datetime.format.php */ }
-				{ dateI18n( __( 'g:i a' ), item.datetime ) }
+				{ dateI18n(
+					/* translators: Time format for activity stream, see https://www.php.net/manual/datetime.format.php */
+					__( 'g:i a' ),
+					item.datetime
+				) }
 			</span>
 		),
 		enableSorting: true,

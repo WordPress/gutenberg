@@ -40,12 +40,13 @@ export default function PostContentInformation() {
 }
 
 export function PostContentInformationUI( { postContent } ) {
-	/*
-	 * translators: If your word count is based on single characters (e.g. East Asian characters),
-	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-	 * Do not translate into your own language.
-	 */
-	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const wordCountType =
+		/*
+		 * translators: If your word count is based on single characters (e.g. East Asian characters),
+		 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+		 * Do not translate into your own language.
+		 */
+		_x( 'words', 'Word count type. Do not translate!' );
 	const wordsCounted = useMemo(
 		() => ( postContent ? wordCount( postContent, wordCountType ) : 0 ),
 		[ postContent, wordCountType ]

@@ -125,8 +125,11 @@ async function getPostUpdatedMessage( {
 		DRAFT_STATUSES.includes( status ) &&
 		( ! previousStatus || DRAFT_STATUSES.includes( previousStatus ) );
 	if ( stayedDraft ) {
-		/* translators: %s: collaborator display name */
-		return sprintf( __( 'Draft saved by %s.' ), name );
+		return sprintf(
+			/* translators: %s: collaborator display name */
+			__( 'Draft saved by %s.' ),
+			name
+		);
 	}
 
 	// Any other status change names the status the collaborator moved the
@@ -149,8 +152,11 @@ async function getPostUpdatedMessage( {
 		}
 	}
 
-	/* translators: %s: collaborator display name */
-	return sprintf( __( 'Saved by %s.' ), name );
+	return sprintf(
+		/* translators: %s: collaborator display name */
+		__( 'Saved by %s.' ),
+		name
+	);
 }
 
 /**

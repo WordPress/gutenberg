@@ -48,15 +48,19 @@ export default function PublishButtonLabel() {
 		};
 	}, [] );
 	if ( isPublishing ) {
-		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Publishing…' );
+		return (
+			/* translators: button label text should, if possible, be under 16 characters. */
+			__( 'Publishing…' )
+		);
 	} else if (
 		( isPublished || isBeingScheduled ) &&
 		isSaving &&
 		! isAutosaving
 	) {
-		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Saving…' );
+		return (
+			/* translators: button label text should, if possible, be under 16 characters. */
+			__( 'Saving…' )
+		);
 	}
 	if ( ! hasPublishAction ) {
 		// TODO: this is because "Submit for review" string is too long in some languages.

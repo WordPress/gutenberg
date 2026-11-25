@@ -115,11 +115,15 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return null;
 	}
 
-	/* translators: button label text should, if possible, be under 16 characters. */
-	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
+	const label = isPending
+		? /* translators: button label text should, if possible, be under 16 characters. */
+			__( 'Save as pending' )
+		: /* translators: button label text should, if possible, be under 16 characters. */
+			__( 'Save draft' );
 
-	/* translators: button label text should, if possible, be under 16 characters. */
-	const shortLabel = __( 'Save' );
+	const shortLabel =
+		/* translators: button label text should, if possible, be under 16 characters. */
+		__( 'Save' );
 
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;

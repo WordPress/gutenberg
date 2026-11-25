@@ -62,12 +62,13 @@ function DocumentTools() {
 				} }
 				onClick={ toggleInserterSidebar }
 				icon={ plus }
-				/* translators: button label text should, if possible, be under 16
-					characters. */
-				label={ _x(
-					'Block Inserter',
-					'Generic label for block inserter button'
-				) }
+				label={
+					/* translators: button label text should, if possible, be under 16 characters. */
+					_x(
+						'Block Inserter',
+						'Generic label for block inserter button'
+					)
+				}
 				size="compact"
 			/>
 			{ isMediumViewport && (
@@ -79,8 +80,10 @@ function DocumentTools() {
 						className="edit-widgets-header-toolbar__list-view-toggle"
 						icon={ listView }
 						isPressed={ isListViewOpen }
-						/* translators: button label text should, if possible, be under 16 characters. */
-						label={ __( 'List View' ) }
+						label={
+							/* translators: button label text should, if possible, be under 16 characters. */
+							__( 'List View' )
+						}
 						onClick={ toggleListView }
 						ref={ listViewToggleRef }
 						size="compact"

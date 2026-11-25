@@ -160,11 +160,17 @@ export default function Edit( props ) {
 		}
 	} else if ( showPostTitle ) {
 		if ( commentsCount === 1 ) {
-			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Response to "%s"' ), postTitle );
+			placeholder = sprintf(
+				/* translators: %s: Post title. */
+				__( 'Response to "%s"' ),
+				postTitle
+			);
 		} else {
-			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Responses to "%s"' ), postTitle );
+			placeholder = sprintf(
+				/* translators: %s: Post title. */
+				__( 'Responses to "%s"' ),
+				postTitle
+			);
 		}
 	} else if ( commentsCount === 1 ) {
 		placeholder = __( 'Response' );

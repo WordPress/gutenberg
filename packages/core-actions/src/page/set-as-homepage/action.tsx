@@ -47,8 +47,9 @@ const setAsHomepage: ActionScriptParts< BasePost > = {
 		);
 	},
 	RenderModal: ( { items, closeModal } ) => {
-		// translators: Button label to confirm setting the specified page as the homepage.
-		const submitLabel = __( 'Set homepage' );
+		const submitLabel =
+			/* translators: Button label to confirm setting the specified page as the homepage. */
+			__( 'Set homepage' );
 
 		return (
 			<SetSitePageModal

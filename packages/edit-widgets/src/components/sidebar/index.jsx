@@ -84,8 +84,10 @@ function SidebarContent( {
 				</WCTabs.Context.Provider>
 			}
 			headerClassName="edit-widgets-sidebar__panel-tabs"
-			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
+			title={
+				/* translators: button label text should, if possible, be under 16 characters. */
+				__( 'Settings' )
+			}
 			closeLabel={ __( 'Close Settings' ) }
 			scope="core/edit-widgets"
 			identifier={ currentArea }
