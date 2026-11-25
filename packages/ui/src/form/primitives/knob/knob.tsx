@@ -13,8 +13,9 @@ import {
 	clamp,
 	crossesCenter,
 	getDial,
-	getPointer,
 	getStepChange,
+	isOnDot,
+	measure,
 	modulo,
 } from './dial';
 import type { KnobProps } from './types';
@@ -30,6 +31,9 @@ type Gesture = {
 	dialAngle: number | null;
 	// The step the gesture last selected, or null before it selects one.
 	index: number | null;
+	// The step the press itself names. Until the pointer leaves it, the
+	// gesture is a tap that waits for the release.
+	tapIndex: number | null;
 	// The dial angle when the press landed on the dot, or null when it landed
 	// elsewhere. A press on the dot takes hold of it where it is, so only
 	// turning moves it.
@@ -152,15 +156,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// The value changes once the pointer moves or lifts, so a
 			// canceled press leaves it alone. The turn is chosen then too:
 			// focusing the dial below can make a paired field commit a value.
+			const pressed = measure( event.currentTarget )( event );
 			gesture.current = {
 				pointerId: event.pointerId,
 				clientX: event.clientX,
 				clientY: event.clientY,
 				dialAngle: null,
 				index: null,
-				grabbedAt: getPointer( event.currentTarget, event, angle ).onDot
-					? angle
-					: null,
+				tapIndex: null,
+				grabbedAt: isOnDot( pressed, angle ) ? angle : null,
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
@@ -180,31 +184,39 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const isRelease = event.type === 'pointerup';
-			const pointer = getPointer( event.currentTarget, event, angle );
+			const locate = measure( event.currentTarget );
+			const pointer = locate( event );
 			// A tap that has selected nothing is dropped when the pointer
 			// lifts outside the dial.
 			if ( isRelease && current.index === null && ! pointer.inside ) {
 				return;
 			}
-			const previous = getPointer( event.currentTarget, current, angle );
-			// A move that keeps the heading turns nothing, so it leaves a
-			// pending tap alone. A pen reports changes in pressure this way.
-			if ( ! isRelease && pointer.angle === previous.angle ) {
-				return;
-			}
+			const previous = locate( current );
 			current.clientX = event.clientX;
 			current.clientY = event.clientY;
-			if ( pointer.angle === null ) {
+			// The middle of the dial has no heading. A move that keeps the
+			// heading turns nothing, as when a pen changes its pressure.
+			if (
+				pointer.angle === null ||
+				( ! isRelease && pointer.angle === previous.angle )
+			) {
 				return;
 			}
 			let from = current.dialAngle;
 			if ( from === null ) {
-				// Start from the dot while it is still where the press took
-				// hold of it. Otherwise start from the heading of the press.
+				// Start from the dot while it still points where the press
+				// took hold of it. Otherwise start from the heading of the
+				// press.
+				const holdsDot =
+					current.grabbedAt !== null &&
+					Math.abs(
+						modulo( current.grabbedAt - angle + 180, 360 ) - 180
+					) < 1e-6;
 				from =
-					previous.angle === null || current.grabbedAt === angle
+					previous.angle === null || holdsDot
 						? angle
 						: getDialAngle( previous.angle, angle );
+				current.tapIndex = fromAngle( from );
 			}
 			// A drag turns the dial the shorter way round, so the turn count
 			// carries across twelve o'clock. A move that cuts across the dial
@@ -224,6 +236,14 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 			current.dialAngle = dialAngle;
 			const nextIndex = fromAngle( dialAngle );
+			// A press that slips without leaving its step is still a tap.
+			if (
+				! isRelease &&
+				current.index === null &&
+				nextIndex === current.tapIndex
+			) {
+				return;
+			}
 			// Compare with the step this gesture last selected. The value
 			// prop can lag behind it while a parent has yet to update.
 			const changed = nextIndex !== ( current.index ?? index );

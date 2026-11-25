@@ -396,7 +396,9 @@ describe( 'Knob', () => {
 
 	it( 'follows the pointer when the dot is pressed just as a paired field commits another heading', async () => {
 		await render( <PairedRotation /> );
-		await page.getByRole( 'spinbutton' ).fill( '450' );
+		// Committing 420 moves the dot to two o'clock. The drag ends a quarter
+		// turn from where it began, on the turn nearest to 420.
+		await page.getByRole( 'spinbutton' ).fill( '420' );
 		const dial = page.getByRole( 'group' );
 		const { at, right } = getPoints( dial );
 		// The dot still shows zero at twelve o'clock when the press lands on it.
@@ -406,6 +408,80 @@ describe( 'Knob', () => {
 			'[/MouseLeft]',
 		] );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '450' );
+	} );
+
+	it( 'keeps a value a paired field commits when the dot stays where it was pressed', async () => {
+		await render( <PairedRotation /> );
+		// 360 has the heading of zero, so the dot does not move.
+		await page.getByRole( 'spinbutton' ).fill( '360' );
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		await dial.click( { position: at( 21, 10 ) } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '360' );
+	} );
+
+	it( 'keeps a tap pending while a small slip stays on its step', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Angle" onValueChange={ onValueChange } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at } = getPoints( dial );
+		// Both points round to 43 degrees. The second is off the round face,
+		// in the corner of its box, so lifting there drops the tap.
+		await userEvent.pointer( [
+			{ target: dial, coords: at( 33, 6 ), keys: '[MouseLeft>]' },
+			{ target: dial, coords: at( 34, 5 ) },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reaches the last step when the steps are an inexact fraction of a turn', async () => {
+		const unitsPerTurn = 2 * Math.PI;
+		const { rerender } = await render(
+			<Knob
+				aria-label="Angle"
+				unitsPerTurn={ unitsPerTurn }
+				step={ unitsPerTurn / 75 }
+			/>
+		);
+		const slider = page.getByRole( 'slider' );
+		const value = () =>
+			Number( ( slider.element() as HTMLInputElement ).value );
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowDown}' );
+		await expect.poll( value ).toBeCloseTo( ( unitsPerTurn * 74 ) / 75, 6 );
+		await rerender(
+			<Knob
+				aria-label="Angle"
+				min={ 0 }
+				max={ unitsPerTurn }
+				unitsPerTurn={ unitsPerTurn }
+				step={ unitsPerTurn / 100 }
+			/>
+		);
+		await userEvent.keyboard( '{End}' );
+		await expect.poll( value ).toBeCloseTo( unitsPerTurn, 6 );
+	} );
+
+	it( 'selects the heading under the pointer when a drag moves inward and then through the center', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" min={ 0 } max={ 360 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { at, top } = getPoints( dial );
+		await userEvent.pointer( [
+			{ target: dial, coords: top, keys: '[MouseLeft>]' },
+			{ target: dial, coords: at( 20, 14 ) },
+			{ target: dial, coords: at( 14, 20 ) },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '270' );
 	} );
 
 	it( 'selects the end when a tap rounds to it from just past it', async () => {

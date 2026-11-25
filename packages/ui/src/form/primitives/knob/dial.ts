@@ -54,17 +54,14 @@ export function getDial( {
 	);
 	const toValue = ( index: number ) =>
 		Number( ( first + index * step ).toFixed( precision ) ) || 0;
-	// Division can land a hair above a whole number, so step back from the
-	// first candidate to the last step that fits. Two tries cover the error.
-	let lastStep = Math.max( 0, Math.ceil( span / step ) );
-	for ( let tries = 0; tries < 2 && lastStep > 0; tries++ ) {
-		const fits = wraps
-			? toValue( lastStep ) < unitsPerTurn
-			: toValue( lastStep ) <= max;
-		if ( fits ) {
-			break;
-		}
-		lastStep--;
+	// Count the steps that fit. Division can land a hair off a whole number,
+	// so a count within rounding error of one is taken as whole. A wrapping
+	// dial then leaves out the full turn, which has the heading of zero.
+	const count = span / step;
+	const whole = Math.round( count );
+	let lastStep = Math.max( 0, Math.floor( count ) );
+	if ( Math.abs( count - whole ) < 1e-9 ) {
+		lastStep = wraps ? whole - 1 : whole;
 	}
 	// Angles come from the rounded values, so an end at zero is exactly zero.
 	const toAngle = ( index: number ) =>
@@ -107,38 +104,41 @@ const DOT_REACH = 6;
 // The middle of the dial, where a pointer has no meaningful heading.
 const CENTER_RADIUS = 5;
 
-// Where a position on the screen is on the dial. `x` and `y` are measured from
-// the center in the units the dial is drawn in. `angle` is the clockwise angle
-// from twelve o'clock, between -180 and 180 degrees, or null in the middle.
-// `onDot` says whether the position is on the dot at `dialAngle`.
-export function getPointer(
-	dial: HTMLElement,
-	{ clientX, clientY }: { clientX: number; clientY: number },
-	dialAngle: number
-) {
+type Point = { x: number; y: number };
+
+// Measures the dial once, and returns a function that says where a position on
+// the screen is on it. `x` and `y` are measured from the center in the units
+// the dial is drawn in. `angle` is the clockwise angle from twelve o'clock,
+// between -180 and 180 degrees, or null in the middle.
+export function measure( dial: HTMLElement ) {
 	const { left, top, width, height } = dial.getBoundingClientRect();
 	const unit = Math.min( width, height ) / VIEW_SIZE;
-	const x = ( clientX - left - width / 2 ) / unit;
-	const y = ( clientY - top - height / 2 ) / unit;
-	const distance = Math.hypot( x, y );
-	const heading = ( dialAngle * Math.PI ) / 180;
-	return {
-		x,
-		y,
-		angle:
-			distance < CENTER_RADIUS
-				? null
-				: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
-		inside: distance <= VIEW_SIZE / 2,
-		onDot:
-			Math.hypot(
-				x - DOT_OFFSET * Math.sin( heading ),
-				y + DOT_OFFSET * Math.cos( heading )
-			) <= DOT_REACH,
+	return ( { clientX, clientY }: { clientX: number; clientY: number } ) => {
+		const x = ( clientX - left - width / 2 ) / unit;
+		const y = ( clientY - top - height / 2 ) / unit;
+		const distance = Math.hypot( x, y );
+		return {
+			x,
+			y,
+			angle:
+				distance < CENTER_RADIUS
+					? null
+					: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
+			inside: distance <= VIEW_SIZE / 2,
+		};
 	};
 }
 
-type Point = { x: number; y: number };
+// Whether a position is on the dot of a dial that points to `dialAngle`.
+export function isOnDot( { x, y }: Point, dialAngle: number ) {
+	const heading = ( dialAngle * Math.PI ) / 180;
+	return (
+		Math.hypot(
+			x - DOT_OFFSET * Math.sin( heading ),
+			y + DOT_OFFSET * Math.cos( heading )
+		) <= DOT_REACH
+	);
+}
 
 // Whether the straight path between two pointer positions passes through the
 // middle of the dial. The pointer then cut across the dial instead of going
