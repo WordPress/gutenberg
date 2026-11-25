@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import type { MouseEvent } from 'react';
-import { Menu as BUMenu } from '@base-ui/react/menu';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -13,14 +12,18 @@ import {
 	IconButton,
 	Stack,
 	Tooltip,
-	getWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
-import { REACTION_EMOJIS, getReactionEmoji } from './reaction-emojis';
+import EmojiPicker from './emoji-picker';
+import { useEmojiLabel } from './emojibase-data';
+import {
+	emojiToHexKey,
+	getReactionEmoji,
+	hexKeyToEmoji,
+} from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
-import type { ReactionSummary } from './use-note-reactions';
 
 interface ReactionButtonProps {
 	noteId: number;
@@ -28,11 +31,6 @@ interface ReactionButtonProps {
 	count: number;
 	isActive: boolean;
 	disabled: boolean;
-	onToggle: ( hexKey: string ) => void;
-}
-
-interface ReactionPickerProps {
-	reactions?: ReactionSummary;
 	onToggle: ( hexKey: string ) => void;
 }
 
@@ -119,11 +117,19 @@ function ReactionButton( {
 		?.filter( ( reaction ) => reaction.content.raw === hexKey )
 		.map( ( reaction ) => reaction.author_name );
 	const emoji = getReactionEmoji( hexKey );
-	const emojiLabel = emoji?.label ?? hexKey;
+	const glyph = emoji?.emoji ?? hexKeyToEmoji( hexKey );
+	// An emoji outside the curated set is named by Emojibase. Until the
+	// label loads, the glyph stands in, which screen readers announce by
+	// its Unicode name.
+	const resolvedLabel = useEmojiLabel( hexKey, ! emoji, isShowingNames );
+	const emojiLabel = emoji?.label ?? resolvedLabel ?? glyph;
 	// Names that don't add up to the count are stale until the refetch lands.
 	const label =
 		names?.length === count
-			? formatReactorNames( names, emoji?.sentenceLabel ?? hexKey )
+			? formatReactorNames(
+					names,
+					emoji?.sentenceLabel ?? resolvedLabel ?? glyph
+				)
 			: sprintf(
 					/* translators: 1: emoji label, 2: count of reactions */
 					_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),
@@ -166,7 +172,7 @@ function ReactionButton( {
 				}
 			>
 				<span className="editor-collab-sidebar-panel__reaction-button-emoji">
-					{ emoji?.emoji ?? hexKey }
+					{ glyph }
 				</span>
 				<span>{ count.toLocaleString() }</span>
 			</Tooltip.Trigger>
@@ -175,92 +181,8 @@ function ReactionButton( {
 	);
 }
 
-function ReactionPicker( { reactions, onToggle }: ReactionPickerProps ) {
-	const [ isOpen, setIsOpen ] = useState( false );
-
-	return (
-		<BUMenu.Root
-			orientation="horizontal"
-			// Hover would move the highlight away from the item the keyboard
-			// is on.
-			highlightItemOnHover={ false }
-			open={ isOpen }
-			onOpenChange={ setIsOpen }
-		>
-			<BUMenu.Trigger
-				render={
-					<IconButton
-						size="small"
-						variant="minimal"
-						tone="neutral"
-						className="editor-collab-sidebar-panel__add-reaction-button"
-						icon={ reactionIcon }
-						label={ __( 'Add reaction' ) }
-					/>
-				}
-			/>
-			<BUMenu.Portal container={ getWpCompatOverlaySlot() }>
-				<BUMenu.Positioner
-					side="bottom"
-					align="end"
-					sideOffset={ 8 }
-					collisionPadding={ 12 }
-				>
-					<BUMenu.Popup
-						aria-label={ __( 'Add reaction' ) }
-						className="editor-collab-sidebar-panel__reaction-picker"
-						onKeyDownCapture={ ( event ) => {
-							// Escape would otherwise close only the focused
-							// item's tooltip.
-							if ( event.key === 'Escape' ) {
-								event.stopPropagation();
-								setIsOpen( false );
-							}
-						} }
-					>
-						{ REACTION_EMOJIS.map( ( { emoji, hexKey, label } ) => (
-							<Tooltip.Root key={ hexKey }>
-								<Tooltip.Trigger
-									render={
-										<BUMenu.CheckboxItem
-											nativeButton
-											checked={
-												!! reactions?.[ hexKey ]
-													?.current_user_reaction
-											}
-											onCheckedChange={ () =>
-												onToggle( hexKey )
-											}
-											closeOnClick
-											// Typeahead matches `label`, not `aria-label`.
-											label={ label }
-											aria-label={ label }
-											className="editor-collab-sidebar-panel__reaction-option"
-											render={
-												<Button
-													variant="minimal"
-													tone="neutral"
-												/>
-											}
-										/>
-									}
-								>
-									<span className="editor-collab-sidebar-panel__reaction-option-emoji">
-										{ emoji }
-									</span>
-								</Tooltip.Trigger>
-								<Tooltip.Popup>{ label }</Tooltip.Popup>
-							</Tooltip.Root>
-						) ) }
-					</BUMenu.Popup>
-				</BUMenu.Positioner>
-			</BUMenu.Portal>
-		</BUMenu.Root>
-	);
-}
-
 /**
- * A note's reaction pills, followed by the add-reaction picker.
+ * A note's reaction pills, followed by the add-reaction emoji picker.
  *
  * @param props          Component props.
  * @param props.noteId   The note comment ID.
@@ -311,9 +233,27 @@ export function NoteReactions( {
 				 * first reaction lands would remount the open picker's trigger.
 				 */ }
 				{ canReact && (
-					<ReactionPicker
-						reactions={ reactions }
-						onToggle={ toggleReaction }
+					<EmojiPicker
+						label={ __( 'Add reaction' ) }
+						trigger={
+							<IconButton
+								size="small"
+								variant="minimal"
+								tone="neutral"
+								className="editor-collab-sidebar-panel__add-reaction-button"
+								icon={ reactionIcon }
+								label={ __( 'Add reaction' ) }
+							/>
+						}
+						reactedHexKeys={ entries
+							.filter(
+								( [ , entry ] ) =>
+									entry.current_user_reaction > 0
+							)
+							.map( ( [ hexKey ] ) => hexKey ) }
+						onSelect={ ( emoji ) =>
+							toggleReaction( emojiToHexKey( emoji ) )
+						}
 					/>
 				) }
 			</Stack>

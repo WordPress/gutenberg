@@ -969,13 +969,13 @@ test.describe( 'Block Notes', () => {
 				// actions they survive being deselected.
 				await blockNoteUtils.deselect();
 				await expect(
-					page.getByRole( 'button', { name: 'Add reaction' } )
+					page.getByRole( 'combobox', { name: 'Add reaction' } )
 				).toHaveCount( 0 );
 				await expect( reactionButton ).toBeVisible();
 			} );
 		} );
 
-		test( 'the reaction menu is keyboard accessible', async ( {
+		test( 'the emoji picker is keyboard accessible', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
@@ -984,61 +984,114 @@ test.describe( 'Block Notes', () => {
 				note: 'Test comment for keyboard access',
 			} );
 
-			const trigger = page.getByRole( 'button', {
+			// Open the emoji picker with keyboard.
+			const addReactionTrigger = page.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
-			const menu = page.getByRole( 'menu', { name: 'Add reaction' } );
-
-			// Escape closes the menu and hands focus back to the trigger.
-			await trigger.focus();
+			await addReactionTrigger.focus();
 			await page.keyboard.press( 'Enter' );
-			await expect( menu ).toBeVisible();
-			await page.keyboard.press( 'Escape' );
-			await expect( menu ).toBeHidden();
-			await expect( trigger ).toBeFocused();
 
-			// The arrow keys move through the emoji, and Enter picks one.
-			await page.keyboard.press( 'Enter' );
-			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
-			).toBeFocused();
+			await blockNoteUtils.waitForFullPicker();
+
+			// Focus stays in the search field while the arrow keys move a
+			// highlight through the grid, and Enter picks the highlight.
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			await expect( searchField ).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowRight' );
-			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
-			).toBeFocused();
+			const secondEmoji = page.getByRole( 'gridcell' ).nth( 1 );
+			await expect( searchField ).toHaveAttribute(
+				'aria-activedescendant',
+				await secondEmoji.getAttribute( 'id' )
+			);
+			await expect( searchField ).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
+			// The selected emoji renders as a reaction pill on the note.
 			await expect(
-				page.getByRole( 'button', { name: /Plus/ } )
-			).toContainText( '1' );
-
-			// The menu marks the emoji the user has already reacted with.
-			await trigger.click();
-			// Focus has moved into the portaled menu, but its focus events
-			// still bubble to the thread's `useFocusOutside` through the
-			// React tree, so the thread stays selected and the trigger mounted.
-			await expect(
-				blockNoteUtils.getThread( 'Test comment for keyboard access' )
-			).toHaveAttribute( 'aria-expanded', 'true' );
-			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Plus' } )
-			).toBeChecked();
-			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'Thumbs up' } )
-			).not.toBeChecked();
-
-			// The emoji name shows in a tooltip, and one Escape closes both.
-			await menu
-				.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
-				.hover();
-			await expect(
-				page.getByText( 'Heart', { exact: true } )
+				page.locator( '.editor-collab-sidebar-panel__reaction-button' )
 			).toBeVisible();
-			await page.keyboard.press( 'Escape' );
-			await expect( menu ).toBeHidden();
+		} );
+
+		test( 'Tab from the emoji search skips the grid', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Tabbing through the picker' },
+				comment: 'Tab order in the emoji picker',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.focus();
+			await page.keyboard.press( 'Enter' );
+			await blockNoteUtils.waitForFullPicker();
+
+			const searchField = page.getByRole( 'combobox', {
+				name: 'Search emoji',
+			} );
+			await expect( searchField ).toBeFocused();
+
+			// The grid is reached with the arrow keys from the search
+			// field, so Tab moves on to the skin tone toggle.
+			await page.keyboard.press( 'Tab' );
 			await expect(
-				page.getByText( 'Heart', { exact: true } )
-			).toBeHidden();
+				page.getByRole( 'button', { name: /^Skin tone:/ } )
+			).toBeFocused();
+
+			// The scrolling grid is never a Tab stop of its own, which
+			// would read out every emoji in it.
+			await page.keyboard.press( 'Tab' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							!! document.activeElement?.closest(
+								'.editor-collab-sidebar-panel__picker-viewport'
+							)
+					)
+				)
+				.toBe( false );
+			// Tabbing past the toggle leaves the non-modal picker, closing it.
+			await expect( searchField ).toBeHidden();
+		} );
+
+		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.insertBlockWithNote( {
+				content: 'Testing the hover trigger',
+				note: 'Test comment for the hover trigger',
+			} );
+
+			const trigger = page.getByRole( 'combobox', {
+				name: 'Add reaction',
+			} );
+			// The reply composer shares the note class, so match only the
+			// note that carries the trigger.
+			const note = page
+				.locator( '.editor-collab-sidebar-panel__note' )
+				.filter( { has: trigger } );
+
+			// Park the pointer outside the sidebar: adding the note leaves it
+			// over the thread, which would hold the trigger open.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+
+			await note.hover();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+
+			// Keyboard reaches it too: the reveal hangs off the trigger, not
+			// the thread, which stays focused for as long as it is selected.
+			await page.mouse.move( 0, 0 );
+			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+			await trigger.focus();
+			await expect( trigger ).toHaveCSS( 'opacity', '1' );
 		} );
 
 		test( 'resolving a thread locks its reactions', async ( {
@@ -1068,7 +1121,7 @@ test.describe( 'Block Notes', () => {
 			} );
 			await expect( reactionPill ).toBeVisible();
 
-			const addReaction = sidebar.getByRole( 'button', {
+			const addReaction = sidebar.getByRole( 'combobox', {
 				name: 'Add reaction',
 			} );
 			const resolveButton = sidebar.getByRole( 'button', {
@@ -1093,38 +1146,292 @@ test.describe( 'Block Notes', () => {
 			await expect( reactionPill ).toBeEnabled();
 		} );
 
-		test( 'the add-reaction trigger is revealed on hover and focus', async ( {
+		test( 'a curated pick and the same emoji from search share one hex key', async ( {
 			page,
 			blockNoteUtils,
 		} ) => {
-			await blockNoteUtils.insertBlockWithNote( {
-				content: 'Testing the hover trigger',
-				note: 'Test comment for the hover trigger',
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Curated hex key' },
+				comment: 'Pick heart twice',
 			} );
 
-			const trigger = page.getByRole( 'button', {
-				name: 'Add reaction',
+			// The Frequently used seed stores the heart by its hex key.
+			const created = page.waitForRequest(
+				( request ) =>
+					request.method() === 'POST' &&
+					/\/wp\/v2\/comments/.test(
+						decodeURIComponent( request.url() )
+					)
+			);
+			await blockNoteUtils.addReactionToComment( 'Heart' );
+			expect( ( await created ).postDataJSON().content ).toBe( '2764' );
+
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '❤' );
+			await expect( reactionButton ).toContainText( '1' );
+
+			/*
+			 * Picking the same heart from the search results resolves to
+			 * the same key, so it toggles the existing reaction off rather
+			 * than adding a second pill. "Heart" is a curated label, so the
+			 * exact match skips "smiling face with hearts", and the cell is
+			 * marked as the user's own reaction.
+			 */
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'heart' );
+			await page
+				.getByRole( 'gridcell', {
+					name: 'Heart, your reaction',
+					exact: true,
+				} )
+				.click();
+			await expect( reactionButton ).toHaveCount( 0 );
+		} );
+
+		test( 'a full-picker pick that is not curated renders the chosen emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Non-curated emoji' },
+				comment: 'Pick avocado from full picker',
 			} );
-			// The reply composer shares the note class, so match only notes
-			// that carry a reaction trigger.
-			const note = page
-				.locator( '.editor-collab-sidebar-panel__note' )
-				.filter( { has: trigger } );
 
-			// Park the pointer outside the sidebar: adding the note leaves it
-			// over the thread, which would hold the trigger open.
-			await page.mouse.move( 0, 0 );
-			await expect( trigger ).toHaveCSS( 'opacity', '0' );
+			await blockNoteUtils.pickFullPickerEmojiBySearch( 'avocado' );
 
-			await note.hover();
-			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '🥑' );
+		} );
 
-			// Keyboard reaches it too: the reveal hangs off the trigger, not
-			// the thread, which stays focused for as long as it is selected.
-			await page.mouse.move( 0, 0 );
-			await expect( trigger ).toHaveCSS( 'opacity', '0' );
-			await trigger.focus();
-			await expect( trigger ).toHaveCSS( 'opacity', '1' );
+		test( 'Escape in the skin-tone menu closes only that popup', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Nested overlay dismissal' },
+				comment: 'Escape unwinds one layer at a time',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// Open the nested skin-tone menu.
+			const skinToneToggle = page.getByRole( 'button', {
+				name: /^Skin tone:/,
+			} );
+			await skinToneToggle.click();
+			// The notes' Actions menus stay mounted, so pick out this one.
+			const skinToneMenu = page
+				.getByRole( 'menu' )
+				.filter( { hasText: 'Choose your default skin tone' } );
+			await expect( skinToneMenu ).toBeVisible();
+
+			// The first Escape closes only the menu, returns focus to its
+			// toggle, and leaves the full picker open.
+			await page.keyboard.press( 'Escape' );
+			await expect( skinToneMenu ).toBeHidden();
+			await expect( skinToneToggle ).toBeFocused();
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeVisible();
+
+			// Keyboard focus back on the toggle shows its tooltip, the next
+			// layer an Escape dismisses, again leaving the picker open.
+			const skinToneTooltip = page.getByText(
+				'Skin tone: Default skin tone'
+			);
+			await expect( skinToneTooltip ).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+			await expect( skinToneTooltip ).toBeHidden();
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeVisible();
+
+			// The next Escape closes the full picker and returns focus
+			// to the add-reaction trigger.
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				page.getByPlaceholder( 'Search emoji' )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'combobox', { name: 'Add reaction' } )
+			).toBeFocused();
+		} );
+
+		test( 'full picker shows a Frequently used section that learns from picks', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Frequently used emoji' },
+				comment: 'Learn frequent picks',
+			} );
+
+			// Clear any usage persisted by earlier tests or runs so the
+			// seeded state is deterministic.
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core', 'emojiPickerFrequentEmojis', [] )
+			);
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// Seeded with the curated set, so it has content before any picks.
+			const frequentSection = page
+				.locator( '.editor-collab-sidebar-panel__picker-list > div' )
+				.filter( { hasText: 'Frequently used' } )
+				.first();
+			await expect(
+				page
+					.locator( '.editor-collab-sidebar-panel__picker-category' )
+					.first()
+			).toHaveText( 'Frequently used' );
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'Heart',
+					exact: true,
+				} )
+			).toBeVisible();
+			// An emoji no other test picks is not in the section yet.
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'avocado',
+					exact: true,
+				} )
+			).toBeHidden();
+
+			// While searching, the section is hidden so it doesn't
+			// duplicate hits from the category results.
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'avocado' );
+			await expect( page.getByText( 'Frequently used' ) ).toBeHidden();
+
+			await page
+				.getByRole( 'gridcell', { name: 'avocado', exact: true } )
+				.click();
+
+			// On reopening, the pick has joined the Frequently used section,
+			// marked as the user's own reaction.
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+			await expect(
+				frequentSection.getByRole( 'gridcell', {
+					name: 'avocado, your reaction',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+
+		test( 'can set a default skin tone that applies to picked emoji', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Skin tone preference' },
+				comment: 'Pick a toned thumbs up',
+			} );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// The persistent toggle next to the search field shows the
+			// current (default) tone.
+			await page
+				.getByRole( 'button', { name: 'Skin tone: Default skin tone' } )
+				.click();
+
+			// The menu has an explicit heading and six tones, with the
+			// default tone checked.
+			await expect(
+				page.getByText( 'Choose your default skin tone' )
+			).toBeVisible();
+			const tones = page.getByRole( 'menuitemradio' );
+			await expect( tones ).toHaveCount( 6 );
+			await expect(
+				page.getByRole( 'menuitemradio', { name: 'Default skin tone' } )
+			).toHaveAttribute( 'aria-checked', 'true' );
+
+			await page
+				.getByRole( 'menuitemradio', {
+					name: 'Dark skin tone',
+					exact: true,
+				} )
+				.click();
+
+			// The toggle reflects the new tone and the menu closes.
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Skin tone: Dark skin tone',
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByText( 'Choose your default skin tone' )
+			).toBeHidden();
+
+			// Tone-capable emoji in the grid now carry the chosen tone.
+			await page.getByPlaceholder( 'Search emoji' ).fill( 'thumbs up' );
+			await page
+				.getByRole( 'gridcell', {
+					name: 'thumbs up: dark skin tone',
+					exact: true,
+				} )
+				.click();
+
+			// The stored reaction renders the toned emoji.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toHaveCount( 1 );
+			await expect( reactionButton ).toContainText( '👍🏿' );
+		} );
+
+		test( 'note remains selected while reaction picker is open', async ( {
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing selection persistence' },
+				comment: 'Selection persistence',
+			} );
+
+			const thread = page.getByRole( 'treeitem', {
+				name: /Note: Selection persistence/,
+			} );
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await page
+				.getByRole( 'combobox', { name: 'Add reaction' } )
+				.click();
+			await blockNoteUtils.waitForFullPicker();
+
+			// Focus has moved into the portaled popup, but its focus events
+			// still bubble to the thread's `useFocusOutside` through the
+			// React tree, so the thread stays selected and the trigger mounted.
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 	} );
 
