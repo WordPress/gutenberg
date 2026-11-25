@@ -42,6 +42,7 @@ export default function EmbedVideoUrlInput( {
 			onConfirm={ handleConfirm }
 			onCancel={ onClose }
 			confirmButtonText={ __( 'Add video' ) }
+			focusOnMount="firstContentElement"
 			size="medium"
 		>
 			<Stack direction="column" gap="lg">
