@@ -57,11 +57,6 @@ export interface MediaCategoryPanelProps {
 	/** The name of the source being browsed. */
 	source?: string;
 	onChangeSource?: ( source: string ) => void;
-	/**
-	 * Goes back to the default source and media type. `false` when they are
-	 * the ones showing already; leave it out to offer no reset.
-	 */
-	onReset?: ( () => void ) | false;
 	/** Rendered beneath the pager. */
 	footer?: import( 'react' ).ReactNode;
 }

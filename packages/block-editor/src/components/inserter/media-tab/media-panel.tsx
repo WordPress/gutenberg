@@ -62,7 +62,6 @@ export function MediaCategoryPanel( {
 	sources,
 	source,
 	onChangeSource,
-	onReset,
 	footer,
 }: MediaCategoryPanelProps ) {
 	const panelRef = useRef< HTMLDivElement >( null );
@@ -187,7 +186,6 @@ export function MediaCategoryPanel( {
 				sources={ sources }
 				source={ source }
 				onChangeSource={ onChangeSource }
-				onReset={ onReset }
 				mediaTypes={ mediaTypes }
 				mediaType={ mediaType }
 				onChangeMediaType={ onChangeMediaType }

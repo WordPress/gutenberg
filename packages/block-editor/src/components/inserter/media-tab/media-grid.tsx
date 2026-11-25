@@ -34,10 +34,6 @@ type MediaGridProps = {
 	sources?: MediaSource[];
 	source?: string;
 	onChangeSource?: ( source: string ) => void;
-	/**
-	 * Goes back to the default source and media type, from the same menu.
-	 */
-	onReset?: ( () => void ) | false;
 
 	// Media-type tabs.
 	/**
@@ -180,7 +176,6 @@ export default function MediaGrid( {
 	sources,
 	source,
 	onChangeSource,
-	onReset,
 	mediaTypes,
 	mediaType,
 	onChangeMediaType,
@@ -356,7 +351,6 @@ export default function MediaGrid( {
 			getItemId={ getItemId }
 			onClickItem={ onClickItem }
 			empty={ empty }
-			onReset={ onReset }
 		>
 			<Stack
 				direction="row"

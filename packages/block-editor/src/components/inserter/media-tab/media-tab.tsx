@@ -12,9 +12,10 @@ const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 // The categories that together make up the media library: one per media type,
 // shown as tabs rather than as separate sources. Everything else a category
-// can be — the post's attached images, Openverse, anything registered through
-// the public API — is a source of its own. So a source is not a category: this
-// set collapses into the one "Media library" source.
+// can be — the post's attached images, Openverse, anything a plugin registers
+// with `registerInserterMediaCategory` — is a source of its own, listed in the
+// menu in the order it was registered and however many there are. So a source
+// is not a category: this set collapses into the one "Media library" source.
 // TODO: `InserterMediaCategory` has no notion of grouping, so this matches by
 // name. A `group` property on the registration API would do this properly.
 const LIBRARY_CATEGORIES = [ 'images', 'videos', 'audio' ];
@@ -130,18 +131,6 @@ function MediaTab( {
 		[ isLibrary, libraryCategories ]
 	);
 
-	const resetView = useCallback( () => {
-		setSourceName( LIBRARY_SOURCE );
-		setMediaType( DEFAULT_MEDIA_TYPE );
-	}, [] );
-	// With a single source there is nothing to go back to but a tab.
-	let onReset: ( () => void ) | false | undefined;
-	if ( sources.length > 1 ) {
-		const isDefaultView =
-			sourceName === LIBRARY_SOURCE && mediaType === DEFAULT_MEDIA_TYPE;
-		onReset = isDefaultView ? false : resetView;
-	}
-
 	const category = isLibrary
 		? ( libraryCategories.find(
 				( candidate ) => candidate.mediaType === mediaType
@@ -168,7 +157,6 @@ function MediaTab( {
 			sources={ sources }
 			source={ activeSource.name }
 			onChangeSource={ setSourceName }
-			onReset={ onReset }
 			footer={
 				<MediaLibraryButton
 					label={ __( 'Open Media Library' ) }
