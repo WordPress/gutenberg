@@ -58,7 +58,8 @@ describe( 'getUnclampedWeight', () => {
 			).toBeUndefined();
 		} );
 
-		// Lato 2.015 numbers its own ladder: Hairline 250, Thin 275.
+		// A family may number its own ladder, giving Hairline 250 and Thin
+		// 275. Reading Hairline as 100 would collide it with Thin.
 		it( 'for an author-numbered Hairline and Thin pair', () => {
 			expect( getUnclampedWeight( 'Hairline', 250 ) ).toBeUndefined();
 			expect( getUnclampedWeight( 'Thin', 275 ) ).toBeUndefined();
