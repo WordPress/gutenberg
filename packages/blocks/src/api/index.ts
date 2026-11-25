@@ -175,6 +175,7 @@ export {
 const editableRootKey = Symbol( 'editableRoot' );
 import { parseRawBlock as _parseRawBlock } from './parser';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
+import { getCommentAttributes } from './serializer';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -182,4 +183,5 @@ lock( privateApis, {
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
 	applyBuiltInValidationFixes,
+	getCommentAttributes,
 } );
