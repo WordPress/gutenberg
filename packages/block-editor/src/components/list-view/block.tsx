@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { FocusEvent, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
@@ -66,6 +66,10 @@ function ListViewBlock( {
 }: ListViewBlockProps ) {
 	const cellRef = useRef< HTMLTableCellElement >( null );
 	const rowRef = useRef< HTMLTableRowElement >( null );
+	// The space a + opens stays open while the + is hovered or focused from
+	// the keyboard. `:hover` still matches during `mouseleave`, so hovering is
+	// tracked here.
+	const isAppenderHoveredRef = useRef( false );
 	const settingsToggleRef = useRef< HTMLButtonElement >( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	// The settings menu is costly to mount, so a row only gets one once it
@@ -176,9 +180,42 @@ function ListViewBlock( {
 		listViewInstanceId,
 		updateExpansion,
 		setInsertedBlockClientId,
+		BlockAppender,
+		hasBlockAppender,
+		setBlockAppenderPreview,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
+
+	// Whether the row gets a + that adds a block inside it. The block must
+	// take inner blocks and allow inserting them, and the List View can leave
+	// out blocks by name, as the Navigation block does for its links. Should
+	// be kept in sync with the List View appender's own check.
+	const canAppend = useSelect(
+		( select ) => {
+			if ( ! BlockAppender ) {
+				return false;
+			}
+			const {
+				canEditBlock: _canEditBlock,
+				getBlockListSettings,
+				getBlockName,
+				getTemplateLock,
+				isZoomOut,
+			} = unlock( select( blockEditorStore ) );
+			const templateLock = getTemplateLock( clientId );
+			const _blockName = getBlockName( clientId );
+			return (
+				_canEditBlock( clientId ) &&
+				!! getBlockListSettings( clientId ) &&
+				( ! hasBlockAppender ||
+					( !! _blockName && hasBlockAppender( _blockName ) ) ) &&
+				! ( !! templateLock && templateLock !== 'contentOnly' ) &&
+				! isZoomOut()
+			);
+		},
+		[ clientId, BlockAppender, hasBlockAppender ]
+	);
 	const isMatch = useShortcutEventMatch();
 
 	// Determine which blocks to update:
@@ -586,11 +623,24 @@ function ListViewBlock( {
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
 
+	const hasRenderedAppender = canAppend && ! isDisabled;
+
+	const showBlockAppenderPreview = () =>
+		setBlockAppenderPreview( { clientId } );
+	const hideBlockAppenderPreview = () =>
+		setBlockAppenderPreview( ( current ) =>
+			current.clientId === clientId ? { clientId: null } : current
+		);
+
 	let colSpan;
 	if ( hasRenderedMovers ) {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
+	}
+	// Rows without a + span its column, so the columns after it line up.
+	if ( BlockAppender && ! hasRenderedAppender ) {
+		colSpan = ( colSpan ?? 1 ) + 1;
 	}
 
 	const classes = clsx( {
@@ -733,6 +783,63 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasRenderedAppender && BlockAppender && (
+				<TreeGridCell
+					className="block-editor-list-view-block__appender-cell"
+					aria-selected={ !! isSelected }
+					// Hovering the +, or moving to it with the keyboard,
+					// opens a space where its new block will go.
+					onMouseEnter={ () => {
+						isAppenderHoveredRef.current = true;
+						showBlockAppenderPreview();
+					} }
+					onMouseLeave={ ( event: MouseEvent< HTMLElement > ) => {
+						isAppenderHoveredRef.current = false;
+						if (
+							! event.currentTarget.querySelector(
+								':focus-visible'
+							)
+						) {
+							hideBlockAppenderPreview();
+						}
+					} }
+					onFocus={ ( event: FocusEvent< HTMLElement > ) => {
+						if ( event.target.matches( ':focus-visible' ) ) {
+							showBlockAppenderPreview();
+						}
+					} }
+					onBlur={ ( event: FocusEvent< HTMLElement > ) => {
+						if (
+							! isAppenderHoveredRef.current &&
+							! event.currentTarget.contains(
+								event.relatedTarget as Node | null
+							)
+						) {
+							hideBlockAppenderPreview();
+						}
+					} }
+					// The new block takes the space's place.
+					onClick={ () =>
+						setBlockAppenderPreview( {
+							clientId: null,
+							isInstant: true,
+						} )
+					}
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<BlockAppender
+							clientId={ clientId }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

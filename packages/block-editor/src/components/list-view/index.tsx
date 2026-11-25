@@ -17,6 +17,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import {
+	ListViewBlockAppenderPreviewContext,
 	ListViewContext,
 	ListViewInsertedBlockContext,
 	ListViewTreeStateContext,
@@ -35,6 +36,7 @@ import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import type {
+	ListViewBlockAppenderPreview,
 	ListViewExpansionAction,
 	ListViewExpansionState,
 	ListViewProps,
@@ -93,6 +95,8 @@ const expansion = (
  * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param props.additionalBlockContent Component that renders additional block content UI.
  * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
+ * @param props.blockAppender          Component that renders a + in each row that can take inner blocks, which adds one at the end of them. Rows get none when it is not set.
+ * @param props.hasBlockAppender       Whether a row that can take inner blocks gets the `blockAppender`, given its block's name. Every such row gets one when it is not set.
  * @param ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -110,6 +114,8 @@ function ListViewComponent(
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
 		showContentPopover = false,
+		blockAppender: BlockAppender,
+		hasBlockAppender,
 	}: PrivateListViewProps,
 	ref: ForwardedRef< HTMLElement >
 ) {
@@ -139,6 +145,9 @@ function ListViewComponent(
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
 		string | null
 	>( null );
+
+	const [ blockAppenderPreview, setBlockAppenderPreview ] =
+		useState< ListViewBlockAppenderPreview >( { clientId: null } );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
@@ -317,6 +326,9 @@ function ListViewComponent(
 			listViewInstanceId: instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			BlockAppender,
+			hasBlockAppender,
+			setBlockAppenderPreview,
 			treeGridElementRef: elementRef,
 			updateExpansion,
 		} ),
@@ -326,6 +338,8 @@ function ListViewComponent(
 			instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
+			BlockAppender,
+			hasBlockAppender,
 			updateExpansion,
 		]
 	);
@@ -376,6 +390,7 @@ function ListViewComponent(
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,
+					'has-block-appender': !! BlockAppender,
 				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
@@ -401,20 +416,24 @@ function ListViewComponent(
 					<ListViewInsertedBlockContext.Provider
 						value={ insertedBlockClientId }
 					>
-						<ListViewTreeStateContext.Provider
-							value={ treeStateContextValue }
+						<ListViewBlockAppenderPreviewContext.Provider
+							value={ blockAppenderPreview }
 						>
-							<ListViewBranch
-								blocks={ clientIdsTree }
-								parentId={ rootClientId }
-								selectBlock={ selectEditorBlock }
-								showBlockMovers={ showBlockMovers }
-								fixedListWindow={ fixedListWindow }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								showAppender={ showAppender }
-							/>
-						</ListViewTreeStateContext.Provider>
+							<ListViewTreeStateContext.Provider
+								value={ treeStateContextValue }
+							>
+								<ListViewBranch
+									blocks={ clientIdsTree }
+									parentId={ rootClientId }
+									selectBlock={ selectEditorBlock }
+									showBlockMovers={ showBlockMovers }
+									fixedListWindow={ fixedListWindow }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									showAppender={ showAppender }
+								/>
+							</ListViewTreeStateContext.Provider>
+						</ListViewBlockAppenderPreviewContext.Provider>
 					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>

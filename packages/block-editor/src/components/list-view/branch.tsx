@@ -7,7 +7,12 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useInsertedBlockClientId, useListViewTreeState } from './context';
+import ListViewBlockAppenderPreview from './block-appender-preview';
+import {
+	useInsertedBlockClientId,
+	useListViewContext,
+	useListViewTreeState,
+} from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -77,6 +82,8 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		showAppender: showAppenderProp = true,
 		isLastBranch = true,
 	} = props;
+
+	const { BlockAppender } = useListViewContext();
 
 	const { canParentExpand, isParentSynced } = useSelect(
 		( select ) => {
@@ -150,12 +157,13 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 		// The next sibling is offset by this block's subtree.
 		const blockListPosition = nextPosition;
-		nextPosition += countBlocks(
+		const blockRowCount = countBlocks(
 			block,
 			expansionState,
 			draggedClientIds,
 			isExpanded
 		);
+		nextPosition += blockRowCount;
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
@@ -261,6 +269,13 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
 						isLastBranch={ isLastInList }
+					/>
+				) }
+				{ BlockAppender && (
+					<ListViewBlockAppenderPreview
+						clientId={ clientId }
+						level={ level + 1 }
+						innerRowCount={ Math.max( blockRowCount - 1, 0 ) }
 					/>
 				) }
 			</AsyncModeProvider>

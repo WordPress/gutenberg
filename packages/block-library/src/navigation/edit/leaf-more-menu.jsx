@@ -1,8 +1,4 @@
-import {
-	createBlock,
-	hasBlockSupport,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	addSubmenu,
 	chevronUp,
@@ -13,17 +9,15 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import { DEFAULT_BLOCK } from '../constants';
+import {
+	BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU,
+	useAddSubmenuLink,
+} from './use-add-submenu-link';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
-
-const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
 
 /**
  * The menu item that adds a link inside a Navigation item, turning a link into
@@ -41,9 +35,10 @@ export function AddSubmenuItem( {
 	updateExpansion,
 	setInsertedBlockClientId,
 } ) {
-	const { insertBlock, replaceBlock, replaceInnerBlocks } =
-		useDispatch( blockEditorStore );
-	const { getBlock } = useSelect( blockEditorStore );
+	const addSubmenuLink = useAddSubmenuLink( clientId, {
+		updateExpansion,
+		setInsertedBlockClientId,
+	} );
 	const isDisabled = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockRootClientId, canInsertBlockType } =
@@ -66,54 +61,7 @@ export function AddSubmenuItem( {
 			icon={ addSubmenu }
 			disabled={ isDisabled }
 			onClick={ () => {
-				const updateSelectionOnInsert = false;
-				const newLink = createBlock(
-					DEFAULT_BLOCK.name,
-					DEFAULT_BLOCK.attributes
-				);
-				const block = getBlock( clientId );
-
-				if ( block.name === 'core/navigation-submenu' ) {
-					insertBlock(
-						newLink,
-						block.innerBlocks.length,
-						clientId,
-						updateSelectionOnInsert
-					);
-				} else {
-					// Convert to a submenu if the block currently isn't one.
-					// The submenu keeps the link's client ID, so List View
-					// keeps the item's row, and focus can return to its
-					// Options button once the link UI closes.
-					const newSubmenu = {
-						...createBlock(
-							'core/navigation-submenu',
-							block.attributes,
-							block.innerBlocks
-						),
-						clientId,
-					};
-
-					// The following must happen as two independent actions.
-					// Why? Because the offcanvas editor relies on the getLastInsertedBlocksClientIds
-					// selector to determine which block is "active". As the UX needs the newLink to be
-					// the "active" block it must be the last block to be inserted.
-					// Therefore the Submenu is first created and **then** the newLink is inserted
-					// thus ensuring it is the last inserted block.
-					replaceBlock( clientId, newSubmenu );
-
-					replaceInnerBlocks(
-						newSubmenu.clientId,
-						[ newLink ],
-						updateSelectionOnInsert
-					);
-				}
-
-				// This call sets the local List View state for the "last inserted block".
-				// This is required for the Nav Block to determine whether or not to display
-				// the Link UI for this new block.
-				setInsertedBlockClientId( newLink.clientId );
-				updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
+				addSubmenuLink();
 				onClose();
 			} }
 		>

@@ -39,9 +39,11 @@ export default function NavigationMenuContent( {
 	// `undefined` (and crashing the screen). This component only renders once
 	// `useEditorAssets` reports the assets ready, which is exactly when the
 	// global is defined — do not "clean this up" into an import.
-	const { NavigationLinkUI } = unlock(
-		( window as any ).wp.blockLibrary.privateApis
-	);
+	const {
+		NavigationLinkUI,
+		NavigationLeafAppender,
+		hasNavigationBlockAppender,
+	} = unlock( ( window as any ).wp.blockLibrary.privateApis );
 
 	const { listViewRootClientId, isLoading, hasChildren } = useSelect(
 		( select ) => {
@@ -100,6 +102,8 @@ export default function NavigationMenuContent( {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
+					blockAppender={ NavigationLeafAppender }
+					hasBlockAppender={ hasNavigationBlockAppender }
 					additionalBlockContent={ NavigationLinkUI }
 					showContentPopover
 					isExpanded

@@ -1134,6 +1134,430 @@ test.describe( 'Navigation block - List view editing', () => {
 			url: 'https://wordpress.org/news/',
 		} );
 	} );
+
+	test.describe( 'adding items from a row', () => {
+		const rowAppenderMenuFixture = {
+			title: 'Row Appender Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Top Level Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Sign up</a></div><!-- /wp:button --></div><!-- /wp:buttons -->' +
+				'<!-- wp:social-links --><ul class="wp-block-social-links"></ul><!-- /wp:social-links -->' +
+				'<!-- wp:home-link {"label":"Home"} /-->' +
+				'<!-- wp:page-list /-->',
+		};
+
+		const openListView = async ( { editor, page, requestUtils } ) => {
+			await requestUtils.createNavigationMenu( rowAppenderMenuFixture );
+			await editor.insertBlock( { name: 'core/navigation' } );
+			await editor.openDocumentSettingsSidebar();
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description: 'Structure for navigation menu: Row Appender Menu',
+			} );
+			await expect(
+				listView.getByRole( 'row', { name: 'Top Level Item 1' } )
+			).toBeVisible();
+			return listView;
+		};
+
+		// The opacity the element is painted with, its ancestors included,
+		// since the List View fades a row's actions in through their cell.
+		const getPaintedOpacity = ( locator ) =>
+			locator.evaluate( ( element ) => {
+				const { getComputedStyle } = element.ownerDocument.defaultView;
+				let opacity = 1;
+				for ( let node = element; node; node = node.parentElement ) {
+					opacity *= Number( getComputedStyle( node ).opacity );
+				}
+				return opacity;
+			} );
+
+		const getBlockName = async ( page, row ) =>
+			page.evaluate(
+				( clientId ) =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getBlockName( clientId ),
+				await row.getAttribute( 'data-block' )
+			);
+
+		test( 'shows the + of every container row, even when it is neither hovered nor selected', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			await page.mouse.move( 0, 0 );
+
+			for ( const name of [
+				'Top Level Item 2',
+				'Buttons',
+				'Social Icons',
+			] ) {
+				const addButton = listView
+					.getByRole( 'row', { name } )
+					.getByRole( 'button', { name: `Add to ${ name }` } );
+				await expect
+					.poll( () => getPaintedOpacity( addButton ) )
+					.toBe( 1 );
+			}
+
+			// Only the + stays once the pointer leaves a row; its Options
+			// still hide.
+			const row = listView.getByRole( 'row', {
+				name: 'Top Level Item 2',
+			} );
+			await row.hover();
+			const optionsButton = row.getByRole( 'button', {
+				name: 'Options',
+			} );
+			await expect
+				.poll( () => getPaintedOpacity( optionsButton ) )
+				.toBe( 1 );
+			await page.mouse.move( 0, 0 );
+			await expect
+				.poll( () => getPaintedOpacity( optionsButton ) )
+				.toBe( 0 );
+			await expect
+				.poll( () =>
+					getPaintedOpacity(
+						row.getByRole( 'button', {
+							name: 'Add to Top Level Item 2',
+						} )
+					)
+				)
+				.toBe( 1 );
+		} );
+
+		test( 'opens a space where the new item will go while its + is hovered or focused', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			const preview = listView.locator(
+				'.block-editor-list-view-block-appender-preview'
+			);
+			const submenuRow = listView.getByRole( 'row', {
+				name: 'Top Level Item 2',
+			} );
+			const addButton = submenuRow.getByRole( 'button', {
+				name: 'Add to Top Level Item 2',
+			} );
+			await expect( addButton ).toBeAttached();
+			// The Page List's pages load after the menu's own items.
+			await expect(
+				listView.getByRole( 'row', { name: 'Test Page 1' } )
+			).toBeVisible();
+			const rowCount = await listView.getByRole( 'row' ).count();
+
+			await test.step( 'while hovered', async () => {
+				await addButton.hover();
+				await expect( preview ).toBeVisible();
+
+				// The space comes after the submenu's last item, where the
+				// new one will go, and is not a row of the tree grid.
+				const order = await listView.evaluate( ( grid ) => {
+					const rows = Array.from(
+						grid.querySelectorAll(
+							'[role=row], .block-editor-list-view-block-appender-preview'
+						)
+					);
+					return rows.map( ( row ) =>
+						row.matches(
+							'.block-editor-list-view-block-appender-preview'
+						)
+							? 'preview'
+							: row.querySelector(
+									'.block-editor-list-view-block-select-button__title'
+								)?.textContent
+					);
+				} );
+				expect(
+					order.slice(
+						order.indexOf( 'Submenu Item' ),
+						order.indexOf( 'Submenu Item' ) + 3
+					)
+				).toEqual( [ 'Submenu Item', 'preview', 'Buttons' ] );
+				await expect( listView.getByRole( 'row' ) ).toHaveCount(
+					rowCount
+				);
+
+				// Its dashed outline lines up with the submenu's items.
+				const outline = await preview
+					.locator(
+						'.block-editor-list-view-block-appender-preview__outline'
+					)
+					.boundingBox();
+				const itemIcon = await listView
+					.getByRole( 'row', { name: 'Submenu Item' } )
+					.locator( '.block-editor-block-icon' )
+					.boundingBox();
+				expect(
+					Math.abs( outline.x + 4 - itemIcon.x )
+				).toBeLessThanOrEqual( 1 );
+
+				// An L-shaped line runs from under the submenu's icon, down
+				// and across to the outline.
+				const line = await preview
+					.locator(
+						'.block-editor-list-view-block-appender-preview__line'
+					)
+					.boundingBox();
+				const submenuIcon = await submenuRow
+					.locator( '.block-editor-block-icon' )
+					.boundingBox();
+				for ( const [ actual, expected ] of [
+					[ line.x, submenuIcon.x + submenuIcon.width / 2 ],
+					[ line.y, submenuIcon.y + submenuIcon.height ],
+					[ line.x + line.width, outline.x ],
+					[ line.y + line.height, outline.y + outline.height / 2 ],
+				] ) {
+					expect( Math.abs( actual - expected ) ).toBeLessThanOrEqual(
+						2
+					);
+				}
+
+				await page.mouse.move( 0, 0 );
+				await expect( preview ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'while focused', async () => {
+				await listView
+					.getByRole( 'link', { name: 'Top Level Item 2' } )
+					.focus();
+				await page.keyboard.press( 'ArrowRight' );
+				await expect( addButton ).toBeFocused();
+				await expect( preview ).toBeVisible();
+				await page.keyboard.press( 'ArrowLeft' );
+				await expect( preview ).toHaveCount( 0 );
+			} );
+
+			await test.step( 'gives way to the new item at once', async () => {
+				await addButton.hover();
+				await expect( preview ).toBeVisible();
+				await addButton.click();
+				await expect( preview ).toHaveCount( 0 );
+				await expect(
+					listView
+						.getByRole( 'gridcell' )
+						.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+				).toBeVisible();
+			} );
+		} );
+
+		test( 'adds the new item to the end of a collapsed submenu and expands it', async ( {
+			editor,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			const row = listView.getByRole( 'row', {
+				name: 'Top Level Item 2',
+			} );
+
+			await listView
+				.getByRole( 'link', { name: 'Top Level Item 2' } )
+				.focus();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect(
+				listView.getByRole( 'row', { name: 'Submenu Item' } )
+			).toBeHidden();
+
+			await row.hover();
+			await row
+				.getByRole( 'button', { name: 'Add to Top Level Item 2' } )
+				.click();
+			await expect(
+				listView.getByRole( 'row', { name: 'Submenu Item' } )
+			).toBeVisible();
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'wordpress.org' } )
+					.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		test( 'adds a Button to a Buttons block and a Social Icon to an empty Social Icons block', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+
+			await test.step( 'Buttons', async () => {
+				const row = listView.getByRole( 'row', { name: 'Buttons' } );
+				await row.hover();
+				await row
+					.getByRole( 'button', { name: 'Add to Buttons' } )
+					.click();
+				await expect(
+					listView
+						.getByRole( 'gridcell', { name: 'Sign up' } )
+						.filter( { hasText: 'Block 1 of 2, Level 2.' } )
+				).toBeVisible();
+				await expect(
+					listView
+						.getByRole( 'gridcell' )
+						.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+				).toBeVisible();
+			} );
+
+			await test.step( 'Social Icons', async () => {
+				const row = listView.getByRole( 'row', {
+					name: 'Social Icons',
+				} );
+				await row.hover();
+				await row
+					.getByRole( 'button', { name: 'Add to Social Icons' } )
+					.click();
+				await page
+					.getByRole( 'option', { name: 'WordPress', exact: true } )
+					.click();
+				await expect(
+					listView
+						.getByRole( 'gridcell', { name: 'WordPress' } )
+						.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+				).toBeVisible();
+			} );
+		} );
+
+		test( 'offers no + on links, or on other rows that are not containers', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			await expect(
+				listView.getByRole( 'row', { name: 'Test Page 1' } )
+			).toBeVisible();
+
+			for ( const name of [
+				'Top Level Item 1',
+				'Submenu Item',
+				'Sign up',
+				'Home',
+				'Page List',
+				'Test Page 1',
+			] ) {
+				await expect(
+					listView
+						.getByRole( 'row', { name } )
+						.getByRole( 'button', { name: /^Add to / } )
+				).toHaveCount( 0 );
+			}
+		} );
+
+		test( 'offers a + on an empty submenu, which adds a link to it', async ( {
+			editor,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			await requestUtils.createNavigationMenu( {
+				title: 'Empty Submenu Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"Top Level Link","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->' +
+					'<!-- wp:navigation-submenu {"label":"Empty Submenu","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+			} );
+			await editor.insertBlock( { name: 'core/navigation' } );
+			await editor.openDocumentSettingsSidebar();
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+				description:
+					'Structure for navigation menu: Empty Submenu Menu',
+			} );
+			const addButton = listView
+				.getByRole( 'row', { name: 'Empty Submenu' } )
+				.getByRole( 'button', { name: 'Add to Empty Submenu' } );
+
+			await expect( addButton ).toBeVisible();
+			await addButton.click();
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'wordpress.org' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		test( 'reaches the + with the arrow keys, and adds nothing on Escape', async ( {
+			editor,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openListView( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			const row = listView.getByRole( 'row', {
+				name: 'Top Level Item 2',
+			} );
+			const addButton = row.getByRole( 'button', {
+				name: 'Add to Top Level Item 2',
+			} );
+
+			// The + shows once the canvas has registered the submenu's inner
+			// blocks, which can be just after the row itself renders.
+			await expect( addButton ).toBeAttached();
+			await listView
+				.getByRole( 'link', { name: 'Top Level Item 2' } )
+				.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( addButton ).toBeFocused();
+			await page.keyboard.press( 'ArrowRight' );
+			await expect(
+				row.getByRole( 'button', { name: 'Options' } )
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( addButton ).toBeFocused();
+
+			await page.keyboard.press( 'Enter' );
+			await expect( linkControl.getSearchInput() ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( linkControl.getSearchInput() ).toBeHidden();
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Submenu Item' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect
+				.poll( () => getBlockName( page, row ) )
+				.toBe( 'core/navigation-submenu' );
+		} );
+	} );
 } );
 
 /**

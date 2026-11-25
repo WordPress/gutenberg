@@ -6,6 +6,7 @@ import type {
 	KeyboardEvent,
 	MouseEvent,
 	ReactNode,
+	RefAttributes,
 	RefObject,
 	SetStateAction,
 	DragEvent,
@@ -145,6 +146,13 @@ export type ListViewContextValue = {
 	listViewInstanceId?: number | string;
 	rootClientId?: string | null;
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	BlockAppender?: ComponentType<
+		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
+	> | null;
+	hasBlockAppender?: ( blockName: string ) => boolean;
+	setBlockAppenderPreview: Dispatch<
+		SetStateAction< ListViewBlockAppenderPreview >
+	>;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
 };
@@ -191,6 +199,12 @@ export type PrivateListViewProps = ListViewProps & {
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
+	/** Component that renders a + in each row that can take inner blocks, which adds one at the end of them. Rows get none when it is not set. */
+	blockAppender?: ComponentType<
+		ListViewBlockAppenderProps & RefAttributes< HTMLElement >
+	> | null;
+	/** Whether a row that can take inner blocks gets the `blockAppender`, given its block's name. Every such row gets one when it is not set. */
+	hasBlockAppender?: ( blockName: string ) => boolean;
 };
 
 /**
@@ -293,6 +307,27 @@ export type ListViewAppenderProps = {
 	clientId?: string | null;
 	tabIndex?: number;
 	onFocus?: FocusEventHandler;
+};
+
+/**
+ * The block whose + is hovered or focused, which opens a space where its new
+ * inner block will go.
+ */
+export type ListViewBlockAppenderPreview = {
+	clientId: string | null;
+	/** Close the space without animating it, as the new block takes its place. */
+	isInstant?: boolean;
+};
+
+/**
+ * Props of the + in each row.
+ */
+export type ListViewBlockAppenderProps = {
+	clientId: string;
+	tabIndex?: number;
+	onFocus?: FocusEventHandler;
+	updateExpansion: UpdateListViewExpansion;
+	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
 };
 
 /**

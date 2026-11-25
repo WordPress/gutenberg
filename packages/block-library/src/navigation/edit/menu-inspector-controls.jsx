@@ -12,6 +12,7 @@ import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
+import LeafAppender, { hasNavigationBlockAppender } from './leaf-appender';
 import { NavigationLinkUI } from './navigation-link-ui';
 import NavigationListViewHeader from './navigation-list-view-header';
 
@@ -79,6 +80,8 @@ const MainContent = ( {
 				description={ description }
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
+				blockAppender={ LeafAppender }
+				hasBlockAppender={ hasNavigationBlockAppender }
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }
 			/>
