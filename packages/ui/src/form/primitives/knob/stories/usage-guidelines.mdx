@@ -28,7 +28,7 @@ Both controls stay in the Tab order, so each needs its own name. Let the visible
 
 Without `min` and `max`, the dial covers one turn and wraps, as in the example above. Zero points up, 90 points right, and one step past 359 returns to 0. Use this for a direction, such as a gradient angle.
 
-Set `min` and `max` together when the number of turns matters. The range needs room for at least two steps. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A click picks the heading on the turn nearest the current value, so clicking three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
+Set `min` and `max` together when the number of turns matters. The range needs room for at least two steps. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A press picks the heading on the turn nearest the current value, so pressing three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
 
 `unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. `step` is the smallest change the value can take. It defaults to 1 for degrees and gradians, and to 0.01 for radians and turns. It needs to be smaller than a turn.
 
@@ -38,7 +38,7 @@ Steps count from `min`. Choose a `min` that is a whole number of steps away from
 
 ## Show an unset value
 
-Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Turning the dial from there sets a value. Clicking the dot sets the value it points to.
+Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Pressing the dial sets a value. A press on the dot sets the value it points to.
 
 A slider always has a number, so assistive technology reads the placeholder as the dial's value. Use `getAriaValueText` to say where that number comes from, such as “45 degrees, inherited”. The input is where an unset value shows as empty. `undefined` does not mean unset. It makes the dial uncontrolled, starting from `defaultValue`.
 
@@ -46,7 +46,16 @@ A slider always has a number, so assistive technology reads the placeholder as t
 
 ## Pointer interaction
 
-Click or tap a heading to select it, or drag around the center to keep turning. Pressing the dot takes hold of it where it is, so only turning moves it. A tap selects the heading where the pointer lifts, so a canceled press leaves the value alone, and so does lifting outside the dial. A press becomes a drag once the pointer has moved a few pixels and reached another step. During a drag past an end of a bounded dial, the dot waits there until the pointer comes back round to it.
+The dial follows these rules. Each one is a function of the press, the path of the pointer, and the value, so it can be tested without a browser.
+
+1. A press on a heading selects that heading at once, as a press on a slider's track does. A bounded dial takes the heading on the turn nearest to the value. When no turn in the range has it, the press selects the nearer end.
+2. A press on the dot takes hold of it where it is. So does a press in the middle of the dial, which has no heading. The value then changes only when the pointer turns.
+3. A drag turns the dial as far as the pointer goes round, the shorter way. It keeps counting across twelve o'clock, which is how a bounded dial counts turns.
+4. Past an end of a bounded dial, the dot waits at that end until the pointer comes back round to it.
+5. A move straight through the middle of the dial has no way round. It selects the heading it lands on, as a press does. Positions inside the middle are skipped.
+6. The value changes while the pointer moves. Lifting the pointer ends the gesture and keeps the value, and so does a canceled gesture. To undo a change, turn back or use the input.
+7. A press moves focus to the dial before it reads the value. A paired field that commits when it loses focus has then committed, and the press counts its turn from that value.
+8. An empty dial sets a value on its first press. A press on its dot sets the value the dot points to.
 
 ## Keyboard interaction
 

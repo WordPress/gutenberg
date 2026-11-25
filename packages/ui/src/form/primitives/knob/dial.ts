@@ -2,7 +2,7 @@ export function modulo( value: number, period: number ) {
 	return ( ( value % period ) + period ) % period;
 }
 
-export function clamp( value: number, min: number, max: number ) {
+function clamp( value: number, min: number, max: number ) {
 	return Math.max( min, Math.min( max, value ) );
 }
 
@@ -81,28 +81,67 @@ export function getDial( {
 		return unitsPerTurn - turned < turned - toValue( index ) ? 0 : index;
 	}
 
+	const firstAngle = toAngle( 0 );
+	const lastAngle = toAngle( lastStep );
+	const stepAngle = ( step / unitsPerTurn ) * 360;
+
+	// The angle of a value as given, before it snaps to a step. A bounded
+	// dial keeps it within its ends.
+	const exactAngle = ( value: number ) =>
+		wraps
+			? ( value / unitsPerTurn ) * 360
+			: clamp( ( value / unitsPerTurn ) * 360, firstAngle, lastAngle );
+
+	// The dial angle that a press on `heading` selects, for a value that lies
+	// at `valueAngle`. A wrapping dial has one turn, so the heading is the
+	// answer. A bounded dial has the heading on several turns. It takes the
+	// one nearest to the value, so a press never moves the value by more than
+	// it has to. When that turn does not have the heading, it takes the turn
+	// that does, or else the one that brings it closest to an end. A heading
+	// that rounds to an end counts as within the range.
+	function press( heading: number, valueAngle: number ) {
+		if ( wraps ) {
+			return heading;
+		}
+		const nearest =
+			heading +
+			360 *
+				Math.round(
+					( clamp( valueAngle, firstAngle, lastAngle ) - heading ) /
+						360
+				);
+		const outside = ( angle: number ) =>
+			Math.max(
+				firstAngle - angle - stepAngle / 2,
+				angle - lastAngle - stepAngle / 2,
+				0
+			);
+		return [ nearest - 360, nearest + 360 ].reduce(
+			( best, candidate ) =>
+				outside( candidate ) < outside( best ) ? candidate : best,
+			nearest
+		);
+	}
+
 	return {
 		wraps,
 		step,
 		precision,
 		lastStep,
-		firstAngle: toAngle( 0 ),
-		lastAngle: toAngle( lastStep ),
-		stepAngle: ( step / unitsPerTurn ) * 360,
 		toValue,
 		toIndex,
 		toAngle,
 		fromAngle: ( angle: number ) =>
 			toIndex( ( angle / 360 ) * unitsPerTurn ),
-		// The angle of a value as given, before it snaps to a step. A bounded
-		// dial keeps it within its ends.
-		exactAngle: ( value: number ) =>
-			( ( wraps
-				? value
-				: clamp( value, toValue( 0 ), toValue( lastStep ) ) ) /
-				unitsPerTurn ) *
-			360,
+		exactAngle,
+		press,
 	};
+}
+
+// The shorter way round from one heading to another, in degrees between -180
+// and 180. Adding these up over a drag counts the turns the pointer makes.
+export function turnBetween( from: number, to: number ) {
+	return modulo( to - from + 180, 360 ) - 180;
 }
 
 // The dial is drawn in a square of this many units. The dot sits `DOT_OFFSET`
@@ -120,7 +159,7 @@ type Point = { x: number; y: number };
 
 // Measures the dial once, and returns a function that says where a position on
 // the screen is on it. `x` and `y` are measured from the center in the units
-// the dial is drawn in. `angle` is the clockwise angle from twelve o'clock,
+// the dial is drawn in. `heading` is the clockwise angle from twelve o'clock,
 // between -180 and 180 degrees, or null in the middle.
 export function measure( dial: HTMLElement ) {
 	const { left, top, width, height } = dial.getBoundingClientRect();
@@ -128,17 +167,31 @@ export function measure( dial: HTMLElement ) {
 	return ( { clientX, clientY }: { clientX: number; clientY: number } ) => {
 		const x = ( clientX - left - width / 2 ) / unit;
 		const y = ( clientY - top - height / 2 ) / unit;
-		const distance = Math.hypot( x, y );
 		return {
 			x,
 			y,
-			angle:
-				distance < CENTER_RADIUS
+			heading:
+				Math.hypot( x, y ) < CENTER_RADIUS
 					? null
 					: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
-			inside: distance <= VIEW_SIZE / 2,
 		};
 	};
+}
+
+// Whether the straight path between two positions passes through the middle of
+// the dial. Such a move is close to half a turn either way, so it says where
+// the pointer went but not which way round.
+export function crossesMiddle( from: Point, to: Point ) {
+	const dx = to.x - from.x;
+	const dy = to.y - from.y;
+	const length = dx * dx + dy * dy;
+	const along =
+		length === 0
+			? 0
+			: clamp( -( from.x * dx + from.y * dy ) / length, 0, 1 );
+	return (
+		Math.hypot( from.x + along * dx, from.y + along * dy ) < CENTER_RADIUS
+	);
 }
 
 // Whether a position is on the dot of a dial that points to `dialAngle`.
@@ -149,22 +202,6 @@ export function isOnDot( { x, y }: Point, dialAngle: number ) {
 			x - DOT_OFFSET * Math.sin( heading ),
 			y + DOT_OFFSET * Math.cos( heading )
 		) <= DOT_REACH
-	);
-}
-
-// Whether the straight path between two pointer positions passes through the
-// middle of the dial. The pointer then cut across the dial instead of going
-// around it, however few positions the browser reported on the way.
-export function crossesCenter( from: Point, to: Point ) {
-	const dx = to.x - from.x;
-	const dy = to.y - from.y;
-	const length = dx * dx + dy * dy;
-	const along =
-		length === 0
-			? 0
-			: clamp( -( from.x * dx + from.y * dy ) / length, 0, 1 );
-	return (
-		Math.hypot( from.x + along * dx, from.y + along * dy ) < CENTER_RADIUS
 	);
 }
 
