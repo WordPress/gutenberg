@@ -14,6 +14,7 @@ import {
 import useAutoGridDrop from '../grid/use-auto-grid-drop';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import type { EdgeName, Point } from '../../utils/math';
 import type {
 	ListViewDropZoneBlock,
@@ -424,6 +425,9 @@ export default function useListViewDropZone( {
 	ref: RefCallback< HTMLElement >;
 	target: ListViewDropZoneTarget | null | undefined;
 } {
+	const { areBlocksContiguous, canMoveBlocksToPosition } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -492,6 +496,9 @@ export default function useListViewDropZone( {
 			( event: DragEvent, currentTarget: HTMLElement ) => {
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
+				const isNonContiguousMove =
+					isBlockDrag &&
+					! areBlocksContiguous( draggedBlockClientIds );
 
 				const blockElements = Array.from(
 					currentTarget.querySelectorAll< HTMLElement >(
@@ -513,6 +520,28 @@ export default function useListViewDropZone( {
 						10
 					);
 					const rootClientId = getBlockRootClientId( clientId );
+					let canInsertDraggedBlocksAsSibling = true;
+					let canInsertDraggedBlocksAsChild = true;
+					if ( isNonContiguousMove ) {
+						canInsertDraggedBlocksAsSibling =
+							canMoveBlocksToPosition(
+								draggedBlockClientIds,
+								rootClientId ?? ''
+							);
+						canInsertDraggedBlocksAsChild = canMoveBlocksToPosition(
+							draggedBlockClientIds,
+							clientId
+						);
+					} else if ( isBlockDrag ) {
+						canInsertDraggedBlocksAsSibling = canInsertBlocks(
+							draggedBlockClientIds,
+							rootClientId
+						);
+						canInsertDraggedBlocksAsChild = canInsertBlocks(
+							draggedBlockClientIds,
+							clientId
+						);
+					}
 
 					return {
 						clientId,
@@ -523,15 +552,8 @@ export default function useListViewDropZone( {
 						nestingLevel: nestingLevel || undefined,
 						isDraggedBlock: isBlockDrag ? isDraggedBlock : false,
 						innerBlockCount: getBlockCount( clientId ),
-						canInsertDraggedBlocksAsSibling: isBlockDrag
-							? canInsertBlocks(
-									draggedBlockClientIds,
-									rootClientId
-								)
-							: true,
-						canInsertDraggedBlocksAsChild: isBlockDrag
-							? canInsertBlocks( draggedBlockClientIds, clientId )
-							: true,
+						canInsertDraggedBlocksAsSibling,
+						canInsertDraggedBlocksAsChild,
 					};
 				} );
 
@@ -543,6 +565,8 @@ export default function useListViewDropZone( {
 
 				if ( newTarget ) {
 					setTarget( newTarget );
+				} else if ( isNonContiguousMove ) {
+					setTarget( null );
 				}
 			},
 			[
@@ -552,6 +576,8 @@ export default function useListViewDropZone( {
 				getBlockIndex,
 				getBlockRootClientId,
 				rtl,
+				areBlocksContiguous,
+				canMoveBlocksToPosition,
 			]
 		),
 		50

@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { CSSProperties, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
@@ -17,7 +17,7 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, SPACE, isAppleOS } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
@@ -43,10 +43,11 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
 import type { ListViewBlockProps, TreeGridItemRenderProps } from './types';
-import type { TreeBlock } from '../../store/types';
+import type { BlockEditorThunkArgs, TreeBlock } from '../../store/types';
 
 function ListViewBlock( {
 	clientId,
+	draggedItemsHeight,
 	displacement,
 	isAfterDraggedBlocks,
 	isDragged,
@@ -99,7 +100,6 @@ function ListViewBlock( {
 	);
 
 	const {
-		canInsertBlockType,
 		getSelectedBlockClientIds,
 		getPreviousBlockClientId,
 		getBlockRootClientId,
@@ -111,7 +111,10 @@ function ListViewBlock( {
 		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
-	} = useSelect( blockEditorStore );
+		canDuplicateBlocks,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const pasteStyles = usePasteStyles();
@@ -282,25 +285,8 @@ function ListViewBlock( {
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			event.preventDefault();
 
-			const { blocksToUpdate, firstBlockRootClientId } =
-				getBlocksToUpdate();
-
-			const canDuplicate = getBlocksByClientId( blocksToUpdate ).every(
-				( blockToUpdate ) => {
-					return (
-						!! blockToUpdate &&
-						hasBlockSupport(
-							blockToUpdate.name,
-							'multiple',
-							true
-						) &&
-						canInsertBlockType(
-							blockToUpdate.name,
-							firstBlockRootClientId
-						)
-					);
-				}
-			);
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const canDuplicate = canDuplicateBlocks( blocksToUpdate );
 
 			if ( canDuplicate ) {
 				const updatedBlocks = await duplicateBlocks(
@@ -445,17 +431,31 @@ function ListViewBlock( {
 	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
-		( event: MouseEvent | KeyboardEvent ) => {
-			// For keyboard activation (Enter/Space on a link), transfer focus
+		async ( event: MouseEvent | KeyboardEvent ) => {
+			// For Enter activation on a link, transfer focus
 			// to the canvas at the default initial position (start of the first
 			// field). For mouse clicks, keep focus in the list view so that
 			// subsequent keyboard operations (arrow navigation, copy/paste)
 			// still work.
-			const isKeyboardActivation = event?.detail === 0;
-			selectBlock( event, clientId, isKeyboardActivation ? 0 : null );
+			const isUpdatingSetSelection =
+				! event.shiftKey &&
+				! event.altKey &&
+				( ( 'keyCode' in event && event.keyCode === SPACE ) ||
+					( isAppleOS() ? event.metaKey : event.ctrlKey ) );
+			const isKeyboardActivation =
+				event?.detail === 0 && ! isUpdatingSetSelection;
 			event.preventDefault();
+			await selectBlock(
+				event,
+				clientId,
+				isKeyboardActivation ? 0 : null
+			);
+			if ( isUpdatingSetSelection ) {
+				// Enabling/disabling the drag wrapper can remount the row's link.
+				await focusListItem( clientId, treeGridElementRef?.current );
+			}
 		},
-		[ clientId, selectBlock ]
+		[ clientId, selectBlock, treeGridElementRef ]
 	);
 
 	const updateFocusAndSelection = useCallback(
@@ -636,6 +636,15 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			// Close the gaps left by dragged rows above this row, keeping one
+			// row of space for the drop marker.
+			style={
+				draggedItemsHeight === undefined
+					? undefined
+					: ( {
+							'--wp-admin--list-view-dragged-items-height': `${ draggedItemsHeight }px`,
+						} as CSSProperties )
+			}
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
 			onMouseEnter={ isDisabled ? undefined : onMouseEnter }

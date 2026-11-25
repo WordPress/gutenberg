@@ -40,6 +40,8 @@ export interface DropTargetPositionOptions {
 	parentBlockClientId?: string | null;
 	parentBlockOrientation?: BlockListOrientation;
 	rootBlockIndex?: number;
+	/** Disable grouping and replacement for moves that only support insertion. */
+	allowGroupAndReplace?: boolean;
 }
 
 /**

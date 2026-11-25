@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: Preserve non-contiguous block selections through undo and redo and share them with other users.
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).

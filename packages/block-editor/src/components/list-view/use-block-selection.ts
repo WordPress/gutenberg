@@ -2,13 +2,26 @@ import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { UP, DOWN, HOME, END, ESCAPE } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	HOME,
+	END,
+	ESCAPE,
+	SPACE,
+	isAppleOS,
+} from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
 import type { ListViewSelectionEvent } from './types';
+import { unlock } from '../../lock-unlock';
 
 export default function useBlockSelection() {
+	const { toggleBlockSelection } = unlock( useDispatch( blockEditorStore ) );
+	const { getSetSelectionClientIds } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const { clearSelectedBlock, multiSelect, selectBlock } =
 		useDispatch( blockEditorStore );
 	const {
@@ -29,6 +42,19 @@ export default function useBlockSelection() {
 			destinationClientId?: string | null,
 			focusPosition?: 0 | -1 | null
 		) => {
+			if (
+				event &&
+				! event.shiftKey &&
+				! event.altKey &&
+				( ( event.type === 'keydown' && event.keyCode === SPACE ) ||
+					( event.type === 'click' &&
+						( isAppleOS() ? event.metaKey : event.ctrlKey ) ) )
+			) {
+				// Prevent link navigation or Space scrolling.
+				event.preventDefault();
+				await toggleBlockSelection( clientId, null );
+				return;
+			}
 			if ( ! event?.shiftKey && event?.keyCode !== ESCAPE ) {
 				selectBlock( clientId, focusPosition );
 				return;
@@ -106,7 +132,8 @@ export default function useBlockSelection() {
 					startTarget,
 					endTarget,
 					startParents,
-					endParents
+					endParents,
+					!! getSetSelectionClientIds()
 				);
 				await multiSelect( start, end, null );
 			}
@@ -166,6 +193,8 @@ export default function useBlockSelection() {
 			hasSelectedBlock,
 			multiSelect,
 			selectBlock,
+			toggleBlockSelection,
+			getSetSelectionClientIds,
 		]
 	);
 

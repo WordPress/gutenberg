@@ -13,6 +13,28 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 } ) );
 
 describe( 'parseDropEvent', () => {
+	it.each(
+		[
+			null,
+			[],
+			'invalid',
+			{ type: 'block', srcClientIds: 'block-id' },
+			{ type: 'block', srcClientIds: [ 42 ] },
+			{ type: 'block', srcClientIds: [] },
+			{ type: 'block', srcRootClientId: 42, srcClientIds: [ 'a' ] },
+		].map( ( data ) => [ data ] )
+	)( 'ignores malformed drag data %j without changing blocks', ( data ) => {
+		const event = {
+			dataTransfer: { getData: () => JSON.stringify( data ) },
+		} as unknown as DragEvent;
+		expect( parseDropEvent( event ) ).toEqual( {
+			srcRootClientId: null,
+			srcClientIds: null,
+			srcIndex: null,
+			type: null,
+			blocks: null,
+		} );
+	} );
 	it( 'converts an event dataTransfer property from JSON to an object', () => {
 		const rawDataTransfer = {
 			blocks: null,
@@ -93,6 +115,37 @@ describe( 'parseDropEvent', () => {
 } );
 
 describe( 'onBlockDrop', () => {
+	it( 'moves non-contiguous siblings together when dropped between selected blocks', () => {
+		const moveBlocks = vi.fn();
+		const handleSet = vi.fn( () => true );
+		const getBlockIndex = vi.fn( () => 0 );
+		const handler = onBlockDrop(
+			'',
+			2,
+			getBlockIndex,
+			() => [],
+			moveBlocks,
+			vi.fn(),
+			vi.fn(),
+			'insert',
+			() => null,
+			undefined,
+			handleSet
+		);
+		handler( {
+			dataTransfer: {
+				getData: () =>
+					JSON.stringify( {
+						type: 'block',
+						srcRootClientId: '',
+						srcClientIds: [ 'a', 'c' ],
+					} ),
+			},
+		} as unknown as DragEvent );
+		expect( handleSet ).toHaveBeenCalledWith( [ 'a', 'c' ], '' );
+		expect( getBlockIndex ).not.toHaveBeenCalled();
+		expect( moveBlocks ).not.toHaveBeenCalled();
+	} );
 	it( 'does nothing if the event is not a block type drop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;

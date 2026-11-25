@@ -1078,7 +1078,7 @@ _Parameters_
 
 _Returns_
 
-- `boolean`: Whether block is selected and multi-selection exists.
+- `boolean`: Whether block is selected and no multi-selection exists.
 
 ### isBlockValid
 
@@ -1270,7 +1270,7 @@ Action that clears the block selection.
 
 _Returns_
 
-- `Object`: Action object.
+- Action object.
 
 ### duplicateBlocks
 
@@ -1401,12 +1401,14 @@ Undocumented declaration.
 
 Action that moves given blocks to a new position.
 
+Does not select the moved blocks. Blocks are moved in document order, using their current parents. When both an ancestor and its descendant are supplied in `clientIds`, only the ancestor moves, because its descendants move with it.
+
 _Parameters_
 
-- _clientIds_ `?string`: The client IDs of the blocks.
-- _fromRootClientId_ `?string`: Root client ID source.
+- _clientIds_ `string[]`: The client IDs of the blocks.
+- _fromRootClientId_ `?string`: Source parent fallback when the current parent is unavailable.
 - _toRootClientId_ `?string`: Root client ID destination.
-- _index_ `number`: The index to move the blocks to.
+- _index_ `number`: Destination index after removing moved blocks. Omit to append.
 
 ### moveBlocksUp
 
@@ -1432,6 +1434,22 @@ _Parameters_
 - _start_ `string`: First block of the multi selection.
 - _end_ `string`: Last block of the multiselection.
 - _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
+
+### multiSelectSet
+
+Selects a set of whole blocks, including blocks with different ordinary parents.
+
+Client IDs are stored in document order. Selection start and end preserve the order of selection: selecting E then adding B stores [B, E], with selection start E and selection end B. Shift-selection extends from selection start; selection end does not track keyboard focus.
+
+By default, selection start and end use the first and last valid input IDs. If either ID is not in the selected client IDs, withSetSelection uses the first or last selected block in document order instead. Matching selection start and end IDs do not imply that only one block is selected.
+
+_Parameters_
+
+- _clientIds_ `string[]`: Block client IDs to select.
+- _initialPosition_ `InitialPosition`: Initial caret position, or null to retain focus outside the canvas.
+- _options_ `{ selectionStartClientId?: string; selectionEndClientId?: string; }`: Optional selection start and end blocks.
+- _options.selectionStartClientId_ `string`: Client ID of the block where the selection starts.
+- _options.selectionEndClientId_ `string`: Client ID of the block where the selection ends.
 
 ### receiveBlocks
 
@@ -1644,6 +1662,7 @@ _Parameters_
 - _selectionStart_ `WPBlockSelection`: The selection start.
 - _selectionEnd_ `WPBlockSelection`: The selection end.
 - _initialPosition_ `0|-1|null`: Initial block position.
+- _setSelectionClientIds_ `string[]`: Selected block client IDs, omitted for text and range selections.
 
 _Returns_
 

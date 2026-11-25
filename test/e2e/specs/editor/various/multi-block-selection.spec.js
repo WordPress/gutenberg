@@ -22,6 +22,183 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'keeps canvas and List View selection synchronized', async ( {
+		editor,
+		page,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 3 ] );
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await expect(
+			listView
+				.getByRole( 'gridcell', { selected: true } )
+				.filter( { has: page.getByRole( 'link' ) } )
+		).toHaveCount( 2 );
+		await listView
+			.getByRole( 'link', { name: 'Paragraph', exact: true } )
+			.nth( 3 )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 3, 4 ] );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 3 );
+	} );
+
+	test( 'keeps nested controls interactive during canvas modifier-click', async ( {
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:html --><details><summary>Disclosure control</summary><p>Details body</p></details><div role="checkbox" tabindex="0" aria-checked="false">Custom control</div><!-- /wp:html -->'
+		);
+		const firstParagraph = editor.canvas.getByText( 'Alpha', {
+			exact: true,
+		} );
+		await firstParagraph.click();
+		const details = editor.canvas.locator( 'details' );
+		await expect( details ).not.toHaveAttribute( 'open', '' );
+		await editor.canvas
+			.locator( 'summary' )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect( details ).toHaveAttribute( 'open', '' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toHaveLength( 1 );
+
+		await firstParagraph.click();
+		const customControl = editor.canvas.getByRole( 'checkbox', {
+			name: 'Custom control',
+		} );
+		await customControl.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect( customControl ).toBeFocused();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toHaveLength( 1 );
+	} );
+
+	test( 'preserves selection when interacting with the toolbar and inspector', async ( {
+		editor,
+		page,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await editor.openDocumentSettingsSidebar();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 3 ] );
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await toolbar
+			.getByRole( 'button', { name: 'Align text', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemradio', {
+				name: 'Align text right',
+				exact: true,
+			} )
+			.click();
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map(
+					( block ) => block.attributes.style?.typography?.textAlign
+				)
+			)
+			.toEqual( [ 'right', undefined, 'right' ] );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 3 ] );
+	} );
+
+	test( 'undoes duplication across multiple parents in one step', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Alpha' } },
+				{ name: 'core/paragraph', attributes: { content: 'Bravo' } },
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Charlie' } },
+			],
+		} );
+		const before = await editor.getBlocks();
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'primary+shift+d' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				innerBlocks: [
+					{ attributes: { content: 'Alpha' } },
+					{ attributes: { content: 'Alpha' } },
+					{ attributes: { content: 'Bravo' } },
+				],
+			},
+			{
+				innerBlocks: [
+					{ attributes: { content: 'Charlie' } },
+					{ attributes: { content: 'Charlie' } },
+				],
+			},
+		] );
+		await page.getByRole( 'button', { name: 'Undo', exact: true } ).click();
+		await expect.poll( editor.getBlocks ).toEqual( before );
+	} );
+
+	test( 'undoes and redoes mutations without restoring stale selected IDs', async ( {
+		editor,
+		page,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'primary+shift+d' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 2, 5 ] );
+		await page.getByRole( 'button', { name: 'Undo', exact: true } ).click();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 3 ] );
+		await page.getByRole( 'button', { name: 'Redo', exact: true } ).click();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 2, 5 ] );
+	} );
+
 	test( 'should select with double ctrl+a and speak', async ( {
 		page,
 		editor,

@@ -1,5 +1,63 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { find } from '../focusable';
+import { find, isFocusable } from '../focusable';
+
+describe( 'focusable.isFocusable()', () => {
+	let container: HTMLDivElement;
+
+	beforeEach( () => {
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+	} );
+
+	afterEach( () => {
+		container.remove();
+	} );
+
+	it.each( [
+		[ 'button', '<button>Control</button>', true ],
+		[ 'input', '<input>', true ],
+		[ 'textarea', '<textarea></textarea>', true ],
+		[ 'select', '<select><option>Option</option></select>', true ],
+		[ 'link', '<a href="#target">Link</a>', true ],
+		[ 'summary', '<details><summary>Disclosure</summary></details>', true ],
+		[
+			'custom control',
+			'<div tabindex="0" role="checkbox">Control</div>',
+			true,
+		],
+		[ 'negative tabindex', '<div tabindex="-1">Control</div>', true ],
+		[ 'editable', '<div contenteditable="true">Text</div>', true ],
+		[ 'plain element', '<div>Text</div>', false ],
+		[ 'disabled button', '<button disabled>Control</button>', false ],
+		[ 'disabled input', '<input disabled>', false ],
+		[ 'hidden input', '<input type="hidden">', false ],
+		[ 'hidden element', '<button hidden>Control</button>', false ],
+		[
+			'invisible element',
+			'<button style="visibility:hidden">Control</button>',
+			false,
+		],
+		[
+			'inert ancestor',
+			'<div inert><button>Control</button></div>',
+			false,
+		],
+	] as const )(
+		'checks a %s consistently with find()',
+		( _, html, expected ) => {
+			container.innerHTML = html;
+			const element =
+				container.querySelector(
+					'summary, button, input, textarea, select, a, [tabindex], [contenteditable]'
+				) ?? container.firstElementChild!;
+
+			expect( isFocusable( element ) ).toBe( expected );
+			expect( find( container ).includes( element as HTMLElement ) ).toBe(
+				expected
+			);
+		}
+	);
+} );
 
 describe( 'focusable.find() CSS visibility', () => {
 	let node: HTMLDivElement;
@@ -162,6 +220,7 @@ describe( 'focusable', () => {
 			area.focus();
 			expect( area ).toHaveFocus();
 			expect( find( node ) ).toEqual( [ area ] );
+			expect( isFocusable( area ) ).toBe( true );
 		} );
 
 		it( 'ignores a mapped area whose referenced image is hidden', () => {
@@ -178,6 +237,9 @@ describe( 'focusable', () => {
 
 			expect( image.getClientRects().length ).toBeGreaterThan( 0 );
 			expect( find( node ) ).toEqual( [] );
+			expect( isFocusable( node.querySelector( 'area' )! ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'ignores a mapped area whose referenced image is inside an inert subtree', () => {

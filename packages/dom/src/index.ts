@@ -4,6 +4,9 @@ import * as tabbable from './tabbable';
 /**
  * Object grouping `focusable` and `tabbable` utils
  * under the keys with the same name.
+ *
+ * Use `focus.focusable.isFocusable( element )` to check an individual element,
+ * or `focus.focusable.find( container )` to find focusable descendants.
  */
 export const focus = { focusable, tabbable };
 

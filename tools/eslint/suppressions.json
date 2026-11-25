@@ -2612,11 +2612,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/list-item/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/list/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1

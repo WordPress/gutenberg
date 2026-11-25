@@ -66,6 +66,7 @@ const {
 	insertBlocks,
 	mergeBlocks,
 	moveBlocksToPosition,
+	moveBlockToPosition,
 	multiSelect,
 	removeBlock,
 	removeBlocks,
@@ -944,6 +945,10 @@ describe( 'actions', () => {
 		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
+				getBlock: () => ( {} ),
+				getBlockParents: () => [],
+				getBlockRootClientId: () => 'ribs',
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => true,
 			};
@@ -974,6 +979,10 @@ describe( 'actions', () => {
 		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
+				getBlock: () => ( {} ),
+				getBlockParents: () => [],
+				getBlockRootClientId: () => 'ribs',
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => false,
 			};
@@ -997,14 +1006,17 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'moveBlockToPosition', () => {
-		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action with a single block', () => {
+		it( 'dispatches MOVE_BLOCKS_TO_POSITION for a single block', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
+				getBlock: () => ( {} ),
+				getBlockParents: () => [],
+				getBlockRootClientId: () => 'ribs',
 			};
 			const dispatch = vi.fn() as MockDispatch;
 
-			moveBlocksToPosition(
-				// @ts-expect-error Deliberately one client ID as a string, which is forwarded unchanged.
+			moveBlockToPosition(
 				'chicken',
 				'ribs',
 				'ribs',
@@ -1021,7 +1033,7 @@ describe( 'actions', () => {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
-				clientIds: 'chicken',
+				clientIds: [ 'chicken' ],
 				index: 5,
 			} );
 		} );

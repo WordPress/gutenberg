@@ -5,6 +5,62 @@ test.describe( 'Copy/cut/paste', () => {
 		await admin.createNewPost();
 	} );
 
+	for ( const surface of [ 'canvas', 'List View' ] ) {
+		test( `copies non-contiguous blocks and pastes after the last selected block in ${ surface } (@firefox, @webkit)`, async ( {
+			editor,
+			pageUtils,
+		} ) => {
+			await editor.setContent(
+				'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta</p><!-- /wp:paragraph -->'
+			);
+			await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+			await editor.canvas
+				.getByText( 'Charlie', { exact: true } )
+				.click( { modifiers: [ 'ControlOrMeta' ] } );
+			if ( surface === 'List View' ) {
+				await pageUtils.pressKeys( 'access+o' );
+			}
+			await pageUtils.pressKeys( 'primary+c' );
+			await pageUtils.pressKeys( 'primary+v' );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					{ attributes: { content: 'Alpha' } },
+					{ attributes: { content: 'Bravo' } },
+					{ attributes: { content: 'Charlie' } },
+					{ attributes: { content: 'Alpha' } },
+					{ attributes: { content: 'Charlie' } },
+					{ attributes: { content: 'Delta' } },
+				] );
+		} );
+	}
+
+	test( 'preserves paste-over behavior for contiguous sibling selections (@firefox, @webkit)', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Bravo', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'primary+v' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { content: 'Alpha' } },
+				{ attributes: { content: 'Charlie' } },
+				{ attributes: { content: 'Charlie' } },
+			] );
+	} );
+
 	test( 'should copy and paste individual blocks with collapsed selection', async ( {
 		editor,
 		page,

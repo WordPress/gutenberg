@@ -7,6 +7,7 @@ import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import AutoGridItemMovers from '../grid/auto-grid-item-movers';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import {
 	getLayoutBlockSupport,
 	normalizeLegacyLayout,
@@ -17,6 +18,7 @@ import type { BlockMoverProps } from './types';
 function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 	const {
 		canMove,
+		canDrag,
 		rootClientId,
 		isFirst,
 		isLast,
@@ -30,11 +32,12 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				getBlockIndex,
 				getBlockListSettings,
 				canMoveBlocks,
+				areBlocksContiguous,
 				getBlockOrder,
 				getBlockRootClientId,
 				getBlockAttributes,
 				getBlockName,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 			const normalizedClientIds = Array.isArray( clientIds )
 				? clientIds
 				: [ clientIds ];
@@ -54,7 +57,11 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				normalizeLegacyLayout( layout ) || layoutSupport?.default;
 
 			return {
-				canMove: canMoveBlocks( clientIds ),
+				// Arrow movers require contiguous blocks with the same parent; dragging does not.
+				canMove:
+					canMoveBlocks( clientIds ) &&
+					areBlocksContiguous( clientIds ),
+				canDrag: canMoveBlocks( clientIds ),
 				rootClientId: _rootClientId,
 				isFirst: firstIndex === 0,
 				isLast: lastIndex === blockOrder.length - 1,
@@ -79,8 +86,8 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 
 	if (
 		hasBlocks &&
-		( ! canMove ||
-			( isFirst && isLast && ! rootClientId ) ||
+		( ! canDrag ||
+			( canMove && isFirst && isLast && ! rootClientId ) ||
 			( hideDragHandle && isManualGrid ) )
 	) {
 		return null;
@@ -118,6 +125,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 					isAutoFit={ isAutoFit }
 				/>
 			) : (
+				canMove &&
 				! isManualGrid && (
 					<div className="block-editor-block-mover__move-button-container">
 						<ToolbarItem>

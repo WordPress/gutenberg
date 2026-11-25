@@ -40,6 +40,7 @@ export interface BlockRefsProviderProps {
 export interface BlockSelectionState {
 	selectionStart?: BlockSelection;
 	selectionEnd?: BlockSelection;
+	setSelectionClientIds?: string[];
 	initialPosition?: InitialPosition;
 }
 

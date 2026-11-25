@@ -14,12 +14,14 @@ import {
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
 import type { WritingFlowClipboardEvent } from './types';
+import type { BlockEditorThunkArgs } from '../../store/types';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
@@ -62,7 +64,10 @@ export default function useClipboardHandler() {
 		getBlockRootClientId,
 		getBlockAttributes,
 		getSelectionStart,
-	} = useSelect( blockEditorStore );
+		isSelectionContiguous,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
 	const {
 		flashBlock,
 		removeBlocks,
@@ -71,7 +76,10 @@ export default function useClipboardHandler() {
 		__unstableExpandSelection,
 		__unstableSplitSelection,
 		selectionChange,
-	} = useDispatch( blockEditorStore );
+		pasteBlocksAfter,
+	} = unlock< BlockEditorThunkArgs[ 'dispatch' ] >(
+		useDispatch( blockEditorStore )
+	);
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect< HTMLElement >( ( node ) => {
@@ -306,6 +314,11 @@ export default function useClipboardHandler() {
 				}
 
 				if ( isFullySelected ) {
+					if ( ! isSelectionContiguous() ) {
+						event.preventDefault();
+						pasteBlocksAfter( blocks, selectedBlockClientIds );
+						return;
+					}
 					replaceBlocks(
 						selectedBlockClientIds,
 						blocks,

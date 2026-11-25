@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: Highlight each selected block, or its nearest visible parent when hidden inside collapsed content.
+
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).

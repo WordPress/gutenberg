@@ -532,6 +532,8 @@ export interface BlocksState {
 export interface SelectionState {
 	selectionStart: BlockSelection;
 	selectionEnd: BlockSelection;
+	/** Selected block client IDs from multiSelectSet, omitted for zero/one block, text, and range selections. */
+	setSelectionClientIds?: string[];
 }
 
 /**
@@ -652,7 +654,11 @@ export type Action =
 	| {
 			type: 'MOVE_BLOCKS_TO_POSITION';
 			clientIds: string[];
-			fromRootClientId?: string | null;
+			/**
+			 * Source parent, or an array of source parents when moving blocks together.
+			 * With an array, index is relative to the destination after removing moved blocks.
+			 */
+			fromRootClientId?: string | string[] | null;
 			toRootClientId?: string | null;
 			index?: number;
 	  }
@@ -670,6 +676,13 @@ export type Action =
 			type: 'MULTI_SELECT';
 			start: string;
 			end: string;
+			initialPosition?: InitialPosition;
+	  }
+	| {
+			type: 'MULTI_SELECT_SET';
+			clientIds: string[];
+			selectionStart: BlockSelection;
+			selectionEnd: BlockSelection;
 			initialPosition?: InitialPosition;
 	  }
 	| { type: 'OPEN_LIST_VIEW_CONTENT_PANEL' }
@@ -727,6 +740,7 @@ export type Action =
 			selectionStart: BlockSelection;
 			selectionEnd: BlockSelection;
 			initialPosition?: InitialPosition;
+			setSelectionClientIds?: string[];
 	  }
 	| { type: 'RESET_ZOOM_LEVEL' }
 	| {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `focus.focusable.isFocusable()` to check whether an individual element is focusable.
+
 ## 5.2.0 (2026-11-18)
 
 ### Bug Fixes

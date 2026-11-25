@@ -4,17 +4,23 @@
 
 ### New Features
 
+-   Selection: Add non-contiguous block selection in the canvas and List View, including keyboard selection and the `multiSelectSet` action.
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add an Offset control with X and Y axes to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ### Enhancements
 
+-   Support dragging, duplicating, and pasting with non-contiguous block selections across different parents.
+-   `moveBlocksToPosition` and `canMoveBlocks`: Support non-contiguous blocks and blocks from different parents, including requests containing parents and their descendants.
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 
 ### Bug Fixes
 
+-   `canMoveBlock`: Prevent moving blocks with a disabled editing mode.
+-   Block actions: Match Add before and Add after availability to the destination's configured default block.
+-   Visibility: Only offer and apply visibility changes when every selected block can be edited.
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).

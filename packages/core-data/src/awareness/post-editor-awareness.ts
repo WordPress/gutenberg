@@ -16,13 +16,19 @@ import { STORE_NAME as coreStore } from '../name';
 import {
 	asHtmlStringIndex,
 	htmlIndexToRichTextOffset,
+	getRootMap,
 } from '../utils/crdt-utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
 	SelectionDirection,
+	getBlockPathForLocalClientId,
+	findBlockByPath,
 } from '../utils/crdt-user-selections';
+import { unlock } from '../lock-unlock';
+import { CRDT_RECORD_MAP_KEY } from '../sync';
+import type { YPostRecord } from '../utils/crdt';
 import type {
 	ResolvedSelection,
 	SelectionState,
@@ -68,12 +74,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 		} = select( blockEditorStore );
+		// Older block-editor versions only report selection start and end.
+		// Keep that behavior when getSetSelectionClientIds is unavailable.
+		const { getSetSelectionClientIds } = unlock(
+			select( blockEditorStore )
+		);
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
 		// An empty selection is `{}`, which the selection helpers check for.
 		let selectionStart = getSelectionStart() as WPBlockSelection;
 		let selectionEnd = getSelectionEnd() as WPBlockSelection;
+		let setSelectionClientIds = getSetSelectionClientIds?.();
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
 		// During rapid selection changes (e.g. undo restoring content and
@@ -92,10 +104,12 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			// An empty selection is `{}`, see above.
 			const newSelectionStart = getSelectionStart() as WPBlockSelection;
 			const newSelectionEnd = getSelectionEnd() as WPBlockSelection;
+			const newSetSelectionClientIds = getSetSelectionClientIds?.();
 
 			if (
 				newSelectionStart === selectionStart &&
-				newSelectionEnd === selectionEnd
+				newSelectionEnd === selectionEnd &&
+				newSetSelectionClientIds === setSelectionClientIds
 			) {
 				return;
 			}
@@ -111,6 +125,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 			selectionStart = newSelectionStart;
 			selectionEnd = newSelectionEnd;
+			setSelectionClientIds = newSetSelectionClientIds;
 
 			// Typically selection position is only persisted after typing in a block, which
 			// can cause selection position to be reset by other users making block updates.
@@ -119,7 +134,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			void this.updateSelectionInEntityRecord(
 				selectionStart,
 				selectionEnd,
-				initialPosition
+				initialPosition,
+				setSelectionClientIds
 			);
 
 			// We receive two selection changes in quick succession
@@ -135,7 +151,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				// Compute direction across the full debounce window.
 				const selectionStateOptions: {
 					selectionDirection?: SelectionDirection;
-				} = {};
+					setSelectionClientIds?: string[];
+				} = { setSelectionClientIds };
 
 				if ( selectionBeforeDebounce ) {
 					selectionStateOptions.selectionDirection =
@@ -169,14 +186,16 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	/**
 	 * Update the entity record with the current collaborator's selection.
 	 *
-	 * @param selectionStart  - The start position of the selection.
-	 * @param selectionEnd    - The end position of the selection.
-	 * @param initialPosition - The initial position of the selection.
+	 * @param selectionStart        - The start position of the selection.
+	 * @param selectionEnd          - The end position of the selection.
+	 * @param initialPosition       - The initial position of the selection.
+	 * @param setSelectionClientIds - Selected block client IDs from multiSelectSet, omitted for text and range selections.
 	 */
 	private async updateSelectionInEntityRecord(
 		selectionStart: WPBlockSelection,
 		selectionEnd: WPBlockSelection,
-		initialPosition: number | null | undefined
+		initialPosition: number | null | undefined,
+		setSelectionClientIds?: string[]
 	): Promise< void > {
 		// Send an entityRecord `selection` update if we have a selection.
 		//
@@ -186,8 +205,48 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		//
 		// Manually adding an edit for each movement ensures that other user's changes to the document will
 		// not cause the local user's selection to reset to the last local change location.
+		let selectionFields: { setSelectionClientIds?: string[] } = {};
+		if ( setSelectionClientIds ) {
+			// useBlockSync clones client IDs for controlled inner blocks. Save the
+			// client IDs from this entity's Yjs document, not the editor's cloned IDs.
+			const blocks = getRootMap< YPostRecord >(
+				this.doc,
+				CRDT_RECORD_MAP_KEY
+			).get( 'blocks' );
+			if ( ! blocks ) {
+				return;
+			}
+			const mapping = new Map< string, string >();
+			for ( const id of setSelectionClientIds ) {
+				const path = getBlockPathForLocalClientId( id, true );
+				const block = path && findBlockByPath( path, blocks );
+				const entityClientId = block?.get( 'clientId' );
+				if ( entityClientId ) {
+					mapping.set( id, entityClientId );
+				}
+			}
+			const start = mapping.get( selectionStart.clientId );
+			const end = mapping.get( selectionEnd.clientId );
+			if (
+				! start ||
+				! end ||
+				mapping.size !== setSelectionClientIds.length
+			) {
+				return;
+			}
+			selectionStart = { clientId: start };
+			selectionEnd = { clientId: end };
+			selectionFields = {
+				setSelectionClientIds: [ ...mapping.values() ],
+			};
+		}
 		const edits = {
-			selection: { selectionStart, selectionEnd, initialPosition },
+			selection: {
+				selectionStart,
+				selectionEnd,
+				initialPosition,
+				...selectionFields,
+			},
 		};
 
 		const options = {
@@ -267,7 +326,11 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				const parentArray = absolutePos.type as YBlocks;
 				const block = parentArray.get( absolutePos.index );
 
-				if ( block instanceof Y.Map ) {
+				if (
+					block instanceof Y.Map &&
+					( ! selection.clientId ||
+						block.get( 'clientId' ) === selection.clientId )
+				) {
 					const path = getBlockPathInYdoc( block );
 					localClientId = path
 						? resolveBlockClientIdByPath( path, blocks )

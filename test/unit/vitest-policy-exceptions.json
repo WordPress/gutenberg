@@ -8,6 +8,8 @@
 		"packages/components/src/number-control/test/index.browser.test.tsx": "Supplies identical touch and mouse PointerEvent sequences to verify the per-pointer-type drag policy; Browser Mode userEvent does not support touch drags."
 	},
 	"jsdomBrowserApis": {
+		"packages/editor/src/components/collaborators-overlay/test/use-block-highlighting.jsdom.test.tsx": "Supplies fixed visible and hidden rectangles to test selected-block ancestor fallback and avatar deduplication, independently of browser layout.",
+		"packages/block-editor/src/components/writing-flow/test/non-contiguous-selection.jsdom.test.tsx": "Supplies a fixed visible width to exercise modifier-click control exclusions and the older DOM API fallback; actual focusability and visibility are covered by the DOM package's Browser Mode tests.",
 		"test/unit/config/setup-globals.vitest.jsdom.test.js": "This infrastructure regression must exercise the opt-in matchMedia mock in the jsdom project that installs it.",
 		"packages/block-editor/src/utils/test/dom.jsdom.test.tsx": "Uses explicit DOMRect fixtures to test clipping and element-selection algorithms without relying on browser layout.",
 		"packages/grid/src/dashboard-lanes/test/use-lane-placement.jsdom.test.tsx": "Injects ResizeObserver entries and requestAnimationFrame scheduling to test deterministic lane-placement state without browser layout.",

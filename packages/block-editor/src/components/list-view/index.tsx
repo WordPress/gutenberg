@@ -41,6 +41,7 @@ import type {
 	ListViewSelectBlock,
 	PrivateListViewProps,
 } from './types';
+import type { ClientIdsTreeNode } from '../../store/types';
 
 const expansion = (
 	state: ListViewExpansionState,
@@ -135,6 +136,26 @@ function ListViewComponent(
 	const { updateBlockSelection } = useBlockSelection();
 
 	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
+	const visibleDraggedClientIds = useMemo( () => {
+		if ( ! draggedClientIds.length ) {
+			return draggedClientIds;
+		}
+		const uniqueIds = new Set( draggedClientIds );
+		const getVisibleClientIds = (
+			nodes: ClientIdsTreeNode[]
+		): string[] => {
+			const visible: string[] = [];
+			for ( const block of nodes ) {
+				if ( uniqueIds.has( block.clientId ) ) {
+					visible.push( block.clientId );
+				} else if ( expansionState[ block.clientId ] ?? isExpanded ) {
+					visible.push( ...getVisibleClientIds( block.innerBlocks ) );
+				}
+			}
+			return visible;
+		};
+		return getVisibleClientIds( clientIdsTree );
+	}, [ draggedClientIds, clientIdsTree, expansionState, isExpanded ] );
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
 		string | null
@@ -268,7 +289,7 @@ function ListViewComponent(
 
 	useListViewCollapseItems( { updateExpansion } );
 
-	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
+	const firstDraggedBlockClientId = visibleDraggedClientIds[ 0 ];
 
 	// Convert a blockDropTarget into indexes relative to the blocks in the list view.
 	// These values are used to determine which blocks should be displaced to make room
@@ -336,7 +357,7 @@ function ListViewComponent(
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
-			draggedClientIds,
+			draggedClientIds: visibleDraggedClientIds,
 			expansionState,
 			firstDraggedBlockIndex,
 		} ),
@@ -344,7 +365,7 @@ function ListViewComponent(
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
-			draggedClientIds,
+			visibleDraggedClientIds,
 			expansionState,
 			firstDraggedBlockIndex,
 		]
@@ -388,10 +409,10 @@ function ListViewComponent(
 					// React styles take custom properties.
 					{
 						'--wp-admin--list-view-dragged-items-height':
-							draggedClientIds?.length
+							visibleDraggedClientIds.length
 								? `${
 										BLOCK_LIST_ITEM_HEIGHT *
-										( draggedClientIds.length - 1 )
+										( visibleDraggedClientIds.length - 1 )
 									}px`
 								: null,
 					} as CSSProperties

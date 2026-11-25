@@ -1,5 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { isAppleOS } from '@wordpress/keycodes';
+import { focus, isFormElement } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import {
@@ -8,6 +10,7 @@ import {
 	isBlockElementOutsideFields,
 } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
+import { getCommonDepthClientIds } from '../list-view/utils';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
 // synthesizes from it. Other engines place it in the mousedown's default
@@ -17,7 +20,9 @@ const placesCaretOnTap =
 	!! window.CSS?.supports?.( '-webkit-touch-callout', 'none' );
 
 export default function useClickSelection() {
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect, toggleBlockSelection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const {
 		isSelectionEnabled,
 		getBlockSelectionStart,
@@ -29,6 +34,8 @@ export default function useClickSelection() {
 		canMoveBlocks,
 		getSelectedBlockClientIds,
 		canHostEditableRoot,
+		getSetSelectionClientIds,
+		getBlockParents,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
 		( node ) => {
@@ -37,6 +44,7 @@ export default function useClickSelection() {
 			// The block to collapse a multi-selection to on click, recorded
 			// on mousedown. See the comment in `onMouseDown`.
 			let clickCollapseClientId: string | undefined;
+			let isToggleClick = false;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
@@ -44,6 +52,14 @@ export default function useClickSelection() {
 				// on a page that lost focus, as when the keyboard is swiped
 				// away, focuses it again before mousedown.
 				isFocusedOnPointerDown = node.matches( ':focus' );
+				if (
+					! event.shiftKey &&
+					! event.altKey &&
+					( isAppleOS() ? event.metaKey : event.ctrlKey )
+				) {
+					// The mousedown capture toggles block selection before native caret placement.
+					return;
+				}
 
 				// A press on a block's own element outside its fields, such as
 				// a list item's bullet: stop editing so the browser drags the
@@ -82,6 +98,7 @@ export default function useClickSelection() {
 				}
 
 				clickCollapseClientId = undefined;
+				isToggleClick = false;
 
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -89,7 +106,79 @@ export default function useClickSelection() {
 					return;
 				}
 
+				if (
+					clickedClientId &&
+					! event.shiftKey &&
+					! event.altKey &&
+					( isAppleOS() ? event.metaKey : event.ctrlKey )
+				) {
+					const blockElement = node.ownerDocument.getElementById(
+						`block-${ clickedClientId }`
+					)!;
+					// Plugins may load this package with an older WordPress DOM API.
+					const isFocusable =
+						typeof focus.focusable.isFocusable === 'function'
+							? focus.focusable.isFocusable
+							: undefined;
+					const focusableElements = isFocusable
+						? undefined
+						: focus.focusable.find( blockElement );
+					// Stop at the clicked block: its focusable wrapper (or a control
+					// in an ancestor block) does not make its contents a nested control.
+					for (
+						let element: Element | null = event.target as Element;
+						element && element !== blockElement;
+						element = element.parentElement
+					) {
+						if (
+							// Disabled form controls and non-focusable button roles
+							// retain their existing exclusion from block selection.
+							isFormElement( element ) ||
+							// Clicking a form label or its contents activates the associated control.
+							// Let that happen instead of toggling block selection.
+							( element.tagName === 'LABEL' &&
+								!! ( element as HTMLLabelElement ).control ) ||
+							element.getAttribute( 'role' ) === 'button' ||
+							// Ordinary editable text remains a block-selection target.
+							( ! element.matches(
+								'[contenteditable]:not([contenteditable="false"])'
+							) &&
+								( isFocusable?.( element ) ??
+									focusableElements?.includes(
+										element as HTMLElement
+									) ) )
+						) {
+							return;
+						}
+					}
+					event.preventDefault();
+					event.stopPropagation();
+					isToggleClick = true;
+					node.ownerDocument
+						.defaultView!.getSelection()!
+						.removeAllRanges();
+					toggleBlockSelection( clickedClientId );
+					return;
+				}
 				const startClientId = getBlockSelectionStart();
+				if (
+					event.shiftKey &&
+					clickedClientId &&
+					startClientId &&
+					getSetSelectionClientIds()
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+					const { start, end } = getCommonDepthClientIds(
+						startClientId,
+						clickedClientId,
+						getBlockParents( startClientId ),
+						getBlockParents( clickedClientId ),
+						true
+					);
+					multiSelect( start, end );
+					return;
+				}
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus
@@ -192,6 +281,12 @@ export default function useClickSelection() {
 			}
 
 			function onClick( event: MouseEvent ) {
+				if ( isToggleClick ) {
+					isToggleClick = false;
+					event.preventDefault();
+					event.stopPropagation();
+					return;
+				}
 				const clientId = clickCollapseClientId;
 				clickCollapseClientId = undefined;
 
@@ -235,14 +330,14 @@ export default function useClickSelection() {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'pointerdown', onPointerDown );
-			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'click', onClick );
+			node.addEventListener( 'pointerdown', onPointerDown, true );
+			node.addEventListener( 'mousedown', onMouseDown, true );
+			node.addEventListener( 'click', onClick, true );
 
 			return () => {
-				node.removeEventListener( 'pointerdown', onPointerDown );
-				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'click', onClick );
+				node.removeEventListener( 'pointerdown', onPointerDown, true );
+				node.removeEventListener( 'mousedown', onMouseDown, true );
+				node.removeEventListener( 'click', onClick, true );
 			};
 		},
 		[
@@ -257,6 +352,10 @@ export default function useClickSelection() {
 			canMoveBlocks,
 			getSelectedBlockClientIds,
 			canHostEditableRoot,
+			multiSelect,
+			toggleBlockSelection,
+			getSetSelectionClientIds,
+			getBlockParents,
 		]
 	);
 }

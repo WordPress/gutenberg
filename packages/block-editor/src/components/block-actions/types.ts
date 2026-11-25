@@ -7,6 +7,10 @@ export interface BlockActionsRenderProps {
 	canCopyStyles: boolean;
 	canDuplicate: boolean;
 	canInsertBlock: boolean;
+	/** Whether the first block's parent accepts insertion before the selection. */
+	canInsertBefore?: boolean;
+	/** Whether the last block's parent accepts insertion after the selection. */
+	canInsertAfter?: boolean;
 	canRemove: boolean;
 	onDuplicate: () => unknown;
 	onRemove: () => unknown;

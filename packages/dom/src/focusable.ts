@@ -99,6 +99,27 @@ function isValidFocusableArea( element: HTMLAreaElement ): boolean {
 }
 
 /**
+ * Returns whether an element is focusable, using the same rules as `find`.
+ * Elements with a negative tabindex are included. Visibility, inert ancestors,
+ * and image-map associations are checked; the element is not focused.
+ *
+ * @param element Element to test.
+ * @return Whether the element is focusable.
+ */
+export function isFocusable( element: Element ): boolean {
+	if ( ! element.matches( buildSelector( false ) ) ) {
+		return false;
+	}
+	if ( element.nodeName === 'AREA' ) {
+		// The mapped image determines whether this region is visible or inert.
+		return isValidFocusableArea( element as HTMLAreaElement );
+	}
+	return (
+		! element.closest( '[inert]' ) && isVisible( element as HTMLElement )
+	);
+}
+
+/**
  * Returns all focusable elements within a given context.
  *
  * @param context              Element in which to search.
@@ -120,18 +141,5 @@ export function find(
 		buildSelector( sequential )
 	);
 
-	return Array.from( elements ).filter( ( element ) => {
-		const { nodeName } = element;
-		if ( 'AREA' === nodeName ) {
-			// The mapped image determines whether this region is visible or inert.
-			return isValidFocusableArea( element as HTMLAreaElement );
-		}
-
-		// Elements inside an inert subtree are not focusable.
-		if ( element.closest( '[inert]' ) ) {
-			return false;
-		}
-
-		return isVisible( element );
-	} );
+	return Array.from( elements ).filter( isFocusable );
 }

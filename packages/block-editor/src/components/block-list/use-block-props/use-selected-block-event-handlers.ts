@@ -135,7 +135,11 @@ export function useEventHandlers( {
 				// Multi-selected blocks are not draggable by themselves;
 				// the pressed one is, for the length of the press.
 				const hadDraggable = node.getAttribute( 'draggable' );
+				const hadTabIndex = node.getAttribute( 'tabindex' );
 				node.setAttribute( 'draggable', 'true' );
+				// With editing disabled for the press, keep the source focusable.
+				// Otherwise the browser focuses its Group and collapses the set.
+				node.setAttribute( 'tabindex', '-1' );
 				const editables = [
 					// A rendered block has a parent.
 					node.parentElement!.closest< HTMLElement >(
@@ -153,6 +157,11 @@ export function useEventHandlers( {
 				}
 
 				function restore() {
+					if ( hadTabIndex === null ) {
+						node.removeAttribute( 'tabindex' );
+					} else {
+						node.setAttribute( 'tabindex', hadTabIndex );
+					}
 					if ( hadDraggable === null ) {
 						node.removeAttribute( 'draggable' );
 					} else {

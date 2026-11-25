@@ -48,7 +48,7 @@ export type UpdateListViewExpansion = Dispatch< ListViewExpansionAction >;
  */
 export type ListViewSelectionEvent = Pick<
 	MouseEvent | KeyboardEvent | globalThis.KeyboardEvent,
-	'shiftKey' | 'type' | 'preventDefault'
+	'shiftKey' | 'metaKey' | 'ctrlKey' | 'altKey' | 'type' | 'preventDefault'
 > & {
 	keyCode?: number;
 	detail?: number;
@@ -221,6 +221,7 @@ export type ListViewBranchProps = {
 
 export type ListViewBlockProps = {
 	clientId: string;
+	draggedItemsHeight?: number;
 	displacement?: ListViewDisplacement;
 	isAfterDraggedBlocks?: boolean;
 	isDragged: boolean;

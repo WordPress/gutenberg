@@ -3,9 +3,120 @@ import { pressKey, LINE_START_KEY } from './fixtures/keyboard-utils';
 
 test.describe( 'Collaboration - Selection Rendering', () => {
 	test.afterEach( async ( { requestUtils } ) => {
-		// Reset preferences via REST so a mid-test failure doesn't leak
-		// the fixed-toolbar setting (or any other pref) to other tests.
+		// Reset preferences even when a test fails partway through.
 		await requestUtils.resetPreferences();
+	} );
+
+	test( 'preserves non-contiguous sets through remote edits, undo/redo, and remote highlighting @firefox @webkit', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Collaborative set selection',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+			content: [ 'A', 'B', 'C', 'D', 'E' ]
+				.map(
+					( text ) =>
+						`<!-- wp:paragraph --><p>${ text }</p><!-- /wp:paragraph -->`
+				)
+				.join( '\n' ),
+		} );
+		await collaborationUtils.openCollaborativeSession( post.id );
+		const { editor2, page2 } = collaborationUtils;
+		await expect.poll( () => editor2.getBlocks() ).toHaveLength( 5 );
+		const ids = await page.evaluate( () => {
+			const selectors = window.wp.data.select( 'core/block-editor' );
+			const clientIds = selectors.getBlockOrder();
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.multiSelectSet(
+					[ clientIds[ 0 ], clientIds[ 2 ], clientIds[ 4 ] ],
+					null
+				);
+			return clientIds;
+		} );
+		const remoteHighlights = editor2.canvas.locator(
+			'.is-collaborator-selected'
+		);
+		await expect( remoteHighlights ).toHaveText( [ 'A', 'C', 'E' ] );
+		// Only the selected client IDs change; selection start and end remain A and E.
+		await page.evaluate( ( clientIds ) => {
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.multiSelectSet( [ clientIds[ 0 ], clientIds[ 4 ] ], null );
+		}, ids );
+		await expect( remoteHighlights ).toHaveText( [ 'A', 'E' ] );
+		await page2.evaluate( () => {
+			const store = window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( store.getBlockOrder()[ 1 ], {
+					content: 'Remote B',
+				} );
+		} );
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{ attributes: { content: 'A' } },
+				{ attributes: { content: 'Remote B' } },
+				{ attributes: { content: 'C' } },
+				{ attributes: { content: 'D' } },
+				{ attributes: { content: 'E' } },
+			] );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( [ ids[ 0 ], ids[ 4 ] ] );
+		await page.evaluate( ( clientIds ) => {
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( [ clientIds[ 0 ], clientIds[ 4 ] ], {
+					content: 'Changed',
+				} );
+		}, ids );
+		await expect( remoteHighlights ).toHaveText( [ 'Changed', 'Changed' ] );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).undo()
+		);
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{ attributes: { content: 'A' } },
+				{ attributes: { content: 'Remote B' } },
+				{ attributes: { content: 'C' } },
+				{ attributes: { content: 'D' } },
+				{ attributes: { content: 'E' } },
+			] );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( [ ids[ 0 ], ids[ 4 ] ] );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).redo()
+		);
+		await expect( remoteHighlights ).toHaveText( [ 'Changed', 'Changed' ] );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( [ ids[ 0 ], ids[ 4 ] ] );
 	} );
 
 	test( 'Text selection is visible to other users', async ( {

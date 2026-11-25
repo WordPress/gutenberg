@@ -1,16 +1,21 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
+import type { CurriedSelectorsOf, DataRegistry } from '@wordpress/data';
+import { unlock } from '../lock-unlock';
 
 /**
  * The previous sibling to nest a list item under when indenting, or undefined
  * for the first item, which has no sibling to nest under.
  *
- * @param {Object} select   The block editor store's selectors.
- * @param {string} clientId The list item's client ID.
+ * @param select   The block editor store's selectors.
+ * @param clientId The list item's client ID.
  *
- * @return {string|undefined} The client ID to nest the item under.
+ * @return The client ID to nest the item under.
  */
-export function getIndentTarget( select, clientId ) {
+export function getIndentTarget(
+	select: CurriedSelectorsOf< typeof blockEditorStore >,
+	clientId: string
+) {
 	return select.getPreviousBlockClientId( clientId );
 }
 
@@ -18,13 +23,16 @@ export function getIndentTarget( select, clientId ) {
  * The ancestor list item the given item's list is nested in when outdenting, or
  * undefined at the top level, where there is nothing to outdent to.
  *
- * @param {Object} select   The block editor store's selectors.
- * @param {string} clientId The list item's client ID.
+ * @param select   The block editor store's selectors.
+ * @param clientId The list item's client ID.
  *
- * @return {string|undefined} The ancestor list item's client ID.
+ * @return The ancestor list item's client ID.
  */
-export function getOutdentTarget( select, clientId ) {
-	const listId = select.getBlockRootClientId( clientId );
+export function getOutdentTarget(
+	select: CurriedSelectorsOf< typeof blockEditorStore >,
+	clientId: string
+) {
+	const listId = select.getBlockRootClientId( clientId )!;
 	const parentListItemId = select.getBlockRootClientId( listId );
 	if (
 		! parentListItemId ||
@@ -40,17 +48,17 @@ export function getOutdentTarget( select, clientId ) {
  * list item has no nested list yet, one is created from the source list so it
  * inherits its attributes.
  *
- * @param {Object}   registry     The data registry.
- * @param {string[]} clientIds    The blocks to move.
- * @param {string}   sourceListId The list the blocks currently live in, also
- *                                cloned when a nested list has to be created.
- * @param {string}   listItemId   The list item to nest the blocks under.
+ * @param registry     The data registry.
+ * @param clientIds    The blocks to move.
+ * @param sourceListId The list the blocks currently live in, also
+ *                     cloned when a nested list has to be created.
+ * @param listItemId   The list item to nest the blocks under.
  */
 export function moveBlocksToNestedList(
-	registry,
-	clientIds,
-	sourceListId,
-	listItemId
+	registry: DataRegistry,
+	clientIds: string[],
+	sourceListId: string,
+	listItemId: string
 ) {
 	const { getBlockOrder, getBlock } = registry.select( blockEditorStore );
 	const { moveBlocksToPosition, removeBlocks, insertBlock } =
@@ -70,9 +78,9 @@ export function moveBlocksToNestedList(
 	// created list would fail its canInsert check. Cloning the source list keeps
 	// its attributes; passing the items as inner blocks keeps their client IDs.
 	const nestedList = cloneBlock(
-		getBlock( sourceListId ),
+		getBlock( sourceListId )!,
 		{},
-		clientIds.map( ( id ) => getBlock( id ) )
+		clientIds.map( ( id ) => getBlock( id )! )
 	);
 	// Remove and re-insert in one batch so the blocks are never momentarily
 	// detached. A caller batch nests harmlessly: only the outermost flushes.
@@ -86,12 +94,12 @@ export function moveBlocksToNestedList(
  * Indents the selected list items, nesting them under the previous sibling of
  * the given item. Defaults to the first selected item.
  *
- * @param {Object} registry   The data registry.
- * @param {string} [clientId] The list item providing the sibling to nest under.
+ * @param registry The data registry.
+ * @param clientId The list item providing the sibling to nest under.
  *
- * @return {boolean} Whether the items were indented.
+ * @return Whether the items were indented.
  */
-export function indentListItems( registry, clientId ) {
+export function indentListItems( registry: DataRegistry, clientId?: string ) {
 	const select = registry.select( blockEditorStore );
 	const {
 		getBlockRootClientId,
@@ -108,6 +116,15 @@ export function indentListItems( registry, clientId ) {
 	const clientIds = _hasMultiSelection
 		? getMultiSelectedBlockClientIds()
 		: getSelectedBlockClientIds();
+	// Indentation moves one sibling range under its previous item.
+	// Reject non-contiguous selections, since there will be gaps or blocks
+	// from different lists.
+	if (
+		! clientIds.length ||
+		! unlock( select ).areBlocksContiguous( clientIds )
+	) {
+		return false;
+	}
 
 	if ( clientId === undefined ) {
 		clientId = clientIds[ 0 ];
@@ -120,7 +137,7 @@ export function indentListItems( registry, clientId ) {
 		return false;
 	}
 
-	const rootClientId = getBlockRootClientId( clientId );
+	const rootClientId = getBlockRootClientId( clientId )!;
 	// Read the selection before the move: creating a nested list removes and
 	// re-inserts the items, which drops it.
 	const selectionStart = getSelectionStart();
@@ -156,12 +173,15 @@ export function indentListItems( registry, clientId ) {
  * Outdents list items, moving them up a level. Defaults to the selected items;
  * a specific set can be passed, e.g. to outdent an item's children.
  *
- * @param {Object}          registry    The data registry.
- * @param {string[]|string} [clientIds] The list items to outdent.
+ * @param registry  The data registry.
+ * @param clientIds The list items to outdent.
  *
- * @return {boolean} Whether the items were outdented.
+ * @return Whether the items were outdented.
  */
-export function outdentListItems( registry, clientIds ) {
+export function outdentListItems(
+	registry: DataRegistry,
+	clientIds?: string[] | string
+) {
 	const select = registry.select( blockEditorStore );
 	const {
 		getBlockRootClientId,
@@ -181,7 +201,13 @@ export function outdentListItems( registry, clientIds ) {
 		clientIds = [ clientIds ];
 	}
 
-	if ( ! clientIds.length ) {
+	// Outdent uses the first and last items to split one source list.
+	// Reject non-contiguous selections, since there will be gaps or blocks
+	// from different lists.
+	if (
+		! clientIds.length ||
+		! unlock( select ).areBlocksContiguous( clientIds )
+	) {
 		return false;
 	}
 
@@ -198,7 +224,7 @@ export function outdentListItems( registry, clientIds ) {
 		return false;
 	}
 
-	const parentListId = getBlockRootClientId( firstClientId );
+	const parentListId = getBlockRootClientId( firstClientId )!;
 	const lastClientId = clientIds[ clientIds.length - 1 ];
 	const order = getBlockOrder( parentListId );
 	const followingListItems = order.slice( getBlockIndex( lastClientId ) + 1 );

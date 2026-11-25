@@ -100,6 +100,31 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 	} );
 
+	test( 'keeps separate history entries when selected client IDs change but selection start and end do not', () => {
+		const selection = {
+			selectionStart: { clientId: 'block-1' },
+			selectionEnd: { clientId: 'block-3' },
+		};
+		history.updateSelection( {
+			...selection,
+			setSelectionClientIds: [ 'block-1', 'block-3' ],
+		} );
+		history.updateSelection( {
+			...selection,
+			setSelectionClientIds: [ 'block-1', 'block-2', 'block-3' ],
+		} );
+		history.updateSelection( selection );
+		expect(
+			history
+				.getSelectionHistory()
+				.map( ( entry ) => entry.setSelectionClientIds )
+		).toEqual( [
+			undefined,
+			[ 'block-1', 'block-2', 'block-3' ],
+			[ 'block-1', 'block-3' ],
+		] );
+	} );
+
 	describe( 'updateSelection with relative positions', () => {
 		test( 'should convert and store a selection as a relative position', () => {
 			const selection = createSelection( {

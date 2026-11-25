@@ -102,6 +102,7 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut,
 				canEditBlock,
 				canMoveBlocks,
+				areBlocksContiguous,
 				getBlockIndex,
 				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
@@ -129,7 +130,10 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
-				canMove: canMoveBlocks( clientIds ),
+				// Menu movers require contiguous blocks with the same parent.
+				canMove:
+					canMoveBlocks( clientIds ) &&
+					areBlocksContiguous( clientIds ),
 				isFirst: getBlockIndex( firstBlockClientId ) === 0,
 				isLast:
 					getBlockIndex( firstBlockClientId ) ===
@@ -213,6 +217,8 @@ export function BlockSettingsDropdown( {
 				canCopyStyles,
 				canDuplicate,
 				canInsertBlock,
+				canInsertBefore = canInsertBlock,
+				canInsertAfter = canInsertBlock,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
@@ -228,7 +234,8 @@ export function BlockSettingsDropdown( {
 				const isEmpty =
 					! canRemove &&
 					! canDuplicate &&
-					! canInsertBlock &&
+					! canInsertBefore &&
+					! canInsertAfter &&
 					isContentOnly;
 
 				if ( isEmpty ) {
@@ -323,31 +330,27 @@ export function BlockSettingsDropdown( {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ canInsertBlock && ! isZoomOut && (
-										<>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertBefore
-												) }
-												shortcut={
-													shortcuts.insertBefore
-												}
-											>
-												{ __( 'Add before' ) }
-											</MenuItem>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertAfter
-												) }
-												shortcut={
-													shortcuts.insertAfter
-												}
-											>
-												{ __( 'Add after' ) }
-											</MenuItem>
-										</>
+									{ canInsertBefore && ! isZoomOut && (
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertBefore
+											) }
+											shortcut={ shortcuts.insertBefore }
+										>
+											{ __( 'Add before' ) }
+										</MenuItem>
+									) }
+									{ canInsertAfter && ! isZoomOut && (
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertAfter
+											) }
+											shortcut={ shortcuts.insertAfter }
+										>
+											{ __( 'Add after' ) }
+										</MenuItem>
 									) }
 									{ canEdit && (
 										<NoteIconSlotFill.Slot

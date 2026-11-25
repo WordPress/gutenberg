@@ -12,9 +12,10 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
@@ -28,6 +29,10 @@ function BlockSwitcherDropdownMenuContents( {
 	onClose,
 	clientIds,
 }: BlockSwitcherDropdownMenuContentsProps ) {
+	const registry = useRegistry();
+	const { areBlocksContiguous } = unlock(
+		registry.select( blockEditorStore )
+	);
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const {
@@ -100,6 +105,11 @@ function BlockSwitcherDropdownMenuContents( {
 	}
 	// Simple block transformation based on the `Block Transforms` API.
 	function onBlockTransform( name: string, variationName?: string ) {
+		// Replacing blocks requires contiguous siblings. Check again in case
+		// the blocks changed while the menu was open.
+		if ( ! areBlocksContiguous( clientIds ) ) {
+			return;
+		}
 		// The offered transformations apply to the blocks.
 		const newBlocks = switchToBlockType( blocks, name, variationName )!;
 		replaceBlocks( clientIds, newBlocks );
@@ -134,6 +144,10 @@ function BlockSwitcherDropdownMenuContents( {
 	}
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks: Block[] ) {
+		// Transforming to a pattern requires a single block or contiguous siblings.
+		if ( ! areBlocksContiguous( clientIds ) ) {
+			return;
+		}
 		replaceBlocks( clientIds, transformedBlocks );
 		selectForMultipleBlocks( transformedBlocks );
 	}
@@ -232,6 +246,13 @@ export const BlockSwitcher = ( {
 	label,
 	text,
 }: BlockSwitcherProps ) => {
+	const isContiguous = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).areBlocksContiguous(
+				clientIds
+			),
+		[ clientIds ]
+	);
 	const isSingleBlock = clientIds.length === 1;
 
 	const blockSwitcherDescription = isSingleBlock
@@ -259,6 +280,8 @@ export const BlockSwitcher = ( {
 						icon={ children }
 						text={ text }
 						toggleProps={ {
+							// Only a single block or contiguous siblings can be transformed.
+							disabled: ! isContiguous,
 							description: blockSwitcherDescription,
 							...toggleProps,
 						} }

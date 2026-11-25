@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List: Disable indent and outdent for non-contiguous selections or selections spanning different lists.
+
 ### Bug Fixes
 
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).

@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
 import type { TransformCommandItem, TransformCommandsSelection } from './types';
+import type { BlockEditorThunkArgs } from '../../store/types';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -40,8 +41,15 @@ const getTransformCommands = () =>
 				getSelectedBlockClientIds,
 				getBlocksByClientId,
 				canRemoveBlocks,
-			} = select( blockEditorStore );
+				isSelectionContiguous,
+			} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+				select( blockEditorStore )
+			);
 
+			// Transforming requires a single selected block or contiguous selected siblings.
+			if ( ! isSelectionContiguous() ) {
+				return { invalidSelection: true };
+			}
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
@@ -178,15 +186,14 @@ const getQuickActionsCommands = () =>
 			};
 		}, [] );
 		const {
-			canInsertBlockType,
-			getBlockRootClientId,
+			canInsertDefaultBlockAt,
 			getBlocksByClientId,
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
+			canDuplicateBlocks,
+			getBlockEditingMode,
 		} = unlock( useSelect( blockEditorStore ) );
-		const { getBlockEditingMode } = useSelect( blockEditorStore );
-		const { getDefaultBlockName, getGroupingBlockName } =
-			useSelect( blocksStore );
+		const { getGroupingBlockName } = useSelect( blocksStore );
 
 		const blocks = getBlocksByClientId( clientIds );
 
@@ -233,19 +240,11 @@ const getQuickActionsCommands = () =>
 		}
 
 		const { showViewportModal } = unlock( blockEditorDispatch );
-		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-		const canInsertDefaultBlock = canInsertBlockType(
-			// A default block type is registered.
-			getDefaultBlockName()!,
-			rootClientId
+		const canInsertBefore = canInsertDefaultBlockAt( clientIds[ 0 ] );
+		const canInsertAfter = canInsertDefaultBlockAt(
+			clientIds[ clientIds.length - 1 ]
 		);
-		const canDuplicate = blocks.every( ( block: Block | null ) => {
-			return (
-				!! block &&
-				hasBlockSupport( block.name, 'multiple', true ) &&
-				canInsertBlockType( block.name, rootClientId )
-			);
-		} );
+		const canDuplicate = canDuplicateBlocks( clientIds );
 		const canRemove = canRemoveBlocks( clientIds );
 
 		const commands = [];
@@ -259,33 +258,33 @@ const getQuickActionsCommands = () =>
 			} );
 		}
 
-		if ( canInsertDefaultBlock ) {
-			commands.push(
-				{
-					name: 'add-before',
-					label: __( 'Add before' ),
-					callback: () => {
-						const clientId: string = Array.isArray( clientIds )
-							? clientIds[ 0 ]
-							: // @ts-expect-error The client IDs are always an array, so this is never read.
-								clientId;
-						insertBeforeBlock( clientId );
-					},
-					icon: add,
+		if ( canInsertBefore ) {
+			commands.push( {
+				name: 'add-before',
+				label: __( 'Add before' ),
+				callback: () => {
+					const clientId: string = Array.isArray( clientIds )
+						? clientIds[ 0 ]
+						: // @ts-expect-error The client IDs are always an array, so this is never read.
+							clientId;
+					insertBeforeBlock( clientId );
 				},
-				{
-					name: 'add-after',
-					label: __( 'Add after' ),
-					callback: () => {
-						const clientId: string = Array.isArray( clientIds )
-							? clientIds[ clientIds.length - 1 ]
-							: // @ts-expect-error The client IDs are always an array, so this is never read.
-								clientId;
-						insertAfterBlock( clientId );
-					},
-					icon: add,
-				}
-			);
+				icon: add,
+			} );
+		}
+		if ( canInsertAfter ) {
+			commands.push( {
+				name: 'add-after',
+				label: __( 'Add after' ),
+				callback: () => {
+					const clientId: string = Array.isArray( clientIds )
+						? clientIds[ clientIds.length - 1 ]
+						: // @ts-expect-error The client IDs are always an array, so this is never read.
+							clientId;
+					insertAfterBlock( clientId );
+				},
+				icon: add,
+			} );
 		}
 
 		if ( isGroupable ) {

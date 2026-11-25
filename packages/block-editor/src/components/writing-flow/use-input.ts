@@ -10,6 +10,7 @@ import {
 } from '@wordpress/blocks';
 import type { BlockEnterTransform } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import type { InitialPosition } from '../../store/types';
@@ -20,6 +21,7 @@ import type { WritingFlowKeyEvent } from './types';
  */
 export default function useInput() {
 	const {
+		isSelectionContiguous,
 		__unstableIsFullySelected,
 		getSelectedBlockClientIds,
 		getSelectedBlockClientId,
@@ -35,7 +37,7 @@ export default function useInput() {
 		getBlockOrder,
 		getBlockEditingMode,
 		getBlockListSettings,
-	} = useSelect( blockEditorStore );
+	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		replaceBlocks,
 		__unstableSplitSelection,
@@ -284,6 +286,11 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
+				// Enter can only replace or split a single block or contiguous siblings.
+				if ( ! isSelectionContiguous() ) {
+					event.preventDefault();
+					return;
+				}
 				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {

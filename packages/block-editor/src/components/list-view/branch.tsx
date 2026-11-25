@@ -222,12 +222,24 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				firstDraggedBlockIndex,
 				isDragged,
 			} );
+		// Only dragged rows preceding this row contribute to its collapsed gap.
+		const draggedItemsHeight = draggedClientIds?.length
+			? Math.max(
+					0,
+					draggedClientIds.filter(
+						( id ) =>
+							( blockIndexes[ id ] ?? Infinity ) <
+							( blockIndexes[ clientId ] ?? -1 )
+					).length - 1
+				) * BLOCK_LIST_ITEM_HEIGHT
+			: undefined;
 
 		rows.push(
 			<AsyncModeProvider key={ clientId } value={ ! isSync }>
 				{ showBlock && (
 					<ListViewBlock
 						clientId={ clientId }
+						draggedItemsHeight={ draggedItemsHeight }
 						selectBlock={ selectBlock }
 						isSelected={ isSelected }
 						isBranchSelected={ isSelectedBranch }

@@ -19,6 +19,7 @@ import {
 } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
+import { getCommonDepthClientIds } from '../list-view/utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -191,6 +192,7 @@ export function getClosestTabbable(
 export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
+		getBlockParents,
 		getMultiSelectedBlocksEndClientId,
 		getNextBlockClientId,
 		getPreviousBlockClientId,
@@ -293,7 +295,14 @@ export default function useArrowNav() {
 							: getNextBlockClientId( focusClientId! );
 
 						if ( nextClientId ) {
-							multiSelect( anchorClientId!, nextClientId );
+							const { start, end } = getCommonDepthClientIds(
+								anchorClientId!,
+								nextClientId,
+								getBlockParents( anchorClientId! ),
+								getBlockParents( nextClientId ),
+								true
+							);
+							multiSelect( start, end );
 							event.preventDefault();
 						}
 					}

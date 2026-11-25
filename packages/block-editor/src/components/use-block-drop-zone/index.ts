@@ -68,6 +68,7 @@ export function getDropTargetPosition(
 		dropZoneElement,
 		parentBlockOrientation,
 		rootBlockIndex = 0,
+		allowGroupAndReplace = true,
 	} = options;
 
 	// Allow before/after when dragging over the top/bottom edges of the drop zone.
@@ -200,13 +201,15 @@ export function getDropTargetPosition(
 		!! blocksData[ adjacentIndex ]?.isUnmodifiedDefaultBlock;
 
 	// If the target index is set then group with the block at that index.
-	if ( targetBlockIndex !== null ) {
+	if ( allowGroupAndReplace && targetBlockIndex !== null ) {
 		return [ targetBlockIndex, 'group', nearestSide ];
 	}
-	// If both blocks are not unmodified default blocks then just insert between them.
+	// Insertion-only moves use the same nearest-edge position, including document
+	// indices and layout direction, rather than grouping or replacing the target.
 	if (
-		! isNearestBlockUnmodifiedDefaultBlock &&
-		! isAdjacentBlockUnmodifiedDefaultBlock
+		! allowGroupAndReplace ||
+		( ! isNearestBlockUnmodifiedDefaultBlock &&
+			! isAdjacentBlockUnmodifiedDefaultBlock )
 	) {
 		// If the user is dropping to the trailing edge of the block
 		// add 1 to the index to represent dragging after.
@@ -330,9 +333,12 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
+		canRemoveBlocks,
 		isZoomOut,
 		getSectionRootClientId,
 		getBlockParents,
+		areBlocksContiguous,
+		canMoveBlocksToPosition,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -363,6 +369,9 @@ export default function useBlockDropZone( {
 				}
 
 				const draggedBlockClientIds = getDraggedBlockClientIds();
+				const isNonContiguousMove =
+					draggedBlockClientIds.length > 0 &&
+					! areBlocksContiguous( draggedBlockClientIds );
 				const targetParents = [
 					targetRootClientId,
 					...getBlockParents( targetRootClientId, true ),
@@ -383,17 +392,28 @@ export default function useBlockDropZone( {
 				const draggedBlockNames = getBlockNamesByClientId(
 					draggedBlockClientIds
 				);
-				const isBlockDroppingAllowed = isDropTargetValid(
-					getBlockType,
-					allowedBlocks,
-					draggedBlockNames,
-					targetBlockName
-				);
+				const isBlockDroppingAllowed =
+					( ! isNonContiguousMove ||
+						canMoveBlocksToPosition(
+							draggedBlockClientIds,
+							targetRootClientId
+						) ) &&
+					isDropTargetValid(
+						getBlockType,
+						allowedBlocks,
+						draggedBlockNames,
+						targetBlockName
+					);
 
 				// The before/after operations insert into the parent block
 				// list, not the target's own.
 				const isParentDropTargetValid =
 					!! dropZoneElement &&
+					( ! isNonContiguousMove ||
+						canMoveBlocksToPosition(
+							draggedBlockClientIds,
+							parentBlockClientId
+						) ) &&
 					isDropTargetValid(
 						getBlockType,
 						getAllowedBlocks( parentBlockClientId ),
@@ -466,6 +486,7 @@ export default function useBlockDropZone( {
 					{ x: event.clientX, y: event.clientY },
 					getBlockListSettings( targetRootClientId )?.orientation,
 					{
+						allowGroupAndReplace: ! isNonContiguousMove,
 						dropZoneElement: isParentDropTargetValid
 							? dropZoneElement
 							: undefined,
@@ -510,10 +531,12 @@ export default function useBlockDropZone( {
 						'core/gallery',
 						targetRootClientId
 					);
-					const areGroupableBlocks = isGroupable( [
-						targetBlock.clientId,
-						getDraggedBlockClientIds(),
-					] );
+					// A drop may bring a contiguous source to a distant target.
+					// Validate the wrapper destination and removal permissions, not
+					// the pre-drop adjacency of the target and source blocks.
+					const areGroupableBlocks =
+						isGroupable( [ targetBlock.clientId ] ) &&
+						canRemoveBlocks( draggedBlockClientIds );
 					const groupBlockVariations = getBlockVariations(
 						// A grouping block type is registered.
 						getGroupingBlockName()!,
@@ -585,8 +608,11 @@ export default function useBlockDropZone( {
 				showInsertionPoint,
 				canInsertBlockType,
 				isGroupable,
+				canRemoveBlocks,
 				getBlockVariations,
 				getGroupingBlockName,
+				areBlocksContiguous,
+				canMoveBlocksToPosition,
 			]
 		),
 		200

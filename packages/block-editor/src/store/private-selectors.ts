@@ -1,6 +1,7 @@
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getBlockType,
+	getDefaultBlockName,
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
@@ -18,6 +19,12 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getBlock,
+	getSelectedBlockClientIds,
+	canMoveBlocks,
+	canRemoveBlock,
+	canEditBlock,
+	areInnerBlocksControlled,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -25,6 +32,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	filterOutChildClientIds,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -50,6 +58,187 @@ const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
+
+/**
+ * Checks insertion beside a block using its parent's configured default block.
+ *
+ * @param state    Editor state.
+ * @param clientId Block beside which the default block would be inserted.
+ * @return Whether that destination accepts its default block.
+ */
+export function canInsertDefaultBlockAt( state: State, clientId: string ) {
+	if ( ! getBlock( state, clientId ) ) {
+		return false;
+	}
+	const parent = getBlockRootClientId( state, clientId );
+	const defaultBlock = parent
+		? getBlockListSettings( state, parent )?.defaultBlock
+		: undefined;
+	const name = defaultBlock?.name ?? getDefaultBlockName();
+	return !! name && canInsertBlockType( state, name, parent );
+}
+
+/**
+ * Checks that every target permits visibility edits, including mixed-parent selections.
+ *
+ * @param state     Editor state.
+ * @param clientIds Blocks whose visibility would change.
+ * @return Whether all blocks support visibility and permit default-mode edits.
+ */
+export function canEditBlocksVisibility( state: State, clientIds: string[] ) {
+	return (
+		clientIds.length > 0 &&
+		clientIds.every( ( id ) => {
+			const block = getBlock( state, id );
+			return (
+				!! block &&
+				getBlockEditingMode( state, id ) === 'default' &&
+				canEditBlock( state, id ) &&
+				hasBlockSupport( block.name, 'visibility', true )
+			);
+		} )
+	);
+}
+
+/**
+ * Checks whether the specified blocks are contiguous siblings, in any input order.
+ *
+ * For siblings [A, B, C, D], [B, C] and [C, B] are contiguous; [A, C] is not.
+ *
+ * @param state     Editor state.
+ * @param clientIds Target block IDs.
+ * @return Whether the blocks are contiguous siblings.
+ */
+export function areBlocksContiguous( state: State, clientIds: string[] ) {
+	if ( clientIds.length < 2 ) {
+		return true;
+	}
+	// Look up each block in the first block's sibling order. indexOf returns -1
+	// if a block is missing or belongs to a different parent.
+	const parent = state.blocks.parents.get( clientIds[ 0 ] );
+	const order = state.blocks.order.get( parent ?? '' ) ?? [];
+	const indices = clientIds.map( ( id ) => order.indexOf( id ) );
+	return (
+		// Reject repeated client IDs.
+		new Set( clientIds ).size === clientIds.length &&
+		// Every block must appear in this sibling list.
+		indices.every( ( index ) => index !== -1 ) &&
+		// Adjacent siblings occupy every index between the lowest and highest:
+		// [3, 1, 2] includes indices 1 through 3; [1, 3] skips index 2.
+		Math.max( ...indices ) - Math.min( ...indices ) + 1 === clientIds.length
+	);
+}
+
+/**
+ * Checks whether the selection is a contiguous sibling range.
+ *
+ * @param state Editor state.
+ * @return Whether the selection is contiguous.
+ */
+export function isSelectionContiguous( state: State ) {
+	return areBlocksContiguous( state, getSelectedBlockClientIds( state ) );
+}
+
+/**
+ * Checks duplication against each block's own insertion destination.
+ *
+ * @param state     Editor state.
+ * @param clientIds Target block IDs.
+ * @return Whether every target can be duplicated.
+ */
+export function canDuplicateBlocks( state: State, clientIds: string[] ) {
+	return (
+		!! clientIds?.length &&
+		clientIds.every( ( id ) => {
+			const block = getBlock( state, id );
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'multiple', true ) &&
+				canInsertBlockType(
+					state,
+					block.name,
+					getBlockRootClientId( state, id )
+				)
+			);
+		} )
+	);
+}
+
+/**
+ * Checks whether blocks can move to a destination, regardless of selection.
+ * Accepts a single block, contiguous siblings, or blocks across parents.
+ *
+ * @param state        Editor state.
+ * @param clientIds    Block IDs to move.
+ * @param rootClientId Destination parent, or the document root.
+ * @return Whether all blocks can move to the destination.
+ */
+export function canMoveBlocksToPosition(
+	state: State,
+	clientIds: string[],
+	rootClientId = ''
+) {
+	// Reject an invalid source list or a destination that no longer exists.
+	if (
+		! canMoveBlocks( state, clientIds ) ||
+		( rootClientId && ! getBlock( state, rootClientId ) )
+	) {
+		return false;
+	}
+	// Exclude supplied descendants because they move inside their ancestor,
+	// not independently with their own removal, insertion, or entity checks.
+	const moveClientIds = filterOutChildClientIds( clientIds, ( id ) =>
+		getBlockParents( state, id )
+	);
+	// Check the destination and its ancestors against the moved IDs to prevent
+	// placing a block inside itself or its descendants, which would create a cycle.
+	const destinationParents = rootClientId
+		? [ rootClientId, ...getBlockParents( state, rootClientId, true ) ]
+		: [];
+	if ( destinationParents.some( ( id ) => moveClientIds.includes( id ) ) ) {
+		return false;
+	}
+	// The nearest controlled parent owns the contents as a separate entity.
+	// No controlled parent means the blocks belong to the main editor entity.
+	const controlledDestinationParent =
+		destinationParents.find( ( id ) =>
+			areInnerBlocksControlled( state, id )
+		) ?? '';
+	return moveClientIds.every( ( id ) => {
+		const controlledSourceParent =
+			getBlockParents( state, id, true ).find( ( parent ) =>
+				areInnerBlocksControlled( state, parent )
+			) ?? '';
+		return (
+			// Moving between saved entities needs coordinated updates to both;
+			// this action only changes the block tree owned by one entity.
+			controlledSourceParent === controlledDestinationParent &&
+			// Reordering needs no insertion/removal permission. Changing parents does.
+			( getBlockRootClientId( state, id ) === rootClientId ||
+				( canRemoveBlock( state, id ) &&
+					canInsertBlockType(
+						state,
+						getBlockName( state, id ),
+						rootClientId
+					) ) )
+		);
+	} );
+}
+
+/**
+ * Returns the selected block client IDs for a selection made with multiSelectSet,
+ * including when the selected blocks are adjacent.
+ *
+ * Returns undefined for no selection, a single selected block, a text selection,
+ * or a selection made with multiSelect. Use getSelectedBlockClientIds to get
+ * selected block client IDs regardless of how the selection was made.
+ *
+ * @param state Editor state.
+ * @return Selected block client IDs, or undefined when no selection made with multiSelectSet is stored.
+ */
+export function getSetSelectionClientIds( state: State ) {
+	return state.selection.setSelectionClientIds;
+}
 
 function isViewportAvailable( state: State, viewport: string ) {
 	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {

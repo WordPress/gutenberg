@@ -3,6 +3,7 @@ import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { groupBlocks } from '../../utils/group-blocks';
 import type { BlockActionsProps } from './types';
 
@@ -21,7 +22,9 @@ export default function BlockActions( {
 				getBlocksByClientId,
 				getDirectInsertBlock,
 				canRemoveBlocks,
-			} = select( blockEditorStore );
+				canDuplicateBlocks,
+				canInsertDefaultBlockAt,
+			} = unlock( select( blockEditorStore ) );
 
 			// The blocks to act on exist.
 			const blocks = getBlocksByClientId( clientIds ) as Block[];
@@ -35,6 +38,10 @@ export default function BlockActions( {
 				: null;
 
 			return {
+				canInsertBefore: canInsertDefaultBlockAt( clientIds[ 0 ] ),
+				canInsertAfter: canInsertDefaultBlockAt(
+					clientIds[ clientIds.length - 1 ]
+				),
 				canRemove: canRemoveBlocks( clientIds ),
 				canInsertBlock: blocks.every( ( block ) => {
 					return (
@@ -49,20 +56,23 @@ export default function BlockActions( {
 							hasBlockSupport( block.name, 'typography' ) )
 					);
 				} ),
-				canDuplicate: blocks.every( ( block ) => {
-					return (
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, rootClientId )
-					);
-				} ),
+				canDuplicate: canDuplicateBlocks( clientIds ),
 			};
 		},
 		[ clientIds, getDefaultBlockName ]
 	);
-	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
+	const { getBlocksByClientId, getBlocks, areBlocksContiguous } = unlock(
+		useSelect( blockEditorStore )
+	);
 
-	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
+	const {
+		canRemove,
+		canInsertBlock,
+		canInsertBefore,
+		canInsertAfter,
+		canCopyStyles,
+		canDuplicate,
+	} = selected;
 
 	const {
 		removeBlocks,
@@ -79,6 +89,8 @@ export default function BlockActions( {
 		canCopyStyles,
 		canDuplicate,
 		canInsertBlock,
+		canInsertBefore,
+		canInsertAfter,
 		canRemove,
 		onDuplicate() {
 			return duplicateBlocks( clientIds, updateSelection );
@@ -93,7 +105,8 @@ export default function BlockActions( {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onGroup() {
-			if ( ! clientIds.length ) {
+			// Grouping requires contiguous blocks with the same parent.
+			if ( ! clientIds.length || ! areBlocksContiguous( clientIds ) ) {
 				return;
 			}
 

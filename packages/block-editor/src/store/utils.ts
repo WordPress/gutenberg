@@ -28,6 +28,32 @@ import type {
 type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
+
+/**
+ * Removes a block's client ID when an ancestor's ID is also supplied.
+ * The block moves with its ancestor rather than being moved independently.
+ * For [parent, child, sibling], returns [parent, sibling] in the same order.
+ *
+ * @param clientIds       Block client IDs to filter.
+ * @param getBlockParents Function returning a block's ancestor client IDs.
+ * @return The remaining client IDs, in their original order.
+ */
+export function filterOutChildClientIds(
+	clientIds: string[],
+	getBlockParents: ( clientId: string ) => string[]
+): string[] {
+	if ( clientIds.length < 2 ) {
+		return clientIds;
+	}
+	const uniqueIds = new Set( clientIds );
+	return clientIds.filter(
+		( id ) =>
+			! getBlockParents( id ).some( ( parent ) =>
+				uniqueIds.has( parent )
+			)
+	);
+}
+
 const parsedPatternCache = new WeakMap< BlockPattern, ParsedBlockPattern >();
 const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 

@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import type { SelectFunction } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
+import { unlock } from '../../lock-unlock';
 
 function selector( select: SelectFunction ) {
 	const {
@@ -12,7 +13,8 @@ function selector( select: SelectFunction ) {
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
 		__unstableIsFullySelected,
-	} = select( blockEditorStore );
+		getSetSelectionClientIds,
+	} = unlock( select( blockEditorStore ) );
 
 	return {
 		isMultiSelecting: isMultiSelecting(),
@@ -21,6 +23,7 @@ function selector( select: SelectFunction ) {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isFullSelection: __unstableIsFullySelected(),
+		isSetSelection: !! getSetSelectionClientIds(),
 	};
 }
 
@@ -32,6 +35,7 @@ export default function useMultiSelection() {
 		hasMultiSelection,
 		selectedBlockClientId,
 		isFullSelection,
+		isSetSelection,
 	} = useSelect( selector, [] );
 
 	/**
@@ -47,6 +51,16 @@ export default function useMultiSelection() {
 			// for the list view or other areas where we don't want to transfer
 			// focus to the editor canvas.
 			if ( initialPosition === undefined || initialPosition === null ) {
+				// A List View selection must not leave an old native range marking
+				// intervening blocks, but must not take focus from List View either.
+				const nativeSelection = defaultView!.getSelection();
+				if (
+					isSetSelection &&
+					nativeSelection?.anchorNode &&
+					node.contains( nativeSelection.anchorNode )
+				) {
+					nativeSelection.removeAllRanges();
+				}
 				return;
 			}
 
@@ -88,6 +102,7 @@ export default function useMultiSelection() {
 			selectedBlockClientId,
 			initialPosition,
 			isFullSelection,
+			isSetSelection,
 		]
 	);
 }

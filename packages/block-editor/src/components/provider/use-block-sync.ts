@@ -3,6 +3,7 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { SelectionContext } from './selection-context';
 import type { BlockSelection } from '../../store/types';
 import type {
@@ -99,6 +100,14 @@ function restoreSelectionIds(
 		selectionStart: restoreClientId( selectionStart ),
 		selectionEnd: restoreClientId( selectionEnd ),
 		initialPosition,
+		...( selectionState.setSelectionClientIds
+			? {
+					setSelectionClientIds:
+						selectionState.setSelectionClientIds.map(
+							( id ) => mapping.internalToExternal.get( id ) ?? id
+						),
+				}
+			: {} ),
 	};
 }
 
@@ -160,6 +169,9 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
+	const { getSetSelectionClientIds } = unlock(
+		registry.select( blockEditorStore )
+	);
 
 	const pendingChangesRef = useRef< {
 		incoming: Block[] | null;
@@ -187,22 +199,40 @@ export default function useBlockSync( {
 	const restoreSelection = () => {
 		const selection = getSelection();
 		if (
-			! selection?.selectionStart?.clientId ||
+			( ! selection?.selectionStart?.clientId &&
+				! selection?.setSelectionClientIds?.length ) ||
 			selection === appliedSelectionRef.current
 		) {
 			return;
 		}
 
-		const startClientId = selection.selectionStart.clientId;
+		const startClientId = selection.selectionStart?.clientId;
+		// Re-cloning replaces all internal IDs. Restore the selected blocks that
+		// still map to this controller even when the original selection start was deleted.
+		const setSelectionClientIds = selection.setSelectionClientIds?.flatMap(
+			( id ) => {
+				if ( clientId ) {
+					const mappedId =
+						idMappingRef.current.externalToInternal.get( id );
+					return mappedId ? [ mappedId ] : [];
+				}
+				return getBlockName( id ) ? [ id ] : [];
+			}
+		);
 
 		// Check if this selection belongs to this controller.
 		// Inner block controllers (clientId is set) own the block if
 		// the external ID appears in their clone mapping.
 		// The root controller (no clientId) owns it if the block
 		// exists directly in the store.
-		const isOurs = clientId
-			? idMappingRef.current.externalToInternal.has( startClientId )
-			: !! getBlockName( startClientId );
+		const isOurs = setSelectionClientIds
+			? setSelectionClientIds.length > 0
+			: !! startClientId &&
+				( clientId
+					? idMappingRef.current.externalToInternal.has(
+							startClientId
+						)
+					: !! getBlockName( startClientId ) );
 
 		if ( isOurs ) {
 			appliedSelectionRef.current = selection;
@@ -225,12 +255,14 @@ export default function useBlockSync( {
 			// selection change back to the entity (which would cause
 			// an infinite update loop).
 			isRestoringSelectionRef.current = true;
-			// The check above found the selection start.
+			// Set normalization replaces missing selection start/end IDs with the
+			// first/last remaining selected blocks; range restoration stays unchanged.
 			resetSelection(
-				convert( selection.selectionStart )!,
+				convert( selection.selectionStart ) ?? {},
 				// The store accepts an unset selection end.
-				convert( selection.selectionEnd ) as BlockSelection,
-				selection.initialPosition
+				convert( selection.selectionEnd ) ?? {},
+				selection.initialPosition,
+				setSelectionClientIds
 			);
 			isRestoringSelectionRef.current = false;
 		}
@@ -376,6 +408,7 @@ export default function useBlockSync( {
 		let previousAreBlocksDifferent = false;
 		let prevSelectionStart = getSelectionStart();
 		let prevSelectionEnd = getSelectionEnd();
+		let prevSetSelectionClientIds = getSetSelectionClientIds();
 
 		subscribedRef.current = true;
 		const unsubscribe = registry.subscribe( () => {
@@ -421,13 +454,16 @@ export default function useBlockSync( {
 			// Check if selection changed.
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
+			const newSetSelectionClientIds = getSetSelectionClientIds();
 			const selectionChanged =
 				newSelectionStart !== prevSelectionStart ||
-				newSelectionEnd !== prevSelectionEnd;
+				newSelectionEnd !== prevSelectionEnd ||
+				newSetSelectionClientIds !== prevSetSelectionClientIds;
 
 			if ( selectionChanged ) {
 				prevSelectionStart = newSelectionStart;
 				prevSelectionEnd = newSelectionEnd;
+				prevSetSelectionClientIds = newSetSelectionClientIds;
 			}
 
 			if ( blocksChanged || selectionChanged ) {
@@ -448,6 +484,12 @@ export default function useBlockSync( {
 						const selectionInfo = {
 							selectionStart: newSelectionStart,
 							selectionEnd: newSelectionEnd,
+							...( newSetSelectionClientIds
+								? {
+										setSelectionClientIds:
+											newSetSelectionClientIds,
+									}
+								: {} ),
 							initialPosition:
 								getSelectedBlocksInitialCaretPosition(),
 						};
@@ -503,6 +545,12 @@ export default function useBlockSync( {
 							const selectionInfo = {
 								selectionStart: newSelectionStart,
 								selectionEnd: newSelectionEnd,
+								...( newSetSelectionClientIds
+									? {
+											setSelectionClientIds:
+												newSetSelectionClientIds,
+										}
+									: {} ),
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
 							};
@@ -525,7 +573,7 @@ export default function useBlockSync( {
 			subscribedRef.current = false;
 			unsubscribe();
 		};
-	}, [ registry, clientId ] );
+	}, [ registry, clientId, getSetSelectionClientIds ] );
 
 	useEffect( () => {
 		return () => {

@@ -18,6 +18,11 @@ import type {
 } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { CollaboratorInfo, PostEditorState } from '../types';
+import { lock } from '../../lock-unlock';
+import {
+	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
+	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
+} from '../config';
 
 // Mock WordPress dependencies
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
@@ -66,6 +71,7 @@ interface MockBlockEditorOverrides {
 	getBlockName?: string;
 	getSelectionStart?: Mock;
 	getSelectionEnd?: Mock;
+	getSetSelectionClientIds?: Mock;
 }
 
 type SeededRandom = {
@@ -151,7 +157,7 @@ function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
 		overrides.getBlocks ??
 		vi.fn().mockReturnValue( overrides.blocks ?? defaultBlocks );
 
-	( select as Mock ).mockReturnValue( {
+	const selectors = {
 		getSelectionStart:
 			overrides.getSelectionStart ?? vi.fn().mockReturnValue( {} ),
 		getSelectionEnd:
@@ -163,7 +169,11 @@ function mockBlockEditorStore( overrides: MockBlockEditorOverrides = {} ) {
 			.fn()
 			.mockReturnValue( overrides.getBlockName ?? 'core/paragraph' ),
 		getBlocks,
+	};
+	lock( selectors, {
+		getSetSelectionClientIds: overrides.getSetSelectionClientIds,
 	} );
+	( select as Mock ).mockReturnValue( selectors );
 
 	return { getBlocks };
 }
@@ -350,7 +360,121 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
+	test( 'saves and shares changed selected client IDs when selection start and end are unchanged and IDs are cloned', () => {
+		vi.mocked( Date.now ).mockRestore();
+		const yBlocks = doc
+			.getMap( CRDT_RECORD_MAP_KEY )
+			.get( 'blocks' ) as Y.Array< Y.Map< any > >;
+		yBlocks.push( [
+			createYBlock( 'block-2', 'core/paragraph' ),
+			createYBlock( 'block-3', 'core/paragraph' ),
+		] );
+		const start = { clientId: 'local-1' };
+		const end = { clientId: 'local-3' };
+		const getSetSelectionClientIds = vi.fn().mockReturnValue( undefined );
+		mockBlockEditorStore( {
+			getSelectionStart: vi.fn().mockReturnValue( start ),
+			getSelectionEnd: vi.fn().mockReturnValue( end ),
+			getSetSelectionClientIds,
+		} );
+		( select as Mock )().getBlockIndex.mockImplementation(
+			( id: string ) => Number( id.slice( -1 ) ) - 1
+		);
+		const awareness = new PostEditorAwareness(
+			doc,
+			'postType',
+			'post',
+			123
+		);
+		awareness.setUp();
+		try {
+			getSetSelectionClientIds.mockReturnValue( [
+				'local-1',
+				'local-3',
+			] );
+			subscribeCallback!();
+			expect( mockEditEntityRecord ).toHaveBeenLastCalledWith(
+				'postType',
+				'post',
+				123,
+				{
+					selection: {
+						selectionStart: { clientId: 'block-1' },
+						selectionEnd: { clientId: 'block-3' },
+						initialPosition: null,
+						setSelectionClientIds: [ 'block-1', 'block-3' ],
+					},
+				},
+				{ undoIgnore: true }
+			);
+			vi.advanceTimersByTime(
+				LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS +
+					AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS
+			);
+			expect(
+				awareness.getLocalState()?.editorState?.selection
+			).toMatchObject( {
+				type: SelectionType.None,
+				setSelection: [
+					{ clientId: 'block-1' },
+					{ clientId: 'block-3' },
+				],
+			} );
+			getSetSelectionClientIds.mockReturnValue( [
+				'local-1',
+				'local-2',
+				'local-3',
+			] );
+			subscribeCallback!();
+			vi.advanceTimersByTime(
+				LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS +
+					AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS
+			);
+			expect(
+				awareness.getLocalState()?.editorState?.selection
+			).toMatchObject( {
+				setSelection: [
+					{ clientId: 'block-1' },
+					{ clientId: 'block-2' },
+					{ clientId: 'block-3' },
+				],
+			} );
+		} finally {
+			awareness.destroy();
+		}
+	} );
+
 	describe( 'setUp', () => {
+		test( 'does not resolve a deleted selected block to its unselected neighbor', () => {
+			const blocks = doc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.get( 'blocks' ) as Y.Array< Y.Map< any > >;
+			blocks.push( [ createYBlock( 'block-2', 'core/paragraph' ) ] );
+			const blockSelection: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition: Y.createRelativePositionFromTypeIndex(
+					blocks,
+					0
+				),
+				clientId: 'block-1',
+			};
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			try {
+				blocks.delete( 0, 1 );
+				expect(
+					awareness.convertSelectionStateToAbsolute( blockSelection, [
+						{ clientId: 'local-2', innerBlocks: [] },
+					] ).localClientId
+				).toBeNull();
+			} finally {
+				awareness.destroy();
+			}
+		} );
 		test( 'should be idempotent', () => {
 			const awareness = new PostEditorAwareness(
 				doc,

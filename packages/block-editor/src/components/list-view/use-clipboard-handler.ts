@@ -1,10 +1,11 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
-import type { TreeBlock } from '../../store/types';
+import type { BlockEditorThunkArgs, TreeBlock } from '../../store/types';
 import type { ListViewSelectBlock } from './types';
 
 // This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.ts
@@ -24,9 +25,19 @@ export default function useClipboardHandler( {
 		getSettings,
 		canInsertBlockType,
 		canRemoveBlocks,
-	} = useSelect( blockEditorStore );
-	const { flashBlock, removeBlocks, replaceBlocks, insertBlocks } =
-		useDispatch( blockEditorStore );
+		areBlocksContiguous,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
+	const {
+		flashBlock,
+		removeBlocks,
+		replaceBlocks,
+		insertBlocks,
+		pasteBlocksAfter,
+	} = unlock< BlockEditorThunkArgs[ 'dispatch' ] >(
+		useDispatch( blockEditorStore )
+	);
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node: HTMLElement ) => {
@@ -66,7 +77,7 @@ export default function useClipboardHandler( {
 			};
 		}
 
-		function handler( event: ClipboardEvent ) {
+		async function handler( event: ClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was possibly already handled in rich-text/use-paste-handler.js.
 				return;
@@ -158,6 +169,17 @@ export default function useClipboardHandler( {
 					// The setting is a boolean.
 					canUserUseUnfilteredHTML as boolean | undefined
 				);
+				if ( ! areBlocksContiguous( selectedBlockClientIds ) ) {
+					const insertedIds = await pasteBlocksAfter(
+						blocks,
+						selectedBlockClientIds,
+						null
+					);
+					if ( insertedIds?.length ) {
+						updateFocusAndSelection( insertedIds[ 0 ], false );
+					}
+					return;
+				}
 
 				if ( selectedBlockClientIds.length === 1 ) {
 					const [ selectedBlockClientId ] = selectedBlockClientIds;

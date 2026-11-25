@@ -376,15 +376,13 @@ const withBlockTree =
 				);
 				break;
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				const updatedBlockUids = [];
-				if ( action.fromRootClientId ) {
-					updatedBlockUids.push( action.fromRootClientId );
-				} else {
-					updatedBlockUids.push( '' );
-				}
-				if ( action.toRootClientId ) {
-					updatedBlockUids.push( action.toRootClientId );
-				}
+				// Refresh the nested block tree for every source and the destination.
+				const updatedBlockUids = [
+					...( Array.isArray( action.fromRootClientId )
+						? action.fromRootClientId
+						: [ action.fromRootClientId ?? '' ] ),
+					action.toRootClientId ?? '',
+				];
 				newState.tree = new Map( newState.tree );
 				updateParentInnerBlocksInTree(
 					newState,
@@ -1086,6 +1084,35 @@ export const blocks = pipe(
 				const fromRootClientId = action.fromRootClientId ?? '';
 				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
+				// An array lists the source parents for moving blocks together.
+				// A string specifies a single source parent.
+				if ( Array.isArray( fromRootClientId ) ) {
+					const uniqueIds = new Set( clientIds );
+					const newState = new Map( state );
+					// Remove the moved blocks from each affected parent first,
+					// including any already in the destination.
+					for ( const parent of new Set( [
+						...fromRootClientId,
+						toRootClientId,
+					] ) ) {
+						newState.set(
+							parent,
+							( state.get( parent ) ?? [] ).filter(
+								( id ) => ! uniqueIds.has( id )
+							)
+						);
+					}
+					// Insert them together, using the index adjusted for those removals.
+					newState.set(
+						toRootClientId,
+						insertAt(
+							newState.get( toRootClientId )!,
+							clientIds,
+							index
+						)
+					);
+					return newState;
+				}
 
 				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {
@@ -1527,6 +1554,13 @@ export function selection(
 	action: Action
 ) {
 	switch ( action.type ) {
+		case 'MULTI_SELECT_SET':
+			const setSelection = {
+				selectionStart: action.selectionStart,
+				selectionEnd: action.selectionEnd,
+				setSelectionClientIds: action.clientIds,
+			};
+			return fastDeepEqual( state, setSelection ) ? state : setSelection;
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
 				return {
@@ -1552,6 +1586,9 @@ export function selection(
 			return {
 				selectionStart,
 				selectionEnd,
+				...( action.setSelectionClientIds
+					? { setSelectionClientIds: action.setSelectionClientIds }
+					: {} ),
 			};
 		case 'MULTI_SELECT':
 			const nextSelection = {
@@ -1568,6 +1605,11 @@ export function selection(
 
 			return nextSelection;
 		case 'RESET_BLOCKS':
+			if ( state.setSelectionClientIds ) {
+				// Keep the selected client IDs for withSetSelection to check against
+				// the updated blocks, including blocks nested inside action.blocks.
+				return state;
+			}
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
 
@@ -1599,6 +1641,50 @@ export function selection(
 					selectionEnd: state.selectionStart,
 				};
 			}
+			break;
+		case 'REMOVE_BLOCKS':
+			if ( state.setSelectionClientIds ) {
+				// withSetSelection removes client IDs for deleted blocks, including
+				// blocks deleted along with their parent.
+				return state;
+			}
+			break;
+		case 'REPLACE_BLOCKS':
+			if ( ! state.setSelectionClientIds ) {
+				break;
+			}
+			// Select the replacement blocks in place of the replaced blocks.
+			// withSetSelection can remove deleted IDs, but cannot determine
+			// which new blocks replace selected blocks from the updated tree alone.
+			if (
+				! action.clientIds.some( ( id ) =>
+					state.setSelectionClientIds!.includes( id )
+				)
+			) {
+				return state;
+			}
+			return {
+				...state,
+				setSelectionClientIds: [
+					...state.setSelectionClientIds.filter(
+						( id ) => ! action.clientIds.includes( id )
+					),
+					...action.blocks.map( ( block ) => block.clientId ),
+				],
+			};
+		case 'SELECT_BLOCK':
+			if ( state.setSelectionClientIds ) {
+				// Selecting one block clears setSelectionClientIds even when
+				// selectionStart and selectionEnd already refer to that block.
+				return {
+					selectionStart: selectionHelper(
+						state.selectionStart,
+						action
+					),
+					selectionEnd: selectionHelper( state.selectionEnd, action ),
+				};
+			}
+			break;
 	}
 
 	const selectionStart = selectionHelper( state.selectionStart, action );
@@ -1762,6 +1848,7 @@ export function initialPosition(
 	} else if (
 		[
 			'MULTI_SELECT',
+			'MULTI_SELECT_SET',
 			'SELECT_BLOCK',
 			'RESET_SELECTION',
 			'INSERT_BLOCKS',
@@ -3440,7 +3527,108 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 	};
 }
 
+/**
+ * Higher-order reducer that updates setSelectionClientIds after block or selection changes.
+ * Removes IDs for missing blocks and descendants of selected blocks, sorts IDs
+ * in document order, and keeps the selected blocks within one entity.
+ *
+ * @param reducer Original state reducer.
+ * @return Reducer that also updates the selected client IDs and selection start/end.
+ */
+function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+		const current = nextState.selection;
+		if (
+			! current.setSelectionClientIds ||
+			( state?.blocks.order === nextState.blocks.order &&
+				state.blocks.controlledInnerBlocks ===
+					nextState.blocks.controlledInnerBlocks &&
+				state.selection === current )
+		) {
+			return nextState;
+		}
+		const uniqueIds = new Set( current.setSelectionClientIds );
+		let orderedIds: string[] = [];
+		const controlledParentsByClientId = new Map< string, string >();
+		const collectSelectedClientIds = (
+			rootClientId: string,
+			controlledParentClientId: string
+		) => {
+			// Only children of a controlled block belong to its separate entity.
+			// The controlled block itself belongs to its parent's entity.
+			const childControlledParentClientId =
+				nextState.blocks.controlledInnerBlocks.has( rootClientId )
+					? rootClientId
+					: controlledParentClientId;
+			for ( const id of nextState.blocks.order.get( rootClientId ) ??
+				[] ) {
+				if ( uniqueIds.has( id ) ) {
+					orderedIds.push( id );
+					controlledParentsByClientId.set(
+						id,
+						childControlledParentClientId
+					);
+				} else {
+					collectSelectedClientIds(
+						id,
+						childControlledParentClientId
+					);
+				}
+			}
+		};
+		collectSelectedClientIds( '', '' );
+		// A block can move into or out of a controlled parent. Keep selected
+		// blocks in the same entity as selectionStart. If that block is missing
+		// or has a selected parent, use the first selected block in document order.
+		const selectionStartClientId = orderedIds.includes(
+			current.selectionStart.clientId!
+		)
+			? current.selectionStart.clientId!
+			: orderedIds[ 0 ];
+		const controlledParentClientId = controlledParentsByClientId.get(
+			selectionStartClientId
+		);
+		orderedIds = orderedIds.filter(
+			( id ) =>
+				controlledParentsByClientId.get( id ) ===
+				controlledParentClientId
+		);
+		const selectionStart = {
+			clientId:
+				uniqueIds.has( current.selectionStart.clientId! ) &&
+				orderedIds.includes( current.selectionStart.clientId! )
+					? current.selectionStart.clientId
+					: orderedIds[ 0 ],
+		};
+		const selectionEnd = {
+			clientId: orderedIds.includes( current.selectionEnd.clientId! )
+				? current.selectionEnd.clientId
+				: orderedIds[ orderedIds.length - 1 ],
+		};
+		const nextSelection =
+			orderedIds.length > 1
+				? {
+						selectionStart,
+						selectionEnd,
+						setSelectionClientIds: orderedIds,
+					}
+				: {
+						selectionStart: orderedIds.length
+							? { clientId: orderedIds[ 0 ] }
+							: {},
+						selectionEnd: orderedIds.length
+							? { clientId: orderedIds[ 0 ] }
+							: {},
+					};
+		return fastDeepEqual( current, nextSelection )
+			? nextState
+			: { ...nextState, selection: nextSelection };
+	};
+}
+
 export default pipe(
 	withDerivedBlockEditingModes,
+	withSetSelection,
 	withAutomaticChangeReset
 )( combinedReducers ) as Reducer< State >;

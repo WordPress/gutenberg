@@ -13,7 +13,9 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
 import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import type { DragEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
-import type { Settings } from '../../store/types';
+import { unlock } from '../../lock-unlock';
+import type { BlockEditorThunkArgs, Settings } from '../../store/types';
+import { filterOutChildClientIds } from '../../store/utils';
 import type {
 	BlockDropData,
 	BlockDropOperation,
@@ -45,11 +47,41 @@ export function parseDropEvent(
 		return result;
 	}
 
+	// Drag data may come from outside this editor. Ignore invalid JSON or
+	// unexpected shapes instead of using them as block IDs.
 	try {
-		result = Object.assign(
-			result,
-			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
+		const parsed: unknown = JSON.parse(
+			event.dataTransfer.getData( 'wp-blocks' )
 		);
+		if (
+			! parsed ||
+			typeof parsed !== 'object' ||
+			Array.isArray( parsed )
+		) {
+			return result;
+		}
+		const data = parsed as Partial< BlockDropData >;
+		// The source parent must be an ID when provided.
+		if (
+			data.srcRootClientId !== undefined &&
+			data.srcRootClientId !== null &&
+			typeof data.srcRootClientId !== 'string'
+		) {
+			return result;
+		}
+		// Dragged block IDs must be a non-empty list of strings when provided.
+		if (
+			data.srcClientIds !== undefined &&
+			data.srcClientIds !== null &&
+			( ! Array.isArray( data.srcClientIds ) ||
+				! data.srcClientIds.length ||
+				data.srcClientIds.some(
+					( id ) => typeof id !== 'string' || ! id
+				) )
+		) {
+			return result;
+		}
+		result = { ...result, ...data };
 	} catch {
 		return result;
 	}
@@ -70,6 +102,7 @@ export function parseDropEvent(
  * @param operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
  * @param getBlock                  A function that returns a block given its client id.
  * @param onSameOrderDrop           Runs custom behavior for insertion drops that keep the block order.
+ * @param onBlockSetDrop            Handles non-contiguous block drops before calculating indices for contiguous blocks.
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -82,7 +115,11 @@ export function onBlockDrop(
 	clearSelectedBlock: () => void,
 	operation: BlockDropOperation,
 	getBlock: ( clientId: string ) => Block | null,
-	onSameOrderDrop?: OnBlocksDrop
+	onSameOrderDrop?: OnBlocksDrop,
+	onBlockSetDrop?: (
+		clientIds: string[],
+		sourceRootClientId: string | null
+	) => boolean
 ) {
 	return ( event: DragEvent | globalThis.DragEvent ) => {
 		const {
@@ -104,6 +141,12 @@ export function onBlockDrop(
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
+			if (
+				! sourceClientIds?.length ||
+				onBlockSetDrop?.( sourceClientIds, sourceRootClientId )
+			) {
+				return;
+			}
 			// A block drop carries the dragged client IDs.
 			const sourceBlockIndex = getBlockIndex( sourceClientIds![ 0 ] );
 
@@ -267,7 +310,14 @@ export default function useOnBlockDrop(
 		getBlocksByClientId,
 		getSettings,
 		getBlock,
-	} = useSelect( blockEditorStore );
+		getBlockRootClientId,
+		getBlockParents,
+		getClientIdsWithDescendants,
+		areBlocksContiguous,
+		canMoveBlocksToPosition,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		insertBlocks,
@@ -276,6 +326,7 @@ export default function useOnBlockDrop(
 		clearSelectedBlock,
 		replaceBlocks,
 		removeBlocks,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
@@ -426,7 +477,100 @@ export default function useOnBlockDrop(
 		clearSelectedBlock,
 		operation,
 		getBlock,
-		onBlocksDrop
+		onBlocksDrop,
+		( clientIds, sourceRootClientId ) => {
+			if ( clientIds.some( ( id ) => ! getBlock( id ) ) ) {
+				return true;
+			}
+			const sourceIds = filterOutChildClientIds(
+				clientIds,
+				getBlockParents
+			);
+			// Delegate contiguous drops to onBlockDrop only if filterOutChildClientIds
+			// leaves the IDs unchanged and the drag data's source parent matches the
+			// blocks' current parent. onBlockDrop receives the original drag data, so
+			// otherwise it would count children separately or use the wrong parent.
+			if (
+				sourceIds.length === clientIds.length &&
+				areBlocksContiguous( sourceIds ) &&
+				getBlockRootClientId( sourceIds[ 0 ] ) === sourceRootClientId
+			) {
+				return false;
+			}
+			if (
+				operation === 'group' ||
+				operation === 'replace' ||
+				! canMoveBlocksToPosition( clientIds, targetRootClientId ?? '' )
+			) {
+				return true;
+			}
+			registry.batch( () => {
+				// Call custom drop behavior separately for each source parent so grid
+				// positioning and other adjustments use the blocks' original containers.
+				if ( onBlocksDrop ) {
+					const byParent = new Map< string, string[] >();
+					for ( const id of sourceIds ) {
+						const parent = getBlockRootClientId( id )!;
+						const siblings = byParent.get( parent ) ?? [];
+						siblings.push( id );
+						byParent.set( parent, siblings );
+					}
+					for ( const [ parent, ids ] of byParent ) {
+						onBlocksDrop( ids, parent );
+					}
+				}
+				// Recheck movement permissions after custom drop callbacks because they
+				// may have changed the blocks or their parents.
+				const destinationRootClientId = targetRootClientId ?? '';
+				if (
+					! canMoveBlocksToPosition(
+						sourceIds,
+						destinationRootClientId
+					) ||
+					! Number.isInteger( targetBlockIndex ) ||
+					targetBlockIndex < 0
+				) {
+					return;
+				}
+				const uniqueIds = new Set( sourceIds );
+				const orderedIds = getClientIdsWithDescendants().filter(
+					( id ) => uniqueIds.has( id )
+				);
+				const targetOrder = getBlockOrder( destinationRootClientId );
+				const targetIndex = Math.min(
+					targetBlockIndex,
+					targetOrder.length
+				);
+				// Subtract moved siblings before the pointer's insertion position because
+				// the move action expects a destination index after their removal.
+				const insertionIndex =
+					targetIndex -
+					targetOrder
+						.slice( 0, targetIndex )
+						.filter( ( id ) => uniqueIds.has( id ) ).length;
+				if (
+					orderedIds.every(
+						( id, i ) => targetOrder[ insertionIndex + i ] === id
+					)
+				) {
+					return;
+				}
+				moveBlocksToPosition(
+					orderedIds,
+					getBlockRootClientId( orderedIds[ 0 ] ),
+					destinationRootClientId,
+					insertionIndex
+				);
+				// Select the moved blocks here to keep them selected after the drop;
+				// the general move action leaves selection unchanged for other callers.
+				multiSelect(
+					orderedIds[ 0 ],
+					orderedIds[ orderedIds.length - 1 ],
+					0
+				);
+			} );
+			return true;
+		}
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,

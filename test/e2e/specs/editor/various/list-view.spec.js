@@ -11,6 +11,230 @@ test.describe( 'List View', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'drags non-contiguous blocks from List View into a contiguous selection (@firefox, @webkit)', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent(
+			[ 'Alpha', 'Bravo', 'Charlie', 'Delta' ]
+				.map(
+					( content ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"${ content }"}} --><p>${ content }</p><!-- /wp:paragraph -->`
+				)
+				.join( '\n' )
+		);
+		const before = await editor.getBlocks( { full: true } );
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'access+o' );
+		const tree = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const source = tree.getByRole( 'link', {
+			name: 'Charlie',
+			exact: true,
+		} );
+		const target = tree.getByRole( 'link', { name: 'Bravo', exact: true } );
+		const targetRow = tree.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'link', { name: 'Bravo', exact: true } ),
+		} );
+		const lastRow = tree.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'link', { name: 'Delta', exact: true } ),
+		} );
+		const targetBox = await target.boundingBox();
+		await source.hover();
+		await page.mouse.down();
+		await page.mouse.move( targetBox.x + 40, targetBox.y + 2, {
+			steps: 10,
+		} );
+		await page.mouse.move( targetBox.x + 41, targetBox.y + 2 );
+		// Follow the row as the insertion gap displaces it; do not drop at its old position.
+		await expect
+			.poll( async () => {
+				const box = await target.boundingBox();
+				await page.mouse.move( box.x + 40, box.y + 2 );
+				await page.mouse.move( box.x + 41, box.y + 2 );
+				return targetRow.getAttribute( 'class' );
+			} )
+			.toMatch( /is-displacement-normal/ );
+		// Intervening rows collapse only preceding dragged slots, not the whole set.
+		await expect( targetRow ).toHaveCSS(
+			'--wp-admin--list-view-dragged-items-height',
+			'0px'
+		);
+		await expect( lastRow ).toHaveCSS(
+			'--wp-admin--list-view-dragged-items-height',
+			'32px'
+		);
+		await page.mouse.up();
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks( { full: true } ) ).map(
+					( block ) => block.clientId
+				)
+			)
+			.toEqual( [
+				before[ 0 ].clientId,
+				before[ 2 ].clientId,
+				before[ 1 ].clientId,
+				before[ 3 ].clientId,
+			] );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( [ before[ 0 ].clientId, before[ 2 ].clientId ] );
+	} );
+
+	test( 'drags non-contiguous blocks from List View across collapsed parents without reserving hidden row space (@firefox, @webkit)', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		for ( const [ index, contents ] of [
+			[ 'Alpha', 'Bravo' ],
+			[ 'Charlie', 'Delta' ],
+		].entries() ) {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { metadata: { name: `Container ${ index + 1 }` } },
+				innerBlocks: contents.map( ( content ) => ( {
+					name: 'core/paragraph',
+					attributes: { content, metadata: { name: content } },
+				} ) ),
+			} );
+		}
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Landing', metadata: { name: 'Landing' } },
+		} );
+		const before = await editor.getBlocks( { full: true } );
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await pageUtils.pressKeys( 'access+o' );
+		const tree = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await expect(
+			tree.getByRole( 'link', { name: 'Container 2', exact: true } )
+		).toHaveAttribute( 'aria-expanded', 'false' );
+		const source = tree.getByRole( 'link', { name: 'Alpha', exact: true } );
+		const previousRow = tree.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'link', {
+				name: 'Container 2',
+				exact: true,
+			} ),
+		} );
+		const targetRow = tree.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'link', { name: 'Landing', exact: true } ),
+		} );
+		const targetBox = await targetRow.boundingBox();
+		const sourceBox = await source.boundingBox();
+		await source.hover();
+		await page.mouse.down();
+		await page.mouse.move(
+			targetBox.x + 30,
+			sourceBox.y + sourceBox.height / 2,
+			{ steps: 5 }
+		);
+		await page.mouse.move( targetBox.x + 30, targetBox.y + 2, {
+			steps: 10,
+		} );
+		await expect
+			.poll( async () => {
+				const box = await targetRow.boundingBox();
+				await page.mouse.move( box.x + 30, box.y + 2 );
+				await page.mouse.move( box.x + 31, box.y + 2 );
+				return [
+					await previousRow.getAttribute( 'class' ),
+					await targetRow.getAttribute( 'class' ),
+				];
+			} )
+			.toEqual( [
+				expect.stringMatching( /is-displacement-up/ ),
+				expect.stringMatching( /is-displacement-normal/ ),
+			] );
+		await expect( targetRow ).toHaveCSS(
+			'--wp-admin--list-view-dragged-items-height',
+			'0px'
+		);
+		await page.mouse.up();
+		const selectedIds = [
+			before[ 0 ].innerBlocks[ 0 ].clientId,
+			before[ 1 ].innerBlocks[ 0 ].clientId,
+		];
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks( { full: true } ) ).map(
+					( block ) => block.clientId
+				)
+			)
+			.toEqual( [
+				before[ 0 ].clientId,
+				before[ 1 ].clientId,
+				...selectedIds,
+				before[ 2 ].clientId,
+			] );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( selectedIds );
+	} );
+
+	test( 'builds a non-contiguous selection using the List View keyboard (@firefox, @webkit)', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const links = listView.getByRole( 'link', {
+			name: 'Paragraph',
+			exact: true,
+		} );
+		await links.nth( 0 ).focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( links.nth( 2 ) ).toBeFocused();
+		await page.keyboard.press( 'Space' );
+		await expect( links.nth( 2 ) ).toBeFocused();
+		await expect(
+			listView
+				.getByRole( 'gridcell', { selected: true } )
+				.filter( { has: page.getByRole( 'link' ) } )
+		).toHaveCount( 2 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+		await page.keyboard.press( 'Space' );
+		await expect(
+			listView
+				.getByRole( 'gridcell', { selected: true } )
+				.filter( { has: page.getByRole( 'link' ) } )
+		).toHaveCount( 1 );
+		await expect( links.nth( 2 ) ).toBeFocused();
+	} );
+
 	test( 'allows a user to drag a block to a new sibling position', async ( {
 		editor,
 		page,

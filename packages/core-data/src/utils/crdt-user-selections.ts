@@ -1,7 +1,9 @@
 import { select } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
+import deepEqual from 'fast-deep-equal';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
+import { unlock } from '../lock-unlock';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import {
@@ -52,18 +54,22 @@ export enum SelectionDirection {
  * differ between the block-editor store and the Yjs document (e.g. in "Show
  * Template" mode).
  *
- * @param selectionStart             - The start position of the selection
- * @param selectionEnd               - The end position of the selection
- * @param yDoc                       - The Yjs document
- * @param options                    - Optional parameters
- * @param options.selectionDirection - The direction of the selection (forward or backward)
+ * @param selectionStart                - The start position of the selection
+ * @param selectionEnd                  - The end position of the selection
+ * @param yDoc                          - The Yjs document
+ * @param options                       - Optional parameters
+ * @param options.selectionDirection    - The direction of the selection (forward or backward)
+ * @param options.setSelectionClientIds - Selected block client IDs from multiSelectSet, omitted for text and range selections.
  * @return The SelectionState
  */
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
 	yDoc: Y.Doc,
-	options?: { selectionDirection?: SelectionDirection }
+	options?: {
+		selectionDirection?: SelectionDirection;
+		setSelectionClientIds?: string[];
+	}
 ): SelectionState {
 	const { selectionDirection } = options ?? {};
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
@@ -77,6 +83,25 @@ export function getSelectionState(
 	if ( isSelectionEmpty || ! yBlocks ) {
 		// Case 1: No selection, or no blocks in the document.
 		return noSelection;
+	}
+	if ( options?.setSelectionClientIds ) {
+		const setSelection: SelectionWholeBlock[] = [];
+		for ( const id of options.setSelectionClientIds ) {
+			const path = getBlockPathForLocalClientId( id, true );
+			const block = path && findBlockByPath( path, yBlocks );
+			const blockPosition =
+				path && createRelativePositionForBlockPath( path, yBlocks );
+			if ( block && blockPosition ) {
+				setSelection.push( {
+					type: SelectionType.WholeBlock,
+					blockPosition,
+					clientId: block.get( 'clientId' ),
+				} );
+			}
+		}
+		// Older clients treat SelectionType.None as no selection and ignore
+		// setSelection, rather than highlighting unselected blocks between them.
+		return { type: SelectionType.None, setSelection };
 	}
 
 	// When the page initially loads, selectionStart can contain an empty object `{}`.
@@ -249,11 +274,13 @@ function getSelectionEndpoint(
  * content blocks, so we stop the upward walk when the parent is
  * core/post-content (its inner blocks correspond to the Yjs root blocks).
  *
- * @param clientId - The local block-editor clientId to resolve.
+ * @param clientId             - The local block-editor clientId to resolve.
+ * @param excludeOtherEntities - Reject controlled contents other than this post's content.
  * @return The index path from root, or null if not resolvable.
  */
 export function getBlockPathForLocalClientId(
-	clientId: string
+	clientId: string,
+	excludeOtherEntities = false
 ): AbsoluteBlockIndexPath | null {
 	const { getBlockIndex, getBlockRootClientId, getBlockName } =
 		select( blockEditorStore );
@@ -274,9 +301,24 @@ export function getBlockPathForLocalClientId(
 		// root blocks correspond to post-content's inner blocks.
 		const parentName = getBlockName( parent );
 		if ( parentName === 'core/post-content' ) {
-			break;
+			return path;
+		}
+		if (
+			excludeOtherEntities &&
+			select( blockEditorStore ).areInnerBlocksControlled?.( parent )
+		) {
+			return null;
 		}
 		current = parent;
+	}
+	if ( excludeOtherEntities ) {
+		// Reaching the editor root in template mode means the block belongs to
+		// the surrounding template, not this post's controlled content. Its index
+		// must not be interpreted as a coincidentally matching post-block index.
+		const { getBlocksByName } = unlock( select( blockEditorStore ) );
+		if ( getBlocksByName?.( 'core/post-content' ).length ) {
+			return null;
+		}
 	}
 	return path.length > 0 ? path : null;
 }
@@ -288,7 +330,7 @@ export function getBlockPathForLocalClientId(
  * @param blocks - The root-level Yjs blocks array.
  * @return The block Y.Map if found, null otherwise.
  */
-function findBlockByPath(
+export function findBlockByPath(
 	path: AbsoluteBlockIndexPath,
 	blocks: YBlocks
 ): YBlock | null {
@@ -356,7 +398,13 @@ export function areSelectionsStatesEqual(
 
 	switch ( selection1.type ) {
 		case SelectionType.None:
-			return true;
+			// setSelection comes from another client and may contain invalid data.
+			// Compare the values here; useBlockHighlighting checks each block
+			// selection before resolving its position and displaying an outline.
+			return deepEqual(
+				selection1.setSelection,
+				( selection2 as SelectionNone ).setSelection
+			);
 
 		case SelectionType.Cursor:
 			return areCursorPositionsEqual(

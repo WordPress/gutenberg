@@ -29,6 +29,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	filterOutChildClientIds,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -45,6 +46,7 @@ import {
 	getClientIdsTree,
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleStateViewport,
+	areBlocksContiguous,
 } from './private-selectors';
 import type {
 	InserterItem,
@@ -537,6 +539,9 @@ export function getSelectedBlockCount( state: State ) {
  * @return {boolean} Whether a single block is selected.
  */
 export function hasSelectedBlock( state: State ) {
+	if ( state.selection.setSelectionClientIds ) {
+		return false;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 	return (
 		!! selectionStart.clientId &&
@@ -553,14 +558,9 @@ export function hasSelectedBlock( state: State ) {
  * @return {?string} Selected block client ID.
  */
 export function getSelectedBlockClientId( state: State ) {
-	const { selectionStart, selectionEnd } = state.selection;
-	const { clientId } = selectionStart;
-
-	if ( ! clientId || clientId !== selectionEnd.clientId ) {
-		return null;
-	}
-
-	return clientId;
+	return hasSelectedBlock( state )
+		? state.selection.selectionStart.clientId!
+		: null;
 }
 
 /**
@@ -879,6 +879,9 @@ function getSelectionNestingAncestor( state: State ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state: State ) => {
+		if ( state.selection.setSelectionClientIds ) {
+			return state.selection.setSelectionClientIds;
+		}
 		const { selectionStart, selectionEnd } = state.selection;
 
 		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
@@ -919,6 +922,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state: State ) => [
 		state.blocks.order,
 		state.blocks.parents,
+		state.selection.setSelectionClientIds,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -933,6 +937,9 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state: State ) {
+	if ( state.selection.setSelectionClientIds ) {
+		return state.selection.setSelectionClientIds;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
@@ -1044,6 +1051,7 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state: State ) => [
 		state.blocks.order,
+		state.selection.setSelectionClientIds,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -1062,9 +1070,9 @@ export const isAncestorMultiSelected = createSelector(
  * @return {?string} Client ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartClientId( state: State ) {
-	const { selectionStart, selectionEnd } = state.selection;
+	const { selectionStart } = state.selection;
 
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
+	if ( ! hasMultiSelection( state ) ) {
 		return null;
 	}
 
@@ -1084,9 +1092,9 @@ export function getMultiSelectedBlocksStartClientId( state: State ) {
  * @return {?string} Client ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndClientId( state: State ) {
-	const { selectionStart, selectionEnd } = state.selection;
+	const { selectionEnd } = state.selection;
 
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
+	if ( ! hasMultiSelection( state ) ) {
 		return null;
 	}
 
@@ -1125,6 +1133,9 @@ export function __unstableIsFullySelected( state: State ) {
  * @return {boolean} Whether the selection is collapsed.
  */
 export function __unstableIsSelectionCollapsed( state: State ) {
+	if ( state.selection.setSelectionClientIds ) {
+		return false;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 	return (
@@ -1156,6 +1167,9 @@ export function __unstableIsSelectionMergeable(
 	state: State,
 	isForward?: boolean
 ) {
+	if ( state.selection.setSelectionClientIds ) {
+		return false;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 
@@ -1354,18 +1368,11 @@ export function getBlockIndex( state: State, clientId: string ) {
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
  *
- * @return {boolean} Whether block is selected and multi-selection exists.
+ * @return {boolean} Whether block is selected and no multi-selection exists.
  */
 export function isBlockSelected( state: State, clientId?: string | null ) {
-	const { selectionStart, selectionEnd } = state.selection;
-
-	if ( selectionStart.clientId !== selectionEnd.clientId ) {
-		return false;
-	}
-
-	// Both sides are `undefined` when nothing is selected and the caller
-	// passes an optional client ID.
-	return !! clientId && selectionStart.clientId === clientId;
+	// An absent client ID never identifies a selected block.
+	return !! clientId && getSelectedBlockClientId( state ) === clientId;
 }
 
 /**
@@ -1482,6 +1489,9 @@ export function isBlockWithinSelection( state: State, clientId: string ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state: State ) {
+	if ( state.selection.setSelectionClientIds ) {
+		return state.selection.setSelectionClientIds.length > 1;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 	return selectionStart.clientId !== selectionEnd.clientId;
 }
@@ -2192,6 +2202,11 @@ export function canMoveBlock( state: State, clientId: string ) {
 		return false;
 	}
 
+	// Disabled blocks cannot move, even when lock.move is false.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+		return false;
+	}
+
 	// Blocks within static inner content are fixed in place; a `lock`
 	// attribute can't override the structural constraint.
 	if (
@@ -2254,7 +2269,17 @@ export function canMoveBlock( state: State, clientId: string ) {
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
 export function canMoveBlocks( state: State, clientIds: string[] ) {
-	return clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) );
+	const uniqueIds = new Set( clientIds );
+	return (
+		clientIds.length > 0 &&
+		uniqueIds.size === clientIds.length &&
+		// Validate all supplied IDs before filtering, so a request containing a
+		// missing block is rejected as a whole.
+		clientIds.every( ( id ) => !! getBlock( state, id ) ) &&
+		filterOutChildClientIds( clientIds, ( id ) =>
+			getBlockParents( state, id )
+		).every( ( id ) => canMoveBlock( state, id ) )
+	);
 }
 
 /**
@@ -3712,11 +3737,15 @@ export const isUngroupable = createRegistrySelector(
 export const isGroupable = createRegistrySelector(
 	( select ) =>
 		( state: State, clientIds: string[] = EMPTY_ARRAY ) => {
-			const { getGroupingBlockName } = select( blocksStore );
-			const groupingBlockName = getGroupingBlockName();
 			const _clientIds = clientIds?.length
 				? clientIds
 				: getSelectedBlockClientIds( state );
+			// Grouping requires contiguous blocks with the same parent.
+			if ( ! areBlocksContiguous( state, _clientIds ) ) {
+				return false;
+			}
+			const { getGroupingBlockName } = select( blocksStore );
+			const groupingBlockName = getGroupingBlockName();
 			const rootClientId = _clientIds?.length
 				? getBlockRootClientId( state, _clientIds[ 0 ] )
 				: undefined;

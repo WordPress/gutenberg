@@ -23,6 +23,266 @@ test.describe( 'Draggable block', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'retains grouping drops for ordinary contiguous drags (@firefox, @webkit)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			[ 'First', 'Gap', 'Target' ]
+				.map(
+					( content ) =>
+						`<!-- wp:paragraph --><p>${ content }</p><!-- /wp:paragraph -->`
+				)
+				.join( '\n' )
+		);
+		await editor.canvas.getByText( 'First', { exact: true } ).click();
+		await editor.showBlockToolbar();
+		const drag = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Drag', exact: true } );
+		const target = await editor.canvas
+			.getByText( 'Target', { exact: true } )
+			.boundingBox();
+		await drag.hover();
+		await page.mouse.down();
+		await page.mouse.move(
+			target.x + target.width - 2,
+			target.y + target.height / 2,
+			{ steps: 10 }
+		);
+		await dragTo(
+			page,
+			target.x + target.width - 2,
+			target.y + target.height / 2
+		);
+		await expect(
+			page
+				.locator(
+					'.block-editor-block-list__insertion-point.is-horizontal'
+				)
+				.getByTestId( 'block-list-insertion-point-indicator' )
+		).toBeVisible();
+		await page.mouse.up();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'Gap' } },
+			{
+				name: 'core/group',
+				attributes: { layout: { type: 'flex' } },
+				innerBlocks: [
+					{ attributes: { content: 'Target' } },
+					{ attributes: { content: 'First' } },
+				],
+			},
+		] );
+	} );
+
+	for ( const source of [ 'Alpha', 'Charlie' ] ) {
+		test( `drags non-contiguous blocks from selected ${ source } in the canvas into a contiguous selection (@firefox, @webkit)`, async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				[ 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo' ]
+					.map(
+						( content ) =>
+							`<!-- wp:paragraph --><p>${ content }</p><!-- /wp:paragraph -->`
+					)
+					.join( '\n' )
+			);
+			const before = await editor.getBlocks( { full: true } );
+			await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+			await editor.canvas
+				.getByText( 'Charlie', { exact: true } )
+				.click( { modifiers: [ 'ControlOrMeta' ] } );
+			const toolbar = page.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} );
+			await expect(
+				toolbar.getByRole( 'button', { name: 'Drag', exact: true } )
+			).toBeVisible();
+			await expect(
+				toolbar.getByRole( 'button', { name: /Move (up|down)/ } )
+			).toHaveCount( 0 );
+			const sourceBox = await editor.canvas
+				.getByText( source, { exact: true } )
+				.boundingBox();
+			const targetBox = await editor.canvas
+				.getByText( 'Delta', { exact: true } )
+				.boundingBox();
+			await page.mouse.move(
+				sourceBox.x + sourceBox.width - 20,
+				sourceBox.y + sourceBox.height / 2
+			);
+			await page.mouse.down();
+			await page.mouse.move(
+				targetBox.x + 40,
+				targetBox.y + targetBox.height - 2,
+				{ steps: 10 }
+			);
+			await dragTo(
+				page,
+				targetBox.x + 40,
+				targetBox.y + targetBox.height - 2
+			);
+			const indicator = page.getByTestId(
+				'block-list-insertion-point-indicator'
+			);
+			await expect( indicator ).toBeVisible();
+			await expect
+				.poll(
+					async () =>
+						( await indicator.boundingBox() )?.y ?? -Infinity
+				)
+				.toBeGreaterThan( targetBox.y );
+			await page.mouse.up();
+			await expect
+				.poll( async () =>
+					( await editor.getBlocks( { full: true } ) ).map(
+						( block ) => block.clientId
+					)
+				)
+				.toEqual( [
+					before[ 1 ].clientId,
+					before[ 3 ].clientId,
+					before[ 0 ].clientId,
+					before[ 2 ].clientId,
+					before[ 4 ].clientId,
+				] );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds()
+					)
+				)
+				.toEqual( [ before[ 0 ].clientId, before[ 2 ].clientId ] );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.isDraggingBlocks()
+					)
+				)
+				.toBe( false );
+		} );
+	}
+
+	test( 'restores all dragged blocks to their original parents and positions in one undo step (@firefox, @webkit)', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const contents of [
+			[ 'Alpha', 'Bravo' ],
+			[ 'Charlie', 'Delta' ],
+		] ) {
+			await editor.insertBlock( {
+				name: 'core/group',
+				innerBlocks: contents.map( ( content ) => ( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} ) ),
+			} );
+		}
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Landing' },
+		} );
+		const before = await editor.getBlocks( { full: true } );
+		const selectedIds = [
+			before[ 0 ].innerBlocks[ 0 ].clientId,
+			before[ 1 ].innerBlocks[ 0 ].clientId,
+		];
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( selectedIds );
+		const sourceBox = await editor.canvas
+			.getByText( 'Charlie', { exact: true } )
+			.boundingBox();
+		const targetBox = await editor.canvas
+			.getByText( 'Landing', { exact: true } )
+			.boundingBox();
+		await page.mouse.move(
+			sourceBox.x + sourceBox.width - 20,
+			sourceBox.y + sourceBox.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			targetBox.x + 40,
+			targetBox.y + targetBox.height - 2,
+			{ steps: 10 }
+		);
+		await dragTo(
+			page,
+			targetBox.x + 40,
+			targetBox.y + targetBox.height - 2
+		);
+		const indicator = page.getByTestId(
+			'block-list-insertion-point-indicator'
+		);
+		await expect( indicator ).toBeVisible();
+		await expect
+			.poll(
+				async () => ( await indicator.boundingBox() )?.y ?? -Infinity
+			)
+			.toBeGreaterThan( targetBox.y );
+		await page.mouse.up();
+		const expectedIds = [
+			before[ 0 ].clientId,
+			before[ 1 ].clientId,
+			before[ 2 ].clientId,
+			...selectedIds,
+		];
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks( { full: true } ) ).map(
+					( block ) => block.clientId
+				)
+			)
+			.toEqual( expectedIds );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ innerBlocks: [ { attributes: { content: 'Bravo' } } ] },
+				{ innerBlocks: [ { attributes: { content: 'Delta' } } ] },
+				{ attributes: { content: 'Landing' } },
+				{ attributes: { content: 'Alpha' } },
+				{ attributes: { content: 'Charlie' } },
+			] );
+		await page.getByRole( 'button', { name: 'Undo', exact: true } ).click();
+		await expect
+			.poll( () => editor.getBlocks( { full: true } ) )
+			.toEqual( before );
+		await page.getByRole( 'button', { name: 'Redo', exact: true } ).click();
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks( { full: true } ) ).map(
+					( block ) => block.clientId
+				)
+			)
+			.toEqual( expectedIds );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toEqual( selectedIds );
+	} );
+
 	test( 'can drag and drop to the top of a vertical block list', async ( {
 		editor,
 		page,

@@ -10,7 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -30,6 +30,7 @@ export default function PatternConvertButton( {
 	rootClientId,
 	closeBlockSettingsMenu,
 }: PatternConvertButtonProps ) {
+	const registry = useRegistry();
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { replaceBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -40,6 +41,15 @@ export default function PatternConvertButton( {
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const canConvert = useSelect(
 		( select ) => {
+			const { areBlocksContiguous } = unlock(
+				select( blockEditorStore )
+			);
+
+			// Patterns represent a connected chunk of content, so only support
+			// a contiguous selection of blocks.
+			if ( ! areBlocksContiguous( clientIds ) ) {
+				return false;
+			}
 			const { canUser } = select( coreStore );
 			const {
 				getBlocksByClientId,
@@ -131,12 +141,28 @@ export default function PatternConvertButton( {
 				} );
 			}
 		} else {
-			const newBlock = createBlock( 'core/block', {
-				ref: pattern.id,
-			} );
-
-			replaceBlocks( clientIds, newBlock );
-			setEditingPattern( newBlock.clientId, true );
+			// Saving is asynchronous: check the original blocks before replacing them,
+			// so a changed selection cannot remove blocks from another parent or a locked list.
+			const {
+				areBlocksContiguous,
+				canRemoveBlocks,
+				canInsertBlockType,
+				getBlockRootClientId,
+			} = unlock( registry.select( blockEditorStore ) );
+			if (
+				areBlocksContiguous( clientIds ) &&
+				canRemoveBlocks( clientIds ) &&
+				canInsertBlockType(
+					'core/block',
+					getBlockRootClientId( clientIds[ 0 ] )
+				)
+			) {
+				const newBlock = createBlock( 'core/block', {
+					ref: pattern.id,
+				} );
+				replaceBlocks( clientIds, newBlock );
+				setEditingPattern( newBlock.clientId, true );
+			}
 		}
 
 		createSuccessNotice(

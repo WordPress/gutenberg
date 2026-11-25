@@ -60,21 +60,33 @@ export const isClientIdSelected = (
  * selection is always at the same nesting level, and not split across
  * separate levels.
  *
- * @param startId      The first id of a selection.
- * @param endId        The end id of a selection, usually one that has been clicked on.
- * @param startParents An array of ancestor ids for the start id, in descending order.
- * @param endParents   An array of ancestor ids for the end id, in descending order.
+ * @param startId             The first id of a selection.
+ * @param endId               The end id of a selection, usually one that has been clicked on.
+ * @param startParents        An array of ancestor ids for the start id, in descending order.
+ * @param endParents          An array of ancestor ids for the end id, in descending order.
+ * @param requireCommonParent Whether to find start and end blocks with the same parent, rather than only matching depths.
  * @return An object containing the start and end ids.
  */
 export function getCommonDepthClientIds(
 	startId: string,
 	endId: string,
 	startParents: string[],
-	endParents: string[]
+	endParents: string[],
+	requireCommonParent = false
 ): { start: string; end: string } {
 	const startPath = [ ...startParents, startId ];
 	const endPath = [ ...endParents, endId ];
-	const depth = Math.min( startPath.length, endPath.length ) - 1;
+	let depth = Math.min( startPath.length, endPath.length ) - 1;
+	if ( requireCommonParent ) {
+		let commonDepth = 0;
+		while (
+			commonDepth < depth &&
+			startPath[ commonDepth ] === endPath[ commonDepth ]
+		) {
+			commonDepth++;
+		}
+		depth = commonDepth;
+	}
 	const start = startPath[ depth ];
 	const end = endPath[ depth ];
 

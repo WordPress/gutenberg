@@ -15,6 +15,7 @@ import {
 	SelectionType,
 } from '../crdt-user-selections';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import { lock } from '../../lock-unlock';
 import type {
 	CursorPosition,
 	SelectionNone,
@@ -544,10 +545,63 @@ describe( 'getSelectionState', () => {
 				),
 			getBlockName: vi.fn().mockReturnValue( 'core/paragraph' ),
 		} );
+		lock( ( select as Mock )(), {
+			getBlocksByName: vi.fn().mockReturnValue( [] ),
+		} );
 	} );
 
 	afterEach( () => {
 		testDoc.destroy();
+	} );
+
+	test( 'shares each selected block and detects changes to selected blocks without changes to selection start or end', () => {
+		const start = { clientId: 'block-1' };
+		const end = { clientId: 'block-3' };
+		const first = getSelectionState( start, end, testDoc, {
+			setSelectionClientIds: [ 'block-1', 'missing', 'block-3' ],
+		} );
+		expect( first ).toMatchObject( {
+			type: SelectionType.None,
+			setSelection: [ { clientId: 'block-1' }, { clientId: 'block-3' } ],
+		} );
+		const second = getSelectionState( start, end, testDoc, {
+			setSelectionClientIds: [ 'block-1', 'block-2', 'block-3' ],
+		} );
+		expect( areSelectionsStatesEqual( first, second ) ).toBe( false );
+		expect(
+			areSelectionsStatesEqual( first, { type: SelectionType.None } )
+		).toBe( false );
+		expect(
+			areSelectionsStatesEqual(
+				first,
+				getSelectionState( start, end, testDoc, {
+					setSelectionClientIds: [ 'block-1', 'block-3' ],
+				} )
+			)
+		).toBe( true );
+	} );
+
+	test( 'keeps set awareness inside the post content entity in template mode', () => {
+		const selectors = ( select as Mock )();
+		lock( selectors, {
+			getBlocksByName: vi.fn().mockReturnValue( [ 'post-content' ] ),
+		} );
+		selectors.getBlockRootClientId.mockImplementation( ( id: string ) =>
+			id === 'block-1' ? 'post-content' : ''
+		);
+		selectors.getBlockName.mockImplementation( ( id: string ) =>
+			id === 'post-content' ? 'core/post-content' : 'core/paragraph'
+		);
+		const result = getSelectionState(
+			{ clientId: 'block-1' },
+			{ clientId: 'block-2' },
+			testDoc,
+			{ setSelectionClientIds: [ 'block-1', 'block-2' ] }
+		);
+		expect( result ).toMatchObject( {
+			type: SelectionType.None,
+			setSelection: [ { clientId: 'block-1' } ],
+		} );
 	} );
 
 	describe( 'SelectionType.None', () => {

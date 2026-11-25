@@ -1,4 +1,5 @@
 import { Y } from '@wordpress/sync';
+import deepEqual from 'fast-deep-equal';
 import {
 	asRichTextOffset,
 	findBlockByClientIdInDoc,
@@ -33,6 +34,7 @@ export type YSelection = YRelativeSelection | YBlockSelection;
 export type YFullSelection = {
 	start: YSelection;
 	end: YSelection;
+	setSelectionClientIds?: string[];
 };
 
 export interface YSelectionHistory {
@@ -91,7 +93,17 @@ export function createBlockSelectionHistory(
 		);
 		const end = convertWPBlockSelectionToSelection( selectionEnd, ydoc );
 
-		return { start, end };
+		return {
+			start,
+			end,
+			...( newSelection.setSelectionClientIds
+				? {
+						setSelectionClientIds: [
+							...newSelection.setSelectionClientIds,
+						],
+					}
+				: {} ),
+		};
 	};
 
 	/**
@@ -109,18 +121,23 @@ export function createBlockSelectionHistory(
 	/**
 	 * Add a selection to the history, maintaining only the last `historySize` unique selections.
 	 * New selections are added to the front.
-	 * Removes any existing entries with the same start and end block combination.
+	 * Replaces entries with the same selection start, end, and selected client IDs.
 	 * @param yFullSelection
 	 */
 	const addToHistory = ( yFullSelection: YFullSelection ): void => {
-		// Remove any existing entries with the same start and end block combination
+		// The selected client IDs can change without selection start/end changing.
+		// A selection with setSelectionClientIds also differs from a range without it.
 		const startClientId = yFullSelection.start.clientId;
 		const endClientId = yFullSelection.end.clientId;
 
 		history = history.filter( ( entry ) => {
 			const isSameBlockCombination =
 				entry.start.clientId === startClientId &&
-				entry.end.clientId === endClientId;
+				entry.end.clientId === endClientId &&
+				deepEqual(
+					entry.setSelectionClientIds,
+					yFullSelection.setSelectionClientIds
+				);
 
 			return ! isSameBlockCombination;
 		} );

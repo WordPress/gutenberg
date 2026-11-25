@@ -6,7 +6,6 @@ import {
 	doBlocksMatchTemplate,
 	getBlockType,
 	getDefaultBlockName,
-	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
@@ -32,6 +31,7 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
+import { filterOutChildClientIds } from './utils';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockEditingMode,
@@ -103,22 +103,25 @@ export const validateBlocksToTemplate =
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {WPBlockSelection} selectionStart  The selection start.
- * @param {WPBlockSelection} selectionEnd    The selection end.
- * @param {0|-1|null}        initialPosition Initial block position.
+ * @param {WPBlockSelection} selectionStart        The selection start.
+ * @param {WPBlockSelection} selectionEnd          The selection end.
+ * @param {0|-1|null}        initialPosition       Initial block position.
+ * @param {string[]}         setSelectionClientIds Selected block client IDs, omitted for text and range selections.
  *
  * @return {Object} Action object.
  */
 export function resetSelection(
 	selectionStart: BlockSelection,
 	selectionEnd: BlockSelection,
-	initialPosition?: InitialPosition
+	initialPosition?: InitialPosition,
+	setSelectionClientIds?: string[]
 ) {
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
 		selectionEnd,
 		initialPosition,
+		...( setSelectionClientIds ? { setSelectionClientIds } : {} ),
 	};
 }
 
@@ -355,9 +358,101 @@ export const multiSelect =
 	};
 
 /**
+ * Selects a set of whole blocks, including blocks with different ordinary parents.
+ *
+ * Client IDs are stored in document order. Selection start and end preserve the
+ * order of selection: selecting E then adding B stores [B, E], with selection
+ * start E and selection end B. Shift-selection extends from selection start;
+ * selection end does not track keyboard focus.
+ *
+ * By default, selection start and end use the first and last valid input IDs.
+ * If either ID is not in the selected client IDs, withSetSelection uses the
+ * first or last selected block in document order instead. Matching
+ * selection start and end IDs do not imply that only one block is selected.
+ *
+ * @param clientIds                      Block client IDs to select.
+ * @param initialPosition                Initial caret position, or null to retain focus outside the canvas.
+ * @param options                        Optional selection start and end blocks.
+ * @param options.selectionStartClientId Client ID of the block where the selection starts.
+ * @param options.selectionEndClientId   Client ID of the block where the selection ends.
+ */
+export const multiSelectSet =
+	(
+		clientIds: string[],
+		initialPosition: InitialPosition = 0,
+		{
+			selectionStartClientId,
+			selectionEndClientId,
+		}: {
+			selectionStartClientId?: string;
+			selectionEndClientId?: string;
+		} = {}
+	) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const uniqueIds = [ ...new Set( clientIds ) ].filter(
+			( id ) =>
+				select.getBlock( id ) &&
+				select.getBlockEditingMode( id ) !== 'disabled'
+		);
+		// Remove IDs whose parent is selected before checking controlled parents.
+		// Selecting a controlled parent includes its contents, not a separate
+		// selection inside the entity that stores those contents.
+		const requested = new Set( uniqueIds );
+		const selectedClientIds = uniqueIds.filter(
+			( id ) =>
+				! select
+					.getBlockParents( id )
+					.some( ( parent ) => requested.has( parent ) )
+		);
+		// Controlled inner blocks are saved in a separate entity with its own
+		// client IDs and undo history. Selected blocks can have different parents,
+		// but must belong to the same entity.
+		const getControlledParentClientId = ( id: string ) =>
+			select
+				.getBlockParents( id, true )
+				.find( ( parent ) =>
+					select.areInnerBlocksControlled( parent )
+				) ?? '';
+		const controlledParentClientId = selectedClientIds.length
+			? getControlledParentClientId( selectedClientIds[ 0 ] )
+			: '';
+		if (
+			selectedClientIds.some(
+				( id ) =>
+					getControlledParentClientId( id ) !==
+					controlledParentClientId
+			)
+		) {
+			return;
+		}
+		dispatch( {
+			type: 'MULTI_SELECT_SET',
+			clientIds: selectedClientIds,
+			selectionStart: {
+				clientId: selectionStartClientId ?? uniqueIds[ 0 ],
+			},
+			selectionEnd: {
+				clientId:
+					selectionEndClientId ?? uniqueIds[ uniqueIds.length - 1 ],
+			},
+			initialPosition,
+		} );
+		const count = select.getSelectedBlockCount();
+		speak(
+			sprintf(
+				/* translators: %s: number of selected blocks */
+				_n( '%s block selected.', '%s blocks selected.', count ),
+				// @ts-expect-error `%s` formats the number too.
+				count
+			),
+			'assertive'
+		);
+	};
+
+/**
  * Action that clears the block selection.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function clearSelectedBlock() {
 	return {
@@ -468,13 +563,32 @@ const createOnMove =
 	( type: string ) =>
 	( clientIds: string[], rootClientId?: string | null ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		const canMoveBlocks = select.canMoveBlocks( clientIds );
-		if ( ! canMoveBlocks ) {
+		if ( ! select.canMoveBlocks( clientIds ) ) {
 			return;
 		}
 
-		dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
+		const moveClientIds = filterOutChildClientIds(
+			castArray( clientIds ),
+			select.getBlockParents
+		);
+		// Reject non-contiguous blocks after filtering: the up/down reducer moves
+		// one consecutive sibling range and would otherwise move unselected blocks.
+		if ( ! select.areBlocksContiguous( moveClientIds ) ) {
+			return;
+		}
+		// Sort client IDs into document order so the reducer starts at the correct
+		// block and checks the bottom boundary using the last ID.
+		const orderedIds = [ ...moveClientIds ].sort(
+			( a, b ) => select.getBlockIndex( a ) - select.getBlockIndex( b )
+		);
+		dispatch( {
+			type,
+			clientIds: orderedIds,
+			rootClientId:
+				select.getBlockRootClientId( orderedIds[ 0 ] ) ??
+				rootClientId ??
+				'',
+		} );
 	};
 
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
@@ -483,10 +597,15 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 /**
  * Action that moves given blocks to a new position.
  *
- * @param {?string} clientIds        The client IDs of the blocks.
- * @param {?string} fromRootClientId Root client ID source.
- * @param {?string} toRootClientId   Root client ID destination.
- * @param {number}  index            The index to move the blocks to.
+ * Does not select the moved blocks. Blocks are moved in document order, using
+ * their current parents.
+ * When both an ancestor and its descendant are supplied in `clientIds`, only
+ * the ancestor moves, because its descendants move with it.
+ *
+ * @param {string[]} clientIds        The client IDs of the blocks.
+ * @param {?string}  fromRootClientId Source parent fallback when the current parent is unavailable.
+ * @param {?string}  toRootClientId   Root client ID destination.
+ * @param {number}   index            Destination index after removing moved blocks. Omit to append.
  */
 export const moveBlocksToPosition =
 	(
@@ -496,40 +615,123 @@ export const moveBlocksToPosition =
 		index?: number
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		const canMoveBlocks = select.canMoveBlocks( clientIds );
-
-		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		if ( ! canMoveBlocks ) {
+		if ( ! select.canMoveBlocks( clientIds ) ) {
 			return;
 		}
 
-		// If moving inside the same root block the move is always possible.
-		if ( fromRootClientId !== toRootClientId ) {
-			const canRemoveBlocks = select.canRemoveBlocks( clientIds );
-
-			// If we're moving to another block, it means we're deleting blocks from
-			// the original block, so we need to check if removing is possible.
-			if ( ! canRemoveBlocks ) {
-				return;
-			}
-
-			const canInsertBlocks = select.canInsertBlocks(
-				clientIds,
-				toRootClientId
-			);
-
-			// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-			if ( ! canInsertBlocks ) {
-				return;
-			}
+		// Reject negative or fractional indices: the index must identify a position
+		// in the destination block list after removing the moved blocks.
+		if (
+			index !== undefined &&
+			( ! Number.isInteger( index ) || index < 0 )
+		) {
+			return;
 		}
 
+		const destinationRootClientId = toRootClientId ?? '';
+		// Reject a missing destination parent, since blocks cannot be inserted into it.
+		// Skip this lookup for an empty ID, which targets the top-level block list.
+		if (
+			destinationRootClientId &&
+			! select.getBlock( destinationRootClientId )
+		) {
+			return;
+		}
+		const moveClientIds = filterOutChildClientIds(
+			castArray( clientIds ),
+			select.getBlockParents
+		);
+		// Check the destination and its ancestors against the moved IDs to prevent
+		// placing a block inside itself or its descendants, which would create a cycle.
+		const destinationParents = destinationRootClientId
+			? [
+					destinationRootClientId,
+					...select.getBlockParents( destinationRootClientId ),
+				]
+			: [];
+		if (
+			destinationParents.some( ( id ) => moveClientIds.includes( id ) )
+		) {
+			return;
+		}
+
+		if ( select.areBlocksContiguous( moveClientIds ) ) {
+			// Sort siblings into document order: the same-parent reducer moves a range
+			// starting at the first ID, so reversed IDs would move the wrong blocks.
+			const orderedIds = [ ...moveClientIds ].sort(
+				( a, b ) =>
+					select.getBlockIndex( a ) - select.getBlockIndex( b )
+			);
+			// Read the source parent from the block being moved: a child-first request
+			// may supply the child's parent rather than the ancestor's parent.
+			const sourceRootClientId =
+				select.getBlockRootClientId( orderedIds[ 0 ] ) ??
+				fromRootClientId ??
+				'';
+			// Check removal and insertion permissions only when changing parents;
+			// reordering within one parent does not add or remove blocks from its list.
+			if ( sourceRootClientId !== destinationRootClientId ) {
+				if ( ! select.canRemoveBlocks( orderedIds ) ) {
+					return;
+				}
+				if (
+					! select.canInsertBlocks(
+						orderedIds,
+						destinationRootClientId
+					)
+				) {
+					return;
+				}
+			}
+
+			dispatch( {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				fromRootClientId: sourceRootClientId,
+				toRootClientId: destinationRootClientId,
+				clientIds: orderedIds,
+				index,
+			} );
+			return;
+		}
+
+		// Reject non-contiguous moves between separately saved entities: this action
+		// updates one entity's block tree and cannot coordinate saves for both.
+		if (
+			! select.canMoveBlocksToPosition(
+				moveClientIds,
+				destinationRootClientId
+			)
+		) {
+			return;
+		}
+
+		// Order moved IDs by document position so blocks from different parents
+		// keep their relative order when inserted together at the destination.
+		const uniqueIds = new Set( moveClientIds );
+		const orderedIds = select
+			.getClientIdsWithDescendants()
+			.filter( ( id ) => uniqueIds.has( id ) );
+		const targetOrder = select.getBlockOrder( destinationRootClientId );
+		const remainingCount = targetOrder.filter(
+			( id ) => ! uniqueIds.has( id )
+		).length;
+		const insertionIndex = Math.min(
+			index ?? remainingCount,
+			remainingCount
+		);
+		// Pass every source parent to the reducer so it removes the blocks from all
+		// their original lists and inserts them at the destination in one update.
+		const sourceParents = [
+			...new Set(
+				orderedIds.map( ( id ) => select.getBlockRootClientId( id )! )
+			),
+		];
 		dispatch( {
 			type: 'MOVE_BLOCKS_TO_POSITION',
-			fromRootClientId,
-			toRootClientId,
-			clientIds,
-			index,
+			clientIds: orderedIds,
+			fromRootClientId: sourceParents,
+			toRootClientId: destinationRootClientId,
+			index: insertionIndex,
 		} );
 	};
 
@@ -1953,49 +2155,73 @@ export function setBlockMovingClientId() {
  */
 export const duplicateBlocks =
 	( clientIds: string[], updateSelection: boolean = true ) =>
-	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		if ( ! clientIds || ! clientIds.length ) {
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		if ( ! select.canDuplicateBlocks( clientIds ) ) {
 			return;
 		}
-
-		// Return early if blocks don't exist.
-		const blocks = select.getBlocksByClientId( clientIds );
-		if ( blocks.some( ( block ) => ! block ) ) {
-			return;
-		}
-
-		// Return early if blocks don't support multiple usage.
-		const blockNames = blocks.map( ( block ) => block!.name );
-		if (
-			blockNames.some(
-				( blockName ) =>
-					! hasBlockSupport( blockName, 'multiple', true )
-			)
-		) {
-			return;
-		}
-
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const clientIdsArray = castArray( clientIds );
-		const lastSelectedIndex = select.getBlockIndex(
-			clientIdsArray[ clientIdsArray.length - 1 ]
-		);
-		const clonedBlocks = blocks.map( ( block ) =>
-			cloneSanitizedBlock( block! )
-		);
-		dispatch.insertBlocks(
-			clonedBlocks,
-			lastSelectedIndex + 1,
-			rootClientId,
-			updateSelection
-		);
-		if ( clonedBlocks.length > 1 && updateSelection ) {
-			dispatch.multiSelect(
-				clonedBlocks[ 0 ].clientId,
-				clonedBlocks[ clonedBlocks.length - 1 ].clientId
+		// Deduplicate and order targets as they appear in the document. Skip
+		// descendants of selected parents: cloning a parent already copies them.
+		const uniqueIds = new Set( clientIds );
+		const orderedIds = select
+			.getClientIdsWithDescendants()
+			.filter(
+				( id ) =>
+					uniqueIds.has( id ) &&
+					! select
+						.getBlockParents( id )
+						.some( ( parent ) => uniqueIds.has( parent ) )
 			);
+		// Prepare one insertion per adjacent sibling group before changing the
+		// tree. Copying A and B together keeps A B A' B', not A A' B B'.
+		const insertionOperations: {
+			parent: string | null;
+			index: number;
+			blocks: Block[];
+		}[] = [];
+		for ( const id of orderedIds ) {
+			const parent = select.getBlockRootClientId( id );
+			const index = select.getBlockIndex( id );
+			const clone = cloneSanitizedBlock( select.getBlock( id )! );
+			const previous =
+				insertionOperations[ insertionOperations.length - 1 ];
+			// The saved insertion index is just after the previous group. If this
+			// sibling occupies that position, extend the group and its insertion index.
+			if (
+				previous &&
+				previous.parent === parent &&
+				previous.index === index
+			) {
+				previous.blocks.push( clone );
+				previous.index++;
+			} else {
+				insertionOperations.push( {
+					parent,
+					index: index + 1,
+					blocks: [ clone ],
+				} );
+			}
 		}
-		return clonedBlocks.map( ( block ) => block.clientId );
+		// Keep the returned IDs in document order, independently of insertion order.
+		const clonedIds = insertionOperations.flatMap( ( operation ) =>
+			operation.blocks.map( ( block ) => block.clientId )
+		);
+		registry.batch( () => {
+			// Insert from last to first so copies do not shift any pending insertion
+			// positions. Batch the insertions and selection into one subscriber update.
+			for ( const operation of [ ...insertionOperations ].reverse() ) {
+				dispatch.insertBlocks(
+					operation.blocks,
+					operation.index,
+					operation.parent,
+					insertionOperations.length === 1 && updateSelection
+				);
+			}
+			if ( updateSelection && clonedIds.length > 1 ) {
+				// Select only the copies, not originals in the gaps between them.
+				dispatch.multiSelectSet( clonedIds );
+			}
+		} );
+		return clonedIds;
 	};
 
 /**

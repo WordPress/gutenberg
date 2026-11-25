@@ -11,6 +11,7 @@ import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
 	InsertionPoint,
+	InitialPosition,
 	LastFocus,
 	RemovalPromptMessage,
 	Settings,
@@ -24,6 +25,87 @@ const { isContentBlock } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+/**
+ * Adds or removes one whole block without extending a selection range.
+ *
+ * @param clientId        Block to toggle.
+ * @param initialPosition Initial canvas position, or null to retain external focus.
+ * @return Selection thunk.
+ */
+export const toggleBlockSelection =
+	( clientId: string, initialPosition: InitialPosition = 0 ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		if (
+			! select.isSelectionEnabled() ||
+			! select.getBlock( clientId ) ||
+			select.getBlockEditingMode( clientId ) === 'disabled'
+		) {
+			return;
+		}
+		const selected = select.getSelectedBlockClientIds();
+		if (
+			select
+				.getBlockParents( clientId )
+				.some( ( parent ) => selected.includes( parent ) )
+		) {
+			return;
+		}
+		dispatch.multiSelectSet(
+			selected.includes( clientId )
+				? selected.filter( ( id ) => id !== clientId )
+				: [ ...selected, clientId ],
+			initialPosition,
+			{
+				selectionStartClientId:
+					select.getBlockSelectionStart() ?? clientId,
+				selectionEndClientId: clientId,
+			}
+		);
+	};
+
+/**
+ * Pastes blocks after the last selected block without replacing selected blocks.
+ *
+ * @param blocks          Clipboard blocks.
+ * @param clientIds       Selected target IDs in document order.
+ * @param initialPosition Initial canvas position, or null to retain List View focus.
+ * @return Thunk inserting all clipboard blocks, or none if the destination rejects them.
+ */
+export const pasteBlocksAfter =
+	(
+		blocks: Block[],
+		clientIds: string[],
+		initialPosition: InitialPosition = 0
+	) =>
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		const lastId = clientIds[ clientIds.length - 1 ];
+		if ( ! blocks.length || ! lastId || ! select.getBlock( lastId ) ) {
+			return;
+		}
+		const parent = select.getBlockRootClientId( lastId );
+		if (
+			! blocks.every( ( block ) =>
+				select.canInsertBlockType( block.name, parent )
+			)
+		) {
+			return;
+		}
+		registry.batch( () => {
+			dispatch.insertBlocks(
+				blocks,
+				select.getBlockIndex( lastId ) + 1,
+				parent,
+				false,
+				initialPosition
+			);
+			dispatch.multiSelectSet(
+				blocks.map( ( block ) => block.clientId ),
+				initialPosition
+			);
+		} );
+		return blocks.map( ( block ) => block.clientId );
+	};
 
 /**
  * A list of private/experimental block editor settings that

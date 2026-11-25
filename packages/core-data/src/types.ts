@@ -108,6 +108,7 @@ export interface WPBlockSelection {
 export interface WPSelection {
 	selectionEnd: WPBlockSelection;
 	selectionStart: WPBlockSelection;
+	setSelectionClientIds?: string[];
 	initialPosition?: number | null;
 }
 
@@ -135,8 +136,11 @@ export type CursorPosition = {
 };
 
 export type SelectionNone = {
-	// The user has not made a selection.
+	// Older clients interpret this type as no selection.
 	type: SelectionType.None;
+	// Newer clients outline each selected block. Older clients ignore this field
+	// rather than highlighting unselected blocks between the selected blocks.
+	setSelection?: SelectionWholeBlock[];
 };
 
 export type SelectionCursor = {
@@ -184,6 +188,9 @@ export type SelectionWholeBlock = {
 	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
 	blockPosition: Y.RelativePosition;
+	// Include the selected block's client ID so deleting it cannot accidentally
+	// highlight the next block at the same position in the Yjs array.
+	clientId?: string;
 };
 
 export type SelectionState =
