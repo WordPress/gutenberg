@@ -4,8 +4,9 @@ export type WPDropOperation = 'insert' | 'replace';
 
 /**
  * The operation to perform on drop, including grouping with the target block.
+ * `before` and `after` insert next to the parent block.
  */
-export type BlockDropOperation = WPDropOperation | 'group';
+export type BlockDropOperation = WPDropOperation | 'group' | 'before' | 'after';
 
 /**
  * The block drag and drop data of a drop event.
@@ -38,9 +39,18 @@ export type MoveBlocks = (
 ) => void;
 
 /**
+ * Runs custom behavior for dropped blocks, including unchanged block order.
+ */
+export type OnBlocksDrop = (
+	sourceClientIds: string[],
+	sourceRootClientId: string | null
+) => void;
+
+/**
  * Options of `useOnBlockDrop`.
  */
 export interface UseOnBlockDropOptions {
 	operation?: BlockDropOperation;
 	nearestSide?: 'left' | 'right';
+	onBlocksDrop?: OnBlocksDrop;
 }

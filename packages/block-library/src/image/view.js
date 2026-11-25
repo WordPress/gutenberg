@@ -41,6 +41,14 @@ const touchStartEvent = {
 let inertElements = [];
 
 /**
+ * Timer for the cleanup that runs after the close animation. Reopening the
+ * lightbox cancels it, so it can't clear the new selection.
+ *
+ * @type {number|undefined}
+ */
+let closeCleanupTimer;
+
+/**
  * Per-gesture state for the in-progress horizontal drag on the lightbox.
  *
  * `direction` is null until the gesture exceeds a small disambiguation
@@ -198,6 +206,20 @@ function getImageSrcset( { lightboxSrcset } ) {
 	return lightboxSrcset || '';
 }
 
+/**
+ * Returns the metadata of the image with the passed ID. The ID comes from the
+ * context, so only own properties of `state.metadata` are returned, never an
+ * inherited one.
+ *
+ * @param {string} imageId Image ID.
+ * @return {Object|undefined} The image metadata, if it exists.
+ */
+function getImageMetadata( imageId ) {
+	// Reads the property before the check so that the caller subscribes to it.
+	const metadata = state.metadata[ imageId ];
+	return Object.hasOwn( state.metadata, imageId ) ? metadata : undefined;
+}
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -230,7 +252,7 @@ const { state, actions, callbacks } = store(
 				);
 			},
 			get selectedImage() {
-				return state.metadata[ state.selectedImageId ];
+				return getImageMetadata( state.selectedImageId );
 			},
 			get hasNavigationIcon() {
 				const { navigationButtonType } = state.selectedImage;
@@ -248,7 +270,7 @@ const { state, actions, callbacks } = store(
 			},
 			get thisImage() {
 				const { imageId } = getContext();
-				return state.metadata[ imageId ];
+				return getImageMetadata( imageId );
 			},
 			get hasNavigation() {
 				return state.galleryImages.length > 1;
@@ -335,9 +357,12 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! state.metadata[ imageId ].imageRef?.complete ) {
+				if ( ! getImageMetadata( imageId )?.imageRef?.complete ) {
 					return;
 				}
+
+				// Cancels the cleanup of a previous close that hasn't run yet.
+				clearTimeout( closeCleanupTimer );
 
 				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
@@ -362,11 +387,11 @@ const { state, actions, callbacks } = store(
 					// the `styles.scss` file, but in any case we should wait a few
 					// milliseconds longer than the duration, otherwise a user may scroll
 					// too soon and cause the animation to look sloppy.
-					setTimeout( function () {
+					closeCleanupTimer = setTimeout( function () {
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
-						state.selectedImage.buttonRef.focus( {
+						state.selectedImage?.buttonRef?.focus( {
 							preventScroll: true,
 						} );
 
@@ -678,8 +703,12 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				const imageMetadata = getImageMetadata( imageId );
+				if ( ! imageMetadata ) {
+					return;
+				}
+
 				// Link element to preload the image.
-				const imageMetadata = state.metadata[ imageId ];
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
@@ -883,9 +912,13 @@ const { state, actions, callbacks } = store(
 				}
 
 				const { imageId } = getContext();
+				const imageMetadata = getImageMetadata( imageId );
+				if ( ! imageMetadata ) {
+					return;
+				}
 
-				state.metadata[ imageId ].imageRef = ref;
-				state.metadata[ imageId ].currentSrc = ref.currentSrc;
+				imageMetadata.imageRef = ref;
+				imageMetadata.currentSrc = ref.currentSrc;
 
 				const {
 					naturalWidth,
@@ -900,15 +933,21 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				const figure = ref.parentElement;
-				const figureWidth = ref.parentElement.clientWidth;
+				// The image is not necessarily a direct child of the figure, as
+				// plugins can wrap it, so it uses the container the button is
+				// positioned against rather than the image's parent element.
+				const container = ref.closest( '.wp-lightbox-container' );
+				if ( ! container ) {
+					return;
+				}
+				const containerWidth = container.clientWidth;
 
 				// It needs special handling for the height because a caption will cause
-				// the figure to be taller than the image, which means it needs to
+				// the container to be taller than the image, which means it needs to
 				// account for that when calculating the placement of the button in the
 				// top right corner of the image.
-				let figureHeight = ref.parentElement.clientHeight;
-				const caption = figure.querySelector( 'figcaption' );
+				let containerHeight = container.clientHeight;
+				const caption = container.querySelector( 'figcaption' );
 				if ( caption ) {
 					const captionComputedStyle =
 						window.getComputedStyle( caption );
@@ -917,16 +956,16 @@ const { state, actions, callbacks } = store(
 							captionComputedStyle.position
 						)
 					) {
-						figureHeight =
-							figureHeight -
+						containerHeight =
+							containerHeight -
 							caption.offsetHeight -
 							parseFloat( captionComputedStyle.marginTop ) -
 							parseFloat( captionComputedStyle.marginBottom );
 					}
 				}
 
-				const buttonOffsetTop = figureHeight - offsetHeight;
-				const buttonOffsetRight = figureWidth - offsetWidth;
+				const buttonOffsetTop = containerHeight - offsetHeight;
+				const buttonOffsetRight = containerWidth - offsetWidth;
 
 				let buttonTop = buttonOffsetTop + 16;
 				let buttonRight = buttonOffsetRight + 16;
@@ -934,7 +973,7 @@ const { state, actions, callbacks } = store(
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
 				// calculate where to place the button.
-				if ( state.metadata[ imageId ].scaleAttr === 'contain' ) {
+				if ( imageMetadata.scaleAttr === 'contain' ) {
 					// Natural ratio of the image.
 					const naturalRatio = naturalWidth / naturalHeight;
 					// Offset ratio of the image.
@@ -961,8 +1000,8 @@ const { state, actions, callbacks } = store(
 					}
 				}
 
-				state.metadata[ imageId ].buttonTop = buttonTop;
-				state.metadata[ imageId ].buttonRight = buttonRight;
+				imageMetadata.buttonTop = buttonTop;
+				imageMetadata.buttonRight = buttonRight;
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
@@ -998,7 +1037,10 @@ const { state, actions, callbacks } = store(
 			initTriggerButton() {
 				const { imageId } = getContext();
 				const { ref } = getElement();
-				state.metadata[ imageId ].buttonRef = ref;
+				const imageMetadata = getImageMetadata( imageId );
+				if ( imageMetadata ) {
+					imageMetadata.buttonRef = ref;
+				}
 			},
 		},
 	},

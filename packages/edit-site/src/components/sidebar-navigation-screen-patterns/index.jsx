@@ -4,7 +4,7 @@ import {
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { file } from '@wordpress/icons';
+import { folder } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useViewConfig } from '@wordpress/views';
@@ -59,7 +59,7 @@ function CategoriesGroup( {
 					key={ view.slug }
 					count={ patternCounts[ view.slug ] }
 					label={ view.title }
-					icon={ file }
+					icon={ folder }
 					id={ view.slug }
 					type={ PATTERN_TYPES.user }
 					isActive={

@@ -56,13 +56,15 @@ const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 function AnimatedMediaItem( {
 	children,
 	index,
+	itemsKey,
 	className,
 }: {
 	children: React.ReactNode;
 	index: number;
+	itemsKey: string;
 	className?: string;
 } ) {
-	const ref = useMovingAnimation( index );
+	const ref = useMovingAnimation( index, itemsKey );
 	return (
 		<div ref={ ref } className={ className }>
 			{ children }
@@ -304,6 +306,21 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
+
+/**
+ * Identifies the set of items regardless of their order, so a reorder can be
+ * told apart from items being added or removed.
+ *
+ * @param items The items in the list.
+ * @return A key that only changes when items are added or removed.
+ */
+function getItemsKey( items: Array< MediaEditAttachment > | null ) {
+	return ( items ?? [] )
+		.map( ( item ) => String( item.id ) )
+		.sort()
+		.join( ',' );
+}
+
 interface MediaEditAttachmentsProps {
 	allItems: Array< MediaEditAttachment > | null;
 	addButtonLabel: string;
@@ -327,6 +344,7 @@ function ExpandedMediaEditAttachments( {
 	isUploading,
 	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<div
 			className={ clsx( 'fields__media-edit-expanded', {
@@ -344,6 +362,7 @@ function ExpandedMediaEditAttachments( {
 					<AnimatedMediaItem
 						key={ attachment.id }
 						index={ index }
+						itemsKey={ itemsKey }
 						className={ clsx( 'fields__media-edit-expanded-item', {
 							'has-preview-image': hasPreviewImage,
 						} ) }
@@ -451,6 +470,7 @@ function CompactMediaEditAttachments( {
 	isUploading,
 	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<>
 			{ !! allItems?.length && (
@@ -469,6 +489,7 @@ function CompactMediaEditAttachments( {
 								<AnimatedMediaItem
 									key={ attachment.id }
 									index={ index }
+									itemsKey={ itemsKey }
 									className="fields__media-edit-compact"
 								>
 									<MediaPickerButton

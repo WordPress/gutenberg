@@ -8,7 +8,6 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
-		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
@@ -19,7 +18,6 @@
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
 		"@wordpress/react-inert-value": "file:../../packages/react-inert-value",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
-		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/views": "file:../../packages/views"
 	},
 	"devDependencies": {

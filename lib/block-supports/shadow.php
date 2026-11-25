@@ -21,13 +21,13 @@ function gutenberg_register_shadow_support( $block_type ) {
 		$block_type->attributes = array();
 	}
 
-	if ( $has_shadow_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
 	}
 
-	if ( $has_shadow_support && ! array_key_exists( 'shadow', $block_type->attributes ) ) {
+	if ( ! array_key_exists( 'shadow', $block_type->attributes ) ) {
 		$block_type->attributes['shadow'] = array(
 			'type' => 'string',
 		);
@@ -54,13 +54,35 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$shadow_block_styles = array();
+	return gutenberg_get_shadow_classes_and_styles( $block_attributes );
+}
 
-	$custom_shadow                 = $block_attributes['style']['shadow'] ?? null;
-	$shadow_block_styles['shadow'] = $custom_shadow;
+/**
+ * Returns shadow classes and inline styles for block attributes, like the JS
+ * `getShadowClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
+ *
+ * @since 7.3.0
+ *
+ * @param array<string, mixed> $block_attributes Block attributes.
+ * @return array<string, string> Array with `class` and `style` keys, each present only when non-empty.
+ *
+ * @phpstan-param array{ style?: array<string, mixed>, ...<string, mixed> } $block_attributes
+ * @phpstan-return array{ class?: non-empty-string, style?: non-empty-string }
+ */
+function gutenberg_get_shadow_classes_and_styles( $block_attributes ) {
+	if ( ! is_array( $block_attributes ) ) {
+		return array();
+	}
+
+	$shadow = $block_attributes['style']['shadow'] ?? null;
 
 	$attributes = array();
-	$styles     = gutenberg_style_engine_get_styles( $shadow_block_styles );
+	$styles     = gutenberg_style_engine_get_styles( array( 'shadow' => $shadow ) );
+
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
 
 	if ( ! empty( $styles['css'] ) ) {
 		$attributes['style'] = $styles['css'];

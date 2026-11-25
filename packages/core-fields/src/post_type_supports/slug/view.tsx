@@ -1,18 +1,13 @@
-import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import type { PostWithSlug } from './types';
 import { getSlug } from './utils';
 
 /*
- * The slug of a post. It keeps the first slug in state rather than in a ref read during render.
+ * The slug of a post.
  */
 const SlugView = ( { item }: { item: PostWithSlug } ) => {
-	const slug = getSlug( item );
-	// The slug the post had first, shown while the slug is emptied.
-	const [ originalSlug ] = useState( slug );
-
-	const slugToDisplay = slug || originalSlug;
-
-	return `${ slugToDisplay }`;
+	// A draft without a slug or a title has no slug yet.
+	return getSlug( item ) || __( 'None' );
 };
 
 export default SlugView;

@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function WelcomeGuidePage() {
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isVisible = useSelect( ( select ) => {
 		const isPageActive = !! select( preferencesStore ).get(
@@ -29,7 +29,9 @@ export default function WelcomeGuidePage() {
 			className="edit-site-welcome-guide guide-page"
 			contentLabel={ heading }
 			finishButtonText={ __( 'Continue' ) }
-			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuidePage' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-site', 'welcomeGuidePage', false )
+			}
 			pages={ [
 				{
 					image: (

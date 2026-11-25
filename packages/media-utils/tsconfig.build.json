@@ -2,8 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ],
-		"checkJs": false
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
@@ -11,7 +10,7 @@
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
-		{ "path": "../data" },
+		{ "path": "../data/tsconfig.build.json" },
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },

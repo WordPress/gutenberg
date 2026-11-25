@@ -3,7 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
-import Tooltip from '../tooltip';
+import { Tooltip, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	CUSTOM_VALUE_SETTINGS,
@@ -74,6 +74,7 @@ export default function BoxInputControl( {
 	values,
 	selectedUnits,
 	setSelectedUnits,
+	units,
 	sides,
 	side,
 	min = 0,
@@ -82,11 +83,9 @@ export default function BoxInputControl( {
 	placeholder: placeholderProp,
 	...props
 }: BoxControlInputControlProps ) {
-	const defaultValuesToModify = getSidesToModify( side, sides );
+	useEnableWpCompatOverlaySlot();
 
-	const handleOnFocus = ( event: React.FocusEvent< HTMLInputElement > ) => {
-		onFocus( event, { side } );
-	};
+	const defaultValuesToModify = getSidesToModify( side, sides );
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
@@ -144,19 +143,34 @@ export default function BoxInputControl( {
 		isValueMixed( values, defaultValuesToModify );
 	const [ parsedQuantity, parsedUnit ] =
 		parseQuantityAndUnitFromRawValue( mergedValue );
-	const computedUnit = hasValues
-		? parsedUnit
-		: selectedUnits[ defaultValuesToModify[ 0 ] ];
+	const resolvedUnit =
+		parsedUnit ?? selectedUnits[ defaultValuesToModify[ 0 ] ];
+	// Fall back to the first allowed unit when neither the value nor the
+	// selected unit provides one, so slider changes never emit unitless values.
+	const computedUnit = resolvedUnit ?? units?.[ 0 ]?.value ?? 'px';
 	const generatedId = useInstanceId( BoxInputControl, 'box-control-input' );
 	const inputId = [ generatedId, side ].join( '-' );
+
+	const handleOnFocus = (
+		event: React.FocusEvent< HTMLInputElement > & {
+			preventBaseUIHandler?: () => void;
+		}
+	) => {
+		onFocus( event, { side } );
+
+		const isUnitSelectFocus = event.target.id !== inputId;
+		if ( isUnitSelectFocus ) {
+			event.preventBaseUIHandler?.();
+		}
+	};
+
 	const isMixedUnit =
 		defaultValuesToModify.length > 1 &&
 		mergedValue === undefined &&
 		defaultValuesToModify.some(
-			( s ) => selectedUnits[ s ] !== computedUnit
+			( s ) => selectedUnits[ s ] !== resolvedUnit
 		);
-	const usedValue =
-		mergedValue === undefined && computedUnit ? computedUnit : mergedValue;
+	const usedValue = mergedValue ?? computedUnit;
 	const mixedPlaceholder = isMixed || isMixedUnit ? __( 'Mixed' ) : undefined;
 	const hasPresets = presets && presets.length > 0 && presetKey;
 	const hasPresetValue =
@@ -203,26 +217,41 @@ export default function BoxInputControl( {
 			/>
 			{ showCustomValueControl && (
 				<>
-					<Tooltip placement="top-end" text={ LABELS[ side ] }>
-						<UnitControl
-							{ ...props }
-							min={ min }
-							className={ clsx(
-								styles[ 'unit-control' ],
-								'component-box-control__unit-control'
-							) }
+					<Tooltip.Root>
+						<Tooltip.Trigger
 							id={ inputId }
-							isPressEnterToChange
-							disableUnits={ isMixed || isMixedUnit }
-							value={ usedValue }
-							onChange={ handleOnValueChange }
-							onUnitChange={ handleOnUnitChange }
-							onFocus={ handleOnFocus }
-							label={ LABELS[ side ] }
-							placeholder={ mixedPlaceholder ?? placeholderProp }
-							hideLabelFromVision
+							render={
+								<UnitControl
+									{ ...props }
+									min={ min }
+									units={ units }
+									className={ clsx(
+										styles[ 'unit-control' ],
+										'component-box-control__unit-control'
+									) }
+									id={ inputId }
+									isPressEnterToChange
+									disableUnits={ isMixed || isMixedUnit }
+									value={ usedValue }
+									onChange={ handleOnValueChange }
+									onUnitChange={ handleOnUnitChange }
+									onFocus={ handleOnFocus }
+									label={ LABELS[ side ] }
+									placeholder={
+										mixedPlaceholder ?? placeholderProp
+									}
+									hideLabelFromVision
+								/>
+							}
 						/>
-					</Tooltip>
+						<Tooltip.Popup
+							positioner={
+								<Tooltip.Positioner side="top" align="end" />
+							}
+						>
+							{ LABELS[ side ] }
+						</Tooltip.Popup>
+					</Tooltip.Root>
 
 					<RangeControl
 						className={ styles[ 'range-control' ] }
@@ -237,13 +266,9 @@ export default function BoxInputControl( {
 							);
 						} }
 						min={ isFinite( min ) ? min : 0 }
-						max={
-							CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
-								?.max ?? 10
-						}
+						max={ CUSTOM_VALUE_SETTINGS[ computedUnit ]?.max ?? 10 }
 						step={
-							CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
-								?.step ?? 0.1
+							CUSTOM_VALUE_SETTINGS[ computedUnit ]?.step ?? 0.1
 						}
 						value={ parsedQuantity ?? 0 }
 						withInputField={ false }

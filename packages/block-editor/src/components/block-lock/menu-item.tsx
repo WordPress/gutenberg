@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
-import { lockOutline, unlock } from '@wordpress/icons';
+import { lock, unlock } from '@wordpress/icons';
 import useBlockLock from './use-block-lock';
 import type { BlockLockControlProps } from './types';
 import BlockLockModal from './modal';
@@ -25,7 +25,7 @@ export default function BlockLockMenuItem( {
 	return (
 		<>
 			<MenuItem
-				icon={ isLocked ? unlock : lockOutline }
+				icon={ isLocked ? unlock : lock }
 				onClick={ toggleModal }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"

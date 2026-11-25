@@ -24,7 +24,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}
 
 	const items = [
-		{ value: '', label: __( 'Select widget' ) },
+		{ value: null, label: __( 'Select widget' ) },
 		...widgetTypes.map( ( widgetType ) => ( {
 			value: widgetType.id,
 			label: widgetType.name,
@@ -35,8 +35,9 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 		<SelectControl
 			label={ __( 'Legacy widget' ) }
 			value={
-				items.find( ( item ) => item.value === selectedId ) ??
-				items[ 0 ]
+				items.find(
+					( item ) => item.value === ( selectedId ?? null )
+				) ?? items[ 0 ]
 			}
 			items={ items }
 			onValueChange={ ( item ) => {

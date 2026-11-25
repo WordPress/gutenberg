@@ -443,7 +443,12 @@ export const StyleBookPreview = ( {
 	let blockVariation = null;
 	if ( section.includes( '/colors' ) ) {
 		previewCategory = 'colors';
-	} else if ( section.includes( '/typography' ) ) {
+	} else if (
+		section.includes( '/typography' ) ||
+		// Element screens show the Text category, as they did when they
+		// lived under Typography.
+		section.startsWith( '/blocks/elements/' )
+	) {
 		previewCategory = 'text';
 	} else if ( section.includes( '/blocks' ) ) {
 		previewCategory = 'blocks';

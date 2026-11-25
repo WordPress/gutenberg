@@ -43,13 +43,14 @@ Please note that when using this setting, `styles.spacing.padding` should always
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage, backgroundSize
+- background: backgroundImage, backgroundSize, gradient
 - border: color, radius, style, width
 - color: link, heading, button, caption
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
-- typography: lineHeight
+- transform: rotate
+- typography: lineHeight, textColumns
 
 ---
 
@@ -193,6 +194,17 @@ Settings related to spacing.
 
 ---
 
+### transform
+
+Settings related to transforms.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| rotate | Allow users to set a rotation. | `boolean` | `false` |
+| translate | Allow users to set an X and Y offset. | `boolean` | `false` |
+
+---
+
 ### typography
 
 Settings related to typography.
@@ -256,6 +268,7 @@ Background styles.
 | backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
 | backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
 | backgroundClip | Sets the `background-clip` CSS property. One of `border-box`, `padding-box`, `content-box` or `text`. | `string`, `{ ref }` |
+| gradient | Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image. | `string` |
 
 ---
 
@@ -343,9 +356,20 @@ Spacing styles.
 
 | Property | Description | Type |
 | -------- | ----------- | ---- |
-| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. | `string`, `{ ref }` |
+| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now. | `string`, `{ ref }`, `{ top, left }` |
 | margin | Margin styles. | `{ top, right, bottom, left }` |
 | padding | Padding styles. | `{ top, right, bottom, left }` |
+
+---
+
+### transform
+
+Transform styles. Only blocks and block style variations support them.
+
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| rotate | Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`. | `string` |
+| translate | Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`. | `{ x, y }` |
 
 ---
 
@@ -368,6 +392,7 @@ Typography styles.
 | textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
+| textWrap | Sets the `text-wrap` CSS property. | `string`, `{ ref }` |
 
 ---
 

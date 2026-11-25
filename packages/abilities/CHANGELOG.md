@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Accept a date-time without a time zone offset, such as `2026-10-21T09:30:00`, in the `date-time` schema format, as the server does ([#86845](https://github.com/WordPress/gutenberg/pull/86845)).
+-   Validate the `uri` schema format with the URL parser of the platform, so that URLs with non-ASCII characters, such as a permalink under a non-ASCII permalink structure, are accepted ([#86844](https://github.com/WordPress/gutenberg/pull/86844)).
+
+## 0.26.0 (2026-11-18)
+
+## 0.25.0 (2026-11-04)
+
+## 0.24.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

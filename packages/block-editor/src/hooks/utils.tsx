@@ -63,7 +63,7 @@ export const cleanEmptyObject = < T, >(
 };
 
 export function transformStyles(
-	activeSupports: Record< string, boolean >,
+	activeSupports: Record< string, unknown >,
 	migrationPaths: Record< string, string[][] >,
 	result: Block,
 	source: Block[],
@@ -169,7 +169,7 @@ export function useStyleOverride( {
 	css,
 }: {
 	id?: string | null;
-	css: string;
+	css?: string;
 } ) {
 	return usePrivateStyleOverride( { id, css } );
 }
@@ -334,6 +334,8 @@ export function useBlockSettings(
 		customTextShadowPresets,
 		defaultTextShadowPresets,
 		themeTextShadowPresets,
+		rotate,
+		translate,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
@@ -403,7 +405,9 @@ export function useBlockSettings(
 		'typography.defaultTextShadowPresets',
 		'typography.textShadowPresets.custom',
 		'typography.textShadowPresets.default',
-		'typography.textShadowPresets.theme'
+		'typography.textShadowPresets.theme',
+		'transform.rotate',
+		'transform.translate'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -504,6 +508,10 @@ export function useBlockSettings(
 			layout,
 			parentLayout,
 			shadow,
+			transform: {
+				rotate,
+				translate,
+			},
 		};
 	}, [
 		backgroundImage,
@@ -576,6 +584,8 @@ export function useBlockSettings(
 		isHeadingEnabled,
 		isButtonEnabled,
 		shadow,
+		rotate,
+		translate,
 	] );
 
 	// Theme.json settings arrive untyped.
@@ -678,11 +688,11 @@ function BlockProps( {
 	index: number;
 	useBlockProps: BlockListBlockFeature[ 'useBlockProps' ];
 	setAllWrapperProps: Dispatch<
-		SetStateAction< ( BlockWrapperProps | undefined )[] >
+		SetStateAction< ( BlockWrapperProps | null | undefined )[] >
 	>;
 } & BlockListBlockFeatureProps ) {
 	const wrapperProps = hook( props );
-	const setWrapperProps = ( next: BlockWrapperProps | undefined ) =>
+	const setWrapperProps = ( next: BlockWrapperProps | null | undefined ) =>
 		setAllWrapperProps( ( prev ) => {
 			const nextAll = [ ...prev ];
 			nextAll[ index ] = next;
@@ -710,7 +720,7 @@ export function createBlockListBlockFilter(
 		( BlockListBlock ) =>
 			function WithBlockListBlockHooks( props: BlockListBlockHookProps ) {
 				const [ allWrapperProps, setAllWrapperProps ] = useState<
-					( BlockWrapperProps | undefined )[]
+					( BlockWrapperProps | null | undefined )[]
 				>( Array( features.length ).fill( undefined ) );
 				return [
 					...features.map( ( feature, i ) => {

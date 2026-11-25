@@ -1,17 +1,18 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
 import * as UsageGuidelinesStories from './usage-guidelines.story';
+import * as BadgeStories from './index.story';
 
 <Meta of={ UsageGuidelinesStories } />
 
 # Badge usage guidelines
 
-## Badges should not be interactive
+## Keep badge actions limited to infotips
 
-Badges communicate status or metadata. They should not perform actions or navigate to another page.
+Badges communicate status or metadata. They should not perform actions or navigate to another page. A badge with an `infotip` is the one exception to the non-interactive pattern: it opens a popover that explains the status.
 
 ### ❌ Don't
 
--   **Use badges as links or buttons.** Do not add click handlers or make badges focusable to trigger actions or navigation.
+-   **Use badges as links or buttons.** Do not add click handlers or make badges focusable to trigger actions or navigation. Use the `infotip` prop to open additional context.
 
 ### ✅ Do
 
@@ -125,11 +126,11 @@ Use the least attention‑grabbing intent that still:
 
 ## Keep icons outside badges
 
-`Badge` is text-only. Intent is communicated through color and label — not through icons inside the badge.
+`Badge` is text-only by default. Intent is communicated through color and label. A badge with an `infotip` adds a fixed trailing help icon. This icon signals that more context is available; it does not represent the status. Do not add other icons.
 
 ### ❌ Don't
 
--   **Put icons inside badges.** A status icon duplicates what the intent color and label already convey.
+-   **Put status icons inside badges.** A status icon duplicates what the intent color and label already convey.
 
 <Canvas of={ UsageGuidelinesStories.IncorrectBadgeWithIcon } />
 
@@ -142,3 +143,33 @@ Use the least attention‑grabbing intent that still:
 -   **Keep nearby icons separate.** When a row already includes a content icon (e.g. post type, plugin), use that icon for identity and let the badge communicate status on its own.
 
 <Canvas of={ UsageGuidelinesStories.WithAdjacentContentIcon } />
+
+## Use infotips sparingly to explain a status
+
+Use `infotip` when a status needs a short explanation that does not fit in the label. Choose the intent as usual, then add an infotip only if the status needs explaining.
+
+<Canvas of={ BadgeStories.WithInfotip } />
+
+-   Rewrite an unclear label first. Self-explanatory statuses such as "Draft", "Active", or "Scheduled" usually do not need an infotip.
+-   Reserve infotips for statuses that need context. If every badge needs an explanation, show the information directly in the interface.
+-   Keep essential information visible. Users who do not open the infotip should still understand the status and what to do next. Use inline text or a Notice for critical messages.
+-   Keep essential recovery actions available elsewhere in the interface. The infotip must not be the only way to retry a failed upload or fix a publishing error.
+-   Keep content brief, usually one to three sentences. Prefer at most one related link or button. Use a detail view or dialog for long explanations or workflows with several actions.
+
+### Compose the popup
+
+Pass the `Popover` export and a complete `Popover.Popup` composition to `infotip` as `{ popover: Popover, popup: <Popover.Popup>…</Popover.Popup> }`. Use the same `Popover` import for the supplied component family and every popup part so they share context. Supplying `Popover` lets bundlers omit its code when only static badges are used. Include a meaningful `Popover.Title`, which can be visually hidden, and use `Popover.Description` for explanatory text. Popover's positioning, portal, and focus options remain available on the supplied popup. Constrain the popup width for readable lines and narrow layouts, as shown in these examples.
+
+A popup can contain a related link or button. Prefer one action that directly relates to the explanation. For buttons, use `variant="minimal"`, `tone="neutral"`, and `size="compact"`, and align the action to the inline end of the popup.
+
+<Canvas of={ BadgeStories.InfotipWithLink } />
+
+<Canvas of={ BadgeStories.InfotipWithButton } />
+
+### Interaction and accessibility
+
+Keep the badge's visible label in its accessible name.
+
+Do not place a badge with an infotip inside a link, button, or another interactive trigger. If you customize the badge's `render` prop, preserve its button element when an infotip is present.
+
+If you remove the `infotip` while the badge or its popup has focus, move focus to a relevant control in the surrounding interface.

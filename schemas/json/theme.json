@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- transform: rotate\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -481,6 +481,28 @@
 				}
 			}
 		},
+		"settingsTransformProperties": {
+			"type": "object",
+			"properties": {
+				"transform": {
+					"description": "Settings related to transforms.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Allow users to set a rotation.",
+							"type": "boolean",
+							"default": false
+						},
+						"translate": {
+							"description": "Allow users to set an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsSpacingProperties": {
 			"type": "object",
 			"properties": {
@@ -607,7 +629,13 @@
 										"vmax",
 										"svmax",
 										"lvmax",
-										"dvmax"
+										"dvmax",
+										"cqw",
+										"cqh",
+										"cqi",
+										"cqb",
+										"cqmin",
+										"cqmax"
 									],
 									"default": "rem"
 								}
@@ -973,6 +1001,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsViewportProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
@@ -990,6 +1019,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
 			]
@@ -1007,6 +1037,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"viewport",
 				"custom"
@@ -1024,6 +1055,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"custom"
 			]
@@ -1204,6 +1236,9 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
@@ -1217,6 +1252,12 @@
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -1333,7 +1374,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -1466,6 +1519,10 @@
 								},
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"gradient": {
+							"description": "Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image.",
+							"type": "string"
 						}
 					},
 					"additionalProperties": false
@@ -1788,10 +1845,34 @@
 					"type": "object",
 					"properties": {
 						"blockGap": {
-							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
+							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. Block styles also accept an object with `top` and `left` to set the row and column gaps separately. Root styles only support a single value for now.",
 							"oneOf": [
 								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
+								{ "$ref": "#/definitions/refComplete" },
+								{
+									"type": "object",
+									"properties": {
+										"top": {
+											"description": "Sets the row gap.",
+											"oneOf": [
+												{ "type": "string" },
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										},
+										"left": {
+											"description": "Sets the column gap.",
+											"oneOf": [
+												{ "type": "string" },
+												{
+													"$ref": "#/definitions/refComplete"
+												}
+											]
+										}
+									},
+									"additionalProperties": false
+								}
 							]
 						},
 						"margin": {
@@ -1860,6 +1941,32 @@
 										{ "type": "string" },
 										{ "$ref": "#/definitions/refComplete" }
 									]
+								}
+							},
+							"additionalProperties": false
+						}
+					},
+					"additionalProperties": false
+				},
+				"transform": {
+					"description": "Transform styles. Only blocks and block style variations support them.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
+							"type": "string"
+						},
+						"translate": {
+							"description": "Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`.",
+							"type": "object",
+							"properties": {
+								"x": {
+									"description": "The horizontal offset.",
+									"type": "string"
+								},
+								"y": {
+									"description": "The vertical offset.",
+									"type": "string"
 								}
 							},
 							"additionalProperties": false
@@ -1961,6 +2068,13 @@
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"textWrap": {
+							"description": "Sets the `text-wrap` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
 						}
 					},
 					"additionalProperties": false
@@ -1978,6 +2092,7 @@
 				"outline",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography"
 			]
 		},
@@ -2213,25 +2328,67 @@
 			"type": "object",
 			"properties": {
 				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":any-link": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":link": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":visited": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2261,6 +2418,119 @@
 				":hover",
 				":link",
 				":visited"
+			]
+		},
+		"stylesSelectPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":active": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":focus": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":focus-visible": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":hover": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				}
+			}
+		},
+		"stylesSelectPseudoSelectorsPropertyNames": {
+			"enum": [ ":active", ":focus", ":focus-visible", ":hover" ]
+		},
+		"stylesTextInputPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":focus": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":focus-visible": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":required": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":user-valid": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				":user-invalid": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				},
+				"::placeholder": {
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
+				}
+			}
+		},
+		"stylesTextInputPseudoSelectorsPropertyNames": {
+			"enum": [
+				":focus",
+				":focus-visible",
+				":required",
+				":user-valid",
+				":user-invalid",
+				"::placeholder"
 			]
 		},
 		"stylesElementsPropertiesComplete": {
@@ -2475,11 +2745,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesSelectPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesSelectPseudoSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2492,11 +2768,17 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesTextInputPseudoSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesTextInputPseudoSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2504,7 +2786,32 @@
 					]
 				}
 			},
-			"additionalProperties": false
+			"additionalProperties": false,
+			"allOf": [
+				{
+					"type": "object",
+					"additionalProperties": {
+						"type": "object",
+						"properties": {
+							"transform": false,
+							"spacing": {
+								"type": "object",
+								"properties": {
+									"blockGap": {
+										"description": "Elements only support a single block gap value.",
+										"oneOf": [
+											{ "type": "string" },
+											{
+												"$ref": "#/definitions/refComplete"
+											}
+										]
+									}
+								}
+							}
+						}
+					}
+				}
+			]
 		},
 		"stylesBlocksPropertiesComplete": {
 			"description": "Styles defined on a per-block basis using the block's selector.",
@@ -2755,6 +3062,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2768,6 +3078,12 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-author": {
@@ -2884,7 +3200,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/tag-cloud": {
@@ -3303,6 +3631,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -3316,6 +3647,12 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -3432,7 +3769,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -3686,6 +4035,21 @@
 		"properties": {
 			"styles": {
 				"type": "object",
+				"properties": {
+					"transform": false,
+					"spacing": {
+						"type": "object",
+						"properties": {
+							"blockGap": {
+								"description": "Root styles only support a single block gap value for now.",
+								"oneOf": [
+									{ "type": "string" },
+									{ "$ref": "#/definitions/refComplete" }
+								]
+							}
+						}
+					}
+				},
 				"propertyNames": {
 					"anyOf": [
 						{

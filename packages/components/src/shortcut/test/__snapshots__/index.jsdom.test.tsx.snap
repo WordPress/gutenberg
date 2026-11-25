@@ -3,13 +3,16 @@
 exports[`Shortcut > renders passed className 1`] = `
 <span
   class="my-class"
+  dir="ltr"
 >
   shortcut text
 </span>
 `;
 
 exports[`Shortcut > renders the shortcut display text when a string is passed as the shortcut 1`] = `
-<span>
+<span
+  dir="ltr"
+>
   shortcut text
 </span>
 `;

@@ -10,7 +10,7 @@ export const DEFAULT_VIEWS: {
 	},
 	{
 		slug: 'my-patterns',
-		label: __( 'My patterns' ),
+		label: __( 'Site patterns' ),
 	},
 	{
 		slug: 'registered',

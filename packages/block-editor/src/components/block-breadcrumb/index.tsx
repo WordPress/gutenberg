@@ -2,8 +2,10 @@ import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- This migration intentionally adopts the shared Breadcrumb component.
-import { Breadcrumb } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- This migration intentionally adopts the shared Breadcrumb component.
+	Breadcrumb,
+} from '@wordpress/ui';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';

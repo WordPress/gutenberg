@@ -87,7 +87,7 @@ function gutenberg_test_entity_actions_api_replace_action() {
 			array_merge(
 				$removed[0],
 				array(
-					'label'     => 'Move to bin…',
+					'label'     => 'Move to bin',
 					'isPrimary' => false,
 				)
 			),

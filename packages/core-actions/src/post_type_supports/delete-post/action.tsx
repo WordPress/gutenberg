@@ -7,7 +7,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { decodeEntities } from '@wordpress/html-entities';
 import {

@@ -12,7 +12,7 @@ import type {
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = ( ...args: any[] ) => any | Generator;
-export type Resolver = Function | Generator;
+export type Resolver = Function | Generator | NormalizedResolver;
 export type Selector = Function;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
@@ -428,10 +428,20 @@ export type ActionCreatorsOf< T > =
 export type PromisifiedActionCreators< ActionCreators > = {
 	[
 		Action in keyof ActionCreators
-	]: ActionCreators[ Action ] extends ActionCreator
-		? PromisifyActionCreator< ActionCreators[ Action ] >
-		: ActionCreators[ Action ];
+	]: ActionCreators[ Action ] extends ActionCreatorWithCustomDispatchSignature
+		? ActionCreators[ Action ][ 'DispatchSignature' ]
+		: ActionCreators[ Action ] extends ActionCreator
+			? PromisifyActionCreator< ActionCreators[ Action ] >
+			: ActionCreators[ Action ];
 };
+
+/**
+ * Lets a generic action creator declare its dispatched signature, whose type
+ * parameters `PromisifyActionCreator` would erase.
+ */
+export interface ActionCreatorWithCustomDispatchSignature {
+	DispatchSignature: Function;
+}
 
 // Wraps action creator return types with a Promise and handles thunks and generators.
 export type PromisifyActionCreator< Action extends ActionCreator > = (

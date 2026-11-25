@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import type { Color } from '@wordpress/global-styles-engine';
 import {
 	getColorObjectByAttributeValues,
 	getColorObjectByColorValue,
@@ -10,12 +9,11 @@ import {
 describe( 'color utils', () => {
 	describe( 'getColorObjectByAttributeValues', () => {
 		it( 'should return the custom color object when there is no definedColor', () => {
-			// The lookups only read these fields.
 			const colors = [
 				{ slug: 'red' },
 				{ slug: 'green' },
 				{ slug: 'blue' },
-			] as Color[];
+			];
 			const customColor = '#ffffff';
 
 			expect(
@@ -30,12 +28,11 @@ describe( 'color utils', () => {
 		} );
 
 		it( 'should return the custom color object when definedColor was not found', () => {
-			// The lookups only read these fields.
 			const colors = [
 				{ slug: 'red' },
 				{ slug: 'green' },
 				{ slug: 'blue' },
-			] as Color[];
+			];
 			const definedColor = 'purple';
 			const customColor = '#ffffff';
 
@@ -51,12 +48,11 @@ describe( 'color utils', () => {
 		} );
 
 		it( 'should return the found color object', () => {
-			// The lookups only read these fields.
 			const colors = [
 				{ slug: 'red' },
 				{ slug: 'green' },
 				{ slug: 'blue' },
-			] as Color[];
+			];
 			const definedColor = 'blue';
 			const customColor = '#ffffff';
 
@@ -74,12 +70,11 @@ describe( 'color utils', () => {
 
 	describe( 'getColorObjectByColorValue', () => {
 		it( 'should return undefined if the given color was not found', () => {
-			// The lookups only read these fields.
 			const colors = [
 				{ slug: 'red', color: '#ff0000' },
 				{ slug: 'green', color: '#00ff00' },
 				{ slug: 'blue', color: '#0000ff' },
-			] as Color[];
+			];
 
 			expect(
 				getColorObjectByColorValue( colors, '#ffffff' )
@@ -87,12 +82,11 @@ describe( 'color utils', () => {
 		} );
 
 		it( 'should return a color object for the given color value', () => {
-			// The lookups only read these fields.
 			const colors = [
 				{ slug: 'red', color: '#ff0000' },
 				{ slug: 'green', color: '#00ff00' },
 				{ slug: 'blue', color: '#0000ff' },
-			] as Color[];
+			];
 
 			expect( getColorObjectByColorValue( colors, '#00ff00' ) ).toEqual( {
 				slug: 'green',

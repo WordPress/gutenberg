@@ -346,6 +346,29 @@ describe( 'getFilename', () => {
 		expect( getFilename( url ) ).toBe( filename );
 	} );
 
+	it.each( [
+		[
+			'https://wordpress.org/uploads/%E7%94%9F%E6%88%90%E6%B3%A2%E3%81%AE%E9%9F%B31.mp3',
+			'生成波の音1.mp3',
+		],
+		[ 'https://wordpress.org/uploads/my%20photo.jpg', 'my photo.jpg' ],
+		[ '/uploads/caf%C3%A9.png?query=%E9%9F%B3#%E9%9F%B3', 'café.png' ],
+		[ 'https://wordpress.org/uploads/生成波の音2.wav', '生成波の音2.wav' ],
+		[ 'https://wordpress.org/uploads/a%2Fb.jpg', 'a/b.jpg' ],
+		[ 'https://wordpress.org/uploads/100%25.jpg', '100%.jpg' ],
+	] )(
+		'decodes percent-encoded characters in the filename: %s',
+		( url, filename ) => {
+			expect( getFilename( url ) ).toBe( filename );
+		}
+	);
+
+	it( 'returns the filename as is when it can not be decoded', () => {
+		expect(
+			getFilename( 'https://wordpress.org/uploads/%E9%9F.mp3' )
+		).toBe( '%E9%9F.mp3' );
+	} );
+
 	it( 'returns undefined when the provided value does not contain a filename', () => {
 		expect( getFilename( 'http://localhost:8080/' ) ).toBe( undefined );
 		expect( getFilename( 'http://localhost:8080/a/path/' ) ).toBe(
@@ -1349,6 +1372,67 @@ describe( 'cleanForSlug', () => {
 		expect(
 			cleanForSlug( 'No &nbsp; Entities> &ndash; Here &mdash;&lt;' )
 		).toBe( 'no-entities-here' );
+	} );
+
+	// The expected values are what `sanitize_title()` returns in WordPress
+	// core, decoded.
+	it( 'Should keep emoji and other symbols, like WordPress', () => {
+		expect( cleanForSlug( 'Hello ❤️' ) ).toBe( 'hello-❤️' );
+		expect( cleanForSlug( 'Emoji 🎉🚀 party' ) ).toBe( 'emoji-🎉🚀-party' );
+		expect( cleanForSlug( '→ arrows ←' ) ).toBe( '→-arrows-←' );
+		expect( cleanForSlug( 'x² + y³' ) ).toBe( 'x²-y³' );
+	} );
+
+	it( 'Should strip the punctuation WordPress strips', () => {
+		expect( cleanForSlug( "C'est l’été « déjà »" ) ).toBe(
+			'cest-lete-deja'
+		);
+		expect( cleanForSlug( '¿Qué tal? ¡Hola!' ) ).toBe( 'que-tal-hola' );
+		expect( cleanForSlug( 'Copyright © 2026 ™' ) ).toBe( 'copyright-2026' );
+		expect( cleanForSlug( 'Ça va • bien…' ) ).toBe( 'ca-va-bien' );
+		expect( cleanForSlug( 'zero\u200bwidth' ) ).toBe( 'zerowidth' );
+	} );
+
+	it( 'Should convert dashes, wide spaces and the multiplication sign like WordPress', () => {
+		expect( cleanForSlug( 'a – b — c' ) ).toBe( 'a-b-c' );
+		expect( cleanForSlug( 'thin\u2009space' ) ).toBe( 'thin-space' );
+		expect( cleanForSlug( '1 × 2' ) ).toBe( '1-x-2' );
+	} );
+
+	it( 'Should remove accents like WordPress', () => {
+		expect( cleanForSlug( 'Ünïcödé Straße' ) ).toBe( 'unicode-strase' );
+		expect( cleanForSlug( 'Price €5' ) ).toBe( 'price-e5' );
+		// WordPress keeps the accents of letters missing from its table.
+		expect( cleanForSlug( 'ǧ ȁ' ) ).toBe( 'ǧ-ȁ' );
+		// Decomposed accents are composed first.
+		expect( cleanForSlug( 'cafe\u0301' ) ).toBe( 'cafe' );
+	} );
+
+	it( 'Should strip HTML tags like WordPress', () => {
+		expect( cleanForSlug( '<b>Bold</b> title' ) ).toBe( 'bold-title' );
+		expect( cleanForSlug( '1<2' ) ).toBe( '1' );
+		expect( cleanForSlug( '1 < 2' ) ).toBe( '1-2' );
+		expect( cleanForSlug( 'a<!-- note -->b' ) ).toBe( 'ab' );
+	} );
+
+	it( 'Should keep what fits in 200 percent-encoded characters, like WordPress', () => {
+		expect( cleanForSlug( 'a'.repeat( 250 ) ) ).toBe( 'a'.repeat( 200 ) );
+		// Each Devanagari character takes nine percent-encoded characters.
+		expect( cleanForSlug( 'अलग-अलग-प्रकार-के-प्लंबिंग-ट्रैप्स' ) ).toBe(
+			'अलग-अलग-प्रकार-के-प्लंबिं'
+		);
+		// A character that doesn't fit isn't split.
+		expect( cleanForSlug( 'a'.repeat( 198 ) + 'é' ) ).toBe(
+			'a'.repeat( 198 ) + 'e'
+		);
+		expect( cleanForSlug( 'a'.repeat( 198 ) + 'ψ' ) ).toBe(
+			'a'.repeat( 198 )
+		);
+	} );
+
+	it( 'Should keep percent-encoded octets and remove other percent signs', () => {
+		expect( cleanForSlug( '100% sure' ) ).toBe( '100-sure' );
+		expect( cleanForSlug( 'a%20b' ) ).toBe( 'a%20b' );
 	} );
 } );
 

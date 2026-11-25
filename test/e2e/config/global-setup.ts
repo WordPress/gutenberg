@@ -1,27 +1,28 @@
+import path from 'path';
 import { request } from '@playwright/test';
 import type { FullConfig } from '@playwright/test';
 import { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 import { setupRtcWebSocketProvider } from './rtc-websocket-setup';
 
-async function globalSetup( config: FullConfig ) {
-	const { storageState, baseURL } = config.projects[ 0 ].use;
-	const storageStatePath =
-		typeof storageState === 'string' ? storageState : undefined;
-
+async function setupSite( baseURL?: string, storageStatePath?: string ) {
 	const requestContext = await request.newContext( {
 		baseURL,
 	} );
 
 	const requestUtils = new RequestUtils( requestContext, {
+		baseURL,
 		storageStatePath,
 	} );
 
 	// Authenticate and save the storageState to disk.
 	await requestUtils.setupRest();
 
+	// Switch the theme alone: switch_theme() saves the parent before the child,
+	// so a request in between loads the old theme on the new parent and can fatal.
+	await requestUtils.activateTheme( 'twentytwentyone' );
+
 	// Reset the test environment before running the tests.
 	await Promise.all( [
-		requestUtils.activateTheme( 'twentytwentyone' ),
 		// Disable this test plugin as it's conflicting with some of the tests.
 		// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
 		requestUtils.deactivatePlugin(
@@ -35,6 +36,30 @@ async function globalSetup( config: FullConfig ) {
 	] );
 
 	await requestContext.dispose();
+}
+
+async function globalSetup( config: FullConfig ) {
+	const sites = process.env.WP_BASE_URLS?.split( ',' );
+	if ( sites ) {
+		await Promise.all(
+			sites.map( ( site, index ) =>
+				setupSite(
+					site,
+					path.join(
+						process.env.WP_ARTIFACTS_PATH!,
+						`storage-states/admin-${ index }.json`
+					)
+				)
+			)
+		);
+		return;
+	}
+
+	const { storageState, baseURL } = config.projects[ 0 ].use;
+	await setupSite(
+		baseURL,
+		typeof storageState === 'string' ? storageState : undefined
+	);
 }
 
 export default globalSetup;

@@ -2,22 +2,105 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
 ### Enhancements
 
--   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
--   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
+-   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
+-   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
 
 ### Bug Fixes
 
+-   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Keep hiding empty badge fields in the `grid` and `pickerGrid` layouts with the updated `Badge` from `@wordpress/ui` ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
+-   Add a ring around the selection checkbox in the `grid` and `pickerGrid` layouts, so it stays visible on any preview ([#87223](https://github.com/WordPress/gutenberg/pull/87223)).
+
+### Internal
+
+-   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 22.1.0 (2026-11-18)
+
+### Enhancements
+
+-   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
+
+### Bug Fixes
+
+-   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
+-   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
+-   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
+-   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
+
+### Internal
+
+-   Update the `@ariakit/react` dependency to 0.4.43 ([#86887](https://github.com/WordPress/gutenberg/pull/86887)).
+-   Update the `@daypicker/react` dependency to 10.0.2 ([#86886](https://github.com/WordPress/gutenberg/pull/86886)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 22.0.0 (2026-11-04)
+
+### Breaking Changes
+
+-   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
+
+### Enhancements
+
+-   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
+-   Use the UI SelectControl for Sort by and relative-date Unit settings ([#86167](https://github.com/WordPress/gutenberg/pull/86167)).
+-   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
+-   Omit trailing ellipses from action button labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
+-   Use the design system outline for keyboard focus on list items ([#85358](https://github.com/WordPress/gutenberg/pull/85358)).
+-   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
+-   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
+-   Use design system focus ring for filter chips & prevent text from touching remove button ([#85374](https://github.com/WordPress/gutenberg/pull/85374)).
+-   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+-   DataForm: The `showPlaceholderIfEmpty` option of the `panel` layout also shows the placeholder when the field's `render` output is empty, like for an id matching no record ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+
+### Bug Fixes
+
+-   DataForm: Keep the first line of a panel field label that wraps level with its value ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
+-   Replace the pagination page select with a page number input above 100 pages, so a dataset with tens of thousands of pages no longer freezes the browser ([#85303](https://github.com/WordPress/gutenberg/pull/85303)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Alias legacy `Popover` imports as `WCPopover` ([#85838](https://github.com/WordPress/gutenberg/pull/85838)).
+
+## 21.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   `DataViews.BulkActionToolbar` now renders nothing; built-in table and grid layouts include bulk actions automatically ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
+### Enhancements
+
+-   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
+-   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
+-   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
+-   Show bulk actions in table and grid headers, with a labeled action menu on mobile ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
+### Bug Fixes
+
+-   Restore focus to the grid selection checkbox after cancelling bulk selection ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Enable overlay compatibility for `DataViews` and `DataViewsPicker` in directly bundled applications so `@wordpress/ui` popups stack above `@wordpress/components` overlays ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
 ### Internal
 
+-   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
+-   Update `@testing-library/user-event` to 14.6.8 for DataViews tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
+-   Remove unused Emotion dependencies ([#85021](https://github.com/WordPress/gutenberg/pull/85021)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).

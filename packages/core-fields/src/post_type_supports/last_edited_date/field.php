@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'datetime',
-	'label'         => __( 'Last edited', 'gutenberg' ),
+	'label'         => __( 'Last edited' ),
 	'readOnly'      => true,
 	'enableHiding'  => false,
 	'enableSorting' => false,

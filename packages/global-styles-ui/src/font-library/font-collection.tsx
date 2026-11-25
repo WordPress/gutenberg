@@ -12,17 +12,23 @@ import {
 	__experimentalVStack as VStack,
 	Navigator,
 	__experimentalHeading as Heading,
-	Notice,
-	SelectControl as WCSelectControl,
+	Notice as WCNotice,
 	Flex,
 	Button,
 	SearchControl,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Progress } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Progress,
+	Select,
+	SelectControl,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
+import { sprintf, __, _n, _x, isRTL } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import {
 	moreVertical,
 	next,
@@ -60,6 +66,8 @@ const LOCAL_STORAGE_ITEM = 'wp-font-library-google-fonts-permission';
 const MIN_WINDOW_HEIGHT = 500;
 
 function FontCollection( { slug }: { slug: string } ) {
+	useEnableWpCompatOverlaySlot();
+
 	const requiresPermission = slug === 'google-fonts';
 
 	const getGoogleFontsPermissionFromStorage = () => {
@@ -125,12 +133,36 @@ function FontCollection( { slug }: { slug: string } ) {
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
 
-	const categories = [ DEFAULT_CATEGORY, ...collectionCategories ];
+	const categoryItems = [ DEFAULT_CATEGORY, ...collectionCategories ].map(
+		( category ) => ( { label: category.name, value: category.slug } )
+	);
+	const selectedCategoryItem =
+		categoryItems.find( ( item ) => item.value === filters.category ) ??
+		categoryItems[ 0 ];
 
 	const fonts = useMemo(
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
+
+	// Announce the number of results once the user searches or picks a
+	// category, as the list updates without any feedback for screen readers.
+	const hasFilters =
+		filters.search !== undefined || filters.category !== undefined;
+	useEffect( () => {
+		if ( ! hasFilters ) {
+			return;
+		}
+		speak(
+			fonts.length
+				? sprintf(
+						/* translators: %d: number of fonts found. */
+						_n( '%d font found.', '%d fonts found.', fonts.length ),
+						fonts.length
+					)
+				: __( 'No fonts found. Try with a different search term.' )
+		);
+	}, [ hasFilters, fonts ] );
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
@@ -354,21 +386,25 @@ function FontCollection( { slug }: { slug: string } ) {
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<WCSelectControl
+								<SelectControl
+									className="font-library__category"
 									label={ __( 'Category' ) }
-									value={ filters.category }
-									onChange={ handleCategoryFilter }
-								>
-									{ categories &&
-										categories.map( ( category ) => (
-											<option
-												value={ category.slug }
-												key={ category.slug }
-											>
-												{ category.name }
-											</option>
-										) ) }
-								</WCSelectControl>
+									items={ categoryItems }
+									value={ selectedCategoryItem }
+									itemToStringValue={ ( item ) =>
+										JSON.stringify( item.value )
+									}
+									onValueChange={ ( item ) => {
+										if (
+											item &&
+											item.value !== null &&
+											item.value !==
+												selectedCategoryItem.value
+										) {
+											handleCategoryFilter( item.value );
+										}
+									} }
+								/>
 							</HStack>
 
 							<Spacer margin={ 4 } />
@@ -449,12 +485,12 @@ function FontCollection( { slug }: { slug: string } ) {
 							{ notice && (
 								<>
 									<Spacer margin={ 1 } />
-									<Notice
+									<WCNotice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
-									</Notice>
+									</WCNotice>
 									<Spacer margin={ 1 } />
 								</>
 							) }
@@ -562,31 +598,45 @@ function FontCollection( { slug }: { slug: string } ) {
 										div: <div aria-hidden />,
 										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<WCSelectControl
-												aria-label={ __(
-													'Current page'
-												) }
+											<Select.Root
 												value={ page.toString() }
-												options={ [
-													...Array( totalPages ),
-												].map( ( e, i ) => {
-													return {
-														label: (
+												onValueChange={ ( newPage ) => {
+													if ( newPage !== null ) {
+														setPage(
+															parseInt( newPage )
+														);
+													}
+												} }
+											>
+												<Select.Trigger
+													className="font-library__page-selection-trigger"
+													size="small"
+													variant="minimal"
+													aria-label={ __(
+														'Current page'
+													) }
+												/>
+												<Select.Popup width="content">
+													{ [
+														...Array( totalPages ),
+													].map( ( e, i ) => {
+														const value = (
 															i + 1
-														).toString(),
-														value: (
-															i + 1
-														).toString(),
-													};
-												} ) }
-												onChange={ ( newPage ) =>
-													setPage(
-														parseInt( newPage )
-													)
-												}
-												size="small"
-												variant="minimal"
-											/>
+														).toString();
+														return (
+															<Select.Item
+																key={ value }
+																value={ value }
+																size="small"
+															>
+																<Select.ItemLabel>
+																	{ value }
+																</Select.ItemLabel>
+															</Select.Item>
+														);
+													} ) }
+												</Select.Popup>
+											</Select.Root>
 										),
 									}
 								) }

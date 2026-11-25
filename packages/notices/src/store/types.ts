@@ -16,6 +16,11 @@ export type NoticeAction = {
 	 * Optional function to invoke when action is triggered by user.
 	 */
 	onClick?: VoidFunction;
+
+	/**
+	 * Whether to open the URL in a new tab, in a snackbar notice.
+	 */
+	openInNewTab?: boolean;
 };
 
 /**

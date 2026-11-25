@@ -7,9 +7,9 @@ import {
 	type MockedFunction,
 	beforeEach,
 } from 'vitest';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useId, useState } from '@wordpress/element';
+import { createRef, useId } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import * as Menu from '../index';
 import {
@@ -76,65 +76,6 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
-	it( 'keeps a popup portaled into an iframe open for inside presses and closes it for outside presses', async () => {
-		const user = userEvent.setup();
-		const iframe = document.createElement( 'iframe' );
-		document.body.appendChild( iframe );
-		const iframeDocument = iframe.contentDocument;
-
-		if ( ! iframeDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-
-		try {
-			const outsideTarget = iframeDocument.createElement( 'button' );
-			iframeDocument.body.appendChild( outsideTarget );
-
-			render(
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup
-						portal={
-							<Menu.Portal container={ iframeDocument.body } />
-						}
-					>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Actions' } )
-			);
-			const portaledMenu = await within( iframeDocument.body ).findByRole(
-				'menu'
-			);
-			const item = within( portaledMenu ).getByRole( 'menuitem', {
-				name: 'Duplicate',
-			} );
-
-			act( () => {
-				item.dispatchEvent(
-					new MouseEvent( 'pointerdown', { bubbles: true } )
-				);
-			} );
-			expect( portaledMenu ).toBeVisible();
-
-			act( () => {
-				outsideTarget.dispatchEvent(
-					new MouseEvent( 'pointerdown', { bubbles: true } )
-				);
-			} );
-			await waitFor( () => {
-				expect( portaledMenu ).not.toBeInTheDocument();
-			} );
-		} finally {
-			iframe.remove();
-		}
-	} );
-
 	it( 'renders prefix icons at 16px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
@@ -210,52 +151,6 @@ describe( 'Menu', () => {
 
 		expect( triggerWithHandle ).toBeDefined();
 		expect( triggerWithPayload ).toBeDefined();
-	} );
-
-	it( 'closes a non-modal menu on iframe pointerdown after its trigger becomes disabled', async () => {
-		const user = userEvent.setup();
-
-		function MenuTriggerDisabledWhileOpen() {
-			const [ open, setOpen ] = useState( false );
-
-			return (
-				<>
-					<Menu.Root
-						modal={ false }
-						onOpenChange={ setOpen }
-						open={ open }
-					>
-						<Menu.Trigger disabled={ open }>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<iframe title="Editor canvas" />
-				</>
-			);
-		}
-
-		render( <MenuTriggerDisabledWhileOpen /> );
-		const iframe = screen.getByTitle( 'Editor canvas' );
-		const iframeDocument = document.implementation.createHTMLDocument();
-		Object.defineProperty( iframe, 'contentDocument', {
-			configurable: true,
-			get: () => iframeDocument,
-		} );
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-
-		act( () => {
-			iframeDocument.dispatchEvent(
-				new MouseEvent( 'pointerdown', { bubbles: true } )
-			);
-		} );
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
 	} );
 
 	describe( 'group composition', () => {

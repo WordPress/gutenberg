@@ -8,37 +8,6 @@ import { store as blockEditorStore } from '../../../store';
 import { ALL_SIDES, LABELS } from '../utils';
 import type { Side, SpacingInputControlProps } from '../types';
 
-const CUSTOM_VALUE_SETTINGS = {
-	px: { max: 300, steps: 1 },
-	'%': { max: 100, steps: 1 },
-	vw: { max: 100, steps: 1 },
-	vh: { max: 100, steps: 1 },
-	em: { max: 10, steps: 0.1 },
-	rm: { max: 10, steps: 0.1 },
-	svw: { max: 100, steps: 1 },
-	lvw: { max: 100, steps: 1 },
-	dvw: { max: 100, steps: 1 },
-	svh: { max: 100, steps: 1 },
-	lvh: { max: 100, steps: 1 },
-	dvh: { max: 100, steps: 1 },
-	vi: { max: 100, steps: 1 },
-	svi: { max: 100, steps: 1 },
-	lvi: { max: 100, steps: 1 },
-	dvi: { max: 100, steps: 1 },
-	vb: { max: 100, steps: 1 },
-	svb: { max: 100, steps: 1 },
-	lvb: { max: 100, steps: 1 },
-	dvb: { max: 100, steps: 1 },
-	vmin: { max: 100, steps: 1 },
-	svmin: { max: 100, steps: 1 },
-	lvmin: { max: 100, steps: 1 },
-	dvmin: { max: 100, steps: 1 },
-	vmax: { max: 100, steps: 1 },
-	svmax: { max: 100, steps: 1 },
-	lvmax: { max: 100, steps: 1 },
-	dvmax: { max: 100, steps: 1 },
-};
-
 export default function SpacingInputControl( {
 	icon,
 	isMixed = false,
@@ -106,7 +75,6 @@ export default function SpacingInputControl( {
 			allowNegativeOnDrag={ ( minimumCustomValue as number ) < 0 }
 			ariaLabel={ ariaLabel }
 			className="spacing-sizes-control"
-			customValueSettings={ CUSTOM_VALUE_SETTINGS }
 			disableCustomValues={ disableCustomSpacingSizes }
 			icon={ icon }
 			isMixed={ isMixed }

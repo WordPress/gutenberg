@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import type { Button } from '@wordpress/components';
+import type { Button, DistributiveOmit } from '@wordpress/components';
 import type { Preset } from '../preset-input-control/types';
 
 /**
@@ -66,8 +66,12 @@ export interface BorderRadiusControlProps {
 }
 
 /**
- * Props of the `LinkedButton` of `BorderRadiusControl`.
+ * Props of the `LinkedButton` of `BorderRadiusControl`, which sets its own
+ * look and label.
  */
-export type BorderRadiusLinkedButtonProps = ComponentProps< typeof Button > & {
+export type BorderRadiusLinkedButtonProps = DistributiveOmit<
+	ComponentProps< typeof Button >,
+	'className' | 'size' | 'icon' | 'iconSize' | 'label'
+> & {
 	isLinked: boolean;
 };

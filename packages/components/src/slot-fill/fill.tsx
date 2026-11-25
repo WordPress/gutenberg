@@ -55,9 +55,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
 			: children;
 
 	// When using a `Fill`, the `children` will be rendered in the document of the
-	// `Slot`. Wrap the children in a `StyleProvider` so CSS module styles and
-	// legacy Emotion styles target that document/iframe instead of the document
-	// containing the `Fill`.
+	// `Slot`. Wrap the children in a `StyleProvider` so CSS Module styles target
+	// that document/iframe instead of the document containing the `Fill`.
 	return createPortal(
 		<StyleProvider document={ portalEl.ownerDocument }>
 			{ wrappedChildren }

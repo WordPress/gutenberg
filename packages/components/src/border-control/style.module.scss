@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .border-control {
 	border: 0;
@@ -20,7 +19,7 @@
 		flex: 1 1 40%;
 	}
 
-	/* Raised specificity to beat UnitSelect's runtime-injected Emotion min-height. */
+	/* Preserve the established specificity for UnitSelect's min-height override. */
 	&#{&}
 	:global(.components-unit-control__select):global(.components-unit-control__select) {
 		min-height: 0;
@@ -37,7 +36,7 @@
 .dropdown {
 	background: #fff;
 
-	/* Raised specificity to stay ahead of the Emotion Button base styles. */
+	/* Preserve the established specificity for Button overrides. */
 	&#{&} > button {
 		aspect-ratio: 1;
 		padding: 0;
@@ -48,15 +47,7 @@
 		border-end-start-radius: $radius-small;
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;
-		border: $border-width solid $components-color-border;
-
-		&:focus,
-		&:hover:not(:disabled) {
-			box-shadow: inset 0 0 0 0.5px $components-color-accent;
-			border-color: $components-color-accent;
-			z-index: 1;
-			position: relative;
-		}
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 	}
 }
 
