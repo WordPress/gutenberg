@@ -6,6 +6,8 @@ import {
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as editorStore } from '../../store';
+import { getSuggestTrashRefusalMessage } from '../../store/suggest-post-edit-guard';
+import { useIsPostSettingLocked } from '../suggestion-mode/use-locked-post-field';
 import PostTrashCheck from './check';
 
 /**
@@ -32,6 +34,8 @@ export default function PostTrash( { onActionPerformed } ) {
 	);
 	const { trashPost } = useDispatch( editorStore );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+	// Trashing is not something a suggestion can propose.
+	const isLocked = useIsPostSettingLocked();
 
 	if ( isNew || ! postId ) {
 		return null;
@@ -66,9 +70,16 @@ export default function PostTrash( { onActionPerformed } ) {
 				isDestructive
 				variant="secondary"
 				isBusy={ isDeleting }
-				aria-disabled={ isDeleting }
+				aria-disabled={ isDeleting || isLocked }
+				disabled={ isLocked }
+				accessibleWhenDisabled
+				description={
+					isLocked ? getSuggestTrashRefusalMessage() : undefined
+				}
 				onClick={
-					isDeleting ? undefined : () => setShowConfirmDialog( true )
+					isDeleting || isLocked
+						? undefined
+						: () => setShowConfirmDialog( true )
 				}
 			>
 				{ label }

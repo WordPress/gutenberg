@@ -14,7 +14,12 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import SuggestionActions, {
+	SuggestionActionButtons,
+	useSuggestionDecision,
+} from './suggestion-actions';
 import { NoteReactions } from './reactions/note-reactions';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -82,7 +87,16 @@ export function Note( {
 		}
 	}, [ rawContent ] );
 
-	const canResolve = note.parent === 0;
+	// Suggestion threads expose their own Accept/Reject affordance in the
+	// header; the generic "Resolve" button would duplicate that action with
+	// a confusingly similar checkmark icon, so hide it for suggestion notes.
+	const hasSuggestionPayload = !! note?.meta?._wp_suggestion;
+	const suggestionDecision = useSuggestionDecision(
+		hasSuggestionPayload ? note : null
+	);
+	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
+	const isReviewableSuggestion =
+		note.parent === 0 && hasSuggestionPayload && isSuggestionModeEnabled();
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -96,7 +110,10 @@ export function Note( {
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
+			// A suggestion's card says what it proposes; text added to its
+			// note would outlive the decision. Replies carry the discussion.
 			isEligible: ( { status } ) =>
+				! isReviewableSuggestion &&
 				( ! isResolutionNote || hasUserText ) &&
 				! hasResolved( status ),
 			onClick: () => setActionState( 'edit' ),
@@ -104,14 +121,23 @@ export function Note( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => canResolve && hasResolved( status ),
+			// A decided suggestion can be reopened too; its own Accept and
+			// Reject replace Resolve, but not Reopen. Only with the
+			// experiment on, like every other decision on a suggestion.
+			isEligible: ( { status } ) =>
+				( canResolve || isReviewableSuggestion ) &&
+				hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
+			// A suggestion is closed with Accept or Reject, which take its
+			// marker out of the content: deleting the note would strand it.
 			isEligible: ( { status } ) =>
-				canResolve || ( ! isResolutionNote && ! hasResolved( status ) ),
+				! isReviewableSuggestion &&
+				( canResolve ||
+					( ! isResolutionNote && ! hasResolved( status ) ) ),
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
@@ -192,9 +218,13 @@ export function Note( {
 		);
 	}
 
-	const actions = isSelected ? (
+	const showActions = isSelected || hasSuggestionPayload;
+	const actions = showActions ? (
 		<>
-			{ canResolve && onResolve && (
+			{ hasSuggestionPayload && (
+				<SuggestionActionButtons decision={ suggestionDecision } />
+			) }
+			{ isSelected && canResolve && onResolve && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -204,10 +234,14 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ /* A pending suggestion has no menu actions of its own. */ }
+			{ isSelected &&
+				( ! isReviewableSuggestion || availableItems.length > 0 ) && (
+					<NoteActionsMenu
+						items={ availableItems }
+						buttonRef={ actionButtonRef }
+					/>
+				) }
 		</>
 	) : null;
 
@@ -232,6 +266,13 @@ export function Note( {
 					disabled={ isThreadResolved }
 				/>
 			</div>
+			{ hasSuggestionPayload && (
+				<SuggestionActions
+					thread={ note }
+					decision={ suggestionDecision }
+					onReopen={ () => onEditNote( note, { status: 'hold' } ) }
+				/>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

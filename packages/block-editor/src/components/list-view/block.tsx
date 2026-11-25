@@ -32,6 +32,7 @@ import { useListViewContext } from './context';
 import {
 	getBlockPositionDescription,
 	getBlockPropertiesDescription,
+	getBlockSuggestionTreatment,
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -127,6 +128,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		suggestion,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -154,6 +156,7 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				suggestion: attributes?.metadata?.suggestion,
 			};
 		},
 		[ clientId ]
@@ -573,6 +576,13 @@ function ListViewBlock( {
 		viewportSettings
 	);
 
+	// Pending structural suggestions (insert / remove / move) are shown on the
+	// canvas but were invisible here, so a reviewer navigating by List View —
+	// including anyone reading it with assistive technology — had no way to
+	// tell that a block is proposed for removal. Both halves matter: the class
+	// drives the row treatment, the label joins the row's description.
+	const blockSuggestionTreatment = getBlockSuggestionTreatment( suggestion );
+
 	const hasSiblings = siblingBlockCount > 0;
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
@@ -593,7 +603,7 @@ function ListViewBlock( {
 		colSpan = 3;
 	}
 
-	const classes = clsx( {
+	const classes = clsx( blockSuggestionTreatment?.className, {
 		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,
@@ -686,6 +696,7 @@ function ListViewBlock( {
 								blockPositionDescription,
 								blockPropertiesDescription,
 								blockVisibilityDescription,
+								blockSuggestionTreatment?.label,
 							]
 								.filter( Boolean )
 								.join( ' ' ) }

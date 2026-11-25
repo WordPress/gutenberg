@@ -1,8 +1,4 @@
-import {
-	getBlockType,
-	serialize,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
@@ -21,6 +17,7 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import { serializeCopiedBlocks } from '../writing-flow/utils';
 import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
@@ -41,7 +38,10 @@ function CopyMenuItem( {
 	const notifyCopy = useNotifyCopy();
 	const ref = useCopyToClipboard(
 		// The copied blocks exist.
-		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
+		() =>
+			serializeCopiedBlocks(
+				getBlocksByClientId( clientIds ) as Block[]
+			),
 		() => {
 			switch ( eventType ) {
 				case 'copy':

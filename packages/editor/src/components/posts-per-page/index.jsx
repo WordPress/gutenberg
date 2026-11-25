@@ -11,9 +11,13 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 
 export default function PostsPerPage() {
 	const { editEntityRecord } = useDispatch( coreStore );
+	// Site settings are not part of the post: a suggestion cannot propose
+	// them, so they are read-only while suggesting.
+	const lockedProps = useLockedPostSettingProps();
 	const { postsPerPage, isTemplate, postSlug } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType } =
 			select( editorStore );
@@ -67,6 +71,7 @@ export default function PostsPerPage() {
 						aria-expanded={ isOpen }
 						aria-label={ __( 'Change posts per page' ) }
 						onClick={ onToggle }
+						{ ...lockedProps }
 					>
 						{ postsPerPage }
 					</Button>

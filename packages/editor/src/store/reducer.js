@@ -526,6 +526,98 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editor intent the user last chose (`edit`,
+ * `suggest`). What the editor is in on the current entity is derived from it
+ * by `getEffectiveEditorIntent`.
+ * The intent is intentionally session-scoped: it lives in the editor
+ * store, not in the preferences store, so reloading the editor always
+ * returns to the default `edit` intent. Persisting suggest across
+ * reloads is undesirable — it surprises the user and is the wrong default
+ * for most sessions.
+ *
+ * @param {'edit'|'suggest'} state  Current state.
+ * @param {Object}           action Dispatched action.
+ * @return {'edit'|'suggest'} Updated state.
+ */
+export function editorIntent( state = 'edit', action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_INTENT':
+			return action.intent;
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the post the suggest intent was chosen on, or null while
+ * editing. Suggesting belongs to that post: on any other entity (a template
+ * opened from it, another post) the editor is editing, and suggesting again
+ * once it returns. See `getEffectiveEditorIntent`.
+ *
+ * @param {?{postType: ?string, postId: ?(string|number)}} state  Current state.
+ * @param {Object}                                         action Dispatched action.
+ * @return {?{postType: ?string, postId: ?(string|number)}} Updated state.
+ */
+export function editorIntentPost( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_INTENT':
+			return action.intent === 'suggest'
+				? {
+						postType: action.postType ?? null,
+						postId: action.postId ?? null,
+					}
+				: null;
+	}
+	return state;
+}
+
+/**
+ * Whether Suggest mode holds a suggestion that Undo would withdraw. Such a
+ * suggestion never reaches the core-data history (an attribute suggestion
+ * lives in the overlay while the block stays at its baseline), so history
+ * alone would leave the Undo button inert. Kept current by the suggestion
+ * undo guard.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function hasSuggestionUndo( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_HAS_SUGGESTION_UNDO':
+			return action.hasSuggestionUndo;
+	}
+	return state;
+}
+
+/**
+ * Post field proposals made while suggesting, keyed by proposal id (the post
+ * field, or `meta.<key>` for a meta key). Each holds the value the field had
+ * when the proposal was first made (`baseline`) and the proposed value. They
+ * are in-memory only: the record a reviewer acts on is the note each one is
+ * saved as. Cleared when another post is edited.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function postFieldProposals( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_POST_FIELD_PROPOSAL':
+			return { ...state, [ action.id ]: action.proposal };
+		case 'CLEAR_POST_FIELD_PROPOSAL': {
+			if ( ! ( action.id in state ) ) {
+				return state;
+			}
+			const { [ action.id ]: _removed, ...rest } = state;
+			return rest;
+		}
+		case 'SET_EDITED_POST':
+			return Object.keys( state ).length ? {} : state;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -554,5 +646,9 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	editorIntent,
+	editorIntentPost,
+	hasSuggestionUndo,
+	postFieldProposals,
 	dataviews: dataviewsReducer,
 } );
