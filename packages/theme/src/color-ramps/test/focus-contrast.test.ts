@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { get, OKLCH } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '..';
 import { getContrast } from '../lib/color-utils';
 
@@ -89,11 +90,31 @@ describe( 'accent focus contrast', () => {
 		).toBeUndefined();
 	} );
 
+	it( 'keeps the passing seed closest to the supplied one', () => {
+		expect(
+			buildAccentRamp( 'primary', '#fae95b', buildBgRamp( '#e7fe44' ) )
+				.ramp.bgFill1
+		).toBe( '#968400' );
+	} );
+
 	it( 'keeps a stroke target when gamut mapping lowers the searched color', () => {
 		expect(
 			buildAccentRamp( 'primary', '#ff0000', buildBgRamp( '#595959' ) )
 				.warnings
 		).toBeUndefined();
+	} );
+
+	it( 'keeps the forced brand surface tint on a dark background', () => {
+		const { ramp } = buildAccentRamp(
+			'primary',
+			'#3858e9',
+			buildBgRamp( '#222524' )
+		);
+		for ( const step of [ 'surface1', 'surface2', 'surface3' ] as const ) {
+			expect( get( ramp[ step ], [ OKLCH, 'c' ] ) ).toBeGreaterThan(
+				0.05
+			);
+		}
 	} );
 
 	it( 'retains a primary ramp that already meets the focus constraints', () => {

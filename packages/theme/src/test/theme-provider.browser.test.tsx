@@ -22,6 +22,8 @@ const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
 const PRIMARY_FILL = '#1089f7';
+// The default background leaves the fill closer to `PRIMARY`.
+const PRIMARY_FILL_ON_DEFAULT_BACKGROUND = '#128af8';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
 const FORMER_WARNING_PRIMARY = '#608010';
@@ -271,7 +273,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY_FILL
+				PRIMARY_FILL_ON_DEFAULT_BACKGROUND
 			);
 		} );
 
@@ -295,7 +297,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY_FILL
+				PRIMARY_FILL_ON_DEFAULT_BACKGROUND
 			);
 
 			await unmount();
@@ -320,7 +322,7 @@ describe( 'ThemeProvider', () => {
 					) );
 
 					expect( root.style.getPropertyValue( BRAND_BG ) ).toBe(
-						PRIMARY_FILL
+						PRIMARY_FILL_ON_DEFAULT_BACKGROUND
 					);
 					expect( root.style.getPropertyPriority( BRAND_BG ) ).toBe(
 						''
@@ -363,7 +365,7 @@ describe( 'ThemeProvider', () => {
 			);
 
 			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
-				PRIMARY_FILL
+				PRIMARY_FILL_ON_DEFAULT_BACKGROUND
 			);
 			expect( iframeDoc.documentElement ).toHaveAttribute(
 				'data-wpds-root-provider',

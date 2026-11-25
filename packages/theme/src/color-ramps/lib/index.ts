@@ -231,10 +231,11 @@ function calculateRamp( {
 			maxDeficitStep = stepName;
 		}
 
-		// Gamut mapping can push an emitted color below its target. Use the
-		// endpoint instead when it still meets the actual targets.
+		// Gamut mapping can push a color that reached its target below it once
+		// emitted. Use the endpoint instead when it still meets the targets.
 		const color =
 			neutralSurface &&
+			searchResults.reached &&
 			! meetsTargets( searchResults.color ) &&
 			meetsTargets( endpoint )
 				? endpoint
@@ -372,7 +373,8 @@ export function buildRamp(
 			: stepsForStep( maxDeficitStep!, config );
 
 		const seedL = get( seed, [ OKLCH, 'l' ] );
-		// The search can end on a failing sample after passing a closer one.
+		// Keep the passing sample closest to the supplied seed. The search can
+		// end on a farther or failing one.
 		let passing: { seed: PlainColorObject; ramp: Ramp } | undefined;
 
 		function getSeedForL( l: number ): PlainColorObject {
@@ -427,22 +429,22 @@ export function buildRamp(
 			upperDeficit
 		);
 
-		// Calculate the final ramp with adjusted seed.
-		const finalResult = calculateRamp( {
-			seed: bestSeed,
-			sortedSteps,
-			config,
-			mainDir,
-			oppDir,
-			neutralSurface,
-			pinLightness,
-		} );
-		bestRamp = finalResult.rampResults;
-		seed = bestSeed;
-
-		if ( passing && ! meetsEmittedTargets( bestRamp, seed ) ) {
+		if ( passing ) {
+			// Primary samples already hold the complete ramp.
 			bestRamp = passing.ramp;
 			seed = passing.seed;
+		} else {
+			// Calculate the final ramp with adjusted seed.
+			bestRamp = calculateRamp( {
+				seed: bestSeed,
+				sortedSteps,
+				config,
+				mainDir,
+				oppDir,
+				neutralSurface,
+				pinLightness,
+			} ).rampResults;
+			seed = bestSeed;
 		}
 	}
 
