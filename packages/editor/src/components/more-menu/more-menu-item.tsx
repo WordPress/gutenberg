@@ -1,5 +1,5 @@
 import { Icon as WCIcon } from '@wordpress/components';
-import { forwardRef, isValidElement } from '@wordpress/element';
+import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
@@ -137,22 +137,33 @@ function UnforwardedMoreMenuItem(
 	) : null;
 	let prefix: ReactNode;
 	if ( icon ) {
-		// Preserve support for Dashicon slugs and custom icon components.
-		// The wrapper lets an icon without its own fill follow the text color,
-		// as it did in the legacy `MenuItem`.
-		prefix = (
-			<span className="editor-more-menu-item__prefix">
-				{ isValidElement< ComponentProps< 'svg' > >( icon ) &&
-				( icon.type === 'svg' || icon.type === SVG ) ? (
-					<Menu.PrefixIcon
-						icon={ icon }
-						className={ icon.props.className }
-					/>
-				) : (
+		if (
+			isValidElement< ComponentProps< 'svg' > >( icon ) &&
+			( icon.type === 'svg' || icon.type === SVG )
+		) {
+			// Plugin icons often leave out their fill, which the legacy
+			// `MenuItem` set to the text color. Default it as an attribute,
+			// which a fill the icon sets itself still overrides.
+			prefix = (
+				<Menu.PrefixIcon
+					icon={
+						icon.props.fill === undefined
+							? cloneElement( icon, { fill: 'currentColor' } )
+							: icon
+					}
+					className={ icon.props.className }
+				/>
+			);
+		} else {
+			// Preserve support for Dashicon slugs and custom icon components.
+			// The SVG of a component is out of reach, so its fill is defaulted
+			// in CSS instead.
+			prefix = (
+				<span className="editor-more-menu-item__prefix-icon">
 					<WCIcon icon={ icon } />
-				) }
-			</span>
-		);
+				</span>
+			);
+		}
 	}
 	const itemShortcut = adaptShortcut( shortcut );
 	// `MenuItem` documented `isSelected`; `ComplementaryAreaToggle` sets

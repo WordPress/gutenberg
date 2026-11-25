@@ -8,11 +8,11 @@
 }
 
 // Plugin icons often leave out their fill, which the legacy `MenuItem` set to
-// the text color. Without it, they stay black on a highlighted item.
-.editor-more-menu-item__prefix {
+// the text color. `:not([fill])` keeps a fill the icon sets itself.
+.editor-more-menu-item__prefix-icon {
 	display: contents;
 
-	svg {
+	svg:not([fill]) {
 		fill: currentColor;
 	}
 }
