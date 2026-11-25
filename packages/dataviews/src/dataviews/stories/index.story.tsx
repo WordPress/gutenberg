@@ -13,6 +13,11 @@ import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
 import LargePageCountComponent from './large-page-count';
+import {
+	NarrowIneligibleFiltersComponent,
+	NarrowMediaComponent,
+	NarrowPatternsComponent,
+} from './narrow-panels';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -351,4 +356,48 @@ export const LargePageCount = {
 				'Number of items the dataset reports. At 20 per page, the default makes 72,652 pages',
 		},
 	},
+};
+
+const narrowPanelArgTypes = {
+	containerHeight: {
+		control: false,
+		table: {
+			disable: true,
+		},
+	},
+};
+
+/**
+ * A narrow, single-purpose panel such as the Patterns tab of the block
+ * inserter, composed from `DataViews.Search`, `DataViews.ViewMenu` and
+ * `DataViews.FilterTabs`. The pattern categories are the main way to browse,
+ * so they are tabs; the secondary filters live in the menu behind the settings
+ * button.
+ */
+export const NarrowPatterns = {
+	name: 'Narrow · Patterns',
+	render: NarrowPatternsComponent,
+	argTypes: narrowPanelArgTypes,
+};
+
+/**
+ * A narrow, single-purpose panel such as the Media tab of the block inserter.
+ * The media type is shown as tabs with no "All" tab, and the menu holds the
+ * source and the sorting.
+ */
+export const NarrowMedia = {
+	name: 'Narrow · Media',
+	render: NarrowMediaComponent,
+	argTypes: narrowPanelArgTypes,
+};
+
+/**
+ * `DataViews.ViewMenu` only holds what works as menu items: filters with a
+ * short, fixed list of choices where one value is chosen at a time. Long lists,
+ * dates, multiple choice and choices loaded on demand are left out of the menu.
+ */
+export const NarrowIneligibleFilters = {
+	name: 'Narrow · Ineligible filters',
+	render: NarrowIneligibleFiltersComponent,
+	argTypes: narrowPanelArgTypes,
 };

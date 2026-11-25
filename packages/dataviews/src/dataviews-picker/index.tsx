@@ -17,6 +17,7 @@ import {
 	FiltersToggle,
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
+import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
 import {
 	DataViewsPickerFooter,
 	DataViewsPickerBulkActionToolbar,
@@ -32,6 +33,7 @@ import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
+import DataViewsViewMenu from '../components/dataviews-view-menu';
 import normalizeFields from '../field-types';
 import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
@@ -381,6 +383,7 @@ const DataViewsPickerSubComponents =
 		BulkActionToolbar: typeof DataViewsPickerBulkActionToolbar;
 		Footer: typeof DataViewsPickerFooter;
 		Filters: typeof Filters;
+		FilterTabs: typeof DataViewsFilterTabs;
 		FiltersToggled: typeof FiltersToggled;
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
@@ -390,6 +393,7 @@ const DataViewsPickerSubComponents =
 		Pagination: typeof DataViewsPagination;
 		Search: typeof DataViewsSearch;
 		ViewConfig: typeof DataviewsViewConfigDropdown;
+		ViewMenu: typeof DataViewsViewMenu;
 	};
 
 DataViewsPickerSubComponents.Actions = PickerActions;
@@ -397,6 +401,7 @@ DataViewsPickerSubComponents.BulkActionToolbar =
 	DataViewsPickerBulkActionToolbar;
 DataViewsPickerSubComponents.Footer = DataViewsPickerFooter;
 DataViewsPickerSubComponents.Filters = Filters;
+DataViewsPickerSubComponents.FilterTabs = DataViewsFilterTabs;
 DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
@@ -406,5 +411,6 @@ DataViewsPickerSubComponents.PageSelect = DataViewsPageSelect;
 DataViewsPickerSubComponents.Pagination = DataViewsPagination;
 DataViewsPickerSubComponents.Search = DataViewsSearch;
 DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsPickerSubComponents.ViewMenu = DataViewsViewMenu;
 
 export default DataViewsPickerSubComponents;

@@ -15,3 +15,71 @@
 	border-radius: 8px;
 	padding: 24px;
 }
+
+/* Narrow panels: a frame the width of a sidebar such as the block inserter. */
+.narrow-panel {
+	width: 350px;
+	height: 600px;
+	display: flex;
+	flex-direction: column;
+	overflow: auto;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.narrow-panel-note {
+	max-width: 350px;
+	margin: 0;
+}
+
+/* The same gutter the DataViews layouts use, so the rows line up. */
+.narrow-panel-row {
+	flex-shrink: 0;
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-sm);
+}
+
+.narrow-panel-row > :first-child {
+	flex: 1;
+	min-width: 0;
+}
+
+.narrow-panel-footer {
+	flex-shrink: 0;
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+/* A stand-in for a pattern preview: a line of text above a block. */
+.narrow-panel-pattern {
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-sm);
+	padding: var(--wpds-dimension-padding-md);
+	background: var(--wpds-color-background-surface-neutral-weak);
+}
+
+.narrow-panel-pattern span {
+	background: var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.narrow-panel-pattern span:first-child {
+	width: 60%;
+	height: 6px;
+	background: var(--wpds-color-stroke-surface-neutral);
+}
+
+.narrow-panel-pattern span:last-child {
+	flex: 1;
+}
+
+/* A stand-in for a media thumbnail. */
+.narrow-panel-media {
+	width: 100%;
+	aspect-ratio: 1;
+}
+
+.narrow-panel-footer > button {
+	justify-content: center;
+}
