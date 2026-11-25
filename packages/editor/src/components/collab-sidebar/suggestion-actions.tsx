@@ -101,7 +101,7 @@ function isPostFieldStillProposed( op: any, value: unknown ): boolean {
  *   suggestion is still there; Accept and Reject, with a hint.
  * - `unsaved`: decided here, waiting for the post to be saved.
  * - `stuck`: final, yet the post still carries the suggestion (left by an
- *   editor from before decisions were saved with the post); Apply again,
+ *   editor from before decisions were saved with the post); Accept again,
  *   Reject again and Reopen.
  * - `resolved`: final, and the post reflects it.
  * - `outdated`: someone else's save removed the suggestion before anyone
@@ -477,14 +477,14 @@ export function SuggestionActionButtons( {
 					isOpen
 					onConfirm={ confirmStaleApply }
 					onCancel={ dismissStaleDialog }
-					confirmButtonText={ __( 'Apply anyway' ) }
+					confirmButtonText={ __( 'Accept anyway' ) }
 				>
 					{ decision.isPostSuggestion
 						? __(
-								'This post setting has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+								'This post setting has changed since the suggestion was made. Accepting it will overwrite the newer edit. Continue?'
 							)
 						: __(
-								'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+								'This block has changed since the suggestion was made. Accepting it will overwrite the newer edit. Continue?'
 							) }
 				</ConfirmDialog>
 			) }
@@ -724,7 +724,7 @@ export default function SuggestionActions( {
 		applyDisabledReason,
 	} = decision;
 	const decisionLabel =
-		decision.decision === REJECTED ? __( 'Rejected' ) : __( 'Applied' );
+		decision.decision === REJECTED ? __( 'Rejected' ) : __( 'Accepted' );
 
 	let status: string | null = null;
 	let hint: string | null = null;
@@ -737,7 +737,7 @@ export default function SuggestionActions( {
 		status =
 			decision.decision === REJECTED
 				? __( 'Rejected, but the suggestion is still in the post.' )
-				: __( 'Applied, but the change is not in the post.' );
+				: __( 'Accepted, but the change is not in the post.' );
 	} else if ( presentation === 'resolved' ) {
 		status = decisionLabel;
 	} else if ( presentation === 'outdated' ) {
@@ -833,7 +833,7 @@ export default function SuggestionActions( {
 								accessibleWhenDisabled
 								onClick={ decision.onApplyClick }
 							>
-								{ __( 'Apply again' ) }
+								{ __( 'Accept again' ) }
 							</Button>
 							<Button
 								variant="secondary"

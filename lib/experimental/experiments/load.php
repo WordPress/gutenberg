@@ -76,7 +76,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-suggestion-mode',
 					'label'       => __( 'Suggestion Mode', 'gutenberg' ),
-					'description' => __( 'Enables Suggestion mode. In Suggestion mode, edits are captured as proposed changes (inline and structural) that the author can apply or reject, similar to suggesting changes in a document.', 'gutenberg' ),
+					'description' => __( 'Enables Suggestion mode. In Suggestion mode, edits are captured as proposed changes (inline and structural) that the author can accept or reject, similar to suggesting changes in a document.', 'gutenberg' ),
 				),
 			),
 		),

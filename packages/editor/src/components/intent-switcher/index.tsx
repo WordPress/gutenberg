@@ -68,7 +68,7 @@ const INTENTS: Array< {
 	{
 		value: EDITOR_INTENT_SUGGEST,
 		label: __( 'Suggesting' ),
-		info: __( 'Propose changes the author can apply or reject.' ),
+		info: __( 'Propose changes the author can accept or reject.' ),
 		shortcut: intentShortcut( 'x' ),
 	},
 ];

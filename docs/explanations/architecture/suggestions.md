@@ -201,7 +201,7 @@ sequenceDiagram
 
     A->>P: Accept or Reject in the notes sidebar
     opt Attribute changed since capture
-        P-->>A: Confirm "Apply anyway?"
+        P-->>A: Confirm "Accept anyway?"
     end
     P->>R: PUT provisional status
     P->>B: Apply the operations
@@ -668,7 +668,7 @@ stateDiagram-v2
   P --> O: post saved without the anchor, by someone else
   P --> T: own anchor withdrawn (note collector)
   T --> P: redo brings the anchor back
-  A --> AU: Apply again
+  A --> AU: Accept again
   R --> RU: Reject again
   A --> P: Reopen
   R --> P: Reopen
@@ -790,7 +790,7 @@ In the notes sidebar, a suggestion thread renders:
 | pending | no | Reject, with Accept disabled and "This suggestion is no longer in the post. Reject it to close the note." |
 | provisional | yes | Accept / Reject, and "{Name} accepted this suggestion, but the post was not saved." |
 | provisional | no | "Applied" (or "Rejected"), and "Save the post to keep this decision." |
-| `applied` / `rejected` | yes | "Applied, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Apply again, Reject again and Reopen |
+| `applied` / `rejected` | yes | "Accepted, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Accept again, Reject again and Reopen |
 | `applied` / `rejected` | no | "Applied" (or "Rejected") |
 | `outdated` | no | "No longer applies - the text was removed." (the block was removed, or the block changed, for block suggestions), with Reopen |
 

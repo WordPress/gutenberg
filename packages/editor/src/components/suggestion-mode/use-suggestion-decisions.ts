@@ -1145,7 +1145,7 @@ export function useSuggestionDecisions() {
 			decideGroup(
 				applyOneSuggestion,
 				args,
-				__( 'Suggestion applied.' )
+				__( 'Suggestion accepted.' )
 			),
 		[ decideGroup, applyOneSuggestion ]
 	);

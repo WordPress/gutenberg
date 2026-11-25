@@ -240,7 +240,7 @@ describe( 'SuggestionActions states', () => {
 		expect( button( 'Reject suggestion' ) ).not.toHaveAttribute(
 			'aria-disabled'
 		);
-		expect( button( 'Apply again' ) ).toBeNull();
+		expect( button( 'Accept again' ) ).toBeNull();
 
 		fireEvent.click( button( 'Accept suggestion' )! );
 		expect( decisions.applySuggestion ).not.toHaveBeenCalled();
@@ -275,7 +275,7 @@ describe( 'SuggestionActions states', () => {
 	it( 'decided but not saved, anchor absent: asks for a save, no buttons', async () => {
 		await setup( { status: 'applied-unsaved', anchored: false } );
 
-		expect( screen.getByText( 'Applied' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Accepted' ) ).toBeInTheDocument();
 		expect(
 			screen.getByText( 'Save the post to keep this decision.' )
 		).toBeInTheDocument();
@@ -283,7 +283,7 @@ describe( 'SuggestionActions states', () => {
 		expect( button( 'Reject suggestion' ) ).toBeNull();
 	} );
 
-	it( 'final, anchor present: Apply again, Reject again and Reopen', async () => {
+	it( 'final, anchor present: Accept again, Reject again and Reopen', async () => {
 		const { onReopen } = await setup( {
 			status: 'applied',
 			commentStatus: 'approved',
@@ -291,11 +291,11 @@ describe( 'SuggestionActions states', () => {
 		} );
 
 		expect(
-			screen.getByText( 'Applied, but the change is not in the post.' )
+			screen.getByText( 'Accepted, but the change is not in the post.' )
 		).toBeInTheDocument();
 		expect( button( 'Accept suggestion' ) ).toBeNull();
 
-		fireEvent.click( button( 'Apply again' )! );
+		fireEvent.click( button( 'Accept again' )! );
 		expect( decisions.applySuggestion ).toHaveBeenCalledWith(
 			expect.objectContaining( { commentId: NOTE_ID } )
 		);
@@ -338,8 +338,8 @@ describe( 'SuggestionActions states', () => {
 			anchored: false,
 		} );
 
-		expect( screen.getByText( 'Applied' ) ).toBeInTheDocument();
-		expect( button( 'Apply again' ) ).toBeNull();
+		expect( screen.getByText( 'Accepted' ) ).toBeInTheDocument();
+		expect( button( 'Accept again' ) ).toBeNull();
 		expect( button( 'Reopen' ) ).toBeNull();
 		expect( button( 'Accept suggestion' ) ).toBeNull();
 	} );

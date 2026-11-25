@@ -244,7 +244,7 @@ sequenceDiagram
     Au->>SB: Accept on a suggestion card
     SB->>P: applySuggestion
     alt Targeted attribute changed since capture
-        P-->>Au: Confirm "Apply anyway?"
+        P-->>Au: Confirm "Accept anyway?"
     end
     P->>API: PUT _wp_suggestion_status = applied-unsaved (comment stays on hold)
     P->>I: requestInterceptorBypass for this block
