@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   List: Disable indent and outdent for non-contiguous selections or selections spanning different lists.
+-   List: Disable indent and outdent for non-contiguous selections or selections spanning different lists ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 
 ### Bug Fixes
 

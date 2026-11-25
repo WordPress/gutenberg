@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Handle non-contiguous selections when creating patterns.
+-   Handle non-contiguous selections when creating patterns ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 
 ### Bug Fixes
 

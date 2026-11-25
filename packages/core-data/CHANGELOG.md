@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Real-time collaboration: Preserve non-contiguous block selections through undo and redo and share them with other users.
+-   Real-time collaboration: Preserve non-contiguous block selections through undo and redo and share them with other users ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 
 ### Bug Fixes
 

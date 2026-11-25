@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `focus.focusable.isFocusable()` to check whether an individual element is focusable.
+-   Add `focus.focusable.isFocusable()` to check whether an individual element is focusable ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 
 ## 5.2.0 (2026-11-18)
 

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Real-time collaboration: Highlight each selected block, or its nearest visible parent when hidden inside collapsed content.
+-   Real-time collaboration: Highlight each selected block, or its nearest visible parent when hidden inside collapsed content ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 
 ### Bug Fixes
 
