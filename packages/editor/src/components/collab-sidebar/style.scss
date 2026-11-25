@@ -11,8 +11,7 @@
 		padding: $grid-unit-10;
 
 		.editor-collab-sidebar-panel__deleted-block-notice,
-		.editor-collab-sidebar-panel__more-reply-separator,
-		.editor-collab-sidebar-panel__note ~ .editor-collab-sidebar-panel__note,
+		.editor-collab-sidebar-panel__thread-content,
 		.editor-collab-sidebar-panel__note > :not(:first-child),
 		.editor-collab-sidebar-panel__note-actions {
 			display: none;
@@ -22,8 +21,13 @@
 			white-space: nowrap;
 		}
 
+		// Not `display: none`: the author and date name the thread's toggle.
 		&:not(:hover, :focus-within) .editor-collab-sidebar-panel__user-info {
-			display: none;
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
 		}
 	}
 }
@@ -96,11 +100,6 @@
 		z-index: 1;
 	}
 
-	&:focus {
-		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
-	}
-
 	&.is-floating {
 		left: $grid-unit-20;
 		right: $grid-unit-20;
@@ -121,6 +120,18 @@
 			transition: top var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
 		}
 	}
+}
+
+// A thread only holds focus itself after a click, which needs no ring.
+.editor-collab-sidebar-panel__add-note:focus,
+.editor-collab-sidebar-panel__thread:has(.editor-collab-sidebar-panel__thread-toggle:focus-visible) {
+	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+}
+
+// Clicking anywhere on a collapsed thread expands it.
+.editor-collab-sidebar-panel__thread:not(.is-selected) {
+	cursor: var(--wpds-cursor-control);
 }
 
 .editor-collab-sidebar-panel__user-info {
@@ -253,6 +264,31 @@
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
+}
+
+// The root note's byline, as a button. The thread draws its focus ring.
+.editor-collab-sidebar-panel__thread-toggle {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-md);
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-align: start;
+	cursor: var(--wpds-cursor-control);
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.editor-collab-sidebar-panel__thread-content {
+	display: contents;
 }
 
 // Visually hidden until focused (skip link pattern)

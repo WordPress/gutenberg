@@ -160,19 +160,19 @@ export function Notes( {
 		}
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
-		const isSelfTarget = event.currentTarget === event.target;
+		// The thread's disclosure toggle, or the thread itself after a click
+		// on its text. Enter and Space are the toggle's own clicks.
+		const isSelfTarget =
+			event.target === event.currentTarget ||
+			event.target.classList.contains(
+				'editor-collab-sidebar-panel__thread-toggle'
+			);
 
-		if (
-			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
-			isSelfTarget &&
-			! isSelected
-		) {
+		if ( event.key === 'ArrowRight' && isSelfTarget && ! isSelected ) {
 			// Expand thread.
 			pickNote( thread.id, thread.blockClientId );
 		} else if (
-			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
-				isSelfTarget &&
-				isSelected ) ||
+			( event.key === 'ArrowLeft' && isSelfTarget && isSelected ) ||
 			event.key === 'Escape'
 		) {
 			// Collapse thread.
@@ -228,9 +228,14 @@ export function Notes( {
 					{ __( 'No notes found.' ) }
 				</Text>
 			) }
+			{ /*
+			 * A list rather than a tree: tree roles put screen readers into
+			 * focus mode, which hands the arrow keys to the widget instead of
+			 * leaving them free to read the note text.
+			 */ }
 			<Stack
 				className="editor-collab-sidebar-panel"
-				role="tree"
+				role="list"
 				direction="column"
 				gap="md"
 				justify="flex-start"
@@ -260,6 +265,7 @@ export function Notes( {
 								justify="center"
 								gap="sm"
 								className="editor-collab-sidebar-panel__status-separator"
+								role="listitem"
 							>
 								<Text variant="heading-sm" render={ <p /> }>
 									{ __( 'Resolved' ) }

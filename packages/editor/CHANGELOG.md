@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Notes sidebar: Expose the note threads as a list instead of a tree, so screen readers can read a note's text with their usual reading keys ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 
