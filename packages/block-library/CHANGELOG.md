@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
 -   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
@@ -14,6 +15,7 @@
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
 -   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
+-   Gallery: In a multiselection, hide the settings that only apply to the first gallery, such as Link, Detach, Source, Order by, Resolution, Open images in new tab, and Aspect ratio ([#87374](https://github.com/WordPress/gutenberg/pull/87374)).
 -   Navigation: Give imported classic menus unique names when the same menu is imported more than once ([#85443](https://github.com/WordPress/gutenberg/pull/85443)).
 
 ### Internal
