@@ -8,48 +8,44 @@ import * as KnobStories from './index.story';
 
 # Knob
 
-Use a knob when the position of a dial helps someone choose a number, such as the direction of a gradient. Click or tap to choose a nearby step, or drag around the center to keep turning. For precise entry, a numeric field can share the same controlled value.
+`Knob` is a dial for choosing an angle. It is internal to `@wordpress/ui` and is not exported. Use it to build a control that pairs the dial with an input, where the input shows the exact number and the dial shows the direction.
+
+Do not use a knob on its own. A small dial is hard to set to an exact value, so there must always be an input beside it that edits the same value.
 
 ## Choose the range
 
-By default, the dial spans 0 to 100 with a gap between its end stops. Use `min`, `max`, and a positive `step` to set the selectable values. The steps start at `min`. If the range does not divide evenly, the last selectable value is the last step at or below `max`. A step larger than the whole range selects between its two endpoints.
+Without `min` and `max`, the dial covers one turn and wraps. Zero points up, 90 points right, and one step past 359 returns to 0. Use this for a direction, such as a gradient angle.
 
-Set `wrap` when the first value follows the last. For whole degrees, use `min={ 0 }`, `max={ 359 }`, and `step={ 1 }`. Zero points up and 90 points right. Both endpoints are selectable, so each direction has one value.
+<Canvas of={ KnobStories.Default } />
 
-<Canvas of={ KnobStories.BoundedAndWrapping } />
+Set `min` and `max` together when the number of turns matters. The dial stops at both ends and counts the turns in between. With −720 to 720, the dial can turn twice in either direction from zero. A click picks the heading on the turn nearest the current value, so clicking three o'clock from 390° selects 450°. A drag keeps counting when it passes twelve o'clock.
 
-## Count turns
+<Canvas of={ KnobStories.Bounded } />
 
-Set `unitsPerTurn` when dial positions have a physical meaning. The dot shows the heading on a full circle. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. A positional tap picks the closest heading among selectable steps within one turn of the current value in either direction. When two values point the same way, the nearer value wins. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
+`unitsPerTurn` sets how many units make a full turn. It defaults to 360 for degrees. Use 400 for gradians, 1 for turns, and `2 * Math.PI` for radians. Set `step` to the smallest change the value should take. Steps count from `min`, so choose a `min` that is a whole number of steps away from zero.
 
-`min` and `max` bound the total value. Add `wrap` to repeat that range indefinitely. For a seamless loop, include one step per position. With whole degrees, use 0 to 359 for one turn or 0 to 719 for two turns before the value returns to zero.
+<Canvas of={ KnobStories.WithUnits } />
 
-The range can end partway through a turn. With 0 to 500 and 360 units per turn, 500 points 140° clockwise from the top. A bounded dial stops there. On a wrapping dial, the next step returns to zero at the top. Clicking six o’clock from 500 selects 180, the only available value at that position. Omit `unitsPerTurn` to fit all 501 values around one continuous loop.
+## Pair it with an input
 
-<Canvas of={ KnobStories.PartialTurns } />
+The input owns the value. It decides which numbers it accepts and what gets saved. The dial reads that value and reports changes with `onValueChange`.
 
-For values measured in turns, use `unitsPerTurn={ 1 }`. A step of 0.25 allows quarter turns. If one step spans an entire turn or more, tap the left half to subtract a step or the right half to add one. The same gesture applies to half-turn steps when several values share the two headings. Dragging still follows the physical scale. Include a visible value and describe the tap gesture in these cases.
-
-<Canvas of={ KnobStories.WholeTurns } />
-
-## Label the dial
-
-Give a standalone knob the name of its setting, such as “Gradient angle”. Place it in `Field.Root` with a visible `Field.Label`. Add `Field.Description` when the setting needs an explanation. Outside a field, use `aria-labelledby` to reference visible label text, or supply an `aria-label`. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText` for values with custom names.
-
-Pass `value` and `onValueChange` to keep a readout or another control in sync. For an uncontrolled dial, pass `defaultValue`. To restore a form’s defaults with a Reset button, control the value and restore it in the form’s `onReset` handler. The `ref` points to the outer element. Use `inputRef` to focus the range input.
-
-<Canvas of={ KnobStories.WithField } />
-
-### Next to a number input
-
-When the dial offers another way to edit the same value, give each focusable control its own name. In the example below, the visible label “Rotation (degrees)” names the number field. The compact dial uses `aria-label="Rotation (degrees) dial"` so its name starts with the visible setting and distinguishes it from the number field. Both controls stay in the Tab order.
-
-Use `aria-describedby` to associate each control with its own instructions. The dial's description explains that it adjusts the same rotation. The number field's description explains how to clear an override and restore the inherited value. Clearing this field restores 45°. Entering zero sets an explicit 0°.
+A wrapping dial shows a value outside one turn at the same heading. The field below can hold 450 while the dial points where 90 does. A bounded dial shows a value outside its range at the nearest end. The dial never calls `onValueChange` to correct a value it was given. Give `name` to the input only, so the form submits the number the user sees.
 
 <Canvas of={ KnobStories.WithNumberInput } />
 
-Use a separate `Field.Root` for each control that needs a `Field.Label`. When several inputs need a shared context, such as X and Y under “Rotation”, put them in a `Fieldset.Root` with a `Fieldset.Legend` and keep an individual label for each input. [WAI guidance on grouping form controls](https://www.w3.org/WAI/tutorials/forms/grouping/)
+### Label both controls
+
+Both controls stay in the Tab order, so each needs its own name. Let the visible label name the input. Give the dial an `aria-label` that starts with the same words, such as “Rotation dial”. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText`.
+
+### Show an unset value
+
+Pass `value={ null }` when no angle is set. The dial draws a hollow dot at `placeholder`, which is where an inherited or default angle goes. Turning the dial from there sets a value. Clicking the heading it already points to sets that value too.
+
+A slider always has a number, so assistive technology reads the placeholder as the dial's value. The input is where an unset value shows as empty. `undefined` does not mean unset. It makes the dial uncontrolled, starting from `defaultValue`.
+
+<Canvas of={ KnobStories.WithInheritedValue } />
 
 ## Keyboard interaction
 
-Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10 units. The dial rounds this increment to the nearest whole number of steps, with a minimum of one step. Home and End go straight to the first and last selectable values.
+Tab focuses the dial. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to ten steps. Home and End go to the first and last selectable values. A wrapping dial continues past either end.

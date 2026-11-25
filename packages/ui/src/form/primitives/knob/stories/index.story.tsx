@@ -4,46 +4,56 @@ import { useId, useState } from '@wordpress/element';
 import { Stack } from '../../../../stack';
 import { Text } from '../../../../text';
 import { InputControl } from '../../../input-control';
-import * as Field from '../../field';
+import { SelectControl } from '../../../select-control';
+import { InputLayout } from '../../input-layout';
 import { Knob } from '../index';
-import { getStepRange } from '../dial';
-import type { KnobProps } from '../types';
 
 const meta: Meta< typeof Knob > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/Knob',
 	id: 'design-system-components-form-primitives-knob',
 	component: Knob,
-	parameters: {
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'API and design may change.',
-		},
-	},
 	argTypes: {
 		onValueChange: { action: 'onValueChange' },
+		value: { control: false },
 	},
 };
 export default meta;
 
 type Story = StoryObj< typeof Knob >;
 
+const DEGREES = {
+	style: 'unit',
+	unit: 'degree',
+	unitDisplay: 'long',
+} as const;
+
+/** Without `min` and `max`, the dial covers one turn and wraps from 359° to 0°. */
 export const Default: Story = {
 	args: {
-		'aria-label': 'Opacity',
-		defaultValue: 65,
-		format: { style: 'unit', unit: 'percent' },
+		'aria-label': 'Gradient angle',
+		defaultValue: 45,
+		format: DEGREES,
 	},
 };
 
-/** A full turn contains 360 distinct whole-degree values, including zero. */
-export const Wrapping: Story = {
+/** With `min` and `max`, the dial stops at both ends and counts the turns in between. */
+export const Bounded: Story = {
 	args: {
-		'aria-label': 'Gradient angle',
-		max: 359,
-		wrap: true,
-		defaultValue: 315,
-		format: { style: 'unit', unit: 'degree', unitDisplay: 'long' },
+		'aria-label': 'Rotation',
+		min: -720,
+		max: 720,
+		defaultValue: 0,
+		format: DEGREES,
+	},
+};
+
+/** A hollow dot marks a heading that is shown but not set, such as an inherited angle. */
+export const Empty: Story = {
+	args: {
+		'aria-label': 'Rotation',
+		value: null,
+		placeholder: 45,
+		format: DEGREES,
 	},
 };
 
@@ -51,173 +61,77 @@ export const Disabled: Story = {
 	args: { ...Default.args, disabled: true },
 };
 
-function RangeExample( {
-	label,
-	description,
-	unit,
-	name,
-	defaultValue = 0,
-	onValueChange,
-	...props
-}: KnobProps & { label: string; description: string; unit?: string } ) {
-	const [ requestedValue, setValue ] = useState( defaultValue );
-	const value = getStepRange( props.min, props.max, props.step ).snap(
-		requestedValue
-	);
-	return (
-		<Field.Root name={ name }>
-			<Field.Label>{ label }</Field.Label>
-			<Stack gap="sm" align="center">
+/**
+ * The number field keeps the value. The dial points to the same heading and
+ * wraps it onto one turn, so 450 points where 90 does.
+ */
+export const WithNumberInput: Story = {
+	args: { format: DEGREES },
+	render: function GradientAngle( { onValueChange, ...args } ) {
+		const [ angle, setAngle ] = useState( 135 );
+		const [ draft, setDraft ] = useState< string >();
+		return (
+			<Stack direction="row" gap="sm" align="flex-end">
+				<InputControl
+					label="Gradient angle"
+					type="number"
+					suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
+					disabled={ args.disabled }
+					value={ draft ?? angle }
+					onChange={ ( { currentTarget } ) => {
+						setDraft( currentTarget.value );
+						if ( currentTarget.value !== '' ) {
+							setAngle( currentTarget.valueAsNumber );
+						}
+					} }
+					onBlur={ () => setDraft( undefined ) }
+				/>
 				<Knob
-					{ ...props }
-					value={ value }
+					{ ...args }
+					aria-label="Gradient angle dial"
+					value={ angle }
 					onValueChange={ ( next ) => {
-						setValue( next );
+						setAngle( next );
 						onValueChange?.( next );
 					} }
-				/>
-				<Text aria-hidden="true">
-					{ value }
-					{ unit }
-				</Text>
-			</Stack>
-			<Field.Description>{ description }</Field.Description>
-		</Field.Root>
-	);
-}
-
-/** Field supplies the dial's accessible name and description. The visible readout shares its controlled value. */
-export const WithField: Story = {
-	args: {
-		name: 'angle',
-		max: 359,
-		wrap: true,
-		defaultValue: 45,
-		format: { style: 'unit', unit: 'degree', unitDisplay: 'long' },
-	},
-	render: ( args ) => (
-		<RangeExample
-			{ ...args }
-			label="Gradient angle"
-			description="Choose the direction of the gradient."
-			unit="°"
-		/>
-	),
-};
-
-/** Compare a bounded amount with a wrapping angle at the same dial position. */
-export const BoundedAndWrapping: Story = {
-	parameters: { controls: { disable: true } },
-	render: () => (
-		<Stack direction="row" gap="xl" wrap="wrap">
-			<RangeExample
-				label="Opacity"
-				description="Stops at 0% and 100%."
-				defaultValue={ 50 }
-				unit="%"
-				format={ { style: 'unit', unit: 'percent' } }
-			/>
-			<RangeExample
-				label="Gradient angle"
-				description="Wraps from 359° to 0°."
-				max={ 359 }
-				wrap
-				unit="°"
-				format={ {
-					style: 'unit',
-					unit: 'degree',
-					unitDisplay: 'long',
-				} }
-			/>
-		</Stack>
-	),
-};
-
-/** Compare three ways to map the same 0–500 range onto a dial. */
-export const PartialTurns: Story = {
-	parameters: { controls: { disable: true } },
-	render: () => {
-		const range = { min: 0, max: 500, defaultValue: 500 };
-		return (
-			<Stack direction="column" gap="lg">
-				<RangeExample
-					{ ...range }
-					label="Bounded, 360 units per turn"
-					description="The dial stops at 500, partway through the second turn."
-					unitsPerTurn={ 360 }
-				/>
-				<RangeExample
-					{ ...range }
-					label="Wrapping, 360 units per turn"
-					description="One step past 500 returns to zero at twelve o’clock."
-					unitsPerTurn={ 360 }
-					wrap
-				/>
-				<RangeExample
-					{ ...range }
-					label="Wrapping, one turn for the full range"
-					description="All 501 steps share one turn. The last step sits beside zero."
-					wrap
 				/>
 			</Stack>
 		);
 	},
 };
 
-/** Each step is an entire revolution. A readout distinguishes identical headings. */
-export const WholeTurns: Story = {
-	parameters: { controls: { disable: true } },
-	render: () => (
-		<RangeExample
-			min={ -2 }
-			max={ 2 }
-			unitsPerTurn={ 1 }
-			defaultValue={ 0 }
-			label="Rotation (whole turns)"
-			description="Tap the left half to subtract a turn or the right half to add one. Drag a full circle to change by one turn."
-		/>
-	),
-};
-
-/** The number field and dial edit the same rotation. Each has its own accessible name and instructions. */
-export const WithNumberInput: Story = {
-	args: {
-		min: -720,
-		max: 720,
-		unitsPerTurn: 360,
-		defaultValue: 0,
-		format: { style: 'unit', unit: 'degree', unitDisplay: 'long' },
-	},
-	render: function RotationField( { defaultValue, onValueChange, ...args } ) {
+/**
+ * An unset rotation shows the inherited angle as the field's placeholder and
+ * as a hollow dot on the dial. Clearing the field restores it. Entering zero
+ * sets an explicit 0°.
+ */
+export const WithInheritedValue: Story = {
+	args: { min: -720, max: 720, format: DEGREES },
+	render: function Rotation( { onValueChange, ...args } ) {
+		const inherited = 45;
 		const numberHelpId = useId();
 		const dialHelpId = useId();
-		const range = getStepRange( args.min, args.max, args.step );
-		const inheritedRotation = range.snap( 45 );
-		const [ requestedRotation, setRotation ] = useState( defaultValue );
-		const rotation =
-			requestedRotation === undefined
-				? undefined
-				: range.snap( requestedRotation );
+		const [ rotation, setRotation ] = useState< number | null >( null );
 		const [ draft, setDraft ] = useState< string >();
 		return (
 			<Stack direction="column" gap="sm">
 				<Stack direction="row" gap="sm" align="flex-end">
 					<InputControl
-						label="Rotation (degrees)"
+						label="Rotation"
 						type="number"
-						min={ args.min ?? 0 }
-						max={ range.toValue( range.lastStep ) }
-						step={ range.step }
+						suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
+						min={ args.min }
+						max={ args.max }
 						disabled={ args.disabled }
 						aria-describedby={ numberHelpId }
-						placeholder={ String( inheritedRotation ) }
+						placeholder={ String( inherited ) }
 						value={ draft ?? rotation ?? '' }
 						onChange={ ( { currentTarget } ) => {
 							setDraft( currentTarget.value );
 							if ( currentTarget.validity.valid ) {
 								setRotation(
 									currentTarget.value === ''
-										? undefined
+										? null
 										: currentTarget.valueAsNumber
 								);
 							}
@@ -226,9 +140,10 @@ export const WithNumberInput: Story = {
 					/>
 					<Knob
 						{ ...args }
-						aria-label="Rotation (degrees) dial"
+						aria-label="Rotation dial"
 						aria-describedby={ dialHelpId }
-						value={ rotation ?? inheritedRotation }
+						value={ rotation }
+						placeholder={ inherited }
 						onValueChange={ ( next ) => {
 							setRotation( next );
 							onValueChange?.( next );
@@ -240,25 +155,95 @@ export const WithNumberInput: Story = {
 						The dial adjusts the same rotation as the number field.
 					</span>{ ' ' }
 					<span id={ numberHelpId }>
-						Clear the field to use the inherited{ ' ' }
-						{ inheritedRotation }°.
+						Clear the field to use the inherited { inherited }°.
 					</span>
 				</Text>
 			</Stack>
 		);
 	},
 	play: async ( { canvas } ) => {
-		const number = canvas.getByRole( 'spinbutton', {
-			name: 'Rotation (degrees)',
-		} );
-		const dial = canvas.getByRole( 'slider', {
-			name: 'Rotation (degrees) dial',
-		} );
+		const number = canvas.getByRole( 'spinbutton', { name: 'Rotation' } );
+		const dial = canvas.getByRole( 'slider', { name: 'Rotation dial' } );
 		await expect( number ).toHaveAccessibleDescription(
 			/^Clear the field to use the inherited/
 		);
 		await expect( dial ).toHaveAccessibleDescription(
 			'The dial adjusts the same rotation as the number field.'
+		);
+	},
+};
+
+const UNITS = [
+	{ value: 'deg', label: 'deg', unitsPerTurn: 360, step: 1 },
+	{ value: 'grad', label: 'grad', unitsPerTurn: 400, step: 1 },
+	{ value: 'rad', label: 'rad', unitsPerTurn: 2 * Math.PI, step: 0.01 },
+	{ value: 'turn', label: 'turn', unitsPerTurn: 1, step: 0.01 },
+];
+
+/**
+ * `unitsPerTurn` sets how many units make a full turn, so the dial needs no
+ * unit of its own. A quarter turn clockwise reads 90 in degrees, 100 in
+ * gradians, 1.57 in radians, and 0.25 in turns.
+ */
+export const WithUnits: Story = {
+	parameters: { controls: { disable: true } },
+	render: function RotationWithUnits() {
+		const [ unit, setUnit ] = useState( UNITS[ 0 ] );
+		const [ rotation, setRotation ] = useState( 90 );
+		const [ draft, setDraft ] = useState< string >();
+		// Two turns either way, rounded down to a whole number of steps so that
+		// zero stays selectable.
+		const limit = Number(
+			(
+				Math.floor( ( 2 * unit.unitsPerTurn ) / unit.step ) * unit.step
+			).toFixed( 2 )
+		);
+		return (
+			<Stack direction="row" gap="sm" align="flex-end">
+				<InputControl
+					label="Rotation"
+					type="number"
+					step={ unit.step }
+					value={ draft ?? rotation }
+					onChange={ ( { currentTarget } ) => {
+						setDraft( currentTarget.value );
+						if ( currentTarget.value !== '' ) {
+							setRotation( currentTarget.valueAsNumber );
+						}
+					} }
+					onBlur={ () => setDraft( undefined ) }
+				/>
+				<SelectControl
+					label="Unit"
+					items={ UNITS }
+					value={ unit }
+					onValueChange={ ( next ) => {
+						const nextUnit =
+							UNITS.find(
+								( item ) => item.value === next?.value
+							) ?? unit;
+						const turns = rotation / unit.unitsPerTurn;
+						setUnit( nextUnit );
+						setRotation(
+							Number(
+								( turns * nextUnit.unitsPerTurn ).toFixed( 2 )
+							)
+						);
+					} }
+				/>
+				<Knob
+					aria-label="Rotation dial"
+					min={ -limit }
+					max={ limit }
+					step={ unit.step }
+					unitsPerTurn={ unit.unitsPerTurn }
+					getAriaValueText={ ( formatted ) =>
+						`${ formatted } ${ unit.label }`
+					}
+					value={ rotation }
+					onValueChange={ setRotation }
+				/>
+			</Stack>
 		);
 	},
 };
