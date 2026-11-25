@@ -34,6 +34,30 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		] );
 	} );
 
+	it.each( [
+		'foreground.interactive.brand',
+		'foreground.interactive.brand-active',
+	] )( 'reports %s text below 4.5:1 on neutral surfaces', ( token ) => {
+		const colorValues = new Map( [
+			[ `--wpds-color-${ token.replaceAll( '.', '-' ) }`, '#777' ],
+			[ '--wpds-color-background-surface-neutral', '#fff' ],
+		] );
+
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.neutral',
+				backgroundColor: '#fff',
+				foregroundToken: token,
+				foregroundColor: '#777',
+				requiredContrast: 4.5,
+				achievedContrast: expect.closeTo( 4.478, 3 ),
+			},
+		] );
+	} );
+
 	it( 'reports insufficient focus-ring contrast against brand surfaces', () => {
 		const colorValues = new Map( [
 			[ '--wpds-color-stroke-focus', '#fff' ],
