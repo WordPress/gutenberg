@@ -72,4 +72,28 @@ test.describe( 'Home preview', () => {
 		);
 		await expect( editButton ).toBeHidden();
 	} );
+
+	// The classic site editor has no equivalent of a route that names a post
+	// type but no post.
+	test( 'does not open the home page from a route that names only a post type', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			! isSiteEditorV2,
+			'Only the extensible site editor routes a canvas by post type alone.'
+		);
+
+		// With no menus, the navigation route names the post type but no post.
+		await requestUtils.deleteAllMenus();
+		await admin.visitSiteEditor( { postType: 'wp_navigation' } );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Add New' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Edit', exact: true } )
+		).toHaveCount( 0 );
+	} );
 } );

@@ -64,20 +64,23 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	 * should go anywhere at all: a trashed entity has to be restored before it
 	 * can be edited.
 	 *
-	 * A route that names no entity previews whatever the editor resolves the
-	 * site's home page to — a static front page or the template that shows
-	 * the front page — so clicking it edits that, resolved the same way the
-	 * editor does.
+	 * A route that names neither a post type nor a post previews whatever the
+	 * editor resolves the site's home page to — a static front page or the
+	 * template that shows the front page — so clicking it edits that, resolved
+	 * the same way the editor does. A route that names a post type but no post,
+	 * such as the navigation list of a site with no menus, previews nothing the
+	 * editor resolves, so there is nothing to edit.
 	 *
 	 * The records are the ones the editor loads for this canvas, so reading
 	 * them here costs no request of their own.
 	 */
+	const resolvesHomePage = ! canvas.postType && ! canvas.postId;
 	const { editLink, isTrashed } = useSelect(
 		( select ) => {
 			let postType: string | undefined = canvas.postType;
 			let postId: string | number | undefined = canvas.postId;
 
-			if ( ! hasEntity ) {
+			if ( resolvesHomePage ) {
 				if ( ! canvas.isPreview || ! isBlockTheme ) {
 					return { editLink: undefined, isTrashed: false };
 				}
@@ -109,7 +112,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 			canvas.postType,
 			canvas.postId,
 			canvas.isPreview,
-			hasEntity,
+			resolvesHomePage,
 			isBlockTheme,
 		]
 	);
