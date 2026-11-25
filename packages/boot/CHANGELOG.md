@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Open the home page for editing when the preview canvas of a route that names no entity, such as the home route, is clicked. Before, clicking it did nothing.
+-   Open the home page for editing when the preview canvas of a route that names no entity, such as the home route, is clicked. Before, clicking it did nothing ([#87409](https://github.com/WordPress/gutenberg/pull/87409)).
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 
 ## 0.27.0 (2026-11-18)
