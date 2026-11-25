@@ -27,41 +27,6 @@ const DEGREES = {
 	unitDisplay: 'long',
 } as const;
 
-/** Without `min` and `max`, the dial covers one turn and wraps from 359° to 0°. */
-export const Default: Story = {
-	args: {
-		'aria-label': 'Gradient angle',
-		defaultValue: 45,
-		format: DEGREES,
-	},
-};
-
-/** With `min` and `max`, the dial stops at both ends and counts the turns in between. */
-export const Bounded: Story = {
-	args: {
-		'aria-label': 'Rotation',
-		min: -720,
-		max: 720,
-		defaultValue: 0,
-		format: DEGREES,
-	},
-};
-
-/** A hollow dot marks a heading that is shown but not set, such as an inherited angle. */
-export const Empty: Story = {
-	args: {
-		'aria-label': 'Rotation',
-		value: null,
-		placeholder: 45,
-		format: DEGREES,
-		getAriaValueText: ( formatted ) => `${ formatted }, inherited`,
-	},
-};
-
-export const Disabled: Story = {
-	args: { ...Default.args, disabled: true },
-};
-
 /**
  * The number field keeps the value. The dial points to the same heading and
  * wraps it onto one turn, so 450 points where 90 does.
@@ -100,6 +65,11 @@ export const WithNumberInput: Story = {
 			</Stack>
 		);
 	},
+};
+
+export const Disabled: Story = {
+	...WithNumberInput,
+	args: { ...WithNumberInput.args, disabled: true },
 };
 
 /**
@@ -214,6 +184,8 @@ export const WithUnits: Story = {
 				<InputControl
 					label="Rotation"
 					type="number"
+					min={ -limit }
+					max={ limit }
 					step={ unit.step }
 					value={ draft ?? rotation }
 					onChange={ ( { currentTarget } ) => {

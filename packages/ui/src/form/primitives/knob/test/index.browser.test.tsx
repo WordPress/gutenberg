@@ -310,26 +310,16 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
 
-	it( 'stays visible and selectable when the range holds a single value', async () => {
-		const onValueChange = vi.fn();
+	it( 'stays visible when the range is too narrow for a second step', async () => {
 		await render(
 			<ThemeProvider isRoot>
-				<Knob
-					aria-label="Rotation"
-					min={ 0 }
-					max={ 0.5 }
-					value={ null }
-					onValueChange={ onValueChange }
-				/>
+				<Knob aria-label="Rotation" min={ 0 } max={ 0.5 } />
 			</ThemeProvider>
 		);
-		const dial = page.getByRole( 'group' );
-		const { width, height } = dial.element().getBoundingClientRect();
+		const dial = page.getByRole( 'group' ).element();
 		expect(
-			dial.element().querySelector( 'svg' )?.getBoundingClientRect().width
-		).toBe( width );
-		await dial.click( { position: { x: width - 3, y: height / 2 } } );
-		expect( onValueChange ).toHaveBeenCalledExactlyOnceWith( 0 );
+			dial.querySelector( 'svg' )?.getBoundingClientRect().width
+		).toBe( dial.getBoundingClientRect().width );
 	} );
 
 	it( 'uses the default step when the given step is too small to count', async () => {
@@ -444,10 +434,79 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
 	} );
 
-	it( 'selects the heading under the pointer after a drag crosses the center', async () => {
+	it( 'selects the heading under the pointer after a drag passes through the center', async () => {
 		await render(
 			<ThemeProvider isRoot>
 				<Knob aria-label="Rotation" min={ 0 } max={ 360 } />
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		// From just above the center, through it, to just left of it. Turning
+		// a quarter turn back from zero would stop at the lower end instead.
+		await userEvent.pointer( [
+			{ target: dial, coords: { x: 20, y: 14 }, keys: '[MouseLeft>]' },
+			{ target: dial, coords: { x: 17, y: 17 } },
+			{ target: dial, coords: { x: 14, y: 20 } },
+			'[/MouseLeft]',
+		] );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '270' );
+	} );
+
+	it( 'selects a heading the range has before treating a tap as past an end', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					min={ 0 }
+					max={ 315 }
+					defaultValue={ 90 }
+				/>
+			</ThemeProvider>
+		);
+		// Half past ten, the heading of the upper end at 315 degrees.
+		await page
+			.getByRole( 'group' )
+			.click( { position: { x: 11.5, y: 11.5 } } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '315' );
+	} );
+
+	it( 'reports a drag back to the start while a controlled value has not updated', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Angle"
+					value={ 0 }
+					onValueChange={ onValueChange }
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		const top = { x: width / 2, y: 3 };
+		const right = { x: width - 3, y: height / 2 };
+		await userEvent.pointer( [
+			{ target: dial, coords: top, keys: '[MouseLeft>]' },
+			{ target: dial, coords: right },
+			{ target: dial, coords: top },
+			'[/MouseLeft]',
+		] );
+		expect( onValueChange.mock.calls ).toEqual( [ [ 90 ], [ 0 ] ] );
+	} );
+
+	it( 'drops a tap when the pointer leaves the dial before it lifts', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<div
+					style={ { display: 'flex', alignItems: 'center', gap: 20 } }
+				>
+					<Knob aria-label="Angle" onValueChange={ onValueChange } />
+					<div
+						data-testid="beside"
+						style={ { width: 10, height: 10 } }
+					/>
+				</div>
 			</ThemeProvider>
 		);
 		const dial = page.getByRole( 'group' );
@@ -455,14 +514,14 @@ describe( 'Knob', () => {
 		await userEvent.pointer( [
 			{
 				target: dial,
-				coords: { x: width / 2, y: 3 },
+				coords: { x: width - 3, y: height / 2 },
 				keys: '[MouseLeft>]',
 			},
-			{ target: dial, coords: { x: width / 2, y: height / 2 } },
-			{ target: dial, coords: { x: width / 2, y: height - 3 } },
+			// Straight out to the right, so the heading stays the same.
+			{ target: page.getByTestId( 'beside' ) },
 			'[/MouseLeft]',
 		] );
-		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
+		expect( onValueChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'follows a drag across twelve o’clock on a wrapping dial', async () => {

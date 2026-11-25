@@ -94,18 +94,23 @@ export function getDial( {
 	};
 }
 
-// The clockwise angle of the pointer from twelve o'clock, between -180 and 180
-// degrees.
-export function getPointerAngle( event: React.PointerEvent< HTMLElement > ) {
+// Where the pointer is on the dial. `angle` is its clockwise angle from twelve
+// o'clock, between -180 and 180 degrees, or null at the center, which has no
+// meaningful angle.
+export function getPointer( event: React.PointerEvent< HTMLElement > ) {
 	const { left, top, width, height } =
 		event.currentTarget.getBoundingClientRect();
 	const x = event.clientX - left - width / 2;
 	const y = event.clientY - top - height / 2;
-	// There is no meaningful angle at the center of the dial.
-	if ( Math.hypot( x, y ) < Math.min( width, height ) / 8 ) {
-		return null;
-	}
-	return ( Math.atan2( x, -y ) * 180 ) / Math.PI;
+	const distance = Math.hypot( x, y );
+	const radius = Math.min( width, height ) / 2;
+	return {
+		angle:
+			distance < radius / 4
+				? null
+				: ( Math.atan2( x, -y ) * 180 ) / Math.PI,
+		inside: distance <= radius,
+	};
 }
 
 export function getStepChange(

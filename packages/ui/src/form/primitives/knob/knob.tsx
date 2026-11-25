@@ -6,7 +6,7 @@ import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
-import { clamp, getDial, getPointerAngle, getStepChange, modulo } from './dial';
+import { clamp, getDial, getPointer, getStepChange, modulo } from './dial';
 import type { KnobProps } from './types';
 import styles from './style.module.scss';
 
@@ -17,6 +17,8 @@ type Gesture = {
 	// The angle the gesture has turned the dial to, counted across turns. It
 	// is null until the first move or the release.
 	dialAngle: number | null;
+	// The step the gesture last selected, or null before it selects one.
+	index: number | null;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
@@ -27,9 +29,9 @@ const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
 // means the pointer cut across the dial instead of going around it.
 const CUT_ACROSS = 120;
 
-// How far past an end, in degrees, a press still means that end. This covers
-// the dot, so grabbing it at a stop does not jump to another turn.
-const NEAR_END = 45;
+// How far from the dot, in degrees, a press still takes hold of it. This is a
+// little more than the dot covers.
+const GRAB = 30;
 
 /**
  * A dial for choosing an angle. It sits beside an input that shows the exact
@@ -91,10 +93,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		);
 		const angle = toAngle( index );
 
-		function selectIndex( nextIndex: number, evenIfUnchanged = false ) {
-			if ( nextIndex === index && ! evenIfUnchanged ) {
-				return;
-			}
+		function select( nextIndex: number ) {
 			const nextValue = toValue( nextIndex );
 			if ( value === undefined ) {
 				setUncontrolledValue( nextValue );
@@ -103,9 +102,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		}
 
 		// The pointer names a heading. Take it on the turn nearest to `from`,
-		// so a click never moves the value by more than it has to. On a
-		// bounded dial, a heading that this turn does not have comes from the
-		// turn that has it, or else from as close to an end as it can.
+		// so a click never moves the value by more than it has to.
 		function getDialAngle( pointerAngle: number, from: number ) {
 			if ( wraps ) {
 				return (
@@ -117,11 +114,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			const nearest =
 				pointerAngle +
 				360 * Math.round( ( start - pointerAngle ) / 360 );
-			const outside = ( dialAngle: number ) =>
-				Math.max( firstAngle - dialAngle, dialAngle - lastAngle, 0 );
-			if ( outside( nearest ) <= NEAR_END ) {
+			// A press on the dot takes hold of it where it is. At a stop, the
+			// far side of the dot is past the end and still means that end.
+			if ( Math.abs( nearest - start ) <= GRAB ) {
 				return nearest;
 			}
+			// Otherwise take the turn that has this heading, or else the one
+			// that brings it closest to an end.
+			const outside = ( dialAngle: number ) =>
+				Math.max( firstAngle - dialAngle, dialAngle - lastAngle, 0 );
 			return [ nearest - 360, nearest + 360 ].reduce(
 				( best, candidate ) =>
 					outside( candidate ) < outside( best ) ? candidate : best,
@@ -145,8 +146,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			// focusing the dial below can make a paired field commit a value.
 			gesture.current = {
 				pointerId: event.pointerId,
-				pointerAngle: getPointerAngle( event ),
+				pointerAngle: getPointer( event ).angle,
 				dialAngle: null,
+				index: null,
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
@@ -165,20 +167,25 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			) {
 				return;
 			}
-			const pointerAngle = getPointerAngle( event );
+			const isRelease = event.type === 'pointerup';
+			const { angle: pointerAngle, inside } = getPointer( event );
 			if ( pointerAngle === null ) {
 				// There is no heading at the center. Pick one afresh when
 				// the pointer leaves it.
 				current.pointerAngle = null;
 				return;
 			}
-			// A pen reports changes in pressure as moves at the same point.
-			// They leave a pending tap alone.
-			if (
-				event.type === 'pointermove' &&
-				pointerAngle === current.pointerAngle
-			) {
-				return;
+			if ( pointerAngle === current.pointerAngle ) {
+				// A pen reports changes in pressure as moves at the same
+				// point. They leave a pending tap alone.
+				if ( ! isRelease ) {
+					return;
+				}
+				// A tap that has selected nothing is dropped when the
+				// pointer lifts outside the dial.
+				if ( current.index === null && ! inside ) {
+					return;
+				}
 			}
 			let from = current.dialAngle;
 			if ( from === null ) {
@@ -208,12 +215,19 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 			current.dialAngle = dialAngle;
 			current.pointerAngle = pointerAngle;
+			const nextIndex = fromAngle( dialAngle );
+			// Compare with the step this gesture last selected. The value
+			// prop can lag behind it while a parent has yet to update.
+			const changed = nextIndex !== ( current.index ?? index );
 			// An empty dial has no value yet, so releasing on the heading it
 			// already points to is still a choice.
-			selectIndex(
-				fromAngle( dialAngle ),
-				isEmpty && event.type === 'pointerup'
-			);
+			if (
+				changed ||
+				( isEmpty && isRelease && current.index === null )
+			) {
+				current.index = nextIndex;
+				select( nextIndex );
+			}
 		}
 
 		function handleKeyDown(
@@ -255,7 +269,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						( largeStepCount * step ).toFixed( precision )
 					) }
 					value={ toValue( index ) }
-					onValueChange={ ( next ) => selectIndex( toIndex( next ) ) }
+					onValueChange={ ( next ) => {
+						const nextIndex = toIndex( next );
+						if ( nextIndex !== index ) {
+							select( nextIndex );
+						}
+					} }
 				>
 					<Slider.Thumb
 						className={ styles.thumb }
