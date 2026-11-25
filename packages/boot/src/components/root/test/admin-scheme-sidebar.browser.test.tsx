@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
+import styles from '../style.module.scss';
 
 // Largest difference allowed in each sRGB channel, out of 255.
 const TOLERANCE = 4;
@@ -16,7 +17,8 @@ describe( 'admin color scheme sidebar', () => {
 		document.body.className = '';
 	} );
 
-	// The sidebar should stay close to the `$base-color` of the Core scheme.
+	// The sidebar should stay close to the `$base-color` of the Core scheme in
+	// WordPress 7.1 and later.
 	it.each( [
 		{ scheme: 'blue', core: '#245278' },
 		{ scheme: 'sunrise', core: '#8a312d' },
@@ -27,14 +29,7 @@ describe( 'admin color scheme sidebar', () => {
 
 			await render(
 				<ThemeProvider color={ getAdminThemeColors() }>
-					<div
-						style={ {
-							background:
-								'var(--wpds-color-background-surface-neutral-weak)',
-						} }
-					>
-						sidebar
-					</div>
+					<div className={ styles.layout }>sidebar</div>
 				</ThemeProvider>
 			);
 
