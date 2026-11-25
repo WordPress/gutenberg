@@ -87,6 +87,7 @@ export type InteractiveBackgroundColor =
  */
 export type ContentForegroundColor =
 	| 'neutral'
+	| 'neutral-strong'
 	| 'neutral-weak'
 	| 'success'
 	| 'success-weak'
@@ -142,6 +143,7 @@ export type InteractiveStrokeColor =
  */
 export type ForegroundColor =
 	| 'neutral'
+	| 'neutral-strong'
 	| 'neutral-weak'
 	| 'success'
 	| 'success-weak'
@@ -155,7 +157,6 @@ export type ForegroundColor =
 	| 'error-weak'
 	| 'neutral-active'
 	| 'neutral-disabled'
-	| 'neutral-strong'
 	| 'neutral-strong-active'
 	| 'neutral-strong-disabled'
 	| 'neutral-weak-active'

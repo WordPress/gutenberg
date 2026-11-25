@@ -1343,6 +1343,10 @@
 					"$value": "{wpds-color.primitive.bg.fgSurface4}",
 					"$description": "Foreground color for content like text with normal emphasis."
 				},
+				"neutral-strong": {
+					"$value": "{wpds-color.primitive.bg.fgSurface5}",
+					"$description": "Foreground color for content like headings with strong emphasis."
+				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
 					"$description": "Foreground color for content like text with weak emphasis."

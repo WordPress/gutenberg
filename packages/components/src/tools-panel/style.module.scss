@@ -46,6 +46,7 @@
 
 // Outrank Heading's base typography regardless of stylesheet insertion order.
 .tools-panel-heading.tools-panel-heading {
+	color: var(--wpds-color-foreground-content-neutral-strong);
 	font-size: inherit;
 	line-height: normal;
 	margin: 0;

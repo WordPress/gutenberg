@@ -1155,6 +1155,24 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-color-foreground-content-neutral-strong': {
+		$description:
+			'Foreground color for content like headings with strong emphasis.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#141414',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.078, 0.078, 0.078 ],
+					hex: '#141414',
+					alpha: 1,
+				},
+				css: '#141414',
+			},
+		},
+	},
 	'--wpds-color-foreground-content-neutral-weak': {
 		$description:
 			'Foreground color for content like text with weak emphasis.',
@@ -3158,6 +3176,7 @@ export const groups = /** @type {const} */ ( {
 					content: {
 						tokens: [
 							'--wpds-color-foreground-content-neutral',
+							'--wpds-color-foreground-content-neutral-strong',
 							'--wpds-color-foreground-content-neutral-weak',
 							'--wpds-color-foreground-content-success',
 							'--wpds-color-foreground-content-success-weak',

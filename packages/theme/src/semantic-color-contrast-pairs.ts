@@ -29,6 +29,10 @@ const brandFocusTokens = [
 ] as const;
 
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
+	...neutralSurfaces.map( ( background ) => ( {
+		background,
+		foreground: 'foreground.content.neutral-strong' as const,
+	} ) ),
 	...brandSurfaces.flatMap( ( background ) =>
 		(
 			[
