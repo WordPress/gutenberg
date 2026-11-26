@@ -175,9 +175,10 @@ export interface InserterMediaCategory {
 		search_items?: string;
 	};
 	/**
-	 * The media type of the media category.
+	 * The media type of the media category. `file` covers documents, such as
+	 * PDFs, and other non-media files, which are inserted as File blocks.
 	 */
-	mediaType: 'image' | 'audio' | 'video';
+	mediaType: 'image' | 'audio' | 'video' | 'file';
 	/**
 	 * The function to fetch media items for the category. Returning an
 	 * `InserterMediaResponse` instead of a plain array opts the category into
@@ -829,6 +830,11 @@ export type Action =
 	| { type: 'UPDATE_SETTINGS'; settings: Settings; reset?: boolean };
 
 export type RemoveBlocksAction = Extract< Action, { type: 'REMOVE_BLOCKS' } >;
+
+export type UpdateBlockAttributesAction = Extract<
+	Action,
+	{ type: 'UPDATE_BLOCK_ATTRIBUTES' }
+>;
 
 export type Reducer< S > = ( state: S | undefined, action: Action ) => S;
 
