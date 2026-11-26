@@ -41,11 +41,11 @@
 	}
 }
 
-.block-editor-block-inspector__no-blocks,
-.block-editor-block-inspector__no-block-tools {
+.block-editor-block-inspector__no-blocks {
 	display: block;
 	font-size: var(--wpds-typography-font-size-md);
 	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
 	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }
@@ -64,10 +64,6 @@
 
 .block-editor-block-inspector__state-badges-text {
 	white-space: nowrap;
-}
-
-.block-editor-block-inspector__no-block-tools {
-	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-block-inspector-edit-contents {
