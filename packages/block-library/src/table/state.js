@@ -267,6 +267,26 @@ function getSectionCellPositions( section ) {
 }
 
 /**
+ * Returns the number of rows a cell covers, clamped to the end of its section.
+ *
+ * @param {Object} state        Current table state.
+ * @param {Object} cellLocation The location of the cell.
+ *
+ * @return {number} The cell's rowspan, or 1 when the cell doesn't exist.
+ */
+export function getCellRowspan( state, cellLocation ) {
+	const { sectionName, rowIndex, columnIndex } = cellLocation;
+	const section = state[ sectionName ] ?? [];
+	const cell = section[ rowIndex ]?.cells?.[ columnIndex ];
+
+	if ( ! cell ) {
+		return 1;
+	}
+
+	return Math.min( getSpan( cell.rowspan ), section.length - rowIndex );
+}
+
+/**
  * Inserts a row in the table state.
  *
  * @param {Object} state               Current table state.

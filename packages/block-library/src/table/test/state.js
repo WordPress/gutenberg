@@ -4,6 +4,7 @@ import {
 	createTable,
 	getFirstRow,
 	getCellAttribute,
+	getCellRowspan,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -217,6 +218,120 @@ describe( 'getCellAttribute', () => {
 		);
 
 		expect( state ).toBe( 'testVal' );
+	} );
+} );
+
+describe( 'getCellRowspan', () => {
+	const tableWithMergedBodyCell = deepFreeze( {
+		body: [
+			{
+				cells: [
+					{ content: '1-A', tag: 'td' },
+					{ content: '1-B', tag: 'td' },
+					{ content: '1-C', tag: 'td' },
+				],
+			},
+			{
+				cells: [
+					{ content: '2-A', tag: 'td' },
+					{ content: 'Merged', tag: 'td', rowspan: '2' },
+					{ content: '2-C', tag: 'td' },
+				],
+			},
+			{
+				cells: [
+					{ content: '3-A', tag: 'td' },
+					{ content: '3-C', tag: 'td' },
+				],
+			},
+			{
+				cells: [
+					{ content: '4-A', tag: 'td' },
+					{ content: '4-B', tag: 'td' },
+					{ content: '4-C', tag: 'td' },
+				],
+			},
+		],
+	} );
+
+	it( 'returns the rowspan of a merged cell', () => {
+		expect(
+			getCellRowspan( tableWithMergedBodyCell, {
+				sectionName: 'body',
+				rowIndex: 1,
+				columnIndex: 1,
+			} )
+		).toBe( 2 );
+	} );
+
+	it( 'returns 1 for a cell without a rowspan', () => {
+		expect(
+			getCellRowspan( tableWithMergedBodyCell, {
+				sectionName: 'body',
+				rowIndex: 1,
+				columnIndex: 0,
+			} )
+		).toBe( 1 );
+	} );
+
+	it( 'clamps the rowspan to the end of the section', () => {
+		expect(
+			getCellRowspan( tableWithTallRowspan, {
+				sectionName: 'body',
+				rowIndex: 0,
+				columnIndex: 0,
+			} )
+		).toBe( 3 );
+		expect(
+			getCellRowspan(
+				deepFreeze( {
+					body: [
+						{
+							cells: [
+								{ content: 'A', tag: 'td', rowspan: '5' },
+							],
+						},
+						{ cells: [] },
+					],
+				} ),
+				{ sectionName: 'body', rowIndex: 0, columnIndex: 0 }
+			)
+		).toBe( 2 );
+	} );
+
+	it( 'returns 1 when the cell does not exist', () => {
+		expect(
+			getCellRowspan( tableWithMergedBodyCell, {
+				sectionName: 'head',
+				rowIndex: 0,
+				columnIndex: 0,
+			} )
+		).toBe( 1 );
+	} );
+
+	it( 'places a row inserted after the span outside of the merged cell', () => {
+		const rowIndex = 1;
+		const state = insertRow( tableWithMergedBodyCell, {
+			sectionName: 'body',
+			rowIndex:
+				rowIndex +
+				getCellRowspan( tableWithMergedBodyCell, {
+					sectionName: 'body',
+					rowIndex,
+					columnIndex: 1,
+				} ),
+		} );
+
+		expect( state.body[ 1 ].cells[ 1 ] ).toEqual( {
+			content: 'Merged',
+			tag: 'td',
+			rowspan: '2',
+		} );
+		expect( state.body[ 3 ].cells ).toEqual( [
+			{ content: '', tag: 'td' },
+			{ content: '', tag: 'td' },
+			{ content: '', tag: 'td' },
+		] );
 	} );
 } );
 
