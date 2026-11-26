@@ -8,6 +8,9 @@ export const route = {
 			// This route shows the site, so it shows the template around
 			// whatever the canvas resolves to, including a static front page.
 			renderingMode: 'template-locked' as const,
+			// This route shows the site as it is, so let the user browse it
+			// and choose what to edit.
+			isBrowsable: true,
 		};
 	},
 };

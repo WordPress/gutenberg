@@ -60,6 +60,18 @@ export interface CanvasData {
 	 * user's preference when omitted.
 	 */
 	renderingMode?: 'post-only' | 'template-locked';
+
+	/**
+	 * Whether a preview canvas that names no entity shows the site's front end
+	 * for the user to browse, with a button that opens the page on screen for
+	 * editing, instead of the editor's preview of the home page. Only applies
+	 * to block themes.
+	 *
+	 * Suits a route that shows the site as it is. A route whose stage edits
+	 * something the preview has to reflect before it is saved, such as the
+	 * site title, keeps the editor's preview, which shows unsaved edits.
+	 */
+	isBrowsable?: boolean;
 }
 
 /**

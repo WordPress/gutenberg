@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `isBrowsable` to the canvas data a route returns. On a block theme, a preview canvas that names no entity then shows the site's front end for the user to browse, with a button that opens the page on screen for editing.
+
 ### Bug Fixes
 
 -   Open the home page for editing when the preview canvas of a route that names no post type or post, such as the home route, is clicked. Before, clicking it did nothing ([#87409](https://github.com/WordPress/gutenberg/pull/87409)).
