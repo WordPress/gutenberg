@@ -57,7 +57,7 @@ export default function QueryInspectorControls( props ) {
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
-	const { postTypesSelectOptions, postTypeFormatSupportMap } = usePostTypes();
+	const { postTypesSelectOptions } = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	const registry = useRegistry();
@@ -71,7 +71,7 @@ export default function QueryInspectorControls( props ) {
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
 		const supportedTaxonomies = newPostType?.taxonomies;
-		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
+		if ( !! supportedTaxonomies && !! taxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {
 				return Object.entries( _taxQuery || {} ).reduce(
@@ -163,12 +163,12 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
-	const postTypeHasFormatSupport = postTypeFormatSupportMap[ postType ];
 	const showFormatControl = useSelect(
 		( select ) => {
+			const { getPostType } = select( coreStore );
 			// Check if the post type supports post formats and if the control is allowed.
 			if (
-				! postTypeHasFormatSupport ||
+				! getPostType( postType )?.supports?.[ 'post-formats' ] ||
 				! isControlAllowed( allowedControls, 'format' )
 			) {
 				return false;
@@ -184,7 +184,7 @@ export default function QueryInspectorControls( props ) {
 				themeSupports.formats.some( ( type ) => type !== 'standard' )
 			);
 		},
-		[ allowedControls, postTypeHasFormatSupport ]
+		[ allowedControls, postType ]
 	);
 
 	const showExcludeCurrentControl =
