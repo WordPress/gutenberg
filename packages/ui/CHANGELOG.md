@@ -33,6 +33,10 @@
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 
+### Bug Fixes
+
+-   `Dialog`, `Drawer`, `AlertDialog`: Round the corners of the scroll area where it meets the popup, so the popup no longer clips the square corners of its focus outline ([#87210](https://github.com/WordPress/gutenberg/pull/87210)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes

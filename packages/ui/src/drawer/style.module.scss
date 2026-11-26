@@ -342,5 +342,31 @@
 		.popup[data-swipe-direction="down"] > .content:last-child {
 			padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
 		}
+
+		/*
+		 * The scroll container's corners follow the popup's inner radius (see
+		 * `overlay-chrome.module.css`), but a drawer rounds only the two
+		 * corners away from its anchored edge. Keep the corners on the
+		 * anchored edge square, matching the popup's own corner radii above.
+		 */
+		.popup[data-swipe-direction="left"] .content {
+			border-start-start-radius: 0;
+			border-end-start-radius: 0;
+		}
+
+		.popup[data-swipe-direction="right"] .content {
+			border-start-end-radius: 0;
+			border-end-end-radius: 0;
+		}
+
+		.popup[data-swipe-direction="up"] .content {
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
+		}
+
+		.popup[data-swipe-direction="down"] .content {
+			border-end-start-radius: 0;
+			border-end-end-radius: 0;
+		}
 	}
 }
