@@ -3830,7 +3830,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 
 		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 5deg;--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);scale: 0.9;}', $stylesheet );
-		$this->assertStringNotContainsString( '.wp-block-image img{rotate', $stylesheet );
+		$this->assertStringNotContainsString( ':root :where(.wp-block-image img', $stylesheet );
 	}
 
 	public function test_get_stylesheet_custom_root_selector() {
