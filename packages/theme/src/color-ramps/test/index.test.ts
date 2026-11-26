@@ -135,8 +135,8 @@ describe( 'buildRamps', () => {
 		const weakBackgrounds = Object.fromEntries(
 			intentColors.map( ( intent ) => [
 				intent,
-				buildAccentRamp( DEFAULT_SEED_COLORS[ intent ], bgRamp ).ramp
-					.surface2,
+				buildAccentRamp( intent, DEFAULT_SEED_COLORS[ intent ], bgRamp )
+					.ramp.surface2,
 			] )
 		);
 
@@ -317,7 +317,7 @@ describe( 'buildRamps', () => {
 
 	it( 'keeps tapered accent surfaces gray for a near-gray primary', () => {
 		const background = buildBgRamp( '#fcfcfc' );
-		const { ramp } = buildAccentRamp( '#222524', background );
+		const { ramp } = buildAccentRamp( 'primary', '#222524', background );
 
 		expect( ramp.surface2 ).toBe( '#f8f8f8' );
 		expect( ramp.surface6 ).toBe( '#d1d1d1' );
@@ -349,7 +349,7 @@ describe( 'buildRamps', () => {
 		'moves active fills in the $direction ramp direction and keeps both foreground pairs accessible',
 		( { background, primary, direction } ) => {
 			const bgRamp = buildBgRamp( background );
-			const accentRamp = buildAccentRamp( primary, bgRamp );
+			const accentRamp = buildAccentRamp( 'primary', primary, bgRamp );
 			const restingLuminance = getLuminance( accentRamp.ramp.bgFill1 );
 			const activeLuminance = getLuminance( accentRamp.ramp.bgFill2 );
 
@@ -369,6 +369,7 @@ describe( 'buildRamps', () => {
 	it( 'retains the high-contrast foreground anchor when it satisfies both fill states', () => {
 		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const accentRamp = buildAccentRamp(
+			'primary',
 			DEFAULT_SEED_COLORS.primary,
 			bgRamp
 		);
@@ -424,6 +425,7 @@ describe( 'buildRamps', () => {
 	it( 'rescales a seed using every contrast reference', () => {
 		const seed = '#85767a';
 		const ramp = buildAccentRamp(
+			'primary',
 			seed,
 			buildBgRamp( DEFAULT_SEED_COLORS.background )
 		);
