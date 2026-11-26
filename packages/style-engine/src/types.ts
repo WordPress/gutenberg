@@ -71,6 +71,14 @@ export interface Style {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
 	};
+	transform?: {
+		rotate?: CSSProperties[ 'rotate' ];
+		translate?: {
+			x?: string;
+			y?: string;
+		};
+		scale?: number | string;
+	};
 	typography?: {
 		fontSize?: CSSProperties[ 'fontSize' ];
 		fontFamily?: CSSProperties[ 'fontFamily' ];

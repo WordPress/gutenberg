@@ -706,7 +706,7 @@ test.describe( 'Page List', () => {
 			// The picker should reflect the WP timezone (UTC-5), not the
 			// browser/system timezone.
 			await expect( year ).toHaveValue( '2026' );
-			await expect( month ).toHaveValue( '02' );
+			await expect( month ).toHaveText( 'February' );
 			await expect( day ).toHaveValue( '15' );
 			await expect( hours ).toHaveValue( '12' );
 			await expect( minutes ).toHaveValue( '30' );
@@ -720,7 +720,7 @@ test.describe( 'Page List', () => {
 				hours: 12,
 				minutes: 30,
 			} );
-			await expect( month ).toHaveValue( '03' );
+			await expect( month ).toHaveText( 'March' );
 			await expect( day ).toHaveValue( '20' );
 			await expect( hours ).toHaveValue( '12' );
 			await expect( minutes ).toHaveValue( '30' );

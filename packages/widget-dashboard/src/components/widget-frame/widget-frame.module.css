@@ -5,6 +5,12 @@
 	overflow-y: auto;
 	min-width: 0;
 	min-height: 0;
+
+	/*
+	 * Card zeroes this above a footer. Scrolled rows still reach the divider,
+	 * since the viewport clips at its padding edge.
+	 */
+	padding-block-end: var(--wp-ui-card-padding);
 }
 
 /* Bleeding body reaches the card borders. Card exposes no padding-less section. */

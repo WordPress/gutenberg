@@ -2,6 +2,43 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add an Offset control with X and Y axes to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add a Scale control to the Transform panel, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+
+### Enhancements
+
+-   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
+-   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
+
+### Bug Fixes
+
+-   List View: Use the theme's brand colors for selected labels, anchor badges and action focus rings. When design tokens are loaded, setting `--wp-admin-theme-color` alone no longer changes the selected row's fill ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
+-   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
+-   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
+-   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
+-   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
+-   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
+-   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
+-   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
+-   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
+-   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
+-   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
+## 20.1.0 (2026-11-18)
+
 ### Enhancements
 
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
@@ -10,10 +47,13 @@
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
--   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
+-   Export the `BlockStyle`, `BlockStyleState`, `MediaUploadFunction` and `MediaUploadOptions` types ([#87018](https://github.com/WordPress/gutenberg/pull/87018)).
 
 ### Bug Fixes
 
+-   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
+-   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
+-   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
@@ -29,10 +69,15 @@
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
+-   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
+-   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
+-   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
+-   Block drag: restore the dragged block (styles, pointer events, dragging state) when the drag ends without `drop` or `dragend` reaching the canvas document ([#85462](https://github.com/WordPress/gutenberg/pull/85462)).
 
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Remove the private `hasBlockSpotlight` selector ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
 
 ## 20.0.0 (2026-11-04)
 

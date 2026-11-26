@@ -61,18 +61,16 @@ function Root( { className, ...settings }: BlockListProps ) {
 		deviceType,
 		viewportSettings,
 	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			isTyping,
-			hasBlockSpotlight,
-			getEditedContentOnlySection,
-		} = unlock( select( blockEditorStore ) );
+		const { getSettings, isTyping, getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
 		const editorSettings = getSettings();
 		const {
 			outlineMode,
 			focusMode,
 			isPreviewMode: _isPreviewMode,
 		} = editorSettings;
+		const _editedContentOnlySection = getEditedContentOnlySection();
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
 			/*
@@ -81,9 +79,10 @@ function Root( { className, ...settings }: BlockListProps ) {
 			 * would just render most of its content faded out.
 			 */
 			isFocusMode:
-				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
+				! _isPreviewMode &&
+				( focusMode || !! _editedContentOnlySection ),
 			isPreviewMode: _isPreviewMode,
-			editedContentOnlySection: getEditedContentOnlySection(),
+			editedContentOnlySection: _editedContentOnlySection,
 			deviceType:
 				editorSettings[ deviceTypeKey ]?.toLowerCase() || 'desktop',
 			viewportSettings: editorSettings.__experimentalFeatures?.viewport,
