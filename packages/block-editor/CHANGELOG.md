@@ -7,14 +7,18 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add an Offset control with X and Y axes to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add a Scale control to the Transform panel, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 
 ### Enhancements
 
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 
 ### Bug Fixes
 
+-   List View: Use the theme's brand colors for selected labels, anchor badges and action focus rings. When design tokens are loaded, setting `--wp-admin-theme-color` alone no longer changes the selected row's fill ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
+-   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
@@ -23,6 +27,10 @@
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
+-   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
+-   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
+-   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
+-   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Prevent Group commands from creating disallowed direct-parent relationships ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
 
 ### Internal

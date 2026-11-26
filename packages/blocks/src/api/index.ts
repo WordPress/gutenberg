@@ -1,6 +1,8 @@
 import { lock } from '../lock-unlock';
 import { isContentBlock } from './utils';
 import { isBlockAllowedInParent } from './is-block-allowed-in-parent';
+import { parseRawBlock as _parseRawBlock } from './parser';
+import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
 // and `save`. The transforms specification allows converting one blocktype to
@@ -161,6 +163,11 @@ export {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from './templates';
+
+/**
+ * A block template entry: the block name, then optional attributes and inner block template.
+ */
+export type { TemplateItem } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';
 export {
@@ -174,8 +181,6 @@ export {
 // be set from `block.json` and third-party blocks can't opt in yet. It may
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
-import { parseRawBlock as _parseRawBlock } from './parser';
-import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 
 export const privateApis = {};
 lock( privateApis, {
