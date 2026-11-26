@@ -55,6 +55,7 @@ export interface BlockInspectorSingleBlockProps {
 	showStateOnCanvas?: boolean;
 	isResponsiveEditing?: boolean;
 	blockStatesEditingEnabled?: boolean;
+	canEdit?: boolean;
 }
 
 export type InlineEditButtonProps = Pick<
