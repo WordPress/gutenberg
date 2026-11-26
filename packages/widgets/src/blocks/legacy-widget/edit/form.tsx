@@ -93,7 +93,6 @@ export default function Form( {
 		onChangeInstance,
 		onChangeHasPreview,
 		isMediumLargeViewport,
-		createNotice,
 	] );
 
 	if ( isWide && isMediumLargeViewport ) {

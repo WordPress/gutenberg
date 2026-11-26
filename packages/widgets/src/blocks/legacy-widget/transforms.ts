@@ -1,35 +1,6 @@
 import { createBlock } from '@wordpress/blocks';
 import type { Block, BlockConfiguration } from '@wordpress/blocks';
-import type { LegacyWidgetAttributes } from './index';
-
-interface RawInstance extends Record< string, unknown > {
-	content?: string;
-	count?: number | boolean;
-	dropdown?: boolean;
-	show_date?: boolean;
-	number?: number;
-	taxonomy?: string;
-	hierarchical?: boolean;
-	url?: string;
-	preload?: string;
-	loop?: boolean;
-	attachment_id?: number;
-	alt?: string;
-	caption?: string;
-	height?: number;
-	link_classes?: string;
-	link_rel?: string;
-	link_target_blank?: boolean;
-	link_type?: string;
-	link_url?: string;
-	size?: string;
-	width?: number;
-	ids?: number[];
-	show_author?: boolean;
-	show_summary?: boolean;
-	items?: number;
-	title?: string;
-}
+import type { LegacyWidgetAttributes, RawInstance } from './types';
 
 interface LegacyWidgetTransformItem {
 	block: string;
@@ -201,40 +172,28 @@ const transforms: NonNullable< BlockConfiguration[ 'transforms' ] > = {
 		( { block, widget, transform, transformBlock } ) => ( {
 			type: 'block',
 			blocks: [ block ],
-			isMatch: (
-				attributes:
-					Record< string, unknown > | Record< string, unknown >[]
-			) => {
-				const attrs = (
-					Array.isArray( attributes ) ? attributes[ 0 ] : attributes
-				) as LegacyWidgetAttributes | undefined;
-				const raw = (
-					attrs?.instance as { raw?: RawInstance } | null | undefined
-				 )?.raw;
-				return attrs?.idBase === widget && !! raw;
+			isMatch: ( attributes ) => {
+				const { idBase, instance } =
+					attributes as LegacyWidgetAttributes;
+				return idBase === widget && !! instance?.raw;
 			},
-			transform: (
-				attributes:
-					Record< string, unknown > | Record< string, unknown >[]
-			) => {
-				const attrs = (
-					Array.isArray( attributes ) ? attributes[ 0 ] : attributes
-				) as LegacyWidgetAttributes | undefined;
-				const raw = (
-					attrs?.instance as { raw?: RawInstance } | null | undefined
-				 )?.raw;
+			transform: ( attributes ) => {
+				// `isMatch` only lets instances with a `raw` value through.
+				const { instance } = attributes as LegacyWidgetAttributes & {
+					instance: { raw: RawInstance };
+				};
 				const transformedBlock = transformBlock
-					? transformBlock( raw ?? {} )
+					? transformBlock( instance.raw )
 					: createBlock(
 							block,
-							transform ? transform( raw ?? {} ) : undefined
+							transform ? transform( instance.raw ) : undefined
 						);
-				if ( ! raw?.title ) {
+				if ( ! instance.raw?.title ) {
 					return transformedBlock;
 				}
 				return [
 					createBlock( 'core/heading', {
-						content: raw.title,
+						content: instance.raw.title,
 					} ),
 					transformedBlock,
 				];

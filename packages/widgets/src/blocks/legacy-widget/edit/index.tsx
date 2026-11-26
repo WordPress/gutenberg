@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useEntityRecord } from '@wordpress/core-data';
 import type { BlockEditProps } from '@wordpress/blocks';
-import type { LegacyWidgetAttributes } from '../index';
+import type { LegacyWidgetAttributes } from '../types';
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
 import Form from './form';
@@ -119,7 +119,7 @@ function NotEmpty( {
 		( nextInstance: Record< string, unknown > ) => {
 			setAttributes( { instance: nextInstance } );
 		},
-		[ setAttributes ]
+		[]
 	);
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
@@ -142,9 +142,7 @@ function NotEmpty( {
 	}
 
 	const mode = idBase && ! isSelected ? 'preview' : 'edit';
-	const rawInstance = (
-		instance as { raw?: Record< string, unknown > } | null | undefined
-	 )?.raw;
+	const rawInstance = instance?.raw;
 
 	return (
 		<>

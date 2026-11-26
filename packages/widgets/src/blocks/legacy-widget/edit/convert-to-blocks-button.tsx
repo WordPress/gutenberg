@@ -3,11 +3,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-interface RawInstance extends Record< string, unknown > {
-	title?: string;
-	text?: string;
-}
+import type { RawInstance } from '../types';
 
 interface ConvertToBlocksButtonProps {
 	clientId: string;

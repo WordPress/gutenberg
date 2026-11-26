@@ -69,12 +69,6 @@ export default class Control {
 	form!: HTMLFormElement;
 	content!: HTMLDivElement;
 
-	handleFormChange = debounce( () => {
-		if ( this.idBase ) {
-			this.saveForm();
-		}
-	}, 200 );
-
 	constructor( {
 		id,
 		idBase,
@@ -96,6 +90,10 @@ export default class Control {
 		// a fake but unique number.
 		this.number = ++lastNumber;
 
+		this.handleFormChange = debounce(
+			this.handleFormChange.bind( this ),
+			200
+		);
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 
 		this.initDOM();
@@ -249,6 +247,16 @@ export default class Control {
 	}
 
 	/**
+	 * Perform a save when a multi widget's form is changed. Non-multi widgets are
+	 * saved manually.
+	 */
+	handleFormChange() {
+		if ( this.idBase ) {
+			this.saveForm();
+		}
+	}
+
+	/**
 	 * Perform a save when the control's form is manually submitted.
 	 *
 	 * @param event Form submit event.
@@ -294,38 +302,34 @@ export default class Control {
 	/**
 	 * The widget's instance object.
 	 */
-	get instance() {
+	get instance(): Record< string, unknown > | null | undefined {
 		return this._instance;
 	}
 
 	/**
 	 * The widget's instance object.
 	 */
-	set instance( instance ) {
+	set instance( instance: Record< string, unknown > ) {
 		if ( this._instance !== instance ) {
 			this._instance = instance;
-			if ( instance ) {
-				this.onChangeInstance( instance );
-			}
+			this.onChangeInstance( instance );
 		}
 	}
 
 	/**
 	 * Whether or not the widget can be previewed.
 	 */
-	get hasPreview() {
+	get hasPreview(): boolean | null {
 		return this._hasPreview;
 	}
 
 	/**
 	 * Whether or not the widget can be previewed.
 	 */
-	set hasPreview( hasPreview ) {
+	set hasPreview( hasPreview: boolean ) {
 		if ( this._hasPreview !== hasPreview ) {
 			this._hasPreview = hasPreview;
-			if ( hasPreview !== null ) {
-				this.onChangeHasPreview( hasPreview );
-			}
+			this.onChangeHasPreview( hasPreview );
 		}
 	}
 }
