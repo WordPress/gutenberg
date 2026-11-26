@@ -12,6 +12,7 @@ import {
 	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
+import type { WaveformPlayerInstance } from '../types';
 
 // Base player data used across tests
 const basePlayerData = {
@@ -21,7 +22,7 @@ const basePlayerData = {
 	buttonColor: '#000000',
 };
 
-function readStyle( element ) {
+function readStyle( element: Element ) {
 	if ( ! element.isConnected ) {
 		let root = element;
 		while ( root.parentElement ) {
@@ -474,13 +475,16 @@ describe( 'Waveform utilities', () => {
 
 			const instance = {
 				container,
-				options: {},
-				applySeekLabel: vi.fn( ( label ) => {
+				options: {} as { seekLabel?: string },
+				applySeekLabel: vi.fn( ( label: string ) => {
 					seekControl.setAttribute( 'aria-label', label );
 				} ),
 			};
 
-			updateSeekControlLabel( instance, 'Updated Song' );
+			updateSeekControlLabel(
+				instance as unknown as WaveformPlayerInstance,
+				'Updated Song'
+			);
 
 			expect( instance.options.seekLabel ).toBe( 'Updated Song' );
 			expect( instance.applySeekLabel ).toHaveBeenCalledWith(
@@ -554,7 +558,7 @@ describe( 'Waveform utilities', () => {
 			container.appendChild( playBtn );
 
 			const cleanup = setupPlayButtonAccessibility( container );
-			cleanup();
+			cleanup!();
 
 			// After cleanup, events should not change the label.
 			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
@@ -695,7 +699,7 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'initWaveformPlayer', () => {
-		let jsdomStubs;
+		let jsdomStubs: ReturnType< typeof vi.spyOn >[];
 
 		beforeEach( () => {
 			// The WaveformPlayer library defers loading the audio source
@@ -747,7 +751,7 @@ describe( 'Waveform utilities', () => {
 			 * See https://core.trac.wordpress.org/ticket/65673.
 			 */
 			expect( player.instance.audio ).not.toBeNull();
-			expect( player.instance.audio.crossOrigin ).toBeNull();
+			expect( player.instance.audio?.crossOrigin ).toBeNull();
 			expect( player.instance.audio ).not.toHaveAttribute(
 				'crossorigin'
 			);

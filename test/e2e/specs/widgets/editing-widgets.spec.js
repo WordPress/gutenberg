@@ -123,7 +123,7 @@ test.describe( 'Widgets screen', () => {
 		await addedParagraphBlockInSecondWidgetArea.click();
 		await page.keyboard.type( 'Third Paragraph' );
 
-		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+		const expectedWidgetAreas = {
 			'sidebar-1': [
 				{
 					name: 'core/paragraph',
@@ -146,6 +146,20 @@ test.describe( 'Widgets screen', () => {
 					attributes: { content: 'Third Paragraph' },
 				},
 			],
+		};
+		await expect
+			.poll( widgetsScreen.getWidgetAreaBlocks )
+			.toMatchObject( expectedWidgetAreas );
+
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+		await page.reload();
+
+		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+			...expectedWidgetAreas,
+			wp_inactive_widgets: [],
 		} );
 	} );
 
@@ -550,6 +564,45 @@ test.describe( 'Widgets screen', () => {
 		} );
 	} );
 
+	test( 'keeps a moved widget in the destination area after saving and reloading', async ( {
+		page,
+		editor,
+		requestUtils,
+		widgetsScreen,
+	} ) => {
+		await requestUtils.addWidgetBlock(
+			'<!-- wp:paragraph --><p>Moved paragraph</p><!-- /wp:paragraph -->',
+			'sidebar-1'
+		);
+		const {
+			widgets: [ widgetId ],
+		} = await requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-1' } );
+		await page.reload();
+
+		await page.getByText( 'Moved paragraph', { exact: true } ).click();
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'Move to widget area' );
+		await page
+			.getByRole( 'menu', { name: 'Move to widget area' } )
+			.getByRole( 'menuitemradio', { name: 'Footer #2' } )
+			.click();
+
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+		await page.reload();
+
+		const [ destination, inactive ] = await Promise.all( [
+			requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-2' } ),
+			requestUtils.rest( {
+				path: '/wp/v2/sidebars/wp_inactive_widgets',
+			} ),
+		] );
+		expect( destination.widgets ).toContain( widgetId );
+		expect( inactive.widgets ).not.toContain( widgetId );
+	} );
+
 	test( 'Allows widget deletion to be undone', async ( {
 		page,
 		editor,
@@ -767,5 +820,25 @@ class WidgetsScreen {
 			},
 			{ box: true }
 		);
+	};
+
+	/**
+	 * Let the requested writes finish so a reload doesn't interrupt them.
+	 *
+	 * @param {string[]} sidebarIds Sidebar writes to wait for.
+	 */
+	saveWidgetsAndWaitForSidebars = async ( sidebarIds ) => {
+		await Promise.all( [
+			...sidebarIds.map( ( id ) =>
+				this.#page.waitForResponse(
+					( response ) =>
+						response.request().method() === 'POST' &&
+						new URL( response.url() ).pathname.endsWith(
+							`/wp/v2/sidebars/${ id }`
+						)
+				)
+			),
+			this.saveWidgets(),
+		] );
 	};
 }
