@@ -331,8 +331,10 @@ export const WithOverflowMenu: Story = {
 
 /**
  * A card can hold more than one group, each under a heading of its own
- * that names it. The groups keep their own frames inside the padding of
- * the card, because the headings sit between them.
+ * that names it. Each group goes in a `Card.FullBleed`, so its rows run from
+ * edge to edge, and keeps a line above its first row. Render the content as
+ * a `Stack` to space the parts, so that each `Card.FullBleed` stays a direct
+ * child of the content.
  */
 export const InsideACollapsibleCard: Story = {
 	render: () => (
@@ -340,72 +342,72 @@ export const InsideACollapsibleCard: Story = {
 			<CollapsibleCard.Header role="heading" aria-level={ 2 }>
 				<Card.Title>More settings</Card.Title>
 			</CollapsibleCard.Header>
-			<CollapsibleCard.Content>
-				<Stack direction="column" gap="xl">
-					<Stack direction="column" gap="sm">
-						<Text
-							variant="heading-sm"
-							render={ <h3 /> }
-							id="item-story-site"
-						>
-							Site
-						</Text>
-						<Item.Group aria-labelledby="item-story-site">
-							<Item.LinkRow href="#privacy">
-								<Item.Media>
-									<Icon icon={ lock } />
-								</Item.Media>
-								<Item.Label>Privacy</Item.Label>
-								<Item.Description>
-									Choose who can see your site.
-								</Item.Description>
-								<Item.Chevron />
-							</Item.LinkRow>
-							<Item.LinkRow href="#discussion">
-								<Item.Media>
-									<Icon icon={ comment } />
-								</Item.Media>
-								<Item.Label>Discussion</Item.Label>
-								<Item.Description>
-									Comments, pingbacks and moderation.
-								</Item.Description>
-								<Item.Chevron />
-							</Item.LinkRow>
-						</Item.Group>
-					</Stack>
-					<Stack direction="column" gap="sm">
-						<Text
-							variant="heading-sm"
-							render={ <h3 /> }
-							id="item-story-content"
-						>
-							Content
-						</Text>
-						<Item.Group aria-labelledby="item-story-content">
-							<Item.LinkRow href="#writing">
-								<Item.Media>
-									<Icon icon={ post } />
-								</Item.Media>
-								<Item.Label>Writing</Item.Label>
-								<Item.Description>
-									Default category and post format.
-								</Item.Description>
-								<Item.Chevron />
-							</Item.LinkRow>
-							<Item.LinkRow href="#media">
-								<Item.Media>
-									<Icon icon={ image } />
-								</Item.Media>
-								<Item.Label>Media</Item.Label>
-								<Item.Description>
-									Image sizes and upload folders.
-								</Item.Description>
-								<Item.Chevron />
-							</Item.LinkRow>
-						</Item.Group>
-					</Stack>
-					<Link href="#all-settings">All settings</Link>
-				</Stack>
+			<CollapsibleCard.Content
+				render={ <Stack direction="column" gap="md" /> }
+			>
+				<Text
+					variant="heading-sm"
+					render={ <h3 /> }
+					id="item-story-site"
+				>
+					Site
+				</Text>
+				<Card.FullBleed>
+					<Item.Group aria-labelledby="item-story-site">
+						<Item.LinkRow href="#privacy">
+							<Item.Media>
+								<Icon icon={ lock } />
+							</Item.Media>
+							<Item.Label>Privacy</Item.Label>
+							<Item.Description>
+								Choose who can see your site.
+							</Item.Description>
+							<Item.Chevron />
+						</Item.LinkRow>
+						<Item.LinkRow href="#discussion">
+							<Item.Media>
+								<Icon icon={ comment } />
+							</Item.Media>
+							<Item.Label>Discussion</Item.Label>
+							<Item.Description>
+								Comments, pingbacks and moderation.
+							</Item.Description>
+							<Item.Chevron />
+						</Item.LinkRow>
+					</Item.Group>
+				</Card.FullBleed>
+				<Text
+					variant="heading-sm"
+					render={ <h3 /> }
+					id="item-story-content"
+				>
+					Content
+				</Text>
+				<Card.FullBleed>
+					<Item.Group aria-labelledby="item-story-content">
+						<Item.LinkRow href="#writing">
+							<Item.Media>
+								<Icon icon={ post } />
+							</Item.Media>
+							<Item.Label>Writing</Item.Label>
+							<Item.Description>
+								Default category and post format.
+							</Item.Description>
+							<Item.Chevron />
+						</Item.LinkRow>
+						<Item.LinkRow href="#media">
+							<Item.Media>
+								<Icon icon={ image } />
+							</Item.Media>
+							<Item.Label>Media</Item.Label>
+							<Item.Description>
+								Image sizes and upload folders.
+							</Item.Description>
+							<Item.Chevron />
+						</Item.LinkRow>
+					</Item.Group>
+				</Card.FullBleed>
+				<Link href="#all-settings">All settings</Link>
 			</CollapsibleCard.Content>
 		</CollapsibleCard.Root>
 	),
