@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Group: Behind the `gutenberg-grid-interactivity` experiment, make the Canvas variation a full width 12 by 12 grid with an example of placed blocks, and register it when the block is registered, so it does not depend on the order in which the experiment's flag is set ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
+-   Image, Cover, Video, Media & Text, Post Featured Image: Behind the `gutenberg-grid-interactivity` experiment, fill their cell in a manual placement grid whose cells have a fixed size, cropping media as needed. Each block reads the grid's `--wp--style--grid-cells` custom property with a container style query in its own styles. In the editor, the cell decides their size, so Image and Post Featured Image keep only Scale (and Image its focal point), the block-support minimum height and aspect ratio controls are hidden there, and Cover hides its own minimum height control, resize handle and full height toggle ([#84504](https://github.com/WordPress/gutenberg/pull/84504)).
+
 ### Bug Fixes
 
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
@@ -24,11 +29,6 @@
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
-
-### Enhancements
-
--   Group: Behind the `gutenberg-grid-interactivity` experiment, make the Canvas variation a full width 12 by 12 grid with an example of placed blocks, and register it when the block is registered, so it does not depend on the order in which the experiment's flag is set ([#84947](https://github.com/WordPress/gutenberg/pull/84947)).
--   Image, Cover, Video, Media & Text, Post Featured Image: Behind the `gutenberg-grid-interactivity` experiment, fill their cell in a manual placement grid whose cells have a fixed size, cropping media as needed. Each block reads the grid's `--wp--style--grid-cells` custom property with a container style query in its own styles. In the editor, the cell decides their size, so Image and Post Featured Image keep only Scale (and Image its focal point), the block-support minimum height and aspect ratio controls are hidden there, and Cover hides its own minimum height control, resize handle and full height toggle ([#84504](https://github.com/WordPress/gutenberg/pull/84504)).
 
 ## 12.2.0 (2026-11-18)
 
