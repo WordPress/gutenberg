@@ -1,7 +1,10 @@
 /*
- * The drop area and the selected-file rows share one surface, so a field
- * keeps its size and shape when a file is chosen. With one line of text, each
- * is the same height as an input. It grows when a long filename wraps.
+ * The drop area and the selected-file rows share one shape, so a field keeps
+ * its size when a file is chosen. With one line of text, each is the same
+ * height as an input. It grows when a long filename wraps.
+ *
+ * The drop area is a control, so it uses the neutral interactive colors, like
+ * an input without a border. Its dashed border marks where a file can go.
  */
 .surface {
 	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
@@ -12,21 +15,22 @@
 	min-inline-size: 0;
 	border:
 		var(--wpds-border-width-xs) dashed
-		var(--wpds-color-stroke-surface-neutral-strong);
+		var(--wpds-color-stroke-interactive-neutral);
 	border-radius: var(--wpds-border-radius-sm);
-	background: var(--wpds-color-background-surface-neutral);
-	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-interactive-neutral-weak);
+	color: var(--wpds-color-foreground-interactive-neutral);
 }
 
 /*
- * A row shows a file that is already chosen, so its border is solid, not
- * dashed like the drop area's. Its padding matches the picker button's, so a
- * row and a drop area line up.
+ * A row shows a file that is already chosen. It isn't a control itself, so it
+ * uses surface colors and a solid border. Its padding matches the picker
+ * button's, so a row and a drop area line up.
  */
 .row {
 	border-style: solid;
 	border-color: var(--wpds-color-stroke-surface-neutral);
 	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
 	padding-block: var(--file-picker-padding-block);
 	padding-inline-start: var(--wpds-dimension-padding-sm);
 }
@@ -80,7 +84,13 @@
 }
 
 .surface:has(> .choose:not([data-disabled]):hover) {
-	background: var(--wpds-color-background-surface-neutral-weak);
+	border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
+}
+
+.surface:has(> .choose[data-disabled]) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	background: var(--wpds-color-background-interactive-neutral-weak-disabled);
 }
 
 /* A 24px box for the add icon or the thumbnail, so both states line up. */
