@@ -14,6 +14,28 @@ Skills complement the [MCP server](?path=/docs/design-system-using-with-ai-mcp--
 
 Agents only read skills from their own skills directory, such as `.claude/skills` or `.agents/skills`. Your package manager or a helper tool has to link the skills from `node_modules` into that directory. How to do that depends on the package manager.
 
+## npm
+
+npm does not link skills from dependencies yet. Use the community [`skills` CLI](https://github.com/vercel-labs/skills), which reads your `package.json` dependencies and links their skills into your agent directories:
+
+```bash
+npm install @wordpress/ui @wordpress/theme
+npm install --save-dev skills
+npm exec --no -- skills experimental_sync -y
+```
+
+To keep the links current, add the sync to a `prepare` script in your `package.json`:
+
+```json
+{
+	"scripts": {
+		"prepare": "skills experimental_sync -y"
+	}
+}
+```
+
+The command is experimental and may change.
+
 ## pnpm
 
 [pnpm 12.11](https://pnpm.io/blog/releases/12.11.0) or later links skills from your direct dependencies on `pnpm install`. Install the packages as direct dependencies, then approve their skills:
@@ -60,28 +82,6 @@ pnpm writes the links and its `.gitignore` into those directories. If your proje
 
 See the pnpm documentation on [agent skills](https://pnpm.io/agent-skills) and the settings reference for [`permissions`](https://pnpm.io/settings/build#permissions) and [`skills.dirs`](https://pnpm.io/settings/build#skillsdirs).
 
-## npm
-
-npm does not link skills from dependencies yet. Use the community [`skills` CLI](https://github.com/vercel-labs/skills), which reads your `package.json` dependencies and links their skills into your agent directories:
-
-```bash
-npm install @wordpress/ui @wordpress/theme
-npm install --save-dev skills
-npm exec --no -- skills experimental_sync -y
-```
-
-To keep the links current, add the sync to a `prepare` script in your `package.json`:
-
-```json
-{
-	"scripts": {
-		"prepare": "skills experimental_sync -y"
-	}
-}
-```
-
-The command is experimental and may change.
-
 ## Yarn
 
 Yarn does not link skills from dependencies yet. With Yarn, use the same `skills` CLI as npm:
@@ -100,8 +100,6 @@ Look for the skills from the table above, such as `wp-ui` and `wp-theme`, in you
 
 The links point into `node_modules`, so do not commit them: committed links would be broken until the dependencies are installed.
 
-pnpm adds a `# pnpm` block to a `.gitignore` in each agent skills directory and keeps it up to date, so you don't need to ignore anything for pnpm. pnpm links each skill under its own name, such as `wp-ui`, and only uses the longer `pnpm-<package>-<skill>` name when two skills collide.
-
 For the `skills` CLI (npm and Yarn), add the links to your `.gitignore`. For example, to ignore the `@wordpress/ui` and `@wordpress/theme` skills:
 
 ```gitignore
@@ -118,3 +116,5 @@ For the `skills` CLI (npm and Yarn), add the links to your `.gitignore`. For exa
 ```
 
 Keep only the lines for the directories you use. The `skills` CLI also writes a `skills-lock.json` file that you should commit.
+
+pnpm adds a `# pnpm` block to a `.gitignore` in each agent skills directory and keeps it up to date, so you don't need to ignore anything for pnpm. pnpm links each skill under its own name, such as `wp-ui`, and only uses the longer `pnpm-<package>-<skill>` name when two skills collide.
