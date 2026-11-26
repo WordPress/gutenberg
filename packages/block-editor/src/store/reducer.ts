@@ -3595,11 +3595,9 @@ function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
 				controlledParentClientId
 		);
 		const selectionStart = {
-			clientId:
-				uniqueIds.has( current.selectionStart.clientId! ) &&
-				orderedIds.includes( current.selectionStart.clientId! )
-					? current.selectionStart.clientId
-					: orderedIds[ 0 ],
+			clientId: orderedIds.includes( current.selectionStart.clientId! )
+				? current.selectionStart.clientId
+				: orderedIds[ 0 ],
 		};
 		const selectionEnd = {
 			clientId: orderedIds.includes( current.selectionEnd.clientId! )
