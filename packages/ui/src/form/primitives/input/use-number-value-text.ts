@@ -1,11 +1,5 @@
-import { useEffect, useRef, useState } from '@wordpress/element';
 import type { InputProps } from './types';
-
-function toValueText(
-	value: InputProps[ 'value' ] | InputProps[ 'defaultValue' ]
-) {
-	return value === undefined || value === null ? '' : String( value );
-}
+import { useInputValue } from './use-input-value';
 
 /**
  * Works around VoiceOver in Chrome on macOS, which reads a number input with a
@@ -33,44 +27,17 @@ export function useNumberValueText(
 		onValueChange,
 	} = props;
 	const needsValueText = type === 'number' && ariaValueText === undefined;
-	const tracksValue = needsValueText && value === undefined;
 
-	const ref = useRef< HTMLInputElement >( null );
-	const [ uncontrolledValue, setUncontrolledValue ] = useState( () =>
-		toValueText( defaultValue )
-	);
-
-	useEffect( () => {
-		const input = ref.current;
-		if ( ! tracksValue || ! input ) {
-			return;
-		}
-		setUncontrolledValue( input.value );
-
-		// A form reset restores the default value without an input event.
-		const onReset = ( event: Event ) => {
-			if ( event.target !== input.form ) {
-				return;
-			}
-			// `reset` fires before the form restores its values.
-			setTimeout( () => setUncontrolledValue( input.value ) );
-		};
-		const { ownerDocument } = input;
-		ownerDocument.addEventListener( 'reset', onReset );
-		return () => ownerDocument.removeEventListener( 'reset', onReset );
-	}, [ tracksValue ] );
-
-	const handleValueChange: InputProps[ 'onValueChange' ] = (
-		nextValue,
-		eventDetails
-	) => {
-		if ( tracksValue ) {
-			setUncontrolledValue( nextValue );
-		}
-		onValueChange?.( nextValue, eventDetails );
-	};
-
-	const valueText = tracksValue ? uncontrolledValue : toValueText( value );
+	const {
+		ref,
+		value: valueText,
+		onValueChange: handleValueChange,
+	} = useInputValue( {
+		value,
+		defaultValue,
+		onValueChange,
+		enabled: needsValueText,
+	} );
 
 	return {
 		ref,

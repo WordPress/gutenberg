@@ -17,7 +17,7 @@ const meta: Meta< typeof SearchControl > = {
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `SearchControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by `SearchInput` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
