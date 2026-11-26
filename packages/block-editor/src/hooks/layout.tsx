@@ -363,15 +363,46 @@ function LayoutPanelPure( {
 		activeBlockVariation,
 		selectedState,
 		isResponsiveEditing,
+		hasMixedLayoutTypes,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
+				getMultiSelectedBlockClientIds,
 				getSettings,
 				getSelectedBlockStyleState,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
+
+			// Hide the layout controls when the selected blocks use different
+			// layout types, as a change would apply to all of them.
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+			let _hasMixedLayoutTypes = false;
+			if ( multiSelectedClientIds.includes( clientId ) ) {
+				// Controls only show when the selected blocks are the same block
+				// type, so they all have the same layout support as this block.
+				const _layoutBlockSupport = getBlockSupport(
+					blockName,
+					layoutBlockSupportKey,
+					{}
+				) as LayoutBlockSupport;
+				const defaultLayout = {
+					...layoutSettings,
+					..._layoutBlockSupport,
+				}.default;
+				const getLayoutTypeForBlock = ( id: string ) =>
+					( getBlockAttributes( id )?.layout || defaultLayout )
+						?.type ||
+					_layoutBlockSupport.default?.type ||
+					'default';
+				const layoutType = getLayoutTypeForBlock( clientId );
+				_hasMixedLayoutTypes = multiSelectedClientIds.some(
+					( id: string ) => getLayoutTypeForBlock( id ) !== layoutType
+				);
+			}
+
 			return {
+				hasMixedLayoutTypes: _hasMixedLayoutTypes,
 				activeBlockVariation: select(
 					blocksStore
 				).getActiveBlockVariation(
@@ -384,7 +415,7 @@ function LayoutPanelPure( {
 				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
-		[ blockName, clientId ]
+		[ blockName, clientId, layoutSettings ]
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -440,7 +471,7 @@ function LayoutPanelPure( {
 		]
 	);
 
-	if ( blockEditingMode !== 'default' ) {
+	if ( blockEditingMode !== 'default' || hasMixedLayoutTypes ) {
 		return null;
 	}
 
@@ -496,6 +527,7 @@ function LayoutPanelPure( {
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
+		isDefaultBlockStyleState( selectedState ) &&
 		allowInheriting &&
 		( ! blockLayoutType ||
 			blockLayoutType === 'default' ||
@@ -559,11 +591,7 @@ function LayoutPanelPure( {
 	const resetInheritToggle = () => onChangeLayout( { type: 'default' } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
-	const hasInheritToggleValue = () =>
-		isViewportLayoutState
-			? ( usedLayout?.type ?? 'default' ) !==
-				( resetLayoutDefaults?.type ?? 'default' )
-			: layout?.type === 'constrained';
+	const hasInheritToggleValue = () => layout?.type === 'constrained';
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
 		( resetLayoutDefaults?.type ?? 'default' );

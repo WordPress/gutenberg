@@ -30,7 +30,7 @@
 	overflow-wrap: anywhere;
 
 	&.block-editor-block-card__title {
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		line-height: $default-line-height;
 		margin: 0;
 	}

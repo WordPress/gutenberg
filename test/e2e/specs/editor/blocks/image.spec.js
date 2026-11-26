@@ -1371,6 +1371,63 @@ test.describe( 'Image - lightbox', () => {
 			} );
 		} );
 
+		test( 'should keep the overlay intact when reopened before the close cleanup runs', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+
+			await page.goto( `/?p=${ postId }` );
+
+			const enlargeButton = page.getByRole( 'button', {
+				name: 'Enlarge',
+				exact: true,
+			} );
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Enlarged image',
+			} );
+			const enlargedImage = overlay.locator(
+				'img[data-wp-bind--src="state.enlargedSrc"]'
+			);
+
+			await enlargeButton.click();
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Controls the timer that cleans up after the close animation.
+			await page.clock.install();
+			await page.clock.pauseAt( Date.now() );
+
+			await overlay.getByRole( 'button', { name: 'Close' } ).click();
+			await expect( overlay ).not.toHaveClass( /active/ );
+
+			// Reopens before the close cleanup timer fires. The click is
+			// dispatched directly because the closing overlay still covers the
+			// trigger button.
+			await enlargeButton.dispatchEvent( 'click' );
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Lets the pending close cleanup run.
+			await page.clock.runFor( 1000 );
+
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( dialog ).toBeVisible();
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				uploadedMedia.source_url
+			);
+
+			// Closing again restores focus to the trigger button.
+			await page.keyboard.press( 'Escape' );
+			await page.clock.runFor( 1000 );
+			await expect( overlay ).not.toHaveClass( /active/ );
+			await expect( enlargeButton ).toBeFocused();
+		} );
+
 		test.describe( 'Overlay not a direct child of body', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(

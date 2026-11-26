@@ -589,8 +589,16 @@ export const getInserterMediaCategories = createSelector(
 			) {
 				return false;
 			}
+			// Files are not a MIME type of their own: they cover documents
+			// (`application/*`) and plain text files (`text/*`).
+			const mimeTypePrefixes =
+				category.mediaType === 'file'
+					? [ 'application/', 'text/' ]
+					: [ `${ category.mediaType }/` ];
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
+				mimeTypePrefixes.some( ( prefix ) =>
+					mimeType.startsWith( prefix )
+				)
 			);
 		} );
 	},
@@ -1206,18 +1214,6 @@ export const isBlockParentHiddenAtViewport = (
 		isBlockHiddenAtViewport( state, parentId, viewport )
 	);
 };
-
-/**
- * Returns true if there is a spotlighted block, which is the case while a
- * contentOnly section is being edited.
- *
- * @param state Global application state.
- *
- * @return Whether the block is currently spotlighted.
- */
-export function hasBlockSpotlight( state: State ) {
-	return !! state.editedContentOnlySection;
-}
 
 /**
  * Returns whether a block is locked to prevent editing.

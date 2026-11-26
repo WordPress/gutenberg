@@ -475,6 +475,7 @@ Use this setting to enable the following Global Styles settings:
 - border: color, radius, style, width
 - color: link, heading, button, caption
 - spacing: blockGap, margin, padding
+- transform: rotate
 - typography: lineHeight, textColumns
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
