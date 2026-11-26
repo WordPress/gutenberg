@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87455](https://github.com/WordPress/gutenberg/issues/87455)).
+-   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
