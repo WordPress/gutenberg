@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Remove the empty `search` query arg from the Patterns URL after resetting the filters or clearing the search.
+-   Remove the empty `search` query arg from the Patterns URL after resetting the filters or clearing the search ([#87383](https://github.com/WordPress/gutenberg/pull/87383)).
 
 ## 8.2.0 (2026-11-18)
 
