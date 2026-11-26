@@ -6,6 +6,7 @@
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   Show `auto` as the canvas height in the viewport status in the editor footer for patterns, template parts and navigation menus ([#87375](https://github.com/WordPress/gutenberg/pull/87375)).
 
 ### Internal
 
