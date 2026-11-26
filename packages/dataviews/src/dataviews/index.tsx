@@ -29,6 +29,7 @@ import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
+import { LAYOUT_TABLE } from '../constants';
 import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 
@@ -100,6 +101,7 @@ function DataViews< Item >( {
 	getItemHasChildren,
 	expandedItemIds,
 	onChangeExpandedItemIds,
+	hierarchyPagination,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
@@ -115,6 +117,24 @@ function DataViews< Item >( {
 	onReset,
 }: DataViewsProps< Item > ) {
 	useEnableWpCompatOverlaySlot();
+	const isGrouped = !! (
+		view.groupBy &&
+		fields.some( ( field ) => field.id === view.groupBy?.field )
+	);
+	// Hierarchy pagination works only on the tree the table builds.
+	const isTree = !! (
+		view.type === LAYOUT_TABLE &&
+		view.showLevels &&
+		! isGrouped &&
+		getItemParentId &&
+		getItemHasChildren &&
+		expandedItemIds &&
+		onChangeExpandedItemIds
+	);
+	// Infinite scroll keeps loading the table as one list, so hierarchy
+	// pagination applies only while it is off.
+	const isHierarchyPaginationActive =
+		isTree && !! hierarchyPagination && ! view.infiniteScrollEnabled;
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
@@ -190,7 +210,10 @@ function DataViews< Item >( {
 		view,
 		onChangeView,
 		isLoading,
-		totalPages: paginationInfo.totalPages,
+		// Hierarchy pagination has no pages to clamp.
+		totalPages: isHierarchyPaginationActive
+			? null
+			: paginationInfo.totalPages,
 	} );
 
 	useEffect( () => {
@@ -230,7 +253,11 @@ function DataViews< Item >( {
 				actions,
 				data: displayData,
 				isLoading,
-				paginationInfo: displayPaginationInfo,
+				// Each level loads on its own, so the totals count the loaded
+				// rows and there is a single page.
+				paginationInfo: isHierarchyPaginationActive
+					? { totalItems: displayData.length, totalPages: 1 }
+					: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
@@ -241,6 +268,10 @@ function DataViews< Item >( {
 				getItemHasChildren,
 				expandedItemIds,
 				onChangeExpandedItemIds,
+				// Only set while the tree uses it, so readers can check it alone.
+				hierarchyPagination: isHierarchyPaginationActive
+					? hierarchyPagination
+					: undefined,
 				isItemClickable,
 				onClickItem,
 				renderItemLink,

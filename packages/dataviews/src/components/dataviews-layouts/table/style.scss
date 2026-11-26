@@ -123,6 +123,43 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 			border-bottom: 0;
 		}
 
+		// Paint each cell's edge above its content. The sticky actions cell
+		// keeps its position, and its fade strip in `::before`. Its divider in
+		// `::after` draws the ring instead, above the strip.
+		&:focus-visible {
+			outline: none;
+
+			> td:not(.dataviews-view-table__actions-column) {
+				position: relative;
+			}
+
+			> td:not(.dataviews-view-table__actions-column)::before,
+			> td.dataviews-view-table__actions-column::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				width: auto;
+				opacity: 1;
+				background: none;
+				pointer-events: none;
+				border: 2px solid var(--wpds-color-stroke-focus);
+				border-inline-width: 0;
+
+				@media (forced-colors: active) {
+					border-color: Highlight;
+				}
+			}
+
+			> td:first-child::before {
+				border-inline-start-width: 2px;
+			}
+
+			> td:last-child:not(.dataviews-view-table__actions-column)::before,
+			> td.dataviews-view-table__actions-column:last-child::after {
+				border-inline-end-width: 2px;
+			}
+		}
+
 		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 			opacity: 0;
 		}
@@ -291,6 +328,17 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		flex-shrink: 0;
 	}
 
+	.dataviews-view-table__hierarchy-load-more-content {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		min-height: var(--wpds-dimension-size-md);
+
+		[role="alert"] {
+			color: var(--wpds-color-foreground-content-error-weak);
+		}
+	}
 
 	// Density style overrides.
 	&.has-compact-density {

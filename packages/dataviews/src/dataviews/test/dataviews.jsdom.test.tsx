@@ -39,6 +39,20 @@ const DEFAULT_VIEW = {
 	filters: [],
 };
 
+const HIERARCHY_VIEW = {
+	...DEFAULT_VIEW,
+	fields: [],
+	showLevels: true,
+	titleField: 'title',
+};
+const hierarchyFixture = [
+	{ id: 2, title: 'Child' },
+	{ id: 1, title: 'Parent' },
+];
+const getHierarchyParentId = ( item: Data ) =>
+	item.id === 2 ? 1 : undefined;
+const getHierarchyHasChildren = ( item: Data ) => item.id === 1;
+
 const defaultLayouts: SupportedLayouts = {
 	[ LAYOUT_TABLE ]: true,
 	[ LAYOUT_GRID ]: true,
@@ -396,12 +410,7 @@ describe( 'DataViews component', () => {
 					{ id: 5, title: 'Other parent' },
 				] }
 				getItemParentId={ ( item ) => item.parentId }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -419,22 +428,12 @@ describe( 'DataViews component', () => {
 		const onChangeExpandedItemIds = vi.fn();
 		render(
 			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child' },
-					{ id: 1, title: 'Parent' },
-				] }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				getItemHasChildren={ ( item ) => item.id === 1 }
+				data={ hierarchyFixture }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
 				expandedItemIds={ [] }
 				onChangeExpandedItemIds={ onChangeExpandedItemIds }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -458,12 +457,7 @@ describe( 'DataViews component', () => {
 				}
 				expandedItemIds={ [] }
 				onChangeExpandedItemIds={ vi.fn() }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -524,6 +518,294 @@ describe( 'DataViews component', () => {
 		expect( onChangeExpandedItemIds ).toHaveBeenCalledWith( [
 			'unloaded',
 		] );
+	} );
+
+	it( 'hides page controls while hierarchy pagination is on', () => {
+		const renderView = ( showLevels: boolean ) => (
+			<DataViews
+				fields={ fields }
+				defaultLayouts={ defaultLayouts }
+				getItemId={ ( item ) => item.id.toString() }
+				data={ hierarchyFixture }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
+				expandedItemIds={ [ '1' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( { hasMore: true } ),
+					onLoadMore: vi.fn(),
+				} }
+				paginationInfo={ { totalItems: 30, totalPages: 3 } }
+				view={ {
+					...HIERARCHY_VIEW,
+					showLevels,
+					infiniteScrollEnabled: false,
+				} }
+				onChangeView={ vi.fn() }
+			/>
+		);
+		const { rerender } = render( renderView( true ) );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Load more children of Parent',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Next page' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'combobox', { name: 'Current page' } )
+		).not.toBeInTheDocument();
+
+		rerender( renderView( false ) );
+		// The page controls come back once the tree is off.
+		expect(
+			screen.getByRole( 'button', { name: 'Next page' } )
+		).toBeVisible();
+	} );
+
+	it( 'shows "Show N more", Loading and Retry with the parent in the label', () => {
+		const renderView = ( isLoading = false, error?: string ) => (
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+					{ id: 3, title: 'Sibling' },
+				] }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
+				expandedItemIds={ [ '1' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( id ) => ( {
+						hasMore: true,
+						remainingItems: id === '1' ? 27 : 1,
+						isLoading,
+						error,
+					} ),
+					onLoadMore: vi.fn(),
+				} }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					titleField: 'title',
+					showLevels: true,
+				} }
+			/>
+		);
+		const { rerender } = render( renderView() );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Show 27 more children of Parent',
+			} )
+		).toHaveTextContent( 'Show 27 more' );
+		expect(
+			screen.getByRole( 'button', { name: 'Show 1 more' } )
+		).toHaveTextContent( 'Show 1 more' );
+		rerender( renderView( true ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Loading children of Parent' } )
+		).toHaveTextContent( 'Loading…' );
+		rerender( renderView( false, 'Failed' ) );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Retry loading children of Parent',
+			} )
+		).toHaveTextContent( 'Retry' );
+	} );
+
+	it( 'puts each Load more row after the last loaded row of its parent', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const hierarchyData = [
+			{ id: 3, title: 'Grandchild' },
+			{ id: 2, title: 'Child B' },
+			{ id: 1, title: 'Parent A' },
+			{ id: 4, title: 'Root D' },
+		];
+		const renderDataView = (
+			items: typeof hierarchyData,
+			hasParentLoadMoreRow = true
+		) => (
+			<DataViewWrapper
+				data={ items }
+				getItemParentId={ ( item ) => {
+					if ( item.id === 2 || item.id === 5 ) {
+						return 1;
+					}
+					return item.id === 3 ? 2 : undefined;
+				} }
+				getItemHasChildren={ ( item ) => item.id < 3 }
+				expandedItemIds={ [ '1', '2' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( parentId ) => {
+						if ( parentId === '2' ) {
+							return { hasMore: true, isLoading: true };
+						}
+						return {
+							hasMore:
+								parentId === '1' ? hasParentLoadMoreRow : true,
+						};
+					},
+					onLoadMore,
+				} }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					groupBy: { field: 'missing', direction: 'asc' },
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+		const { rerender } = render( renderDataView( hierarchyData ) );
+
+		const rows = screen.getAllByRole( 'row' );
+		expect( rows[ 1 ] ).toHaveTextContent( 'Parent A' );
+		expect( rows[ 2 ] ).toHaveTextContent( 'Child B' );
+		expect( rows[ 3 ] ).toHaveTextContent( 'Grandchild' );
+		expect( rows[ 4 ] ).toHaveTextContent( 'Loading…' );
+		expect( rows[ 5 ] ).toHaveTextContent( 'Load more' );
+		expect( rows[ 6 ] ).toHaveTextContent( 'Root D' );
+		expect( rows[ 7 ] ).toHaveTextContent( 'Load more' );
+		const parentLoadMore = screen.getByRole( 'button', {
+			name: 'Load more children of Parent A',
+		} );
+		await user.click( parentLoadMore );
+		expect( onLoadMore ).toHaveBeenCalledWith( '1' );
+
+		rerender(
+			renderDataView( [
+				...hierarchyData,
+				{ id: 5, title: 'New child' },
+			] )
+		);
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Load more children of Parent A',
+			} )
+		).toHaveFocus();
+
+		rerender(
+			renderDataView(
+				[ ...hierarchyData, { id: 5, title: 'New child' } ],
+				false
+			)
+		);
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'row', { name: /New child/ } )
+			).toHaveFocus()
+		);
+	} );
+
+	it.each( [ 'a child level loads', 'the table starts empty' ] )(
+		'moves focus to the first new row after Load more when %s',
+		async ( update ) => {
+			const user = userEvent.setup();
+			const isRoot = update === 'the table starts empty';
+			const loadedItems = isRoot
+				? []
+				: [
+						{ id: 1, title: 'Parent' },
+						{ id: 2, title: 'First child' },
+					];
+			const renderDataView = ( items: Data[], hasMore: boolean ) => (
+				<DataViewWrapper
+					data={ items }
+					isLoading={ hasMore && items !== loadedItems }
+					getItemParentId={ ( item ) =>
+						! isRoot && item.id > 1 ? 1 : undefined
+					}
+					getItemHasChildren={ ( item ) => ! isRoot && item.id === 1 }
+					expandedItemIds={ isRoot ? [] : [ '1' ] }
+					onChangeExpandedItemIds={ vi.fn() }
+					hierarchyPagination={ {
+						getPaginationInfo: ( parentId ) =>
+							parentId === ( isRoot ? null : '1' )
+								? {
+										hasMore,
+										isLoading:
+											hasMore && items !== loadedItems,
+									}
+								: undefined,
+						onLoadMore: vi.fn(),
+					} }
+					view={ HIERARCHY_VIEW }
+				/>
+			);
+			const { rerender } = render( renderDataView( loadedItems, true ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: isRoot ? 'Load more' : 'Load more children of Parent',
+				} )
+			);
+			const nextItems = [ ...loadedItems, { id: 3, title: 'New item' } ];
+			// The new rows arrive while the level still loads. An inert table
+			// would drop focus from the Load more button.
+			rerender( renderDataView( nextItems, true ) );
+			expect( screen.getByRole( 'table' ) ).not.toHaveAttribute(
+				'inert'
+			);
+			rerender( renderDataView( nextItems, false ) );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'row', { name: /New item/ } )
+				).toHaveFocus()
+			);
+		}
+	);
+
+	it( 'shows Retry, not "No results", when the first load fails', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const hierarchyProps = {
+			data: [],
+			getItemParentId: () => undefined,
+			getItemHasChildren: () => undefined,
+			expandedItemIds: [],
+			onChangeExpandedItemIds: vi.fn(),
+			paginationInfo: { totalItems: 0, totalPages: 0 },
+			view: {
+				...DEFAULT_VIEW,
+				fields: [],
+				showLevels: true,
+				titleField: 'title',
+			},
+		};
+		const { rerender } = render(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( {
+						hasMore: false,
+						error: 'Pages could not be loaded.',
+					} ),
+					onLoadMore,
+				} }
+			/>
+		);
+
+		expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+			'Pages could not be loaded.'
+		);
+		expect( screen.queryByText( 'No results' ) ).not.toBeInTheDocument();
+		await user.click( screen.getByRole( 'button', { name: 'Retry' } ) );
+		expect( onLoadMore ).toHaveBeenCalledWith( null );
+
+		rerender(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( { hasMore: false } ),
+					onLoadMore,
+				} }
+			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'status' ) ).toHaveFocus()
+		);
 	} );
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {

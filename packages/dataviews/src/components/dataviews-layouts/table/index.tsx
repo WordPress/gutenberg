@@ -1,17 +1,13 @@
 import clsx from 'clsx';
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	Button,
-	Spinner as WCSpinner,
-	Popover as WCPopover,
-} from '@wordpress/components';
+import { Button, Popover as WCPopover } from '@wordpress/components';
 import {
 	chevronDownSmall,
 	chevronLeftSmall,
 	chevronRightSmall,
 } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Spinner, VisuallyHidden } from '@wordpress/ui';
 import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
 import {
 	useContext,
@@ -36,6 +32,7 @@ import {
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
+	HierarchyPaginationInfo,
 	MediaAspectRatio,
 	NormalizedField,
 	ViewTable as ViewTableType,
@@ -48,6 +45,12 @@ import getHierarchicalRows, {
 	type HierarchicalRow,
 } from './get-hierarchical-rows';
 import getTreeRows, { type TreeRow } from './get-tree-rows';
+import getLoadMoreRowData, {
+	hasLoadMoreRow,
+	type LoadMoreRowData,
+} from './get-load-more-row-data';
+import HierarchyLoadMoreRow from './hierarchy-load-more-row';
+import useHierarchyFocus from './use-hierarchy-focus';
 import { useScrollState } from './use-scroll-state';
 import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -119,6 +122,7 @@ interface TableRowProps< Item > {
 	posinset?: number;
 	treeRow?: TreeRow< Item >;
 	onToggleExpanded?: ( id: string ) => void;
+	rowRef?: ( element: HTMLTableRowElement | null ) => void;
 }
 
 function TableColumnField< Item >( {
@@ -168,8 +172,10 @@ function TableRow< Item >( {
 	posinset,
 	treeRow,
 	onToggleExpanded,
+	rowRef,
 }: TableRowProps< Item > ) {
-	const { paginationInfo } = useContext( DataViewsContext );
+	const { paginationInfo, hierarchyPagination } =
+		useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
 	const {
@@ -264,6 +270,9 @@ function TableRow< Item >( {
 
 	return (
 		<tr
+			ref={ rowRef }
+			// Load more moves focus to the first new row, so rows must take focus.
+			tabIndex={ hierarchyPagination ? -1 : undefined }
 			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -357,6 +366,7 @@ function ViewTable< Item >( {
 	getItemHasChildren,
 	expandedItemIds,
 	onChangeExpandedItemIds,
+	hierarchyPagination,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -405,6 +415,9 @@ function ViewTable< Item >( {
 	const renderedRows: ( HierarchicalRow< Item > | TreeRow< Item > )[] = tree
 		? tree.visibleRows
 		: rows;
+	// Hierarchy pagination works only on the tree.
+	const activeHierarchyPagination = tree ? hierarchyPagination : undefined;
+	const isHierarchyPaginationActive = !! activeHierarchyPagination;
 	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
@@ -422,6 +435,12 @@ function ViewTable< Item >( {
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
+	const {
+		tableRef: hierarchyTableRef,
+		emptyRef: hierarchyEmptyRef,
+		getRowRef: getHierarchyRowRef,
+		moveFocus: moveHierarchyFocus,
+	} = useHierarchyFocus( renderedRows );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
@@ -492,6 +511,14 @@ function ViewTable< Item >( {
 		return;
 	}
 
+	const loadMoreRowData =
+		tree && activeHierarchyPagination
+			? getLoadMoreRowData( tree.visibleRows, activeHierarchyPagination )
+			: new Map< number, LoadMoreRowData< Item >[] >();
+	const rootPaginationInfo =
+		activeHierarchyPagination?.getPaginationInfo( null );
+	const hasRootLoadMoreRow = hasLoadMoreRow( rootPaginationInfo );
+
 	const onHide = ( field: NormalizedField< Item > ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
 		const fallback = hidden
@@ -541,8 +568,29 @@ function ViewTable< Item >( {
 	const columnCount =
 		columns.length +
 		( hasPrimaryColumn ? 1 : 0 ) +
-		( hasBulkActions ? 1 : 0 ) +
+		( hasBulkActions && ! isTree ? 1 : 0 ) +
 		( actions?.length ? 1 : 0 );
+	const renderLoadMoreRow = (
+		parent: TreeRow< Item > | null,
+		previousRowId: string | undefined,
+		paginationInfo: HierarchyPaginationInfo
+	) => (
+		<HierarchyLoadMoreRow
+			key={ `load-more-${ parent?.id ?? 'root' }` }
+			columnCount={ columnCount }
+			level={ parent ? parent.level + 1 : 0 }
+			parentId={ parent?.id ?? null }
+			parentLabel={
+				parent && getItemLabel( parent.item, parent.id, titleField )
+			}
+			previousRowId={ previousRowId }
+			paginationInfo={ paginationInfo }
+			onLoadMore={ activeHierarchyPagination!.onLoadMore }
+			moveFocus={ ( nextPreviousRowId ) =>
+				moveHierarchyFocus( parent?.id ?? null, nextPreviousRowId )
+			}
+		/>
+	);
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -555,6 +603,10 @@ function ViewTable< Item >( {
 			}
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Rows load in place, so the table stays usable, and keeps focus, while
+	// they load.
+	const staysLiveWhileLoading =
+		isInfiniteScroll || isHierarchyPaginationActive;
 	const isRtl = isRTL();
 	// Consumer-configured aspect ratio for the primary column's media preview,
 	// validated against the presets (like `density`) so arbitrary values are
@@ -571,9 +623,12 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData && ! isActionInProgress ) {
+	if ( ! hasData && ! isActionInProgress && ! hasRootLoadMoreRow ) {
 		return (
 			<div
+				ref={ hierarchyEmptyRef }
+				role={ isHierarchyPaginationActive ? 'status' : undefined }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-no-results', {
 					'is-refreshing': isDelayedLoading,
 				} ) }
@@ -650,7 +705,7 @@ function ViewTable< Item >( {
 						{
 							'is-hierarchy': isTree,
 							'is-refreshing':
-								! isInfiniteScroll && isDelayedLoading,
+								! staysLiveWhileLoading && isDelayedLoading,
 						}
 					) }
 					ref={ bulkActionsRef }
@@ -667,6 +722,8 @@ function ViewTable< Item >( {
 				</div>
 			) }
 			<table
+				ref={ hierarchyTableRef }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
 						view.layout?.density &&
@@ -677,14 +734,15 @@ function ViewTable< Item >( {
 					'has-actions': !! actions?.length,
 					'has-columns-before': hasHorizontalScrollStart,
 					'has-columns-after': hasHorizontalScrollEnd,
-					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+					'is-refreshing':
+						! staysLiveWhileLoading && isDelayedLoading,
 					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
 				style={ tableStyle }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
-				inert={ inertValue( ! isInfiniteScroll && isLoading ) }
+				inert={ inertValue( ! staysLiveWhileLoading && isLoading ) }
 			>
 				<colgroup>
 					{ /* The column of the fade cell at the start of each row. */ }
@@ -893,9 +951,11 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							renderedRows.map( ( row, index ) => {
+							renderedRows.flatMap( ( row, index ) => {
 								const { id, item, level } = row;
-								return (
+								const loadMoreRows =
+									loadMoreRowData.get( index ) ?? [];
+								return [
 									<TableRow
 										key={ id }
 										item={ item }
@@ -922,21 +982,36 @@ function ViewTable< Item >( {
 										onToggleExpanded={
 											tree?.onToggleExpanded
 										}
+										rowRef={ getHierarchyRowRef( id ) }
 										posinset={
 											isInfiniteScroll
 												? index + 1
 												: undefined
 										}
-									/>
-								);
+									/>,
+									...loadMoreRows.map(
+										( { parent, paginationInfo } ) =>
+											renderLoadMoreRow(
+												parent,
+												id,
+												paginationInfo
+											)
+									),
+								];
 							} ) }
+						{ hasRootLoadMoreRow &&
+							renderLoadMoreRow(
+								null,
+								renderedRows[ renderedRows.length - 1 ]?.id,
+								rootPaginationInfo
+							) }
 					</tbody>
 				) }
 			</table>
 			{ isInfiniteScroll && isLoading && (
 				<div className="dataviews-loading" id={ tableNoticeId }>
 					<p className="dataviews-loading-more">
-						<WCSpinner />
+						<Spinner />
 					</p>
 				</div>
 			) }

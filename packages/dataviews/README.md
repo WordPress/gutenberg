@@ -152,6 +152,17 @@ The ids of the expanded items in a hierarchical table. DataViews does not store 
 
 A function that DataViews calls with the new list of expanded ids when someone expands or collapses a row, or uses Expand all or Collapse all in the header.
 
+#### `hierarchyPagination`: `Object`
+
+Loads each level of a hierarchical table in batches, with the consumer in control. It needs an ungrouped table with `view.showLevels` set to true, plus `getItemParentId`, `getItemHasChildren`, `expandedItemIds` and `onChangeExpandedItemIds`.
+
+-   `getPaginationInfo( parentId )` returns `{ hasMore, remainingItems?, isLoading?, error? }` for the direct children of a parent. `parentId` is `null` for the top level. `remainingItems` is the number of items at that level that are not loaded yet, not the size of the next batch. When you pass it, the button reads "Show N more" instead of "Load more". `error` must be a message ready to show to the user.
+-   `onLoadMore( parentId )`: DataViews calls it when someone presses a Load more or Retry button.
+
+DataViews draws these buttons but does not fetch, merge or deduplicate items. The consumer passes every loaded item in `data`, and handles cancelled requests and stale responses. It applies while `view.infiniteScrollEnabled` is off, and then replaces page numbers and the items-per-page control. It does not change the saved `view`.
+
+To show search results as a flat list, pass a view with `showLevels: false` and only the matching items. To show the ancestors of each match, use a field with a custom renderer as the `descriptionField`. The consumer supplies those ancestor paths, because DataViews does not fetch missing ancestors. The Hierarchical Levels story shows this without the WordPress REST API.
+
 #### `fields`: `Object[]`
 
 The fields describe the visible items for each record in the dataset and how they behave (how to sort them, display them, etc.). See "Fields API" for a description of every property.
@@ -824,6 +835,7 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `getItemHasChildren`
 -   `expandedItemIds`
 -   `onChangeExpandedItemIds`
+-   `hierarchyPagination`
 -   `header`
 
 ## `DataForm`
