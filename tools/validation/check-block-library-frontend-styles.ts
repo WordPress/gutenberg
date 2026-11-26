@@ -28,16 +28,12 @@ const DEFAULT_BUILD_STYLE_DIR = path.join(
  * (`lib/client-assets.php`) and `lib/blocks.php`. `reset.css` is left out
  * because only the editor loads it, as `wp-reset-editor-styles`. `elements.css`
  * is left out because it is not enqueued on its own and is already part of
- * `common.css` and `style.css`. The `-rtl` variants are generated from these
- * and reference the same custom properties.
+ * `common.css` and `style.css`. The `-rtl` variants are checked too, because
+ * RTLCSS directives such as `rtl:raw` can add declarations to them alone.
  */
 const FRONTEND_STYLESHEETS = [
-	'style.css',
-	'common.css',
-	'theme.css',
-	'classic.css',
-	'*/style.css',
-	'*/theme.css',
+	'{style,common,theme,classic}{,-rtl}.css',
+	'*/{style,theme}{,-rtl}.css',
 ];
 
 type AdminToken = {
@@ -64,29 +60,51 @@ const ADMIN_TOKENS: AdminToken[] = [
 		prefix: '--wp-admin-theme-color',
 		reason: 'The admin theme color (`--wp-admin-theme-color*`) follows the admin color scheme in the editor but keeps its default value on the frontend.',
 	},
+	{
+		prefix: '--wp-admin-border-width-focus',
+		reason: 'The admin focus width (`--wp-admin-border-width-focus`) belongs to the admin styles and is defined on the frontend only for backward compatibility.',
+	},
 ];
 
-function blankOutCommentsKeepingLineBreaks( css: string ): string {
-	return css.replace( /\/\*[\s\S]*?\*\//g, ( comment ) =>
-		comment.replace( /[^\n]/g, ' ' )
-	);
-}
+const VAR_REFERENCE = /var\(\s*(--[\w-]+)/iy;
 
+// Scans rather than matching the whole file so that `var()` inside comments
+// and strings is skipped.
 function findAdminTokenReferences( css: string ): TokenReference[] {
-	const code = blankOutCommentsKeepingLineBreaks( css );
-
 	const references: TokenReference[] = [];
-	for ( const match of code.matchAll( /var\(\s*(--[\w-]+)/g ) ) {
-		const [ , token ] = match;
-		const adminToken = ADMIN_TOKENS.find( ( { prefix } ) =>
-			token.startsWith( prefix )
-		);
-		if ( adminToken ) {
-			references.push( {
-				token,
-				line: code.slice( 0, match.index ).split( '\n' ).length,
-				adminToken,
-			} );
+	let line = 1;
+	for ( let index = 0; index < css.length; index++ ) {
+		const character = css[ index ];
+
+		if ( character === '/' && css[ index + 1 ] === '*' ) {
+			const end = css.indexOf( '*/', index + 2 );
+			const next = end === -1 ? css.length : end + 2;
+			line += css.slice( index, next ).split( '\n' ).length - 1;
+			index = next - 1;
+		} else if ( character === '"' || character === "'" ) {
+			index++;
+			while ( index < css.length && css[ index ] !== character ) {
+				if ( css[ index ] === '\\' ) {
+					index++;
+				}
+				if ( css[ index ] === '\n' ) {
+					line++;
+				}
+				index++;
+			}
+		} else if ( character === '\n' ) {
+			line++;
+		} else if ( ! /[\w-]/.test( css[ index - 1 ] ?? '' ) ) {
+			VAR_REFERENCE.lastIndex = index;
+			const token = VAR_REFERENCE.exec( css )?.[ 1 ];
+			const adminToken =
+				token &&
+				ADMIN_TOKENS.find( ( { prefix } ) =>
+					token.startsWith( prefix )
+				);
+			if ( adminToken ) {
+				references.push( { token, line, adminToken } );
+			}
 		}
 	}
 	return references;

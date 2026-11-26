@@ -38,12 +38,13 @@ function check( files: Record< string, string > ) {
 	} );
 }
 
-test( 'passes when only editor stylesheets, comments, or definitions mention admin tokens', () => {
+test( 'passes when only editor stylesheets, comments, strings, or definitions mention admin tokens', () => {
 	const result = check( {
 		'common.css': [
 			'/* Uses var(--wpds-color-stroke-focus). */',
 			':root { --wp-admin-theme-color: #3858e9; }',
 			'.a { top: var(--wp-admin--admin-bar--height, 0px); }',
+			'.a::before { content: "var(--wpds-color-stroke-focus)"; }',
 		].join( '\n' ),
 		'editor.css': '.a { color: var(--wpds-color-stroke-focus); }',
 		'reset.css': '.a { color: var(--wp-admin-theme-color); }',
@@ -65,6 +66,16 @@ test( 'reports admin tokens referenced in frontend stylesheets', () => {
 		'quote/theme.css':
 			'.a { color: var(--x, var(--wp-components-color-accent)); }',
 		'theme.css': '.a { color: var( --wp-admin-theme-color-darker-10 ); }',
+		'cover/style-rtl.css': [
+			'.a {',
+			'  box-sizing: border-box; outline-width: var(--wp-admin-border-width-focus);',
+			'}',
+		].join( '\n' ),
+		'quote/style.css': [
+			'.a::before { content: "/*"; }',
+			'.a { color: var(--wp-components-color-foreground); }',
+			'.a::after { content: "*/"; }',
+		].join( '\n' ),
 	} );
 
 	expect( result.status ).toBe( 1 );
@@ -79,7 +90,13 @@ test( 'reports admin tokens referenced in frontend stylesheets', () => {
 		'theme.css:1: --wp-admin-theme-color-darker-10'
 	);
 	expect( result.stderr ).toContain(
-		'Found 3 admin design token references'
+		'cover/style-rtl.css:2: --wp-admin-border-width-focus'
+	);
+	expect( result.stderr ).toContain(
+		'quote/style.css:2: --wp-components-color-foreground'
+	);
+	expect( result.stderr ).toContain(
+		'Found 5 admin design token references'
 	);
 } );
 
