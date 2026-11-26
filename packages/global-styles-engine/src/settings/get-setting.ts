@@ -55,6 +55,8 @@ const VALID_SETTINGS = [
 	'spacing.padding',
 	'spacing.units',
 	'transform.rotate',
+	'transform.translate',
+	'transform.scale',
 	'typography.fluid',
 	'typography.customFontSize',
 	'typography.defaultFontSizes',
