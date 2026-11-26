@@ -23,7 +23,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
-import { getPostViewTarget } from '../../utils/post-view-target';
+import { getPostViewTarget, openPostView } from '../../utils/post-view-target';
 import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -365,18 +365,13 @@ const getEditorCommandLoader = () =>
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						const target = getPostViewTarget(
-							getCurrentPostId(),
+						openPostView(
 							viewLink,
-							siteUrl
-						);
-						// Unlike a `target="_blank"` link, `window.open()` has
-						// no implicit `noopener`, so ask for it. It forces a
-						// fresh context, so only on the `_blank` fallback.
-						window.open(
-							viewLink,
-							target,
-							target === '_blank' ? 'noopener' : undefined
+							getPostViewTarget(
+								getCurrentPostId(),
+								viewLink,
+								siteUrl
+							)
 						);
 					},
 				} );

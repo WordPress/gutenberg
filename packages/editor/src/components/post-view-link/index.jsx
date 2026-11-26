@@ -5,7 +5,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
-import { getPostViewTarget } from '../../utils/post-view-target';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 export default function PostViewLink() {
 	const {
@@ -48,6 +51,7 @@ export default function PostViewLink() {
 			label={ label || __( 'View post' ) }
 			href={ permalink }
 			target={ getPostViewTarget( postId, permalink, siteUrl ) }
+			onClick={ onPostViewLinkClick }
 			showTooltip={ ! showIconLabels }
 			size="compact"
 		/>

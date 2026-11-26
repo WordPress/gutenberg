@@ -16,7 +16,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { Link } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
-import { getPostViewTarget } from '../../utils/post-view-target';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 /**
  * Renders the `PostURL` component.
@@ -186,6 +189,7 @@ export default function PostURL( { onClose } ) {
 									className="editor-post-url__link"
 									href={ postLink }
 									target={ linkTarget }
+									onClick={ onPostViewLinkClick }
 									openInNewTab
 								>
 									{ postSlug ? (
@@ -213,6 +217,7 @@ export default function PostURL( { onClose } ) {
 							className="editor-post-url__link"
 							href={ postLink }
 							target={ linkTarget }
+							onClick={ onPostViewLinkClick }
 							openInNewTab
 						>
 							{ postLink }

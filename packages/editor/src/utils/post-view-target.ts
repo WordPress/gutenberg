@@ -56,3 +56,87 @@ export function getPostViewTarget(
 
 	return `wp-post${ getSiteKey( siteUrl ) }-${ postId }`;
 }
+
+/**
+ * Opens a post's front end in the window the target names.
+ *
+ * A named window gets no implicit `noopener`, so its opener is cleared before
+ * the post loads, which stops the destination navigating the editor tab even if
+ * the permalink redirects off site. The window stays reachable by name while it
+ * is same origin, so repeat views still reuse the tab.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/28479
+ *
+ * @param url    The front-end URL to open.
+ * @param target The window name, or `_blank`.
+ */
+export function openPostView( url: string, target: string ): void {
+	if ( target === '_blank' ) {
+		// Unlike a link, `window.open()` has no implicit `noopener`.
+		window.open( url, target, 'noopener' );
+		return;
+	}
+
+	const viewWindow = window.open( '', target );
+	if ( ! viewWindow ) {
+		window.open( url, target );
+		return;
+	}
+
+	try {
+		viewWindow.opener = null;
+	} catch {
+		// Already on another origin, which means the permalink redirected off
+		// site. Its opener was cleared when it opened.
+	}
+
+	viewWindow.location = url as string & Location;
+}
+
+/**
+ * Handles a click on a front-end link to a post, so that the post opens with
+ * its opener cleared. See `openPostView`.
+ *
+ * Modified and non-primary clicks are left to the browser, which opens them in
+ * a new tab of their own rather than reusing the post's window.
+ *
+ * @param event The click event.
+ */
+export function onPostViewLinkClick(
+	event: React.MouseEvent< HTMLAnchorElement >
+): void {
+	const link = event.currentTarget;
+	const target = link.target;
+
+	// The browser gives a `_blank` link `noopener` already.
+	if ( ! target || target === '_blank' ) {
+		return;
+	}
+
+	if (
+		event.defaultPrevented ||
+		event.button !== 0 ||
+		event.metaKey ||
+		event.ctrlKey ||
+		event.shiftKey ||
+		event.altKey
+	) {
+		return;
+	}
+
+	const viewWindow = window.open( '', target );
+	if ( ! viewWindow ) {
+		// Blocked, so let the browser follow the link instead.
+		return;
+	}
+
+	event.preventDefault();
+
+	try {
+		viewWindow.opener = null;
+	} catch {
+		// Already on another origin. Its opener was cleared when it opened.
+	}
+
+	viewWindow.location = link.href as string & Location;
+}

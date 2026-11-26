@@ -10,7 +10,10 @@ import { external } from '@wordpress/icons';
 import { Link, VisuallyHidden } from '@wordpress/ui';
 import { usePostScheduleLabel } from '../post-schedule/label';
 import { store as editorStore } from '../../store';
-import { getPostViewTarget } from '../../utils/post-view-target';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 const POSTNAME = '%postname%';
 const PAGENAME = '%pagename%';
@@ -123,6 +126,7 @@ export default function PostPublishPanelPostpublish( {
 					ref={ postLinkRef }
 					href={ link }
 					target={ linkTarget }
+					onClick={ onPostViewLinkClick }
 					openInNewTab
 				>
 					{ decodeEntities( post.title ) || __( '(no title)' ) }
@@ -160,6 +164,7 @@ export default function PostPublishPanelPostpublish( {
 							icon={ external }
 							iconPosition="right"
 							target={ linkTarget }
+							onClick={ onPostViewLinkClick }
 						>
 							{ viewPostLabel }
 							<VisuallyHidden render={ <span /> }>

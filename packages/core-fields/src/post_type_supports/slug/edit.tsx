@@ -9,69 +9,14 @@ import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../shared/post-view-window';
 import type { PostWithSlug } from './types';
 import styles from './style.module.css';
 
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
-
-/**
- * Returns a key for the site, so that two sites on a subdirectory multisite,
- * which share an origin, do not share a window name. It is the site's own path,
- * and is empty on a single site.
- *
- * @param siteUrl The URL of the site the post belongs to.
- *
- * @return The site's path, or an empty string.
- */
-function getSiteKey( siteUrl: string | undefined ): string {
-	if ( ! siteUrl ) {
-		return '';
-	}
-
-	try {
-		const { pathname } = new URL( siteUrl );
-		return pathname === '/' ? '' : pathname.replace( /\/$/, '' );
-	} catch {
-		return '';
-	}
-}
-
-/**
- * Returns the target for the permalink, so that each item reuses one tab
- * instead of opening another on every click.
- *
- * Only a same-origin link gets a named target. A named target gets no implicit
- * `noopener`, so a cross-origin page could navigate the editor tab through
- * `window.opener`, and plugins can filter a permalink to any URL.
- *
- * @see https://github.com/WordPress/gutenberg/issues/28479
- *
- * @param postId  The ID of the post being viewed.
- * @param url     The front-end URL the link points to.
- * @param siteUrl The URL of the site the post belongs to.
- *
- * @return The window name to reuse, or `_blank`.
- */
-function getPostViewTarget(
-	postId: number | undefined,
-	url: string,
-	siteUrl?: string
-): string {
-	if ( postId === undefined || ! url ) {
-		return '_blank';
-	}
-
-	try {
-		const { origin } = new URL( url, document.baseURI );
-		if ( origin !== window.location.origin ) {
-			return '_blank';
-		}
-	} catch {
-		return '_blank';
-	}
-
-	return `wp-post${ getSiteKey( siteUrl ) }-${ postId }`;
-}
 
 /*
  * The slug control, laid out with `Stack` and built with `InputControl`, `InputLayout`, and `Link` from
@@ -211,6 +156,7 @@ const SlugEdit = ( {
 							className={ styles[ 'help-link' ] }
 							href={ permalink }
 							target={ permalinkTarget }
+							onClick={ onPostViewLinkClick }
 							openInNewTab
 						>
 							{ slug ? (
@@ -233,6 +179,7 @@ const SlugEdit = ( {
 					className={ styles[ 'help-link' ] }
 					href={ permalink }
 					target={ permalinkTarget }
+					onClick={ onPostViewLinkClick }
 					openInNewTab
 				>
 					{ permalink }
