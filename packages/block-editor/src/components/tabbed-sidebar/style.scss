@@ -5,10 +5,27 @@
 .block-editor-tabbed-sidebar {
 	background-color: $white;
 	height: 100%;
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: auto minmax(0, 1fr);
 	flex-grow: 1;
 	overflow: hidden;
+
+	// Browsers can make a scrolling panel a tab stop, so show where focus is.
+	// The ring shares the panel's grid cell, outside the scrolling panel, so it
+	// paints above content that sets its own stacking, such as sticky headers.
+	// It avoids positioning, which would change the containing block of
+	// absolutely positioned content such as the pattern category previews.
+	&:has(> .block-editor-tabbed-sidebar__tabpanel:focus-visible)::after {
+		content: "";
+		grid-row: 2;
+		grid-column: 1;
+		z-index: 1;
+		pointer-events: none;
+		@include outset-ring__focus();
+		// Keep the ring inside the sidebar, which clips overflowing content.
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
 }
 
 .block-editor-tabbed-sidebar__tablist-and-close-button {
@@ -31,6 +48,8 @@
 }
 
 .block-editor-tabbed-sidebar__tabpanel {
+	grid-row: 2;
+	grid-column: 1;
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
