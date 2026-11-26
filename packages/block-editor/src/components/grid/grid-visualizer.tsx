@@ -9,7 +9,7 @@ import {
 	useRef,
 	createPortal,
 } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalUseDropZone as useDropZone,
 	useEvent,
@@ -26,6 +26,7 @@ import {
 } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
+import { useManualGridDrop } from './use-manual-grid-drop';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
 import { BlockRefs } from '../provider/block-refs-provider';
@@ -36,14 +37,12 @@ import {
 	getManualGridDropTrackSizes,
 } from './manual-grid-drop';
 import type { GridDropSpans, GridDropTrackSizes } from './manual-grid-drop';
-import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { isPlainObject } from '../../utils/object';
-import type { BlockStyleState, ChildLayoutBlockStyle } from '../../hooks/types';
+import type { BlockStyleState } from '../../hooks/types';
 import type {
 	AutoGridVisualizerProps,
 	GetGridDropRects,
@@ -469,7 +468,6 @@ function useGridVisualizerDropZone(
 		SetStateAction< GridDropPlacement[] | null >
 	>
 ) {
-	const registry = useRegistry();
 	const { refsMap } = useContext( BlockRefs );
 	const tracksRef = useRef< {
 		gridInfo: GridInfo;
@@ -495,18 +493,10 @@ function useGridVisualizerDropZone(
 		column: number;
 		row: number;
 	} | null >( null );
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkLastChangeAsPersistent,
-		stopDragging,
-		hideInsertionPoint,
-	} = unlock( useDispatch( blockEditorStore ) );
-
-	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
-		gridClientId,
-		gridInfo.numColumns
+	const { stopDragging, hideInsertionPoint } = unlock(
+		useDispatch( blockEditorStore )
 	);
+	const commitDrop = useManualGridDrop( gridClientId, gridInfo.numColumns );
 
 	function getDrop( event: DragEvent ) {
 		const clientIds: string[] = getDraggedBlockClientIds();
@@ -704,65 +694,7 @@ function useGridVisualizerDropZone(
 			if ( ! drop ) {
 				return;
 			}
-			const { items, sourceRootClientId } = drop;
-			const clientIds = items.map( ( { clientId } ) => clientId );
-			const updates: Record<
-				string,
-				{ style: ChildLayoutBlockStyle | undefined }
-			> = {};
-			for ( const {
-				clientId,
-				attributes,
-				selectedState,
-				rect,
-			} of items ) {
-				updates[ clientId ] = {
-					style: getUpdatedChildLayoutStyle(
-						isPlainObject( attributes.style )
-							? ( attributes.style as ChildLayoutBlockStyle )
-							: undefined,
-						{
-							columnStart: rect.columnStart,
-							rowStart: rect.rowStart,
-							columnSpan: rect.columnSpan,
-							rowSpan: rect.rowSpan,
-						},
-						selectedState
-					),
-				};
-			}
-			const firstRect = items.reduce( ( first, { rect } ) => {
-				return rect.rowStart < first.rowStart ||
-					( rect.rowStart === first.rowStart &&
-						rect.columnStart < first.columnStart )
-					? rect
-					: first;
-			}, items[ 0 ].rect );
-			registry.batch( () => {
-				updateBlockAttributes( clientIds, updates, {
-					uniqueByBlock: true,
-				} );
-				// Moving in one viewport must not reorder blocks in all viewports.
-				if (
-					sourceRootClientId !== gridClientId ||
-					! items.some( ( { selectedState } ) =>
-						hasViewportBlockStyleState( selectedState )
-					)
-				) {
-					moveBlocksToPosition(
-						clientIds,
-						sourceRootClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							firstRect.columnStart,
-							firstRect.rowStart
-						)
-					);
-				}
-				// Commit placement and order together, including consecutive drops
-				// that update the same style attributes without changing block order.
-				__unstableMarkLastChangeAsPersistent();
-			} );
+			commitDrop( drop.items, drop.sourceRootClientId );
 		},
 	} );
 }
