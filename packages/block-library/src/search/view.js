@@ -47,6 +47,13 @@ const { actions } = store(
 				ctx.isSearchInputVisible = false;
 			},
 			handleSearchKeydown: withSyncEvent( ( event ) => {
+				// Ignore keydown events during IME composition, e.g. an Escape
+				// meant to cancel unconfirmed CJK text. On Safari, the final key
+				// of a composition can have `isComposing: false`, so also check
+				// `keyCode === 229`.
+				if ( event?.isComposing || event?.keyCode === 229 ) {
+					return;
+				}
 				const { ref } = getElement();
 				// If Escape close the menu.
 				if ( event?.key === 'Escape' ) {
