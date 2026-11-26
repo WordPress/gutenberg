@@ -478,6 +478,40 @@ describe( 'Gallery block', () => {
 			).not.toBeInTheDocument();
 		} );
 
+		test( 'shows the layout settings for galleries with the same layout type', async () => {
+			await setup( [
+				createGallery( { layout: { type: 'grid' } } ),
+				createGallery( { layout: { type: 'grid' } } ),
+				createBlock( MULTI_SELECTION_INITIALIZER ),
+			] );
+			await selectGalleries();
+
+			await userEvent.click(
+				await screen.findByRole( 'tab', { name: 'Styles' } )
+			);
+			expect(
+				await screen.findByRole( 'spinbutton', {
+					name: 'Minimum column width',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		test( 'hides the layout settings for galleries with different layout types', async () => {
+			await setup( [
+				createGallery( { layout: { type: 'grid' } } ),
+				createGallery(),
+				createBlock( MULTI_SELECTION_INITIALIZER ),
+			] );
+			await selectGalleries();
+
+			// Layout is the only Styles panel in this test editor, so the tab
+			// isn't shown without it.
+			expect( await screen.findByText( '2 Blocks' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'tab', { name: 'Styles' } )
+			).not.toBeInTheDocument();
+		} );
+
 		test( 'does not offer to detach selected dynamic galleries', async () => {
 			await setup( [
 				createBlock( 'core/gallery', {
