@@ -1,6 +1,8 @@
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
+import type { BlockDeprecation, BlockSaveProps } from '@wordpress/blocks';
+import type { Attributes } from './types';
 
-const v1 = {
+const v1: BlockDeprecation< Attributes > = {
 	attributes: {
 		title: {
 			type: 'string',
@@ -12,7 +14,7 @@ const v1 = {
 		customClassName: true,
 		reusable: false,
 	},
-	save( { attributes } ) {
+	save( { attributes }: BlockSaveProps< Attributes > ) {
 		return (
 			<>
 				<RichText.Content
