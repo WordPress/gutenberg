@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Date: Bind a Date block inserted in a Query Loop to each post's publish date, instead of saving the insert time as a fixed date that every post in the loop showed ([#86083](https://github.com/WordPress/gutenberg/pull/86083)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
