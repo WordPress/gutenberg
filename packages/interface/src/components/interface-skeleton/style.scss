@@ -174,7 +174,7 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__actions {
 	z-index: z-index(".interface-interface-skeleton__actions");
 	position: fixed !important; // Need to override the default relative positioning
-	top: -9999em;
+	top: 100%;
 	bottom: auto;
 	left: auto;
 	right: 0;
