@@ -14,11 +14,12 @@ export function FilePickerImport() {
 	async function importFile( file: File ) {
 		setIsImporting( true );
 		setError( '' );
+		// Hide an earlier confirmation, so it isn't read as this result.
+		snackbars.hide();
 		try {
 			const title = await importPattern( file );
 			snackbars.show( `Imported “${ title }” from JSON.` );
 		} catch {
-			snackbars.hide();
 			setError(
 				`Couldn’t import ${ file.name }. Choose a pattern exported as JSON.`
 			);
