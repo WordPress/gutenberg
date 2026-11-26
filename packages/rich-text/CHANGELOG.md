@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
 ## 8.2.0 (2026-11-18)
 
 ## 8.1.0 (2026-11-04)

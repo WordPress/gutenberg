@@ -238,12 +238,15 @@ export function getCurrentPostLastRevisionId( state ) {
 }
 
 /**
- * Returns any post values which have been changed in the editor but not yet
- * been saved.
+ * Returns the post values which have been changed in the editor, including the
+ * transient `blocks` and `selection` edits, which are not fields of the saved
+ * post and so remain after a save. To check for unsaved changes, use
+ * `isEditedPostDirty()`; for the edits that will be saved, use
+ * `select( 'core' ).getEntityRecordNonTransientEdits()`.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Object of key value pairs comprising unsaved edits.
+ * @return {Object} Object of key value pairs comprising the edits.
  */
 export const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
 	const postType = getCurrentPostType( state );

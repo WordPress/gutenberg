@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `update`: redraw the icon as two curved arrows circling each other, so it reads as a cycle. The two straight diagonal arrows it carried read closer to a resize affordance ([#87088](https://github.com/WordPress/gutenberg/pull/87088)).
+-   `update`, `replay`, `backup`: redraw the three on a shared round base, a 7.25 radius circle centred on the canvas with the same arrowhead, so they read as one family. The `update` arrows keep pointing clockwise, as in #87088, and the `backup` clock hands now meet at the centre of the circle ([#87101](https://github.com/WordPress/gutenberg/pull/87101)).
+
+### Internal
+
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 21.0.0 (2026-11-18)
 
 ### Breaking Changes

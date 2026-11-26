@@ -25,7 +25,7 @@
 	&__revisions-block-message {
 		padding: $grid-unit-20;
 		color: $gray-700;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
 
