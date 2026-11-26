@@ -43,7 +43,9 @@ function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
 	return args as unknown as CoreDataThunkArgs;
 }
 
-function mockEntityConfig( configs: Array< { kind: string; name: string } > ) {
+function mockEntityConfig< T extends { kind: string; name: string } >(
+	configs: T[]
+) {
 	return vi.fn( ( kind: string, name: string ) =>
 		configs.find(
 			( config ) => config.kind === kind && config.name === name
