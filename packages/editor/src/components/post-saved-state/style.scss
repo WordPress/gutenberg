@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -7,7 +6,7 @@
 	align-items: center;
 	width: $button-size - $grid-unit-10;
 	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	overflow: hidden;
 	white-space: nowrap;
 
@@ -17,7 +16,7 @@
 	&.is-saved[aria-disabled="true"],
 	&.is-saved[aria-disabled="true"]:hover {
 		background: transparent;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	svg {
