@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { hasBlockSupport } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -35,7 +36,7 @@ import {
 	hasViewportBlockStyleState,
 } from './block-style-state';
 import { getRotateForState, getUpdatedRotateStyle } from '../utils/rotation';
-import { hasTransformSupport } from './transform';
+import { TRANSFORM_SUPPORT_KEY } from './transform';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -732,7 +733,7 @@ function GridTools( {
 		! isBlockItselfCurrentlyHidden &&
 		blockEditingMode === 'default' &&
 		! hasPseudoBlockStyleState( selectedState ) &&
-		hasTransformSupport( name, 'rotate' );
+		hasBlockSupport( name, [ TRANSFORM_SUPPORT_KEY, 'rotate' ] );
 
 	// Text blocks can't be dragged by their body, so every block that can be
 	// moved gets a handle that drags it the way a body drag does.
