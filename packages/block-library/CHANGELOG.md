@@ -8,6 +8,7 @@
 -   Terms List: Don't crash in the editor when the saved taxonomy has no terms and isn't public ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
 -   Query Loop: Don't crash when resetting the post type while post types load or when there are none to choose from, and keep only the filters that apply to the new post type ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
 -   Query Loop: Remove taxonomy filters when switching to a post type without taxonomies, and show the Format filter whenever the post type supports formats ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
+-   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
