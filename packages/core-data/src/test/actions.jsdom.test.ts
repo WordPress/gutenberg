@@ -108,6 +108,7 @@ describe( 'editEntityRecord', () => {
 				content: 'Original Content',
 			} ),
 			getUndoManager: () => ( {
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
@@ -149,6 +150,7 @@ describe( 'editEntityRecord', () => {
 				},
 			} ),
 			getUndoManager: () => ( {
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
@@ -197,6 +199,7 @@ describe( 'editEntityRecord', () => {
 				meta: { existingKey: 'existingValue' },
 			} ),
 			getUndoManager: () => ( {
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
@@ -239,6 +242,7 @@ describe( 'editEntityRecord', () => {
 				meta: { key1: 'value1' },
 			} ),
 			getUndoManager: () => ( {
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
@@ -278,6 +282,7 @@ describe( 'editEntityRecord', () => {
 				title: 'Edited Title',
 			} ),
 			getUndoManager: () => ( {
+				hasUndo: vi.fn( () => false ),
 				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
@@ -335,6 +340,7 @@ describe( 'editEntityRecord', () => {
 					},
 				} ),
 				getUndoManager: () => ( {
+					hasUndo: vi.fn( () => false ),
 					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
@@ -381,6 +387,7 @@ describe( 'editEntityRecord', () => {
 					meta: { key1: 'value1' },
 				} ),
 				getUndoManager: () => ( {
+					hasUndo: vi.fn( () => false ),
 					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
@@ -436,6 +443,7 @@ describe( 'editEntityRecord', () => {
 					meta: { existingKey: 'existingValue' },
 				} ),
 				getUndoManager: () => ( {
+					hasUndo: vi.fn( () => false ),
 					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
@@ -471,6 +479,7 @@ describe( 'editEntityRecord', () => {
 				getRawEntityRecord: () => ( { id: 1, title: 'Original' } ),
 				getEditedEntityRecord: () => ( { id: 1, title: 'Original' } ),
 				getUndoManager: () => ( {
+					hasUndo: vi.fn( () => false ),
 					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
@@ -527,6 +536,7 @@ describe( 'editEntityRecord', () => {
 					meta: { existingKey: 'existingValue' },
 				} ),
 				getUndoManager: () => ( {
+					hasUndo: vi.fn( () => false ),
 					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),

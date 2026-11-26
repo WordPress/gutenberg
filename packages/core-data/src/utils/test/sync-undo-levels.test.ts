@@ -217,20 +217,75 @@ describe( 'recordEntityEdit', () => {
 		recordEntityEdit(
 			undoManager,
 			syncManager,
-			createRecord( 1, 'a', 'b' ),
+			createRecord( 1, 'a', 'b' )
+		);
+		recordEntityEdit(
+			undoManager,
+			syncManager,
+			createRecord( 1, 'b', 'c' ),
 			true
 		);
 		recordEntityEdit( undoManager, syncManager );
 		recordEntityEdit(
 			undoManager,
 			syncManager,
-			createRecord( 1, 'b', 'c' )
+			createRecord( 1, 'c', 'd' )
 		);
 
-		expect( undoManager.undo() ).toEqual( createRecord( 1, 'b', 'c' ) );
-		expect( undoManager.undo() ).toEqual( createRecord( 1, 'a', 'b' ) );
+		expect( undoManager.undo() ).toEqual( createRecord( 1, 'c', 'd' ) );
+		expect( undoManager.undo() ).toEqual( createRecord( 1, 'a', 'c' ) );
 		expect( syncManager.undoHistory.stopCapturing ).toHaveBeenCalledTimes(
-			3
+			4
+		);
+	} );
+
+	it( 'does not record a staged edit made before the first level', () => {
+		const undoManager = createUndoManager();
+
+		// A block setting a value on itself as it loads.
+		recordEntityEdit(
+			undoManager,
+			undefined,
+			createRecord( 1, 'a', 'b' ),
+			true
+		);
+		expect( undoManager.hasUndo() ).toBe( false );
+
+		recordEntityEdit( undoManager, undefined, createRecord( 1, 'b', 'c' ) );
+
+		expect( undoManager.undo() ).toEqual( createRecord( 1, 'b', 'c' ) );
+		expect( undoManager.hasUndo() ).toBe( false );
+	} );
+
+	it( 'keeps the redo history when undoing past the first level', () => {
+		const undoManager = createUndoManager();
+
+		recordEntityEdit(
+			undoManager,
+			undefined,
+			createRecord( 1, 'a', 'b' ),
+			true
+		);
+		recordEntityEdit( undoManager, undefined, createRecord( 1, 'b', 'c' ) );
+		recordEntityEdit( undoManager, undefined, createRecord( 1, 'c', 'd' ) );
+
+		expect( applyUndoLevel( undoManager, undefined, 'undo' ) ).toEqual(
+			createRecord( 1, 'c', 'd' )
+		);
+		expect( applyUndoLevel( undoManager, undefined, 'undo' ) ).toEqual(
+			createRecord( 1, 'b', 'c' )
+		);
+		// Undoing again finds nothing, and the value the block set on itself
+		// as it loaded is still in place, so the block makes no new edit.
+		expect(
+			applyUndoLevel( undoManager, undefined, 'undo' )
+		).toBeUndefined();
+
+		expect( applyUndoLevel( undoManager, undefined, 'redo' ) ).toEqual(
+			createRecord( 1, 'b', 'c' )
+		);
+		expect( applyUndoLevel( undoManager, undefined, 'redo' ) ).toEqual(
+			createRecord( 1, 'c', 'd' )
 		);
 	} );
 } );
