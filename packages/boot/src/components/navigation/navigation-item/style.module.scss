@@ -18,20 +18,26 @@
 	// Rounded focus ring
 	border-radius: var(--wpds-border-radius-sm);
 
-	&:hover,
-	&:focus,
-	&[aria-current="true"] {
-		color: var(--wpds-color-foreground-interactive-brand-active);
-	}
-
 	svg:last-child {
 		padding: variables.$grid-unit-05;
 	}
 
+	// The current item is a persistent selection, so it uses the resting
+	// brand color. Hover and focus follow it to show the interaction state.
+	&[aria-current="true"],
 	&[aria-current="page"],
 	&[data-status="active"] {
-		color: var(--wpds-color-foreground-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	&[aria-current="page"],
+	&[data-status="active"] {
 		font-weight: var(--wpds-typography-font-weight-emphasis);
+	}
+
+	&:hover,
+	&:focus {
+		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 
 	// Make sure the focus style is drawn on top of the current item background.

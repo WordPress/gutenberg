@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 import { mat2d, vec2 } from 'gl-matrix';
 import { getImageEdit } from '../get-image-edit';
 import { getOutputSize } from '../get-output-size';
+import { applyImageEdit } from '../apply-image-edit';
 import type { ImageEdit } from '../get-image-edit';
 import { createExportCamera, getRotatedBBox } from '../core/camera';
 import { DEFAULT_STATE } from '../core/constants';
@@ -283,6 +284,98 @@ describe( 'getImageEdit ↔ Export-camera parity', () => {
 	}
 } );
 
+describe( 'applyImageEdit ↔ Export-camera parity', () => {
+	// Written by hand rather than read from a state, so the exporter is an
+	// independent check.
+	const edits: [ string, ImageEdit ][] = [
+		[
+			'a flip, a quarter turn and an off-center crop',
+			{
+				flip: { horizontal: true, vertical: false },
+				rotation: 90,
+				crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.3 },
+			},
+		],
+		[
+			'a fine rotation with a crop inside the image',
+			{
+				rotation: 15,
+				crop: { x: 0.35, y: 0.35, width: 0.3, height: 0.3 },
+			},
+		],
+	];
+
+	for ( const [ name, edit ] of edits ) {
+		for ( const { label, u, v } of PROBES ) {
+			it( `${ name }, probe=${ label }`, () => {
+				const applied = applyImageEdit( makeState(), edit );
+				if ( ! ( 'state' in applied ) ) {
+					throw new Error( `Rejected as ${ applied.rejected }` );
+				}
+
+				const exported = exportSourcePixel(
+					applied.state as InternalImageEditorState,
+					IMAGE,
+					outputSizeFor( edit, IMAGE ),
+					u,
+					v
+				);
+				const server = serverSourcePixel( edit, IMAGE, u, v );
+
+				expect( exported.x ).toBeCloseTo( server.x, 0 );
+				expect( exported.y ).toBeCloseTo( server.y, 0 );
+			} );
+		}
+	}
+
+	it( 'never applies a hand-built state as a different edit', () => {
+		// Built by hand, so some frame a part of the image the editor would
+		// not allow. In strict mode each must come back unchanged or be
+		// rejected.
+		const states = buildRows()
+			.filter( ( { probeLabel } ) => probeLabel === 'center' )
+			.map( ( { state } ) => state );
+		const different: string[] = [];
+		let applied = 0;
+		let rejected = 0;
+
+		for ( const state of states ) {
+			const edit = getImageEdit( state );
+			if ( ! edit ) {
+				continue;
+			}
+			const result = applyImageEdit( makeState(), edit, {
+				strict: true,
+			} );
+			if ( ! ( 'state' in result ) ) {
+				rejected++;
+				continue;
+			}
+			applied++;
+			const asked = readEdit( edit );
+			const held = readEdit( getImageEdit( result.state ) );
+			const whole = { x: 0, y: 0, width: 1, height: 1 };
+			const askedCrop = asked.crop ?? whole;
+			const heldCrop = held.crop ?? whole;
+			const same =
+				asked.flip.horizontal === held.flip.horizontal &&
+				asked.flip.vertical === held.flip.vertical &&
+				Math.abs( asked.rotation - held.rotation ) < 1e-6 &&
+				( [ 'x', 'y', 'width', 'height' ] as const ).every(
+					( key ) =>
+						Math.abs( askedCrop[ key ] - heldCrop[ key ] ) <= 1e-3
+				);
+			if ( ! same ) {
+				different.push( JSON.stringify( edit ) );
+			}
+		}
+
+		expect( different ).toEqual( [] );
+		expect( applied ).toBeGreaterThan( 0 );
+		expect( rejected ).toBeGreaterThan( 0 );
+	} );
+} );
+
 describe( 'getOutputSize agrees with getImageEdit', () => {
 	// Big enough that a crop just inside the pruning tolerance is still
 	// tens of pixels, which a smallest-size check would act on.
@@ -300,10 +393,11 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 
 	it( 'swaps the sides on a quarter turn', () => {
 		const state = makeState( { image: BIG, rotation: 90 } );
-		const size = getOutputSize( state );
 
-		expect( size?.width ).toBeCloseTo( 10000, 6 );
-		expect( size?.height ).toBeCloseTo( 20000, 6 );
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 10000,
+			height: 20000,
+		} );
 	} );
 
 	it( 'takes the crop out of the image at its rotation', () => {
@@ -313,17 +407,68 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 			rotation: 90,
 			cropRect: { x: 0.25, y: 0, width: 0.5, height: 1 },
 		} );
-		const size = getOutputSize( state );
 
-		expect( size?.width ).toBeCloseTo( 5000, 6 );
-		expect( size?.height ).toBeCloseTo( 20000, 6 );
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 5000,
+			height: 20000,
+		} );
+	} );
+} );
+
+// The pan and zoom that `applyImageEdit` works out leave floating-point
+// noise, such as a width of 1439.9999999999998 pixels.
+describe( 'reading an edit back removes floating-point noise', () => {
+	function stateOf( edit: ImageEdit ) {
+		const result = applyImageEdit( makeState(), edit );
+		if ( ! ( 'state' in result ) ) {
+			throw new Error( `Rejected: ${ result.rejected }` );
+		}
+		return result.state;
+	}
+
+	it( 'reads a crop of nine tenths as whole pixels', () => {
+		const state = stateOf( {
+			crop: { x: 0.05, y: 0.05, width: 0.9, height: 0.9 },
+		} );
+
+		expect( getOutputSize( state ) ).toEqual( {
+			width: 1440,
+			height: 810,
+		} );
+	} );
+
+	it( 'reads a crop on the edge of the image as starting at 0', () => {
+		const state = stateOf( {
+			crop: { x: 0, y: 0, width: 0.5, height: 1 },
+		} );
+
+		expect( getImageEdit( state )?.crop ).toEqual( {
+			x: 0,
+			y: 0,
+			width: 0.5,
+			height: 1,
+		} );
+	} );
+
+	it( 'keeps a size that is not near whole pixels', () => {
+		const size = getOutputSize( stateOf( { rotation: 5 } ) );
+
+		expect( size?.width ).toBeCloseTo( 1389.9286, 3 );
+		expect( Number.isInteger( size?.width ) ).toBe( false );
 	} );
 } );
 
 describe( 'getImageEdit without a loaded image', () => {
-	it( 'returns null, whatever the edit', () => {
-		const state = makeState( { image: null, rotation: 45 } );
+	it.each( [
+		[ 'no image', null ],
+		[
+			'no usable size',
+			{ src: 'test.jpg', naturalWidth: Number.NaN, naturalHeight: 900 },
+		],
+	] )( 'returns null for %s, whatever the edit', ( _, image ) => {
+		const state = makeState( { image, rotation: 45 } );
 
 		expect( getImageEdit( state ) ).toBeNull();
+		expect( getOutputSize( state ) ).toBeNull();
 	} );
 } );
