@@ -22,8 +22,7 @@
 		transition: background-color 0.1s ease-out, border-color 0.1s ease-out;
 	}
 
-	&:hover,
-	&:has(.editor-document-bar__command:is(:focus-visible, :active)) {
+	&:is(:hover, :has(.editor-document-bar__command:is(:focus-visible, :active))) {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		border-color: var(--wpds-color-stroke-interactive-neutral-active);
 
@@ -92,8 +91,9 @@
 	z-index: 1;
 	position: absolute;
 
+	// Also on the bar's active fill.
 	&:hover,
-	.editor-document-bar:hover & {
+	.editor-document-bar:is(:hover, :has(.editor-document-bar__command:is(:focus-visible, :active))) & {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		background-color: transparent;
 	}
