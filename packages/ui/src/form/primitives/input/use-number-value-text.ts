@@ -13,6 +13,9 @@ function toValueText(
  *
  * Remove this hook once VoiceOver reads such an input as its value.
  *
+ * An uncontrolled input's value text follows user edits and form resets, but
+ * not a value set directly on the element, which fires no event.
+ *
  * @param props The input's props that affect its value text.
  */
 export function useNumberValueText(
