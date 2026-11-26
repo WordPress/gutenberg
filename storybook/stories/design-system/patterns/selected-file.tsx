@@ -72,11 +72,17 @@ function usePreviewUrl( file: File ) {
  */
 function FileThumbnail( { file }: { file: File } ) {
 	const previewUrl = usePreviewUrl( file );
+	// Some images, such as HEIC photos, can't be shown in every browser.
+	const [ brokenUrl, setBrokenUrl ] = useState< string >();
 
 	return (
 		<span className={ styles.thumbnail }>
-			{ previewUrl ? (
-				<img src={ previewUrl } alt="" />
+			{ previewUrl && previewUrl !== brokenUrl ? (
+				<img
+					src={ previewUrl }
+					alt=""
+					onError={ () => setBrokenUrl( previewUrl ) }
+				/>
 			) : (
 				<Icon icon={ fileIcon } />
 			) }
@@ -114,7 +120,7 @@ function FileDetails( {
  * They share one line when they fit. In a narrow space, the type and size
  * move below the name, and a long name wraps, so it is never cut.
  *
- * It renders only `span` elements, so it can be the content of a button.
+ * It renders only phrasing content, so it can be the content of a button.
  */
 export function FileSummary( { file }: { file: File } ) {
 	return (
