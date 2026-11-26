@@ -1231,6 +1231,27 @@ describe( 'block selection with multiSelectSet', () => {
 		);
 	} );
 
+	it( 'duplicates a block when its client ID is passed as a string', async () => {
+		const [ block, sibling ] = blocks;
+		const parent = createBlock( 'core/test-selection', {}, [
+			block,
+			sibling,
+		] );
+		registry.dispatch( store ).resetBlocks( [ parent ] );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( parent.clientId, {} );
+		const clones = await registry
+			.dispatch( store )
+			// @ts-expect-error Test a JavaScript caller passing a single ID.
+			.duplicateBlocks( block.clientId );
+
+		expect( clones ).toHaveLength( 1 );
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( [ block.clientId, clones![ 0 ], sibling.clientId ] );
+	} );
+
 	it( 'duplicates each group of adjacent selected siblings after the originals within the same parent', async () => {
 		const parents = [
 			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),

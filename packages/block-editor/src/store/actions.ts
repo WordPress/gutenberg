@@ -2156,12 +2156,13 @@ export function setBlockMovingClientId() {
 export const duplicateBlocks =
 	( clientIds: string[], updateSelection: boolean = true ) =>
 	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
-		if ( ! select.canDuplicateBlocks( clientIds ) ) {
+		const ids = typeof clientIds === 'string' ? [ clientIds ] : clientIds;
+		if ( ! select.canDuplicateBlocks( ids ) ) {
 			return;
 		}
 		// Deduplicate and order targets as they appear in the document. Skip
 		// descendants of selected parents: cloning a parent already copies them.
-		const uniqueIds = new Set( clientIds );
+		const uniqueIds = new Set( ids );
 		const orderedIds = select
 			.getClientIdsWithDescendants()
 			.filter(
