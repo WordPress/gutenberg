@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
