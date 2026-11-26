@@ -72,6 +72,7 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
+		await requestUtils.deleteAllMedia();
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
@@ -291,5 +292,83 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		).toBeFocused();
 		await page.keyboard.press( 'Space' );
 		await expect( summary ).toContainText( replacement );
+	} );
+
+	test( 'an image resized by its drag handle reads as one resize', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/1024x768_e2e_test_image_size.jpeg'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: media.id, url: media.source_url },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'img' )
+			.click();
+		const handle = editor.canvas.locator(
+			'.components-resizable-box__handle-right'
+		);
+		await expect( handle ).toBeVisible();
+		const box = ( await handle.boundingBox() )!;
+		const saved = suggestionSavedPromise( page );
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		await page.mouse.move( box.x - 150, box.y + box.height / 2, {
+			steps: 10,
+		} );
+		await page.mouse.up();
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		// The drag writes the width, an "auto" height and usually an aspect
+		// ratio. A reviewer is told the one thing that happened.
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Change:' } )
+		).toHaveText( /^Change: image resized to \d+px wide$/ );
+	} );
+
+	test( 'an image rotated in the media editor reads as an edited image', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/1024x768_e2e_test_image_size.jpeg'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { id: media.id, url: media.source_url },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'img' )
+			.click();
+		await editor.clickBlockToolbarButton( 'Edit image' );
+		const modal = page.getByRole( 'dialog', { name: 'Edit media' } );
+		await modal
+			.getByRole( 'button', { name: 'Rotate 90° clockwise' } )
+			.click();
+		const saved = suggestionSavedPromise( page );
+		await modal.getByRole( 'button', { name: 'Save' } ).click();
+		await saved;
+
+		const sidebar = await openNotesSidebar( page );
+		// The edit saves a new attachment, so the block's id and URL change.
+		await expect(
+			sidebar
+				.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+				.filter( { hasText: 'Change:' } )
+		).toHaveText( 'Change: image edited' );
 	} );
 } );
