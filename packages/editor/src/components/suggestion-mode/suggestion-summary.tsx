@@ -22,6 +22,9 @@
  *                        isn't silently swallowed or shown as `camelCase`.
  *                        A scalar value states both sides of the change
  *                        ("heading level 3 → 4"); objects keep the bare name.
+ *                        An Image block's size and file are described by
+ *                        what was done ("image resized to 348px wide",
+ *                        "image edited") rather than attribute by attribute.
  *   - **Rename block:** — the one attribute change worth its own line: a
  *                        block renamed through `metadata.name`, reported
  *                        with the name being proposed. Any other metadata
@@ -414,6 +417,138 @@ function describeAttributeChange( op: any ): string[] {
 			presentAttributeValue( op.after )
 		),
 	];
+}
+
+/**
+ * Present an image dimension, or null when it is left to the browser.
+ *
+ * @param value `width` or `height` attribute value.
+ * @return Display text, or null for an unset or `auto` dimension.
+ */
+function presentImageDimension( value: any ): string | null {
+	if ( typeof value === 'number' ) {
+		return `${ value }px`;
+	}
+	return typeof value === 'string' && value !== '' && value !== 'auto'
+		? value
+		: null;
+}
+
+/**
+ * Whether an `aspectRatio` value is one the resize handles wrote: unset, or
+ * the decimal they compute to keep the image's proportions. A ratio picked
+ * from the Aspect ratio control is a whole number or a fraction ("16/9").
+ *
+ * @param value `aspectRatio` attribute value.
+ * @return True when no one chose the ratio.
+ */
+function isComputedAspectRatio( value: any ): boolean {
+	return (
+		value === null ||
+		value === undefined ||
+		/^\d*\.\d+$/.test( String( value ) )
+	);
+}
+
+/**
+ * A URL's file name without its extension or the `-edited` suffix the media
+ * editor gives the copy it saves.
+ *
+ * @param url Image URL.
+ * @return The file's stem and whether it carries the suffix.
+ */
+function imageFileStem( url: string ): { stem: string; isEdited: boolean } {
+	const name = url.split( /[?#]/ )[ 0 ].split( '/' ).pop() ?? '';
+	const base = name.replace( /\.[^.]*$/, '' );
+	const stem = base.replace( /-edited(-\d+)?$/, '' );
+	return { stem, isEdited: stem !== base };
+}
+
+/**
+ * Describe what a suggestion does to an Image block's size and file.
+ *
+ * Dragging a resize handle writes `width`, an `auto` `height` and a
+ * computed `aspectRatio`; cropping or rotating saves a new attachment, so
+ * `id` and `url` change. Listed one by one these read as internals, so each
+ * group is named by what the author did.
+ *
+ * @param operations The suggestion's operations.
+ * @return The descriptions, and the operations they stand for.
+ */
+function describeImageChanges( operations: SuggestionOperation[] ): {
+	descriptions: string[];
+	described: Set< SuggestionOperation >;
+} {
+	const descriptions: string[] = [];
+	const described = new Set< SuggestionOperation >();
+	const find = ( attribute: string ) =>
+		operations.find(
+			( op ) => op?.type === 'attribute-set' && op.attribute === attribute
+		);
+
+	const urlOp = find( 'url' );
+	if (
+		urlOp &&
+		typeof urlOp.before === 'string' &&
+		typeof urlOp.after === 'string' &&
+		urlOp.before !== '' &&
+		urlOp.after !== ''
+	) {
+		const before = imageFileStem( urlOp.before );
+		const after = imageFileStem( urlOp.after );
+		descriptions.push(
+			after.isEdited && after.stem === before.stem
+				? __( 'image edited' )
+				: __( 'image replaced' )
+		);
+		described.add( urlOp );
+		const idOp = find( 'id' );
+		if ( idOp ) {
+			described.add( idOp );
+		}
+	}
+
+	const widthOp = find( 'width' );
+	const heightOp = find( 'height' );
+	const width = widthOp ? presentImageDimension( widthOp.after ) : null;
+	const height = heightOp ? presentImageDimension( heightOp.after ) : null;
+	let resize: string | null = null;
+	if ( width && height ) {
+		resize = sprintf(
+			/* translators: 1: image width, e.g. "300px". 2: image height, e.g. "200px". */
+			__( 'image resized to %1$s × %2$s' ),
+			width,
+			height
+		);
+	} else if ( width ) {
+		/* translators: %s: image width, e.g. "300px". */
+		resize = sprintf( __( 'image resized to %s wide' ), width );
+	} else if ( height ) {
+		/* translators: %s: image height, e.g. "200px". */
+		resize = sprintf( __( 'image resized to %s tall' ), height );
+	} else if ( widthOp ) {
+		resize = __( 'image reset to its original size' );
+	}
+	if ( resize ) {
+		descriptions.push( resize );
+		const ratioOp = find( 'aspectRatio' );
+		const resizeOps = [
+			widthOp,
+			heightOp,
+			ratioOp &&
+			isComputedAspectRatio( ratioOp.before ) &&
+			isComputedAspectRatio( ratioOp.after )
+				? ratioOp
+				: undefined,
+		];
+		for ( const op of resizeOps ) {
+			if ( op ) {
+				described.add( op );
+			}
+		}
+	}
+
+	return { descriptions, described };
 }
 
 /**
@@ -940,6 +1075,7 @@ function describePostFieldChange(
  * @param operations         Operations.
  * @param options            Options.
  * @param options.truncate   Whether to cap quoted text. Defaults to true.
+ * @param options.blockName  Name of the block the operations change.
  * @param options.taxonomies Taxonomy names by `rest_base`, for terms.
  * @param options.termNames  Term names by id, for terms.
  * @return Rendered lines.
@@ -948,10 +1084,12 @@ export function summarizeOperations(
 	operations: SuggestionOperation[] | null | undefined,
 	{
 		truncate = true,
+		blockName,
 		taxonomies = {},
 		termNames = {},
 	}: {
 		truncate?: boolean;
+		blockName?: string;
 		taxonomies?: TaxonomyNames;
 		termNames?: Record< number, string >;
 	} = {}
@@ -970,7 +1108,16 @@ export function summarizeOperations(
 	const linkUrls: string[] = [];
 	const linkChanges: string[] = [];
 
+	const imageChanges =
+		blockName === 'core/image' ? describeImageChanges( operations ) : null;
+	if ( imageChanges ) {
+		attributeLabels.push( ...imageChanges.descriptions );
+	}
+
 	for ( const op of operations ) {
+		if ( imageChanges?.described.has( op ) ) {
+			continue;
+		}
 		if ( op.type === 'block-remove' ) {
 			lines.push( {
 				label: __( 'Remove block:' ),
@@ -1311,6 +1458,7 @@ export function summarizeOperations(
  *
  * @param props            Props.
  * @param props.operations Operations to summarize.
+ * @param props.blockName  Name of the block the operations change.
  */
 const EMPTY_TERM_NAMES: Record< number, string > = {};
 
@@ -1419,8 +1567,10 @@ function FeaturedImageChange( {
 
 export default function SuggestionSummary( {
 	operations,
+	blockName,
 }: {
 	operations: SuggestionOperation[];
+	blockName?: string;
 } ) {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const summaryId = useInstanceId(
@@ -1430,17 +1580,23 @@ export default function SuggestionSummary( {
 	const taxonomies = useTaxonomyNames();
 	const termNames = useTermNames( operations, taxonomies );
 	const lines = useMemo(
-		() => summarizeOperations( operations, { taxonomies, termNames } ),
-		[ operations, taxonomies, termNames ]
+		() =>
+			summarizeOperations( operations, {
+				blockName,
+				taxonomies,
+				termNames,
+			} ),
+		[ operations, blockName, taxonomies, termNames ]
 	);
 	const fullLines = useMemo(
 		() =>
 			summarizeOperations( operations, {
 				truncate: false,
+				blockName,
 				taxonomies,
 				termNames,
 			} ),
-		[ operations, taxonomies, termNames ]
+		[ operations, blockName, taxonomies, termNames ]
 	);
 	if ( lines.length === 0 ) {
 		return null;
