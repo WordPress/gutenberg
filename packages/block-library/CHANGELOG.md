@@ -23,6 +23,7 @@
 -   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 -   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
+-   Table: Account for merged cells (`colspan` and `rowspan`) when inserting, deleting or aligning a column, so the action applies to the right cells and the table stays aligned ([#86811](https://github.com/WordPress/gutenberg/pull/86811)).
 
 ### Internal
 
