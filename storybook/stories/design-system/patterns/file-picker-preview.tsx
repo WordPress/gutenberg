@@ -59,7 +59,14 @@ export async function importPattern( file: File ) {
 		} ),
 		new Promise( ( resolve ) => setTimeout( resolve, 1500 ) ),
 	] );
-	if ( typeof data?.title !== 'string' ) {
+	// Check the file like the Patterns screen does.
+	if (
+		data?.__file !== 'wp_block' ||
+		typeof data.title !== 'string' ||
+		typeof data.content !== 'string' ||
+		! data.title ||
+		! data.content
+	) {
 		throw new Error( 'Not a pattern file.' );
 	}
 	return data.title as string;

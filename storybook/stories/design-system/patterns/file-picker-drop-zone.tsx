@@ -48,7 +48,12 @@ export function FilePickerDropZone( { disabled = false } ) {
 			return;
 		}
 		const [ chosen ] = files;
-		if ( getExtension( chosen.name ).toLowerCase() !== '.png' ) {
+		// `accept` only filters the picker, and allows both the extension and
+		// the MIME type, so check both here too.
+		if (
+			chosen.type !== 'image/png' &&
+			getExtension( chosen.name ).toLowerCase() !== '.png'
+		) {
 			setError( `Couldn’t use ${ chosen.name }. Choose a PNG image.` );
 			return;
 		}

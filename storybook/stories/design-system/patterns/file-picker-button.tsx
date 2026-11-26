@@ -59,8 +59,9 @@ export function FilePickerButton() {
 									return;
 								}
 								// `accept` only filters the picker, so check
-								// the file.
+								// the file, by its type or its extension.
 								if (
+									chosen.type !== 'application/json' &&
 									getExtension(
 										chosen.name
 									).toLowerCase() !== '.json'
