@@ -206,7 +206,7 @@ describe( 'CopyMenuItem', () => {
 		props: Partial< ComponentProps< typeof CopyMenuItem > > = {}
 	) {
 		const onCopy = vi.fn();
-		render(
+		const { unmount } = render(
 			createElement(
 				BlockRefs.Provider,
 				{
@@ -226,7 +226,7 @@ describe( 'CopyMenuItem', () => {
 			)
 		);
 		fireEvent.click( screen.getByRole( 'menuitem' ) );
-		return { onCopy };
+		return { onCopy, unmount };
 	}
 
 	it( 'copies resolved content without changing the block and marks copy success', async () => {
@@ -245,6 +245,44 @@ describe( 'CopyMenuItem', () => {
 		expect( block.attributes.metadata!.bindings!.content.source ).toBe(
 			'testing/copy'
 		);
+	} );
+
+	it( 'writes serialized text even when rich copy events succeed and sanitize block comments', async () => {
+		const copied = new Map< string, string >();
+		const setData = vi.fn( ( type: string, value: string ) => {
+			copied.set(
+				type,
+				type === 'text/html'
+					? value.replace( /<!--[\s\S]*?-->/g, '' )
+					: value
+			);
+		} );
+		vi.mocked( document.execCommand ).mockImplementation( () => {
+			fireEvent.copy( screen.getByRole( 'textbox' ), {
+				clipboardData: { setData },
+			} );
+			return true;
+		} );
+		clipboard.writeText.mockImplementation( async ( value ) => {
+			copied.set( 'text/plain', value );
+		} );
+		const { onCopy } = renderMenuItem();
+
+		await waitFor( () => expect( onCopy ).toHaveBeenCalledTimes( 1 ) );
+		expect( clipboard.writeText ).toHaveBeenCalledTimes( 1 );
+		expect( clipboard.write ).not.toHaveBeenCalled();
+		expect( document.execCommand ).not.toHaveBeenCalled();
+		expect( setData ).not.toHaveBeenCalled();
+		const pasted = parse( copied.get( 'text/plain' )! );
+		expect( pasted ).toMatchObject( [
+			{
+				isValid: true,
+				attributes: {
+					content: 'Bound text',
+					metadata: block.attributes.metadata,
+				},
+			},
+		] );
 	} );
 
 	it( 'removes cut blocks only after the clipboard write succeeds', async () => {
@@ -278,36 +316,16 @@ describe( 'CopyMenuItem', () => {
 		const { onCopy } = renderMenuItem( { eventType: 'cut' } );
 
 		await waitFor( () =>
-			expect( document.execCommand ).toHaveBeenCalled()
+			expect( clipboard.writeText ).toHaveBeenCalledTimes( 1 )
 		);
+		expect( document.execCommand ).not.toHaveBeenCalled();
 		expect( removeBlocks ).not.toHaveBeenCalled();
 		expect( notifyCopy ).not.toHaveBeenCalled();
 		expect( onCopy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'preserves the binding when Cut uses the asynchronous clipboard fallback', async () => {
+	it( 'preserves the binding when Cut writes serialized text', async () => {
 		const copied = new Map< string, string >();
-		clipboard.write.mockImplementation( async ( items ) => {
-			for ( const [ type, blob ] of Object.entries(
-				items[ 0 ].representations
-			) ) {
-				const text = blob.text
-					? await blob.text()
-					: await new Promise< string >( ( resolve ) => {
-							const reader = new FileReader();
-							reader.onload = () =>
-								resolve( reader.result as string );
-							reader.readAsText( blob );
-						} );
-				// Model an HTML clipboard write that sanitizes block comments.
-				copied.set(
-					type,
-					type === 'text/html'
-						? text.replace( /<!--[\s\S]*?-->/g, '' )
-						: text
-				);
-			}
-		} );
 		clipboard.writeText.mockImplementation( async ( text ) => {
 			copied.set( 'text/plain', text );
 		} );
@@ -319,7 +337,8 @@ describe( 'CopyMenuItem', () => {
 		await waitFor( () =>
 			expect( removeBlocks ).toHaveBeenCalledTimes( 1 )
 		);
-		expect( document.execCommand ).toHaveBeenCalled();
+		expect( document.execCommand ).not.toHaveBeenCalled();
+		expect( clipboard.write ).not.toHaveBeenCalled();
 
 		const pasted = getPasteBlocks( {
 			clipboardData: {
@@ -338,6 +357,26 @@ describe( 'CopyMenuItem', () => {
 				},
 			},
 		] );
+	} );
+
+	it( 'finishes Cut after a successful write even if the menu has closed', async () => {
+		let finishWrite!: () => void;
+		clipboard.writeText.mockReturnValue(
+			new Promise< void >( ( resolve ) => {
+				finishWrite = resolve;
+			} )
+		);
+		const { unmount } = renderMenuItem( { eventType: 'cut' } );
+		unmount();
+		expect( removeBlocks ).not.toHaveBeenCalled();
+		finishWrite();
+		await waitFor( () =>
+			expect( removeBlocks ).toHaveBeenCalledWith(
+				[ block.clientId ],
+				false
+			)
+		);
+		expect( notifyCopy ).toHaveBeenCalledWith( 'cut', [ block.clientId ] );
 	} );
 
 	it( 'keeps copy styles on the original serialization path', async () => {

@@ -56,19 +56,6 @@ function copiedGroupMarkup() {
 	] );
 }
 
-function clipboardItem( representations: Record< string, string | Error > ) {
-	return {
-		types: Object.keys( representations ),
-		getType: vi.fn( async ( type: string ) => {
-			const value = representations[ type ];
-			if ( typeof value !== 'string' ) {
-				throw value;
-			}
-			return { text: async () => value } as Blob;
-		} ),
-	} as unknown as ClipboardItem;
-}
-
 function copiedListMarkup( copyWholeList = false ) {
 	const registry = createRegistry();
 	registry.register( blocksStore );
@@ -234,64 +221,47 @@ describe( 'usePasteStyles clipboard representations', () => {
 	} );
 	afterEach( () => vi.unstubAllGlobals() );
 
-	it.each( [ 'ClipboardItem', 'readText' ] )(
-		'keeps Group styles when plain text contains literal fragment comments (%s)',
-		async ( transport ) => {
-			const text = copiedGroupMarkup();
-			const result = await pasteStyles(
-				transport === 'ClipboardItem'
-					? {
-							read: vi
-								.fn()
-								.mockResolvedValue( [
-									clipboardItem( { 'text/plain': text } ),
-								] ),
-						}
-					: { readText: vi.fn().mockResolvedValue( text ) }
-			);
-			expect( result.attributes.style ).toEqual( style );
-			expect( result.attributes.content ).toBe( 'Target text' );
-		}
-	);
+	it( 'reads serialized text and ignores sanitized HTML clipboard data', async () => {
+		const read = vi.fn().mockResolvedValue( [] );
+		const readText = vi.fn().mockResolvedValue( copiedMarkup() );
+		const result = await pasteStyles( { read, readText } );
 
-	it.each( [
-		[ 'html', '', '' ],
-		[ 'text', '', '' ],
-		[ 'html', ' \n\t', '' ],
-		[ 'html', `<meta charset='utf-8'>\n`, '' ],
-		[
-			'html',
-			'<html><body><!--StartFragment-->\n',
-			'\n<!--EndFragment--></body></html>',
-		],
-	] )(
-		'keeps the List wrapper for Paste and the selected item styles for Paste styles (%s, %s)',
-		async ( representation, prefix, suffix ) => {
-			const copied = copiedListMarkup();
-			const { plainText } = copied;
-			const html = prefix + copied.html + suffix;
-			const result = await pasteStyles(
-				representation === 'html'
-					? {
-							read: vi.fn().mockResolvedValue( [
-								clipboardItem( {
-									'text/html': html,
-									'text/plain': plainText,
-								} ),
-							] ),
-						}
-					: { readText: vi.fn().mockResolvedValue( html ) }
+		expect( result.attributes ).toMatchObject( {
+			content: 'Target text',
+			style,
+		} );
+		expect( result.attributes.metadata ).toBeUndefined();
+		expect( result.notices ).toMatchObject( [ { status: 'success' } ] );
+		expect( readText ).toHaveBeenCalledOnce();
+		expect( read ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps Group styles when serialized text contains literal fragment comments', async () => {
+		const text = copiedGroupMarkup();
+		expect( text ).toContain( '<!--StartFragment-->' );
+		const result = await pasteStyles( {
+			readText: vi.fn().mockResolvedValue( text ),
+		} );
+		expect( result.attributes.style ).toEqual( style );
+		expect( result.attributes.content ).toBe( 'Target text' );
+	} );
+
+	it.each( [ false, true ] )(
+		'keeps the selected List or List Item styles in serialized text (whole list: %s)',
+		async ( wholeList ) => {
+			const { html } = copiedListMarkup( wholeList );
+			const result = await pasteStyles( {
+				readText: vi.fn().mockResolvedValue( html ),
+			} );
+			expect( result.attributes.fontSize ).toBe(
+				wholeList ? 'small' : 'large'
 			);
-			expect( result.attributes.fontSize ).toBe( 'large' );
 			expect( result.attributes.content ).toBe( 'Target text' );
 			expect( result.attributes.metadata ).toBeUndefined();
-			const representations: Record< string, string > =
-				representation === 'html'
-					? { 'text/html': html, 'text/plain': plainText }
-					: { 'text/plain': html };
 			const pasted = getPasteBlocks( {
 				clipboardData: {
-					getData: ( type: string ) => representations[ type ] ?? '',
+					getData: ( type: string ) =>
+						type === 'text/plain' ? html : '',
 					files: [],
 					items: [],
 				} as unknown as DataTransfer,
@@ -322,189 +292,25 @@ describe( 'usePasteStyles clipboard representations', () => {
 			expect( serialize( pasted ) ).not.toContain(
 				BLOCK_CLIPBOARD_WRAPPER
 			);
-			expect( plainText ).toBe( 'Bound item' );
 		}
 	);
 
-	it( 'keeps the styles of an actually selected List', async () => {
-		const { html } = copiedListMarkup( true );
-		expect( html ).not.toContain( BLOCK_CLIPBOARD_WRAPPER );
+	it( 'reports an error when the text clipboard read is denied', async () => {
 		const result = await pasteStyles( {
-			read: vi
-				.fn()
-				.mockResolvedValue( [
-					clipboardItem( { 'text/html': html } ),
-				] ),
+			readText: vi.fn().mockRejectedValue( new Error( 'Denied' ) ),
 		} );
-		expect( result.attributes.fontSize ).toBe( 'small' );
+		expect( result.attributes.style ).toBeUndefined();
+		expect( result.notices ).toMatchObject( [ { status: 'error' } ] );
 	} );
 
-	it( 'uses serialized HTML and applies only its styles', async () => {
-		const readText = vi.fn();
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [
-				clipboardItem( {
-					'text/html': copiedMarkup(),
-					'text/plain': 'Copied text',
-				} ),
-			] ),
-			readText,
-		} );
-
-		expect( result.attributes ).toMatchObject( {
-			content: 'Target text',
-			style,
-		} );
-		expect( result.attributes.metadata ).toBeUndefined();
-		expect( result.notices ).toMatchObject( [ { status: 'success' } ] );
-		expect( readText ).not.toHaveBeenCalled();
-	} );
-
-	it( 'uses the same item plain text when its HTML representation is unavailable', async () => {
-		const item = clipboardItem( {
-			'text/html': new DOMException(
-				'Unavailable HTML',
-				'NotFoundError'
-			),
-			'text/plain': copiedMarkup(),
-		} );
-		const readText = vi
-			.fn()
-			.mockRejectedValue(
-				new DOMException(
-					'No second clipboard activation',
-					'NotAllowedError'
-				)
-			);
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [ item ] ),
-			readText,
-		} );
-
-		expect( result.attributes.style ).toEqual( style );
-		expect( item.getType ).toHaveBeenCalledWith( 'text/plain' );
-		expect( readText ).not.toHaveBeenCalled();
-		expect( result.notices ).toMatchObject( [ { status: 'success' } ] );
-	} );
-
-	it( 'uses the next item when an HTML blob cannot be read', async () => {
-		const unavailableItem = {
-			types: [ 'text/html' ],
-			getType: vi.fn().mockResolvedValue( {
-				text: vi
-					.fn()
-					.mockRejectedValue( new Error( 'Unreadable HTML' ) ),
-			} ),
-		} as unknown as ClipboardItem;
-		const readText = vi
-			.fn()
-			.mockRejectedValue(
-				new DOMException(
-					'No second clipboard activation',
-					'NotAllowedError'
-				)
-			);
-		const result = await pasteStyles( {
-			read: vi
-				.fn()
-				.mockResolvedValue( [
-					unavailableItem,
-					clipboardItem( { 'text/html': copiedMarkup() } ),
-				] ),
-			readText,
-		} );
-
-		expect( result.attributes.style ).toEqual( style );
-		expect( readText ).not.toHaveBeenCalled();
-	} );
-
-	it( 'reads serialized plain text when the HTML has no block data', async () => {
-		const readText = vi.fn();
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [
-				clipboardItem( {
-					'text/html': '<p>Copied text</p>',
-					'text/plain': copiedMarkup(),
-				} ),
-			] ),
-			readText,
-		} );
-
-		expect( result.attributes.style ).toEqual( style );
-		expect( readText ).not.toHaveBeenCalled();
-	} );
-
-	it.each( [ 'unavailable', 'denied' ] )(
-		'reads legacy serialized text when rich reading is %s',
-		async ( richReading ) => {
-			const readText = vi.fn().mockResolvedValue( copiedMarkup() );
+	it.each( [ 'Plain text', '<p>Plain HTML</p>' ] )(
+		'warns when text contains no serialized blocks (%s)',
+		async ( text ) => {
 			const result = await pasteStyles( {
-				...( richReading === 'denied'
-					? {
-							read: vi
-								.fn()
-								.mockRejectedValue( new Error( 'Denied' ) ),
-						}
-					: {} ),
-				readText,
+				readText: vi.fn().mockResolvedValue( text ),
 			} );
-
-			expect( result.attributes.style ).toEqual( style );
-			expect( readText ).toHaveBeenCalledOnce();
+			expect( result.attributes.style ).toBeUndefined();
+			expect( result.notices ).toMatchObject( [ { status: 'warning' } ] );
 		}
 	);
-
-	it( 'reads legacy serialized text after all item representations fail', async () => {
-		const readText = vi.fn().mockResolvedValue( copiedMarkup() );
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [
-				clipboardItem( {
-					'text/html': new Error( 'Unreadable HTML' ),
-				} ),
-			] ),
-			readText,
-		} );
-
-		expect( result.attributes.style ).toEqual( style );
-		expect( readText ).toHaveBeenCalledOnce();
-	} );
-
-	it( 'reports an error when the item and legacy read are denied', async () => {
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [
-				clipboardItem( {
-					'text/html': new Error( 'Denied HTML' ),
-				} ),
-			] ),
-			readText: vi.fn().mockRejectedValue( new Error( 'Denied' ) ),
-		} );
-
-		expect( result.attributes.style ).toBeUndefined();
-		expect( result.notices ).toMatchObject( [ { status: 'error' } ] );
-	} );
-
-	it( 'warns when readable representations contain no serialized blocks', async () => {
-		const result = await pasteStyles( {
-			read: vi.fn().mockResolvedValue( [
-				clipboardItem( {
-					'text/html': '<p>Plain HTML</p>',
-					'text/plain': 'Plain text',
-				} ),
-			] ),
-			readText: vi.fn(),
-		} );
-
-		expect( result.attributes.style ).toBeUndefined();
-		expect( result.notices ).toMatchObject( [ { status: 'warning' } ] );
-	} );
-
-	it( 'reports an error when both clipboard reads are denied', async () => {
-		const result = await pasteStyles( {
-			read: vi.fn().mockRejectedValue( new Error( 'Denied' ) ),
-			readText: vi.fn().mockRejectedValue( new Error( 'Denied' ) ),
-		} );
-
-		expect( result.attributes.style ).toBeUndefined();
-		expect( result.notices ).toMatchObject( [ { status: 'error' } ] );
-	} );
 } );

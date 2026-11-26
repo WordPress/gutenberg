@@ -9,7 +9,7 @@ import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe } from '@wordpress/compose';
+import { pipe, useCopyToClipboard } from '@wordpress/compose';
 import type { ComponentProps } from 'react';
 import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
@@ -23,7 +23,6 @@ import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { getClipboardBlocksContent } from '../writing-flow/utils';
-import useBlockCopyToClipboard from './use-block-copy-to-clipboard';
 import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
@@ -44,17 +43,17 @@ export function CopyMenuItem( {
 	const registry = useRegistry();
 	const { attributesForCopy } = useContext( BlockRefs );
 	const notifyCopy = useNotifyCopy();
-	const ref = useBlockCopyToClipboard(
+	const ref = useCopyToClipboard(
 		() => {
 			const blocks = getBlocksByClientId( clientIds ) as Block[];
 			return eventType === 'copyStyles'
-				? { html: serialize( blocks ), hasBoundAttributes: false }
+				? serialize( blocks )
 				: getClipboardBlocksContent(
 						blocks,
 						registry,
 						attributesForCopy,
 						{ addWrapper: true }
-					);
+					).html;
 		},
 		() => {
 			switch ( eventType ) {

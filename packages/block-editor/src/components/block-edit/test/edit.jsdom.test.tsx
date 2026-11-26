@@ -56,7 +56,8 @@ describe( 'Edit', () => {
 			} ) => Record< string, unknown > = () => ( {
 				content: 'Resolved text',
 			} ),
-			copySupport: { supportsCopy?: boolean } = { supportsCopy: true }
+			copySupport: { supportsCopy?: boolean } = { supportsCopy: true },
+			onEdit?: ( attributes: Record< string, unknown > ) => void
 		) {
 			registerBlockBindingsSource( {
 				name: 'testing/copy',
@@ -69,11 +70,17 @@ describe( 'Edit', () => {
 				apiVersion: 3,
 				category: 'text',
 				title: 'Copy test',
-				edit: ( { attributes } ) => (
-					<p>
-						{ ( attributes.content ?? attributes.text ) as string }
-					</p>
-				),
+				edit: ( { attributes } ) => {
+					onEdit?.( attributes );
+					return (
+						<p>
+							{
+								( attributes.content ??
+									attributes.text ) as string
+							}
+						</p>
+					);
+				},
 				save: noop,
 			} );
 		}
@@ -328,6 +335,7 @@ describe( 'Edit', () => {
 			{ blockContext: { queryId: 0 } },
 			{ blockContext: { query: {} } },
 			{ blockContext: { termQuery: {} } },
+			{ blockContext: { commentId: 12 } },
 		] )(
 			'does not register an ineligible edit instance (%j)',
 			( props ) => {
@@ -410,6 +418,60 @@ describe( 'Edit', () => {
 					).attributes
 				).toEqual( { ...attributes, text: 'Visible label' } );
 				expect( attributes ).not.toHaveProperty( 'text' );
+			}
+		);
+
+		it.each( [
+			'?s=books',
+			'',
+			null,
+			undefined,
+			'https://example.com/new',
+		] )(
+			'preserves the saved Button URL when its copy value is invalid (%s)',
+			( resolvedUrl ) => {
+				const onEdit = vi.fn();
+				registerBoundBlock(
+					() => ( { text: 'Visible label', url: resolvedUrl } ),
+					{ supportsCopy: true },
+					onEdit
+				);
+				const attributesForCopy = new Map();
+				const attributes = {
+					url: 'https://example.com/saved',
+					metadata: {
+						bindings: {
+							text: { source: 'testing/copy' },
+							url: { source: 'testing/copy' },
+						},
+					},
+				};
+				render(
+					<BoundEdit
+						attributesForCopy={ attributesForCopy }
+						attributes={ attributes }
+						bindableAttributes={ [ 'text', 'url' ] }
+					/>
+				);
+				const validUrl = resolvedUrl === 'https://example.com/new';
+				expect( onEdit ).toHaveBeenLastCalledWith(
+					expect.objectContaining( {
+						url: validUrl ? resolvedUrl : null,
+						text: 'Visible label',
+					} )
+				);
+				const copiedAttributes = getBoundAttributesForCopy(
+					{ clientId: 'bound-block', attributes },
+					attributesForCopy
+				);
+				expect( copiedAttributes ).toEqual( {
+					text: 'Visible label',
+					...( validUrl ? { url: resolvedUrl } : {} ),
+				} );
+				expect( { ...attributes, ...copiedAttributes }.url ).toBe(
+					validUrl ? resolvedUrl : 'https://example.com/saved'
+				);
+				expect( attributes.url ).toBe( 'https://example.com/saved' );
 			}
 		);
 

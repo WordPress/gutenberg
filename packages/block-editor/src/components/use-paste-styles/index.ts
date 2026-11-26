@@ -5,10 +5,7 @@ import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
-import {
-	normalizeClipboardHTML,
-	stripBlockClipboardWrapper,
-} from '../../utils/block-clipboard';
+import { stripBlockClipboardWrapper } from '../../utils/block-clipboard';
 import {
 	hasAlignSupport,
 	hasBorderSupport,
@@ -27,14 +24,11 @@ import {
  * Parse a clipboard representation that contains serialized blocks.
  *
  * @param text The copied text.
- * @param type The clipboard representation's MIME type.
  * @return The serialized blocks, or an empty array for other content.
  */
-function getSerializedBlocks( text: string, type = 'text/plain' ): Block[] {
+function getSerializedBlocks( text: string ): Block[] {
 	try {
-		const normalizedText =
-			type === 'text/html' ? normalizeClipboardHTML( text ) : text;
-		const content = stripBlockClipboardWrapper( normalizedText );
+		const content = stripBlockClipboardWrapper( text );
 		const blocks = parse( content, {
 			__unstableSkipMigrationLogs: true,
 			__unstableSkipAutop: true,
@@ -42,50 +36,13 @@ function getSerializedBlocks( text: string, type = 'text/plain' ): Block[] {
 		if ( blocks.length === 1 && blocks[ 0 ].name === 'core/freeform' ) {
 			return [];
 		}
-		if ( content !== normalizedText && blocks.length === 1 ) {
+		if ( content !== text && blocks.length === 1 ) {
 			return blocks[ 0 ].innerBlocks;
 		}
 		return blocks;
 	} catch {
 		return [];
 	}
-}
-
-async function readCopiedBlocks( clipboard: Clipboard ): Promise< Block[] > {
-	if ( clipboard.read ) {
-		try {
-			const items = await clipboard.read();
-			let hasReadError = false;
-			// Bound blocks have serialized markup in HTML and visible text in
-			// plain text. Copy styles and unbound blocks use serialized text.
-			for ( const type of [ 'text/html', 'text/plain' ] ) {
-				for ( const item of items ) {
-					if ( ! item.types.includes( type ) ) {
-						continue;
-					}
-					try {
-						const blocks = getSerializedBlocks(
-							await ( await item.getType( type ) ).text(),
-							type
-						);
-						if ( blocks.length ) {
-							return blocks;
-						}
-					} catch {
-						hasReadError = true;
-						// An advertised representation can be unavailable.
-						// Try the others from this successful clipboard read.
-					}
-				}
-			}
-			if ( ! hasReadError ) {
-				return [];
-			}
-		} catch {
-			// Some browsers only allow the legacy text read.
-		}
-	}
-	return getSerializedBlocks( await clipboard.readText() );
 }
 
 /**
@@ -202,8 +159,8 @@ export default function usePasteStyles() {
 					return;
 				}
 
-				copiedBlocks = await readCopiedBlocks(
-					window.navigator.clipboard
+				copiedBlocks = getSerializedBlocks(
+					await window.navigator.clipboard.readText()
 				);
 			} catch {
 				// Possibly the permission is denied.

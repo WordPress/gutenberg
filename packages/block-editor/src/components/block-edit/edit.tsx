@@ -161,6 +161,10 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 							// Sources return URLs as strings.
 							( ! value || ! isURLLike( value as string ) )
 						) {
+							if ( isForCopy ) {
+								// Keep the saved fallback when a source URL is invalid.
+								continue;
+							}
 							// Return null if value is not a valid URL.
 							attributesFromSources[ attributeName ] = null;
 						} else {
@@ -216,7 +220,8 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			isPreviewMode ||
 			blockContext.query !== undefined ||
 			blockContext.queryId !== undefined ||
-			blockContext.termQuery !== undefined
+			blockContext.termQuery !== undefined ||
+			blockContext.commentId !== undefined
 		) {
 			return;
 		}
@@ -239,6 +244,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	}, [
 		attributes,
 		attributesForCopy,
+		blockContext.commentId,
 		blockContext.query,
 		blockContext.queryId,
 		blockContext.termQuery,
