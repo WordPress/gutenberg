@@ -216,9 +216,8 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canCopyStyles,
 				canDuplicate,
-				canInsertBlock,
-				canInsertBefore = canInsertBlock,
-				canInsertAfter = canInsertBlock,
+				canInsertBefore,
+				canInsertAfter,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
