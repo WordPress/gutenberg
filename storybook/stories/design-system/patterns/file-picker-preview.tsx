@@ -59,7 +59,7 @@ export async function importPattern( file: File ) {
 		} ),
 		new Promise( ( resolve ) => setTimeout( resolve, 1500 ) ),
 	] );
-	// Check the file like the Patterns screen does.
+	// Check the fields the Patterns screen requires before it saves a pattern.
 	if (
 		data?.__file !== 'wp_block' ||
 		typeof data.title !== 'string' ||
