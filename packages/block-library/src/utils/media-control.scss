@@ -49,6 +49,21 @@
 	outline: 1px solid transparent;
 }
 
+// Takes the same space as the image indicator, so the label doesn't shift
+// between states. The 24px icon overflows it evenly on each side.
+.block-library-utils__media-control__inspector-icon-indicator {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+
+	svg {
+		flex-shrink: 0;
+	}
+}
+
 .block-library-utils__media-control__reset {
 	position: absolute;
 	right: 0;

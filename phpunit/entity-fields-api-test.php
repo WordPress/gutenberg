@@ -744,6 +744,51 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Firing the action again once the registry has been read does not reopen
+	 * it: the registrations, updates, and unregistrations made then are
+	 * refused, and so are the core collections, which register again on it.
+	 */
+	public function test_firing_the_action_again_does_not_reopen_the_registry() {
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::register_collection' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::update' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::unregister' );
+		$fields   = wp_get_registered_entity_fields( 'postType', 'page' );
+		$callback = static function () {
+			wp_register_entity_fields(
+				'test-plugin',
+				'postType',
+				'page',
+				array(
+					array(
+						'id'    => 'late',
+						'type'  => 'text',
+						'label' => 'Late',
+					),
+				)
+			);
+			wp_update_entity_fields(
+				'test-plugin',
+				'postType',
+				'page',
+				array(
+					array(
+						'id'    => 'author',
+						'label' => 'Late',
+					),
+				)
+			);
+			wp_unregister_entity_fields( 'postType', 'page', array( 'date' ) );
+		};
+		add_action( 'wp_entity_fields_api_init', $callback );
+		$this->callbacks[] = array( $callback, 10 );
+
+		do_action( 'wp_entity_fields_api_init' );
+
+		$this->assertSame( $fields, wp_get_registered_entity_fields( 'postType', 'page' ) );
+	}
+
+	/**
 	 * The core fields are registered on `wp_entity_fields_api_init` at priority 0,
 	 * before the plugins hooking the action at the default priority.
 	 */

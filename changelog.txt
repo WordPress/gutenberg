@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 24.5.0-rc.1 =
+= 24.5.0 =
 
 ## Changelog
 
@@ -362,6 +362,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @00kaku @aaronrobertshaw @adamsilverstein @aduth @alecgeatches @andrewserong @annezazu @ariel-maidana @cbravobernal @CGastrell @ciampo @coderGtm @DANNER5472 @Deepak-Bhojwani @desrosj @dhrupo @dhruvikpatel18 @dmsnell @dognose24 @draganescu @dsas @ellatrix @fushar @hambai @haritpanchal @hbhalodia @himanshu-mahendra-jain @himanshupathak95 @huzaifaalmesbah @IamYashKapoor @im3dabasia @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @karthikeya-io @kmlyz @kushagra-goyal-14 @lazerg @lucatume @luisherranz @Mamaduka @mattcowan @mattmiklic @mdtanjid0 @mikachan @mirka @mtias @Mukulsingh27 @Mustafabharmal @Nikschavan @noruzzamans @ntsekouras @oandregal @obenland @padams @Pathan-Amaankhan @Pranjal1423 @R1shabh-Gupta @ramonjd @rejaulalomkhan @retrofox @robelsust @SainathPoojary @salvatorecorsi @sanketio @saranshsinhaa @sarthaknagoshe2002 @shail-mehta @shreyasikhar @simison @SirLouen @Swanand01 @t-hamano @talldan @tellthemachines @torounit @umerwebdev @umeshnevase @USERSATOSHI @vladolaru @westonruter @yaman-694 @yashjawale @youknowriad
+
+
 
 
 = 24.4.2 =
