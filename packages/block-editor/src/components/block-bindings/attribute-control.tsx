@@ -27,6 +27,11 @@ import type {
 	BlockBindingsField,
 } from './types';
 
+const FIELD_TYPES_BY_ATTRIBUTE_TYPE: Record< string, string[] > = {
+	'rich-text': [ 'string' ],
+	url: [ 'url', 'string' ],
+};
+
 /**
  * Renders a control for viewing and editing a block attribute binding.
  *
@@ -61,8 +66,10 @@ export default function BlockBindingsAttributeControl( {
 				return {};
 			}
 
-			const attributeType =
-				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
+			const fieldTypes: Array< string | undefined > =
+				FIELD_TYPES_BY_ATTRIBUTE_TYPE[ _attribute?.type ] ?? [
+					_attribute?.type,
+				];
 
 			const sourceFields: Record< string, BlockBindingsField[] > = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
@@ -76,7 +83,7 @@ export default function BlockBindingsAttributeControl( {
 					}
 					const compatibleFieldsList = fieldsList.filter(
 						( field: BlockBindingsField ) =>
-							field.type === attributeType
+							fieldTypes.includes( field.type )
 					);
 					if ( compatibleFieldsList.length ) {
 						sourceFields[ sourceName ] = compatibleFieldsList;
