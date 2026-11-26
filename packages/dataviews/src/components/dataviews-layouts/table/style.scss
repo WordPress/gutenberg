@@ -141,7 +141,7 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
 			&,
 			& + tr {
-				--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-neutral-strong);
+				--dataviews-view-table-row-stroke: var(--wpds-color-foreground-interactive-neutral);
 			}
 		}
 

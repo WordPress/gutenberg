@@ -38,10 +38,12 @@
 				color: var(--wpds-color-foreground-content-neutral);
 			}
 		}
-		&.is-selected .dataviews-view-picker-grid__media::after {
-			box-shadow:
-				inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-surface-neutral-strong),
-				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
+		// Draw the selection ring outside the preview, so that it sits on the
+		// page background and stays visible whatever the preview shows. The
+		// outline follows the rounded corners of the preview.
+		&.is-selected .dataviews-view-picker-grid__media {
+			outline: var(--wpds-border-width-xs) solid var(--wpds-color-foreground-interactive-neutral);
+			outline-offset: var(--wpds-border-width-sm);
 		}
 		.dataviews-view-picker-grid__media:focus::after {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
