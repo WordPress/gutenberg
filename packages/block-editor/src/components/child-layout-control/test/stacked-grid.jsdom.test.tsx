@@ -133,8 +133,18 @@ describe( 'ChildLayoutControl in a grid stacked on mobile', () => {
 		return onChange;
 	}
 
-	it( 'shows the place of the block in the stack', () => {
+	it( 'shows the place of the block in the stack', async () => {
+		const user = userEvent.setup();
 		showControl();
+
+		// The block has no mobile layout yet, so the placement is shown from
+		// the panel's menu.
+		await user.click(
+			screen.getByRole( 'button', { name: 'Dimensions options' } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitemcheckbox', { name: /Grid placement/ } )
+		);
 
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Column span' } )
@@ -143,11 +153,11 @@ describe( 'ChildLayoutControl in a grid stacked on mobile', () => {
 			screen.getByRole( 'spinbutton', { name: 'Row span' } )
 		).toHaveValue( 1 );
 		expect(
-			screen.getByRole( 'spinbutton', { name: 'Column' } )
+			screen.getByRole( 'spinbutton', { name: 'Column start' } )
 		).toHaveValue( 1 );
-		expect( screen.getByRole( 'spinbutton', { name: 'Row' } ) ).toHaveValue(
-			3
-		);
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Row start' } )
+		).toHaveValue( 3 );
 	} );
 
 	it( 'unstacks the grid and keeps the stacked placement of the edited block', async () => {
