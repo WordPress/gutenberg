@@ -36,10 +36,10 @@ const FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS = {
 };
 
 // System colors that Chromium does not map to the forced colors palette.
-// Matches the keyword only: the prefix skips over quoted strings, and the
-// lookarounds reject asset paths, `url()` contents, and longer identifiers.
+// Matches the keyword only: the prefix skips over quoted strings and whole
+// `url()` arguments, and the lookarounds reject longer identifiers.
 const SELECTED_ITEM_SYSTEM_COLOR =
-	/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^"'])*?(?<=^|[\s,(])(?<!url\(\s*)(SelectedItem(?:Text)?)(?=$|[\s,)!;])/i;
+	/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|url\([^)]*\)|(?!url\()[^"'])*?(?<=^|[\s,(])(SelectedItem(?:Text)?)(?=$|[\s,)!;])/i;
 
 /** @type {import('stylelint').Config} */
 module.exports = {
