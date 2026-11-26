@@ -11,7 +11,7 @@
 -   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 -   `DropdownMenu`, `Dropdown`: Align menu spacing and dividers with the `Menu` component from `@wordpress/ui`: tighter popover and group padding, dividers inset to line up with item labels, and matching group label styles. This applies to any `Dropdown` that contains `MenuGroup`s ([#87092](https://github.com/WordPress/gutenberg/pull/87092)).
 -   `Tabs`, `TabPanel`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, with the same clearance on every side, and draw the focus ring inside it ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
--   Panel and ToolsPanel use the theme colors for surfaces, dividers, labels, and controls ([#87427](https://github.com/WordPress/gutenberg/pull/87427)).
+-   `Panel`, `ToolsPanel`: Use the `--wpds-color-*` tokens for surfaces, dividers, labels, icons, and controls, so they follow the active theme ([#87427](https://github.com/WordPress/gutenberg/pull/87427)).
 
 ### Deprecations
 
