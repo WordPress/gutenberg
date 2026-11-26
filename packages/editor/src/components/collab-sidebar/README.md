@@ -119,7 +119,7 @@ API:
 
 Registering never measures directly. `requestMeasure()` re-observes the root; a new observation always reports once, so the observer runs another pass before the next paint, together with any other resizes in that frame.
 
-`getNoteAnchorRect(noteId, blockEl)` resolves the anchor at read time, because rich-text re-renders replace the marker element: an inline note, the pending `new` note included, anchors to its marker, and anything else to its block.
+`getNoteAnchorRect(noteId, blockEl)` resolves the anchor at read time, because rich-text re-renders replace the marker element: an inline note, the pending `new` note included, anchors to its marker, a suggestion to the first of its markers, and anything else to its block.
 
 ### 2. `useFloatingBoard` - the React bridge (in `hooks.js`)
 
