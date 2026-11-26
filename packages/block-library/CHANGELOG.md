@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Cover: Load a background image large enough to fill the height of the block, so a wide image in a tall Cover is no longer blurry on narrow screens.
+-   Cover: Load a background image large enough to fill the height of the block, so a wide image in a tall Cover is no longer blurry on narrow screens ([#87464](https://github.com/WordPress/gutenberg/pull/87464)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
