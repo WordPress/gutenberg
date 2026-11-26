@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
+import type { BlockSaveProps } from '@wordpress/blocks';
 import metadata from './block.json';
+import type { EmbedAttributes } from './types';
 
 const { attributes: blockAttributes } = metadata;
 
@@ -8,7 +10,7 @@ const { attributes: blockAttributes } = metadata;
 // to the embed figcaption element.
 const v2 = {
 	attributes: blockAttributes,
-	save( { attributes } ) {
+	save( { attributes }: BlockSaveProps< EmbedAttributes > ) {
 		const { url, caption, type, providerNameSlug } = attributes;
 
 		if ( ! url ) {
@@ -36,7 +38,9 @@ const v2 = {
 
 const v1 = {
 	attributes: blockAttributes,
-	save( { attributes: { url, caption, type, providerNameSlug } } ) {
+	save( {
+		attributes: { url, caption, type, providerNameSlug },
+	}: BlockSaveProps< EmbedAttributes > ) {
 		if ( ! url ) {
 			return null;
 		}

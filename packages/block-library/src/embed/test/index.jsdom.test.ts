@@ -5,6 +5,7 @@ import {
 	registerBlockVariation,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
+import type { useSelect } from '@wordpress/data';
 import {
 	findMoreSuitableBlock,
 	getClassNames,
@@ -22,7 +23,9 @@ const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useSelect: () => ( {} ),
+	// A stub returning an empty object, which `useSelect`'s overloads don't
+	// describe.
+	useSelect: ( () => ( {} ) ) as unknown as typeof useSelect,
 } ) );
 
 describe( 'utils', () => {
@@ -224,7 +227,8 @@ describe( 'utils', () => {
 
 				registerBlockVariation(
 					DEFAULT_EMBED_BLOCK,
-					variations.find( ( { name } ) => name === 'youtube' )
+					// The YouTube variation is defined.
+					variations.find( ( { name } ) => name === 'youtube' )!
 				);
 			} );
 			it( 'when no url provided', () => {
