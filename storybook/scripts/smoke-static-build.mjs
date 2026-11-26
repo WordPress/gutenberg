@@ -6,8 +6,9 @@ const storybookDir = path.resolve( import.meta.dirname, '..' );
 const storybookUrl = 'http://127.0.0.1:50240';
 const maxConcurrentStories = 4;
 const storyTimeout = 15_000;
-// Stories with this tag may request other hosts until they stop doing so.
-const externalRequestsTag = 'external-requests';
+// Stories may show Gravatar images, as WordPress does for avatars. The smoke
+// test still blocks these requests, but they do not fail the story.
+const ignoredExternalHosts = [ 'gravatar.com', 'secure.gravatar.com' ];
 /** @type {import('playwright').Browser | undefined} */
 let browser;
 let server;
@@ -56,11 +57,7 @@ try {
 					const story = stories[ nextStoryIndex++ ];
 
 					try {
-						await renderStory(
-							context,
-							story.id,
-							!! story.tags?.includes( externalRequestsTag )
-						);
+						await renderStory( context, story.id );
 					} catch ( error ) {
 						failures.push(
 							`${ story.id }: ${
@@ -103,13 +100,12 @@ try {
 /**
  * Renders a story with requests to other hosts blocked, so a third-party
  * outage or rate limit cannot fail the smoke test. A story fails when it makes
- * such a request, unless `allowExternalRequests` is set.
+ * such a request, unless the host is in `ignoredExternalHosts`.
  *
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
- * @param {boolean}                             allowExternalRequests
  */
-async function renderStory( context, storyId, allowExternalRequests ) {
+async function renderStory( context, storyId ) {
 	const page = await context.newPage();
 	/** @type {string[]} */
 	const failedResponses = [];
@@ -130,10 +126,9 @@ async function renderStory( context, storyId, allowExternalRequests ) {
 			[ 'http:', 'https:' ].includes( url.protocol ) &&
 			url.origin !== storybookUrl,
 		( route ) => {
-			if ( ! allowExternalRequests ) {
-				failedResponses.push(
-					`External request: ${ route.request().url() }`
-				);
+			const url = new URL( route.request().url() );
+			if ( ! ignoredExternalHosts.includes( url.hostname ) ) {
+				failedResponses.push( `External request: ${ url.href }` );
 			}
 			return route.abort( 'blockedbyclient' );
 		}

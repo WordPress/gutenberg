@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import Modal from '../modal';
 import type { ConfirmDialogProps, DialogInputEvent } from './types';
@@ -78,7 +79,7 @@ const UnconnectedConfirmDialog = (
 			{ isOpen && (
 				<Modal
 					onRequestClose={ handleEvent( onCancel ) }
-					onKeyDown={ handleEnter }
+					onKeyDown={ withIgnoreIMEEvents( handleEnter ) }
 					closeButtonLabel={ cancelLabel }
 					isDismissible
 					ref={ forwardedRef }
