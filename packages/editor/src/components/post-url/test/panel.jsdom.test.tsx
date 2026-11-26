@@ -28,6 +28,7 @@ function setupUseSelectMock( { pageOnFront }: { pageOnFront?: number } = {} ) {
 			getPostType: () => ( { viewable: true, labels: {} } ),
 			canUser: () => true,
 			getEditedEntityRecord: () => ( { page_on_front: pageOnFront } ),
+			getEntityRecord: () => ( { url: window.location.origin } ),
 		} ) )
 	);
 }

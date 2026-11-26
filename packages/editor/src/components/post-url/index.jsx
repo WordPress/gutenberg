@@ -35,6 +35,7 @@ export default function PostURL( { onClose } ) {
 	const {
 		isEditable,
 		postId,
+		siteUrl,
 		postSlug,
 		postLink,
 		permalinkPrefix,
@@ -45,6 +46,10 @@ export default function PostURL( { onClose } ) {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const permalinkParts = select( editorStore ).getPermalinkParts();
+		const { canUser, getEntityRecord } = select( coreStore );
+		const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+			? getEntityRecord( 'root', 'site' )?.url
+			: undefined;
 		const hasPublishAction = post?._links?.[ 'wp:action-publish' ] ?? false;
 
 		return {
@@ -55,6 +60,7 @@ export default function PostURL( { onClose } ) {
 			),
 			viewPostLabel: postType?.labels?.view_item,
 			postId: post.id,
+			siteUrl: _siteUrl,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,
@@ -73,7 +79,7 @@ export default function PostURL( { onClose } ) {
 			type: 'snackbar',
 		} );
 	} );
-	const linkTarget = getPostViewTarget( postId, postLink );
+	const linkTarget = getPostViewTarget( postId, postLink, siteUrl );
 	const postUrlSlugDescriptionId =
 		'editor-post-url__slug-description-' + useInstanceId( PostURL );
 

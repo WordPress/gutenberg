@@ -50,6 +50,53 @@ describe( 'getPostViewTarget', () => {
 		expect( getPostViewTarget( 1234, undefined ) ).toBe( '_blank' );
 	} );
 
+	// Two sites on a subdirectory multisite share an origin and can both have a
+	// post 123, so the site's own path tells them apart. It comes from the site
+	// entity rather than the admin URL, which a plugin can move.
+	it( 'keeps the plain name on a single site', () => {
+		expect( getPostViewTarget( 1234, `${ origin }/hello/`, origin ) ).toBe(
+			'wp-post-1234'
+		);
+		expect(
+			getPostViewTarget( 1234, `${ origin }/hello/`, `${ origin }/` )
+		).toBe( 'wp-post-1234' );
+	} );
+
+	it( 'includes the site so two multisite sites do not share a tab', () => {
+		const a = getPostViewTarget(
+			1234,
+			`${ origin }/site-a/hello/`,
+			`${ origin }/site-a`
+		);
+		const b = getPostViewTarget(
+			1234,
+			`${ origin }/site-b/hello/`,
+			`${ origin }/site-b`
+		);
+		expect( a ).toBe( 'wp-post/site-a-1234' );
+		expect( b ).toBe( 'wp-post/site-b-1234' );
+		expect( a ).not.toBe( b );
+	} );
+
+	it( 'ignores a trailing slash on the site URL', () => {
+		expect(
+			getPostViewTarget(
+				1234,
+				`${ origin }/site-a/hello/`,
+				`${ origin }/site-a/`
+			)
+		).toBe( 'wp-post/site-a-1234' );
+	} );
+
+	it( 'keeps the plain name when the site URL is unknown', () => {
+		expect( getPostViewTarget( 1234, `${ origin }/hello/` ) ).toBe(
+			'wp-post-1234'
+		);
+		expect(
+			getPostViewTarget( 1234, `${ origin }/hello/`, 'not a url' )
+		).toBe( 'wp-post-1234' );
+	} );
+
 	it( 'falls back to a new tab for a URL it cannot parse', () => {
 		expect( getPostViewTarget( 1234, 'http://%%%' ) ).toBe( '_blank' );
 	} );

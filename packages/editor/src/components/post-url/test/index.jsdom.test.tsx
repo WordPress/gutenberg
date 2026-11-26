@@ -32,6 +32,8 @@ function setupUseSelectMock( overrides: Partial< typeof DEFAULTS > = {} ) {
 			} ),
 			getCurrentPostType: () => 'post',
 			getPostType: () => ( { labels: { view_item: 'View Post' } } ),
+			canUser: () => true,
+			getEntityRecord: () => ( { url: window.location.origin } ),
 			getPermalinkParts: () => ( {
 				prefix: data.permalinkPrefix,
 				suffix: data.permalinkSuffix,

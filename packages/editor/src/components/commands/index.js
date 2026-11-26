@@ -88,6 +88,7 @@ const getEditorCommandLoader = () =>
 			isViewable,
 			isPublished,
 			viewLink,
+			siteUrl,
 			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
@@ -104,8 +105,12 @@ const getEditorCommandLoader = () =>
 				isCurrentPostPublished,
 			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
-			const { getPostType } = select( coreStore );
+			const { getPostType, canUser, getEntityRecord } =
+				select( coreStore );
 			const postType = getPostType( getCurrentPostType() );
+			const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+				? getEntityRecord( 'root', 'site' )?.url
+				: undefined;
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -117,6 +122,7 @@ const getEditorCommandLoader = () =>
 				isViewable: postType?.viewable ?? false,
 				isPublished: isCurrentPostPublished(),
 				viewLink: getEditedPostAttribute( 'link' ),
+				siteUrl: _siteUrl,
 				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
@@ -359,9 +365,18 @@ const getEditorCommandLoader = () =>
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
+						const target = getPostViewTarget(
+							getCurrentPostId(),
+							viewLink,
+							siteUrl
+						);
+						// Unlike a `target="_blank"` link, `window.open()` has
+						// no implicit `noopener`, so ask for it. It forces a
+						// fresh context, so only on the `_blank` fallback.
 						window.open(
 							viewLink,
-							getPostViewTarget( getCurrentPostId(), viewLink )
+							target,
+							target === '_blank' ? 'noopener' : undefined
 						);
 					},
 				} );

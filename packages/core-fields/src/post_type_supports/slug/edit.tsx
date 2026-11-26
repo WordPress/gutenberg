@@ -1,7 +1,8 @@
 import { Button } from '@wordpress/components';
 import { copy } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
@@ -14,6 +15,28 @@ import styles from './style.module.css';
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
 /**
+ * Returns a key for the site, so that two sites on a subdirectory multisite,
+ * which share an origin, do not share a window name. It is the site's own path,
+ * and is empty on a single site.
+ *
+ * @param siteUrl The URL of the site the post belongs to.
+ *
+ * @return The site's path, or an empty string.
+ */
+function getSiteKey( siteUrl: string | undefined ): string {
+	if ( ! siteUrl ) {
+		return '';
+	}
+
+	try {
+		const { pathname } = new URL( siteUrl );
+		return pathname === '/' ? '' : pathname.replace( /\/$/, '' );
+	} catch {
+		return '';
+	}
+}
+
+/**
  * Returns the target for the permalink, so that each item reuses one tab
  * instead of opening another on every click.
  *
@@ -22,8 +45,18 @@ const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
  * `window.opener`, and plugins can filter a permalink to any URL.
  *
  * @see https://github.com/WordPress/gutenberg/issues/28479
+ *
+ * @param postId  The ID of the post being viewed.
+ * @param url     The front-end URL the link points to.
+ * @param siteUrl The URL of the site the post belongs to.
+ *
+ * @return The window name to reuse, or `_blank`.
  */
-function getPostViewTarget( postId: number | undefined, url: string ): string {
+function getPostViewTarget(
+	postId: number | undefined,
+	url: string,
+	siteUrl?: string
+): string {
 	if ( postId === undefined || ! url ) {
 		return '_blank';
 	}
@@ -37,7 +70,7 @@ function getPostViewTarget( postId: number | undefined, url: string ): string {
 		return '_blank';
 	}
 
-	return `wp-post-${ postId }`;
+	return `wp-post${ getSiteKey( siteUrl ) }-${ postId }`;
 }
 
 /*
@@ -81,7 +114,13 @@ const SlugEdit = ( {
 		isEditable && slug
 			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
 			: safeDecodeURIComponent( data.link || '' );
-	const permalinkTarget = getPostViewTarget( data.id, permalink );
+	const siteUrl = useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+		return canUser( 'read', { kind: 'root', name: 'site' } )
+			? ( getEntityRecord( 'root', 'site' ) as { url?: string } )?.url
+			: undefined;
+	}, [] );
+	const permalinkTarget = getPostViewTarget( data.id, permalink, siteUrl );
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) => {

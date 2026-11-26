@@ -69,15 +69,19 @@ export default function PostPublishPanelPostpublish( {
 	focusOnMount,
 	children,
 } ) {
-	const { post, postType, isScheduled } = useSelect( ( select ) => {
+	const { post, postType, isScheduled, siteUrl } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPost,
 			isCurrentPostScheduled,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, canUser, getEntityRecord } = select( coreStore );
+		const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+			? getEntityRecord( 'root', 'site' )?.url
+			: undefined;
 
 		return {
+			siteUrl: _siteUrl,
 			post: getCurrentPost(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			isScheduled: isCurrentPostScheduled(),
@@ -92,7 +96,7 @@ export default function PostPublishPanelPostpublish( {
 	const addLink = addQueryArgs( 'post-new.php', {
 		post_type: post.type,
 	} );
-	const linkTarget = getPostViewTarget( post.id, link );
+	const linkTarget = getPostViewTarget( post.id, link, siteUrl );
 
 	const postLinkRef = useCallback(
 		( node ) => {
