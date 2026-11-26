@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   `useResourcePermissions`: Deprecate the `status`, `isResolving` and `hasResolved` return values; check the permission values instead.
+-   `useResourcePermissions`: Deprecate the `status`, `isResolving` and `hasResolved` return values; check the permission values instead ([#87457](https://github.com/WordPress/gutenberg/pull/87457)).
 
 ### Bug Fixes
 
@@ -15,7 +15,7 @@
 
 ### Internal
 
--   Remove the `memize` dependency.
+-   Remove the `memize` dependency ([#87457](https://github.com/WordPress/gutenberg/pull/87457)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 9.2.0 (2026-11-18)
