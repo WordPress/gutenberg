@@ -47,10 +47,10 @@ Lay the field out like other form fields: the label, then the drop area, then th
 - **Let the whole field accept a drop.** Place `DropZone` inside the `Fieldset`. Its overlay covers the nearest positioned ancestor, so the fieldset needs `position: relative`. The overlay then has room for its icon and label, which don't fit in a field the height of an input, and a file dropped on the legend or description doesn't open in the browser tab.
 - **Send chosen and dropped files through one handler.** Both paths then follow the same rules. `accept` only filters the picker, and people can still choose or drop any file, so check every file in the handler.
 - **Keep the last valid file when a new one is rejected.** Show the error below the description, in a live region, and link it to the button with `aria-describedby`.
-- **Show what was chosen.** The picker button shows a thumbnail and the filename. Other files show a file icon in place of the thumbnail.
+- **Show what was chosen.** The picker button shows a thumbnail, the filename, and the file type and size. Other files show a file icon in place of the thumbnail.
 - **Say that dropping works.** The picker button names the action, such as "Add an image", and the description says a file can be dropped there. A dashed border alone doesn't tell people that.
 - **Put the remove button beside the picker button, inside the drop area.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the picker button after a removal. Removing a file only clears the selection. It doesn't delete a file that was already uploaded.
-- **Name the picker button after its action.** When it shows a file, its accessible name is "Replace cover.png".
+- **Name the picker button after its action.** When it shows a file, put a visually hidden "Replace" before the file, so its accessible name is "Replace cover.png PNG 812 KB". An `aria-label` would hide the type and size from assistive technology.
 - **Mark the field the way the rest of the form does.** Add "(Required)" to required fields, or "(Optional)" when the form marks optional fields instead, in the legend's own style.
 
 A `Fieldset` groups the drop area and the remove button under one legend. A disabled fieldset disables the buttons and the hidden input natively, but each `Button` also needs its own `disabled` prop to look disabled. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
@@ -70,12 +70,13 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 - **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the picker button when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
 - **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". A file dropped on a full field gets the limit message.
-- **Show the file type next to the name.** Long filenames are cut at the end, so the type and size sit at the end of the row, and people can tell `report.pdf` from `report.png`. Keep a few characters of the name visible in a narrow row, and cut the type and size after that.
+- **Show the whole filename.** Don't cut a long name with an ellipsis. A tooltip can't bring the rest back on a touch screen, and two files with the same start then look the same. Let the name wrap, and let it break inside a word, because filenames often have no spaces. A row is the height of an input while its text fits on one line, and it grows when the text needs more.
+- **Show the file type next to the name.** The type and size sit at the end of the row, so people can tell `report.pdf` from `report.png` at a glance. When they don't fit beside the name, they move below it.
 - **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
 
 ## Upload status
 
-When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar takes the place of its type and size, and its name is weaker, so the row stays one line and the name keeps most of the space. When it finishes, the type and size come back, followed by "Uploaded" in plain text: a finished upload is the normal state, so it doesn't need to draw the eye. When it fails, the row shows only a `Badge` with `intent="high"` that says "Couldn't upload", and a "Retry" button, so the failure stands out and the name still has room in a narrow field.
+When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar takes the place of its type and size, and its name is weaker. When it finishes, the type and size come back, followed by "Uploaded" in plain text: a finished upload is the normal state, so it doesn't need to draw the eye. When it fails, the row shows only a `Badge` with `intent="high"` that says "Couldn't upload", and a "Retry" button, so the failure stands out. In a narrow row, the badge and "Retry" move below the name together, as the type and size do.
 
 <Canvas
 	of={ FilePickerUploadStories.UploadStatus }
@@ -87,7 +88,8 @@ The upload here is simulated, and the first try for each PDF fails, so you can t
 - **Keep each row's actions visible.** While a file uploads, its remove button cancels the upload, so its name says so: "Cancel upload of photo.jpg".
 - **Keep focus in the row after "Retry".** The button goes away when the upload restarts, so move focus to the row's remove button.
 - **Announce the result, not the progress.** Call `speak()` when a file finishes or fails. The `Progress` bar exposes its value to assistive technology, so don't announce each step. Each `speak()` call replaces the previous message, so combine results that arrive together into one announcement.
-- **Use color and text together.** "Uploaded" and "Couldn't upload" use the success and error colors, and the words carry the meaning without them.
+- **Say the status in words.** "Couldn't upload" is a `Badge` with the error colors, and "Uploaded" is plain text. The words carry the meaning without the color.
+- **Keep "Uploaded" in the row.** The progress bar going away is easy to miss, and the announcement is spoken once. The word still says the file is done to someone who comes back later, and it tells an uploaded file from one that is only chosen.
 
 ## Panel drop target
 
@@ -145,7 +147,7 @@ In this preview, a dialog with three sample images stands in for the Media Libra
 
 ## Shared parts
 
-The examples share the parts that show a chosen file. `FileSummary` renders only phrasing content, so it can also be the content of a button. `SelectedFile` adds the row and its remove button.
+The examples share the parts that show a chosen file. `FileSummary` renders only phrasing content, so it can be the content of a button. `SelectedFile` is a row with a remove button, and it can also show a status, a progress bar, and other actions.
 
 <Source code={ SelectedFileSource } language="tsx" />
 

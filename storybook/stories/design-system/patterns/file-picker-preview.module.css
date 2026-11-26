@@ -28,7 +28,7 @@
 	display: flex;
 	box-sizing: border-box;
 	inline-size: 100%;
-	block-size: var(--wpds-dimension-size-lg);
+	min-block-size: var(--wpds-dimension-size-lg);
 	border:
 		var(--wpds-border-width-xs) solid
 		var(--wpds-color-stroke-surface-neutral);

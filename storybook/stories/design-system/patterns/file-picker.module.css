@@ -1,12 +1,14 @@
 /*
  * The drop area and the selected-file rows share one surface, so a field
- * keeps its size and shape when a file is chosen. Each holds one line, so it
- * is the same height as an input.
+ * keeps its size and shape when a file is chosen. With one line of text, each
+ * is the same height as an input. It grows when a long filename wraps.
  */
 .surface {
+	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
+
 	position: relative;
 	box-sizing: border-box;
-	block-size: var(--wpds-dimension-size-lg);
+	min-block-size: var(--wpds-dimension-size-lg);
 	min-inline-size: 0;
 	border:
 		var(--wpds-border-width-xs) dashed
@@ -24,6 +26,7 @@
 	border-style: solid;
 	border-color: var(--wpds-color-stroke-surface-neutral);
 	background: var(--wpds-color-background-surface-neutral-strong);
+	padding-block: var(--file-picker-padding-block);
 	padding-inline-start: var(--wpds-dimension-padding-sm);
 }
 
@@ -31,7 +34,7 @@
 .choose {
 	flex: 1;
 	min-inline-size: 0;
-	padding-block: 0;
+	padding-block: var(--file-picker-padding-block);
 	padding-inline: var(--wpds-dimension-padding-sm);
 	color: inherit;
 	text-align: start;
@@ -120,16 +123,44 @@
 }
 
 /*
- * The type and size follow the name, so the name can be cut at the end
- * without hiding what kind of file it is. At least a few characters of the
- * name always show, so a narrow row still says which file it is.
+ * The filename and what follows it, such as the type and size. They share one
+ * line when they fit. Otherwise, what follows moves below the name.
+ */
+.text {
+	display: flex;
+	flex: 1;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
+	min-inline-size: 0;
+}
+
+/*
+ * What follows the name in a row: the type and size, a progress bar, or a
+ * status and its buttons. It moves below the name as one group, so a status
+ * and its "Retry" button stay together.
+ */
+.trailing {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
+}
+
+/*
+ * A filename is never cut, so everyone can read all of it, also on a touch
+ * screen, where a tooltip isn't available. A long name wraps, and it can break
+ * inside a word, because filenames often have no spaces. On a shared line, the
+ * name takes the free space, so the type and size sit at the end of the row.
  */
 .name {
-	flex: 1;
-	min-inline-size: 6ch;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+	flex: 1 1 auto;
+	overflow-wrap: anywhere;
+	/*
+	 * The lines of a wrapped name sit closer to each other than to the type
+	 * and size below them, so the name reads as one item.
+	 */
+	line-height: var(--wpds-typography-line-height-xs);
 }
 
 /*
@@ -146,43 +177,18 @@
 }
 
 /*
- * The type and size sit at the end of the row. They're cut only once the
- * name is down to its smallest width.
- */
-.meta {
-	flex: 0 1 auto;
-	min-inline-size: 0;
-	overflow: hidden;
-	color: var(--wpds-color-foreground-content-neutral-weak);
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-/*
  * While a file uploads, a short progress bar takes the place of its type and
  * size, at about the same width, so the name doesn't jump when it finishes.
  */
 .progress {
 	flex: none;
 	inline-size: calc(var(--wpds-dimension-size-lg) * 2);
-}
-
-/*
- * A status shown on its own, such as a `Badge`. Like the type and size, it's
- * cut only once the name is down to its smallest width.
- */
-.status {
-	display: flex;
-	flex: 0 1 auto;
-	min-inline-size: 0;
-}
-
-/* `Badge` cuts its label when its own overflow is set. */
-.status-badge {
-	min-inline-size: 0;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
+	/*
+	 * The bar is 1.5px tall. Centered at that height, it would start on a
+	 * fraction of a pixel, and look thicker in some rows than in others. A
+	 * whole-pixel box keeps every bar on the pixel grid.
+	 */
+	block-size: 2px;
 }
 
 .list {

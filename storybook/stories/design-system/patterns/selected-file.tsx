@@ -68,34 +68,55 @@ function usePreviewUrl( file: File ) {
 }
 
 /**
- * Shows a thumbnail or a file icon, the filename, and the file type and size,
- * on one line. The name is cut at the end, so the type and size stay visible.
- *
- * It renders only `span` elements, so it can be the content of a button.
+ * Shows a thumbnail for an image, or a file icon for any other file.
  */
-export function FileSummary( {
+function FileThumbnail( { file }: { file: File } ) {
+	const previewUrl = usePreviewUrl( file );
+
+	return (
+		<span className={ styles.thumbnail }>
+			{ previewUrl ? (
+				<img src={ previewUrl } alt="" />
+			) : (
+				<Icon icon={ fileIcon } />
+			) }
+		</span>
+	);
+}
+
+/**
+ * Shows the file type and size, such as "PNG · 812 KB". The filename can be
+ * long, so the type also tells `report.pdf` from `report.png` at a glance.
+ */
+function FileDetails( {
 	file,
 	status,
-	showDetails = true,
-	isPending = false,
 }: {
 	file: File;
 	/** Text after the type and size, such as "Uploaded". */
 	status?: React.ReactNode;
-	/**
-	 * Whether to show the type and size. Without them, only the status shows,
-	 * which leaves more room for the name. The status can then be a `Badge`.
-	 */
-	showDetails?: boolean;
-	/**
-	 * Whether the file is still on its way, such as during an upload. The name
-	 * is weaker, and the type and size are hidden to make room for progress.
-	 */
-	isPending?: boolean;
 } ) {
-	const previewUrl = usePreviewUrl( file );
-	const extension = getExtension( file.name );
+	return (
+		<Text variant="body-sm" className={ styles.weak }>
+			{ getExtension( file.name ).slice( 1 ).toUpperCase() || 'File' }
+			<span aria-hidden="true"> ·</span> { formatFileSize( file.size ) }
+			{ status && (
+				<>
+					<span aria-hidden="true"> ·</span> { status }
+				</>
+			) }
+		</Text>
+	);
+}
 
+/**
+ * Shows a thumbnail or a file icon, the filename, and the file type and size.
+ * They share one line when they fit. In a narrow space, the type and size
+ * move below the name, and a long name wraps, so it is never cut.
+ *
+ * It renders only `span` elements, so it can be the content of a button.
+ */
+export function FileSummary( { file }: { file: File } ) {
 	return (
 		<Stack
 			render={ <span /> }
@@ -104,35 +125,11 @@ export function FileSummary( {
 			gap="sm"
 			className={ styles.summary }
 		>
-			<span className={ styles.thumbnail }>
-				{ previewUrl ? (
-					<img src={ previewUrl } alt="" />
-				) : (
-					<Icon icon={ fileIcon } />
-				) }
+			<FileThumbnail file={ file } />
+			<span className={ styles.text }>
+				<Text className={ styles.name }>{ file.name }</Text>
+				<FileDetails file={ file } />
 			</span>
-			<Text
-				className={ `${ styles.name } ${
-					isPending ? styles.weak : ''
-				}` }
-			>
-				{ file.name }
-			</Text>
-			{ ! isPending && showDetails && (
-				<Text variant="body-sm" className={ styles.meta }>
-					{ extension.slice( 1 ).toUpperCase() || 'File' }
-					<span aria-hidden="true"> ·</span>{ ' ' }
-					{ formatFileSize( file.size ) }
-					{ status && (
-						<>
-							<span aria-hidden="true"> ·</span> { status }
-						</>
-					) }
-				</Text>
-			) }
-			{ ! isPending && ! showDetails && status && (
-				<span className={ styles.status }>{ status }</span>
-			) }
 		</Stack>
 	);
 }
@@ -152,14 +149,20 @@ export const SelectedFile = forwardRef<
 		removeLabel?: string;
 		/** Text after the type and size, such as "Uploaded". */
 		status?: React.ReactNode;
-		/** Whether to show the type and size. Defaults to `true`. */
+		/**
+		 * Whether to show the type and size. Without them, only the status
+		 * shows, and it can be a `Badge`. Defaults to `true`.
+		 */
 		showDetails?: boolean;
 		/**
 		 * A progress bar for a file that's still on its way. It takes the place
 		 * of the type and size, and the name is weaker until it's gone.
 		 */
 		progress?: React.ReactNode;
-		/** Buttons before the remove button, such as "Retry". */
+		/**
+		 * Buttons after the status, such as "Retry". They stay with the status,
+		 * so both move below the name together in a narrow row.
+		 */
 		actions?: React.ReactNode;
 		/** Whether the remove button is disabled. */
 		disabled?: boolean;
@@ -170,7 +173,7 @@ export const SelectedFile = forwardRef<
 		onRemove,
 		removeLabel,
 		status,
-		showDetails,
+		showDetails = true,
 		progress,
 		actions,
 		disabled,
@@ -181,18 +184,27 @@ export const SelectedFile = forwardRef<
 		<Stack
 			direction="row"
 			align="center"
-			justify="space-between"
 			gap="sm"
 			className={ `${ styles.surface } ${ styles.row }` }
 		>
-			<FileSummary
-				file={ file }
-				status={ status }
-				showDetails={ showDetails }
-				isPending={ !! progress }
-			/>
-			{ progress }
-			{ actions }
+			<FileThumbnail file={ file } />
+			<div className={ styles.text }>
+				<Text
+					className={ `${ styles.name } ${
+						progress ? styles.weak : ''
+					}` }
+				>
+					{ file.name }
+				</Text>
+				<div className={ styles.trailing }>
+					{ progress }
+					{ ! progress && showDetails && (
+						<FileDetails file={ file } status={ status } />
+					) }
+					{ ! progress && ! showDetails && status }
+					{ actions }
+				</div>
+			</div>
 			<IconButton
 				ref={ ref }
 				icon={ closeSmall }

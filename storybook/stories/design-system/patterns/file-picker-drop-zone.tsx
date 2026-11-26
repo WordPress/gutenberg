@@ -11,6 +11,7 @@ import {
 	Stack,
 	Text,
 	ValidityIndicator,
+	VisuallyHidden,
 } from '@wordpress/ui';
 import { FileSummary, getExtension } from './selected-file';
 import styles from './file-picker.module.css';
@@ -98,14 +99,17 @@ export function FilePickerDropZone( { disabled = false } ) {
 							variant="unstyled"
 							className={ styles.choose }
 							disabled={ disabled }
-							aria-label={
-								file ? `Replace ${ file.name }` : undefined
-							}
 							aria-describedby={ error ? errorId : undefined }
 							onClick={ openFileDialog }
 						>
 							{ file ? (
-								<FileSummary file={ file } />
+								<>
+									{ /* The button's name starts with its action. The rest comes from the text it shows, so nothing visible is left out. */ }
+									<VisuallyHidden render={ <span /> }>
+										Replace
+									</VisuallyHidden>
+									<FileSummary file={ file } />
+								</>
 							) : (
 								<Stack
 									render={ <span /> }

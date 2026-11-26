@@ -169,11 +169,7 @@ export function FilePickerUpload() {
 		// A finished upload is the normal state, so it doesn't draw the eye. A
 		// failed one needs action, so it does.
 		uploaded: 'Uploaded',
-		failed: (
-			<Badge intent="high" className={ styles[ 'status-badge' ] }>
-				Couldn’t upload
-			</Badge>
-		),
+		failed: <Badge intent="high">Couldn’t upload</Badge>,
 	};
 
 	return (
@@ -209,7 +205,7 @@ export function FilePickerUpload() {
 									file={ upload.file }
 									status={ status[ upload.status ] }
 									// A failed row shows only its status, so the
-									// name keeps room beside "Retry".
+									// failure stands out.
 									showDetails={ upload.status !== 'failed' }
 									removeLabel={
 										upload.status === 'uploading'
