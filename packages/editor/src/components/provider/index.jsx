@@ -41,6 +41,7 @@ import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
+import { isRenderedOnItsOwn } from './template-around';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -172,12 +173,21 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		recovery,
 		initialEdits,
 		initialViewport,
-		renderingMode,
+		renderingMode: requestedRenderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
 		const hasTemplate = !! template;
+		// A post rendered on its own has no other mode than `post-only`,
+		// whatever mode the caller names. Waiting for a template would wait
+		// forever, and leave the editor in the mode of the last post, such as
+		// a page shown inside its template before Home.
+		const renderedOnItsOwn = isRenderedOnItsOwn( post, template );
+		const renderingMode =
+			requestedRenderingMode && renderedOnItsOwn
+				? 'post-only'
+				: requestedRenderingMode;
 		const {
 			editorSettings,
 			selection,
@@ -202,12 +212,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
 
-				const _mode = getRenderingMode();
+				// A post rendered on its own is `post-only` from its first
+				// render. The store only catches up once the effect below
+				// dispatches, after paint, so reading it alone would render one
+				// frame in the mode of the last post, with its lock.
+				const _mode = renderedOnItsOwn
+					? 'post-only'
+					: getRenderingMode();
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
-				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+				const _defaultMode = renderedOnItsOwn
+					? 'post-only'
+					: ( renderingMode ?? getDefaultRenderingMode( post.type ) );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -247,7 +264,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[ post.type, post.id, hasTemplate, renderedOnItsOwn, renderingMode ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
