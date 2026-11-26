@@ -143,7 +143,7 @@ When people can pick an image from the Media Library or upload one, offer both i
 	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
 />
 
-In this preview, a dialog with three sample images stands in for the Media Library. In the editor, open the library with `MediaUpload` from `@wordpress/block-editor`, inside `MediaUploadCheck`, so the option only shows to people who can upload files. Its `onSelect` receives an attachment, with an ID and a URL, not a `File`. Keep whichever one people chose, and show the row from it.
+In this preview, a dialog with three sample images stands in for the Media Library. In the editor, open the library with `MediaUpload` from `@wordpress/block-editor`, inside `MediaUploadCheck`, so the option only shows to people who can upload files. Its `onSelect` receives an attachment, with an ID and a URL, not a `File`. Keep whichever one people chose, and show the row from it. Like `FormFileUpload`, keep `MediaUpload` outside the menu, and call the `open` function from its `render` prop in the menu item. `MediaUpload` closes the library when it unmounts, and the menu unmounts its items when it closes.
 
 - **Keep the remove button in the row.** Don't hide it as a "Reset" item in the menu, where people can't see it.
 - **Return focus to the trigger.** The menu item that opened the dialog is gone when the dialog closes, so pass the trigger to the dialog's `finalFocus`.
