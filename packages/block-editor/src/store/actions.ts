@@ -397,12 +397,9 @@ export const multiSelectSet =
 		// Remove IDs whose parent is selected before checking controlled parents.
 		// Selecting a controlled parent includes its contents, not a separate
 		// selection inside the entity that stores those contents.
-		const requested = new Set( uniqueIds );
-		const selectedClientIds = uniqueIds.filter(
-			( id ) =>
-				! select
-					.getBlockParents( id )
-					.some( ( parent ) => requested.has( parent ) )
+		const selectedClientIds = filterOutChildClientIds(
+			uniqueIds,
+			select.getBlockParents
 		);
 		// Controlled inner blocks are saved in a separate entity with its own
 		// client IDs and undo history. Selected blocks can have different parents,
