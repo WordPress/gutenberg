@@ -1,10 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { color, download, globe, reset, tool } from '@wordpress/icons';
+import {
+	cart,
+	color,
+	currencyDollar,
+	download,
+	globe,
+	moreVertical,
+	payment,
+	reset,
+	store,
+	tool,
+} from '@wordpress/icons';
 import { Badge } from '../../badge';
 import { Button } from '../../button';
 import * as Card from '../../card';
+import * as CollapsibleCard from '../../collapsible-card';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
+import { Link } from '../../link';
+import * as Menu from '../../menu';
+import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Item from '../index';
 
@@ -231,6 +246,142 @@ export const InsideACard: Story = {
 			</Item.LinkRow>,
 		],
 	},
+};
+
+/**
+ * A row can keep the controls that do not fit beside it in a menu. Here the
+ * whole row opens the settings of the provider, and the menu holds its
+ * other actions. The menu trigger stays visible, and its name says which
+ * row it acts on.
+ */
+export const WithOverflowMenu: Story = {
+	args: {
+		'aria-label': 'Payment providers',
+		children: [
+			{
+				key: 'woopayments',
+				name: 'WooPayments',
+				description: 'Cards, Apple Pay and Google Pay, in one place.',
+				status: <Badge intent="stable">Active</Badge>,
+				icon: payment,
+			},
+			{
+				key: 'cash',
+				name: 'Cash on delivery',
+				description: 'Let customers pay when their order arrives.',
+				status: <Badge>Inactive</Badge>,
+				icon: currencyDollar,
+			},
+		].map( ( provider ) => (
+			<Item.LinkRow href={ `#${ provider.key }` } key={ provider.key }>
+				<Item.Media>
+					<Icon icon={ provider.icon } />
+				</Item.Media>
+				<Item.Label>{ provider.name }</Item.Label>
+				<Item.Description>{ provider.description }</Item.Description>
+				<Item.Meta>{ provider.status }</Item.Meta>
+				<Item.Actions>
+					<Menu.Root>
+						<Menu.Trigger
+							render={
+								<IconButton
+									label={ `More actions for ${ provider.name }` }
+									icon={ moreVertical }
+									variant="minimal"
+									tone="neutral"
+									size="compact"
+								/>
+							}
+						/>
+						<Menu.Popup>
+							<Menu.LinkItem href={ `#${ provider.key }-docs` }>
+								<Menu.ItemLabel>
+									View documentation
+								</Menu.ItemLabel>
+							</Menu.LinkItem>
+							<Menu.Item>
+								<Menu.ItemLabel>Hide suggestion</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+				</Item.Actions>
+			</Item.LinkRow>
+		) ),
+	},
+};
+
+/**
+ * A card can hold more than one group, each under a heading of its own
+ * that names it. The groups keep their own frames inside the padding of
+ * the card, because the headings sit between them.
+ */
+export const InsideACollapsibleCard: Story = {
+	render: () => (
+		<CollapsibleCard.Root defaultOpen>
+			<CollapsibleCard.Header role="heading" aria-level={ 2 }>
+				<Card.Title>
+					More payment options in the United States
+				</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Stack direction="column" gap="xl">
+					<Stack direction="column" gap="sm">
+						<Text
+							variant="heading-sm"
+							render={ <h3 /> }
+							id="item-story-wallets"
+						>
+							Wallets &amp; express checkouts
+						</Text>
+						<Item.Group aria-labelledby="item-story-wallets">
+							<Item.LinkRow href="#express">
+								<Item.Media>
+									<Icon icon={ cart } />
+								</Item.Media>
+								<Item.Label>Express checkout</Item.Label>
+								<Item.Description>
+									Let customers pay with a saved wallet.
+								</Item.Description>
+								<Item.Chevron />
+							</Item.LinkRow>
+						</Item.Group>
+					</Stack>
+					<Stack direction="column" gap="sm">
+						<Text
+							variant="heading-sm"
+							render={ <h3 /> }
+							id="item-story-providers"
+						>
+							Payment providers
+						</Text>
+						<Item.Group aria-labelledby="item-story-providers">
+							<Item.LinkRow href="#marketplace">
+								<Item.Media>
+									<Icon icon={ store } />
+								</Item.Media>
+								<Item.Label>Marketplace payments</Item.Label>
+								<Item.Description>
+									Split payments between sellers.
+								</Item.Description>
+								<Item.Chevron />
+							</Item.LinkRow>
+							<Item.LinkRow href="#bank-transfer">
+								<Item.Media>
+									<Icon icon={ currencyDollar } />
+								</Item.Media>
+								<Item.Label>Direct bank transfer</Item.Label>
+								<Item.Description>
+									Take payments in person by bank transfer.
+								</Item.Description>
+								<Item.Chevron />
+							</Item.LinkRow>
+						</Item.Group>
+					</Stack>
+					<Link href="#more-options">More payment options</Link>
+				</Stack>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**

@@ -116,7 +116,7 @@ export interface MediaProps extends ComponentProps< 'span' > {
 	/**
 	 * A leading icon, thumbnail or swatch. Hidden from assistive
 	 * technology, so it must not carry meaning absent from the label or the
-	 * description.
+	 * description, and must not hold a control, such as a drag handle.
 	 */
 	children?: ReactNode;
 }

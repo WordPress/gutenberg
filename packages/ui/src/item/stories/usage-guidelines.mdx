@@ -18,7 +18,7 @@ The kind of row tells users, and assistive technology, what is interactive.
 
 ## Put static content in `Item.Meta` and controls in `Item.Actions`
 
--   **Keep `Item.Label`, `Item.Description`, and `Item.Meta` static.** In a link or button row, the link or button covers these parts, so an interactive element inside them cannot be reached with a pointer.
+-   **Keep `Item.Media`, `Item.Label`, `Item.Description`, and `Item.Meta` static.** In a link or button row, the link or button covers these parts, so an interactive element inside them cannot be reached with a pointer. `Item.Media` is also hidden from assistive technology.
 -   **Put every control of the row in `Item.Actions`.** This includes the trigger of an infotip. Controls there sit above the link or button of the row, so nothing interactive is nested.
 -   **Name each control for the row it acts on.** The row does not add its label to the name of a control. Use "Reset background color", not "Reset".
 -   **Leave `Item.Chevron` out of a row that has `Item.Actions`.** Next to a control, the chevron reads as belonging to that control.
