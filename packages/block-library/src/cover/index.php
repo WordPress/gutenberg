@@ -191,6 +191,38 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
+	// Handle uploaded image background.
+	if (
+		'image' === $attributes['backgroundType'] &&
+		empty( $attributes['useFeaturedImage'] ) &&
+		empty( $attributes['hasParallax'] ) &&
+		empty( $attributes['isRepeated'] ) &&
+		isset( $attributes['id'] ) &&
+		is_numeric( $attributes['id'] )
+	) {
+		$size_slug = isset( $attributes['sizeSlug'] ) && is_string( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'full';
+		$image_src = wp_get_attachment_image_src( (int) $attributes['id'], $size_slug );
+		$sizes     = $image_src ? block_core_cover_get_background_image_sizes( $attributes, $image_src[1], $image_src[2] ) : null;
+
+		if ( $sizes ) {
+			$processor = new WP_HTML_Tag_Processor( $content );
+			if (
+				$processor->next_tag(
+					array(
+						'tag_name'   => 'IMG',
+						'class_name' => 'wp-block-cover__image-background',
+					)
+				) &&
+				null === $processor->get_attribute( 'sizes' )
+			) {
+				$processor->set_attribute( 'sizes', $sizes );
+				$content = $processor->get_updated_html();
+			}
+		}
+
+		return $content;
+	}
+
 	if ( 'image' !== $attributes['backgroundType'] || false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
@@ -215,7 +247,18 @@ function render_block_core_cover( $attributes, $content ) {
 			$attr['style'] = 'object-position:' . $object_position . ';';
 		}
 
-		$image = get_the_post_thumbnail( null, $attributes['sizeSlug'] ?? 'post-thumbnail', $attr );
+		$size_slug    = isset( $attributes['sizeSlug'] ) && is_string( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+		$thumbnail_id = get_post_thumbnail_id();
+		$image_src    = $thumbnail_id ? wp_get_attachment_image_src( $thumbnail_id, $size_slug ) : false;
+		$sizes        = $image_src ? block_core_cover_get_background_image_sizes( $attributes, $image_src[1], $image_src[2] ) : null;
+		if ( $sizes ) {
+			$attr['sizes'] = $sizes;
+		}
+
+		$image = get_the_post_thumbnail( null, $size_slug, $attr );
+		if ( $sizes ) {
+			$image = block_core_cover_remove_background_image_auto_sizes( $image );
+		}
 	} else {
 		if ( in_the_loop() ) {
 			update_post_thumbnail_cache();
@@ -264,6 +307,113 @@ function render_block_core_cover( $attributes, $content ) {
 
 	return $content;
 }
+
+/**
+ * Returns a `sizes` value for a Cover background image that accounts for the
+ * height of the block.
+ *
+ * The background image uses `object-fit: cover`, so it is scaled up until it
+ * fills both the width and the height of the block. The default `sizes` value
+ * only describes the width, so for an image that is wider than the block, the
+ * browser picks a file too small to fill the height and stretches it.
+ *
+ * @since 7.3.0
+ *
+ * @param array     $attributes   The block attributes.
+ * @param int|float $image_width  Width of the image file in pixels.
+ * @param int|float $image_height Height of the image file in pixels.
+ * @return string|null The `sizes` value, or null to keep the default one.
+ */
+function block_core_cover_get_background_image_sizes( $attributes, $image_width, $image_height ) {
+	if ( ! is_numeric( $image_width ) || ! is_numeric( $image_height ) || $image_width <= 0 || $image_height <= 0 ) {
+		return null;
+	}
+
+	$image_ratio = $image_width / $image_height;
+	$dimensions  = isset( $attributes['style'] ) && is_array( $attributes['style'] ) &&
+		isset( $attributes['style']['dimensions'] ) && is_array( $attributes['style']['dimensions'] )
+		? $attributes['style']['dimensions']
+		: array();
+
+	// With an aspect ratio, the height follows the width, so the width needed
+	// to fill the block is a fixed multiple of the viewport width.
+	$aspect_ratio = $dimensions['aspectRatio'] ?? null;
+	if ( is_string( $aspect_ratio ) && preg_match( '/^\s*(\d*\.?\d+)\s*(?:\/\s*(\d*\.?\d+)\s*)?$/', $aspect_ratio, $matches ) ) {
+		$denominator = isset( $matches[2] ) ? (float) $matches[2] : 1.0;
+		$block_ratio = $denominator > 0 ? (float) $matches[1] / $denominator : 0;
+		if ( $block_ratio > 0 ) {
+			$scale = $image_ratio / $block_ratio;
+			// Filling the width already fills the height.
+			if ( $scale <= 1 ) {
+				return null;
+			}
+			return round( 100 * $scale, 2 ) . 'vw';
+		}
+	}
+
+	$min_height = $dimensions['minHeight'] ?? null;
+	if ( null === $min_height && isset( $attributes['minHeight'] ) && is_numeric( $attributes['minHeight'] ) ) {
+		// Content saved before the minimum height moved to the dimensions block support.
+		$unit       = isset( $attributes['minHeightUnit'] ) && is_string( $attributes['minHeightUnit'] ) ? $attributes['minHeightUnit'] : 'px';
+		$min_height = $attributes['minHeight'] . $unit;
+	}
+	if ( null === $min_height ) {
+		// The minimum height set in the block stylesheet.
+		$min_height = '430px';
+	}
+
+	// Lengths such as `var()` or `clamp()` are left alone, since `sizes` can't use them all.
+	if ( ! is_string( $min_height ) || ! preg_match( '/^(\d*\.?\d+)(px|em|rem|vh|vw|svh|lvh|dvh|vmin|vmax)$/', trim( $min_height ), $matches ) ) {
+		return null;
+	}
+
+	$width_to_fill = round( (float) $matches[1] * $image_ratio, 2 );
+	if ( $width_to_fill <= 0 ) {
+		return null;
+	}
+
+	return 'max(100vw, ' . $width_to_fill . $matches[2] . ')';
+}
+
+/**
+ * Removes the `auto` keyword that WordPress adds to the `sizes` attribute of
+ * lazy-loaded images from a Cover background image.
+ *
+ * `auto` makes the browser use the width of the image element, which ignores
+ * the height that the image has to fill. The keyword is only removed from
+ * values set by block_core_cover_get_background_image_sizes().
+ *
+ * @since 7.3.0
+ *
+ * @param string $image The image tag markup.
+ * @return string The filtered image tag markup.
+ */
+function block_core_cover_remove_background_image_auto_sizes( $image ) {
+	if ( ! is_string( $image ) || ! str_contains( $image, 'wp-block-cover__image-background' ) ) {
+		return $image;
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $image );
+	if (
+		! $processor->next_tag(
+			array(
+				'tag_name'   => 'IMG',
+				'class_name' => 'wp-block-cover__image-background',
+			)
+		)
+	) {
+		return $image;
+	}
+
+	$sizes = $processor->get_attribute( 'sizes' );
+	if ( ! is_string( $sizes ) || ! preg_match( '/^\s*auto\s*,\s*(max\(100vw, [^)]+\)|\d*\.?\d+vw)\s*$/i', $sizes, $matches ) ) {
+		return $image;
+	}
+
+	$processor->set_attribute( 'sizes', $matches[1] );
+	return $processor->get_updated_html();
+}
+add_filter( 'wp_content_img_tag', 'block_core_cover_remove_background_image_auto_sizes' );
 
 /**
  * Registers the `core/cover` block renderer on server.
