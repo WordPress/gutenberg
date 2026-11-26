@@ -28,6 +28,7 @@
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
 -   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
+-   List View: Don't take focus when the first block is added to an empty post ([#87493](https://github.com/WordPress/gutenberg/pull/87493)).
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 
 ### Internal
