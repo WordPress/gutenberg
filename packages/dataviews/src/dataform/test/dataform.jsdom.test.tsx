@@ -992,6 +992,9 @@ describe( 'DataForm component', () => {
 				level: 3,
 				name: /main card/i,
 			} );
+			// A native heading can't contain the toggle, so the wrapper takes
+			// heading semantics through ARIA.
+			expect( heading ).toHaveAttribute( 'role', 'heading' );
 			expect(
 				within( heading ).getByRole( 'button', { name: /main card/i } )
 			).toBeVisible();

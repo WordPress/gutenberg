@@ -297,11 +297,20 @@ export default function FormCardField< Item >( {
 		/>
 	);
 
-	const HeadingTag =
+	const headingLevel =
 		layout.withHeader && layout.headingLevel
-			? ( `h${ layout.headingLevel }` as const )
+			? layout.headingLevel
 			: undefined;
+	const HeadingTag = headingLevel
+		? ( `h${ headingLevel }` as const )
+		: undefined;
 	const heading = HeadingTag ? <HeadingTag /> : undefined;
+	// A native heading only allows phrasing content, so the collapsible
+	// header's wrapper, which contains the toggle, takes heading semantics
+	// through ARIA instead.
+	const collapsibleHeadingProps = headingLevel
+		? { role: 'heading', 'aria-level': headingLevel }
+		: {};
 
 	const headerContent = (
 		<HeaderContent
@@ -326,7 +335,7 @@ export default function FormCardField< Item >( {
 				onOpenChange={ handleOpenChange }
 				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header render={ heading }>
+				<CollapsibleCard.Header { ...collapsibleHeadingProps }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content
