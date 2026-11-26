@@ -7,7 +7,7 @@ import '@wordpress/theme/design-tokens.css';
 // override made from the same cascade layer.
 import * as Item from '../index';
 
-it( 'gives the label more weight than the description, whatever the order of the stylesheets', async () => {
+it( 'styles the label and the description, whatever the order of the stylesheets', async () => {
 	await render(
 		<Item.ContentRow>
 			<Item.Label>Soft shadow</Item.Label>
@@ -24,4 +24,15 @@ it( 'gives the label more weight than the description, whatever the order of the
 	expect( Number( label.fontWeight ) ).toBeGreaterThan(
 		Number( description.fontWeight )
 	);
+
+	// `Text` resets its margin, so the gap between the two parts must not
+	// be a margin.
+	const labelRect = screen.getByText( 'Soft shadow' ).getBoundingClientRect();
+	const descriptionText = screen.getByText( 'Used on featured images.' );
+	expect(
+		descriptionText.getBoundingClientRect().top +
+			parseFloat( description.paddingBlockStart ) -
+			labelRect.bottom
+	).toBeGreaterThan( 0 );
+	expect( parseFloat( description.paddingBlockStart ) ).toBeGreaterThan( 0 );
 } );

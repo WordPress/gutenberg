@@ -73,6 +73,9 @@ export interface LinkRowProps
 	 * `Item.Chevron` show the new-tab arrow. Defaults `target` to `"_blank"`
 	 * when no explicit target is set.
 	 *
+	 * The arrow shows only when the row has an `Item.Chevron`, which a row
+	 * with `Item.Actions` does not have.
+	 *
 	 * @default false
 	 */
 	openInNewTab?: boolean;
@@ -118,7 +121,10 @@ export interface MediaProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-export interface LabelProps extends ComponentProps< 'span' > {
+/*
+ * `id` is left out: the row references this part by an id of its own.
+ */
+export interface LabelProps extends Omit< ComponentProps< 'span' >, 'id' > {
 	/**
 	 * The name of the thing the row represents. In `Item.LinkRow` and
 	 * `Item.ButtonRow` this is the accessible name of the row's control, so
@@ -127,7 +133,13 @@ export interface LabelProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-export interface DescriptionProps extends ComponentProps< 'span' > {
+/*
+ * `id` is left out: the row references this part by an id of its own.
+ */
+export interface DescriptionProps extends Omit<
+	ComponentProps< 'span' >,
+	'id'
+> {
 	/**
 	 * Supporting text. In `Item.LinkRow` and `Item.ButtonRow` it is also the
 	 * accessible description of the row's control.
@@ -135,7 +147,10 @@ export interface DescriptionProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-export interface MetaProps extends ComponentProps< 'span' > {
+/*
+ * `id` is left out: the row references this part by an id of its own.
+ */
+export interface MetaProps extends Omit< ComponentProps< 'span' >, 'id' > {
 	/**
 	 * Trailing status or detail, such as a `Badge` or a current value. In
 	 * `Item.LinkRow` and `Item.ButtonRow` it is also part of the accessible
@@ -156,4 +171,7 @@ export interface ActionsProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-export type ChevronProps = Omit< ComponentProps< 'svg' >, 'children' >;
+export type ChevronProps = Omit<
+	ComponentProps< 'svg' >,
+	'children' | 'render'
+>;

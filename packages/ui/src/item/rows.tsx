@@ -27,9 +27,20 @@ import type {
 	LinkRowProps,
 } from './types';
 
-function join( ...ids: ( string | false )[] ) {
+function join( ...ids: ( string | false | undefined )[] ) {
 	return ids.filter( Boolean ).join( ' ' ) || undefined;
 }
+
+/**
+ * The naming props a consumer can pass to a link or button row. They
+ * follow the precedence of `Menu`: an explicit name replaces the label, and
+ * an explicit description is added to the description and meta of the row.
+ */
+type AriaProps = {
+	'aria-label'?: string;
+	'aria-labelledby'?: string;
+	'aria-describedby'?: string;
+};
 
 type RowOptions = {
 	/**
@@ -41,6 +52,7 @@ type RowOptions = {
 	 */
 	opensInNewTab?: boolean;
 	density?: Density;
+	aria?: AriaProps;
 };
 
 /**
@@ -52,6 +64,7 @@ function useRow( {
 	isActivatable,
 	opensInNewTab = false,
 	density: densityProp = 'comfortable',
+	aria = {},
 }: RowOptions ) {
 	const group = useContext( GroupContext );
 	const density = group?.density ?? densityProp;
@@ -62,9 +75,9 @@ function useRow( {
 	const metaId = `${ id }-meta`;
 	const newTabNoticeId = `${ id }-new-tab`;
 
-	// The label and the chevron are tracked in a ref, not in state. Nothing
-	// is rendered from them; they only feed the warnings below.
-	const warnedPartsRef = useRef( { label: false, chevron: false } );
+	// The label is tracked in a ref, not in state. Nothing is rendered from
+	// it; it only feeds the missing-label warning below.
+	const hasLabelRef = useRef( false );
 	const [ parts, setParts ] = useState( {
 		description: false,
 		meta: false,
@@ -72,10 +85,10 @@ function useRow( {
 	} );
 
 	const register = useCallback( ( part: RowPart ) => {
-		if ( part === 'label' || part === 'chevron' ) {
-			warnedPartsRef.current[ part ] = true;
+		if ( part === 'label' ) {
+			hasLabelRef.current = true;
 			return () => {
-				warnedPartsRef.current[ part ] = false;
+				hasLabelRef.current = false;
 			};
 		}
 
@@ -84,20 +97,19 @@ function useRow( {
 			setParts( ( current ) => ( { ...current, [ part ]: false } ) );
 	}, [] );
 
+	const hasExplicitName = !! (
+		aria[ 'aria-label' ] || aria[ 'aria-labelledby' ]
+	);
+
 	useEffect( () => {
-		// The effects of the parts run before this one, so the parts of
-		// the row have registered themselves by now.
-		if ( isActivatable && ! warnedPartsRef.current.label ) {
+		// The effects of the parts run before this one, so the label has
+		// registered itself by now if the row has one.
+		if ( isActivatable && ! hasExplicitName && ! hasLabelRef.current ) {
 			warning(
 				'Item: an <Item.LinkRow> or <Item.ButtonRow> needs an <Item.Label>. Without it the link or button of the row has no accessible name.'
 			);
 		}
-		if ( opensInNewTab && ! warnedPartsRef.current.chevron ) {
-			warning(
-				'Item: an <Item.LinkRow> that opens in a new tab needs an <Item.Chevron>. It shows the new-tab arrow in place of the chevron.'
-			);
-		}
-	}, [ isActivatable, opensInNewTab ] );
+	}, [ isActivatable, hasExplicitName ] );
 
 	const context = useMemo< RowContextValue >(
 		() => ( {
@@ -126,9 +138,15 @@ function useRow( {
 	 * the parts rendered beside it.
 	 */
 	const labelling = {
-		// The new-tab notice is part of the name, as it is in `Link`.
-		'aria-labelledby': join( labelId, opensInNewTab && newTabNoticeId ),
+		'aria-label': aria[ 'aria-label' ],
+		'aria-labelledby':
+			aria[ 'aria-labelledby' ] ??
+			( aria[ 'aria-label' ]
+				? undefined
+				: // The new-tab notice is part of the name, as it is in `Link`.
+					join( labelId, opensInNewTab && newTabNoticeId ) ),
 		'aria-describedby': join(
+			aria[ 'aria-describedby' ],
 			parts.description && descriptionId,
 			parts.meta && metaId
 		),
@@ -204,18 +222,30 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
 			render,
 			style,
 			target,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			'aria-describedby': ariaDescribedBy,
 			...props
 		},
 		ref
 	) {
 		const opensInNewTab = openInNewTab || /^_blank$/i.test( target ?? '' );
-		const row = useRow( { isActivatable: true, opensInNewTab, density } );
+		const row = useRow( {
+			isActivatable: true,
+			opensInNewTab,
+			density,
+			aria: {
+				'aria-label': ariaLabel,
+				'aria-labelledby': ariaLabelledBy,
+				'aria-describedby': ariaDescribedBy,
+			},
+		} );
 
 		const link = useRender( {
 			defaultTagName: 'a',
 			render,
 			ref,
-			props: mergeProps< 'a' >( row.labelling, props, {
+			props: mergeProps< 'a' >( props, row.labelling, {
 				target: target ?? ( openInNewTab ? '_blank' : undefined ),
 				className: clsx(
 					defenseStyles.a,
@@ -266,19 +296,36 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
  */
 export const ButtonRow = forwardRef< HTMLButtonElement, ButtonRowProps >(
 	function ItemButtonRow(
-		{ children, className, density, style, ...props },
+		{
+			children,
+			className,
+			density,
+			style,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			'aria-describedby': ariaDescribedBy,
+			...props
+		},
 		ref
 	) {
-		const row = useRow( { isActivatable: true, density } );
+		const row = useRow( {
+			isActivatable: true,
+			density,
+			aria: {
+				'aria-label': ariaLabel,
+				'aria-labelledby': ariaLabelledBy,
+				'aria-describedby': ariaDescribedBy,
+			},
+		} );
 
 		return row.wrap(
 			<div className={ clsx( row.className, className ) } style={ style }>
 				<Button
 					ref={ ref }
 					variant="unstyled"
-					{ ...row.labelling }
 					{ ...props }
-					className={ styles.surface }
+					{ ...row.labelling }
+					className={ clsx( styles.surface, styles[ 'is-button' ] ) }
 				/>
 				{ children }
 			</div>

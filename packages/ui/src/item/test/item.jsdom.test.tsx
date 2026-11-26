@@ -178,14 +178,57 @@ describe( 'Item', () => {
 		expect( console ).not.toHaveWarned();
 	} );
 
-	it( 'warns when a link row that opens in a new tab has no chevron', () => {
+	it( 'keeps the row named when a part renders its own element with an id', () => {
 		render(
-			<Item.LinkRow href="https://wordpress.org" openInNewTab>
-				<Item.Label>Documentation</Item.Label>
+			<Item.LinkRow href="/billing">
+				<Item.Label render={ <span id="consumer-label" /> }>
+					Billing
+				</Item.Label>
+				<Item.Description render={ <span id="consumer-description" /> }>
+					Invoices and receipts.
+				</Item.Description>
+				<Item.Meta render={ <span id="consumer-meta" /> }>
+					Paid
+				</Item.Meta>
 			</Item.LinkRow>
 		);
 
-		expect( console ).toHaveWarned();
+		const link = screen.getByRole( 'link', { name: 'Billing' } );
+		expect( link ).toHaveAccessibleDescription(
+			'Invoices and receipts. Paid'
+		);
+	} );
+
+	it( 'lets an explicit name win over the label, as Menu does', () => {
+		render(
+			<Item.ButtonRow
+				onClick={ () => {} }
+				aria-label="Edit billing address"
+			>
+				<Item.Label>Edit</Item.Label>
+			</Item.ButtonRow>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Edit billing address' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'merges an explicit description with the description and meta of the row', () => {
+		render(
+			<>
+				<span id="extra">Updated today.</span>
+				<Item.LinkRow href="/card" aria-describedby="extra">
+					<Item.Label>Card payments</Item.Label>
+					<Item.Description>Accept cards.</Item.Description>
+					<Item.Meta>Enabled</Item.Meta>
+				</Item.LinkRow>
+			</>
+		);
+
+		expect(
+			screen.getByRole( 'link', { name: 'Card payments' } )
+		).toHaveAccessibleDescription( 'Updated today. Accept cards. Enabled' );
 	} );
 
 	it( 'supports a disabled button row', async () => {

@@ -12,7 +12,7 @@ export type GroupContextValue = {
  */
 export const GroupContext = createContext< GroupContextValue | null >( null );
 
-export type RowPart = 'label' | 'description' | 'meta' | 'actions' | 'chevron';
+export type RowPart = 'label' | 'description' | 'meta' | 'actions';
 
 export type RowContextValue = {
 	labelId: string;

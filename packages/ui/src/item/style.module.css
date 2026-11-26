@@ -168,6 +168,12 @@
 			--_gcd-a-border-radius: var(--_wp-ui-item-surface-radius);
 
 			position: absolute;
+			/*
+			 * Above the static parts of the row, even those that create a
+			 * stacking context of their own, such as a mirrored chevron or a
+			 * positioned element in the media, so they cannot take a click.
+			 */
+			z-index: 1;
 			inset: 0;
 			/* A button does not stretch between its insets on its own. */
 			width: 100%;
@@ -176,6 +182,10 @@
 			border-radius: var(--_wp-ui-item-surface-radius);
 			padding: 0;
 			background: none;
+		}
+
+		/* Links keep the cursor of the browser. */
+		.is-button {
 			cursor: var(--wpds-cursor-control);
 		}
 
@@ -225,13 +235,15 @@
 		}
 
 		/*
-		 * A margin and not a row gap: a row gap would also apply when
-		 * there is no description, and push the label off center.
+		 * Padding and not a row gap: a row gap would also apply when there
+		 * is no description, and push the label off center. Not a margin
+		 * either: `Text` resets its margin in the same layer, and the
+		 * defense for paragraphs resets it without a layer.
 		 */
 		.description {
 			grid-column: 2;
 			grid-row: 2;
-			margin-block-start: var(--wpds-dimension-gap-xs);
+			padding-block-start: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -261,7 +273,7 @@
 		/* Above the link or button of the row, so each control keeps its target. */
 		.actions {
 			position: relative;
-			z-index: 1;
+			z-index: 2;
 			grid-column: 4;
 			grid-row: 1 / span 2;
 			display: flex;

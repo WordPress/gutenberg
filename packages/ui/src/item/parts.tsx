@@ -1,8 +1,9 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { cloneElement, forwardRef, useEffect } from '@wordpress/element';
 import { arrowUpRight, chevronRight } from '@wordpress/icons';
 import warning from '@wordpress/warning';
+import type { ReactElement } from 'react';
 import { Icon } from '../icon';
 import { Text } from '../text';
 import styles from './style.module.css';
@@ -15,6 +16,32 @@ import type {
 	MediaProps,
 	MetaProps,
 } from './types';
+
+type RenderProp = LabelProps[ 'render' ];
+
+/**
+ * The control of the row references the label, the description and the
+ * meta by their ids. A `render` element, or the element a `render` function
+ * returns, would otherwise replace the id with its own and break the
+ * reference, so the id is set on it.
+ *
+ * @param render The `render` prop of the part.
+ * @param id     The id the row references.
+ */
+function withId( render: RenderProp, id: string | undefined ): RenderProp {
+	if ( ! render || ! id ) {
+		return render;
+	}
+
+	if ( typeof render === 'function' ) {
+		return ( props ) =>
+			cloneElement( render( props ) as ReactElement< { id?: string } >, {
+				id,
+			} );
+	}
+
+	return cloneElement( render, { id } );
+}
 
 /**
  * A leading icon, thumbnail or swatch. Hidden from assistive technology: a
@@ -40,7 +67,7 @@ export const Media = forwardRef< HTMLSpanElement, MediaProps >(
  * the heading of the screen the row opens, or name the command it runs.
  */
 export const Label = forwardRef< HTMLSpanElement, LabelProps >(
-	function ItemLabel( { className, ...props }, ref ) {
+	function ItemLabel( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Label' );
 
 		useEffect( () => context?.register( 'label' ), [ context ] );
@@ -50,6 +77,7 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 				ref={ ref }
 				variant="body-md"
 				{ ...props }
+				render={ withId( render, context?.labelId ) }
 				id={ context?.labelId }
 				// The control of an activatable row takes its name from
 				// this element. Without `aria-hidden`, a screen reader
@@ -66,7 +94,7 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
  * accessible description of the link or button.
  */
 export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
-	function ItemDescription( { className, ...props }, ref ) {
+	function ItemDescription( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Description' );
 
 		useEffect( () => context?.register( 'description' ), [ context ] );
@@ -76,6 +104,7 @@ export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
 				ref={ ref }
 				variant="body-sm"
 				{ ...props }
+				render={ withId( render, context?.descriptionId ) }
 				id={ context?.descriptionId }
 				className={ clsx( styles.description, className ) }
 			/>
@@ -100,7 +129,7 @@ export const Meta = forwardRef< HTMLSpanElement, MetaProps >( function ItemMeta(
 
 	return useRender( {
 		defaultTagName: 'span',
-		render,
+		render: withId( render, context?.metaId ),
 		ref,
 		props: mergeProps< 'span' >( props, {
 			id: context?.metaId,
@@ -121,8 +150,6 @@ export const Meta = forwardRef< HTMLSpanElement, MetaProps >( function ItemMeta(
 export const Chevron = forwardRef< SVGSVGElement, ChevronProps >(
 	function ItemChevron( { className, ...props }, ref ) {
 		const context = useRowContext( 'Chevron' );
-
-		useEffect( () => context?.register( 'chevron' ), [ context ] );
 
 		useEffect( () => {
 			if ( context?.hasActions ) {

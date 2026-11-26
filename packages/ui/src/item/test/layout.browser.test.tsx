@@ -4,6 +4,7 @@ import { render } from 'vitest-browser-react';
 import '@wordpress/theme/design-tokens.css';
 import { Button } from '../../button';
 import * as Card from '../../card';
+import { ThemeProvider } from '../../utils/theme-provider';
 import * as Item from '../index';
 
 function elementAtCenterOf( element: Element ) {
@@ -47,6 +48,63 @@ describe( 'Item layout', () => {
 		const listRect = screen.getByRole( 'listitem' ).getBoundingClientRect();
 		expect( rowRect.width ).toBe( listRect.width );
 		expect( rowRect.height ).toBe( listRect.height );
+	} );
+
+	it( 'keeps static parts that create their own stacking context under the control of the row', async () => {
+		await render(
+			<div dir="rtl">
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Media>
+						<span
+							data-testid="media"
+							style={ {
+								display: 'inline-block',
+								width: 32,
+								height: 32,
+								position: 'relative',
+								transform: 'translateZ(0)',
+							} }
+						/>
+					</Item.Media>
+					<Item.Label>Color</Item.Label>
+					<Item.Chevron data-testid="chevron" />
+				</Item.ButtonRow>
+			</div>
+		);
+
+		const row = screen.getByRole( 'button', { name: 'Color' } );
+
+		// The chevron is mirrored with a transform in right-to-left, and
+		// the media holds a positioned element.
+		expect( elementAtCenterOf( screen.getByTestId( 'chevron' ) ) ).toBe(
+			row
+		);
+		expect( elementAtCenterOf( screen.getByTestId( 'media' ) ) ).toBe(
+			row
+		);
+	} );
+
+	it( 'keeps the browser cursor on a link row, and the control cursor on a button row', async () => {
+		await render(
+			<ThemeProvider cursor={ { control: 'default' } }>
+				<Item.LinkRow href="#zones">
+					<Item.Label>Zones</Item.Label>
+				</Item.LinkRow>
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Label>Recalculate</Item.Label>
+				</Item.ButtonRow>
+			</ThemeProvider>
+		);
+
+		expect(
+			getComputedStyle( screen.getByRole( 'link', { name: 'Zones' } ) )
+				.cursor
+		).toBe( 'pointer' );
+		expect(
+			getComputedStyle(
+				screen.getByRole( 'button', { name: 'Recalculate' } )
+			).cursor
+		).toBe( 'default' );
 	} );
 
 	it( 'rounds the control of the first and of the last row to follow the frame', async () => {
