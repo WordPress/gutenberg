@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `MenuItem`: Give the `info` text of pressed items the same color as the label, so it stays readable on the pressed fill, including in forced colors mode ([#87153](https://github.com/WordPress/gutenberg/pull/87153)).
 -   `ConfirmDialog`: Ignore Enter key presses during IME composition ([#87378](https://github.com/WordPress/gutenberg/pull/87378)).
 -   `BoxControl`: Show the side input tooltip above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86805](https://github.com/WordPress/gutenberg/pull/86805)).
 -   `MenuItem`: Show items with `aria-disabled` in the system disabled color in forced colors mode ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
@@ -30,9 +31,11 @@
 -   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab. In both orientations, use the design system focus color, which keeps its contrast in the dark theme, and the design system corner radius ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 -   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
+-   `Panel`: Keep `PanelHeader` 48px tall, including its bottom border, inside containers that apply the `reset` mixin, such as the editor sidebar ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 
 ### Internal
 
+-   `ResizableBox`: Read CSS transforms with private helpers from `@wordpress/dom` ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).
