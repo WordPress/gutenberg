@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Save widget areas in sequence so overlapping requests cannot move widgets to Inactive Widgets ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
+-   Save widget areas in sequence so overlapping requests cannot move widgets to Inactive Widgets ([#87445](https://github.com/WordPress/gutenberg/pull/87445)).
 
 ## 7.2.0 (2026-11-18)
 
