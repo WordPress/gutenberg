@@ -446,6 +446,15 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	}
 }
 
+// This column takes the table's spare width, so a title alone needs no floor.
+// A description keeps it, or a narrow table would wrap it a word per line.
+.dataviews-view-table__primary-column-content:not(.has-description) {
+	&,
+	> .dataviews-title-field {
+		min-width: 0;
+	}
+}
+
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: var(--wpds-typography-font-weight-emphasis);
