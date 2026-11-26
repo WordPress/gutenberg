@@ -38,6 +38,9 @@ ruleTester.run( 'i18n-no-mismatched-placeholders', rule, {
 			code: `_n( 'This block', 'These blocks', count )`,
 		},
 		{
+			code: `_n( '%d block, 50% done', '%d blocks', count )`,
+		},
+		{
 			code: `_n( singular, plural, count )`,
 		},
 		{

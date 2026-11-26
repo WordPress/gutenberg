@@ -74,10 +74,23 @@ sprintf(
 			code: `sprintf( __( '%s and %s' ), [ 'foo', 'bar' ] )`,
 		},
 		{
-			code: `sprintf( __( '%s and %s' ), values )`,
+			code: `sprintf( __( '%s and %s' ), ...values )`,
 		},
 		{
-			code: `sprintf( __( '%s and %s' ), ...values )`,
+			code: `sprintf( _n( '%d item', plural, n ), n )`,
+		},
+		{
+			code: `sprintf( '%%%s', a )`,
+		},
+		{
+			code: `sprintf( __( 'Progress: %%%d' ), a )`,
+		},
+		{
+			// Ordering does not matter in strings that are not translated.
+			code: `sprintf( '%s %s', a, b )`,
+		},
+		{
+			code: `sprintf( __( '%s' ), value )`,
 		},
 		{
 			code: `sprintf( '%(first)s and %(second)s', { first, second } )`,
@@ -210,6 +223,19 @@ sprintf(
 					data: { expected: 2, actual: 1 },
 				},
 			],
+		},
+		{
+			code: `sprintf( __( '%1$s of %2$s' ), total )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 2, actual: 1 },
+				},
+			],
+		},
+		{
+			code: `sprintf( 'Save 20% %s', a )`,
+			errors: [ { messageId: 'noPlaceholders' } ],
 		},
 		{
 			code: `i18n.sprintf()`,

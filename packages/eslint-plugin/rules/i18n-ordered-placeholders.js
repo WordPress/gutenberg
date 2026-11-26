@@ -9,6 +9,21 @@ const {
 } = require( '../utils/get-sprintf-placeholders' );
 
 /**
+ * Returns the placeholders in a translatable string, leaving out matches with
+ * a space flag: in translatable strings, these are almost always plain text,
+ * such as "50% done".
+ *
+ * @param {string} string Translatable string.
+ *
+ * @return {import('../utils/get-sprintf-placeholders').SprintfPlaceholder[]} Placeholders.
+ */
+function getPlaceholders( string ) {
+	return getSprintfPlaceholders( string ).filter(
+		( placeholder ) => ! placeholder.hasSpaceFlag
+	);
+}
+
+/**
  * Returns the source text of a string literal with each unordered placeholder
  * given its position, or `null` if that cannot be done safely.
  *
@@ -17,12 +32,18 @@ const {
  * @return {?string} Fixed source text.
  */
 function getFixedRaw( node ) {
-	if ( node.type !== 'Literal' || typeof node.raw !== 'string' ) {
+	// Escape sequences, such as `\x25` for `%`, can hide or create
+	// placeholders in the source text, so only plain literals are fixed.
+	if (
+		node.type !== 'Literal' ||
+		typeof node.raw !== 'string' ||
+		node.raw.includes( '\\' )
+	) {
 		return null;
 	}
 
-	const valuePlaceholders = getSprintfPlaceholders( node.value );
-	const rawPlaceholders = getSprintfPlaceholders( node.raw );
+	const valuePlaceholders = getPlaceholders( node.value );
+	const rawPlaceholders = getPlaceholders( node.raw );
 
 	// Only fix strings where every placeholder is unordered: when ordered
 	// and unordered placeholders are mixed, which argument each unordered
@@ -54,10 +75,12 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
-		fixable: 'code',
+		hasSuggestions: true,
 		messages: {
 			unorderedPlaceholders:
 				'Multiple placeholders in translatable strings should be ordered, such as %1$s and %2$s, so translators can change their order.',
+			numberPlaceholders:
+				'Number the placeholders in the order they appear. This changes the string, so existing translations of it are lost.',
 		},
 	},
 	create( context ) {
@@ -88,7 +111,7 @@ module.exports = {
 						continue;
 					}
 
-					const placeholders = getSprintfPlaceholders( string );
+					const placeholders = getPlaceholders( string );
 
 					if (
 						placeholders.length < 2 ||
@@ -104,10 +127,18 @@ module.exports = {
 					context.report( {
 						node: candidate,
 						messageId: 'unorderedPlaceholders',
-						fix: fixedRaw
-							? ( fixer ) =>
-									fixer.replaceText( candidate, fixedRaw )
-							: null,
+						suggest: fixedRaw
+							? [
+									{
+										messageId: 'numberPlaceholders',
+										fix: ( fixer ) =>
+											fixer.replaceText(
+												candidate,
+												fixedRaw
+											),
+									},
+								]
+							: [],
 					} );
 				}
 			},

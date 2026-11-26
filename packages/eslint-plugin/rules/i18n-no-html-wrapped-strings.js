@@ -26,6 +26,25 @@ const REGEXP_ATTRIBUTE =
 	/([^\s"'=<>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
 /**
+ * Attributes whose values are text shown or announced to users. When the
+ * wrapping element has one of these, as in `<abbr title="…">`, the attribute
+ * text needs translating together with the content.
+ *
+ * @type {Set<string>}
+ */
+const TRANSLATABLE_ATTRIBUTES = new Set( [
+	'alt',
+	'aria-description',
+	'aria-label',
+	'aria-placeholder',
+	'aria-roledescription',
+	'aria-valuetext',
+	'label',
+	'placeholder',
+	'title',
+] );
+
+/**
  * Returns the name of the element wrapping the whole string, or `null` if the
  * string is not wrapped in a single element, or if moving the element out of
  * the string could lose something translators need.
@@ -56,6 +75,15 @@ function getWrappingTagName( string ) {
 
 		// The link target may need to be localized.
 		if ( tagName.toLowerCase() === 'a' && name.toLowerCase() === 'href' ) {
+			return null;
+		}
+
+		// Text in attributes, as in `<abbr title="…">`, needs translating
+		// with the content.
+		if (
+			TRANSLATABLE_ATTRIBUTES.has( name.toLowerCase() ) &&
+			value.trim()
+		) {
 			return null;
 		}
 	}

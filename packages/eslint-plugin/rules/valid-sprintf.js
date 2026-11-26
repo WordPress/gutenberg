@@ -1,6 +1,4 @@
 const {
-	REGEXP_SPRINTF_PLACEHOLDER,
-	REGEXP_SPRINTF_PLACEHOLDER_UNORDERED,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
@@ -11,23 +9,13 @@ const {
 } = require( '../utils/get-sprintf-placeholders' );
 
 /**
- * Node types of a single sprintf argument that cannot be an array. A single
- * array argument is used as the list of arguments, so an argument of any other
- * type, such as a variable, may hold any number of arguments.
- *
- * @type {Set<string>}
- */
-const NON_ARRAY_NODE_TYPES = new Set( [
-	'Literal',
-	'TemplateLiteral',
-	'BinaryExpression',
-	'UnaryExpression',
-	'UpdateExpression',
-] );
-
-/**
  * Returns the number of arguments passed to sprintf after the format string,
  * or `null` if it cannot be known.
+ *
+ * A single array literal is used as the list of arguments, as in
+ * `sprintf( format, [ a, b ] )`. Any other single argument, such as a
+ * variable, counts as one value: passing an array variable is rare, and a
+ * forgotten argument usually looks like `sprintf( format, value )`.
  *
  * @param {Object[]} args Argument nodes after the format string.
  *
@@ -38,19 +26,13 @@ function getArgumentCount( args ) {
 		return null;
 	}
 
-	if ( args.length === 1 ) {
-		if ( args[ 0 ].type === 'ArrayExpression' ) {
-			const { elements } = args[ 0 ];
-			return elements.some(
-				( element ) => ! element || element.type === 'SpreadElement'
-			)
-				? null
-				: elements.length;
-		}
-
-		if ( ! NON_ARRAY_NODE_TYPES.has( args[ 0 ].type ) ) {
-			return null;
-		}
+	if ( args.length === 1 && args[ 0 ].type === 'ArrayExpression' ) {
+		const { elements } = args[ 0 ];
+		return elements.some(
+			( element ) => ! element || element.type === 'SpreadElement'
+		)
+			? null
+			: elements.length;
 	}
 
 	return args.length;
@@ -162,41 +144,44 @@ module.exports = {
 					return;
 				}
 
-				let numPlaceholders;
-				for ( const candidate of candidates ) {
-					const allMatches = candidate.match(
-						REGEXP_SPRINTF_PLACEHOLDER
-					);
+				// A translation function argument that is not a string, such
+				// as a variable, may hold any format string. Thus, bail.
+				if (
+					candidates.some(
+						( candidate ) => typeof candidate !== 'string'
+					)
+				) {
+					return;
+				}
 
-					// Prioritize placeholder number consistency over matching
-					// placeholder, since it's a more common error to omit a
-					// placeholder from the singular form of pluralization.
-					if (
-						numPlaceholders !== undefined &&
-						( ! allMatches ||
-							numPlaceholders !== allMatches.length )
-					) {
-						context.report( {
-							node,
-							messageId: 'placeholderMismatch',
-						} );
-						return;
-					}
+				const placeholderLists = candidates.map(
+					getSprintfPlaceholders
+				);
 
-					const unorderedMatches = candidate.match(
-						REGEXP_SPRINTF_PLACEHOLDER_UNORDERED
-					);
+				// Prioritize placeholder number consistency over matching
+				// placeholder, since it's a more common error to omit a
+				// placeholder from the singular form of pluralization.
+				if (
+					placeholderLists.some(
+						( placeholders ) =>
+							placeholders.length !== placeholderLists[ 0 ].length
+					)
+				) {
+					context.report( {
+						node,
+						messageId: 'placeholderMismatch',
+					} );
+					return;
+				}
 
+				for ( const placeholders of placeholderLists ) {
 					// `i18n-ordered-placeholders` reports unordered
 					// placeholders in translatable strings, wherever they
 					// are used.
 					if (
 						! isTranslation &&
-						unorderedMatches &&
-						allMatches &&
-						unorderedMatches.length > 0 &&
-						allMatches.length > 1 &&
-						unorderedMatches.length !== allMatches.length
+						placeholders.some( ( { isOrdered } ) => isOrdered ) &&
+						placeholders.some( ( { isOrdered } ) => ! isOrdered )
 					) {
 						context.report( {
 							node,
@@ -205,42 +190,27 @@ module.exports = {
 						return;
 					}
 
-					// Catch cases where a string only contains %% (escaped percentage sign).
-					if (
-						! allMatches ||
-						( allMatches.length === 1 && allMatches[ 0 ] === '%%' )
-					) {
+					// Catch strings without placeholders, including strings
+					// that only contain escaped percent signs (`%%`).
+					if ( ! placeholders.length ) {
 						context.report( {
 							node,
 							messageId: 'noPlaceholders',
 						} );
 						return;
 					}
-
-					if ( numPlaceholders === undefined ) {
-						// Track the number of placeholders discovered in the
-						// string to verify that all other candidate options
-						// have the same number.
-						numPlaceholders = allMatches.length;
-					}
 				}
 
 				const actual = getArgumentCount( args.slice( 1 ) );
 
-				if (
-					actual === null ||
-					candidates.some(
-						( candidate ) => typeof candidate !== 'string'
-					)
-				) {
+				if ( actual === null ) {
 					return;
 				}
 
-				const requiredCounts = candidates.map(
-					( candidate ) =>
-						getSprintfArgumentPositions(
-							getSprintfPlaceholders( candidate )
-						).requiredArgumentCount
+				const requiredCounts = placeholderLists.map(
+					( placeholders ) =>
+						getSprintfArgumentPositions( placeholders )
+							.requiredArgumentCount
 				);
 
 				// Named placeholders read properties of a single object

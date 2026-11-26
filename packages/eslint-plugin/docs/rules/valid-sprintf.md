@@ -2,7 +2,9 @@
 
 [`sprintf`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/i18n/README.md#api) must be called with a valid format string with at least one placeholder, and with a valid set of placeholder substitute values: one for each argument the placeholders read.
 
-The number of values is not checked when the format string uses named placeholders, such as `%(name)s`, or when a single value is passed that may be an array of values, such as a variable. Unordered placeholders in translatable format strings are reported by [`i18n-ordered-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ordered-placeholders.md).
+A single array literal is read as the list of values, as in `sprintf( format, [ a, b ] )`. Any other single value, such as a variable, counts as one value. The number of values is not checked when the format string uses named placeholders, such as `%(name)s`, or when values are spread, as in `sprintf( format, ...values )`.
+
+In format strings that are not translated, mixing ordered placeholders such as `%1$s` with unordered ones such as `%s` is reported. Unordered placeholders in translatable format strings are reported by [`i18n-ordered-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ordered-placeholders.md).
 
 ## Rule details
 

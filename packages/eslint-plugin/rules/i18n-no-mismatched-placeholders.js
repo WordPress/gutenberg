@@ -67,8 +67,12 @@ module.exports = {
 					return;
 				}
 
-				const [ singular, plural ] = strings.map(
-					getSprintfPlaceholders
+				// Matches with a space flag are almost always plain text in
+				// translatable strings, such as "50% done".
+				const [ singular, plural ] = strings.map( ( string ) =>
+					getSprintfPlaceholders( string ).filter(
+						( placeholder ) => ! placeholder.hasSpaceFlag
+					)
 				);
 
 				// A singular string with fewer placeholders, such as

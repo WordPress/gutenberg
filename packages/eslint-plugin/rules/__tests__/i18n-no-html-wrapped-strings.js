@@ -37,6 +37,12 @@ ruleTester.run( 'i18n-no-html-wrapped-strings', rule, {
 			code: `__( '<span class="%1$s">Label</span>' )`,
 		},
 		{
+			code: `__( '<abbr title="Coordinated Universal Time">UTC</abbr>' )`,
+		},
+		{
+			code: `__( '<span aria-label="Required">*</span>' )`,
+		},
+		{
 			code: `__( '<br />Line' )`,
 		},
 		{

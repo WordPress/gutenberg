@@ -10,6 +10,23 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
+/**
+ * Returns the expected error for a string, with the suggestion to number its
+ * placeholders when one is offered.
+ *
+ * @param {?string} output Code after applying the suggestion, if one is offered.
+ *
+ * @return {Object} Expected error.
+ */
+function unordered( output = null ) {
+	return {
+		messageId: 'unorderedPlaceholders',
+		suggestions: output
+			? [ { messageId: 'numberPlaceholders', output } ]
+			: [],
+	};
+}
+
 ruleTester.run( 'i18n-ordered-placeholders', rule, {
 	valid: [
 		{
@@ -28,6 +45,13 @@ ruleTester.run( 'i18n-ordered-placeholders', rule, {
 			code: `__( '100%% of %s' )`,
 		},
 		{
+			// Matches with a space flag are plain text, not placeholders.
+			code: `__( '50% done, 20% left' )`,
+		},
+		{
+			code: `__( '100% secure and 50% faster' )`,
+		},
+		{
 			code: `_x( '%1$s of %2$s', 'context with %s and %s' )`,
 		},
 		{
@@ -43,53 +67,63 @@ ruleTester.run( 'i18n-ordered-placeholders', rule, {
 	invalid: [
 		{
 			code: `__( '%s of %s' )`,
-			output: `__( '%1$s of %2$s' )`,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered( `__( '%1$s of %2$s' )` ) ],
 		},
 		{
 			code: `i18n.__( "%d of %.2f" )`,
-			output: `i18n.__( "%1$d of %2$.2f" )`,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered( `i18n.__( "%1$d of %2$.2f" )` ) ],
 		},
 		{
 			code: `_x( '%s by %s', 'post title and author' )`,
-			output: `_x( '%1$s by %2$s', 'post title and author' )`,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [
+				unordered( `_x( '%1$s by %2$s', 'post title and author' )` ),
+			],
 		},
 		{
 			code: `_n( '%d block in %s', '%d blocks in %s', count )`,
-			output: `_n( '%1$d block in %2$s', '%1$d blocks in %2$s', count )`,
 			errors: [
-				{ messageId: 'unorderedPlaceholders' },
-				{ messageId: 'unorderedPlaceholders' },
+				unordered(
+					`_n( '%1$d block in %2$s', '%d blocks in %s', count )`
+				),
+				unordered(
+					`_n( '%d block in %s', '%1$d blocks in %2$s', count )`
+				),
 			],
 		},
 		{
 			code: `_nx( '%s %%s %d', '%1$s %%s %2$d', count, 'context' )`,
-			output: `_nx( '%1$s %%s %2$d', '%1$s %%s %2$d', count, 'context' )`,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [
+				unordered(
+					`_nx( '%1$s %%s %2$d', '%1$s %%s %2$d', count, 'context' )`
+				),
+			],
+		},
+		{
+			code: `__( '%s of %s, 50% done' )`,
+			errors: [ unordered( `__( '%1$s of %2$s, 50% done' )` ) ],
 		},
 		{
 			// Mixed ordered and unordered placeholders are ambiguous, so
-			// they are not fixed.
+			// no suggestion is offered.
 			code: `__( '%1$s of %s' )`,
-			output: null,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered() ],
 		},
 		{
 			code: `__( '%.*f of %s' )`,
-			output: null,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered() ],
 		},
 		{
 			code: `__( '%s of ' + '%s' )`,
-			output: null,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered() ],
+		},
+		{
+			// Escape sequences can hide placeholders in the source text.
+			code: `__( '\\x25%s %\\x73 %s' )`,
+			errors: [ unordered() ],
 		},
 		{
 			code: `sprintf( __( '%s of %s' ), a, b )`,
-			output: `sprintf( __( '%1$s of %2$s' ), a, b )`,
-			errors: [ { messageId: 'unorderedPlaceholders' } ],
+			errors: [ unordered( `sprintf( __( '%1$s of %2$s' ), a, b )` ) ],
 		},
 	],
 } );

@@ -1,15 +1,17 @@
 /**
- * Regular expression matching an escaped percent sign or a sprintf placeholder.
+ * Regular expression matching a sprintf placeholder, or an escaped percent
+ * sign such as `%%`.
  *
- * The placeholder part mirrors `REGEXP_SPRINTF_PLACEHOLDER`, without its
- * lookbehind: the escaped percent sign alternative consumes `%%` first, so
- * `%%s` is an escaped percent sign followed by a literal `s`, and `%%%s` is an
- * escaped percent sign followed by a placeholder.
+ * It mirrors the pattern of `@tannin/sprintf`, the implementation behind
+ * `sprintf` in `@wordpress/i18n`, where a `%` conversion type is an escaped
+ * percent sign. Matching from left to right, `%%s` is an escaped percent sign
+ * followed by a literal `s`, and `%%%s` is an escaped percent sign followed by
+ * a placeholder.
  *
  * @type {RegExp}
  */
-const REGEXP_PERCENT_OR_PLACEHOLDER =
-	/%%|%(?:(\d+)\$|\(([$_a-zA-Z][$_a-zA-Z0-9]*)\))?[ +0#-]*\d*(\.(?:\d+|\*))?(?:ll|[lhqL])?([cduxXefgsp])/g;
+const REGEXP_PLACEHOLDER =
+	/%(?:(\d+)\$|\(([$_a-zA-Z][$_a-zA-Z0-9]*)\))?([ +0#-]*)\d*(\.(?:\d+|\*))?(?:ll|[lhqL])?([cduxXefgsp%])/g;
 
 /**
  * @typedef {Object} SprintfPlaceholder
@@ -22,6 +24,8 @@ const REGEXP_PERCENT_OR_PLACEHOLDER =
  * @property {string}  type             Conversion type, such as `s` or `d`.
  * @property {boolean} isOrdered        Whether the placeholder has a position or a name.
  * @property {boolean} hasStarPrecision Whether the precision is read from an argument, as in `%.*f`.
+ * @property {boolean} hasSpaceFlag     Whether the placeholder has a space flag, as in `% d`. Plain
+ *                                      text such as "50% done" reads as one.
  */
 
 /**
@@ -34,12 +38,12 @@ const REGEXP_PERCENT_OR_PLACEHOLDER =
 function getSprintfPlaceholders( string ) {
 	const placeholders = [];
 
-	for ( const match of string.matchAll( REGEXP_PERCENT_OR_PLACEHOLDER ) ) {
-		if ( match[ 0 ] === '%%' ) {
+	for ( const match of string.matchAll( REGEXP_PLACEHOLDER ) ) {
+		const [ raw, position, name, flags, precision, type ] = match;
+
+		if ( type === '%' ) {
 			continue;
 		}
-
-		const [ raw, position, name, precision, type ] = match;
 
 		placeholders.push( {
 			raw,
@@ -50,6 +54,7 @@ function getSprintfPlaceholders( string ) {
 			type,
 			isOrdered: position !== undefined || name !== undefined,
 			hasStarPrecision: precision === '.*',
+			hasSpaceFlag: flags.includes( ' ' ),
 		} );
 	}
 
