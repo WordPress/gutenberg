@@ -258,7 +258,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ slug ]
 	);
 
-	const { editPost } = useDispatch( editorStore );
+	const { editPost, lockPostSaving, unlockPostSaving } =
+		useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -369,30 +370,38 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-		let newTerm;
+		// Lock saving until the term is assigned, so the post isn't saved
+		// without it.
+		const lockName = `term-create-${ slug }`;
+		lockPostSaving( lockName );
 		try {
-			newTerm = await addTerm( {
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			} );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-			return;
+			let newTerm;
+			try {
+				newTerm = await addTerm( {
+					name: formName,
+					parent: formParent ? formParent : undefined,
+				} );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				return;
+			}
+			const defaultName =
+				slug === 'category' ? __( 'Category' ) : __( 'Term' );
+			const termAddedMessage = sprintf(
+				/* translators: %s: term name. */
+				_x( '%s added', 'term' ),
+				taxonomy?.labels?.singular_name ?? defaultName
+			);
+			speak( termAddedMessage, 'assertive' );
+			setAdding( false );
+			setFormName( '' );
+			setFormParent( '' );
+			onUpdateTerms( [ ...terms, newTerm.id ] );
+		} finally {
+			unlockPostSaving( lockName );
 		}
-		const defaultName =
-			slug === 'category' ? __( 'Category' ) : __( 'Term' );
-		const termAddedMessage = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s added', 'term' ),
-			taxonomy?.labels?.singular_name ?? defaultName
-		);
-		speak( termAddedMessage, 'assertive' );
-		setAdding( false );
-		setFormName( '' );
-		setFormParent( '' );
-		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
 	const labelWithFallback = (
