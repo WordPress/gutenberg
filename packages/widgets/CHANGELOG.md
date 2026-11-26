@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Include TypeScript type declarations ([#87197](https://github.com/WordPress/gutenberg/pull/87197)).
+
 ## 5.2.0 (2026-11-18)
 
 ### Bug Fixes

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { saveWidgetArea } from '../actions';
+import { saveWidgetArea, saveWidgetAreas } from '../actions';
 
 // Only the store descriptors are imported from these packages; stub them so
 // their browser-only side effects do not run.
@@ -57,7 +57,6 @@ function setup(
 	return {
 		run: () =>
 			saveWidgetArea( area )( {
-				dispatch: vi.fn(),
 				select,
 				registry,
 			} ),
@@ -66,6 +65,52 @@ function setup(
 		saveEditedEntityRecord,
 	};
 }
+
+describe( 'saveWidgetAreas', () => {
+	it( 'waits for a widget area’s sidebar save before saving the next area', async () => {
+		const firstSidebarSave = Promise.withResolvers();
+		const saveSidebar = vi.fn( ( kind, name, id ) =>
+			id === 'sidebar-1' ? firstSidebarSave.promise : Promise.resolve()
+		);
+		const registry = {
+			select: () => ( {
+				getEditedEntityRecord: () => ( { blocks: [] } ),
+			} ),
+			dispatch: () => ( {
+				__experimentalBatch: async () => [],
+				editEntityRecord: vi.fn(),
+				finishResolution: vi.fn(),
+				receiveEntityRecords: vi.fn(),
+				saveEditedEntityRecord: saveSidebar,
+			} ),
+		};
+		const select = { getWidgets: () => ( {} ) };
+		const dispatch = Object.assign(
+			( thunk ) => thunk( { registry, select, dispatch } ),
+			{
+				saveWidgetArea: vi.fn( ( id ) =>
+					dispatch( saveWidgetArea( id ) )
+				),
+			}
+		);
+		const save = dispatch(
+			saveWidgetAreas( [ { id: 'sidebar-1' }, { id: 'sidebar-2' } ] )
+		);
+		try {
+			await vi.waitFor( () => expect( saveSidebar ).toHaveBeenCalled() );
+			expect( dispatch.saveWidgetArea.mock.calls ).toEqual( [
+				[ 'sidebar-1' ],
+			] );
+		} finally {
+			firstSidebarSave.resolve();
+			await save;
+		}
+		expect( saveSidebar.mock.calls.map( ( [ , , id ] ) => id ) ).toEqual( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+	} );
+} );
 
 describe( 'saveWidgetArea', () => {
 	it( 'saves a block that shares an existing widget ID with an earlier block as a new widget', async () => {

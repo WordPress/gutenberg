@@ -1,7 +1,10 @@
-import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ButtonLink,
+} from '@wordpress/ui';
 import Navigation from '../navigation';
 import SaveButton from '../save-button';
 import { store as bootStore } from '../../store';
@@ -13,15 +16,16 @@ function DashboardBackButton() {
 		[]
 	);
 	return (
-		<Button
-			__next40pxDefaultSize
+		<ButtonLink
+			variant="minimal"
+			tone="neutral"
 			className={ styles[ 'back-button' ] }
 			href={ dashboardLink || '/' }
-			icon={ isRTL() ? chevronRight : chevronLeft }
-			label={ __( 'Go to the Dashboard' ) }
+			aria-label={ __( 'Go to the Dashboard' ) }
 		>
+			<ButtonLink.Icon icon={ isRTL() ? chevronRight : chevronLeft } />
 			{ __( 'Dashboard' ) }
-		</Button>
+		</ButtonLink>
 	);
 }
 
