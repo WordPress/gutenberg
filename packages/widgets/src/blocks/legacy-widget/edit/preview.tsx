@@ -72,8 +72,8 @@ export default function Preview( {
 			function setHeight() {
 				// Pick the maximum of these two values to account for margin collapsing.
 				const height = Math.max(
-					iframe.contentDocument?.documentElement?.offsetHeight ?? 0,
-					iframe.contentDocument?.body?.offsetHeight ?? 0
+					iframe.contentDocument!.documentElement?.offsetHeight ?? 0,
+					iframe.contentDocument!.body?.offsetHeight ?? 0
 				);
 
 				// Fallback to a height of 100px if the height cannot be determined.

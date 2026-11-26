@@ -22,7 +22,7 @@ const legacyWidgetTransforms: LegacyWidgetTransformItem[] = [
 		block: 'core/html',
 		widget: 'custom_html',
 		transformBlock: ( { content } ) =>
-			createBlock( 'core/html', {}, [], [ content ?? null ] ),
+			createBlock( 'core/html', {}, [], [ content! ] ),
 	},
 	{
 		block: 'core/archives',
@@ -134,13 +134,13 @@ const legacyWidgetTransforms: LegacyWidgetTransformItem[] = [
 	{
 		block: 'core/gallery',
 		widget: 'media_gallery',
-		transform: ( { ids = [], link_type: linkTo, size, number } ) => {
+		transform: ( { ids, link_type: linkTo, size, number } ) => {
 			return {
 				ids,
 				columns: number,
 				linkTo,
 				sizeSlug: size,
-				images: ids.map( ( id ) => ( {
+				images: ids!.map( ( id ) => ( {
 					id,
 				} ) ),
 			};

@@ -55,6 +55,8 @@ interface EncodeWidgetResponse {
  * using React for this, we ensure that we have complete control over the DOM
  * and do not accidentally remove any elements that a third party widget script
  * has attached an event listener to.
+ *
+ * @property {Element} element The control's DOM element.
  */
 export default class Control {
 	id?: string | null;
@@ -69,6 +71,17 @@ export default class Control {
 	form!: HTMLFormElement;
 	content!: HTMLDivElement;
 
+	/**
+	 * Creates and loads a new control.
+	 *
+	 * @param params
+	 * @param params.id
+	 * @param params.idBase
+	 * @param params.instance
+	 * @param params.onChangeInstance
+	 * @param params.onChangeHasPreview
+	 * @param params.onError
+	 */
 	constructor( {
 		id,
 		idBase,
@@ -130,7 +143,7 @@ export default class Control {
 						class: 'id_base',
 						type: 'hidden',
 						name: 'id_base',
-						value: this.idBase ?? this.id ?? '',
+						value: ( this.idBase ?? this.id )!,
 					} ),
 					el( 'input', {
 						class: 'widget-width',
@@ -221,7 +234,7 @@ export default class Control {
 
 				// If we don't have an instance, perform a save right away. This
 				// happens when creating a new Legacy Widget block.
-				if ( ! this.instance?.hash ) {
+				if ( ! this.instance!.hash ) {
 					const { instance } = await encodeWidget( {
 						idBase: this.idBase,
 						instance: this.instance,
@@ -413,7 +426,7 @@ function isEmptyNode( node: Node ): boolean {
 	switch ( node.nodeType ) {
 		case Node.TEXT_NODE:
 			// Text nodes are empty if it's entirely whitespace.
-			return ( node.nodeValue ?? '' ).trim() === '';
+			return node.nodeValue!.trim() === '';
 		case Node.ELEMENT_NODE: {
 			// Elements that are "embedded content" are not empty.
 			// https://dev.w3.org/html5/spec-LC/content-models.html#embedded-content-0

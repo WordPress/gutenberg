@@ -7,7 +7,7 @@ import type { RawInstance } from '../types';
 
 interface ConvertToBlocksButtonProps {
 	clientId: string;
-	rawInstance?: RawInstance;
+	rawInstance: RawInstance;
 }
 
 export default function ConvertToBlocksButton( {
@@ -19,20 +19,17 @@ export default function ConvertToBlocksButton( {
 	return (
 		<ToolbarButton
 			onClick={ () => {
-				if ( ! rawInstance ) {
-					return;
-				}
 				if ( rawInstance.title ) {
 					replaceBlocks( clientId, [
 						createBlock( 'core/heading', {
 							content: rawInstance.title,
 						} ),
-						...rawHandler( { HTML: rawInstance.text ?? '' } ),
+						...rawHandler( { HTML: rawInstance.text! } ),
 					] );
 				} else {
 					replaceBlocks(
 						clientId,
-						rawHandler( { HTML: rawInstance.text ?? '' } )
+						rawHandler( { HTML: rawInstance.text! } )
 					);
 				}
 			} }

@@ -70,13 +70,13 @@ export default function Form( {
 						__(
 							'The "%s" block was affected by errors and may not function properly. Check the developer tools for more details.'
 						),
-						idBase || id || ''
+						( idBase || id )!
 					)
 				);
 			},
 		} );
 
-		ref.current?.appendChild( control.element );
+		ref.current!.appendChild( control.element );
 
 		return () => {
 			if ( outgoingInstances.current.has( instance ) ) {

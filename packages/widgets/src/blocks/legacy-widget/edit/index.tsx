@@ -107,7 +107,7 @@ function NotEmpty( {
 }: LegacyWidgetEditProps ) {
 	const [ hasPreview, setHasPreview ] = useState< boolean | null >( null );
 
-	const widgetTypeId = id ?? idBase ?? '';
+	const widgetTypeId = ( id ?? idBase )!;
 	const { record: widgetType, hasResolved: hasResolvedWidgetType } =
 		useEntityRecord< WidgetTypeRecord >(
 			'root',
@@ -142,7 +142,6 @@ function NotEmpty( {
 	}
 
 	const mode = idBase && ! isSelected ? 'preview' : 'edit';
-	const rawInstance = instance?.raw;
 
 	return (
 		<>
@@ -150,20 +149,20 @@ function NotEmpty( {
 				<BlockControls group="other">
 					<ConvertToBlocksButton
 						clientId={ clientId }
-						rawInstance={ rawInstance }
+						rawInstance={ instance!.raw! }
 					/>
 				</BlockControls>
 			) }
 
 			<InspectorControls>
 				<InspectorCard
-					name={ widgetType?.name }
-					description={ widgetType?.description }
+					name={ widgetType!.name }
+					description={ widgetType!.description }
 				/>
 			</InspectorControls>
 
 			<Form
-				title={ widgetType?.name }
+				title={ widgetType!.name }
 				isVisible={ mode === 'edit' }
 				id={ id }
 				idBase={ idBase }
@@ -188,7 +187,7 @@ function NotEmpty( {
 						/>
 					) }
 					{ hasPreview === false && mode === 'preview' && (
-						<NoPreview name={ widgetType?.name } />
+						<NoPreview name={ widgetType!.name } />
 					) }
 				</>
 			) }
