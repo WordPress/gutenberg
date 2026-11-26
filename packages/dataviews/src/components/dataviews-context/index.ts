@@ -27,6 +27,7 @@ type DataViewsContextType< Item > = {
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 	getItemId: ( item: Item ) => string;
 	getItemLevel?: ( item: Item ) => number;
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
 		props: {

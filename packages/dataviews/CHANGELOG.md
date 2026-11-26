@@ -6,6 +6,7 @@
 
 -   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
+-   Add the `getItemParentId` prop, so a hierarchical table can order and indent rows from parent ids ([#83315](https://github.com/WordPress/gutenberg/pull/83315)).
 
 ### Bug Fixes
 
