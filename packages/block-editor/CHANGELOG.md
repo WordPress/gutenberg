@@ -14,6 +14,7 @@
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
 
 ### Bug Fixes
 
