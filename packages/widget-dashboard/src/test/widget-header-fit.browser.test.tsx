@@ -65,6 +65,7 @@ function Tile( { width }: { width: number } ) {
 			>
 				<WidgetDashboard.Widgets />
 			</WidgetDashboard>
+			<button type="button">After</button>
 		</div>
 	);
 }
@@ -118,7 +119,7 @@ describe( 'WidgetHeader fit', () => {
 		expect( isInline() ).toBe( true );
 	} );
 
-	it( 'keeps focus on the infotip that appeared while the inline controls held focus', async () => {
+	it( 'holds the inline controls while focus moves between them and the infotip', async () => {
 		const user = userEvent.setup();
 		const view = await render( <Tile width={ 600 } /> );
 		await screen.findByTestId( 'body' );
@@ -137,20 +138,33 @@ describe( 'WidgetHeader fit', () => {
 		expect( trigger ).toBeInTheDocument();
 		expect( isInline() ).toBe( true );
 
+		// Focus moves to the infotip: the controls keep holding, so the title
+		// stays clipped and the focused infotip stays mounted.
 		await user.tab( { shift: true } );
-		expect( trigger ).toHaveFocus();
-
-		// Leaving the inline form lets the controls collapse, which gives the
-		// title its room back; the focused infotip must survive that.
-		await waitFor( () => expect( isInline() ).toBe( false ) );
 		await nextFrame();
 		expect( trigger ).toHaveFocus();
+		expect( isInline() ).toBe( true );
 
-		// Once focus moves on, the infotip leaves with the clip it explained.
+		// Its popup holds too, and shows the clipped title.
+		await user.keyboard( '{Enter}' );
+		const dialog = await screen.findByRole( 'dialog' );
+		await nextFrame();
+		expect( dialog ).toHaveTextContent( TITLE );
+		expect( isInline() ).toBe( true );
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => expect( trigger ).toHaveFocus() );
+
+		// Back to the controls: still held.
 		await user.tab();
-		expect(
-			screen.getByRole( 'button', { name: 'Widget controls' } )
-		).toHaveFocus();
+		await nextFrame();
+		expect( screen.getByRole( 'radio', { name: 'Views' } ) ).toHaveFocus();
+		expect( isInline() ).toBe( true );
+
+		// Focus leaves the header: the pending collapse applies, and the
+		// infotip leaves with the clip it explained.
+		await user.tab();
+		expect( screen.getByRole( 'button', { name: 'After' } ) ).toHaveFocus();
+		await waitFor( () => expect( isInline() ).toBe( false ) );
 		await waitFor( () => expect( infotip() ).not.toBeInTheDocument() );
 	} );
 } );

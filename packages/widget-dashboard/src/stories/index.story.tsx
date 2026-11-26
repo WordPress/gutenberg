@@ -692,6 +692,57 @@ export const InlineControlsFit: StoryObj = {
 	},
 };
 
+// The same tile without a help note, so the infotip shows only while the
+// title is clipped.
+const inlineFitNoHelpWidgetType: WidgetType = {
+	...inlineFitWidgetType,
+	name: 'demo/inline-fit-no-help',
+	help: undefined,
+};
+
+function InlineControlsFitNoHelpStory() {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >( [
+		{
+			...INITIAL_LAYOUT[ 0 ],
+			type: inlineFitNoHelpWidgetType.name,
+			placement: { width: 1, height: 1 },
+		},
+	] );
+
+	return (
+		<div
+			style={ {
+				width: 480,
+				minWidth: 200,
+				maxWidth: '100%',
+				resize: 'horizontal',
+				overflow: 'auto',
+			} }
+		>
+			<WidgetDashboard
+				widgetTypes={ [ inlineFitNoHelpWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', columns: 1, rowHeight: 200 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</div>
+	);
+}
+
+export const InlineControlsFitNoHelp: StoryObj = {
+	render: () => <InlineControlsFitNoHelpStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: 'The same tile without a help note, so the infotip shows only while the title is clipped. Tab to the toggle, narrow the viewport until the infotip appears, then press Shift+Tab: the controls stay inline while focus is on the infotip or its popup, and collapse once focus leaves the header.',
+			},
+		},
+	},
+};
+
 // The snapshot type under a title no tile fits comfortably, so the identity's
 // truncation shows at the widths the grid offers.
 const longTitleWidgetType: WidgetType = {

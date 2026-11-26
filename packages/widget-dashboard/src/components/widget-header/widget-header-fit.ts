@@ -16,6 +16,20 @@ export function useWidgetHeaderAvailableSize(): number | null {
 	return useContext( WidgetHeaderAvailableSizeContext );
 }
 
+const WidgetHeaderIdentityFocusContext = createContext( false );
+
+export const WidgetHeaderIdentityFocusProvider =
+	WidgetHeaderIdentityFocusContext.Provider;
+
+/**
+ * Whether focus is in the header's identity (its infotip). Toolbar controls
+ * hold their presentation meanwhile: a change would resize the title, and an
+ * infotip shown only for a clipped title would leave while it holds focus.
+ */
+export function useWidgetHeaderIdentityHasFocus(): boolean {
+	return useContext( WidgetHeaderIdentityFocusContext );
+}
+
 interface WidgetHeaderReserve {
 	registerReserved: ( id: string, width: number ) => void;
 	unregisterReserved: ( id: string ) => void;

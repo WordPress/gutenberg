@@ -4,7 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
+import {
+	useReserveHeaderSpace,
+	useWidgetHeaderIdentityHasFocus,
+} from '../widget-header/widget-header-fit';
 import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributesDropdown } from './attributes-dropdown';
 import { useInlineFit } from './use-inline-fit';
@@ -61,14 +64,21 @@ export function WidgetAttributes( {
 	// The hold covers the open dropdown, focus inside the inline form, and
 	// focus on the dropdown trigger itself: dismissing the popup restores
 	// focus to the trigger asynchronously, so the trigger must survive
-	// until focus moves on. The pending transition applies afterwards.
+	// until focus moves on. Focus in the header's identity holds too: a
+	// transition would resize the title and could remove a focused infotip.
+	// The pending transition applies afterwards.
 	const [ dropdownOpen, setDropdownOpen ] = useState( false );
 	const [ inlineHasFocus, setInlineHasFocus ] = useState( false );
 	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
 		useState( false );
 
+	const identityHasFocus = useWidgetHeaderIdentityHasFocus();
 	const { measureRef, collapsed } = useInlineFit( {
-		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
+		locked:
+			dropdownOpen ||
+			inlineHasFocus ||
+			dropdownTriggerHasFocus ||
+			identityHasFocus,
 	} );
 
 	// A transition can only start once focus left the outgoing

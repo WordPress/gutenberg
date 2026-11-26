@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { useResizeObserver } from '@wordpress/compose';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { inertValue } from '@wordpress/react-inert-value';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
@@ -9,6 +9,7 @@ import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
 import {
 	WidgetHeaderAvailableSizeProvider,
+	WidgetHeaderIdentityFocusProvider,
 	WidgetHeaderReserveProvider,
 } from './widget-header-fit';
 import styles from './widget-header.module.css';
@@ -136,9 +137,13 @@ export function WidgetHeader( {
 	// an infotip that appears or leaves resizes the title, not the identity.
 	const identityReserve = identityWidth + titleOverflow;
 
-	// An infotip shown only for a clipped title leaves once the title fits.
-	// While it holds focus it stays, so focus does not drop to the document.
-	const [ infotipHasFocus, setInfotipHasFocus ] = useState( false );
+	// Focus in the identity (or the infotip's popup) holds the toolbar, so a
+	// focused infotip can't unmount. Resolved on blur, as React renders
+	// between a blur and the next focus.
+	const identityRef = useRef< HTMLDivElement >( null );
+	const identityRefs = useMergeRefs( [ identityRef, identityMeasureRef ] );
+	const identityFocusEventRef = useRef< Event | null >( null );
+	const [ identityHasFocus, setIdentityHasFocus ] = useState( false );
 
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
@@ -160,24 +165,30 @@ export function WidgetHeader( {
 				styles[ 'widget-header' ],
 				overlay && styles.overlay
 			) }
+			onFocus={ ( event ) =>
+				setIdentityHasFocus(
+					event.nativeEvent === identityFocusEventRef.current
+				)
+			}
+			onBlur={ ( event ) => {
+				const next = event.relatedTarget as Node | null;
+				if ( identityRef.current?.contains( next ) ) {
+					setIdentityHasFocus( true );
+				} else if ( ! event.currentTarget.contains( next ) ) {
+					setIdentityHasFocus( false );
+				}
+			} }
 		>
 			{ showIdentity && widgetType?.title && (
 				<Stack
-					ref={ identityMeasureRef }
+					ref={ identityRefs }
 					direction="row"
 					align="center"
 					gap="sm"
 					className={ styles.identity }
 					inert={ inertValue( editMode ) }
-					onFocus={ () => setInfotipHasFocus( true ) }
-					onBlur={ ( event ) => {
-						if (
-							! event.currentTarget.contains(
-								event.relatedTarget as Node | null
-							)
-						) {
-							setInfotipHasFocus( false );
-						}
+					onFocus={ ( event ) => {
+						identityFocusEventRef.current = event.nativeEvent;
 					} }
 				>
 					{ widgetType.icon && (
@@ -195,9 +206,7 @@ export function WidgetHeader( {
 						{ widgetType.title }
 					</Card.Title>
 
-					{ ( widgetType.help ||
-						isTitleTruncated ||
-						infotipHasFocus ) && (
+					{ ( widgetType.help || isTitleTruncated ) && (
 						<WidgetInfotip
 							ref={ infotipMeasureRef }
 							title={ widgetType.title }
@@ -215,7 +224,11 @@ export function WidgetHeader( {
 						<WidgetHeaderAvailableSizeProvider
 							value={ availableSize }
 						>
-							{ children }
+							<WidgetHeaderIdentityFocusProvider
+								value={ identityHasFocus }
+							>
+								{ children }
+							</WidgetHeaderIdentityFocusProvider>
 						</WidgetHeaderAvailableSizeProvider>
 					</WidgetHeaderReserveProvider>
 				</div>
