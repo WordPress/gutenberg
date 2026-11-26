@@ -24,9 +24,6 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 vi.mock( import( '../../inspector-controls/slot' ), () => ( {
 	default: vi.fn( () => null ) as unknown as typeof InspectorControlsSlot,
 } ) );
-vi.mock( import( '../position-controls-panel' ), () => ( {
-	default: () => null,
-} ) );
 
 describe( 'useInspectorControlsTabs', () => {
 	it( 'includes Settings when Allowed blocks is the only settings control', () => {
