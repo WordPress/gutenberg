@@ -160,8 +160,9 @@ export function FilePickerPanel() {
 						) }
 					</div>
 				</Stack>
+				{ /* Its overlay covers the card, the nearest positioned ancestor. */ }
+				<DropZone label="Drop to add fonts" onFilesDrop={ addFiles } />
 			</Card.Content>
-			<DropZone label="Drop to add fonts" onFilesDrop={ addFiles } />
 		</Card.Root>
 	);
 }
