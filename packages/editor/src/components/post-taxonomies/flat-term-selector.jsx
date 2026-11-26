@@ -270,59 +270,57 @@ export function FlatTermSelector( { slug } ) {
 		pendingTermsRef.current.add( pendingTerm.value );
 		setValues( ( currentValues ) => [ ...currentValues, pendingTerm ] );
 
-		let savedTerm;
+		// The post can't be saved until the term is assigned, or it would be
+		// saved without it.
+		lockPostSaving( pendingTerm.value );
 		try {
-			savedTerm = await findOrCreateTerm( name );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-			// Nothing was assigned, so only the shown term has to go.
+			let savedTerm;
+			try {
+				savedTerm = await findOrCreateTerm( name );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				// Nothing was assigned, so only the shown term has to go.
+				pendingTermsRef.current.delete( pendingTerm.value );
+				setValues( ( currentValues ) =>
+					currentValues.filter(
+						( item ) => ! isSameTerm( item, pendingTerm )
+					)
+				);
+				return false;
+			}
+
+			// The term was removed while it was being created.
+			if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
+				return false;
+			}
+
 			pendingTermsRef.current.delete( pendingTerm.value );
 			setValues( ( currentValues ) =>
-				currentValues.filter(
-					( item ) => ! isSameTerm( item, pendingTerm )
-				)
+				currentValues
+					// An existing term can come back for a name that only differs
+					// by case or accent, and it may already be shown.
+					.filter(
+						( item ) =>
+							isSameTerm( item, pendingTerm ) ||
+							! isSameTerm( item, savedTerm )
+					)
+					.map( ( item ) =>
+						isSameTerm( item, pendingTerm ) ? savedTerm : item
+					)
 			);
-			return false;
+			assignTerm( itemToTermId( savedTerm ) );
+			return true;
+		} finally {
+			unlockPostSaving( pendingTerm.value );
 		}
-
-		// The term was removed while it was being created.
-		if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
-			return false;
-		}
-
-		pendingTermsRef.current.delete( pendingTerm.value );
-		setValues( ( currentValues ) =>
-			currentValues
-				// An existing term can come back for a name that only differs
-				// by case or accent, and it may already be shown.
-				.filter(
-					( item ) =>
-						isSameTerm( item, pendingTerm ) ||
-						! isSameTerm( item, savedTerm )
-				)
-				.map( ( item ) =>
-					isSameTerm( item, pendingTerm ) ? savedTerm : item
-				)
-		);
-		assignTerm( itemToTermId( savedTerm ) );
-		return true;
 	}
 
 	async function createTerms( names ) {
-		// The post can't be saved until the new terms are assigned, or it
-		// would be saved without them.
-		const lockName = `term-create-${ ++pendingTermId }`;
-		lockPostSaving( lockName );
-		let results;
-		try {
-			results = await Promise.all(
-				names.map( ( name ) => createTerm( name ) )
-			);
-		} finally {
-			unlockPostSaving( lockName );
-		}
+		const results = await Promise.all(
+			names.map( ( name ) => createTerm( name ) )
+		);
 		// A single announcement, so that the ones for terms added together
 		// don't cut each other off.
 		if ( results.includes( true ) ) {
