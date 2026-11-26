@@ -2356,6 +2356,64 @@ describe( 'state', () => {
 					expect( state.attributes ).toBe( original.attributes );
 				} );
 
+				it( 'should ignore non-existent blocks among existing ones', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat', 'unknown' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {
+						updated: true,
+					} );
+				} );
+
+				it( 'should ignore blocks without updates when attributes are unique by block', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'loquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat', 'loquat' ],
+						attributes: {
+							loquat: { updated: true },
+						},
+						options: { uniqueByBlock: true },
+					} );
+
+					expect( state.attributes.get( 'loquat' ) ).toEqual( {
+						updated: true,
+					} );
+				} );
+
 				it( 'should return with same reference if no changes in updates', () => {
 					const original = deepFreeze(
 						blocks( undefined, {
@@ -5964,6 +6022,29 @@ describe( 'state', () => {
 									patternName: undefined,
 								},
 							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'removes block editing modes when the `patternName` attribute is removed after an ID without updates', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'unknown', 'group-1' ],
+							attributes: {
+								'group-1': {
+									metadata: {
+										patternName: undefined,
+									},
+								},
+							},
+							options: { uniqueByBlock: true },
 						},
 					],
 					testReducer,

@@ -6657,7 +6657,7 @@
 	},
 	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
 		"react-hooks/refs": {
-			"count": 6
+			"count": 2
 		}
 	},
 	"packages/components/src/autocomplete/index.tsx": {
@@ -11975,59 +11975,7 @@
 			"count": 1
 		}
 	},
-	"packages/widgets/src/blocks/widget-group/deprecated.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/widget-group/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/widget-group/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/widget-group/save.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/components/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/components/move-to-widget-area/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/widgets/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/register-legacy-widget-variations.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/utils.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

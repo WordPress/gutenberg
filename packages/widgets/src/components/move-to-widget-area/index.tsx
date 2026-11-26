@@ -8,11 +8,23 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moveTo } from '@wordpress/icons';
 
+interface WidgetArea {
+	id: string;
+	name: string;
+	description?: string;
+}
+
+interface MoveToWidgetAreaProps {
+	currentWidgetAreaId?: string;
+	widgetAreas: WidgetArea[];
+	onSelect: ( widgetAreaId: string ) => void;
+}
+
 export default function MoveToWidgetArea( {
 	currentWidgetAreaId,
 	widgetAreas,
 	onSelect,
-} ) {
+}: MoveToWidgetAreaProps ) {
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -32,7 +44,7 @@ export default function MoveToWidgetArea( {
 											info: widgetArea.description,
 										} )
 									) }
-									value={ currentWidgetAreaId }
+									value={ currentWidgetAreaId ?? '' }
 									onSelect={ ( value ) => {
 										onSelect( value );
 										onClose();

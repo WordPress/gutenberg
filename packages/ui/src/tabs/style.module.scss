@@ -1,3 +1,5 @@
+@use "../utils/css/mixins";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -67,18 +69,21 @@
 			z-index: 1;
 			background-color: var(--wpds-color-foreground-interactive-neutral);
 
-			.tablist:has(
-				> .tab[aria-selected="true"]:not(
-					[data-disabled]
-				):focus-visible
-			)
-				& {
-				background-color: var(--wpds-color-foreground-interactive-neutral-active);
+			@media not (forced-colors: active) {
+				.tablist:has(
+					> .tab[aria-selected="true"]:not(
+						[data-disabled]
+					):focus-visible
+				)
+					& {
+					background-color: var(--wpds-color-foreground-interactive-neutral-active);
+				}
 			}
 
-			/* Windows high contrast mode. */
-			outline: 2px solid transparent;
-			outline-offset: -1px;
+			/* Forced colors mode replaces other background colors with `Canvas`. */
+			@media (forced-colors: active) {
+				background-color: CanvasText;
+			}
 
 			&[data-orientation="horizontal"] {
 				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
@@ -107,7 +112,7 @@
 			background: transparent;
 			border: none;
 			box-shadow: none;
-			outline: none; /* Focus ring applied to pseudo-elements */
+			outline: none; /* The focus indicator is drawn inside the tab. */
 			padding: 0;
 
 			/* Positioning */
@@ -177,23 +182,24 @@
 
 			/* Only keyboard focus draws an outline, which forced colors mode
 			 * keeps, so a hovered tab does not look focused there. */
-			&:focus-visible::after {
-				outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+			&:focus-visible::after,
+			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] &:focus-visible::before {
+				@include mixins.focus-ring();
+				outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				opacity: 1;
 			}
 
 			[data-orientation="horizontal"] & {
+				--_wp-ui-tabs-background-inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
+
 				padding-inline: var(--wpds-dimension-padding-lg);
 				height: 48px; /* TODO: use semantic size/height tokens when available */
 				scroll-margin: 24px;
 
-				/* Center a background one control tall in the tab, with the same
-				 * clearance on every side, so it stays clear of the selection
-				 * indicator. */
+				/* Leave space between the background and the selection indicator. */
 				&::after {
 					content: "";
-					inset: calc((48px - var(--wpds-dimension-size-md)) / 2);
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
+					inset: var(--_wp-ui-tabs-background-inset);
 				}
 			}
 
@@ -206,14 +212,25 @@
 				padding-inline: 0;
 
 				&::after {
-					inset-block:
-						calc((48px - var(--wpds-dimension-size-md)) / 2 +
-						var(--_wp-ui-tabs-background-overhang));
+					/* Let the clip alone shape the outer corners. */
+					border-radius: 0;
+					clip-path: inset(calc(-1 * var(--_wp-ui-tabs-background-overhang)) round var(--wpds-border-radius-sm));
+					inset-block: calc(var(--_wp-ui-tabs-background-inset) + var(--_wp-ui-tabs-background-overhang));
 					inset-inline: 0;
 					outline-offset:
 						calc(var(--_wp-ui-tabs-background-overhang) -
 						var(--wpds-border-width-focus));
 				}
+			}
+
+			/* An SVG can paint past its viewport without making the list scroll.
+			 * Use the native outline when a custom render wraps or omits the SVG. */
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:has(> .tab-children > .focus-ring)::after {
+				outline: none;
+			}
+
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] &:focus-visible:not(:has(> .tab-children > .focus-ring))::after {
+				border-radius: max(0px, var(--wpds-border-radius-sm) - var(--_wp-ui-tabs-background-overhang));
 			}
 
 			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
@@ -222,20 +239,12 @@
 				&::before {
 					content: "";
 					z-index: 0;
-					inset-block: calc((48px - var(--wpds-dimension-size-md)) / 2);
+					inset-block: var(--_wp-ui-tabs-background-inset);
 					inset-inline: 0;
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 
-				&:focus-visible {
-					&::before {
-						outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-						opacity: 1;
-					}
-
-					&::after {
-						outline: none;
-					}
+				&:focus-visible::after {
+					outline: none;
 				}
 			}
 
@@ -246,7 +255,39 @@
 				&::after {
 					content: "";
 					inset: 0;
-					outline-offset: calc(-1 * var(--wpds-border-width-focus));
+				}
+			}
+		}
+
+		.focus-ring {
+			display: none;
+			pointer-events: none;
+
+			.is-minimal-variant:not(.is-scrolling)[data-orientation="horizontal"] .tab:focus-visible > .tab-children > & {
+				display: block;
+				position: absolute;
+				inset-inline-start: 0;
+				top: var(--_wp-ui-tabs-background-inset);
+				width: 100%;
+				height: calc(100% - 2 * var(--_wp-ui-tabs-background-inset));
+				container-type: size;
+				overflow: visible;
+			}
+
+			rect {
+				/* Clip the outer half of the stroke to draw it inside the background. */
+				x: calc(-1 * var(--_wp-ui-tabs-background-overhang));
+				width: calc(100% + 2 * var(--_wp-ui-tabs-background-overhang));
+				height: 100%;
+				/* SVG clamps the two axes independently. Keep the corners circular. */
+				rx: min(var(--wpds-border-radius-sm), 50cqh, 50% + var(--_wp-ui-tabs-background-overhang));
+				fill: none;
+				stroke: var(--focus-color, var(--wpds-color-stroke-focus));
+				stroke-width: calc(2 * var(--wpds-border-width-focus));
+				clip-path: inset(0 round var(--wpds-border-radius-sm)) fill-box;
+
+				@media (forced-colors: active) {
+					stroke: CanvasText;
 				}
 			}
 		}
@@ -266,4 +307,9 @@
 			}
 		}
 	}
+}
+
+/* Unlayered theme rules for svg can expose idle rings or clip the stroke. */
+.tab .focus-ring {
+	all: revert-layer;
 }

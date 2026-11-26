@@ -25,16 +25,11 @@ const Template: StoryFn< typeof ResponsiveWrapper > = ( args ) => (
 );
 
 export const Default = Template.bind( {} );
-Default.tags = [ 'external-requests' ];
 Default.args = {
-	naturalWidth: 2000,
-	naturalHeight: 680,
-	children: (
-		<img
-			src="https://s.w.org/style/images/about/WordPress-logotype-standard.png"
-			alt="WordPress"
-		/>
-	),
+	naturalWidth: 600,
+	naturalHeight: 124,
+	// Served from `storybook/static`.
+	children: <img src="wp-logo@2x.png" alt="WordPress" />,
 };
 
 /**
