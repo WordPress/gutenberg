@@ -78,7 +78,7 @@ function MediaControlIndicator( {
 		);
 	}
 
-	const typeIcon = MEDIA_TYPE_ICONS[ mediaType ?? '' ] ?? fileIcon;
+	const typeIcon = MEDIA_TYPE_ICONS[ mediaType! ] ?? fileIcon;
 
 	return (
 		<span className="block-library-utils__media-control__inspector-icon-indicator">
