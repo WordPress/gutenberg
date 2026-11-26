@@ -10,6 +10,7 @@ import {
 import {
 	MediaReplaceFlow,
 	store as blockEditorStore,
+	type MediaUploadFunction,
 } from '@wordpress/block-editor';
 import { focus } from '@wordpress/dom';
 import { useRef } from '@wordpress/element';
@@ -89,14 +90,14 @@ function MediaControlIndicator( {
 /**
  * MediaControlPreview - Preview component showing media thumbnail and filename
  *
- * @param {Object} props
- * @param {string} props.url            Media URL for thumbnail
- * @param {string} props.mediaType      Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
- * @param {string} props.filename       Filename to display
- * @param {Object} props.itemGroupProps Optional props to pass to ItemGroup
- * @param {string} props.className      Optional className for Truncate
- * @param {string} props.label          Optional label for accessibility
- * @return {Element} Preview component
+ * @param props
+ * @param props.url            Media URL for thumbnail
+ * @param props.mediaType      Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
+ * @param props.filename       Filename to display
+ * @param props.itemGroupProps Optional props to pass to ItemGroup
+ * @param props.className      Optional className for Truncate
+ * @param props.label          Optional label for accessibility
+ * @return Preview component
  */
 export function MediaControlPreview( {
 	url,
@@ -156,17 +157,8 @@ export function MediaControl( {
 }: MediaControlProps ) {
 	const { getSettings } = useSelect( blockEditorStore );
 	const onFilesDrop = ( filesList: File[] ) => {
-		const { mediaUpload } = getSettings() as {
-			mediaUpload?: ( options: {
-				allowedTypes?: string[];
-				filesList: File[];
-				onFileChange: (
-					files: Array< Record< string, unknown > >
-				) => void;
-				onError?: ( message: string ) => void;
-				multiple: boolean;
-			} ) => void;
-		};
+		const mediaUpload = getSettings().mediaUpload as
+			MediaUploadFunction | undefined;
 		if ( ! mediaUpload ) {
 			return;
 		}

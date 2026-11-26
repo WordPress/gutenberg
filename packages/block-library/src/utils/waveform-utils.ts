@@ -252,20 +252,20 @@ export function getWaveformColors(
 /**
  * Create a waveform container element with the specified attributes.
  *
- * @param {Object} options                  - The options for the container.
- * @param {string} options.url              - The audio URL.
- * @param {string} options.title            - The track title.
- * @param {string} options.artist           - The track artist.
- * @param {string} options.artwork          - The track image URL.
- * @param {string} options.waveformColor    - The waveform bar color.
- * @param {string} options.progressColor    - The progress indicator color.
- * @param {string} options.waveformGradient - The waveform gradient direction.
- * @param {string} options.buttonColor      - The play button color.
- * @param {string} options.seekLabel        - Accessible label for the seek control.
- * @param {string} options.seekValueText    - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
- * @param {number} options.height           - The waveform height in pixels.
- * @param {string} options.waveformStyle    - The visualization style (bars, mirror, line, blocks, dots, seekbar).
- * @return {Element} The configured container element.
+ * @param options                  - The options for the container.
+ * @param options.url              - The audio URL.
+ * @param options.title            - The track title.
+ * @param options.artist           - The track artist.
+ * @param options.artwork          - The track image URL.
+ * @param options.waveformColor    - The waveform bar color.
+ * @param options.progressColor    - The progress indicator color.
+ * @param options.waveformGradient - The waveform gradient direction.
+ * @param options.buttonColor      - The play button color.
+ * @param options.seekLabel        - Accessible label for the seek control.
+ * @param options.seekValueText    - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
+ * @param options.height           - The waveform height in pixels.
+ * @param options.waveformStyle    - The visualization style (bars, mirror, line, blocks, dots, seekbar).
+ * @return The configured container element.
  */
 export function createWaveformContainer( {
 	url,
@@ -325,13 +325,13 @@ export function createWaveformContainer( {
 /**
  * Apply custom styles to a generated waveform player.
  *
- * @param {Element} container                 - The generated player container.
- * @param {Object}  styles                    - The player styles.
- * @param {string}  styles.backgroundColor    - The waveform area background color.
- * @param {string}  styles.backgroundGradient - The waveform area background gradient.
- * @param {string}  styles.textColor          - The player text color.
- * @param {string}  styles.playButtonColor    - The play button color.
- * @param {string}  styles.playButtonGradient - The play button gradient.
+ * @param container                 - The generated player container.
+ * @param styles                    - The player styles.
+ * @param styles.backgroundColor    - The waveform area background color.
+ * @param styles.backgroundGradient - The waveform area background gradient.
+ * @param styles.textColor          - The player text color.
+ * @param styles.playButtonColor    - The play button color.
+ * @param styles.playButtonGradient - The play button gradient.
  */
 export function applyWaveformPlayerStyles(
 	container: HTMLElement,
@@ -395,8 +395,8 @@ export function applyWaveformPlayerStyles(
  * Apply contrasting color to SVG icon paths for visibility.
  * The icons should contrast with the button background.
  *
- * @param {Element} container   - The waveform container element.
- * @param {string}  buttonColor - The button background color.
+ * @param container   - The waveform container element.
+ * @param buttonColor - The button background color.
  */
 export function styleSvgIcons( container: Element, buttonColor: string ) {
 	// Compute a contrasting color for the icons based on button brightness.
@@ -412,10 +412,10 @@ export function styleSvgIcons( container: Element, buttonColor: string ) {
 /**
  * Set up play button accessibility: aria-label that toggles on play/pause.
  *
- * @param {Element} container    - The waveform container element.
- * @param {Object}  labels       - Button labels.
- * @param {string}  labels.play  - Label for the play state.
- * @param {string}  labels.pause - Label for the pause state.
+ * @param container    - The waveform container element.
+ * @param labels       - Button labels.
+ * @param labels.play  - Label for the play state.
+ * @param labels.pause - Label for the pause state.
  */
 export function setupPlayButtonAccessibility(
 	container: Element,
@@ -448,8 +448,8 @@ export function setupPlayButtonAccessibility(
 /**
  * Get the accessible label for the waveform seek control.
  *
- * @param {string} label - Accessible label for the seek control.
- * @return {string} The provided label or translated fallback.
+ * @param label - Accessible label for the seek control.
+ * @return The provided label or translated fallback.
  */
 function getSeekControlLabel( label?: string ) {
 	return label || DEFAULT_SEEK_LABEL;
@@ -481,8 +481,8 @@ export function updateSeekControlLabel(
 /**
  * Show the current artwork as the play button background.
  *
- * @param {Element} container  - The waveform player container element.
- * @param {string}  artworkUrl - The track image URL.
+ * @param container  - The waveform player container element.
+ * @param artworkUrl - The track image URL.
  */
 export function setupPlayButtonArtwork(
 	container: HTMLElement,
@@ -504,7 +504,7 @@ export function setupPlayButtonArtwork(
 /**
  * Log play errors, filtering out expected AbortError.
  *
- * @param {Error} error - The error from play().
+ * @param error - The error from play().
  */
 export function logPlayError( error: Error ) {
 	// The browser throws AbortError when a play() promise is interrupted
@@ -523,24 +523,24 @@ export function logPlayError( error: Error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element} element                       - The container element (must be in DOM).
- * @param {Object}  options                       - Configuration options.
- * @param {string}  options.src                   - The audio file URL.
- * @param {string}  options.title                 - The track title.
- * @param {string}  options.artist                - The artist name.
- * @param {string}  options.image                 - The track image URL.
- * @param {string}  options.imageAlt              - The track image alt text.
- * @param {string}  options.waveformColor         - The waveform color.
- * @param {string}  options.waveformGradient      - The waveform gradient.
- * @param {string}  options.textColor             - The player text color.
- * @param {string}  options.backgroundColor       - The player background color.
- * @param {string}  options.backgroundGradient    - The player background gradient.
- * @param           options.autoPlay              - Whether to auto-play when ready.
- * @param           options.onEnded               - Callback when track ends.
- * @param           options.labels                - Translated button labels.
- * @param {string}  options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {boolean} options.showPlayButtonArtwork - Whether to show artwork on the play button.
- * @return {Object} Object with instance, container, and destroy function.
+ * @param element                       - The container element (must be in DOM).
+ * @param options                       - Configuration options.
+ * @param options.src                   - The audio file URL.
+ * @param options.title                 - The track title.
+ * @param options.artist                - The artist name.
+ * @param options.image                 - The track image URL.
+ * @param options.imageAlt              - The track image alt text.
+ * @param options.waveformColor         - The waveform color.
+ * @param options.waveformGradient      - The waveform gradient.
+ * @param options.textColor             - The player text color.
+ * @param options.backgroundColor       - The player background color.
+ * @param options.backgroundGradient    - The player background gradient.
+ * @param options.autoPlay              - Whether to auto-play when ready.
+ * @param options.onEnded               - Callback when track ends.
+ * @param options.labels                - Translated button labels.
+ * @param options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param options.showPlayButtonArtwork - Whether to show artwork on the play button.
+ * @return Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element: Element,

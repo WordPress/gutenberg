@@ -23,9 +23,9 @@ vi.mock( import( '../waveform-utils' ), () => ( {
  * Create a fake player instance that mimics the parts of the waveform
  * player instance the component manipulates.
  *
- * @param {Object}  options Options passed to initWaveformPlayer.
- * @param {Element} element The element passed to initWaveformPlayer.
- * @return {Object} The fake player.
+ * @param options Options passed to initWaveformPlayer.
+ * @param element The element passed to initWaveformPlayer.
+ * @return The fake player.
  */
 function createFakePlayer(
 	options: InitWaveformPlayerOptions,
@@ -73,7 +73,7 @@ function createFakePlayer(
 			instance.artistEl.textContent = artist;
 			instance.artistEl.style.display = '';
 		} ),
-		syncArtwork: vi.fn( ( image: string | null, imageAlt = '' ) => {
+		syncArtwork: vi.fn( ( image?: string | null, imageAlt = '' ) => {
 			if ( ! image ) {
 				instance.artworkEl?.remove();
 				instance.artworkEl = null;
@@ -89,14 +89,14 @@ function createFakePlayer(
 		loadTrack: vi.fn(
 			async (
 				_src: string,
-				title?: string,
-				artist?: string,
-				trackOptions: { artwork?: string; artworkAlt?: string } = {}
+				title: string,
+				artist: string,
+				trackOptions: { artwork: string; artworkAlt: string }
 			) => {
-				titleEl.textContent = title ?? '';
+				titleEl.textContent = title;
 				instance.syncArtist( artist );
 				instance.syncArtwork(
-					trackOptions.artwork ?? null,
+					trackOptions.artwork,
 					trackOptions.artworkAlt
 				);
 			}

@@ -103,7 +103,7 @@ export function WaveformPlayer( {
 	// includes an unstable array), which would cause useRefEffect to destroy
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
-	const onEndedEvent = useEvent( () => onEnded?.() );
+	const onEndedEvent = useEvent( onEnded );
 
 	// Ref for the WaveformPlayer instance
 	const playerRef = useRef< InitializedWaveformPlayer | undefined >(

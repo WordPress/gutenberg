@@ -11,11 +11,11 @@ import type { HtmlRendererProps } from './types';
 /**
  * Renders HTML content as React elements with optional wrapper props.
  *
- * @param {Object} props              - The props for the component.
- * @param {Object} props.wrapperProps - The props to merge with the root element.
- *                                    className and style are merged with the parsed HTML attributes.
- * @param {string} props.html         - The HTML content to render.
- * @return {React.JSX.Element} The rendered React elements.
+ * @param props              The props for the component.
+ * @param props.wrapperProps The props to merge with the root element.
+ *                           className and style are merged with the parsed HTML attributes.
+ * @param props.html         The HTML content to render.
+ * @return The rendered React elements.
  */
 const HtmlRenderer = ( {
 	wrapperProps = {},

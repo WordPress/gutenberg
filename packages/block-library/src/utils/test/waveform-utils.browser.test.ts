@@ -751,7 +751,7 @@ describe( 'Waveform utilities', () => {
 			 * See https://core.trac.wordpress.org/ticket/65673.
 			 */
 			expect( player.instance.audio ).not.toBeNull();
-			expect( player.instance.audio!.crossOrigin ).toBeNull();
+			expect( player.instance.audio?.crossOrigin ).toBeNull();
 			expect( player.instance.audio ).not.toHaveAttribute(
 				'crossorigin'
 			);

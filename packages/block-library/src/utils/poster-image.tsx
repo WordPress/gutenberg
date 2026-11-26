@@ -3,6 +3,7 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	store as blockEditorStore,
+	type MediaUploadFunction,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -34,26 +35,11 @@ function PosterImage( { poster, onChange }: PosterImageProps ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onDropFiles = ( filesList: File[] ) => {
-		(
-			getSettings() as {
-				mediaUpload: ( options: {
-					allowedTypes: string[];
-					filesList: File[];
-					onFileChange: (
-						files: Array< {
-							url?: string;
-							[ key: string ]: unknown;
-						} >
-					) => void;
-					onError: ( message: string ) => void;
-					multiple: boolean;
-				} ) => void;
-			}
-		 ).mediaUpload( {
+		( getSettings().mediaUpload as MediaUploadFunction )( {
 			allowedTypes: POSTER_IMAGE_ALLOWED_MEDIA_TYPES,
 			filesList,
 			onFileChange: ( [ image ] ) => {
-				if ( isBlobURL( image?.url ) ) {
+				if ( isBlobURL( image?.url as string | undefined ) ) {
 					setIsLoading( true );
 					return;
 				}
@@ -163,7 +149,7 @@ function PosterImage( { poster, onChange }: PosterImageProps ) {
 											onChange( undefined );
 
 											// Move focus back to the Media Upload button.
-											posterButtonRef.current?.focus();
+											posterButtonRef.current!.focus();
 										} }
 										className="block-library-poster-image__action"
 										disabled={ isLoading }
