@@ -233,10 +233,6 @@ Undocumented declaration.
 
 The props of the `BlockEditorProvider` component.
 
-### BlockEditProps
-
-The props of the `BlockEdit` component.
-
 ### BlockFormatControls
 
 Undocumented declaration.

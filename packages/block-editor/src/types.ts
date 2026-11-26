@@ -72,11 +72,6 @@ export type { BlockContextProviderProps } from './components/block-context/types
 export type { BlockControlsFillProps as BlockControlsProps } from './components/block-controls/types';
 
 /**
- * The props of the `BlockEdit` component.
- */
-export type { BlockEditProps } from './components/block-edit/types';
-
-/**
  * The props of the `BlockEditorProvider` component.
  */
 export type { BlockEditorProviderProps } from './components/provider/types';

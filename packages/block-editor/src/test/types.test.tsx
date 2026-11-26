@@ -48,9 +48,6 @@ describe( 'Public types', () => {
 		expectTypeOf< BlockEditor.BlockControlsProps >().branded.toEqualTypeOf<
 			PropsOf< typeof BlockEditor.BlockControls >
 		>();
-		expectTypeOf< BlockEditor.BlockEditProps >().branded.toEqualTypeOf<
-			PropsOf< typeof BlockEditor.BlockEdit >
-		>();
 		expectTypeOf< BlockEditor.BlockEditorProviderProps >().branded.toEqualTypeOf<
 			PropsOf< typeof BlockEditor.BlockEditorProvider >
 		>();
@@ -183,6 +180,12 @@ describe( 'Public types', () => {
 		expectTypeOf< BlockEditor.WritingFlowProps >().branded.toEqualTypeOf<
 			PropsOf< typeof BlockEditor.WritingFlow >
 		>();
+	} );
+
+	it( 'keeps the value type parameter of the rich text props', () => {
+		expectTypeOf<
+			BlockEditor.RichTextProps< string >[ 'value' ]
+		>().toEqualTypeOf< string | undefined >();
 	} );
 
 	it( 'exports the types of the hooks', () => {
