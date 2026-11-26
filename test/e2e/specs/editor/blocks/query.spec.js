@@ -164,6 +164,68 @@ test.describe( 'Query block', () => {
 				).toEqual( before );
 			}
 		} );
+
+		test( 'keeps only the filters that apply to posts when the post type is reset without post types to choose from', async ( {
+			page,
+			editor,
+		} ) => {
+			await page.evaluate( () => {
+				const { getBlocks } =
+					window.wp.data.select( 'core/block-editor' );
+				const block = getBlocks()[ 0 ];
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.updateBlockAttributes( block.clientId, {
+						query: {
+							...block.attributes.query,
+							postType: 'book',
+							taxQuery: { include: { genre: [ 1 ] } },
+							format: [ 'aside' ],
+						},
+					} );
+			} );
+
+			// Reload the post types with none to choose from, so the reset has
+			// to read the filters to keep from the `post` record.
+			await page.route( '**/wp/v2/types?*', ( route ) =>
+				route.fulfill( { json: [] } )
+			);
+			const postTypesResponse =
+				page.waitForResponse( '**/wp/v2/types?*' );
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core' )
+					.invalidateResolution( 'getPostTypes', [
+						{ per_page: -1 },
+					] );
+			} );
+			await postTypesResponse;
+			await expect(
+				page.getByRole( 'combobox', { name: 'Post type', exact: true } )
+			).toContainText( 'book (unavailable)' );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Settings options' } )
+				.click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Post type, reset to default',
+				} )
+				.click();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					attributes: {
+						query: {
+							postType: 'post',
+							format: [ 'aside' ],
+							taxQuery: undefined,
+						},
+					},
+				},
+			] );
+		} );
 	} );
 
 	test.describe( 'Post Template block movers', () => {

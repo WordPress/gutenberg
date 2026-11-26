@@ -86,55 +86,35 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 };
 
 /**
- * Returns a helper object that contains:
- * 1. An `options` object from the available post types, to be passed to a `SelectControl`.
- * 2. A helper map with available taxonomies per post type.
- * 3. A helper map with post format support per post type.
+ * Returns a helper object that contains `postTypesSelectOptions`: the post
+ * types that can be queried, as options to be passed to a `SelectControl`, or
+ * `undefined` while they load.
  *
  * @return {Object} The helper object related to post types.
  */
 export const usePostTypes = () => {
 	const postTypes = useSelect( ( select ) => {
-		const { getPostTypes } = select( coreStore );
+		const { getPostTypes, hasFinishedResolution } = select( coreStore );
 		const excludedPostTypes = [ 'attachment' ];
-		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
-			( { viewable, slug } ) =>
-				viewable && ! excludedPostTypes.includes( slug )
-		);
-		return filteredPostTypes;
+		const query = { per_page: -1 };
+		const records = getPostTypes( query );
+		// A failed request, such as a 403, finishes without records.
+		return hasFinishedResolution( 'getPostTypes', [ query ] )
+			? ( records ?? [] ).filter(
+					( { viewable, slug } ) =>
+						viewable && ! excludedPostTypes.includes( slug )
+				)
+			: undefined;
 	}, [] );
-	const postTypesTaxonomiesMap = useMemo( () => {
-		if ( ! postTypes?.length ) {
-			return;
-		}
-		return postTypes.reduce( ( accumulator, type ) => {
-			accumulator[ type.slug ] = type.taxonomies;
-			return accumulator;
-		}, {} );
-	}, [ postTypes ] );
 	const postTypesSelectOptions = useMemo(
 		() =>
-			( postTypes || [] ).map( ( { labels, slug } ) => ( {
+			postTypes?.map( ( { labels, slug } ) => ( {
 				label: labels.singular_name,
 				value: slug,
 			} ) ),
 		[ postTypes ]
 	);
-	const postTypeFormatSupportMap = useMemo( () => {
-		if ( ! postTypes?.length ) {
-			return {};
-		}
-		return postTypes.reduce( ( accumulator, type ) => {
-			accumulator[ type.slug ] =
-				type.supports?.[ 'post-formats' ] || false;
-			return accumulator;
-		}, {} );
-	}, [ postTypes ] );
-	return {
-		postTypesTaxonomiesMap,
-		postTypesSelectOptions,
-		postTypeFormatSupportMap,
-	};
+	return { postTypesSelectOptions };
 };
 
 /**

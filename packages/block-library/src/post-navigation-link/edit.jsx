@@ -21,6 +21,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { addUnavailableItem } from '../utils/add-unavailable-item';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
@@ -72,12 +73,14 @@ export default function PostNavigationLinkEdit( {
 	} );
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			const filteredTaxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
-			return filteredTaxonomies;
+			const { getTaxonomies, hasFinishedResolution } =
+				select( coreStore );
+			const query = { type: postType, per_page: -1 };
+			const records = getTaxonomies( query );
+			// A failed request, such as a 403, finishes without records.
+			return hasFinishedResolution( 'getTaxonomies', [ query ] )
+				? ( records ?? [] )
+				: undefined;
 		},
 		[ postType ]
 	);
@@ -86,14 +89,19 @@ export default function PostNavigationLinkEdit( {
 			label: __( 'Unfiltered' ),
 			value: '',
 		},
-		...( taxonomies ?? [] )
-			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
-			.map( ( item ) => {
-				return {
-					value: item.slug,
-					label: item.name,
-				};
-			} ),
+		...addUnavailableItem(
+			taxonomies
+				?.filter(
+					( { visibility } ) => !! visibility?.publicly_queryable
+				)
+				.map( ( item ) => {
+					return {
+						value: item.slug,
+						label: item.name,
+					};
+				} ),
+			taxonomy
+		),
 	];
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -207,7 +215,7 @@ export default function PostNavigationLinkEdit( {
 					value={
 						taxonomyOptions.find(
 							( item ) => item.value === taxonomy
-						) ?? taxonomyOptions[ 0 ]
+						) ?? null
 					}
 					onValueChange={ ( item ) =>
 						item &&

@@ -4,6 +4,10 @@
 
 ### Bug Fixes
 
+-   Tag Cloud, Terms List, Post Navigation Link, Query Loop: When the saved taxonomy or post type isn't available in the editor, show it as a disabled "(unavailable)" option instead of selecting the first option ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
+-   Terms List: Don't crash in the editor when the saved taxonomy has no terms and isn't public ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
+-   Query Loop: Don't crash when resetting the post type while post types load or when there are none to choose from, and keep only the filters that apply to the new post type ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
+-   Query Loop: Remove taxonomy filters when switching to a post type without taxonomies, and show the Format filter whenever the post type supports formats ([#87380](https://github.com/WordPress/gutenberg/pull/87380)).
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
 -   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).

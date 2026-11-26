@@ -8,8 +8,9 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
@@ -32,10 +33,16 @@ import {
 	useOrderByOptions,
 } from '../../utils';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
+import { addUnavailableItem } from '../../../utils/add-unavailable-item';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
-		props;
+	const {
+		attributes,
+		clientId,
+		setQuery,
+		isSingular,
+		shouldExcludeCurrentPost,
+	} = props;
 	const { query } = attributes;
 	const {
 		order,
@@ -56,19 +63,24 @@ export default function QueryInspectorControls( props ) {
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
-	const {
-		postTypesTaxonomiesMap,
-		postTypesSelectOptions,
-		postTypeFormatSupportMap,
-	} = usePostTypes();
+	const { postTypesSelectOptions } = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
-	const onPostTypeChange = ( newValue ) => {
+	const registry = useRegistry();
+	const onPostTypeChange = async ( newValue ) => {
+		// A reset can run before the post types load, so wait for the record.
+		const newPostType = await registry
+			.resolveSelect( coreStore )
+			.getEntityRecord( 'root', 'postType', newValue )
+			.catch( () => undefined );
+		// The filters can change while waiting, so clean up the latest ones.
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const latestTaxQuery = getBlockAttributes( clientId )?.query.taxQuery;
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
-		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
-		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
+		const supportedTaxonomies = newPostType?.taxonomies;
+		if ( !! supportedTaxonomies && !! latestTaxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {
 				return Object.entries( _taxQuery || {} ).reduce(
@@ -82,11 +94,15 @@ export default function QueryInspectorControls( props ) {
 				);
 			};
 			const updatedTaxQuery = {};
-			const builtIncludeTaxQuery = buildTaxQuery( taxQuery.include );
+			const builtIncludeTaxQuery = buildTaxQuery(
+				latestTaxQuery.include
+			);
 			if ( !! Object.keys( builtIncludeTaxQuery ).length ) {
 				updatedTaxQuery.include = builtIncludeTaxQuery;
 			}
-			const builtExcludeTaxQuery = buildTaxQuery( taxQuery.exclude );
+			const builtExcludeTaxQuery = buildTaxQuery(
+				latestTaxQuery.exclude
+			);
 			if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
 				updatedTaxQuery.exclude = builtExcludeTaxQuery;
 			}
@@ -103,7 +119,7 @@ export default function QueryInspectorControls( props ) {
 		// Post types can register post format support with `add_post_type_support`.
 		// But we need to reset the `format` property when switching to post types
 		// that do not support post formats.
-		const hasFormatSupport = postTypeFormatSupportMap[ newValue ];
+		const hasFormatSupport = newPostType?.supports?.[ 'post-formats' ];
 		if ( ! hasFormatSupport ) {
 			updateQuery.format = [];
 		}
@@ -121,6 +137,21 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
+	const postTypeItems = addUnavailableItem(
+		postTypesSelectOptions,
+		postType
+	);
+	const selectedPostType =
+		postTypeItems.find( ( item ) => item.value === postType ) ?? null;
+	// Keep the dropdown once shown, so choosing a post type doesn't swap it for
+	// the toggle while it has focus.
+	const [ showPostTypeSelect, setShowPostTypeSelect ] = useState( false );
+	if (
+		! showPostTypeSelect &&
+		( postTypeItems.length > 2 || selectedPostType?.disabled )
+	) {
+		setShowPostTypeSelect( true );
+	}
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
@@ -145,12 +176,12 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
-	const postTypeHasFormatSupport = postTypeFormatSupportMap[ postType ];
 	const showFormatControl = useSelect(
 		( select ) => {
+			const { getPostType } = select( coreStore );
 			// Check if the post type supports post formats and if the control is allowed.
 			if (
-				! postTypeHasFormatSupport ||
+				! getPostType( postType )?.supports?.[ 'post-formats' ] ||
 				! isControlAllowed( allowedControls, 'format' )
 			) {
 				return false;
@@ -166,7 +197,7 @@ export default function QueryInspectorControls( props ) {
 				themeSupports.formats.some( ( type ) => type !== 'standard' )
 			);
 		},
-		[ allowedControls, postTypeHasFormatSupport ]
+		[ allowedControls, postType ]
 	);
 
 	const showExcludeCurrentControl =
@@ -274,14 +305,10 @@ export default function QueryInspectorControls( props ) {
 							onDeselect={ () => onPostTypeChange( 'post' ) }
 							isShownByDefault
 						>
-							{ postTypesSelectOptions.length > 2 ? (
+							{ showPostTypeSelect ? (
 								<SelectControl
-									items={ postTypesSelectOptions }
-									value={
-										postTypesSelectOptions.find(
-											( item ) => item.value === postType
-										) ?? postTypesSelectOptions[ 0 ]
-									}
+									items={ postTypeItems }
+									value={ selectedPostType }
 									label={ postTypeControlLabel }
 									onValueChange={ ( item ) => {
 										if ( item && item.value !== postType ) {
@@ -298,7 +325,7 @@ export default function QueryInspectorControls( props ) {
 									onChange={ onPostTypeChange }
 									help={ postTypeControlHelp }
 								>
-									{ postTypesSelectOptions.map(
+									{ postTypesSelectOptions?.map(
 										( option ) => (
 											<ToggleGroupControlOption
 												key={ option.value }
