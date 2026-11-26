@@ -35,52 +35,34 @@ export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	instantiate: ( registry: DataRegistry ) => StoreInstance< Config >;
 }
 
-export type CoreDataStoreSelectors = {
-	getIsResolving: (
-		storeName: string,
-		selectorName: string,
-		args?: unknown[] | null
-	) => boolean | undefined;
-	hasStartedResolution: (
-		storeName: string,
-		selectorName: string,
-		args?: unknown[] | null
-	) => boolean;
-	hasFinishedResolution: (
-		storeName: string,
-		selectorName: string,
-		args?: unknown[] | null
-	) => boolean;
-	isResolving: (
-		storeName: string,
-		selectorName: string,
-		args?: unknown[] | null
-	) => boolean;
-	getCachedResolvers: ( storeName: string ) => Record< string, unknown >;
+// The `core/data` store prepends the store name to each metadata selector and action.
+type WithStoreName< T > = {
+	[ K in keyof T ]: T[ K ] extends ( ...args: infer Args ) => infer Return
+		? ( storeName: string, ...args: Args ) => Return
+		: never;
 };
 
-export type CoreDataStoreActions = {
-	startResolution: (
-		storeName: string,
-		selectorName: string,
-		args: unknown[]
-	) => Promise< void >;
-	finishResolution: (
-		storeName: string,
-		selectorName: string,
-		args: unknown[]
-	) => Promise< void >;
-	invalidateResolution: (
-		storeName: string,
-		selectorName: string,
-		args?: unknown[] | null
-	) => Promise< void >;
-	invalidateResolutionForStore: ( storeName: string ) => Promise< void >;
-	invalidateResolutionForStoreSelector: (
-		storeName: string,
-		selectorName: string
-	) => Promise< void >;
-};
+export type CoreDataStoreSelectors = WithStoreName<
+	Pick<
+		MetadataSelectors,
+		| 'getIsResolving'
+		| 'hasStartedResolution'
+		| 'hasFinishedResolution'
+		| 'isResolving'
+		| 'getCachedResolvers'
+	>
+>;
+
+export type CoreDataStoreActions = WithStoreName<
+	Pick<
+		MetadataActions,
+		| 'startResolution'
+		| 'finishResolution'
+		| 'invalidateResolution'
+		| 'invalidateResolutionForStore'
+		| 'invalidateResolutionForStoreSelector'
+	>
+>;
 
 export interface CoreDataStoreDescriptor extends StoreDescriptor {
 	name: 'core/data';

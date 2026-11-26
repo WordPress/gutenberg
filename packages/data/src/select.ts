@@ -1,4 +1,4 @@
-import type { CurriedSelectorsOf, StoreDescriptor } from './types';
+import type { AnyConfig, CurriedSelectorsOf, StoreDescriptor } from './types';
 import defaultRegistry from './default-registry';
 
 /**
@@ -23,7 +23,7 @@ import defaultRegistry from './default-registry';
  *
  * @return Object containing the store's selectors.
  */
-export function select< T extends StoreDescriptor = StoreDescriptor >(
+export function select< T extends StoreDescriptor< AnyConfig > >(
 	storeNameOrDescriptor: string | T
 ): CurriedSelectorsOf< T > {
 	return defaultRegistry.select(
