@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   Support dragging, duplicating, and pasting with non-contiguous block selections across different parents ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
+-   `duplicateBlocks`: Accept a single block client ID in the public TypeScript signature ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 -   `moveBlocksToPosition` and `canMoveBlocks`: Support non-contiguous blocks and blocks from different parents, including requests containing parents and their descendants ([#87334](https://github.com/WordPress/gutenberg/pull/87334)).
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 

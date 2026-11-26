@@ -1274,12 +1274,12 @@ _Returns_
 
 ### duplicateBlocks
 
-Action that duplicates a list of blocks.
+Duplicates one or more blocks.
 
 _Parameters_
 
-- _clientIds_ `string[]`:
-- _updateSelection_ `boolean`:
+- _clientIds_ `string|string[]`: A block client ID or an array of block client IDs.
+- _updateSelection_ `boolean`: Whether to select the duplicated blocks. Defaults to true.
 
 ### enterFormattedText
 

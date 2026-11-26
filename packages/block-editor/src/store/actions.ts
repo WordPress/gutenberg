@@ -2144,13 +2144,13 @@ export function setBlockMovingClientId() {
 }
 
 /**
- * Action that duplicates a list of blocks.
+ * Duplicates one or more blocks.
  *
- * @param {string[]} clientIds
- * @param {boolean}  updateSelection
+ * @param {string|string[]} clientIds       A block client ID or an array of block client IDs.
+ * @param {boolean}         updateSelection Whether to select the duplicated blocks. Defaults to true.
  */
 export const duplicateBlocks =
-	( clientIds: string[], updateSelection: boolean = true ) =>
+	( clientIds: string | string[], updateSelection: boolean = true ) =>
 	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
 		const ids = typeof clientIds === 'string' ? [ clientIds ] : clientIds;
 		if ( ! select.canDuplicateBlocks( ids ) ) {

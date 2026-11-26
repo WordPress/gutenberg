@@ -1243,7 +1243,6 @@ describe( 'block selection with multiSelectSet', () => {
 			.updateBlockListSettings( parent.clientId, {} );
 		const clones = await registry
 			.dispatch( store )
-			// @ts-expect-error Test a JavaScript caller passing a single ID.
 			.duplicateBlocks( block.clientId );
 
 		expect( clones ).toHaveLength( 1 );
