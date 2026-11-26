@@ -154,7 +154,7 @@ type CurriedStateWithPromise< F > =
  * Used for resolveSelect.
  */
 export type CurriedSelectorsResolveOf< S > = S extends CoreDataStoreDescriptor
-	? CoreDataStoreSelectors
+	? never
 	: S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
 		? {
 				[ key in keyof Selectors ]: CurriedStateWithPromise<
