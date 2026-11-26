@@ -146,7 +146,7 @@
 	position: sticky;
 	top: 0;
 	z-index: 2; // Ensure it appears above dataview items when scrolling.
-	background-color: #fff;
+	background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 }
 
 /**

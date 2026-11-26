@@ -118,7 +118,7 @@
 		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
