@@ -31,9 +31,11 @@ import { unlock } from '../../lock-unlock';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { blockDragOffsets } from '../block-draggable/drag-offset';
 import {
-	getManualGridDropRect,
 	getManualGridDropRects,
+	getManualGridDropSpans,
+	getManualGridDropTrackSizes,
 } from './manual-grid-drop';
+import type { GridDropSpans, GridDropTrackSizes } from './manual-grid-drop';
 import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
@@ -352,56 +354,75 @@ function useGridDropRects(
 	isDragging: boolean
 ): GetGridDropRects {
 	const { refsMap } = useContext( BlockRefs );
-	const sizesRef = useRef(
-		new Map<
+	const measurementsRef = useRef< {
+		gridElement: Element;
+		gridInfo: GridInfo;
+		trackSizes?: GridDropTrackSizes | null;
+		sizes: Map<
 			string,
 			{
 				attributes: object;
 				selectedState: BlockStyleState | undefined;
-				gridElement: Element;
-				gridInfo: GridInfo;
-				rect: GridRect;
+				spans: GridDropSpans;
 			}
-		>()
-	);
+		>;
+	} | null >( null );
 
 	useEffect( () => {
 		if ( ! isDragging ) {
-			sizesRef.current.clear();
+			measurementsRef.current = null;
 		}
 	}, [ isDragging ] );
 
 	return useEvent< GetGridDropRects >(
 		( blocks, column, row, preserveRelativePositions ) => {
+			if (
+				measurementsRef.current?.gridElement !== gridElement ||
+				measurementsRef.current.gridInfo !== gridInfo
+			) {
+				measurementsRef.current = {
+					gridElement,
+					gridInfo,
+					sizes: new Map(),
+				};
+			}
+			const measurements = measurementsRef.current;
 			const items = blocks.map(
 				( { clientId, attributes, selectedState, layout } ) => {
-					let size = sizesRef.current.get( clientId );
+					let size = measurements.sizes.get( clientId );
 					if (
 						! size ||
 						size.attributes !== attributes ||
 						size.selectedState?.viewport !==
 							selectedState?.viewport ||
-						size.selectedState?.pseudo !== selectedState?.pseudo ||
-						size.gridElement !== gridElement ||
-						size.gridInfo !== gridInfo
+						size.selectedState?.pseudo !== selectedState?.pseudo
 					) {
+						const blockElement = refsMap.get( clientId );
+						// Items already in this grid retain their size, including user overrides.
+						const incomingElement =
+							blockElement?.parentElement === gridElement
+								? undefined
+								: blockElement;
+						if (
+							incomingElement &&
+							measurements.trackSizes === undefined
+						) {
+							measurements.trackSizes =
+								getManualGridDropTrackSizes( gridElement );
+						}
 						size = {
 							attributes,
 							selectedState,
-							gridElement,
-							gridInfo,
-							rect: getManualGridDropRect(
-								gridElement,
-								refsMap.get( clientId ),
+							spans: getManualGridDropSpans(
+								incomingElement,
 								layout,
-								1,
-								1,
-								gridInfo.numColumns
+								gridInfo.numColumns,
+								measurements.trackSizes
 							),
 						};
-						sizesRef.current.set( clientId, size );
+						measurements.sizes.set( clientId, size );
 					}
-					return { rect: size.rect, layout };
+					return { spans: size.spans, layout };
 				}
 			);
 			return getManualGridDropRects(

@@ -229,12 +229,14 @@ export function getGridTracks(
  * @param gridElement             The grid element.
  * @param collapseEmptyColumnGaps Whether zero-width auto-fit columns have
  *                                collapsed gutters.
+ * @param computedStyle           A previously read style declaration.
  *
  * @return The measurement, or undefined when the grid can't be measured.
  */
 export function getGridMeasurement(
 	gridElement: HTMLElement,
-	collapseEmptyColumnGaps = false
+	collapseEmptyColumnGaps = false,
+	computedStyle?: CSSStyleDeclaration
 ): GridMeasurement | undefined {
 	if ( ! gridElement.offsetWidth || ! gridElement.offsetHeight ) {
 		return undefined;
@@ -245,7 +247,7 @@ export function getGridMeasurement(
 	if ( ! scaleX || ! scaleY ) {
 		return undefined;
 	}
-	const computedStyle =
+	computedStyle ??=
 		gridElement.ownerDocument.defaultView!.getComputedStyle( gridElement );
 	const inset = ( side: string ) =>
 		parseFloat(

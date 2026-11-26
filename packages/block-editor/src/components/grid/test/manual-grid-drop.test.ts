@@ -6,11 +6,11 @@ describe( 'manual grid selection drops', () => {
 	it( 'keeps the relative positions and spans of selected grid items', () => {
 		const items = [
 			{
-				rect: new GridRect( { columnSpan: 2, rowSpan: 1 } ),
+				spans: { columnSpan: 2, rowSpan: 1 },
 				layout: { columnStart: 2, rowStart: 2 },
 			},
 			{
-				rect: new GridRect( { columnSpan: 1, rowSpan: 2 } ),
+				spans: { columnSpan: 1, rowSpan: 2 },
 				layout: { columnStart: 5, rowStart: 4 },
 			},
 		];
@@ -36,7 +36,7 @@ describe( 'manual grid selection drops', () => {
 			{ columnSpan: 2, rowSpan: 2 },
 			{ columnSpan: 2, rowSpan: 1 },
 			{ columnSpan: 1, rowSpan: 3 },
-		].map( ( spans ) => ( { rect: new GridRect( spans ), layout: {} } ) );
+		].map( ( spans ) => ( { spans, layout: {} } ) );
 
 		expect( getManualGridDropRects( items, 3, 1, 4, false ) ).toEqual( [
 			new GridRect( {
@@ -63,11 +63,11 @@ describe( 'manual grid selection drops', () => {
 	it( 'keeps the selection within the columns while allowing extra rows', () => {
 		const items = [
 			{
-				rect: new GridRect( { columnSpan: 2, rowSpan: 2 } ),
+				spans: { columnSpan: 2, rowSpan: 2 },
 				layout: { columnStart: 1, rowStart: 1 },
 			},
 			{
-				rect: new GridRect( { columnSpan: 2, rowSpan: 2 } ),
+				spans: { columnSpan: 2, rowSpan: 2 },
 				layout: { columnStart: 4, rowStart: 2 },
 			},
 		];

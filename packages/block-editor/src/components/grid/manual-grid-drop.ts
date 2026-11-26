@@ -1,6 +1,19 @@
 import { isPlainObject } from '../../utils/object';
 import { getGridMeasurement, GridRect } from './utils';
 import { getGridSpan, measureGridItemAtWidth } from './grid-item-size';
+import type { GridItemDimensions } from './types';
+
+export interface GridDropTrackSizes {
+	columnWidth: number;
+	columnGap: number;
+	rowHeight: number;
+	rowGap: number;
+}
+
+export interface GridDropSpans {
+	columnSpan: number;
+	rowSpan: number;
+}
 
 function isPositiveInteger( value: unknown ): value is number {
 	return typeof value === 'number' && Number.isInteger( value ) && value > 0;
@@ -11,77 +24,82 @@ function getSpan( value: unknown ): number {
 }
 
 /**
- * Gets a drop placement within the grid's columns, allowing additional rows.
- * Find a compact width without changing the block's rendered height or
- * introducing overflow. Temporary styles are restored before painting.
+ * Reads the destination track sizes and gaps shared by incoming blocks.
  *
- * @param gridElement  Destination grid.
- * @param blockElement Dragged block's element, if rendered.
- * @param layout       Dragged block's resolved layout style.
- * @param column       Hovered column.
- * @param row          Hovered row.
- * @param columnCount  Number of destination columns.
- * @return Drop placement, including the block's spans.
+ * @param gridElement Destination grid.
+ * @return Track sizes and gaps, or null if the grid can't be measured.
  */
-export function getManualGridDropRect(
-	gridElement: Element,
-	blockElement: Element | null | undefined,
-	layout: unknown,
-	column: number,
-	row: number,
-	columnCount: number
-): GridRect {
-	const itemLayout = isPlainObject( layout ) ? layout : {};
-	let columnSpan = Math.min( getSpan( itemLayout.columnSpan ), columnCount );
-	let rowSpan = getSpan( itemLayout.rowSpan );
-	const getRect = () =>
-		new GridRect( {
-			columnStart: Math.min( column, columnCount - columnSpan + 1 ),
-			rowStart: row,
-			columnSpan,
-			rowSpan,
-		} );
-	// Items already in this grid retain their size, including user overrides.
-	if ( ! blockElement || blockElement.parentElement === gridElement ) {
-		return getRect();
-	}
+export function getManualGridDropTrackSizes(
+	gridElement: Element
+): GridDropTrackSizes | null {
 	const view = gridElement.ownerDocument.defaultView;
-	const sourceView = blockElement.ownerDocument.defaultView;
-	if (
-		! view ||
-		! ( gridElement instanceof view.HTMLElement ) ||
-		! sourceView ||
-		! ( blockElement instanceof sourceView.HTMLElement )
-	) {
-		return getRect();
+	if ( ! view || ! ( gridElement instanceof view.HTMLElement ) ) {
+		return null;
 	}
-	const measurement = getGridMeasurement( gridElement );
-	const columnWidth = measurement
-		? measurement.columns[ 0 ]?.end - measurement.columns[ 0 ]?.start
-		: 0;
-	const rowHeight = measurement
-		? measurement.rows[ 0 ]?.end - measurement.rows[ 0 ]?.start
-		: 0;
-	const renderedWidth = blockElement.offsetWidth;
-	const renderedHeight = blockElement.offsetHeight;
+	const computedStyle = view.getComputedStyle( gridElement );
+	const measurement = getGridMeasurement( gridElement, false, computedStyle );
+	if ( ! measurement ) {
+		return null;
+	}
+	const { columns, rows } = measurement;
+	const columnWidth = columns[ 0 ]?.end - columns[ 0 ]?.start;
+	const rowHeight = rows[ 0 ]?.end - rows[ 0 ]?.start;
 	if (
 		! Number.isFinite( columnWidth ) ||
 		! Number.isFinite( rowHeight ) ||
 		columnWidth <= 0 ||
-		rowHeight <= 0 ||
-		renderedWidth <= 0
+		rowHeight <= 0
 	) {
-		return getRect();
+		return null;
 	}
-	const computedStyle = view.getComputedStyle( gridElement );
-	const columnGap =
-		measurement?.columns[ 1 ] !== undefined
-			? measurement.columns[ 1 ].start - columnWidth
-			: parseFloat( computedStyle.columnGap ) || 0;
-	const rowGap =
-		measurement?.rows[ 1 ] !== undefined
-			? measurement.rows[ 1 ].start - rowHeight
-			: parseFloat( computedStyle.rowGap ) || 0;
+	return {
+		columnWidth,
+		rowHeight,
+		columnGap: columns[ 1 ]
+			? columns[ 1 ].start - columnWidth
+			: parseFloat( computedStyle.columnGap ) || 0,
+		rowGap: rows[ 1 ]
+			? rows[ 1 ].start - rowHeight
+			: parseFloat( computedStyle.rowGap ) || 0,
+	};
+}
+
+/**
+ * Finds a compact width for an incoming block without changing its rendered
+ * height or introducing overflow. Temporary styles are restored before painting.
+ *
+ * @param blockElement Incoming block's element, if it can be measured.
+ * @param layout       Dragged block's resolved layout style.
+ * @param columnCount  Number of destination columns.
+ * @param trackSizes   Measured destination track sizes and gaps.
+ * @return Column and row spans for the dragged block.
+ */
+export function getManualGridDropSpans(
+	blockElement: Element | null | undefined,
+	layout: unknown,
+	columnCount: number,
+	trackSizes: GridDropTrackSizes | null | undefined
+): GridDropSpans {
+	const itemLayout = isPlainObject( layout ) ? layout : {};
+	const columnSpan = Math.min(
+		getSpan( itemLayout.columnSpan ),
+		columnCount
+	);
+	const rowSpan = getSpan( itemLayout.rowSpan );
+	const sourceView = blockElement?.ownerDocument.defaultView;
+	if (
+		! trackSizes ||
+		! sourceView ||
+		! ( blockElement instanceof sourceView.HTMLElement )
+	) {
+		return { columnSpan, rowSpan };
+	}
+	const renderedWidth = blockElement.offsetWidth;
+	if ( renderedWidth <= 0 ) {
+		return { columnSpan, rowSpan };
+	}
+	const { columnWidth, columnGap, rowHeight, rowGap } = trackSizes;
+	const renderedHeight = blockElement.offsetHeight;
 	const renderedContentHeight = Math.max(
 		renderedHeight,
 		blockElement.scrollHeight
@@ -100,6 +118,8 @@ export function getManualGridDropRect(
 	// Narrow content can have a full-width wrapper. Search by layout rather
 	// than markup or intrinsic width, which can depend on percentage sizing.
 	// A binary search bounds layout work as the number of columns grows.
+	let fittingMeasurement:
+		{ width: number; dimensions: GridItemDimensions } | undefined;
 	while ( minimumSpan < maximumSpan ) {
 		const candidateSpan = Math.floor( ( minimumSpan + maximumSpan ) / 2 );
 		const width = Math.min( renderedWidth, getWidth( candidateSpan ) );
@@ -111,24 +131,27 @@ export function getManualGridDropRect(
 			dimensions.scrollHeight <= renderedContentHeight + 1;
 		if ( fits ) {
 			maximumSpan = candidateSpan;
+			fittingMeasurement = { width, dimensions };
 		} else {
 			minimumSpan = candidateSpan + 1;
 		}
 	}
-	columnSpan = minimumSpan;
-	const dimensions = measureGridItemAtWidth(
-		blockElement,
-		getWidth( columnSpan )
-	);
-	rowSpan = Math.max(
-		rowSpan,
-		getGridSpan(
-			Math.max( dimensions.offsetHeight, dimensions.scrollHeight ),
-			rowHeight,
-			rowGap
-		)
-	);
-	return getRect();
+	const width = getWidth( minimumSpan );
+	const dimensions =
+		fittingMeasurement?.width === width
+			? fittingMeasurement.dimensions
+			: measureGridItemAtWidth( blockElement, width );
+	return {
+		columnSpan: minimumSpan,
+		rowSpan: Math.max(
+			rowSpan,
+			getGridSpan(
+				Math.max( dimensions.offsetHeight, dimensions.scrollHeight ),
+				rowHeight,
+				rowGap
+			)
+		),
+	};
 }
 
 /**
@@ -143,7 +166,7 @@ export function getManualGridDropRect(
  * @return A placement for every dragged block, in selection order.
  */
 export function getManualGridDropRects(
-	items: { rect: GridRect; layout: unknown }[],
+	items: { spans: GridDropSpans; layout: unknown }[],
 	column: number,
 	row: number,
 	columnCount: number,
@@ -154,7 +177,7 @@ export function getManualGridDropRects(
 	}
 
 	if ( preserveRelativePositions ) {
-		const sourceRects = items.map( ( { rect, layout } ) => {
+		const sourceRects = items.map( ( { spans, layout } ) => {
 			if (
 				! isPlainObject( layout ) ||
 				! isPositiveInteger( layout.columnStart ) ||
@@ -165,8 +188,7 @@ export function getManualGridDropRects(
 			return new GridRect( {
 				columnStart: layout.columnStart,
 				rowStart: layout.rowStart,
-				columnSpan: rect.columnSpan,
-				rowSpan: rect.rowSpan,
+				...spans,
 			} );
 		} );
 		if ( sourceRects.every( ( rect ) => rect !== null ) ) {
@@ -197,12 +219,12 @@ export function getManualGridDropRects(
 
 	let nextColumn = Math.min(
 		column,
-		columnCount - items[ 0 ].rect.columnSpan + 1
+		columnCount - items[ 0 ].spans.columnSpan + 1
 	);
 	let nextRow = row;
 	let rowSpan = 0;
-	return items.map( ( { rect } ) => {
-		if ( nextColumn + rect.columnSpan - 1 > columnCount ) {
+	return items.map( ( { spans } ) => {
+		if ( nextColumn + spans.columnSpan - 1 > columnCount ) {
 			nextColumn = 1;
 			nextRow += rowSpan;
 			rowSpan = 0;
@@ -210,11 +232,10 @@ export function getManualGridDropRects(
 		const placement = new GridRect( {
 			columnStart: nextColumn,
 			rowStart: nextRow,
-			columnSpan: rect.columnSpan,
-			rowSpan: rect.rowSpan,
+			...spans,
 		} );
-		nextColumn += rect.columnSpan;
-		rowSpan = Math.max( rowSpan, rect.rowSpan );
+		nextColumn += spans.columnSpan;
+		rowSpan = Math.max( rowSpan, spans.rowSpan );
 		return placement;
 	} );
 }
