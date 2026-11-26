@@ -464,24 +464,6 @@ export const tokens = /** @type {const} */ ( {
 			'Background color for interactive elements with neutral tone and strong emphasis.',
 		$type: 'color',
 		group: 'color',
-		fallback: '#2e2e2e',
-		modes: {
-			default: {
-				$value: {
-					colorSpace: 'srgb',
-					components: [ 0.18, 0.18, 0.18 ],
-					hex: '#2e2e2e',
-					alpha: 1,
-				},
-				css: '#2e2e2e',
-			},
-		},
-	},
-	'--wpds-color-background-interactive-neutral-strong-active': {
-		$description:
-			'Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.',
-		$type: 'color',
-		group: 'color',
 		fallback: '#1e1e1e',
 		modes: {
 			default: {
@@ -492,6 +474,24 @@ export const tokens = /** @type {const} */ ( {
 					alpha: 1,
 				},
 				css: '#1e1e1e',
+			},
+		},
+	},
+	'--wpds-color-background-interactive-neutral-strong-active': {
+		$description:
+			'Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.',
+		$type: 'color',
+		group: 'color',
+		fallback: '#2e2e2e',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.18, 0.18, 0.18 ],
+					hex: '#2e2e2e',
+					alpha: 1,
+				},
+				css: '#2e2e2e',
 			},
 		},
 	},

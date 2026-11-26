@@ -46,6 +46,7 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getCellRowspan,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -249,7 +250,13 @@ function TableEdit( {
 		}
 
 		const { sectionName, rowIndex } = selectedCell;
-		const newRowIndex = rowIndex + delta;
+
+		// Insert after all the rows the selected cell covers, so that a row
+		// inserted after a cell with rowspan lands outside of its span.
+		const newRowIndex =
+			delta > 0
+				? rowIndex + getCellRowspan( attributes, selectedCell )
+				: rowIndex;
 
 		setAttributes(
 			insertRow( attributes, {
