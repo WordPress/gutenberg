@@ -1,76 +1,110 @@
-import type { HTMLAttributes, MouseEventHandler, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import type { ButtonProps } from '../button/types';
 import type { ComponentProps } from '../utils/types';
 
 /**
- * How much vertical space each row takes.
+ * How much space each row takes.
  *
  * - `comfortable`: full-width rows on a settings screen.
  * - `compact`: rows in a narrow context such as the block inspector.
  */
 export type Density = 'comfortable' | 'compact';
 
+/**
+ * How the rows of a group relate to each other visually.
+ *
+ * - `joined`: one frame, with a dividing line between rows.
+ * - `detached`: each row in its own frame, with a gap between rows.
+ */
+export type GroupVariant = 'joined' | 'detached';
+
 export interface GroupProps extends ComponentProps< 'ul' > {
 	/**
-	 * Any mix of `Item.Link`, `Item.Button` and `Item.Row`.
+	 * Any mix of `Item.LinkRow`, `Item.ButtonRow` and `Item.ContentRow`.
 	 */
 	children?: ReactNode;
 
 	/**
-	 * Whether the group draws the frame around its entries.
+	 * How the rows relate to each other visually. Both variants are one list
+	 * with the same semantics.
 	 *
-	 * Set this to `false` inside a `Card`, which supplies the frame itself,
-	 * so the list can sit between a description and other content.
+	 * - `joined`: one frame, with a dividing line between rows. Use it for
+	 *   uniform rows that users scan as a set.
+	 * - `detached`: each row in its own frame, with a gap between rows. Use it
+	 *   when each row is a self-contained object.
 	 *
-	 * @default true
+	 * @default "joined"
 	 */
-	frame?: boolean;
+	variant?: GroupVariant;
 
 	/**
-	 * How much vertical space each row takes.
+	 * How much space each row takes.
 	 *
 	 * @default "comfortable"
 	 */
 	density?: Density;
 }
 
-/**
- * A row renders as an anchor, a button or a plain element, so its
- * passthrough props are typed against the common `HTMLElement`.
- */
-type RowElementProps = Omit<
-	HTMLAttributes< HTMLElement >,
-	'title' | 'onClick' | 'className' | 'style' | 'children'
-> &
-	Pick< ComponentProps< 'div' >, 'className' | 'style' | 'render' >;
-
-export interface LinkRowProps extends RowElementProps {
+interface StandaloneRowProps {
 	/**
-	 * The row's parts.
+	 * How much space a row outside an `Item.Group` takes. It has no effect
+	 * inside an `Item.Group`, which sets the density of its rows.
+	 *
+	 * @default "comfortable"
 	 */
-	children?: ReactNode;
-	/**
-	 * Where activating the row takes you.
-	 */
-	href: string;
-	target?: string;
-	rel?: string;
-	onClick?: MouseEventHandler;
+	density?: Density;
 }
 
-export interface ButtonRowProps extends RowElementProps {
+export interface LinkRowProps
+	extends
+		Omit< ComponentProps< 'a' >, 'children' | 'target' >,
+		StandaloneRowProps {
 	/**
-	 * The row's parts.
+	 * Where to open the linked document. `"_blank"` also adds the accessible
+	 * new-tab notice, and makes `Item.Chevron` show the new-tab arrow.
+	 *
+	 * When both `target` and `openInNewTab` are set, `target` determines the
+	 * browsing context.
+	 */
+	target?: ComponentProps< 'a' >[ 'target' ];
+
+	/**
+	 * Adds an accessible notice for opening in a new tab, and makes
+	 * `Item.Chevron` show the new-tab arrow. Defaults `target` to `"_blank"`
+	 * when no explicit target is set.
+	 *
+	 * @default false
+	 */
+	openInNewTab?: boolean;
+
+	/**
+	 * The parts of the row. `Item.Label` is required: it names the link.
 	 */
 	children?: ReactNode;
-	/**
-	 * What activating the row runs.
-	 */
-	onClick: MouseEventHandler;
 }
 
-export interface ContentRowProps extends RowElementProps {
+export interface ButtonRowProps
+	extends
+		Omit<
+			ButtonProps,
+			| 'children'
+			| 'variant'
+			| 'tone'
+			| 'size'
+			| 'loading'
+			| 'loadingAnnouncement'
+		>,
+		StandaloneRowProps {
 	/**
-	 * The row's parts, including the controls in `Item.Actions`.
+	 * The parts of the row. `Item.Label` is required: it names the button.
+	 */
+	children?: ReactNode;
+}
+
+export interface ContentRowProps
+	extends ComponentProps< 'div' >, StandaloneRowProps {
+	/**
+	 * The parts of the row, including the controls in `Item.Actions`.
 	 */
 	children?: ReactNode;
 }
@@ -86,33 +120,38 @@ export interface MediaProps extends ComponentProps< 'span' > {
 
 export interface LabelProps extends ComponentProps< 'span' > {
 	/**
-	 * The name of the thing the row represents. For `Item.Link` and
-	 * `Item.Button` this alone is the row's accessible name.
+	 * The name of the thing the row represents. In `Item.LinkRow` and
+	 * `Item.ButtonRow` this is the accessible name of the row's control, so
+	 * it must be text and must not contain interactive elements.
 	 */
 	children?: ReactNode;
 }
 
 export interface DescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supporting text, announced as a description rather than as part of the
-	 * row's name.
+	 * Supporting text. In `Item.LinkRow` and `Item.ButtonRow` it is also the
+	 * accessible description of the row's control.
 	 */
 	children?: ReactNode;
 }
 
 export interface MetaProps extends ComponentProps< 'span' > {
 	/**
-	 * Trailing status or detail, such as a `Badge`. Announced as a
-	 * description. Keep it static: a control here would sit inside an
-	 * `Item.Link` or `Item.Button`. Controls belong in `Item.Actions`.
+	 * Trailing status or detail, such as a `Badge` or a current value. In
+	 * `Item.LinkRow` and `Item.ButtonRow` it is also part of the accessible
+	 * description of the row's control.
+	 *
+	 * Keep it static. Interactive elements belong in `Item.Actions`.
 	 */
 	children?: ReactNode;
 }
 
 export interface ActionsProps extends ComponentProps< 'span' > {
 	/**
-	 * Controls belonging to the row, each its own activation target. Use
-	 * them in an `Item.Row`, whose own surface is not activatable.
+	 * The controls of the row, each with its own activation target.
+	 *
+	 * Give each control a name that includes the row it acts on, such as
+	 * "Reset background color", because the row does not add that context.
 	 */
 	children?: ReactNode;
 }

@@ -8,35 +8,34 @@ import { GroupContext } from './context';
 import type { GroupProps } from './types';
 
 /**
- * A collection of rows. Any mix of `Item.Link`, `Item.Button` and
- * `Item.Row` can go inside, and each becomes one entry of a list.
+ * A list of rows. Any mix of `Item.LinkRow`, `Item.ButtonRow` and
+ * `Item.ContentRow` can go inside, and each becomes one item of the list.
  *
- * The entries are joined in one frame, with a dividing line between them.
- * For entries on separate surfaces, stack a group per entry in a `Stack`.
+ * Name the list with `aria-labelledby` or `aria-label`.
  *
  * ```jsx
- * <Item.Group aria-labelledby="gateways">
- * 	<Item.Link href="/card">
- * 		<Item.Label>Card payments</Item.Label>
- * 		<Item.Chevron />
- * 	</Item.Link>
- * </Item.Group>
+ * import { Item } from '@wordpress/ui';
+ *
+ * function MyComponent() {
+ * 	return (
+ * 		<Item.Group aria-labelledby="gateways">
+ * 			<Item.LinkRow href="/card">
+ * 				<Item.Label>Card payments</Item.Label>
+ * 				<Item.Chevron />
+ * 			</Item.LinkRow>
+ * 		</Item.Group>
+ * 	);
+ * }
  * ```
  */
 export const Group = forwardRef< HTMLUListElement, GroupProps >(
 	function ItemGroup(
-		{
-			className,
-			density = 'comfortable',
-			frame = true,
-			render,
-			...restProps
-		},
+		{ density = 'comfortable', render, variant = 'joined', ...restProps },
 		ref
 	) {
 		const context = useMemo(
-			() => ( { inGroup: true, density } ),
-			[ density ]
+			() => ( { density, variant } ),
+			[ density, variant ]
 		);
 
 		const element = useRender( {
@@ -53,8 +52,8 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 						resetStyles[ 'box-sizing' ],
 						styles.group,
 						styles[ `is-${ density }` ],
-						frame && styles[ 'has-frame' ],
-						className
+						styles[ `is-${ variant }` ],
+						variant === 'joined' && styles[ 'has-frame' ]
 					),
 				},
 				restProps

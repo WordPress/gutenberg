@@ -2,11 +2,15 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
-		/* Density, set on a group and on a standalone row alike. */
+		/*
+		 * Density. Set on a group, and on every row so that a row outside a
+		 * group has it too.
+		 */
 		.is-comfortable {
 			--_wp-ui-item-padding-block: var(--wpds-dimension-padding-lg);
 			--_wp-ui-item-padding-inline: var(--wpds-dimension-padding-2xl);
 			--_wp-ui-item-gap: var(--wpds-dimension-gap-lg);
+			--_wp-ui-item-detached-gap: var(--wpds-dimension-gap-md);
 			--_wp-ui-item-radius: var(--wpds-border-radius-lg);
 		}
 
@@ -14,16 +18,23 @@
 			--_wp-ui-item-padding-block: var(--wpds-dimension-padding-sm);
 			--_wp-ui-item-padding-inline: var(--wpds-dimension-padding-md);
 			--_wp-ui-item-gap: var(--wpds-dimension-gap-md);
+			--_wp-ui-item-detached-gap: var(--wpds-dimension-gap-sm);
 			--_wp-ui-item-radius: var(--wpds-border-radius-sm);
 		}
 
 		.group {
 			display: flex;
 			flex-direction: column;
-			color: var(--wpds-color-foreground-content-neutral);
 		}
 
-		/* One frame, with a dividing line between entries. */
+		.is-detached {
+			gap: var(--_wp-ui-item-detached-gap);
+		}
+
+		/*
+		 * The frame. Drawn by a joined group around all its rows, by each
+		 * list item of a detached group, or by a row outside a group.
+		 */
 		.has-frame {
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			border-radius: var(--_wp-ui-item-radius);
@@ -31,40 +42,31 @@
 		}
 
 		/*
-		 * Without a frame the group sits in someone else's surface, so it
-		 * needs a line above it when something precedes it there — a card
-		 * title and its description, say. Alone in that surface it needs
-		 * none, which `:not(:first-child)` says without a prop.
+		 * Inside `Card.FullBleed` the card is the frame. Only the top line
+		 * of the frame stays, to separate the rows from what precedes them
+		 * in the card, such as its header. The radius is set on the rows
+		 * too, because each row sets its own with its density.
 		 */
-		.group:not(.has-frame):not(:first-child) {
-			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		[data-wp-ui-card-fullbleed] > .has-frame,
+		[data-wp-ui-card-fullbleed] > .is-joined > .listitem > .row {
+			--_wp-ui-item-radius: 0px;
+		}
+
+		[data-wp-ui-card-fullbleed] > .has-frame {
+			border-inline-width: 0;
+			border-block-end-width: 0;
+			background-color: transparent;
 		}
 
 		/*
-		 * `of .listitem` rather than `:first-child`, so a consumer that
-		 * renders a placeholder between entries — as `ToolsPanel` does to
-		 * keep control order — does not take a dividing line with it.
+		 * A joined group draws a line between its rows.
+		 *
+		 * `of .listitem` and not `:first-child`, so that a consumer which
+		 * renders a placeholder between rows, as `ToolsPanel` does to keep
+		 * the order of its controls, does not move the dividing lines.
 		 */
-		.listitem:not(:nth-child(1 of .listitem)) {
+		.is-joined > .listitem:not(:nth-child(1 of .listitem)) {
 			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		}
-
-		/*
-		 * The outer entries carry the group's corners — but only when the
-		 * group draws the frame. Unframed it sits inside someone else's
-		 * surface, which clips its own corners, and rounding the first row
-		 * there would curve it in the middle of a card.
-		 */
-		.has-frame .listitem:nth-child(1 of .listitem),
-		.has-frame .listitem:nth-child(1 of .listitem) > .row {
-			border-start-start-radius: var(--_wp-ui-item-radius);
-			border-start-end-radius: var(--_wp-ui-item-radius);
-		}
-
-		.has-frame .listitem:nth-last-child(1 of .listitem),
-		.has-frame .listitem:nth-last-child(1 of .listitem) > .row {
-			border-end-start-radius: var(--_wp-ui-item-radius);
-			border-end-end-radius: var(--_wp-ui-item-radius);
 		}
 
 		.listitem {
@@ -78,52 +80,126 @@
 		}
 
 		/*
+		 * Two rows: the label, and the description under it. The other
+		 * parts span both rows and center in them.
+		 *
 		 * No column gap: an absent part would otherwise leave the space of
 		 * the track it did not fill. The parts carry their own spacing.
 		 */
 		.row {
+			/* The radius of a corner that sits inside the border of a frame. */
+			--_wp-ui-item-inner-radius: max(0px, var(--_wp-ui-item-radius) - var(--wpds-border-width-xs));
+			/*
+			 * The radius of the top and of the bottom corners of the row.
+			 * Zero unless the row meets the rounded corners of a frame.
+			 */
+			--_wp-ui-item-radius-block-start: 0;
+			--_wp-ui-item-radius-block-end: 0;
+
 			position: relative;
+			/* Keeps the stacking of `.actions` above `.surface` inside the row. */
+			isolation: isolate;
 			display: grid;
 			grid-template-columns: auto minmax(0, 1fr) auto auto;
 			align-items: center;
-			row-gap: var(--wpds-dimension-gap-xs);
 			padding-block: var(--_wp-ui-item-padding-block);
 			padding-inline: var(--_wp-ui-item-padding-inline);
-			color: inherit;
+			border-start-start-radius: var(--_wp-ui-item-radius-block-start);
+			border-start-end-radius: var(--_wp-ui-item-radius-block-start);
+			border-end-start-radius: var(--_wp-ui-item-radius-block-end);
+			border-end-end-radius: var(--_wp-ui-item-radius-block-end);
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		/* The rows that meet the top corners of a frame. */
+		.is-joined > .listitem:nth-child(1 of .listitem) > .row,
+		.listitem.has-frame > .row,
+		.row.has-frame {
+			--_wp-ui-item-radius-block-start: var(--_wp-ui-item-inner-radius);
+		}
+
+		/* The rows that meet the bottom corners of a frame. */
+		.is-joined > .listitem:nth-last-child(1 of .listitem) > .row,
+		.listitem.has-frame > .row,
+		.row.has-frame {
+			--_wp-ui-item-radius-block-end: var(--_wp-ui-item-inner-radius);
+		}
+
+		/* A row outside a group is the frame itself, so it takes the outer radius. */
+		.row.has-frame {
+			border-radius: var(--_wp-ui-item-radius);
 		}
 
 		/*
-		 * The row's own control covers the row rather than wrapping it, so
-		 * controls in `Actions` sit above it instead of inside it. Nothing
-		 * interactive is nested, and each keeps its own target.
+		 * Inside `Card.FullBleed` a row has square corners, unless the card
+		 * says that this edge of the `FullBleed` is flush with its own
+		 * rounded corners. The row then follows them, so that its focus
+		 * ring is not clipped at an angle.
+		 */
+		[data-wp-ui-card-fullbleed] > .is-joined > .listitem:nth-child(1 of .listitem) > .row,
+		[data-wp-ui-card-fullbleed] > .row {
+			--_wp-ui-item-radius-block-start: var(--_wp-ui-card-fullbleed-radius-block-start, 0);
+		}
+
+		[data-wp-ui-card-fullbleed] > .is-joined > .listitem:nth-last-child(1 of .listitem) > .row,
+		[data-wp-ui-card-fullbleed] > .row {
+			--_wp-ui-item-radius-block-end: var(--_wp-ui-card-fullbleed-radius-block-end, 0);
+		}
+
+		[data-wp-ui-card-fullbleed] > .row {
+			border-start-start-radius: var(--_wp-ui-item-radius-block-start);
+			border-start-end-radius: var(--_wp-ui-item-radius-block-start);
+			border-end-start-radius: var(--_wp-ui-item-radius-block-end);
+			border-end-end-radius: var(--_wp-ui-item-radius-block-end);
+		}
+
+		/*
+		 * The link or button of the row covers the row; it does not wrap
+		 * it. Controls in `.actions` sit above it, so nothing interactive
+		 * is nested and each control keeps its own target.
 		 */
 		.surface {
+			--_wp-ui-item-surface-radius:
+				var(--_wp-ui-item-radius-block-start)
+				var(--_wp-ui-item-radius-block-start)
+				var(--_wp-ui-item-radius-block-end)
+				var(--_wp-ui-item-radius-block-end);
+			/* The unlayered defense for `a` elements sets a radius of its own. */
+			--_gcd-a-border-radius: var(--_wp-ui-item-surface-radius);
+
 			position: absolute;
 			inset: 0;
-			border-radius: inherit;
-			cursor: var(--wpds-cursor-control);
-			background: none;
+			/* A button does not stretch between its insets on its own. */
+			width: 100%;
+			height: 100%;
 			border: 0;
+			border-radius: var(--_wp-ui-item-surface-radius);
 			padding: 0;
+			background: none;
+			cursor: var(--wpds-cursor-control);
+		}
+
+		.surface[data-disabled] {
+			cursor: default;
 		}
 
 		.is-activatable {
-			transition: background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
-		}
-
-		.is-activatable:hover:not(:has(.actions:hover)) {
-			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-		}
-
-		@media (prefers-reduced-motion: reduce) {
-			.is-activatable {
-				transition: none;
+			@media not (prefers-reduced-motion) {
+				transition: background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
 			}
+		}
+
+		/*
+		 * The row drops its tint while a control in `.actions` is hovered,
+		 * so that the hover style of that control stays visible.
+		 */
+		.is-activatable:hover:not(:has(.actions:hover)):not(:has(.surface[data-disabled])) {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
 		.media {
 			grid-column: 1;
-			grid-row: 1 / -1;
+			grid-row: 1 / span 2;
 			display: inline-flex;
 			align-items: center;
 			margin-inline-end: var(--_wp-ui-item-gap);
@@ -134,18 +210,34 @@
 			grid-column: 2;
 			grid-row: 1;
 			color: inherit;
-			font-weight: var(--wpds-typography-font-weight-emphasis);
 		}
 
+		.row:has(.surface[data-disabled]) .label {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		}
+
+		/*
+		 * Without a description the label takes both rows, as the parts
+		 * around it do, so that it centers against a taller part.
+		 */
+		.row:not(:has(.description)) .label {
+			grid-row: 1 / span 2;
+		}
+
+		/*
+		 * A margin and not a row gap: a row gap would also apply when
+		 * there is no description, and push the label off center.
+		 */
 		.description {
 			grid-column: 2;
 			grid-row: 2;
+			margin-block-start: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.meta {
 			grid-column: 3;
-			grid-row: 1 / -1;
+			grid-row: 1 / span 2;
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
@@ -156,21 +248,22 @@
 
 		.chevron {
 			grid-column: 4;
-			grid-row: 1 / -1;
+			grid-row: 1 / span 2;
 			margin-inline-start: var(--_wp-ui-item-gap);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+		/* A mirror, not a rotation: the new-tab arrow must keep pointing up. */
 		.chevron:dir(rtl) {
-			transform: rotateZ(180deg);
+			transform: scaleX(-1);
 		}
 
-		/* Above the row's own control, so each action keeps its target. */
+		/* Above the link or button of the row, so each control keeps its target. */
 		.actions {
 			position: relative;
 			z-index: 1;
 			grid-column: 4;
-			grid-row: 1 / -1;
+			grid-row: 1 / span 2;
 			display: flex;
 			align-items: center;
 			gap: var(--wpds-dimension-gap-sm);
@@ -180,13 +273,23 @@
 
 	@layer compositions {
 		/*
+		 * The label is a `Text`, which sets a weight of its own in the
+		 * `components` layer. Overriding it from the same layer would
+		 * depend on the order in which the stylesheets load.
+		 */
+		.label {
+			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-emphasis);
+
+			font-weight: var(--wpds-typography-font-weight-emphasis);
+		}
+
+		/*
 		 * The ring is drawn inside the row: the control runs edge to edge,
-		 * and the surface around the group — its own frame, or the `Card`
-		 * supplying one — clips anything drawn outside.
+		 * and the surface around it, its own frame or a `Card`, clips
+		 * anything drawn outside.
 		 *
-		 * `:focus` rather than `:focus-visible`, to match the shared focus
-		 * utility, which draws the ring on `:focus:not(:active)` so a
-		 * pointer press shows it too.
+		 * `:focus` and not `:focus-visible`, to match the shared focus
+		 * utility, which draws the ring on `:focus:not(:active)`.
 		 */
 		.surface:focus {
 			outline-offset: calc(-1 * var(--wpds-border-width-focus));

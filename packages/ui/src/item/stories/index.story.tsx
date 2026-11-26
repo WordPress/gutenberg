@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { download, globe, payment, reset, tool } from '@wordpress/icons';
+import { color, download, globe, reset, tool } from '@wordpress/icons';
 import { Badge } from '../../badge';
 import { Button } from '../../button';
 import * as Card from '../../card';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
-import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Item from '../index';
 
@@ -38,7 +37,7 @@ type Story = StoryObj< typeof Item.Group >;
  */
 export const Default: Story = {
 	args: {
-		'aria-label': 'Where you ship',
+		'aria-label': 'Shipping',
 		children: [
 			<Item.LinkRow href="#zones" key="zones">
 				<Item.Media>
@@ -72,9 +71,9 @@ export const Default: Story = {
  * The three kinds of row: one that navigates, one that runs a command, and
  * one that is static content with controls of its own.
  */
-export const ThreeKindsOfRow: Story = {
+export const RowTypes: Story = {
 	args: {
-		'aria-label': 'Three kinds of row',
+		'aria-label': 'Row types',
 		children: [
 			<Item.LinkRow href="#styles" key="link">
 				<Item.Label>Global Styles</Item.Label>
@@ -90,8 +89,19 @@ export const ThreeKindsOfRow: Story = {
 			<Item.ContentRow key="content">
 				<Item.Label>Soft shadow</Item.Label>
 				<Item.Actions>
-					<Button variant="outline">Edit</Button>
-					<Button variant="minimal" tone="neutral">
+					<Button
+						variant="outline"
+						size="compact"
+						aria-label="Edit soft shadow"
+					>
+						Edit
+					</Button>
+					<Button
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+						aria-label="Remove soft shadow"
+					>
 						Remove
 					</Button>
 				</Item.Actions>
@@ -101,23 +111,28 @@ export const ThreeKindsOfRow: Story = {
 };
 
 /**
- * A row can both be the control and carry controls of its own. The row's
- * control covers the row rather than wrapping it, so nothing interactive is
- * nested and each keeps its own target.
+ * A link or button row can also carry controls of its own. The link or
+ * button of the row covers the row and does not wrap it, so the controls in
+ * `Item.Actions` are not nested inside it and each keeps its own target.
+ *
+ * Name each control for the row it acts on, and leave the chevron out.
  */
-export const ActivatableWithActions: Story = {
+export const ButtonRowWithActions: Story = {
 	args: {
 		'aria-label': 'Background',
 		density: 'compact',
 		children: [
 			<Item.ButtonRow onClick={ () => {} } key="color">
 				<Item.Media>
-					<Icon icon={ payment } />
+					<Icon icon={ color } />
 				</Item.Media>
 				<Item.Label>Color</Item.Label>
+				<Item.Meta>
+					<Text variant="body-sm">#3858e9</Text>
+				</Item.Meta>
 				<Item.Actions>
 					<IconButton
-						label="Reset color"
+						label="Reset background color"
 						icon={ reset }
 						variant="minimal"
 						tone="neutral"
@@ -130,39 +145,54 @@ export const ActivatableWithActions: Story = {
 };
 
 /**
- * Entries on separate surfaces are a group per entry, stacked. The group
- * has no variant for it: a frame around one row is a group of one.
+ * In a `detached` group each row has its own frame. It is still one list.
+ * Use it when each row is a self-contained object, such as a connector
+ * with its own status and actions.
  */
-export const OnSeparateSurfaces: StoryObj< typeof Item.Group > = {
-	render: () => (
-		<Stack direction="column" gap="md">
-			{ [
-				[
-					'Akismet Anti-spam',
-					'Protect your site from spam.',
-					'Set up',
-				],
-				[ 'Anthropic', 'Text generation with Claude.', 'Install' ],
-			].map( ( [ label, description, action ] ) => (
-				<Item.Group aria-label={ label } key={ label }>
-					<Item.ContentRow>
-						<Item.Label>{ label }</Item.Label>
-						<Item.Description>{ description }</Item.Description>
-						<Item.Actions>
-							<Button variant="outline" size="compact">
-								{ action }
-							</Button>
-						</Item.Actions>
-					</Item.ContentRow>
-				</Item.Group>
-			) ) }
-		</Stack>
-	),
+export const Detached: Story = {
+	args: {
+		'aria-label': 'Connectors',
+		variant: 'detached',
+		children: [
+			<Item.ContentRow key="akismet">
+				<Item.Label>Akismet Anti-spam</Item.Label>
+				<Item.Description>
+					Protect your site from spam.
+				</Item.Description>
+				<Item.Actions>
+					<Button
+						variant="outline"
+						size="compact"
+						aria-label="Set up Akismet Anti-spam"
+					>
+						Set up
+					</Button>
+				</Item.Actions>
+			</Item.ContentRow>,
+			<Item.ContentRow key="anthropic">
+				<Item.Label>Anthropic</Item.Label>
+				<Item.Description>
+					Text generation with Claude.
+				</Item.Description>
+				<Item.Actions>
+					<Button
+						variant="outline"
+						size="compact"
+						aria-label="Install Anthropic"
+					>
+						Install
+					</Button>
+				</Item.Actions>
+			</Item.ContentRow>,
+		],
+	},
 };
 
 /**
- * Inside a `Card`, the card supplies the frame. The group draws a line
- * above itself when something precedes it there, and none when it is alone.
+ * Inside a `Card`, place the group in a `Card.FullBleed` inside
+ * `Card.Content`. The rows then run from edge to edge and the card is the
+ * frame: the group keeps only a line above its first row, which separates
+ * it from the card header.
  */
 export const InsideACard: Story = {
 	render: ( args ) => (
@@ -175,12 +205,15 @@ export const InsideACard: Story = {
 					Connect the services that process payments.
 				</Text>
 			</Card.Header>
-			<Item.Group { ...args } />
+			<Card.Content>
+				<Card.FullBleed>
+					<Item.Group { ...args } />
+				</Card.FullBleed>
+			</Card.Content>
 		</Card.Root>
 	),
 	args: {
 		'aria-labelledby': 'gateways',
-		frame: false,
 		children: [
 			<Item.LinkRow href="#card" key="card">
 				<Item.Label>Card payments</Item.Label>
@@ -201,12 +234,13 @@ export const InsideACard: Story = {
 };
 
 /**
- * A row works on its own, with no group around it. It renders its element
- * and nothing more, so it is not announced as a list of one.
+ * A row works on its own, with no group around it, for something that is
+ * always a single item. It draws its own frame and is not announced as a
+ * list. For a list that can happen to hold one item, keep the `Item.Group`.
  */
 export const Standalone: StoryObj< typeof Item.LinkRow > = {
-	render: () => (
-		<Item.LinkRow href="#billing">
+	render: ( args ) => (
+		<Item.LinkRow { ...args }>
 			<Item.Media>
 				<Icon icon={ download } />
 			</Item.Media>
@@ -217,4 +251,7 @@ export const Standalone: StoryObj< typeof Item.LinkRow > = {
 			<Item.Chevron />
 		</Item.LinkRow>
 	),
+	args: {
+		href: '#billing',
+	},
 };

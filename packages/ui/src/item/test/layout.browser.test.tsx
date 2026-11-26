@@ -1,0 +1,182 @@
+import { describe, expect, it } from 'vitest';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
+import { Button } from '../../button';
+import * as Card from '../../card';
+import * as Item from '../index';
+
+function elementAtCenterOf( element: Element ) {
+	const { left, top, width, height } = element.getBoundingClientRect();
+	return document.elementFromPoint( left + width / 2, top + height / 2 );
+}
+
+describe( 'Item layout', () => {
+	it( 'makes the whole row the target of its button, and keeps the actions on top', async () => {
+		await render(
+			<Item.Group aria-label="Background">
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Label>Color</Item.Label>
+					<Item.Description>
+						The color behind the content.
+					</Item.Description>
+					<Item.Actions>
+						<Button size="compact">Reset background color</Button>
+					</Item.Actions>
+				</Item.ButtonRow>
+			</Item.Group>
+		);
+
+		const row = screen.getByRole( 'button', { name: 'Color' } );
+		const action = screen.getByRole( 'button', {
+			name: 'Reset background color',
+		} );
+
+		// The button of the row covers the static parts of the row.
+		expect(
+			elementAtCenterOf(
+				screen.getByText( 'The color behind the content.' )
+			)
+		).toBe( row );
+		// The action is above the button of the row, not under it.
+		expect( action ).toContainElement(
+			elementAtCenterOf( action ) as HTMLElement
+		);
+
+		const rowRect = row.getBoundingClientRect();
+		const listRect = screen.getByRole( 'listitem' ).getBoundingClientRect();
+		expect( rowRect.width ).toBe( listRect.width );
+		expect( rowRect.height ).toBe( listRect.height );
+	} );
+
+	it( 'rounds the control of the first and of the last row to follow the frame', async () => {
+		await render(
+			<Item.Group aria-label="Shipping">
+				<Item.LinkRow href="#zones">
+					<Item.Label>Zones</Item.Label>
+				</Item.LinkRow>
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Label>Recalculate</Item.Label>
+				</Item.ButtonRow>
+			</Item.Group>
+		);
+
+		// The focus ring follows these radii. A square ring would be
+		// clipped by the rounded corners of the frame.
+		const first = getComputedStyle(
+			screen.getByRole( 'link', { name: 'Zones' } )
+		);
+		expect( first.borderStartStartRadius ).not.toBe( '0px' );
+		expect( first.borderStartEndRadius ).not.toBe( '0px' );
+		expect( first.borderEndStartRadius ).toBe( '0px' );
+		expect( first.borderEndEndRadius ).toBe( '0px' );
+
+		const last = getComputedStyle(
+			screen.getByRole( 'button', { name: 'Recalculate' } )
+		);
+		expect( last.borderStartStartRadius ).toBe( '0px' );
+		expect( last.borderStartEndRadius ).toBe( '0px' );
+		expect( last.borderEndStartRadius ).not.toBe( '0px' );
+		expect( last.borderEndEndRadius ).not.toBe( '0px' );
+	} );
+
+	it( 'leaves the frame to the card inside `Card.FullBleed`, and keeps a line above the first row', async () => {
+		await render(
+			<>
+				<Item.Group aria-label="On its own">
+					<Item.LinkRow href="#zones">
+						<Item.Label>Zones</Item.Label>
+					</Item.LinkRow>
+				</Item.Group>
+				<Card.Root>
+					<Card.Header>
+						<Card.Title>Payment gateways</Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<Card.FullBleed>
+							<Item.Group aria-label="In a card">
+								<Item.LinkRow href="#card">
+									<Item.Label>Card payments</Item.Label>
+								</Item.LinkRow>
+							</Item.Group>
+						</Card.FullBleed>
+					</Card.Content>
+				</Card.Root>
+			</>
+		);
+
+		const onItsOwn = getComputedStyle(
+			screen.getByRole( 'list', { name: 'On its own' } )
+		);
+		expect( onItsOwn.borderBlockStartWidth ).not.toBe( '0px' );
+		expect( onItsOwn.borderInlineStartWidth ).not.toBe( '0px' );
+		expect( onItsOwn.borderBlockEndWidth ).not.toBe( '0px' );
+		expect( onItsOwn.borderStartStartRadius ).not.toBe( '0px' );
+
+		const inCard = getComputedStyle(
+			screen.getByRole( 'list', { name: 'In a card' } )
+		);
+		// The line that separates the rows from the card header.
+		expect( inCard.borderBlockStartWidth ).not.toBe( '0px' );
+		expect( inCard.borderInlineStartWidth ).toBe( '0px' );
+		expect( inCard.borderBlockEndWidth ).toBe( '0px' );
+		expect( inCard.borderStartStartRadius ).toBe( '0px' );
+		const link = getComputedStyle(
+			screen.getByRole( 'link', { name: 'Card payments' } )
+		);
+		// The top of the row is under the card header, in the middle of
+		// the card.
+		expect( link.borderStartStartRadius ).toBe( '0px' );
+		// The bottom of the row is flush with the bottom of the card. It
+		// follows the corners of the card, so that the card does not clip
+		// the focus ring at an angle.
+		expect( link.borderEndStartRadius ).not.toBe( '0px' );
+		expect( link.borderEndEndRadius ).not.toBe( '0px' );
+	} );
+
+	it( 'draws a frame around a row outside a group', async () => {
+		await render(
+			<Item.ContentRow data-testid="row">
+				<Item.Label>Billing history</Item.Label>
+			</Item.ContentRow>
+		);
+
+		expect(
+			getComputedStyle( screen.getByTestId( 'row' ) ).borderTopWidth
+		).not.toBe( '0px' );
+	} );
+
+	it( 'draws one frame around a joined group, and one around each row of a detached group', async () => {
+		await render(
+			<>
+				<Item.Group aria-label="Joined">
+					<Item.ContentRow>
+						<Item.Label>First</Item.Label>
+					</Item.ContentRow>
+				</Item.Group>
+				<Item.Group aria-label="Detached" variant="detached">
+					<Item.ContentRow>
+						<Item.Label>Second</Item.Label>
+					</Item.ContentRow>
+				</Item.Group>
+			</>
+		);
+
+		const joined = screen.getByRole( 'list', { name: 'Joined' } );
+		const detached = screen.getByRole( 'list', { name: 'Detached' } );
+		const [ joinedItem, detachedItem ] = screen.getAllByRole( 'listitem' );
+
+		expect( getComputedStyle( joined ).borderInlineStartWidth ).not.toBe(
+			'0px'
+		);
+		expect( getComputedStyle( joinedItem ).borderInlineStartWidth ).toBe(
+			'0px'
+		);
+		expect( getComputedStyle( detached ).borderInlineStartWidth ).toBe(
+			'0px'
+		);
+		expect(
+			getComputedStyle( detachedItem ).borderInlineStartWidth
+		).not.toBe( '0px' );
+	} );
+} );

@@ -1,67 +1,112 @@
+import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import {
 	forwardRef,
 	useCallback,
+	useContext,
+	useEffect,
 	useId,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
-import type { ReactNode } from 'react';
-import { Button as UIButton } from '../button';
-import { Link as UILink } from '../link';
+import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
+import type { ReactElement } from 'react';
+import { Button } from '../button';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
+import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
-import { RowContext, useGroupContext } from './context';
-import type { RowContextValue } from './context';
-import type { ButtonRowProps, ContentRowProps, LinkRowProps } from './types';
+import { GroupContext, RowContext } from './context';
+import type { RowContextValue, RowPart } from './context';
+import type {
+	ButtonRowProps,
+	ContentRowProps,
+	Density,
+	LinkRowProps,
+} from './types';
 
-function join( ...ids: ( string | false | undefined )[] ) {
-	const present = ids.filter( Boolean );
-	return present.length ? present.join( ' ' ) : undefined;
+function join( ...ids: ( string | false )[] ) {
+	return ids.filter( Boolean ).join( ' ' ) || undefined;
 }
 
+type RowOptions = {
+	/**
+	 * Whether the row itself is a link or a button.
+	 */
+	isActivatable: boolean;
+	/**
+	 * Whether the row is a link that opens in a new tab.
+	 */
+	opensInNewTab?: boolean;
+	density?: Density;
+};
+
 /**
- * The labelling a row shares with its parts, and the list item it wears
- * inside a group.
+ * What the three kinds of row share: the context for their parts, the
+ * labelling of their control, their class names, and the list item they
+ * wear inside a group.
  */
-function useRow() {
-	const { inGroup, density } = useGroupContext();
+function useRow( {
+	isActivatable,
+	opensInNewTab = false,
+	density: densityProp = 'comfortable',
+}: RowOptions ) {
+	const group = useContext( GroupContext );
+	const density = group?.density ?? densityProp;
+
 	const id = useId();
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
 	const metaId = `${ id }-meta`;
+	const newTabNoticeId = `${ id }-new-tab`;
 
+	// The label and the chevron are tracked in a ref, not in state. Nothing
+	// is rendered from them; they only feed the warnings below.
+	const warnedPartsRef = useRef( { label: false, chevron: false } );
 	const [ parts, setParts ] = useState( {
-		label: false,
 		description: false,
 		meta: false,
 		actions: false,
 	} );
 
-	const register = useCallback(
-		( part: 'label' | 'description' | 'meta' | 'actions' ) => {
-			setParts( ( current ) => ( { ...current, [ part ]: true } ) );
-			return () =>
-				setParts( ( current ) => ( { ...current, [ part ]: false } ) );
-		},
-		[]
-	);
+	const register = useCallback( ( part: RowPart ) => {
+		if ( part === 'label' || part === 'chevron' ) {
+			warnedPartsRef.current[ part ] = true;
+			return () => {
+				warnedPartsRef.current[ part ] = false;
+			};
+		}
 
-	// A control inside the row is described by the row it belongs to, so
-	// "Reset" is announced as "Reset, Background". The meta is left out: it
-	// describes the row, not what the control will do.
-	const actionDescribedBy = join(
-		parts.label && labelId,
-		parts.description && descriptionId
-	);
+		setParts( ( current ) => ( { ...current, [ part ]: true } ) );
+		return () =>
+			setParts( ( current ) => ( { ...current, [ part ]: false } ) );
+	}, [] );
 
-	const context = useMemo(
+	useEffect( () => {
+		// The effects of the parts run before this one, so the parts of
+		// the row have registered themselves by now.
+		if ( isActivatable && ! warnedPartsRef.current.label ) {
+			warning(
+				'Item: an <Item.LinkRow> or <Item.ButtonRow> needs an <Item.Label>. Without it the link or button of the row has no accessible name.'
+			);
+		}
+		if ( opensInNewTab && ! warnedPartsRef.current.chevron ) {
+			warning(
+				'Item: an <Item.LinkRow> that opens in a new tab needs an <Item.Chevron>. It shows the new-tab arrow in place of the chevron.'
+			);
+		}
+	}, [ isActivatable, opensInNewTab ] );
+
+	const context = useMemo< RowContextValue >(
 		() => ( {
 			labelId,
 			descriptionId,
 			metaId,
 			register,
-			actionDescribedBy,
+			isActivatable,
+			opensInNewTab,
 			hasActions: parts.actions,
 		} ),
 		[
@@ -69,78 +114,77 @@ function useRow() {
 			descriptionId,
 			metaId,
 			register,
-			actionDescribedBy,
+			isActivatable,
+			opensInNewTab,
 			parts.actions,
 		]
 	);
 
 	/**
-	 * What names the row's own control. The control is an empty element
-	 * covering the row, so its name has to come from the label rendered
-	 * beside it rather than from its own content.
+	 * What names and describes the control of an activatable row. The
+	 * control is an empty element that covers the row, so both come from
+	 * the parts rendered beside it.
 	 */
 	const labelling = {
-		'aria-labelledby': parts.label ? labelId : undefined,
+		// The new-tab notice is part of the name, as it is in `Link`.
+		'aria-labelledby': join( labelId, opensInNewTab && newTabNoticeId ),
 		'aria-describedby': join(
 			parts.description && descriptionId,
 			parts.meta && metaId
 		),
 	};
 
-	return { context, density, inGroup, labelling };
-}
+	const className = clsx(
+		defenseStyles.div,
+		resetStyles[ 'box-sizing' ],
+		styles.row,
+		styles[ `is-${ density }` ],
+		isActivatable && styles[ 'is-activatable' ],
+		// Inside a group, the group or the list item draws the frame.
+		! group && styles[ 'has-frame' ]
+	);
 
-/**
- * The row itself: its parts, the context they share, and the list item it
- * wears inside a group.
- */
-type RowBoxProps = Omit<
-	React.HTMLAttributes< HTMLDivElement >,
-	'children' | 'className'
-> & {
-	children: ReactNode;
-	className?: string;
-	context: RowContextValue;
-	density: string;
-	inGroup: boolean;
-};
+	// Inside a group the row is one of a list, so it wears a list item.
+	// On its own it is only the row.
+	function wrap( row: ReactElement ) {
+		const content = (
+			<RowContext.Provider value={ context }>{ row }</RowContext.Provider>
+		);
 
-const Row = forwardRef< HTMLDivElement, RowBoxProps >( function ItemRowBox(
-	{ children, className, context, density, inGroup, ...props },
-	ref
-) {
-	const row = (
-		<RowContext.Provider value={ context }>
-			<div
-				ref={ ref }
+		if ( ! group ) {
+			return content;
+		}
+
+		return (
+			<li
 				className={ clsx(
-					defenseStyles.div,
-					styles.row,
-					styles[ `is-${ density }` ],
-					className
+					defenseStyles.li,
+					styles.listitem,
+					group.variant === 'detached' && styles[ 'has-frame' ]
 				) }
-				{ ...props }
 			>
-				{ children }
-			</div>
-		</RowContext.Provider>
-	);
+				{ content }
+			</li>
+		);
+	}
 
-	// In a group the row is one of a set, so it wears a list item. On its
-	// own it is just the row.
-	return inGroup ? (
-		<li className={ clsx( defenseStyles.li, styles.listitem ) }>{ row }</li>
-	) : (
-		row
-	);
-} );
+	return { className, labelling, newTabNoticeId, wrap };
+}
 
 /**
  * A row that takes you somewhere. The whole row is the link.
  *
- * The link is an empty element covering the row rather than a wrapper
- * around it, so controls in `Item.Actions` sit above it instead of inside
- * it. Nothing interactive is nested, and each control keeps its own target.
+ * The link is an empty element that covers the row; it does not wrap the
+ * row. Controls in `Item.Actions` sit above it, so nothing interactive is
+ * nested and each control keeps its own target.
+ *
+ * `className` and `style` apply to the row. The `ref`, the `render` prop
+ * and all other props apply to the link. Use `render` to compose the row
+ * with a router link.
+ *
+ * With `openInNewTab`, or with `target="_blank"`, the row tells assistive
+ * technology that it opens in a new tab, and its `Item.Chevron` shows the
+ * new-tab arrow.
  *
  * ```jsx
  * <Item.LinkRow href="/styles">
@@ -152,84 +196,121 @@ const Row = forwardRef< HTMLDivElement, RowBoxProps >( function ItemRowBox(
  */
 export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
 	function ItemLinkRow(
-		{ children, className, href, rel, target, onClick, ...props },
+		{
+			children,
+			className,
+			density,
+			openInNewTab = false,
+			render,
+			style,
+			target,
+			...props
+		},
 		ref
 	) {
-		const { context, density, inGroup, labelling } = useRow();
+		const opensInNewTab = openInNewTab || /^_blank$/i.test( target ?? '' );
+		const row = useRow( { isActivatable: true, opensInNewTab, density } );
 
-		return (
-			<Row
-				className={ clsx( styles[ 'is-activatable' ], className ) }
-				context={ context }
-				density={ density }
-				inGroup={ inGroup }
-			>
-				<UILink
-					ref={ ref }
-					variant="unstyled"
-					className={ styles.surface }
-					href={ href }
-					target={ target }
-					rel={ rel }
-					onClick={ onClick }
-					{ ...labelling }
-					{ ...props }
-				/>
+		const link = useRender( {
+			defaultTagName: 'a',
+			render,
+			ref,
+			props: mergeProps< 'a' >( row.labelling, props, {
+				target: target ?? ( openInNewTab ? '_blank' : undefined ),
+				className: clsx(
+					defenseStyles.a,
+					focusStyles[ 'outset-ring--focus-except-active' ],
+					styles.surface
+				),
+			} ),
+		} );
+
+		return row.wrap(
+			<div className={ clsx( row.className, className ) } style={ style }>
+				{ link }
+				{ opensInNewTab && (
+					// Hidden, so that it is read only as part of the name
+					// of the link, which references it.
+					<span id={ row.newTabNoticeId } hidden>
+						{
+							/* translators: accessibility text appended to link text */
+							__( '(opens in a new tab)' )
+						}
+					</span>
+				) }
 				{ children }
-			</Row>
+			</div>
 		);
 	}
 );
 
 /**
- * A row that runs a command. The whole row is the button, drawn the same
- * way as `Item.LinkRow`.
+ * A row that runs a command, or that opens a popup. The whole row is the
+ * button.
+ *
+ * The button is an empty element that covers the row; it does not wrap the
+ * row. Controls in `Item.Actions` sit above it, so nothing interactive is
+ * nested and each control keeps its own target.
+ *
+ * `className` and `style` apply to the row. The `ref`, the `render` prop
+ * and all other props apply to the button.
+ *
+ * ```jsx
+ * <Item.ButtonRow onClick={ openColorPicker }>
+ * 	<Item.Label>Background</Item.Label>
+ * 	<Item.Actions>
+ * 		<IconButton icon={ reset } label="Reset background color" />
+ * 	</Item.Actions>
+ * </Item.ButtonRow>
+ * ```
  */
 export const ButtonRow = forwardRef< HTMLButtonElement, ButtonRowProps >(
-	function ItemButtonRow( { children, className, onClick, ...props }, ref ) {
-		const { context, density, inGroup, labelling } = useRow();
+	function ItemButtonRow(
+		{ children, className, density, style, ...props },
+		ref
+	) {
+		const row = useRow( { isActivatable: true, density } );
 
-		return (
-			<Row
-				className={ clsx( styles[ 'is-activatable' ], className ) }
-				context={ context }
-				density={ density }
-				inGroup={ inGroup }
-			>
-				<UIButton
+		return row.wrap(
+			<div className={ clsx( row.className, className ) } style={ style }>
+				<Button
 					ref={ ref }
 					variant="unstyled"
-					className={ styles.surface }
-					onClick={ onClick }
-					{ ...labelling }
+					{ ...row.labelling }
 					{ ...props }
+					className={ styles.surface }
 				/>
 				{ children }
-			</Row>
+			</div>
 		);
 	}
 );
 
 /**
- * A row of static content whose controls are its own. The row is not a
- * target, so clicking the label does nothing.
+ * A row of static content. The row is not a target: only the controls in
+ * its `Item.Actions` are interactive.
+ *
+ * ```jsx
+ * <Item.ContentRow>
+ * 	<Item.Label>Soft shadow</Item.Label>
+ * 	<Item.Actions>
+ * 		<Button variant="outline">Edit</Button>
+ * 	</Item.Actions>
+ * </Item.ContentRow>
+ * ```
  */
 export const ContentRow = forwardRef< HTMLDivElement, ContentRowProps >(
-	function ItemContentRow( { children, className, ...props }, ref ) {
-		const { context, density, inGroup } = useRow();
+	function ItemContentRow( { density, render, ...props }, ref ) {
+		const row = useRow( { isActivatable: false, density } );
 
-		return (
-			<Row
-				ref={ ref }
-				className={ className }
-				context={ context }
-				density={ density }
-				inGroup={ inGroup }
-				{ ...props }
-			>
-				{ children }
-			</Row>
-		);
+		const element = useRender( {
+			defaultTagName: 'div',
+			render,
+			ref,
+			props: mergeProps< 'div' >( { className: row.className }, props ),
+		} );
+
+		return row.wrap( element );
 	}
 );
 

@@ -1,43 +1,41 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { Density } from './types';
+import type { Density, GroupVariant } from './types';
 
 export type GroupContextValue = {
-	/**
-	 * Whether a row is inside a group, in which case it wraps itself in a
-	 * list item. On its own a row renders its element and nothing more.
-	 */
-	inGroup: boolean;
 	density: Density;
+	variant: GroupVariant;
 };
 
-export const GroupContext = createContext< GroupContextValue >( {
-	inGroup: false,
-	density: 'comfortable',
-} );
+/**
+ * `null` outside an `Item.Group`. A row then renders no list item and uses
+ * its own `density` prop.
+ */
+export const GroupContext = createContext< GroupContextValue | null >( null );
 
-export function useGroupContext() {
-	return useContext( GroupContext );
-}
+export type RowPart = 'label' | 'description' | 'meta' | 'actions' | 'chevron';
 
 export type RowContextValue = {
 	labelId: string;
 	descriptionId: string;
 	metaId: string;
 	/**
-	 * Called by a part when it mounts, so the row knows which of its
-	 * labelling parts exist. Returns the matching unregister.
+	 * Called by a part when it mounts, so the row knows which of its parts
+	 * exist. Returns the matching unregister.
 	 */
-	register: (
-		part: 'label' | 'description' | 'meta' | 'actions'
-	) => () => void;
+	register: ( part: RowPart ) => () => void;
 	/**
-	 * The ids that describe a control inside the row: its label and its
-	 * description, so "Edit" is announced as "Edit, Soft shadow".
+	 * Whether the row itself is a link or a button. Its label is then
+	 * exposed to assistive technology only as the name of that control.
 	 */
-	actionDescribedBy: string | undefined;
+	isActivatable: boolean;
+	/**
+	 * Whether the row is a link that opens in a new tab. Its chevron then
+	 * shows the new-tab arrow.
+	 */
+	opensInNewTab: boolean;
 	/**
 	 * Whether the row holds controls of its own. A row with controls should
-	 * not also show a chevron: the glyph reads as belonging to the button
+	 * not also show a chevron: the glyph reads as belonging to the control
 	 * beside it rather than to the row.
 	 */
 	hasActions: boolean;
