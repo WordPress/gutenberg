@@ -14,6 +14,8 @@ import {
 	parseSeedColor,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { buildForegroundScale } from './build-foreground-scale.ts';
+import { buildPerceptualSteps } from './build-perceptual-steps.ts';
 import {
 	sortByDependency,
 	getContrastReferences,
@@ -23,12 +25,14 @@ import {
 	solveWithBisect,
 } from './utils.ts';
 import type {
+	BaseRamp,
+	BaseRampStep,
 	FollowDirection,
-	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
 	ReferenceName,
+	RampStepsConfig,
 } from './types.ts';
 import {
 	BLACK,
@@ -38,7 +42,7 @@ import {
 } from './constants.ts';
 
 /**
- * Calculate a complete color ramp based on the provided configuration.
+ * Calculate the base color ramp before perceptual reconstruction.
  *
  * @param params                       - The calculation parameters
  * @param params.seed                  - The base color to build the ramp from
@@ -62,17 +66,17 @@ function calculateRamp( {
 	pinLightness,
 }: {
 	seed: PlainColorObject;
-	sortedSteps: ( keyof Ramp )[];
-	config: RampConfig;
+	sortedSteps: BaseRampStep[];
+	config: RampStepsConfig;
 	mainDir: RampDirection;
 	oppDir: RampDirection;
 	neutralSurface?: PlainColorObject;
 	pinLightness?: {
-		stepName: keyof Ramp;
+		stepName: BaseRampStep;
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record< keyof Ramp, string >;
+	const rampResults = {} as BaseRamp;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -274,24 +278,40 @@ function calculateRamp( {
 	};
 }
 
+type BuildRampOptions = {
+	mainDirection?: RampDirection;
+	neutralSurface?: string;
+	pinLightness?: { stepName: BaseRampStep; value: number };
+	backgroundRamp?: RampResult;
+	rescaleToFitContrastTargets?: boolean;
+};
+
+/**
+ * Solve base constraints, rebuild surfaces and strokes, then position the
+ * foreground scale. Seed lightness may shift to make the base constraints fit.
+ *
+ * @param seedArg                             Original opaque sRGB seed string.
+ * @param rampConfig                          Base constraints and foreground policy.
+ * @param options                             Direction, seed adjustment, and background.
+ * @param options.mainDirection               Main ramp direction override.
+ * @param options.neutralSurface              Neutral surface with the least contrast headroom.
+ * @param options.pinLightness                Optional pinned step lightness.
+ * @param options.backgroundRamp              Background behind an accent ramp.
+ * @param options.rescaleToFitContrastTargets Whether seed rescaling is allowed.
+ * @return Generated colors, direction, and any remaining ramp warnings.
+ */
 export function buildRamp(
 	seedArg: string,
-	config: RampConfig,
+	rampConfig: RampConfig,
 	{
 		mainDirection,
 		neutralSurface: neutralSurfaceColor,
 		pinLightness,
+		backgroundRamp,
 		rescaleToFitContrastTargets = true,
-	}: {
-		mainDirection?: RampDirection;
-		neutralSurface?: string;
-		pinLightness?: {
-			stepName: keyof Ramp;
-			value: number;
-		};
-		rescaleToFitContrastTargets?: boolean;
-	} = {}
+	}: BuildRampOptions = {}
 ): RampResult {
+	const { steps: config, foregroundScale } = rampConfig;
 	// Parse and validate here: the single point where user-supplied color strings enter.
 	const parsedSeed = parseSeedColor( seedArg );
 	const neutralSurface = neutralSurfaceColor
@@ -341,7 +361,7 @@ export function buildRamp(
 		} );
 
 	function getWarnings(
-		ramp: Ramp,
+		ramp: BaseRamp,
 		candidate: PlainColorObject,
 		steps = sortedSteps
 	) {
@@ -377,7 +397,7 @@ export function buildRamp(
 			: stepsForStep( maxDeficitStep!, config );
 
 		const seedL = get( seed, [ OKLCH, 'l' ] );
-		let passing: { seed: PlainColorObject; ramp: Ramp } | undefined;
+		let passing: { seed: PlainColorObject; ramp: BaseRamp } | undefined;
 
 		function getSeedForL( l: number ): PlainColorObject {
 			const color = clampToGamut(
@@ -440,7 +460,7 @@ export function buildRamp(
 			const searched = passing;
 			// The first passing sample can be far from the supplied seed. Narrow
 			// the gap to the closest passing seed, checking only `steps`.
-			const refine = ( steps: ( keyof Ramp )[] ) => {
+			const refine = ( steps: BaseRampStep[] ) => {
 				let closest = searched;
 				let failingL = seedL;
 				let passingL = get( closest.seed, [ OKLCH, 'l' ] );
@@ -529,9 +549,18 @@ export function buildRamp(
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return {
-		ramp: bestRamp,
-		warnings: warnings.length ? warnings : undefined,
-		direction: mainDir,
-	};
+	const rampResult = buildPerceptualSteps(
+		{
+			ramp: bestRamp,
+			warnings: warnings.length ? warnings : undefined,
+			direction: mainDir,
+		},
+		backgroundRamp
+	);
+
+	return buildForegroundScale(
+		rampResult,
+		backgroundRamp ?? rampResult,
+		foregroundScale
+	);
 }

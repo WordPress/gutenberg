@@ -252,7 +252,11 @@ function IdentityWidget() {
 			<strong style={ { fontSize: '1.25em' } }>
 				{ title ?? 'Untitled' }
 			</strong>
-			<span style={ { opacity: 0.75 } }>
+			<span
+				style={ {
+					color: 'var(--wpds-color-foreground-content-info-weak)',
+				} }
+			>
 				{ title
 					? `Accessible name: ${ accessibleName }`
 					: 'No identity provided' }

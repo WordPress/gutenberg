@@ -20,6 +20,16 @@
 			text-wrap: pretty;
 		}
 
+		.heading-2xl,
+		.heading-xl,
+		.heading-lg,
+		.heading-md,
+		.heading-sm {
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-strong);
+
+			color: var(--wpds-color-foreground-content-neutral-strong);
+		}
+
 		/* Interpolating the prefix lets Sass emit the mixin's declarations as
 		   custom properties shared by Text and the global CSS defenses. */
 		.heading-2xl {

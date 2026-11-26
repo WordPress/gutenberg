@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other high-emphasis text ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+
 ### Enhancements
 
+-   Generate perceptually balanced color ramps with distinct resting and active foregrounds across light and dark themes. Brand and status text keep more of their color on dark and tinted surfaces ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 -   Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Preserve saturated background colors in neighboring surfaces and neutral strokes, including page and menu dividers ([#87175](https://github.com/WordPress/gutenberg/pull/87175)).
 

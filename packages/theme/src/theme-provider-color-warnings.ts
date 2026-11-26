@@ -18,7 +18,8 @@ export type ThemeProviderColorWarning =
 	| {
 			type: 'ramp';
 			ramp: ThemeProviderColorRampName;
-			step: keyof Ramp;
+			// Keep the retired step in the published callback type.
+			step: keyof Ramp | 'fgSurface1';
 	  }
 	| {
 			type: 'contrast';
@@ -30,6 +31,13 @@ export type ThemeProviderColorWarning =
 			achievedContrast: number;
 	  };
 
+/**
+ * Combine ramp warnings with WCAG checks for listed semantic text/background
+ * pairs. Missing pairs are skipped; this does not test every token combination.
+ *
+ * @param ramps       Generated ramps and their remaining step warnings.
+ * @param colorValues Semantic CSS custom properties and serialized colors.
+ */
 export function collectThemeProviderColorWarnings(
 	ramps: ReadonlyMap< ThemeProviderColorRampName, RampResult >,
 	colorValues: ReadonlyMap< string, string >

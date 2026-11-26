@@ -38,7 +38,7 @@
 	h2 {
 		font-size: var(--wpds-typography-font-size-md);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral-strong);
 		margin-bottom: 1.5em;
 	}
 
@@ -47,7 +47,7 @@
 		font-size: 11px;
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral-strong);
 		margin-bottom: 1.5em;
 	}
 

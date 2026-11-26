@@ -51,6 +51,6 @@ describe( 'token fallback generation', () => {
 		).toBe( 'var(--wp-admin-theme-color, #3858e9)' );
 		expect(
 			fallbacks[ '--wpds-color-background-interactive-brand-strong' ]
-		).toBe( '#f3f3f3' );
+		).toBe( source[ 'wpds-color' ].primitive.bg.surface1.$value.hex );
 	} );
 } );

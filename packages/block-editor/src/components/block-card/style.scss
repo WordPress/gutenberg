@@ -36,6 +36,10 @@
 	}
 }
 
+h2.block-editor-block-card__title {
+	color: var(--wpds-color-foreground-content-neutral-strong);
+}
+
 .block-editor-block-card__name {
 	padding: 3px 0; // This makes the title as high as the icon.
 }

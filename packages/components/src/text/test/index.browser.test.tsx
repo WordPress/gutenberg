@@ -62,15 +62,22 @@ describe( 'Text', () => {
 		).toBe( '15px' );
 	} );
 
-	test( 'should render variant', async () => {
+	test( 'should render the muted variant with the weak content color', async () => {
 		await render(
-			<Text role="heading" variant="muted">
-				Lorem ipsum.
-			</Text>
+			<>
+				<span
+					style={ {
+						color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					} }
+				>
+					Reference
+				</span>
+				<Text variant="muted">Lorem ipsum.</Text>
+			</>
 		);
-		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			'rgb(110, 110, 110)'
-		);
+		expect(
+			getComputedStyle( screen.getByText( 'Lorem ipsum.' ) ).color
+		).toBe( getComputedStyle( screen.getByText( 'Reference' ) ).color );
 	} );
 
 	test( 'should render as another element', async () => {
@@ -124,7 +131,7 @@ describe( 'Text', () => {
 		);
 
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			'rgb(110, 110, 110)'
+			getComputedStyle( screen.getByRole( 'note' ) ).color
 		);
 	} );
 
