@@ -260,5 +260,55 @@ describe( 'MoreMenuItem', () => {
 			expect( dashicon ).toBeVisible();
 			expect( dashicon ).toHaveClass( 'dashicons-editor-kitchensink' );
 		} );
+
+		it( 'makes an SVG icon without a fill follow the text color', async () => {
+			const user = userEvent.setup();
+			renderMenu(
+				<MoreMenuItem
+					icon={
+						<svg viewBox="0 0 24 24">
+							<path d="M0 0h24v24H0z" />
+						</svg>
+					}
+				>
+					Plain
+				</MoreMenuItem>
+			);
+			await openMenu( user );
+
+			const item = screen.getByRole( 'menuitem', { name: 'Plain' } );
+			// The icon is decorative and has no role to find it by.
+			// eslint-disable-next-line testing-library/no-node-access
+			const svg = item.querySelector( 'svg' );
+
+			expect( svg ).toHaveAttribute( 'fill', 'currentColor' );
+		} );
+
+		it( 'keeps the fill an SVG icon sets itself', async () => {
+			const user = userEvent.setup();
+			renderMenu(
+				<MoreMenuItem
+					icon={
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+						>
+							<path d="M0 0h24v24H0z" />
+						</svg>
+					}
+				>
+					Outline
+				</MoreMenuItem>
+			);
+			await openMenu( user );
+
+			const item = screen.getByRole( 'menuitem', { name: 'Outline' } );
+			// The icon is decorative and has no role to find it by.
+			// eslint-disable-next-line testing-library/no-node-access
+			const svg = item.querySelector( 'svg' );
+
+			expect( svg ).toHaveAttribute( 'fill', 'none' );
+		} );
 	} );
 } );

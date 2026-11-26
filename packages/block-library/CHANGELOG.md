@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
@@ -16,6 +17,8 @@
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
 -   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
 -   Gallery: In a multiselection, hide the settings that only apply to the first gallery, such as Link, Detach, Source, Order by, Resolution, Open images in new tab, and Aspect ratio ([#87374](https://github.com/WordPress/gutenberg/pull/87374)).
+-   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
+-   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
 -   Table: Preserve captions when converting pasted HTML into blocks ([#85439](https://github.com/WordPress/gutenberg/pull/85439)).
 
 ### Internal
