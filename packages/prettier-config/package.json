@@ -32,7 +32,7 @@
 	},
 	"types": "build-types",
 	"devDependencies": {
-		"@types/node": "^24.19.2",
+		"@types/node": "^22.20.5",
 		"@types/prettier": "^2.4.4",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"vitest": "^5.1.1"
