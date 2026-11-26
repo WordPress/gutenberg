@@ -1,6 +1,6 @@
 ---
 name: wp-theme-setup
-description: Use when setting up WordPress Design System tokens in a project: installing `@wordpress/theme`, loading the tokens stylesheet, configuring the Stylelint and ESLint token rules from `@wordpress/theme-build-tools` and `@wordpress/eslint-plugin`, and adding token fallback values automatically at build time.
+description: Use when setting up WordPress Design System tokens in a project: loading the tokens stylesheet, configuring the Stylelint and ESLint token rules from `@wordpress/theme-build-tools` and `@wordpress/eslint-plugin`, and adding token fallback values automatically at build time.
 ---
 
 # Set up design tokens in a project
@@ -9,70 +9,26 @@ This skill ships with the `@wordpress/theme` package and matches the installed v
 
 Inspect the project first: its package manager, its bundler (PostCSS, Lightning CSS, esbuild, Vite or `@wordpress/build`), and its Stylelint and ESLint configuration. Change only what is missing, and do not duplicate setup that already exists.
 
-## 1. Install and load the tokens
+## 1. Load the tokens
 
--   Install `@wordpress/theme` and check its Node.js requirement (`>=22.13.0`). Its JavaScript entrypoints are ESM-only, so use `import` syntax in configuration files.
--   In standard WordPress admin and editor screens, WordPress loads the stylesheet as the `wp-theme` style handle (since WordPress 7.1). Do not bundle it there or add setup of your own. If you support WordPress versions before 7.1, which do not register `wp-theme`, load the tokens yourself for them: bundle `@wordpress/theme/design-tokens.css`, or enqueue your own copy only when the `wp-theme` handle is not registered (`wp_style_is( 'wp-theme', 'registered' )`).
--   For a separate app shell, an iframe or a popup window inside WordPress, enqueue `wp-theme` as a style dependency in that document instead of bundling `@wordpress/theme/design-tokens.css`.
--   Outside WordPress, import `@wordpress/theme/design-tokens.css` once per document, including each iframe or popup window that renders content.
+Read the **Design Tokens** section of the `README.md` in the installed `@wordpress/theme` package for how to load the tokens stylesheet, including its Node.js requirement, the setup for iframes and popup windows, and the setup outside WordPress, and apply it to the project.
+
+-   Since WordPress 7.1, WordPress registers the tokens stylesheet as the `wp-theme` style handle and loads it in standard admin and editor screens. Do not bundle it there. If you support WordPress versions before 7.1, which do not register `wp-theme`, load the tokens yourself for them: bundle `@wordpress/theme/design-tokens.css`, or enqueue your own copy only when the `wp-theme` handle is not registered (`wp_style_is( 'wp-theme', 'registered' )`).
 
 ## 2. Lint token usage
 
-Install `@wordpress/theme-build-tools` and `@wordpress/theme` as development dependencies, plus `stylelint` if the project does not have it. Enable the Stylelint plugins in the Stylelint configuration:
+Install `@wordpress/theme-build-tools` as a development dependency, plus `stylelint` if the project does not have it. Then read the **Stylelint Plugins** section of the `README.md` in the installed `@wordpress/theme-build-tools` package and enable the plugins it lists in the project's Stylelint configuration.
 
-```json
-{
-	"plugins": [
-		"@wordpress/theme-build-tools/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme-build-tools/stylelint-plugins/no-setting-wpds-custom-properties",
-		"@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values"
-	],
-	"rules": {
-		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true,
-		"plugin-wpds/no-token-fallback-values": true
-	}
-}
-```
+For tokens written in JavaScript, such as inline styles or CSS in template strings, enable the `@wordpress/no-unknown-ds-tokens` and `@wordpress/no-setting-ds-tokens` rules from `@wordpress/eslint-plugin`. See its README, and its **Rules** section for links to each rule. They are part of its `recommended` configuration. If the project enables ESLint rules individually, turn them on explicitly.
 
--   `no-unknown-ds-tokens` reports `--wpds-*` tokens that do not exist in the installed `@wordpress/theme`.
--   `no-setting-wpds-custom-properties` reports definitions or overrides in the `--wpds-*` namespace. Use `ThemeProvider` to change token values.
--   `no-token-fallback-values` reports hand-written fallbacks that can drift from the generated ones. Remove them and rely on step 3.
-
-For tokens written in JavaScript, such as inline styles or CSS in template strings, use the `@wordpress/no-unknown-ds-tokens` and `@wordpress/no-setting-ds-tokens` rules from `@wordpress/eslint-plugin`. They are part of its `recommended` configuration. If the project enables ESLint rules individually, turn them on explicitly.
-
-Run the linters on the whole project, fix the reports, and then add the checks to the project's lint script and CI.
+Run the linters on the whole project and fix the reports. A report from `no-token-fallback-values` means a hand-written fallback that can drift from the generated ones, so remove it and rely on step 3. Then add the checks to the project's lint script and CI.
 
 ## 3. Add token fallback values at build time
 
-The build plugins add the generated fallback to every bare `var(--wpds-*)` reference, so components still render when the tokens stylesheet is not loaded. For example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`. Existing fallbacks are unchanged, and an unknown token in a bare reference fails the build.
+The build plugins add the generated fallback to every bare `var(--wpds-*)` reference, so components still render when the tokens stylesheet is not loaded.
 
 -   Projects that build with `@wordpress/build` already get the plugins. Do not add them again.
--   For a custom build, add the plugin that matches the tool. For CSS, use `postcss-plugins/postcss-ds-token-fallbacks` for PostCSS or `lightningcss-plugins/lightningcss-ds-token-fallbacks` for Lightning CSS. For tokens in JavaScript or TypeScript, use `esbuild-plugins/esbuild-ds-token-fallbacks` for esbuild or `vite-plugins/vite-ds-token-fallbacks` for Vite. All are exported from `@wordpress/theme-build-tools`.
--   With Vite, use both the Vite plugin for JavaScript and TypeScript and the PostCSS plugin for CSS.
-
-```js
-// postcss.config.mjs
-import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
-
-export default {
-	plugins: [ dsTokenFallbacks ],
-};
-```
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
-import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
-
-export default defineConfig( {
-	plugins: [ dsTokenFallbacksJs() ],
-	css: { postcss: { plugins: [ dsTokenFallbacks ] } },
-} );
-```
-
--   For esbuild, add `plugins: [ dsTokenFallbacks ]` to the `esbuild.build()` options.
+-   For a custom build, read the **Build Plugins** section of the `README.md` in the installed `@wordpress/theme-build-tools` package and add the plugin for the project's tool: PostCSS, Lightning CSS, esbuild or Vite. It lists the exports and an example for each. With Vite, it needs both the Vite plugin for JavaScript and TypeScript and the PostCSS plugin for CSS.
 
 ## 4. Verify
 
