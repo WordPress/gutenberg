@@ -3,16 +3,10 @@ import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
 import { createRef, useId, useRef, useState } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
-import {
-	Button,
-	Fieldset,
-	Icon,
-	Stack,
-	Text,
-	ValidityIndicator,
-} from '@wordpress/ui';
+import { Button, Fieldset, Icon, Stack, Text } from '@wordpress/ui';
 import {
 	createId,
+	FilePickerError,
 	formatFileSize,
 	getExtension,
 	SelectedFile,
@@ -183,15 +177,7 @@ export function FilePickerMultiple() {
 			<Fieldset.Description>
 				{ `Drop up to ${ MAX_FILES } PDF, JPEG, or PNG files here, or choose them. Each file can be up to ${ formatFileSize( MAX_FILE_SIZE ) }.` }
 			</Fieldset.Description>
-			<div aria-live="polite" className={ styles.error }>
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
+			<FilePickerError id={ errorId } message={ error } />
 		</Fieldset.Root>
 	);
 }

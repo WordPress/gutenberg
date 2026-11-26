@@ -10,10 +10,9 @@ import {
 	IconButton,
 	Stack,
 	Text,
-	ValidityIndicator,
 	VisuallyHidden,
 } from '@wordpress/ui';
-import { FileSummary, getExtension } from './selected-file';
+import { FilePickerError, FileSummary, getExtension } from './selected-file';
 import styles from './file-picker.module.css';
 
 /**
@@ -155,15 +154,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 			<Fieldset.Description>
 				Drop one PNG here, or choose a file.
 			</Fieldset.Description>
-			<div aria-live="polite" className={ styles.error }>
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
+			<FilePickerError id={ errorId } message={ error } />
 		</Fieldset.Root>
 	);
 }

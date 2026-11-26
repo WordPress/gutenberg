@@ -1,8 +1,8 @@
 import { FormFileUpload } from '@wordpress/components';
 import { useId, useState } from '@wordpress/element';
-import { Button, Stack, ValidityIndicator } from '@wordpress/ui';
+import { Button, Stack } from '@wordpress/ui';
+import { FilePickerError } from './selected-file';
 import { importPattern, useSnackbars } from './file-picker-preview';
-import styles from './file-picker.module.css';
 
 export function FilePickerImport() {
 	const [ isImporting, setIsImporting ] = useState( false );
@@ -51,15 +51,7 @@ export function FilePickerImport() {
 					</Button>
 				) }
 			/>
-			<div aria-live="polite" className={ styles.error }>
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
+			<FilePickerError id={ errorId } message={ error } />
 			{ snackbars.list }
 		</Stack>
 	);

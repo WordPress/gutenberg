@@ -17,9 +17,13 @@ import {
 	Progress,
 	Stack,
 	Text,
-	ValidityIndicator,
 } from '@wordpress/ui';
-import { createId, getExtension, SelectedFile } from './selected-file';
+import {
+	createId,
+	FilePickerError,
+	getExtension,
+	SelectedFile,
+} from './selected-file';
 import styles from './file-picker.module.css';
 
 type Upload = {
@@ -286,15 +290,7 @@ export function FilePickerUpload() {
 				Drop photos or PDFs here, or choose them. Each file uploads as
 				soon as you add it.
 			</Fieldset.Description>
-			<div aria-live="polite" className={ styles.error }>
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
+			<FilePickerError id={ errorId } message={ error } />
 		</Fieldset.Root>
 	);
 }

@@ -2,16 +2,8 @@ import { speak } from '@wordpress/a11y';
 import { FormFileUpload } from '@wordpress/components';
 import { useId, useRef, useState } from '@wordpress/element';
 import { chevronDown, media, upload } from '@wordpress/icons';
-import {
-	Button,
-	Dialog,
-	Fieldset,
-	Icon,
-	Menu,
-	Stack,
-	ValidityIndicator,
-} from '@wordpress/ui';
-import { FileSummary, SelectedFile } from './selected-file';
+import { Button, Dialog, Fieldset, Icon, Menu, Stack } from '@wordpress/ui';
+import { FilePickerError, FileSummary, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 import previewStyles from './file-picker-preview.module.css';
 
@@ -119,15 +111,7 @@ export function FilePickerMenu() {
 			<Fieldset.Description>
 				Choose an image from the Media Library, or upload one.
 			</Fieldset.Description>
-			<div aria-live="polite" className={ styles.error }>
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
+			<FilePickerError id={ errorId } message={ error } />
 			<Dialog.Root
 				open={ isLibraryOpen }
 				onOpenChange={ setIsLibraryOpen }

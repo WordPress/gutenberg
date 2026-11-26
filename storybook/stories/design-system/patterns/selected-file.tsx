@@ -1,6 +1,12 @@
 import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { closeSmall, file as fileIcon } from '@wordpress/icons';
-import { Icon, IconButton, Stack, Text } from '@wordpress/ui';
+import {
+	Icon,
+	IconButton,
+	Stack,
+	Text,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import styles from './file-picker.module.css';
 
 let lastId = 0;
@@ -218,3 +224,28 @@ export const SelectedFile = forwardRef<
 		</Stack>
 	);
 } );
+
+/**
+ * Says why a file was rejected. The live region stays mounted, so a new
+ * message is announced. Give the control `aria-describedby` with the same
+ * `id` while there is a message.
+ */
+export function FilePickerError( {
+	id,
+	message,
+}: {
+	id: string;
+	message: string;
+} ) {
+	return (
+		<div aria-live="polite" className={ styles.error }>
+			{ message && (
+				<ValidityIndicator
+					id={ id }
+					type="invalid"
+					message={ message }
+				/>
+			) }
+		</div>
+	);
+}

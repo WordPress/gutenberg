@@ -2,10 +2,9 @@ import type { FormEvent } from 'react';
 import { speak } from '@wordpress/a11y';
 import { FormFileUpload } from '@wordpress/components';
 import { useId, useRef, useState } from '@wordpress/element';
-import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
-import { getExtension, SelectedFile } from './selected-file';
+import { Button, Fieldset, Stack } from '@wordpress/ui';
+import { FilePickerError, getExtension, SelectedFile } from './selected-file';
 import { importPattern, useSnackbars } from './file-picker-preview';
-import styles from './file-picker.module.css';
 
 export function FilePickerButton() {
 	const [ file, setFile ] = useState< File >();
@@ -115,15 +114,7 @@ export function FilePickerButton() {
 					<Fieldset.Description>
 						A JSON file exported from another site.
 					</Fieldset.Description>
-					<div aria-live="polite" className={ styles.error }>
-						{ error && (
-							<ValidityIndicator
-								id={ errorId }
-								type="invalid"
-								message={ error }
-							/>
-						) }
-					</div>
+					<FilePickerError id={ errorId } message={ error } />
 				</Fieldset.Root>
 				<Stack direction="row">
 					<Button

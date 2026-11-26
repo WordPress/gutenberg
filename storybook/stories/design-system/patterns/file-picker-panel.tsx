@@ -3,15 +3,13 @@ import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
 import { createRef, useId, useRef, useState } from '@wordpress/element';
 import { upload } from '@wordpress/icons';
+import { Button, Card, EmptyState, Stack, Text } from '@wordpress/ui';
 import {
-	Button,
-	Card,
-	EmptyState,
-	Stack,
-	Text,
-	ValidityIndicator,
-} from '@wordpress/ui';
-import { createId, getExtension, SelectedFile } from './selected-file';
+	createId,
+	FilePickerError,
+	getExtension,
+	SelectedFile,
+} from './selected-file';
 import styles from './file-picker.module.css';
 
 const FONT_EXTENSIONS = [ '.ttf', '.otf', '.woff', '.woff2' ];
@@ -148,15 +146,7 @@ export function FilePickerPanel() {
 							</EmptyState.Root>
 						</Stack>
 					) }
-					<div aria-live="polite" className={ styles.error }>
-						{ error && (
-							<ValidityIndicator
-								id={ errorId }
-								type="invalid"
-								message={ error }
-							/>
-						) }
-					</div>
+					<FilePickerError id={ errorId } message={ error } />
 				</Stack>
 				{ /* Its overlay covers the card, the nearest positioned ancestor. */ }
 				<DropZone label="Drop to add fonts" onFilesDrop={ addFiles } />
