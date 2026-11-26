@@ -28,6 +28,7 @@
 -   `Tabs`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
 -   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `Notice.List`: Keep words apart across line breaks and block elements, such as paragraphs and list items, when announcing a notice's title and description ([#87350](https://github.com/WordPress/gutenberg/pull/87350)).
+-   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver in Chrome on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
 
 ### Internal
 
@@ -36,10 +37,6 @@
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
-
-### Bug Fixes
-
--   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver in Chrome on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
 
 ## 0.27.0 (2026-11-18)
 
