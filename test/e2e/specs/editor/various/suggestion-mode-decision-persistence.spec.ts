@@ -19,6 +19,7 @@
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 const NOT_SAVED_HINT = /this suggestion, but the post was not saved\./;
+const SAVE_TO_KEEP_HINT = 'Save the post to keep this decision.';
 
 async function switchIntent( page: any, intentLabel: string ) {
 	await page
@@ -291,6 +292,29 @@ async function suggestHeadingLevel( { editor, page }: any ) {
 	await suggestionSaved;
 	await editor.saveDraft();
 	return currentPostId( page );
+}
+
+/**
+ * Replies to the single suggestion note in the sidebar.
+ *
+ * @param page Playwright page.
+ * @param text Reply body.
+ */
+async function replyToSuggestionNote( page: any, text: string ) {
+	const sidebar = await openNotesSidebar( page );
+	// Selecting the thread renders its reply form.
+	await sidebar
+		.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
+		.click();
+	const replyBox = sidebar.getByRole( 'textbox', {
+		name: /^Reply to note/,
+	} );
+	await replyBox.click();
+	await replyBox.pressSequentially( text );
+	await sidebar.getByRole( 'button', { name: 'Reply', exact: true } ).click();
+	await expect(
+		page.locator( '.components-snackbar-list' ).getByText( 'Reply added.' )
+	).toBeVisible();
 }
 
 test.describe( 'Suggestion mode decisions are provisional until the post is saved', () => {
@@ -738,6 +762,41 @@ test.describe( 'Suggestion mode decisions are provisional until the post is save
 				} )
 				.toEqual( [ 'hold', 'pending' ] );
 		} );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/87430.
+	test.describe( 'the sidebar once the save made a decision final', () => {
+		for ( const action of [ 'Accept', 'Reject' ] as const ) {
+			for ( const withReply of [ false, true ] ) {
+				test( `${ action }${
+					withReply ? ' on a note with a reply' : ''
+				}: shows the decision as final without a reload`, async ( {
+					editor,
+					page,
+				} ) => {
+					await suggestAddition( { editor, page } );
+					if ( withReply ) {
+						await replyToSuggestionNote( page, 'A follow up' );
+					}
+					await switchIntent( page, 'Editing' );
+					await decideSuggestion( page, action );
+
+					const sidebar = await openNotesSidebar( page );
+					const saveHint = sidebar.getByText( SAVE_TO_KEEP_HINT );
+					await expect( saveHint ).toBeVisible();
+
+					await editor.saveDraft();
+
+					await expect( saveHint ).toBeHidden();
+					await expect(
+						sidebar.getByText(
+							action === 'Accept' ? 'Accepted' : 'Rejected',
+							{ exact: true }
+						)
+					).toBeVisible();
+				} );
+			}
+		}
 	} );
 
 	test( 'the sidebar filter lists accepted and rejected suggestions', async ( {
