@@ -3,6 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { keyboardShortcut } from '@wordpress/keycodes';
 import { useViewportMatch } from '@wordpress/compose';
@@ -29,14 +30,22 @@ export default function MoreMenu( {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+	const { showIconLabels, isViewable } = useSelect(
+		( select ) => ( {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+			isViewable:
+				select( coreStore ).getPostType(
+					select( editorStore ).getCurrentPostType()
+				)?.viewable ?? false,
+		} ),
 		[]
 	);
 
 	// On phones, the header has room for undo and redo instead.
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -79,7 +88,7 @@ export default function MoreMenu( {
 				className="editor-more-menu__popup"
 				positioner={ positioner }
 			>
-				{ isMobileViewport && (
+				{ ! isLargeViewport && isViewable && (
 					<>
 						<Menu.Group>
 							<PostPreviewMenuItem
