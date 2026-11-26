@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { ForwardedRef } from 'react';
 import type { Block } from '@wordpress/blocks';
 import {
@@ -35,10 +36,13 @@ import { getRotatedBoundingRect } from '../../utils/rotation';
 import { useInserterDragBlockNames } from './use-inserter-drag-block-names';
 import { parseDropEvent } from '../use-on-block-drop';
 import {
+	getFreeGridDropTarget,
 	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
+import { getGridPlacementFromPixelRect } from './free-placement';
+import type { GridPlacement } from './free-placement';
 import {
 	isGridItemHandleDrag,
 	subscribeToGridItemPointerDrag,
@@ -62,6 +66,7 @@ import type {
 	AutoGridVisualizerProps,
 	GridDragGrab,
 	GridDropIndicatorProps,
+	GridDropLayerMove,
 	GridDropTarget,
 	GridInfo,
 	GridItemAttributes,
@@ -283,10 +288,6 @@ function ManualGridVisualizer( {
 	gridInfo,
 	childGridRect,
 }: ManualGridVisualizerProps ) {
-	const [ dropTarget, setDropTarget ] = useState< GridDropTarget | null >(
-		null
-	);
-
 	const { gridItemStyles, viewport, stackedLayouts } = useSelect(
 		( select ) => {
 			const {
@@ -391,9 +392,7 @@ function ManualGridVisualizer( {
 				gridClientId={ gridClientId }
 				gridElement={ gridElement }
 				gridInfo={ gridInfo }
-				setDropTarget={ setDropTarget }
 			/>
-			{ dropTarget && <GridDropIndicator dropTarget={ dropTarget } /> }
 		</>
 	);
 }
@@ -436,6 +435,40 @@ function getPixelRectStyle( rect: GridPixelRect ) {
 		width: rect.right - rect.left,
 		height: rect.bottom - rect.top,
 	};
+}
+
+/**
+ * Moves an element to a rectangle in pixels, as `getPixelRectStyle` places it
+ * when it renders.
+ *
+ * @param element The element.
+ * @param rect    The rectangle.
+ */
+function setPixelRectStyle( element: HTMLElement, rect: GridPixelRect ) {
+	const { left, top, width, height } = getPixelRectStyle( rect );
+	element.style.left = `${ left }px`;
+	element.style.top = `${ top }px`;
+	element.style.width = `${ width }px`;
+	element.style.height = `${ height }px`;
+}
+
+/**
+ * Whether two drop targets show the same cells, overlaps and guides, so that
+ * only the landing preview's position differs between them.
+ *
+ * @param a A drop target.
+ * @param b Another drop target.
+ *
+ * @return Whether they only differ in where the block lands in its cells.
+ */
+function isSameDropTargetCells( a: GridDropTarget, b: GridDropTarget ) {
+	return (
+		a.srcClientId === b.srcClientId &&
+		a.isInserterDrag === b.isInserterDrag &&
+		fastDeepEqual( a.landing, b.landing ) &&
+		fastDeepEqual( a.overlaps, b.overlaps ) &&
+		fastDeepEqual( a.guides, b.guides )
+	);
 }
 
 /**
@@ -516,20 +549,30 @@ function canInsertBlockNamesInGrid(
  * works out which cells the block would land in, which other blocks those
  * cells overlap, and which alignment guides to show.
  *
+ * The pointer is followed once per animation frame. A block placed freely
+ * lands somewhere new on almost every move, so while its cells, overlaps and
+ * guides stay the same, only the landing preview is moved, without
+ * rendering.
+ *
  * @param props
- * @param props.gridClientId  Client ID of the grid block.
- * @param props.gridElement   The grid element in the canvas.
- * @param props.gridInfo      Grid info, from `getGridInfo`.
- * @param props.setDropTarget Called with the drop target, or null.
+ * @param props.gridClientId Client ID of the grid block.
+ * @param props.gridElement  The grid element in the canvas.
+ * @param props.gridInfo     Grid info, from `getGridInfo`.
  */
 function GridVisualizerDropLayer( {
 	gridClientId,
 	gridElement,
 	gridInfo,
-	setDropTarget,
 }: GridVisualizerDropLayerProps ) {
 	const layerRef = useRef< HTMLDivElement >( null );
+	const landingRef = useRef< HTMLDivElement >( null );
+	const [ dropTarget, setDropTarget ] = useState< GridDropTarget | null >(
+		null
+	);
 	const lastTargetRef = useRef< GridDropTarget | null >( null );
+	// The latest move over the grid, handled in the next animation frame.
+	const pendingMoveRef = useRef< GridDropLayerMove | null >( null );
+	const frameRef = useRef< number | null >( null );
 	// Where the dragged block was grabbed, for the length of the drag.
 	const grabRef = useRef< GridDragGrab | null >( null );
 	// The grid measured when the drag started over it. Blocks don't move
@@ -563,11 +606,55 @@ function GridVisualizerDropLayer( {
 		gridInfo.numColumns
 	);
 
+	function cancelPendingMove() {
+		pendingMoveRef.current = null;
+		if ( frameRef.current !== null ) {
+			window.cancelAnimationFrame( frameRef.current );
+			frameRef.current = null;
+		}
+	}
+
 	function clearDropTarget() {
+		cancelPendingMove();
 		lastTargetRef.current = null;
 		measurementsRef.current = null;
 		setDropTarget( null );
 	}
+
+	/**
+	 * Handles a move over the grid in the next animation frame, where the
+	 * layout read for it doesn't follow a write. Later moves in the same
+	 * frame replace it.
+	 *
+	 * @param move The move.
+	 */
+	function scheduleMove( move: GridDropLayerMove ) {
+		// The first move over the grid finds where the block was grabbed, so
+		// it can't wait for the pointer to move on.
+		if ( grabRef.current?.srcClientId !== move.srcClientId ) {
+			cancelPendingMove();
+			updateDropTarget( move );
+			return;
+		}
+		pendingMoveRef.current = move;
+		if ( frameRef.current === null ) {
+			frameRef.current = window.requestAnimationFrame( flushPendingMove );
+		}
+	}
+
+	/**
+	 * Handles the move waiting for an animation frame now, so that a drop
+	 * lands where the pointer last was.
+	 */
+	function flushPendingMove() {
+		const move = pendingMoveRef.current;
+		cancelPendingMove();
+		if ( move ) {
+			updateDropTarget( move );
+		}
+	}
+
+	useEffect( () => cancelPendingMove, [] );
 
 	function getMeasurements( srcClientId: string | null ) {
 		// Blocks dragged from an inserter aren't in the grid.
@@ -589,6 +676,33 @@ function GridVisualizerDropLayer( {
 	}
 
 	/**
+	 * Gets a move over the grid from a drag event, or a touch drag's position.
+	 * The drag's data can only be read while its event is handled, so what
+	 * it says is read here.
+	 *
+	 * @param event        A drag event, or a touch drag's position.
+	 * @param isHandleDrag Whether the block is dragged by a drag handle.
+	 *
+	 * @return The move.
+	 */
+	function getMove(
+		// A touch drag has no modifier keys and no drag data.
+		event: Pick< DragEvent, 'clientX' | 'clientY' > &
+			Partial< Pick< DragEvent, 'shiftKey' | 'dataTransfer' > >,
+		isHandleDrag: boolean
+	): GridDropLayerMove {
+		const srcClientId = getDraggedBlock();
+		return {
+			clientX: event.clientX,
+			clientY: event.clientY,
+			shiftKey: !! event.shiftKey,
+			isHandleDrag,
+			srcClientId,
+			isInserterDrag: ! srcClientId && isInserterDragToGrid( event ),
+		};
+	}
+
+	/**
 	 * Whether the drag is of blocks from an inserter, which haven't been
 	 * inserted yet, that can all be inserted into the grid.
 	 *
@@ -607,20 +721,21 @@ function GridVisualizerDropLayer( {
 		);
 	}
 
-	function updateDropTarget(
-		event: Pick< DragEvent, 'clientX' | 'clientY' > &
-			Partial< Pick< DragEvent, 'dataTransfer' > >,
-		isHandleDrag: boolean
-	) {
-		const srcClientId = getDraggedBlock();
-		const isInserterDrag = ! srcClientId && isInserterDragToGrid( event );
+	function updateDropTarget( {
+		clientX,
+		clientY,
+		shiftKey,
+		isHandleDrag,
+		srcClientId,
+		isInserterDrag,
+	}: GridDropLayerMove ) {
 		const layer = layerRef.current;
 		if ( ( ! srcClientId && ! isInserterDrag ) || ! layer ) {
 			clearDropTarget();
 			return;
 		}
 
-		const { columnTracks, rowTracks, siblings, src } =
+		const { columnTracks, rowTracks, siblings, src, hasFixedCells } =
 			getMeasurements( srcClientId );
 		if ( ! columnTracks.length || ! rowTracks.length ) {
 			clearDropTarget();
@@ -644,8 +759,8 @@ function GridVisualizerDropLayer( {
 
 		const layerRect = layer.getBoundingClientRect();
 		const scale = layer.offsetWidth / layerRect.width || 1;
-		const x = ( event.clientX - layerRect.left ) * scale;
-		const y = ( event.clientY - layerRect.top ) * scale;
+		const x = ( clientX - layerRect.left ) * scale;
+		const y = ( clientY - layerRect.top ) * scale;
 
 		// The first move over the grid finds where the block was grabbed.
 		if ( grabRef.current?.srcClientId !== srcClientId ) {
@@ -664,7 +779,7 @@ function GridVisualizerDropLayer( {
 		// its rotation, so a rotated block lands by the cells it takes up.
 		// Blocks dragged in from elsewhere are the size of the cells they
 		// span, up to the size of the grid.
-		const landing = getGridDropTarget( {
+		const dropTargetOptions = {
 			x,
 			y,
 			...grabRef.current.grab,
@@ -678,7 +793,21 @@ function GridVisualizerDropLayer( {
 			height: srcPixelRect
 				? srcPixelRect.bottom - srcPixelRect.top
 				: undefined,
-		} );
+		};
+		// Where the grid's cells have a fixed size, a block lands exactly
+		// where it is let go, and Shift snaps its corner to the grid lines.
+		// Touch drags have no Shift, so they are always free.
+		const freeTarget = hasFixedCells
+			? getFreeGridDropTarget( {
+					...dropTargetOptions,
+					angle: srcAngle,
+					snap: shiftKey,
+				} )
+			: null;
+		const placement = freeTarget?.placement ?? null;
+		const landing = placement
+			? new GridRect( placement )
+			: getGridDropTarget( dropTargetOptions );
 
 		const lastTarget = lastTargetRef.current;
 		if (
@@ -687,7 +816,8 @@ function GridVisualizerDropLayer( {
 			lastTarget.landing.columnStart === landing.columnStart &&
 			lastTarget.landing.rowStart === landing.rowStart &&
 			lastTarget.landing.columnSpan === landing.columnSpan &&
-			lastTarget.landing.rowSpan === landing.rowSpan
+			lastTarget.landing.rowSpan === landing.rowSpan &&
+			fastDeepEqual( lastTarget.placement, placement )
 		) {
 			return;
 		}
@@ -703,22 +833,38 @@ function GridVisualizerDropLayer( {
 		}
 
 		// The block lands by its cells, but the cells shown are the ones it
-		// reaches with its rotation, around the same center.
-		const footprint = srcAngle
-			? getGridRectFromPixelRect(
-					getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+		// reaches with its rotation, around the same center. A block placed
+		// freely shows exactly where it lands, with its rotation, and its
+		// footprint is the cells that contain that.
+		let footprint = landing;
+		let landingPixelRect = landingCellsPixelRect;
+		if ( freeTarget ) {
+			landingPixelRect = getRotatedBoundingRect(
+				freeTarget.pixelRect,
+				srcAngle
+			);
+			footprint = new GridRect(
+				getGridPlacementFromPixelRect(
+					landingPixelRect,
 					columnTracks,
 					rowTracks
 				)
-			: landing;
-		// The footprint is snapped to the grid's tracks, so it is inside them.
-		const landingPixelRect = srcAngle
-			? ( getPixelRectFromGridRect(
+			);
+		} else if ( srcAngle ) {
+			footprint = getGridRectFromPixelRect(
+				getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+				columnTracks,
+				rowTracks
+			);
+			// The footprint is snapped to the grid's tracks, so it is inside
+			// them.
+			landingPixelRect =
+				getPixelRectFromGridRect(
 					footprint,
 					columnTracks,
 					rowTracks
-				) ?? landingCellsPixelRect )
-			: landingCellsPixelRect;
+				) ?? landingCellsPixelRect;
+		}
 
 		const overlaps = siblings
 			.filter( ( sibling ) => sibling.rect.intersectsRect( footprint ) )
@@ -764,11 +910,22 @@ function GridVisualizerDropLayer( {
 			isInserterDrag,
 			span: { columnSpan, rowSpan },
 			landing,
+			placement,
 			landingPixelRect,
 			overlaps,
 			guides,
 		};
 		lastTargetRef.current = target;
+		// The drop uses the latest target, but only a change to what is shown
+		// besides the preview's position needs a render.
+		if (
+			lastTarget &&
+			landingRef.current &&
+			isSameDropTargetCells( lastTarget, target )
+		) {
+			setPixelRectStyle( landingRef.current, landingPixelRect );
+			return;
+		}
 		setDropTarget( target );
 	}
 
@@ -779,6 +936,7 @@ function GridVisualizerDropLayer( {
 	 *              doesn't have.
 	 */
 	function dropOnTarget( event?: DragEvent ) {
+		flushPendingMove();
 		const target = lastTargetRef.current;
 		clearDropTarget();
 		if ( target?.isInserterDrag ) {
@@ -795,7 +953,11 @@ function GridVisualizerDropLayer( {
 					gridClientId
 				)
 			) {
-				insertInserterBlocks( blocks, target.landing );
+				insertInserterBlocks(
+					blocks,
+					target.landing,
+					target.placement
+				);
 			}
 			return;
 		}
@@ -803,20 +965,23 @@ function GridVisualizerDropLayer( {
 		if ( ! target || ! srcClientId || target.srcClientId !== srcClientId ) {
 			return;
 		}
-		const { landing, span } = target;
+		const { landing, span, placement } = target;
 		const { columnStart, rowStart } = landing;
-		// A block bigger than the grid is shrunk to fit, as shown by the
-		// landing cells.
-		const layout = {
-			columnStart,
-			rowStart,
-			...( landing.columnSpan < span.columnSpan && {
-				columnSpan: landing.columnSpan,
-			} ),
-			...( landing.rowSpan < span.rowSpan && {
-				rowSpan: landing.rowSpan,
-			} ),
-		};
+		// A block placed freely gets its whole place, and loses any box it
+		// had when it fills its cells. Otherwise a block bigger than the grid
+		// is shrunk to fit, as shown by the landing cells.
+		const layout = placement
+			? { ...placement, box: placement.box }
+			: {
+					columnStart,
+					rowStart,
+					...( landing.columnSpan < span.columnSpan && {
+						columnSpan: landing.columnSpan,
+					} ),
+					...( landing.rowSpan < span.rowSpan && {
+						rowSpan: landing.rowSpan,
+					} ),
+				};
 		// The grid is given to the updater because a block dropped in
 		// from elsewhere isn't in it yet.
 		updateGridChildLayout( srcClientId, layout, gridClientId );
@@ -831,13 +996,19 @@ function GridVisualizerDropLayer( {
 
 	/**
 	 * Inserts blocks dragged from an inserter where they were dropped. The
-	 * first block takes the landing cells, and any others, such as the rest
-	 * of a pattern, go one after the other next to it.
+	 * first block takes the landing cells, or its exact place when it was
+	 * placed freely, and any others, such as the rest of a pattern, go one
+	 * after the other next to it.
 	 *
-	 * @param blocks  The dragged blocks.
-	 * @param landing The cells the first block lands in.
+	 * @param blocks    The dragged blocks.
+	 * @param landing   The cells the first block lands in.
+	 * @param placement The first block's place, when placed freely.
 	 */
-	function insertInserterBlocks( blocks: Block[], landing: GridRect ) {
+	function insertInserterBlocks(
+		blocks: Block[],
+		landing: GridRect,
+		placement: GridPlacement | null
+	) {
 		const occupiedRects = getBlockOrder( gridClientId ).flatMap(
 			( clientId ) => {
 				const {
@@ -890,6 +1061,14 @@ function GridVisualizerDropLayer( {
 		);
 		blocksToInsert.forEach( ( block, index ) => {
 			__unstableMarkNextChangeAsNotPersistent();
+			if ( index === 0 && placement ) {
+				updateGridChildLayout(
+					block.clientId,
+					{ ...placement, box: placement.box },
+					gridClientId
+				);
+				return;
+			}
 			updateGridChildLayout(
 				block.clientId,
 				( style, selectedState, gridAttributes ) =>
@@ -910,7 +1089,7 @@ function GridVisualizerDropLayer( {
 
 	const dropZoneRef = useDropZone( {
 		onDragOver: ( event ) =>
-			updateDropTarget( event, isGridItemHandleDrag( event ) ),
+			scheduleMove( getMove( event, isGridItemHandleDrag( event ) ) ),
 		onDragLeave: clearDropTarget,
 		onDragEnd: clearDropTarget,
 		onDrop: dropOnTarget,
@@ -924,7 +1103,7 @@ function GridVisualizerDropLayer( {
 			const isOverLayer =
 				!! layerRef.current && dropLayer === layerRef.current;
 			if ( type === 'move' && isOverLayer ) {
-				updateDropTarget( { clientX, clientY }, true );
+				scheduleMove( getMove( { clientX, clientY }, true ) );
 			} else if ( type === 'drop' && isOverLayer ) {
 				dropOnTarget();
 			} else {
@@ -938,14 +1117,25 @@ function GridVisualizerDropLayer( {
 	);
 
 	return (
-		<div
-			ref={ useMergeRefs( [ layerRef, dropZoneRef ] ) }
-			className="block-editor-grid-visualizer__drop-layer"
-		/>
+		<>
+			<div
+				ref={ useMergeRefs( [ layerRef, dropZoneRef ] ) }
+				className="block-editor-grid-visualizer__drop-layer"
+			/>
+			{ dropTarget && (
+				<GridDropIndicator
+					dropTarget={ dropTarget }
+					landingRef={ landingRef }
+				/>
+			) }
+		</>
 	);
 }
 
-function GridDropIndicator( { dropTarget }: GridDropIndicatorProps ) {
+function GridDropIndicator( {
+	dropTarget,
+	landingRef,
+}: GridDropIndicatorProps ) {
 	const { landingPixelRect, overlaps, guides } = dropTarget;
 	return (
 		<div
@@ -953,6 +1143,7 @@ function GridDropIndicator( { dropTarget }: GridDropIndicatorProps ) {
 			aria-hidden="true"
 		>
 			<div
+				ref={ landingRef }
 				className="block-editor-grid-visualizer__landing"
 				style={ getPixelRectStyle( landingPixelRect ) }
 			/>
