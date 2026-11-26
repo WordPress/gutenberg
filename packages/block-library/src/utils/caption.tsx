@@ -9,6 +9,7 @@ import {
 import { ToolbarButton } from '@wordpress/components';
 import { caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import type { CaptionProps } from './types';
 
 export function Caption( {
 	attributeKey = 'caption',
@@ -27,8 +28,8 @@ export function Caption( {
 	removeLabel = __( 'Remove caption' ),
 	icon = captionIcon,
 	...props
-} ) {
-	const caption = attributes[ attributeKey ];
+}: CaptionProps ) {
+	const caption = attributes[ attributeKey ] as string | undefined;
 	const isCaptionEmpty = RichText.isEmpty( caption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
 
@@ -44,7 +45,7 @@ export function Caption( {
 
 	// Focus the caption when we click to add one.
 	const ref = useCallback(
-		( node ) => {
+		( node: HTMLElement | null ) => {
 			if ( node && isCaptionEmpty ) {
 				node.focus();
 			}
@@ -94,7 +95,9 @@ export function Caption( {
 							insertBlocksAfter
 								? () =>
 										insertBlocksAfter(
-											createBlock( getDefaultBlockName() )
+											createBlock(
+												getDefaultBlockName()!
+											)
 										)
 								: undefined
 						}

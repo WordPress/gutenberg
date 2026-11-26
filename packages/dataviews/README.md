@@ -2288,6 +2288,7 @@ For example:
     -   An array of strings (multiple field IDs)
     -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
 -   `isCollapsible`: boolean. Optional. `true` by default. Specifies whether the card can be collapsed.
+-   `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6`. Optional. Renders the card's title as a heading of that level, so the card contributes to the document outline. For a collapsible card, the header that toggles the card is exposed as a heading of that level. Pick the level that fits the surrounding page. Without it, the title isn't a heading.
 
 Cards can be collapsed while visible, so you can control when summary fields appear:
 
