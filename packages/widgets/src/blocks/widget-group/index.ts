@@ -1,16 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
-import type { BlockConfiguration } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
-
-interface Attributes extends Record< string, unknown > {
-	title?: string;
-	name?: string;
-}
+import type { Attributes } from './types';
 
 const { name } = metadata;
 export { metadata, name };
@@ -32,19 +28,13 @@ export const settings: Partial< BlockConfiguration< Attributes > > = {
 				blocks: [ '*' ],
 				isMatch( attributes, blocks ) {
 					// Avoid transforming existing `widget-group` blocks.
-					const blockList = Array.isArray( blocks )
-						? blocks
-						: [ blocks ];
-					return ! blockList.some(
+					return ! ( blocks as Block[] ).some(
 						( block ) => block.name === 'core/widget-group'
 					);
 				},
 				__experimentalConvert( blocks ) {
 					// Put the selected blocks inside the new Widget Group's innerBlocks.
-					const blockList = Array.isArray( blocks )
-						? blocks
-						: [ blocks ];
-					let innerBlocks = blockList.map( ( block ) =>
+					let innerBlocks = ( blocks as Block[] ).map( ( block ) =>
 						cloneSanitizedBlock( block )
 					);
 

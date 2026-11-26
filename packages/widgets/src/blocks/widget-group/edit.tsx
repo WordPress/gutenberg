@@ -11,10 +11,7 @@ import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import type { BlockEditProps } from '@wordpress/blocks';
-
-interface Attributes extends Record< string, unknown > {
-	title?: string;
-}
+import type { Attributes } from './types';
 
 export default function Edit( props: BlockEditProps< Attributes > ) {
 	const { clientId } = props;

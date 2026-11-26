@@ -1,9 +1,6 @@
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
 import type { BlockDeprecation, BlockSaveProps } from '@wordpress/blocks';
-
-interface Attributes extends Record< string, unknown > {
-	title?: string;
-}
+import type { Attributes } from './types';
 
 const v1: BlockDeprecation< Attributes > = {
 	attributes: {
