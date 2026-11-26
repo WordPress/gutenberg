@@ -1079,4 +1079,128 @@ describe( 'summarizeOperations', () => {
 			] )
 		).toEqual( [ { label: 'Title:', value: '“Fresh title”' } ] );
 	} );
+
+	describe( 'Image block size and file', () => {
+		const set = ( attribute: string, before: any, after: any ) => ( {
+			type: 'attribute-set',
+			attribute,
+			before,
+			after,
+		} );
+		const summarizeImage = ( operations: any[] ) =>
+			summarizeOperations( operations, { blockName: 'core/image' } );
+
+		it( 'reads a drag resize as one change', () => {
+			expect(
+				summarizeImage( [
+					set( 'width', null, '348px' ),
+					set( 'height', null, 'auto' ),
+					set( 'aspectRatio', null, '0.6667528104406254' ),
+				] )
+			).toEqual( [
+				{ label: 'Change:', value: 'image resized to 348px wide' },
+			] );
+		} );
+
+		it( 'states both dimensions when both are set', () => {
+			expect(
+				summarizeImage( [
+					set( 'width', null, '300px' ),
+					set( 'height', null, '200px' ),
+					set( 'scale', null, 'cover' ),
+				] )
+			).toEqual( [
+				{
+					label: 'Change:',
+					value: 'image resized to 300px × 200px, scale default → cover',
+				},
+			] );
+		} );
+
+		it( 'names the height when only the height is set', () => {
+			expect( summarizeImage( [ set( 'height', null, 200 ) ] ) ).toEqual(
+				[ { label: 'Change:', value: 'image resized to 200px tall' } ]
+			);
+		} );
+
+		it( 'reads removed dimensions as a reset', () => {
+			expect(
+				summarizeImage( [
+					set( 'width', '348px', null ),
+					set( 'height', 'auto', null ),
+					set( 'aspectRatio', '0.6667528104406254', null ),
+				] )
+			).toEqual( [
+				{
+					label: 'Change:',
+					value: 'image reset to its original size',
+				},
+			] );
+		} );
+
+		it( 'keeps an aspect ratio the author picked', () => {
+			expect(
+				summarizeImage( [
+					set( 'width', null, '348px' ),
+					set( 'height', null, 'auto' ),
+					set( 'aspectRatio', null, '16/9' ),
+				] )
+			).toEqual( [
+				{
+					label: 'Change:',
+					value: 'image resized to 348px wide, aspect ratio default → 16/9',
+				},
+			] );
+		} );
+
+		it( 'reads a crop or rotation as an edited image', () => {
+			expect(
+				summarizeImage( [
+					set( 'id', 4, 14 ),
+					set(
+						'url',
+						'https://example.org/uploads/photo.jpeg',
+						'https://example.org/uploads/photo-edited.jpeg'
+					),
+				] )
+			).toEqual( [ { label: 'Change:', value: 'image edited' } ] );
+			expect(
+				summarizeImage( [
+					set( 'id', 14, 18 ),
+					set(
+						'url',
+						'https://example.org/uploads/photo-edited.jpeg',
+						'https://example.org/uploads/photo-edited-1.jpeg'
+					),
+				] )
+			).toEqual( [ { label: 'Change:', value: 'image edited' } ] );
+		} );
+
+		it( 'reads a different file as a replaced image', () => {
+			expect(
+				summarizeImage( [
+					set( 'id', 4, 9 ),
+					set(
+						'url',
+						'https://example.org/uploads/photo.jpeg',
+						'https://example.org/uploads/other.jpeg'
+					),
+					set( 'alt', '', 'Another photo' ),
+				] )
+			).toEqual( [
+				{
+					label: 'Change:',
+					value: 'image replaced, alt default → Another photo',
+				},
+			] );
+		} );
+
+		it( 'leaves the same attributes of other blocks as they were', () => {
+			expect(
+				summarizeOperations( [ set( 'width', null, '50%' ) ], {
+					blockName: 'core/column',
+				} )
+			).toEqual( [ { label: 'Change:', value: 'width default → 50%' } ] );
+		} );
+	} );
 } );
