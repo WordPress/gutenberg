@@ -7,7 +7,7 @@
 	// #1e1e1e. Without that dark theme context, the token can resolve to a light
 	// background. Use the same fixed color here to keep the tooltip dark.
 	background: $gray-900;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	border-radius: var(--wpds-border-radius-md);
 	color: $gray-100;
 	text-align: center;

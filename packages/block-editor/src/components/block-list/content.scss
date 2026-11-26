@@ -402,7 +402,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	justify-content: center;
 	overflow: hidden;
 	font-size: var(--wpds-typography-font-size-md);
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	color: $black;
 	font-weight: 400;
 
@@ -467,7 +467,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	border-radius: $grid-unit-30 * 0.5;
 	background: var(--wp-admin-theme-color);
 	color: $white;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: 12px;
 	font-weight: 500;
 }

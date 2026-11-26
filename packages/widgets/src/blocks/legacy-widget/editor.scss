@@ -14,7 +14,7 @@
 
 	.wp-block-legacy-widget__edit-form-title {
 		color: $black;
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: 14px;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		margin: 0 0 $grid-unit-15 0;
@@ -125,7 +125,7 @@
 	&,
 	& h3,
 	& p {
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 	}
 

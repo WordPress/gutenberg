@@ -6,7 +6,7 @@
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	padding: 1em;
 
 	// Block UI appearance.
@@ -16,7 +16,7 @@
 
 	.block-editor-warning__message {
 		line-height: $default-line-height;
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 		color: $gray-900;
 		margin: 0;

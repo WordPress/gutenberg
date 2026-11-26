@@ -19,7 +19,7 @@
 		font-size: var(--wpds-typography-font-size-md);
 		text-transform: uppercase;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		color: $gray-700;
 		display: inline-flex;
 		white-space: nowrap;

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `DropdownMenu`, `DropZone`, `Placeholder`, `RadioControl`, `ResizableBox`, `Snackbar`, `ToolbarButton`, and `Tooltip`: Use the `--wpds-typography-font-family-body` token for their font family.
 -   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
 -   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height ([#87154](https://github.com/WordPress/gutenberg/pull/87154)).
 -   `TimePicker`: Use the WordPress UI select for choosing a month ([#87079](https://github.com/WordPress/gutenberg/pull/87079)).

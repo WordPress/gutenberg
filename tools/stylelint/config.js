@@ -3,7 +3,7 @@ const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
 // Sass treats hyphens and underscores in identifiers as equivalent.
 const FONT_FAMILY_VARIABLE =
-	/\$font[-_]family[-_](body|headings|mono)(?![\w-])/;
+	/\$(?:font[-_]family[-_](body|headings|mono)|default[-_]font)(?![\w-])/;
 
 const FONT_FAMILY_VARIABLE_REPLACEMENTS = {
 	body: 'var(--wpds-typography-font-family-body)',
@@ -79,10 +79,13 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					const [ , fontFamily ] =
-						value.match( FONT_FAMILY_VARIABLE ) ?? [];
-					if ( fontFamily ) {
-						return `Avoid using the \`$font-family-${ fontFamily }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamily ] }\` instead.`;
+					const fontFamilyMatch = value.match( FONT_FAMILY_VARIABLE );
+					if ( fontFamilyMatch ) {
+						const fontFamily = fontFamilyMatch[ 1 ];
+						const variable = fontFamily
+							? `$font-family-${ fontFamily }`
+							: '$default-font';
+						return `Avoid using the \`${ variable }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamily ?? 'body' ] }\` instead.`;
 					}
 					const fontSizeMatch = value.match( FONT_SIZE_VARIABLE );
 					if ( fontSizeMatch ) {

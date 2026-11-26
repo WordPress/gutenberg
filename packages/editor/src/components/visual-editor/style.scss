@@ -47,7 +47,7 @@
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
 	& .components-button {
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 		padding: 6px 12px;
 

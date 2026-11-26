@@ -5,7 +5,7 @@
 @use "../utils/theme-variables" as *;
 
 .components-snackbar {
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
 	backdrop-filter: blur($grid-unit-20) saturate(180%);

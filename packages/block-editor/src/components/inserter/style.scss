@@ -21,7 +21,7 @@ $block-inserter-tabs-height: 44px;
 	background: none;
 	border: none;
 	padding: 0;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: 0;
 

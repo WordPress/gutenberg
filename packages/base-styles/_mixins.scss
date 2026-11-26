@@ -286,7 +286,7 @@
 }
 
 @mixin input-control() {
-	font-family: variables.$default-font;
+	font-family: wpds.var("--wpds-typography-font-family-body");
 	padding: 6px 8px;
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: variables.$mobile-text-min-font-size;

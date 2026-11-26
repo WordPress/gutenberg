@@ -22,7 +22,7 @@
 	background: $components-color-foreground;
 	border-radius: $radius-small;
 	box-sizing: border-box;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: 12px;
 	color: $components-color-foreground-inverted;
 	padding: $grid-unit-05 $grid-unit-10;
