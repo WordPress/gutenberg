@@ -166,7 +166,7 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 
 /**
  * Checks whether blocks can move to a destination, regardless of selection.
- * Accepts a single block, contiguous siblings, or blocks across parents.
+ * The moved blocks must belong to one entity. The destination may belong to another.
  *
  * @param state        Editor state.
  * @param clientIds    Block IDs to move.
@@ -198,31 +198,33 @@ export function canMoveBlocksToPosition(
 	if ( destinationParents.some( ( id ) => moveClientIds.includes( id ) ) ) {
 		return false;
 	}
-	// The nearest controlled parent owns the contents as a separate entity.
-	// No controlled parent means the blocks belong to the main editor entity.
-	const controlledDestinationParent =
-		destinationParents.find( ( id ) =>
-			areInnerBlocksControlled( state, id )
-		) ?? '';
-	return moveClientIds.every( ( id ) => {
-		const controlledSourceParent =
+	// The nearest controlled parent owns the block. Validate that the moved
+	// blocks come from one entity, independently of where they are going.
+	if ( moveClientIds.length > 1 ) {
+		const getSourceEntity = ( id: string ) =>
 			getBlockParents( state, id, true ).find( ( parent ) =>
 				areInnerBlocksControlled( state, parent )
-			) ?? '';
-		return (
-			// Moving between saved entities needs coordinated updates to both;
-			// this action only changes the block tree owned by one entity.
-			controlledSourceParent === controlledDestinationParent &&
-			// Reordering needs no insertion/removal permission. Changing parents does.
-			( getBlockRootClientId( state, id ) === rootClientId ||
-				( canRemoveBlock( state, id ) &&
-					canInsertBlockType(
-						state,
-						getBlockName( state, id ),
-						rootClientId
-					) ) )
-		);
-	} );
+			);
+		const sourceEntity = getSourceEntity( moveClientIds[ 0 ] );
+		if (
+			moveClientIds.some(
+				( id ) => getSourceEntity( id ) !== sourceEntity
+			)
+		) {
+			return false;
+		}
+	}
+	// Reordering needs no insertion/removal permission. Changing parents does.
+	return moveClientIds.every(
+		( id ) =>
+			getBlockRootClientId( state, id ) === rootClientId ||
+			( canRemoveBlock( state, id ) &&
+				canInsertBlockType(
+					state,
+					getBlockName( state, id ),
+					rootClientId
+				) )
+	);
 }
 
 /**

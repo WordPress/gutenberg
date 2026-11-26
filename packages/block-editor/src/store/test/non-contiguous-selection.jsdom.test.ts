@@ -252,7 +252,7 @@ describe( 'block selection with multiSelectSet', () => {
 		).toEqual( [ ids[ 0 ] ] );
 	} );
 
-	it.each( [ 'remove-locked', 'disallowed', 'cross-entity' ] )(
+	it.each( [ 'remove-locked', 'disallowed', 'mixed-source' ] )(
 		'rejects %s moves without partial mutation',
 		async ( reason ) => {
 			const parents = [
@@ -276,7 +276,7 @@ describe( 'block selection with multiSelectSet', () => {
 					.updateBlockListSettings( parents[ 1 ].clientId, {
 						allowedBlocks: [],
 					} );
-			} else if ( reason === 'cross-entity' ) {
+			} else if ( reason === 'mixed-source' ) {
 				registry
 					.dispatch( store )
 					.setHasControlledInnerBlocks( parents[ 1 ].clientId, true );

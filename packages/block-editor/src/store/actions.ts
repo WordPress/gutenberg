@@ -612,10 +612,6 @@ export const moveBlocksToPosition =
 		index?: number
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		if ( ! select.canMoveBlocks( clientIds ) ) {
-			return;
-		}
-
 		// Ensure the index is a non-negative integer when provided.
 		if (
 			index !== undefined &&
@@ -625,11 +621,11 @@ export const moveBlocksToPosition =
 		}
 
 		const destinationRootClientId = toRootClientId ?? '';
-		// Reject a missing destination parent, since blocks cannot be inserted into it.
-		// Skip this lookup for an empty ID, which targets the top-level block list.
 		if (
-			destinationRootClientId &&
-			! select.getBlock( destinationRootClientId )
+			! select.canMoveBlocksToPosition(
+				clientIds,
+				destinationRootClientId
+			)
 		) {
 			return;
 		}
@@ -637,19 +633,6 @@ export const moveBlocksToPosition =
 			castArray( clientIds ),
 			select.getBlockParents
 		);
-		// Check the destination and its ancestors against the moved IDs to prevent
-		// placing a block inside itself or its descendants, which would create a cycle.
-		const destinationParents = destinationRootClientId
-			? [
-					destinationRootClientId,
-					...select.getBlockParents( destinationRootClientId ),
-				]
-			: [];
-		if (
-			destinationParents.some( ( id ) => moveClientIds.includes( id ) )
-		) {
-			return;
-		}
 
 		if ( select.areBlocksContiguous( moveClientIds ) ) {
 			// Sort siblings into document order: the same-parent reducer moves a range
@@ -664,21 +647,6 @@ export const moveBlocksToPosition =
 				select.getBlockRootClientId( orderedIds[ 0 ] ) ??
 				fromRootClientId ??
 				'';
-			// Check removal and insertion permissions only when changing parents;
-			// reordering within one parent does not add or remove blocks from its list.
-			if ( sourceRootClientId !== destinationRootClientId ) {
-				if ( ! select.canRemoveBlocks( orderedIds ) ) {
-					return;
-				}
-				if (
-					! select.canInsertBlocks(
-						orderedIds,
-						destinationRootClientId
-					)
-				) {
-					return;
-				}
-			}
 
 			dispatch( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -687,17 +655,6 @@ export const moveBlocksToPosition =
 				clientIds: orderedIds,
 				index,
 			} );
-			return;
-		}
-
-		// Reject non-contiguous moves between separately saved entities: this action
-		// updates one entity's block tree and cannot coordinate saves for both.
-		if (
-			! select.canMoveBlocksToPosition(
-				moveClientIds,
-				destinationRootClientId
-			)
-		) {
 			return;
 		}
 

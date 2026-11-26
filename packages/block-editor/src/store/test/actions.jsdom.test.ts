@@ -920,9 +920,9 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'moveBlocksToPosition', () => {
-		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
+		it( 'does not dispatch a move when the source is locked', () => {
 			const select = {
-				canMoveBlocks: () => false,
+				canMoveBlocksToPosition: () => false,
 			};
 			const dispatch = vi.fn() as MockDispatch;
 
@@ -942,15 +942,11 @@ describe( 'actions', () => {
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+		it( 'dispatches a move when the destination is allowed', () => {
 			const select = {
-				canMoveBlocks: () => true,
+				canMoveBlocksToPosition: () => true,
 				areBlocksContiguous: () => true,
-				getBlock: () => ( {} ),
-				getBlockParents: () => [],
 				getBlockRootClientId: () => 'ribs',
-				canRemoveBlocks: () => true,
-				canInsertBlocks: () => true,
 			};
 			const dispatch = vi.fn() as MockDispatch;
 
@@ -976,15 +972,9 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+		it( 'checks the requested destination before dispatching a move', () => {
 			const select = {
-				canMoveBlocks: () => true,
-				areBlocksContiguous: () => true,
-				getBlock: () => ( {} ),
-				getBlockParents: () => [],
-				getBlockRootClientId: () => 'ribs',
-				canRemoveBlocks: () => true,
-				canInsertBlocks: () => false,
+				canMoveBlocksToPosition: vi.fn( () => false ),
 			};
 			const dispatch = vi.fn() as MockDispatch;
 
@@ -1001,6 +991,10 @@ describe( 'actions', () => {
 				} )
 			);
 
+			expect( select.canMoveBlocksToPosition ).toHaveBeenCalledWith(
+				[ 'chicken' ],
+				'chicken-ribs'
+			);
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 	} );
@@ -1008,10 +1002,8 @@ describe( 'actions', () => {
 	describe( 'moveBlockToPosition', () => {
 		it( 'dispatches MOVE_BLOCKS_TO_POSITION for a single block', () => {
 			const select = {
-				canMoveBlocks: () => true,
+				canMoveBlocksToPosition: () => true,
 				areBlocksContiguous: () => true,
-				getBlock: () => ( {} ),
-				getBlockParents: () => [],
 				getBlockRootClientId: () => 'ribs',
 			};
 			const dispatch = vi.fn() as MockDispatch;
