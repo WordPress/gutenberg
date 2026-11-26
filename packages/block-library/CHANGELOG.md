@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Table: Make the Stripes style follow the text color so it stays readable on dark backgrounds, and let themes set the row color with the `--wp--style--table-stripe-color` custom property ([#87120](https://github.com/WordPress/gutenberg/pull/87120)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).

@@ -85,7 +85,7 @@
 		background-color: transparent;
 
 		tbody tr:nth-child(odd) {
-			background-color: $gray-100;
+			background-color: var(--wp--style--table-stripe-color, color-mix(in srgb, currentColor 6.5%, transparent));
 		}
 
 		&.has-subtle-light-gray-background-color {
@@ -117,7 +117,9 @@
 			border-color: transparent;
 		}
 
-		border-bottom: 1px solid $gray-100;
+		border-bottom:
+			1px solid
+			var(--wp--style--table-stripe-color, color-mix(in srgb, currentColor 6.5%, transparent));
 	}
 
 	// Border Styles
