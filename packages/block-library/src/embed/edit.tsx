@@ -227,9 +227,7 @@ const EmbedEdit = ( props: EmbedEditProps ) => {
 						setURL( rewrittenURL );
 						setAttributes( {
 							url: rewrittenURL,
-							// Not guaranteed: submitting an empty field passes
-							// `undefined`, which throws, as it did before.
-							...findMoreSuitableBlock( rewrittenURL! )
+							...findMoreSuitableBlock( rewrittenURL )
 								?.attributes,
 							className: blockClass,
 						} );

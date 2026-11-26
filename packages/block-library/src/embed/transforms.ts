@@ -57,9 +57,7 @@ const transforms: BlockType< EmbedAttributes >[ 'transforms' ] = {
 				const url = rewriteXToTwitter( shortcode.content?.trim() );
 				return createBlock( EMBED_BLOCK, {
 					url,
-					// Not guaranteed: an `[embed]` shortcode with no content
-					// passes `undefined`, which throws, as it did before.
-					...findMoreSuitableBlock( url! )?.attributes,
+					...findMoreSuitableBlock( url )?.attributes,
 				} );
 			},
 		},

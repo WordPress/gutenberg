@@ -64,14 +64,19 @@ export const matchesPatterns = (
  * @return The block variation that should be used for this URL
  */
 export const findMoreSuitableBlock = (
-	url: string
-): EmbedVariation | undefined =>
+	url?: string
+): EmbedVariation | undefined => {
+	if ( ! url ) {
+		return;
+	}
+
 	// Embed variations declare `patterns` and icon descriptors, which
 	// `BlockVariation` doesn't.
-	(
+	return (
 		getBlockVariations( DEFAULT_EMBED_BLOCK ) as
 			EmbedVariation[] | undefined
 	 )?.find( ( { patterns } ) => matchesPatterns( url, patterns ) );
+};
 
 /**
  * Rewrites `x.com` URLs to `twitter.com` as a workaround while the

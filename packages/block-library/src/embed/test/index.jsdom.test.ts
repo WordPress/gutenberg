@@ -67,6 +67,11 @@ describe( 'utils', () => {
 			);
 			expect( findMoreSuitableBlock( unknownURL ) ).toBeUndefined();
 		} );
+
+		test( 'findMoreSuitableBlock returns undefined without a URL', () => {
+			expect( findMoreSuitableBlock( undefined ) ).toBeUndefined();
+			expect( findMoreSuitableBlock( '' ) ).toBeUndefined();
+		} );
 	} );
 	describe( 'getClassNames', () => {
 		it( 'should return aspect ratio class names for iframes with width and height', () => {
