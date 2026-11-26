@@ -1,9 +1,0 @@
-<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li>x</li>
-<!-- /wp:list-item -->
-
-<!-- wp:list-item -->
-<li>y‸</li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
