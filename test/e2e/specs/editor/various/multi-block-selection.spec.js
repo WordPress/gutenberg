@@ -1185,14 +1185,27 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			{ steps: 10 }
 		);
 		await page.mouse.up();
-		await page.keyboard.type( 'a' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'One two three' },
-			},
-			{ name: 'core/paragraph', attributes: { content: 'Sa' } },
-		] );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectionStart,
+						getSelectionEnd,
+						getBlockIndex,
+					} = window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { clientId, attributeKey, offset } ) => [
+							getBlockIndex( clientId ),
+							attributeKey,
+							offset,
+						]
+					);
+				} )
+			)
+			.toEqual( [
+				[ 1, 'content', 1 ],
+				[ 2, 'content', 5 ],
+			] );
 	} );
 
 	test( 'should select the whole paragraph on triple click', async ( {
