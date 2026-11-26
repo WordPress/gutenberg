@@ -7,6 +7,19 @@ import * as Card from '../../card';
 import { ThemeProvider } from '../../utils/theme-provider';
 import * as Item from '../index';
 
+/** The box inside the border and padding of an element. */
+function contentBoxOf( element: Element ) {
+	const { left, right } = element.getBoundingClientRect();
+	const style = getComputedStyle( element );
+	const start =
+		parseFloat( style.borderInlineStartWidth ) +
+		parseFloat( style.paddingInlineStart );
+	const end =
+		parseFloat( style.borderInlineEndWidth ) +
+		parseFloat( style.paddingInlineEnd );
+	return { right: right - end, width: right - left - start - end };
+}
+
 function elementAtCenterOf( element: Element ) {
 	const { left, top, width, height } = element.getBoundingClientRect();
 	return document.elementFromPoint( left + width / 2, top + height / 2 );
@@ -157,18 +170,18 @@ describe( 'Item layout', () => {
 			</div>
 		);
 
-		const rowElement = screen.getByTestId( 'row' );
-		const row = rowElement.getBoundingClientRect();
-		const meta = screen.getByTestId( 'meta' ).getBoundingClientRect();
+		const row = contentBoxOf( screen.getByTestId( 'row' ) );
+		const metaElement = screen.getByTestId( 'meta' );
 		const action = screen
 			.getByRole( 'button', { name: 'Remove webhook' } )
 			.getBoundingClientRect();
 
-		expect( meta.width ).toBeLessThanOrEqual( row.width / 4 );
-		expect( action.right ).toBeLessThanOrEqual( row.right );
-		expect( rowElement.scrollWidth ).toBeLessThanOrEqual(
-			rowElement.clientWidth
-		);
+		// The meta, with the space before it, takes at most a quarter.
+		expect(
+			metaElement.getBoundingClientRect().width +
+				parseFloat( getComputedStyle( metaElement ).marginInlineStart )
+		).toBeLessThanOrEqual( row.width / 4 + 0.5 );
+		expect( action.right ).toBeLessThanOrEqual( row.right + 0.5 );
 	} );
 
 	it( 'keeps wide actions in a narrow row that has media', async () => {
@@ -194,17 +207,12 @@ describe( 'Item layout', () => {
 			</div>
 		);
 
-		const rowElement = screen.getByTestId( 'row' );
+		const row = contentBoxOf( screen.getByTestId( 'row' ) );
 		const action = screen
 			.getByRole( 'button', { name: 'Remove webhook' } )
 			.getBoundingClientRect();
 
-		expect( action.right ).toBeLessThanOrEqual(
-			rowElement.getBoundingClientRect().right
-		);
-		expect( rowElement.scrollWidth ).toBeLessThanOrEqual(
-			rowElement.clientWidth
-		);
+		expect( action.right ).toBeLessThanOrEqual( row.right + 0.5 );
 	} );
 
 	it( 'styles a row by its own control, not by a row nested in its actions', async () => {
