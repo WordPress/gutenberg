@@ -14,7 +14,7 @@ The kind of row tells users, and assistive technology, what is interactive.
 -   **Use `Item.ButtonRow` when the whole row runs a command or opens a popup.**
 -   **Use `Item.ContentRow` when only the controls inside the row are interactive.** Clicking the label does nothing.
 
-`Item.LinkRow` and `Item.ButtonRow` need an `Item.Label`. It is the accessible name of the link or button.
+`Item.LinkRow` and `Item.ButtonRow` need an `Item.Label`, unless the row has an `aria-label` or `aria-labelledby` of its own. The label is the accessible name of the link or button, so assistive technology does not read it on its own: do not render it as a heading.
 
 ## Put static content in `Item.Meta` and controls in `Item.Actions`
 
@@ -57,8 +57,8 @@ To hide a row or a part, do not render it. The components set their own `display
 
 ## Use `Card.FullBleed` to put rows in a card
 
-In a `Card`, place a joined group, or a single row, in a `Card.FullBleed` inside `Card.Content`. The rows then run from edge to edge, and the card is the frame. The group keeps only a line above its first row, which separates it from the card header. A detached group keeps the frame of each row.
+In a `Card`, place a joined group, or a single row, in a `Card.FullBleed` inside `Card.Content`. The rows then run from edge to edge, and the card is the frame. The group keeps only a line above its first row, which separates it from the card header.
 
-Without `Card.FullBleed`, a group in `Card.Content` keeps its own frame inside the padding of the card.
+Without `Card.FullBleed`, a group in `Card.Content` keeps its own frame inside the padding of the card. Put a detached group there, since each of its rows has a frame of its own.
 
 If the card would hold nothing but the group, do not use a `Card`. A group already draws that surface.

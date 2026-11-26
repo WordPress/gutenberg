@@ -373,7 +373,9 @@ describe( 'Item', () => {
 			</Item.LinkRow>
 		);
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith(
+			'Item: an <Item.LinkRow> or <Item.ButtonRow> needs an <Item.Label>. Without it the link or button of the row has no accessible name.'
+		);
 	} );
 
 	it( 'warns when a link row has neither an href nor a render prop', () => {
@@ -383,7 +385,9 @@ describe( 'Item', () => {
 			</Item.LinkRow>
 		);
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith(
+			'Item.LinkRow: pass an `href`, or a `render` prop that supplies one. Without it the row is not a link, and keyboard users cannot reach it.'
+		);
 	} );
 
 	it( 'warns when a row shows a chevron next to its controls', () => {
@@ -397,6 +401,8 @@ describe( 'Item', () => {
 			</Item.ButtonRow>
 		);
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarnedWith(
+			'Item.Chevron: a row that holds controls should not also show a chevron. The glyph reads as belonging to the control beside it rather than to the row.'
+		);
 	} );
 } );

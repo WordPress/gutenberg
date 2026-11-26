@@ -34,7 +34,6 @@ const FULL_BLEED_PROPS = {
  *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
-
 export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
 	function CardFullBleed( { render, ...props }, ref ) {
 		const element = useRender( {

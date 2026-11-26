@@ -330,23 +330,6 @@ describe( 'Item layout', () => {
 		).toBe( '0px' );
 	} );
 
-	it( 'shows a disabled row as disabled when its label renders as a heading', async () => {
-		await render(
-			<>
-				<Item.ButtonRow onClick={ () => {} } disabled>
-					<Item.Label>Span label</Item.Label>
-				</Item.ButtonRow>
-				<Item.ButtonRow onClick={ () => {} } disabled>
-					<Item.Label render={ <h3 /> }>Heading label</Item.Label>
-				</Item.ButtonRow>
-			</>
-		);
-
-		expect(
-			getComputedStyle( screen.getByText( 'Heading label' ) ).color
-		).toBe( getComputedStyle( screen.getByText( 'Span label' ) ).color );
-	} );
-
 	it( 'draws a frame around a row outside a group', async () => {
 		await render(
 			<Item.ContentRow data-testid="row">

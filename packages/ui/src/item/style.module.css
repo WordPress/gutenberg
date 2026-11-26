@@ -248,21 +248,11 @@
 		}
 
 		/* The label of a link or button row is the visible text of a control. */
-		/*
-		 * The label of a link or button row is the visible text of a control.
-		 * `--_gcd-heading-color` carries the color to a label that renders
-		 * as a heading, which the unlayered heading defense would otherwise
-		 * color as static text.
-		 */
 		.is-activatable > .label {
-			--_gcd-heading-color: var(--wpds-color-foreground-interactive-neutral);
-
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		.row:has(> .surface[data-disabled]) > .label {
-			--_gcd-heading-color: var(--wpds-color-foreground-interactive-neutral-disabled);
-
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 			/*
@@ -270,8 +260,6 @@
 			 * otherwise give it the ordinary text color.
 			 */
 			@media (forced-colors: active) {
-				--_gcd-heading-color: GrayText;
-
 				color: GrayText;
 			}
 		}

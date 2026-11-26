@@ -128,7 +128,9 @@ export interface LabelProps extends ComponentProps< 'span' > {
 	 * it must be text and must not contain interactive elements.
 	 *
 	 * In `Item.LinkRow` and `Item.ButtonRow` the row sets the `id` of this
-	 * part, which its control references.
+	 * part, which its control references. The part itself is hidden from
+	 * assistive technology there, so do not render it as a heading: put
+	 * the heading outside the row.
 	 */
 	children?: ReactNode;
 }

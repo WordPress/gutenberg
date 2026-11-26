@@ -49,8 +49,9 @@ export const Media = forwardRef< HTMLSpanElement, MediaProps >(
 );
 
 /**
- * The name of the row. Required in `Item.LinkRow` and `Item.ButtonRow`,
- * where it is the accessible name of the link or button. It should match
+ * The name of the row. In `Item.LinkRow` and `Item.ButtonRow` it is the
+ * accessible name of the link or button, and is required unless the row
+ * has an `aria-label` or `aria-labelledby` of its own. It should match
  * the heading of the screen the row opens, or name the command it runs.
  */
 export const Label = forwardRef< HTMLSpanElement, LabelProps >(
