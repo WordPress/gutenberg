@@ -80,6 +80,113 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( openMenuButton ).toBeFocused();
 		} );
 
+		test.describe( 'Fade out', () => {
+			// Slow the animation down, so the fade can be observed.
+			const slowFadeStyles = `
+				.wp-block-navigation__responsive-container.is-menu-open,
+				.wp-block-navigation__responsive-container.is-menu-open.is-menu-closing {
+					animation-duration: 1s !important;
+				}
+			`;
+
+			test.beforeEach( async ( { page } ) => {
+				await page.emulateMedia( { reducedMotion: 'no-preference' } );
+			} );
+
+			test( 'keeps the overlay displayed until it has faded out', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( { content: slowFadeStyles } );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+				const root = page.locator( 'html' );
+
+				await page.getByRole( 'button', { name: 'Open menu' } ).click();
+				await expect( overlay ).toBeVisible();
+
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+
+				// The overlay is still displayed, and the page still can't scroll.
+				await expect( overlay ).toHaveClass( /is-menu-closing/ );
+				await expect( overlay ).toBeVisible();
+				await expect( root ).toHaveClass( /has-modal-open/ );
+
+				// Once the fade is over, the overlay is removed.
+				await expect( overlay ).toBeHidden();
+				await expect( root ).not.toHaveClass( /has-modal-open/ );
+			} );
+
+			test( 'cancels the fade when the menu is reopened', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( { content: slowFadeStyles } );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+				const root = page.locator( 'html' );
+				const openMenuButton = page.getByRole( 'button', {
+					name: 'Open menu',
+				} );
+
+				await openMenuButton.click();
+				await expect( overlay ).toBeVisible();
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+				await expect( overlay ).toHaveClass( /is-menu-closing/ );
+
+				// Reopen while the overlay is still fading out.
+				await openMenuButton.click();
+				await expect( overlay ).not.toHaveClass( /is-menu-closing/ );
+
+				// The overlay is still open after the fade would have ended.
+				await page.evaluate(
+					() =>
+						new Promise( ( resolve ) =>
+							setTimeout( resolve, 1300 )
+						)
+				);
+				await expect( overlay ).toBeVisible();
+				await expect( root ).toHaveClass( /has-modal-open/ );
+				await expect(
+					page.getByRole( 'link', { name: 'Item 1' } )
+				).toBeVisible();
+			} );
+
+			test( 'closes right away when the overlay has no animation', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( {
+					content:
+						'.wp-block-navigation__responsive-container.is-menu-open { animation: none !important; }',
+				} );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+
+				await page.getByRole( 'button', { name: 'Open menu' } ).click();
+				await expect( overlay ).toBeVisible();
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+
+				// There is no fade to wait for.
+				await expect( page.locator( '.is-menu-closing' ) ).toHaveCount(
+					0
+				);
+				await expect( overlay ).toBeHidden();
+				await expect( page.locator( 'html' ) ).not.toHaveClass(
+					/has-modal-open/
+				);
+			} );
+		} );
+
 		/**
 		 * These are already tested within the Overlay Interactions test above, but Safari is flakey on the Tab
 		 * keypresses (passes 50 - 70% of the time). Tab keypresses are testing fine manually in Safari, but not

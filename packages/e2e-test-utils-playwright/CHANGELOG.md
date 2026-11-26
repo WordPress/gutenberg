@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+
+## 3.3.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `RequestUtils`: Open a new connection for each request, so requests no longer fail intermittently with "socket hang up" ([#86350](https://github.com/WordPress/gutenberg/pull/86350)).

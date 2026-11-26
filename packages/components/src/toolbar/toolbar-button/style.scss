@@ -11,7 +11,7 @@
 	&[data-subscript]::after {
 		content: attr(data-subscript);
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		line-height: 12px;
 		position: absolute;
