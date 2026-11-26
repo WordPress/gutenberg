@@ -674,11 +674,21 @@
 					"default": false
 				},
 				"transform": {
-					"description": "This value signals that a block supports some of the CSS transform properties. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nEach feature is output as its own CSS property, such as `rotate`, never the `transform` shorthand.\n\nWhen the block declares support for a specific transform property, its attributes definition is extended to include the style attribute.",
+					"description": "This value signals that a block supports some of the CSS transform properties. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nEach feature is saved as its own CSS property, such as `rotate`, never the `transform` shorthand, in an inline style on the block wrapper. A block that applies them to an inner element skips serialization with `__experimentalSkipSerialization` and uses the transform classes and styles helpers.\n\nWhen the block declares support for a specific transform property, its attributes definition is extended to include the style attribute.",
 					"type": "object",
 					"properties": {
 						"rotate": {
 							"description": "Allow blocks to define a rotation.",
+							"type": "boolean",
+							"default": false
+						},
+						"translate": {
+							"description": "Allow blocks to define an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						},
+						"scale": {
+							"description": "Allow blocks to define a uniform scale.",
 							"type": "boolean",
 							"default": false
 						}
@@ -867,7 +877,9 @@
 							"type": "object",
 							"properties": {
 								"root": { "type": "string" },
-								"rotate": { "type": "string" }
+								"rotate": { "type": "string" },
+								"translate": { "type": "string" },
+								"scale": { "type": "string" }
 							}
 						}
 					]

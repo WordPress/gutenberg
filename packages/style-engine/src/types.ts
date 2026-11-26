@@ -73,6 +73,11 @@ export interface Style {
 	};
 	transform?: {
 		rotate?: CSSProperties[ 'rotate' ];
+		translate?: {
+			x?: string;
+			y?: string;
+		};
+		scale?: number | string;
 	};
 	typography?: {
 		fontSize?: CSSProperties[ 'fontSize' ];

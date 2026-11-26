@@ -33,7 +33,8 @@ const DefaultComponent = ( args: ImageCropperProps ) => {
 export const Default = {
 	render: DefaultComponent,
 	args: {
-		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+		// Served from `storybook/static`.
+		src: 'landscape.svg',
 		minZoom: 1,
 		maxZoom: 5,
 	},
@@ -234,7 +235,8 @@ export const WithControls = {
 	},
 	render: WithControlsComponent,
 	args: {
-		src: 'https://s.w.org/images/core/5.3/MtBlanc1.jpg',
+		// Served from `storybook/static`.
+		src: 'landscape.svg',
 		minZoom: 1,
 		maxZoom: 5,
 	},

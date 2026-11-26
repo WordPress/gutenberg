@@ -41,6 +41,14 @@ const touchStartEvent = {
 let inertElements = [];
 
 /**
+ * Timer for the cleanup that runs after the close animation. Reopening the
+ * lightbox cancels it, so it can't clear the new selection.
+ *
+ * @type {number|undefined}
+ */
+let closeCleanupTimer;
+
+/**
  * Per-gesture state for the in-progress horizontal drag on the lightbox.
  *
  * `direction` is null until the gesture exceeds a small disambiguation
@@ -353,6 +361,9 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// Cancels the cleanup of a previous close that hasn't run yet.
+				clearTimeout( closeCleanupTimer );
+
 				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
 				state.scrollTopReset = document.documentElement.scrollTop;
@@ -376,11 +387,11 @@ const { state, actions, callbacks } = store(
 					// the `styles.scss` file, but in any case we should wait a few
 					// milliseconds longer than the duration, otherwise a user may scroll
 					// too soon and cause the animation to look sloppy.
-					setTimeout( function () {
+					closeCleanupTimer = setTimeout( function () {
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
-						state.selectedImage.buttonRef.focus( {
+						state.selectedImage?.buttonRef?.focus( {
 							preventScroll: true,
 						} );
 
@@ -748,20 +759,8 @@ const { state, actions, callbacks } = store(
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
 				} = state.selectedImage.imageRef;
-				// A rotation turns the figure around its centre, which its
-				// bounding box keeps, so place the unrotated image from there.
-				const figure = state.selectedImage.imageRef.offsetParent;
-				const figureRect = figure.getBoundingClientRect();
-				let screenPosX =
-					figureRect.x +
-					( figureRect.width - figure.offsetWidth ) / 2 +
-					figure.clientLeft +
-					state.selectedImage.imageRef.offsetLeft;
-				let screenPosY =
-					figureRect.y +
-					( figureRect.height - figure.offsetHeight ) / 2 +
-					figure.clientTop +
-					state.selectedImage.imageRef.offsetTop;
+				let { x: screenPosX, y: screenPosY } =
+					state.selectedImage.imageRef.getBoundingClientRect();
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;

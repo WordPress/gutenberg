@@ -1,15 +1,6 @@
-import {
-	getBlockSupport,
-	getBlockType,
-	hasBlockSupport,
-} from '@wordpress/blocks';
-import type { BlockType } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useMemo } from '@wordpress/element';
-import { getBlockSelector } from '@wordpress/global-styles-engine';
-import { compileCSS, getCSSRules } from '@wordpress/style-engine';
-import type { Style } from '@wordpress/style-engine';
+import { useCallback } from '@wordpress/element';
 import InspectorControls from '../components/inspector-controls';
 import {
 	TransformPanel as StylesTransformPanel,
@@ -17,21 +8,18 @@ import {
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	usePrivateStyleOverride,
-} from './utils';
+import { cleanEmptyObject } from './utils';
 import {
 	getStyleForState,
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
-import { buildScopedBlockSelector } from './state-utils';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
-	BlockListBlockFeatureProps,
+	BlockStyleState,
 	ResetAllFilter,
 	StyleInspectorControlProps,
 	TransformAttributes,
@@ -39,11 +27,6 @@ import type {
 } from './types';
 
 export const TRANSFORM_SUPPORT_KEY = 'transform';
-
-const TRANSFORM_FEATURES = [ 'rotate' ];
-
-// Used for generating the instance ID.
-const TRANSFORM_BLOCK_PROPS_REFERENCE = {};
 
 function TransformInspectorControl( {
 	children,
@@ -72,6 +55,61 @@ function TransformInspectorControl( {
 	);
 }
 
+/**
+ * Returns the inherited value the Transform panel shows for a block state.
+ * Each transform comes from the block styles the state renders over, else
+ * from Global Styles.
+ *
+ * @param resolvedValue Global Styles value resolved for the state.
+ * @param style         The block styles.
+ * @param selectedState Selected block style state.
+ *
+ * @return Inherited value for the panel.
+ */
+export function getStateInheritedValue(
+	resolvedValue: PanelStyle | undefined,
+	style: PanelStyle | undefined,
+	selectedState: BlockStyleState
+): PanelStyle {
+	const { viewport, pseudo } = selectedState;
+	// Ordered from the lowest to the highest priority.
+	const layers = [ style ];
+	if (
+		hasViewportBlockStyleState( selectedState ) &&
+		hasPseudoBlockStyleState( selectedState )
+	) {
+		layers.push(
+			style?.[ viewport as string ] as PanelStyle | undefined,
+			style?.[ pseudo as string ] as PanelStyle | undefined
+		);
+	}
+
+	const transform: Record< string, unknown > = {
+		...resolvedValue?.transform,
+	};
+	for ( const layer of layers ) {
+		const layerTransform = layer?.transform;
+		if ( ! layerTransform || typeof layerTransform !== 'object' ) {
+			continue;
+		}
+		for ( const [ key, layerValue ] of Object.entries( layerTransform ) ) {
+			if ( layerValue === undefined || layerValue === null ) {
+				continue;
+			}
+			// Translate axes layer one by one, as in the CSS.
+			transform[ key ] =
+				key === 'translate' && typeof layerValue === 'object'
+					? {
+							...( transform.translate as object | undefined ),
+							...layerValue,
+						}
+					: layerValue;
+		}
+	}
+
+	return { ...resolvedValue, transform } as PanelStyle;
+}
+
 export function TransformPanel( {
 	clientId,
 	name,
@@ -98,7 +136,7 @@ export function TransformPanel( {
 		},
 		[ clientId, isEnabled ]
 	);
-	const { value: inheritedValue } = useResolvedStyle(
+	const { value: resolvedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState
@@ -108,6 +146,9 @@ export function TransformPanel( {
 		return null;
 	}
 
+	const inheritedValue = isStateSelected
+		? getStateInheritedValue( resolvedValue, style, selectedState )
+		: resolvedValue;
 	const value = isStateSelected
 		? // The state styles have the shape of the block styles.
 			( getStyleForState( style, selectedState ) as
@@ -136,131 +177,13 @@ export function TransformPanel( {
 			onChange={ onChange }
 			// Unlike Global Styles, the block inspector hides a control
 			// unless the block shows it by default.
-			defaultControls={ { rotate: false, ...defaultControls } }
+			defaultControls={ {
+				rotate: false,
+				translate: false,
+				scale: false,
+				...defaultControls,
+			} }
 			inheritedValue={ inheritedValue }
 		/>
 	);
 }
-
-/**
- * Determine whether there is block support for a transform feature.
- *
- * @param nameOrType Block name or type object.
- * @param feature    Transform feature to check for.
- *
- * @return Whether there is support.
- */
-export function hasTransformSupport(
-	nameOrType: string | BlockType,
-	feature: string = 'any'
-): boolean {
-	if ( feature === 'any' ) {
-		return TRANSFORM_FEATURES.some( ( transformFeature ) =>
-			hasBlockSupport( nameOrType, [
-				TRANSFORM_SUPPORT_KEY,
-				transformFeature,
-			] )
-		);
-	}
-
-	return hasBlockSupport( nameOrType, [ TRANSFORM_SUPPORT_KEY, feature ] );
-}
-
-/**
- * Splits a block's transform styles into the ones output inline on the block
- * wrapper and the ones output under the block's transform feature selector.
- * Mirror of `gutenberg_render_transform_support()` in PHP.
- *
- * @param name      Block name.
- * @param transform The block's transform styles.
- *
- * @return Inline styles, and styles keyed by feature selector.
- */
-export function getTransformStyleGroups(
-	name: string,
-	transform: Record< string, unknown > | undefined
-) {
-	const inline: Record< string, unknown > = {};
-	const bySelector: Record< string, Record< string, unknown > > = {};
-	const blockType = getBlockType( name );
-
-	TRANSFORM_FEATURES.forEach( ( feature ) => {
-		if (
-			! blockType ||
-			transform?.[ feature ] === undefined ||
-			! hasTransformSupport( name, feature ) ||
-			shouldSkipSerialization( name, TRANSFORM_SUPPORT_KEY, feature )
-		) {
-			return;
-		}
-
-		const selector =
-			getBlockSelector(
-				blockType,
-				`${ TRANSFORM_SUPPORT_KEY }.${ feature }`
-			) || getBlockSelector( blockType, TRANSFORM_SUPPORT_KEY );
-		if ( selector ) {
-			bySelector[ selector ] = {
-				...bySelector[ selector ],
-				[ feature ]: transform[ feature ],
-			};
-		} else {
-			inline[ feature ] = transform[ feature ];
-		}
-	} );
-
-	return { inline, bySelector };
-}
-
-function useBlockProps( {
-	clientId,
-	name,
-	style,
-}: BlockListBlockFeatureProps & { style?: PanelStyle } ) {
-	const className = useInstanceId(
-		TRANSFORM_BLOCK_PROPS_REFERENCE,
-		'wp-transform'
-	);
-	const { inline, bySelector } = useMemo(
-		() => getTransformStyleGroups( name, style?.transform ),
-		[ name, style?.transform ]
-	);
-	const css = useMemo(
-		() =>
-			Object.entries( bySelector )
-				.map( ( [ selector, transform ] ) =>
-					compileCSS( { transform } as Style, {
-						selector: buildScopedBlockSelector(
-							`.${ className }`,
-							selector,
-							'',
-							name
-						),
-					} )
-				)
-				.join( '' ),
-		[ bySelector, className, name ]
-	);
-
-	usePrivateStyleOverride( { css, clientId } );
-
-	const inlineStyle = Object.fromEntries(
-		getCSSRules( { transform: inline } as Style ).map( ( rule ) => [
-			rule.key,
-			rule.value,
-		] )
-	);
-
-	return {
-		className: css ? className : undefined,
-		style: inlineStyle,
-	};
-}
-
-export default {
-	useBlockProps,
-	attributeKeys: [ 'style' ],
-	hasSupport( name: string | BlockType ) {
-		return hasTransformSupport( name );
-	},
-};
