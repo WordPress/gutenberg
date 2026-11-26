@@ -1,4 +1,4 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType, type BlockSupports } from '@wordpress/blocks';
 import * as legacyWidget from './blocks/legacy-widget';
 import * as widgetGroup from './blocks/widget-group';
 
@@ -14,9 +14,7 @@ export * from './utils';
  * @param supports Block support settings.
  * @see https://developer.wordpress.org/block-editor/how-to-guides/widgets/legacy-widget-block/
  */
-export function registerLegacyWidgetBlock(
-	supports: Record< string, unknown > = {}
-) {
+export function registerLegacyWidgetBlock( supports: BlockSupports = {} ) {
 	const { metadata, settings, name } = legacyWidget;
 	registerBlockType(
 		{ ...metadata, name },
@@ -35,9 +33,7 @@ export function registerLegacyWidgetBlock(
  *
  * @param supports Block support settings.
  */
-export function registerWidgetGroupBlock(
-	supports: Record< string, unknown > = {}
-) {
+export function registerWidgetGroupBlock( supports: BlockSupports = {} ) {
 	const { metadata, settings, name } = widgetGroup;
 	registerBlockType(
 		{ ...metadata, name },
