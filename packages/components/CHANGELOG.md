@@ -37,6 +37,7 @@
 
 ### Internal
 
+-   Move the component migration guides to Markdown files in the `docs` folder, which is now included in the npm package.
 -   `ResizableBox`: Read CSS transforms with private helpers from `@wordpress/dom` ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).

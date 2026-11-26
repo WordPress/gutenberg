@@ -22,6 +22,7 @@
 		"node": ">=22.13.0"
 	},
 	"files": [
+		"docs",
 		"src",
 		"build",
 		"build-module",
@@ -38,6 +39,7 @@
 		},
 		"./README.md": "./README.md",
 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
+		"./docs/*": "./docs/*",
 		"./package.json": "./package.json",
 		"./build-style/*": "./build-style/*"
 	},
