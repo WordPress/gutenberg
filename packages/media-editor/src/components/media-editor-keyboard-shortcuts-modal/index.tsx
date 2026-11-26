@@ -8,9 +8,7 @@ import {
 } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/ui';
 
-type ShortcutEntry = {
-	description: string;
-} & (
+type KeyCombinationDisplayProps =
 	| {
 			keyCombination: {
 				character: string;
@@ -24,8 +22,11 @@ type ShortcutEntry = {
 				modifier?: WPKeycodeModifier | null;
 			};
 			label: string;
-	  }
-);
+	  };
+
+type ShortcutEntry = KeyCombinationDisplayProps & {
+	description: string;
+};
 
 const SHORTCUTS: ShortcutEntry[] = [
 	{
@@ -77,6 +78,50 @@ const SHORTCUTS: ShortcutEntry[] = [
 	},
 ];
 
+function KeyCombinationDisplay( {
+	keyCombination,
+	label,
+}: KeyCombinationDisplayProps ) {
+	const { character, modifier } = keyCombination;
+	const normalizedModifier = modifier ?? 'undefined';
+	const characters = Array.isArray( character ) ? character : [ character ];
+	const formatted = displayShortcutList[ normalizedModifier ](
+		characters[ 0 ] ?? ''
+	);
+	const prefix = formatted.slice( 0, -1 );
+	const keys = Array.isArray( character )
+		? [ ...prefix, ...character ]
+		: formatted;
+
+	return (
+		<kbd
+			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+			dir="ltr"
+		>
+			<VisuallyHidden render={ <span /> }>
+				{ label ||
+					shortcutAriaLabel[ normalizedModifier ](
+						characters.join( '' )
+					) }
+			</VisuallyHidden>
+			<span aria-hidden="true">
+				{ keys.map( ( key, keyIndex ) =>
+					key === '+' && keyIndex < prefix.length ? (
+						<Fragment key={ keyIndex }>{ key }</Fragment>
+					) : (
+						<kbd
+							key={ keyIndex }
+							className="media-editor-keyboard-shortcuts-modal__shortcut-key"
+						>
+							{ key }
+						</kbd>
+					)
+				) }
+			</span>
+		</kbd>
+	);
+}
+
 interface MediaEditorKeyboardShortcutsModalProps {
 	onClose: () => void;
 }
@@ -104,61 +149,17 @@ export default function MediaEditorKeyboardShortcutsModal( {
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map(
-					( { description, keyCombination, label }, index ) => {
-						const { character, modifier } = keyCombination;
-						const normalizedModifier = modifier ?? 'undefined';
-						const characters = Array.isArray( character )
-							? character
-							: [ character ];
-						const formatted = displayShortcutList[
-							normalizedModifier
-						]( characters[ 0 ] ?? '' );
-						const prefix = formatted.slice( 0, -1 );
-						const keys = Array.isArray( character )
-							? [ ...prefix, ...character ]
-							: formatted;
-
-						return (
-							<li
-								key={ index }
-								className="media-editor-keyboard-shortcuts-modal__shortcut"
-							>
-								<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
-									{ description }
-								</span>
-								<kbd
-									className="media-editor-keyboard-shortcuts-modal__shortcut-term"
-									dir="ltr"
-								>
-									<VisuallyHidden render={ <span /> }>
-										{ label ||
-											shortcutAriaLabel[
-												normalizedModifier
-											]( characters.join( '' ) ) }
-									</VisuallyHidden>
-									<span aria-hidden="true">
-										{ keys.map( ( key, keyIndex ) =>
-											key === '+' &&
-											keyIndex < prefix.length ? (
-												<Fragment key={ keyIndex }>
-													{ key }
-												</Fragment>
-											) : (
-												<kbd
-													key={ keyIndex }
-													className="media-editor-keyboard-shortcuts-modal__shortcut-key"
-												>
-													{ key }
-												</kbd>
-											)
-										) }
-									</span>
-								</kbd>
-							</li>
-						);
-					}
-				) }
+				{ SHORTCUTS.map( ( shortcut, index ) => (
+					<li
+						key={ index }
+						className="media-editor-keyboard-shortcuts-modal__shortcut"
+					>
+						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
+							{ shortcut.description }
+						</span>
+						<KeyCombinationDisplay { ...shortcut } />
+					</li>
+				) ) }
 			</ul>
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 		</Modal>

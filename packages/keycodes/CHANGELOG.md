@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Give Backslash, Plus, and Minus keys translated readable labels, including shortcuts without modifiers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+-   `shortcutAriaLabel`: Add translated names for the Backslash, Plus and Minus keys ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
 
 ## 5.2.0 (2026-11-18)
 
