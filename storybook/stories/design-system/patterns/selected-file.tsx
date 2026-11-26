@@ -49,12 +49,16 @@ export function getExtension( name: string ) {
 /**
  * Shows a thumbnail for an image, or a file icon for any other file. The
  * preview URL is revoked when the file changes.
+ *
+ * A browser can leave a file's type empty when it can't tell what the file
+ * is, so a file without a type also gets a preview. If it isn't an image,
+ * the preview fails and the file icon shows.
  */
 function FileThumbnail( { file }: { file: File } ) {
 	const [ previewUrl, setPreviewUrl ] = useState< string >();
 
 	useEffect( () => {
-		if ( ! file.type.startsWith( 'image/' ) ) {
+		if ( file.type && ! file.type.startsWith( 'image/' ) ) {
 			setPreviewUrl( undefined );
 			return;
 		}
