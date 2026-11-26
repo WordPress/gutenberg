@@ -31,7 +31,7 @@ interface WidgetEntity {
  */
 export function transformWidgetToBlock(
 	widget: WidgetEntity
-): Block | undefined {
+): Block | Block[] | null | undefined {
 	if ( widget.id_base !== 'block' ) {
 		let attributes: Record< string, unknown >;
 		if ( widget._embedded.about[ 0 ].is_multi ) {
@@ -85,7 +85,7 @@ export function transformWidgetToBlock(
  * @param block Legacy Widget block object
  * @return a block
  */
-function switchLegacyWidgetType( block: Block ): Block | undefined {
+function switchLegacyWidgetType( block: Block ): Block[] | null | undefined {
 	const transforms = getPossibleBlockTransformations( [ block ] ).filter(
 		( item ) => {
 			// The block without any transformations can't be a wildcard.
@@ -113,7 +113,7 @@ function switchLegacyWidgetType( block: Block ): Block | undefined {
 		return undefined;
 	}
 
-	return switchToBlockType( block, transforms[ 0 ].name )?.[ 0 ];
+	return switchToBlockType( block, transforms[ 0 ].name );
 }
 
 function transformInnerBlocks( innerBlocks: Block[] = [] ): Block[] {
