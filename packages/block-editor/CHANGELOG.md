@@ -13,6 +13,7 @@
 
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 
 ### Bug Fixes
 
@@ -28,6 +29,8 @@
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
 -   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
+-   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
+-   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 
 ### Internal
 
