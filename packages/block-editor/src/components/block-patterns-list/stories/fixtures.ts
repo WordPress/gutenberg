@@ -78,7 +78,8 @@ export default [
 								name: 'core/image',
 								isValid: true,
 								attributes: {
-									url: 'https://pd.w.org/2022/03/3866241b433db4ee2.96648572.jpeg',
+									// Served from `storybook/static`.
+									url: 'landscape.svg',
 									alt: '',
 									caption: '',
 									sizeSlug: 'large',
@@ -91,7 +92,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<figure class="wp-block-image size-large is-style-default"><img src="https://pd.w.org/2022/03/3866241b433db4ee2.96648572.jpeg" alt="" /></figure>',
+									'<figure class="wp-block-image size-large is-style-default"><img src="landscape.svg" alt="" /></figure>',
 								validationIssues: [],
 							},
 							{
