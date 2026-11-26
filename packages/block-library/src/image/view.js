@@ -118,7 +118,7 @@ function getSlidePitch() {
  * @return {string} A CSS transform value.
  */
 function slideTransform( offset ) {
-	return `translate(calc(var(--wp--lightbox-container-offset-x, -50%) + ${ offset }px), var(--wp--lightbox-container-offset-y, -50%))`;
+	return `translate(calc(-50% + ${ offset }px), -50%)`;
 }
 
 /**
@@ -853,6 +853,12 @@ const { state, actions, callbacks } = store(
 					containerWidth = containerHeight * fullSizeRatio;
 				}
 
+				// Keep the container on whole pixels, so that centering it with
+				// `translate(-50%, -50%)` doesn't land on sub-pixel positions,
+				// which makes the image blurry.
+				containerWidth = Math.round( containerWidth );
+				containerHeight = Math.round( containerHeight );
+
 				const hasCroppedSource =
 					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
 				const sourceRatio = hasCroppedSource
@@ -873,35 +879,11 @@ const { state, actions, callbacks } = store(
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
 
-				// As of this writing, using the calculations above will render the
-				// lightbox with a small, erroneous whitespace on the left side of the
-				// image in iOS Safari, perhaps due to an inconsistency in how browsers
-				// handle absolute positioning and CSS transformation. In any case,
-				// adding 1 pixel to the container width and height solves the problem,
-				// though this can be removed if the issue is fixed in the future.
-				const lightboxWidth = containerWidth + 1;
-				const lightboxHeight = containerHeight + 1;
-
-				// Centering with `translate(-50%, -50%)` lands on half pixels
-				// whenever the container size is odd or fractional. The container
-				// is composited while the lightbox is open, so the browser doesn't
-				// snap it to the pixel grid and the image looks blurry. Round the
-				// offsets to whole device pixels instead.
-				const { devicePixelRatio = 1 } = window;
-				const snapToDevicePixel = ( value ) =>
-					Math.round( value * devicePixelRatio ) / devicePixelRatio;
-
 				state.overlayStyles = `
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
-					--wp--lightbox-container-width: ${ lightboxWidth }px;
-					--wp--lightbox-container-height: ${ lightboxHeight }px;
-					--wp--lightbox-container-offset-x: ${ snapToDevicePixel(
-						-lightboxWidth / 2
-					) }px;
-					--wp--lightbox-container-offset-y: ${ snapToDevicePixel(
-						-lightboxHeight / 2
-					) }px;
+					--wp--lightbox-container-width: ${ containerWidth }px;
+					--wp--lightbox-container-height: ${ containerHeight }px;
 					--wp--lightbox-image-width: ${ containerWidth }px;
 					--wp--lightbox-image-height: ${ containerHeight }px;
 					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);
