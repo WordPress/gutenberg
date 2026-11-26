@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Icon } from '../icon';
 import type { PrefixIconProps } from './types';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 /**
  * Renders an icon before a menu item label. Keep the default 16px size for

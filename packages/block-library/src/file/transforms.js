@@ -2,6 +2,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { escapeEditableHTML } from '@wordpress/escape-html';
 import { _x } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 
@@ -90,7 +91,9 @@ const transforms = {
 				const href = attributes.src ?? attributes.url;
 				return createBlock( 'core/file', {
 					href,
-					fileName: attributes.caption || getFilename( href ),
+					fileName:
+						attributes.caption ||
+						escapeEditableHTML( getFilename( href ) ?? '' ),
 					textLinkHref: href,
 					id: attributes.id,
 					anchor: attributes.anchor,

@@ -101,4 +101,11 @@
 	&:focus::before {
 		outline-offset: 0;
 	}
+
+	// Keep the focus ring inset enough to stay visible instead of following
+	// the toolbar group's offsets. Matches the toolbar group's specificity.
+	&.has-icon.has-icon::before {
+		left: 2px;
+		right: 2px;
+	}
 }

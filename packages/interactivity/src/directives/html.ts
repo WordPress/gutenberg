@@ -5,7 +5,12 @@ import { afterNextFrame, isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 import { getHtmlFallback, getHtmlServerContent } from '../vdom';
-import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
+import {
+	emptyHTML,
+	isDangerousHTML,
+	getDangerousHTML,
+	unsupportedHtmlElements,
+} from '../html';
 
 /**
  * Checks whether a value is `{ wpServerHtml: true }`, the server's
@@ -76,12 +81,15 @@ type WriteRecord =
 			plainString: boolean;
 	  };
 
-// data-wp-html — Inner HTML binding for explicitly trusted content.
+// data-wp-html — Inner HTML binding for explicitly trusted content on supported hosts.
 directive(
 	'html',
 	( { directives: { html: htmlEntries }, element, evaluate } ) => {
 		// Default entry; unsupported variants retain their original props.
 		const entry = htmlEntries.find( isDefaultDirectiveSuffix );
+		const supportedElement = ! unsupportedHtmlElements.has(
+			element.type as string
+		);
 		// What the directive last did with the host's content. It's undefined
 		// for a new host and after the server representation, so the next
 		// token is compared with the element's content and adopted when it
@@ -127,6 +135,12 @@ directive(
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warnUniqueIdNotSupported( 'html', entry.uniqueId );
 			}
+		} else if ( ! supportedElement ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The data-wp-html directive is not supported on <${ element.type }> elements. Use an element that supports HTML content instead.`
+				);
+			}
 		} else {
 			try {
 				result = evaluate( entry );
@@ -139,8 +153,8 @@ directive(
 			}
 		}
 
-		// Only supported default entries own the element's content.
-		const active = !! entry && ! entry.uniqueId;
+		// Only supported default entries on supported hosts own content.
+		const active = !! entry && ! entry.uniqueId && supportedElement;
 		// Pending values and the server token representation keep the content,
 		// apart from showing server content that navigation brought to a kept
 		// host.

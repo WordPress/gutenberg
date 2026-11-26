@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Fragment } from '@wordpress/element';
 import { SearchableSelect } from '../';
+import { Avatar } from '../../../../avatar';
 import {
 	GROUPED_ITEMS,
 	type FixtureGroup,
@@ -87,14 +88,7 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 			gap: 8,
 		} }
 	>
-		<img
-			src={ `https://gravatar.com/avatar/?d=initials&initials=${ label }` }
-			alt=""
-			width="20"
-			style={ {
-				borderRadius: '50%',
-			} }
-		/>
+		<Avatar name={ label } size="xs" aria-hidden />
 		{ label }
 	</span>
 );

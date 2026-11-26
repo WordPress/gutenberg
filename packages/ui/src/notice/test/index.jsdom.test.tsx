@@ -157,7 +157,7 @@ describe( 'Notice', () => {
 	} );
 
 	describe( 'actions', () => {
-		it( 'renders ActionButton and ActionLink', async () => {
+		it( 'renders ActionButton, ActionButtonLink and ActionLink', async () => {
 			const user = userEvent.setup();
 			const handleClick = vi.fn();
 
@@ -168,6 +168,9 @@ describe( 'Notice', () => {
 						<Notice.ActionButton onClick={ handleClick }>
 							Retry
 						</Notice.ActionButton>
+						<Notice.ActionButtonLink href="/status">
+							View status
+						</Notice.ActionButtonLink>
 						<Notice.ActionLink href="/docs">
 							Learn more
 						</Notice.ActionLink>
@@ -177,6 +180,10 @@ describe( 'Notice', () => {
 
 			await user.click( screen.getByRole( 'button', { name: 'Retry' } ) );
 			expect( handleClick ).toHaveBeenCalledTimes( 1 );
+
+			expect(
+				screen.getByRole( 'link', { name: 'View status' } )
+			).toHaveAttribute( 'href', '/status' );
 
 			expect(
 				screen.getByRole( 'link', { name: 'Learn more' } )
