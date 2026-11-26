@@ -12,8 +12,8 @@ async function loadWaveformUtils() {
 }
 
 describe( 'Waveform Player dependency', () => {
-	let originalReadyState;
-	let jsdomStubs;
+	let originalReadyState: PropertyDescriptor | undefined;
+	let jsdomStubs: ReturnType< typeof vi.spyOn >[];
 
 	beforeEach( () => {
 		vi.useFakeTimers();
@@ -49,7 +49,7 @@ describe( 'Waveform Player dependency', () => {
 		if ( originalReadyState ) {
 			Object.defineProperty( document, 'readyState', originalReadyState );
 		} else {
-			delete document.readyState;
+			delete ( document as { readyState?: string } ).readyState;
 		}
 	} );
 

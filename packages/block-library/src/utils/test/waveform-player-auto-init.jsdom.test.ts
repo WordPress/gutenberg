@@ -9,7 +9,7 @@ describe( 'Waveform Player auto-initialization', () => {
 	afterEach( () => {
 		vi.resetModules();
 		document.body.innerHTML = '';
-		delete window.WaveformPlayer;
+		delete ( window as { WaveformPlayer?: unknown } ).WaveformPlayer;
 	} );
 
 	it( 'leaves declarative markup it does not own uninitialized', async () => {
