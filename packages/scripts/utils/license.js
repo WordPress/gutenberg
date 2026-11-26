@@ -95,6 +95,7 @@ const otherOssLicenses = [
 	'CC-BY-SA-2.0',
 	'LGPL',
 	'Python-2.0',
+	'PSF-2.0',
 ];
 
 /**
