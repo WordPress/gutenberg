@@ -43,6 +43,9 @@ type PostListItem = Post & {
 };
 
 const EMPTY_ARRAY: PostListItem[] = [];
+const EMPTY_IDS: number[] = [];
+
+const NOTES_COUNT_FIELD = 'notesCount';
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -190,8 +193,25 @@ export default function PostList( { postType }: { postType: string } ) {
 		() => records?.map( ( record: Post ) => record.id ) ?? [],
 		[ records ]
 	);
-	const { notesCount, isLoading: isLoadingNotesCount } =
-		useNotesCount( postIds );
+	// The notes field exists only for post types that support notes.
+	const hasNotesField = fields.some(
+		( field: { id: string } ) => field.id === NOTES_COUNT_FIELD
+	);
+	// Fetch the counts even when the field is hidden, since actions get them
+	// with the posts, but only wait for them when the field is shown.
+	const { notesCount, isLoading: isLoadingNotesCount } = useNotesCount(
+		hasNotesField ? postIds : EMPTY_IDS
+	);
+	const showsNotesCount =
+		hasNotesField &&
+		( !! view.fields?.includes( NOTES_COUNT_FIELD ) ||
+			( view.titleField === NOTES_COUNT_FIELD &&
+				view.showTitle !== false ) ||
+			( view.mediaField === NOTES_COUNT_FIELD &&
+				view.showMedia !== false ) ||
+			( view.descriptionField === NOTES_COUNT_FIELD &&
+				view.showDescription !== false ) ||
+			view.groupBy?.field === NOTES_COUNT_FIELD );
 
 	const data = useMemo(
 		(): PostListItem[] | undefined =>
@@ -324,7 +344,9 @@ export default function PostList( { postType }: { postType: string } ) {
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
 				isLoading={
-					isLoadingData || isLoadingNotesCount || ! hasResolved
+					isLoadingData ||
+					! hasResolved ||
+					( showsNotesCount && isLoadingNotesCount )
 				}
 				view={ view }
 				onChangeView={ onChangeView }
