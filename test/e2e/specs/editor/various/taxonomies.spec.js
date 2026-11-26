@@ -351,8 +351,8 @@ test.describe( 'Taxonomies', () => {
 		const secondTagName = 'tag-b-' + generateRandomNumber();
 		const tagNames = `${ firstTagName }, ${ secondTagName }`;
 
-		// Hold the second create request, so that publishing can be checked
-		// once the first tag is assigned and the second is still in flight.
+		// Hold the second create so it's still in flight
+		// after the first is assigned.
 		const heldCreateRequest = defer();
 		await routeTagCreateRequests( page, async ( route ) => {
 			if ( route.request().postDataJSON()?.name === secondTagName ) {

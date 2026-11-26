@@ -370,9 +370,8 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-		// The post can't be saved until the term is assigned, or it would be
-		// saved without it. Only one term is created at a time, so the
-		// taxonomy is enough to tell the lock apart.
+		// Lock saving until the term is assigned, so the post isn't saved
+		// without it.
 		const lockName = `term-create-${ slug }`;
 		lockPostSaving( lockName );
 		try {

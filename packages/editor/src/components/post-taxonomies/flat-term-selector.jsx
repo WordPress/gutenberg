@@ -270,8 +270,8 @@ export function FlatTermSelector( { slug } ) {
 		pendingTermsRef.current.add( pendingTerm.value );
 		setValues( ( currentValues ) => [ ...currentValues, pendingTerm ] );
 
-		// The post can't be saved until the term is assigned, or it would be
-		// saved without it.
+		// Lock saving until the term is assigned, so the post isn't saved
+		// without it.
 		lockPostSaving( pendingTerm.value );
 		try {
 			let savedTerm;
