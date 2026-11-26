@@ -164,35 +164,37 @@
 		align-items: center;
 		justify-content: center;
 		background: transparent;
+		color: var(--wpds-color-foreground-interactive-neutral);
 		cursor: var(--wpds-cursor-control);
-
-		svg {
-			color: var(--wpds-color-foreground-interactive-neutral);
-		}
 
 		&:hover,
 		&:focus {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 			background: var(--wpds-color-background-interactive-neutral-weak-active);
-			svg {
-				color: var(--wpds-color-foreground-interactive-neutral-active);
-			}
 		}
 
 		&.has-values {
-			svg {
-				color: var(--wpds-color-foreground-interactive-brand);
-			}
+			color: var(--wpds-color-foreground-interactive-brand);
+
 			&:hover,
 			&:focus {
+				color: var(--wpds-color-foreground-interactive-brand-active);
 				background: var(--wpds-color-background-interactive-brand-weak-active);
-				svg {
-					color: var(--wpds-color-foreground-interactive-brand-active);
-				}
 			}
 		}
 
 		&:focus-visible {
 			@include outset-ring__focus();
+		}
+	}
+
+	// The remove icon follows the state of the chip, like the icon and the
+	// label of a `Button` from `@wordpress/ui`.
+	.dataviews-filters__summary-chip:is(:hover:not(.is-not-clickable), :focus-visible, [aria-expanded="true"]) ~ .dataviews-filters__summary-chip-remove {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+
+		&.has-values {
+			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 	}
 }
