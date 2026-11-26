@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-import reducer, { getMergedItemIds, itemIsComplete } from '../reducer';
+import reducer, {
+	getMergedFetchedRanges,
+	getMergedItemIds,
+	itemIsComplete,
+} from '../reducer';
 import { removeItems } from '../actions';
 
 describe( 'getMergedItemIds', () => {
@@ -408,5 +412,73 @@ describe( 'reducer', () => {
 				},
 			},
 		} );
+	} );
+
+	it( 'shrinks and shifts fetchedRanges when deleting an item', () => {
+		const kind = 'postType';
+		const name = 'page';
+		const original = deepFreeze( {
+			items: {
+				default: {
+					1: { id: 1 },
+					2: { id: 2 },
+					3: { id: 3 },
+					7: { id: 7 },
+				},
+			},
+			queries: {
+				default: {
+					'': {
+						itemIds: [
+							1,
+							2,
+							3,
+							undefined,
+							undefined,
+							undefined,
+							7,
+						],
+						meta: { totalItems: 10, totalPages: 4 },
+						fetchedRanges: [
+							[ 0, 3 ],
+							[ 6, 9 ],
+						],
+					},
+				},
+			},
+		} );
+		const state = reducer( original, removeItems( kind, name, 2 ) );
+
+		expect( state.queries ).toEqual( {
+			default: {
+				'': {
+					itemIds: [ 1, 3, undefined, undefined, undefined, 7 ],
+					meta: { totalItems: 9, totalPages: null },
+					fetchedRanges: [
+						[ 0, 2 ],
+						[ 5, 8 ],
+					],
+				},
+			},
+		} );
+	} );
+} );
+
+describe( 'getMergedFetchedRanges', () => {
+	it( 'merges adjacent and overlapping ranges in sorted order', () => {
+		let ranges = getMergedFetchedRanges( undefined, [ 10, 20 ] );
+		expect( ranges ).toEqual( [ [ 10, 20 ] ] );
+
+		ranges = getMergedFetchedRanges( ranges, [ 0, 10 ] );
+		expect( ranges ).toEqual( [ [ 0, 20 ] ] );
+
+		ranges = getMergedFetchedRanges( ranges, [ 30, 40 ] );
+		expect( ranges ).toEqual( [
+			[ 0, 20 ],
+			[ 30, 40 ],
+		] );
+
+		ranges = getMergedFetchedRanges( ranges, [ 15, 35 ] );
+		expect( ranges ).toEqual( [ [ 0, 40 ] ] );
 	} );
 } );

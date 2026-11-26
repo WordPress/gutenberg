@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { getQueriedItems } from '../selectors';
 import type { QueriedDataState } from '../types';
-import { getMergedItemIds } from '../reducer';
+import reducer, { getMergedItemIds } from '../reducer';
+import { removeItems } from '../actions';
 
 describe( 'getQueriedItems', () => {
 	it( 'should return null if requesting but no item IDs', () => {
@@ -442,5 +443,182 @@ describe( 'getQueriedItems', () => {
 			{ supportsPagination: true }
 		);
 		expect( result ).toEqual( [] );
+	} );
+
+	it( 'should return items when a fetched page returns fewer items than X-WP-Total due to server-side filtering', () => {
+		const state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { context: 'edit', search: 'Sample', per_page: 100 },
+			items: [ { id: 2, title: 'Sample guide 2' } ],
+			meta: { totalItems: 2, totalPages: 1 },
+		} );
+
+		const result = getQueriedItems(
+			state,
+			{ context: 'edit', search: 'Sample', per_page: 100 },
+			{ supportsPagination: true }
+		);
+		expect( result ).toEqual( [ { id: 2, title: 'Sample guide 2' } ] );
+	} );
+
+	it( 'should return an empty array when a fetched page filters out all matching items', () => {
+		const state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { context: 'edit', search: 'Sample', per_page: 100 },
+			items: [],
+			meta: { totalItems: 2, totalPages: 1 },
+		} );
+
+		const result = getQueriedItems(
+			state,
+			{ context: 'edit', search: 'Sample', per_page: 100 },
+			{ supportsPagination: true }
+		);
+		expect( result ).toEqual( [] );
+	} );
+
+	it( 'should return items for a short fetched page while still returning null for unfetched pages or larger per_page', () => {
+		// 25 total items, per_page=10. Page 1 returns 8 items (2 skipped by
+		// server permissions). Page 1 is fulfilled, while page 2 and a larger
+		// per_page must still return null until fetched.
+		const page1Items = Array.from( { length: 8 }, ( _, i ) => ( {
+			id: i + 1,
+		} ) );
+		let state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { context: 'edit', page: 1, per_page: 10 },
+			items: page1Items,
+			meta: { totalItems: 25, totalPages: 3 },
+		} );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 1, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toEqual( page1Items );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 1, per_page: 20 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 2, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
+
+		// Fetch page 2 (9 items, 1 skipped). Page 2 and combined per_page=20
+		// are now covered, while page 3 remains null.
+		const page2Items = Array.from( { length: 9 }, ( _, i ) => ( {
+			id: i + 11,
+		} ) );
+		state = reducer( state, {
+			type: 'RECEIVE_ITEMS',
+			query: { context: 'edit', page: 2, per_page: 10 },
+			items: page2Items,
+			meta: { totalItems: 25, totalPages: 3 },
+		} );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 2, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toEqual( page2Items );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 1, per_page: 20 },
+				{ supportsPagination: true }
+			)
+		).toEqual( [ ...page1Items, ...page2Items ] );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ context: 'edit', page: 3, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
+	} );
+
+	it( 'should return null for a short last page once the total grows', () => {
+		// Page 3 of 25 items returns the last 5.
+		let state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { page: 3, per_page: 10 },
+			items: Array.from( { length: 5 }, ( _, i ) => ( { id: i + 21 } ) ),
+			meta: { totalItems: 25, totalPages: 3 },
+		} );
+
+		// A later fetch reports 2 more items.
+		state = reducer( state, {
+			type: 'RECEIVE_ITEMS',
+			query: { page: 1, per_page: 10 },
+			items: Array.from( { length: 10 }, ( _, i ) => ( { id: i + 1 } ) ),
+			meta: { totalItems: 27, totalPages: 3 },
+		} );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ page: 3, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
+	} );
+
+	it( 'should return null for a short page received without a total once a total is known', () => {
+		// Page 3 is received without pagination meta.
+		let state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { page: 3, per_page: 10 },
+			items: Array.from( { length: 5 }, ( _, i ) => ( { id: i + 21 } ) ),
+		} );
+
+		// A later fetch reports a total larger than the stored items.
+		state = reducer( state, {
+			type: 'RECEIVE_ITEMS',
+			query: { page: 1, per_page: 10 },
+			items: Array.from( { length: 10 }, ( _, i ) => ( { id: i + 1 } ) ),
+			meta: { totalItems: 27, totalPages: 3 },
+		} );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ page: 3, per_page: 10 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
+	} );
+
+	it( 'should return null after deleting an item from a full page when more items exist', () => {
+		let state = reducer( undefined, {
+			type: 'RECEIVE_ITEMS',
+			query: { page: 1, per_page: 3 },
+			items: [ { id: 1 }, { id: 2 }, { id: 3 } ],
+			meta: { totalItems: 5, totalPages: 2 },
+		} );
+
+		state = reducer( state, removeItems( 'postType', 'post', 2 ) );
+
+		expect(
+			getQueriedItems(
+				state,
+				{ page: 1, per_page: 3 },
+				{ supportsPagination: true }
+			)
+		).toBe( null );
 	} );
 } );

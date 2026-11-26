@@ -7,6 +7,7 @@ import type {
 	ItemId,
 	QueriedDataAction,
 	QueriedItem,
+	QueriedRange,
 	QueriesState,
 	QueryParts,
 	QueryState,
@@ -79,6 +80,41 @@ export function getMergedItemIds(
 	}
 
 	return mergedItemIds;
+}
+
+/**
+ * Merges a half-open `[start, end)` pagination range into a sorted list of
+ * non-overlapping fetched ranges, combining overlapping or adjacent intervals.
+ *
+ * @param ranges   Existing sorted fetched ranges.
+ * @param newRange Newly fetched `[start, end)` range.
+ *
+ * @return Merged sorted fetched ranges.
+ */
+export function getMergedFetchedRanges(
+	ranges: ReadonlyArray< QueriedRange > = [],
+	newRange: QueriedRange
+): ReadonlyArray< QueriedRange > {
+	if ( newRange[ 1 ] <= newRange[ 0 ] ) {
+		return ranges;
+	}
+
+	const sorted = [ ...ranges, newRange ].sort( ( a, b ) => a[ 0 ] - b[ 0 ] );
+	const merged: Array< QueriedRange > = [
+		[ sorted[ 0 ][ 0 ], sorted[ 0 ][ 1 ] ],
+	];
+
+	for ( let i = 1; i < sorted.length; i++ ) {
+		const current = sorted[ i ];
+		const previous = merged[ merged.length - 1 ];
+		if ( current[ 0 ] <= previous[ 1 ] ) {
+			previous[ 1 ] = Math.max( previous[ 1 ], current[ 1 ] );
+		} else {
+			merged.push( [ current[ 0 ], current[ 1 ] ] );
+		}
+	}
+
+	return merged;
 }
 
 /**
@@ -276,22 +312,43 @@ const receiveQueries = compose( [
 		}
 
 		const key = action.key ?? DEFAULT_ENTITY_KEY;
-
-		return {
-			itemIds: getMergedItemIds(
-				state.itemIds,
-				// Item keys are IDs, and `filter( Boolean )` drops the missing ones.
-				action.items
-					.map( ( item ) => item?.[ key ] )
-					.filter( Boolean ) as Array< ItemId >,
-				{
-					page: action.page,
-					offset: action.offset,
-					perPage: action.perPage,
-				}
-			),
+		// Item keys are IDs, and `filter( Boolean )` drops the missing ones.
+		const nextItemIds = action.items
+			.map( ( item ) => item?.[ key ] )
+			.filter( Boolean ) as Array< ItemId >;
+		const { page = 1, offset, perPage = 10 } = action;
+		const nextState: Partial< QueryState > = {
+			itemIds: getMergedItemIds( state.itemIds, nextItemIds, {
+				page,
+				offset,
+				perPage,
+			} ),
 			meta: action.meta,
 		};
+
+		// Only record a range when the server reported a total: without one,
+		// the selector never reads ranges, and a page that was short because
+		// the list ended can't be told apart from a filtered one. Leaving
+		// `fetchedRanges` out of `nextState` drops any stored ranges, so
+		// short pages return `null` and are fetched again.
+		const totalItems = action.meta?.totalItems;
+		if ( perPage !== -1 && Number.isFinite( totalItems ) ) {
+			const startOffset = offset ?? ( page - 1 ) * perPage;
+			// Cap the range at the total, so a last page that is short only
+			// because the list ended doesn't claim offsets past it. A page
+			// shortened by permission filtering still covers its whole
+			// window, since X-WP-Total counts the omitted items.
+			const endOffset = Math.min(
+				startOffset + Math.max( perPage, nextItemIds.length ),
+				totalItems!
+			);
+			nextState.fetchedRanges = getMergedFetchedRanges(
+				state.fetchedRanges,
+				[ startOffset, endOffset ]
+			);
+		}
+
+		return nextState;
 	}
 ) as (
 	state: QueriesState | undefined,
@@ -320,16 +377,31 @@ function removeQueryItems(
 	queryItems: QueryState,
 	removedItems: Record< ItemId, boolean >
 ): QueryState {
-	const itemIds = queryItems.itemIds.filter(
+	const removedIndices: Array< number > = [];
+	const itemIds = queryItems.itemIds.filter( ( itemId, index ) => {
 		// Holes in the list keep their place: they match no removed item.
-		( itemId ) => ! removedItems[ itemId as ItemId ]
-	);
+		if ( removedItems[ itemId as ItemId ] ) {
+			removedIndices.push( index );
+			return false;
+		}
+		return true;
+	} );
 	const removedCount = queryItems.itemIds.length - itemIds.length;
 	if ( removedCount === 0 ) {
 		return queryItems;
 	}
 
 	const nextQueryItems: QueryState = { ...queryItems, itemIds };
+	if ( queryItems.fetchedRanges ) {
+		const countRemovedBefore = ( position: number ) =>
+			removedIndices.filter( ( index ) => index < position ).length;
+		nextQueryItems.fetchedRanges = queryItems.fetchedRanges
+			.map( ( [ start, end ] ): QueriedRange => [
+				start - countRemovedBefore( start ),
+				end - countRemovedBefore( end ),
+			] )
+			.filter( ( [ start, end ] ) => start < end );
+	}
 	if ( Number.isFinite( queryItems.meta?.totalItems ) ) {
 		nextQueryItems.meta = {
 			...queryItems.meta,

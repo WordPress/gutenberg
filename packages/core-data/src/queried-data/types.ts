@@ -56,11 +56,17 @@ export interface QueriedMeta {
 }
 
 /**
+ * Half-open pagination range `[start, end)` covered by a fetched response.
+ */
+export type QueriedRange = [ start: number, end: number ];
+
+/**
  * The state of one query: the IDs of its items, in order, and its metadata.
  */
 export interface QueryState {
 	itemIds: ReadonlyArray< ItemId | undefined >;
 	meta?: QueriedMeta | null;
+	fetchedRanges?: ReadonlyArray< QueriedRange >;
 }
 
 /**

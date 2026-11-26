@@ -1,7 +1,28 @@
 import EquivalentKeyMap from 'equivalent-key-map';
 import getQueryParts from './get-query-parts';
 import { setNestedValue } from '../utils';
-import type { QueriedDataState, QueriedItemsOptions, Query } from './types';
+import type {
+	QueriedDataState,
+	QueriedItemsOptions,
+	QueriedRange,
+	Query,
+} from './types';
+
+function isRangeCovered(
+	ranges: ReadonlyArray< QueriedRange > | undefined,
+	start: number,
+	end: number
+): boolean {
+	if ( ! ranges || end <= start ) {
+		return false;
+	}
+
+	// A single range must cover the window. This is enough because
+	// `getMergedFetchedRanges` always merges adjacent and overlapping ranges.
+	return ranges.some(
+		( [ rangeStart, rangeEnd ] ) => rangeStart <= start && rangeEnd >= end
+	);
+}
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries
@@ -54,13 +75,25 @@ function getQueriedItemsUncached< Item >(
 
 	// If the requested page range exceeds the stored itemIds, the data for
 	// this specific pagination window may not have been fetched yet. Return
-	// null unless totalItems confirms we already have all available items.
+	// null unless totalItems confirms we already have all available items, or
+	// the requested range was already covered by a fetched response (for
+	// example when the server omits items the current user cannot edit, so
+	// fewer items are returned than X-WP-Total reports).
 	if ( isPaginated && itemIds.length < startOffset + perPage ) {
-		const totalItems =
-			state.queries[ context ][ stableKey ].meta?.totalItems;
+		const queryState = state.queries[ context ][ stableKey ];
+		const totalItems = queryState.meta?.totalItems;
 		// `isFinite` is false for a missing total.
 		if ( Number.isFinite( totalItems ) && itemIds.length < totalItems! ) {
-			return null;
+			const requiredEnd = Math.min( startOffset + perPage, totalItems! );
+			if (
+				! isRangeCovered(
+					queryState.fetchedRanges,
+					startOffset,
+					requiredEnd
+				)
+			) {
+				return null;
+			}
 		}
 	}
 
