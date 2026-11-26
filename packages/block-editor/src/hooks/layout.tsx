@@ -496,6 +496,7 @@ function LayoutPanelPure( {
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
+		isDefaultBlockStyleState( selectedState ) &&
 		allowInheriting &&
 		( ! blockLayoutType ||
 			blockLayoutType === 'default' ||
