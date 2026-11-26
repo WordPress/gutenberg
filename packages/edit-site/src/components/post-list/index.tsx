@@ -190,7 +190,7 @@ export default function PostList( { postType }: { postType: string } ) {
 		() => records?.map( ( record: Post ) => record.id ) ?? [],
 		[ records ]
 	);
-	const { notesCount, isResolving: isLoadingNotesCount } =
+	const { notesCount, isLoading: isLoadingNotesCount } =
 		useNotesCount( postIds );
 
 	const data = useMemo(

@@ -17,13 +17,13 @@ type NoteRecord = {
  * a map of post ID to notes count.
  *
  * @param postIds Array of post IDs to fetch notes for.
- * @return Object with notesCount map and loading state.
+ * @return Object with notesCount map and whether the counts are still loading.
  */
 export default function useNotesCount( postIds: number[] ): {
 	notesCount: Record< number, number >;
-	isResolving: boolean;
+	isLoading: boolean;
 } {
-	const { records: notes, isResolving } = useEntityRecords< NoteRecord >(
+	const { records: notes, hasResolved } = useEntityRecords< NoteRecord >(
 		'root',
 		'comment',
 		{
@@ -52,5 +52,7 @@ export default function useNotesCount( postIds: number[] ): {
 		return counts;
 	}, [ notes ] );
 
-	return { notesCount, isResolving };
+	// The query is idle for a render before it starts resolving, so wait for
+	// it to resolve rather than only while it is resolving.
+	return { notesCount, isLoading: postIds.length > 0 && ! hasResolved };
 }
