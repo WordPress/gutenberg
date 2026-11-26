@@ -58,7 +58,8 @@
 	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;
-		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		// The heading text still describes the document, so keep it legible.
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	&:focus {
@@ -72,15 +73,16 @@
 }
 
 .document-outline__level {
-	background: $gray-300;
-	color: $gray-900;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	border-radius: 3px;
 	font-size: var(--wpds-typography-font-size-md);
 	padding: 1px 6px;
 	margin-right: 4px;
 
 	.is-invalid & {
-		background: $alert-yellow;
+		background: var(--wpds-color-background-surface-caution);
+		color: var(--wpds-color-foreground-content-caution);
 	}
 }
 

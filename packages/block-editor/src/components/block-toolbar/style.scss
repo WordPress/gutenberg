@@ -50,13 +50,13 @@
 		}
 	}
 
-	// Disabled block toolbar icon should have a fixed color.
+	// A disabled block icon only shows the block type, so it reads as content.
 	.components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral);
 
 		// Since it's not clickable, though, don't show a hover state.
 		&:hover {
-			color: $gray-900;
+			color: var(--wpds-color-foreground-content-neutral);
 		}
 	}
 
@@ -64,7 +64,7 @@
 	.is-placeholder & .components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
 		&,
 		&:hover {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 	}
 
