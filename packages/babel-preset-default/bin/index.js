@@ -4,7 +4,7 @@ const path = require( 'path' );
 const { promisify } = require( 'util' );
 const { version } = require( 'core-js/package.json' );
 const compat = require( 'core-js-compat' );
-const webpack = promisify( require( 'webpack' ) );
+const webpack = require( 'webpack' );
 const { minify } = require( 'terser' );
 const exclusions = require( '../polyfill-exclusions' );
 const inclusions = require( '../polyfill-inclusions' );
@@ -60,14 +60,15 @@ async function getBanner( modules ) {
 }
 
 /**
- * Bundles the given `core-js` modules into one ES5 script, wrapped the same
- * way `core-js-builder` wraps its bundle.
+ * Bundles the given `core-js` modules into `build/polyfill.js`, an ES5 script
+ * wrapped the same way `core-js-builder` wraps its bundle.
  *
  * @param {string[]} modules Module names.
- * @return {Promise<string>} Wrapped bundle.
+ * @param {string}   banner  Banner comment.
+ * @return {Promise<string>} Written script.
  */
-async function bundle( modules ) {
-	const stats = await webpack( {
+async function bundle( modules, banner ) {
+	const stats = await promisify( webpack )( {
 		mode: 'none',
 		target: [ 'web', 'es5' ],
 		entry: modules.map( ( name ) =>
@@ -75,28 +76,27 @@ async function bundle( modules ) {
 		),
 		node: false,
 		output: { path: BUILD_DIR, filename: 'polyfill.js', iife: false },
+		plugins: [
+			new webpack.BannerPlugin( {
+				banner: `${ banner }\n!function (undefined) { 'use strict';`,
+				raw: true,
+			} ),
+			new webpack.BannerPlugin( {
+				banner: '}();',
+				raw: true,
+				footer: true,
+			} ),
+		],
 	} );
 	if ( stats.hasErrors() ) {
 		throw new Error( stats.toString( 'errors-only' ) );
 	}
-	const code = await readFile(
-		path.join( BUILD_DIR, 'polyfill.js' ),
-		'utf8'
-	);
-	// Same wrapper and `__webpack_require__` rewrite as `core-js-builder`.
-	return `!function (undefined) { 'use strict'; ${ code.replace(
-		/function __webpack_require__/,
-		'var __webpack_require__ = function '
-	) } }();\n`;
+	return readFile( path.join( BUILD_DIR, 'polyfill.js' ), 'utf8' );
 }
 
 async function build() {
 	const modules = getModules();
-	const [ banner, code ] = await Promise.all( [
-		getBanner( modules ),
-		bundle( modules ),
-	] );
-	const script = `${ banner }\n${ code }`;
+	const script = await bundle( modules, await getBanner( modules ) );
 
 	console.log(
 		`bundling ./build/polyfill.js, size: ${ (
@@ -110,11 +110,7 @@ async function build() {
 				comment.value.toLowerCase().includes( 'license' ),
 		},
 	} );
-
-	await Promise.all( [
-		writeFile( path.join( BUILD_DIR, 'polyfill.js' ), script ),
-		writeFile( path.join( BUILD_DIR, 'polyfill.min.js' ), minified.code ),
-	] );
+	await writeFile( path.join( BUILD_DIR, 'polyfill.min.js' ), minified.code );
 }
 
 build().catch( ( error ) => {

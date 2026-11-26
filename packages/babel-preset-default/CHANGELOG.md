@@ -5,7 +5,7 @@
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
--   Build `build/polyfill.js` with `core-js-compat` and `webpack` 5 instead of `core-js-builder`, which depends on `webpack` 4. The bundled modules are unchanged. The banner now takes its copyright line from the `core-js` license ([#81914](https://github.com/WordPress/gutenberg/pull/81914)).
+-   Build `build/polyfill.js` with `core-js-compat` and `webpack` 5 instead of `core-js-builder`, which depends on `webpack` 4. The banner now takes its copyright line from the `core-js` license ([#81914](https://github.com/WordPress/gutenberg/pull/81914)).
 
 ## 10.2.0 (2026-11-18)
 
