@@ -52,15 +52,12 @@ export default function WpEmbedPreview( { html }: WpEmbedPreviewProps ) {
 		 * WordPress core embed-template on resize:
 		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
 		 *
-		 * @param event              Message event.
-		 * @param event.data         Message data.
-		 * @param event.data.secret  Secret identifying the embed.
-		 * @param event.data.message Message type.
-		 * @param event.data.value   New height of the embed.
+		 * @param event      Message event.
+		 * @param event.data Message data, which any window can post.
 		 */
-		function resizeWPembeds( {
-			data: { secret, message, value } = {},
-		}: MessageEvent< WpEmbedMessage | undefined > ) {
+		function resizeWPembeds( { data }: MessageEvent< unknown > ) {
+			// Messages from other sources may carry `null` or a primitive.
+			const { secret, message, value } = ( data ?? {} ) as WpEmbedMessage;
 			if ( message !== 'height' || secret !== props[ 'data-secret' ] ) {
 				return;
 			}
