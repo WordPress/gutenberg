@@ -331,6 +331,325 @@ const v15BlockSupports = {
 	allowedBlocks: true,
 };
 
+const v16BlockAttributes = {
+	url: {
+		type: 'string',
+	},
+	useFeaturedImage: {
+		type: 'boolean',
+		default: false,
+	},
+	id: {
+		type: 'number',
+	},
+	alt: {
+		type: 'string',
+		default: '',
+	},
+	hasParallax: {
+		type: 'boolean',
+		default: false,
+	},
+	isRepeated: {
+		type: 'boolean',
+		default: false,
+	},
+	dimRatio: {
+		type: 'number',
+		default: 100,
+	},
+	overlayColor: {
+		type: 'string',
+	},
+	customOverlayColor: {
+		type: 'string',
+	},
+	isUserOverlayColor: {
+		type: 'boolean',
+	},
+	backgroundType: {
+		type: 'string',
+		default: 'image',
+	},
+	focalPoint: {
+		type: 'object',
+	},
+	gradient: {
+		type: 'string',
+	},
+	customGradient: {
+		type: 'string',
+	},
+	contentPosition: {
+		type: 'string',
+	},
+	isDark: {
+		type: 'boolean',
+		default: true,
+	},
+	templateLock: {
+		type: [ 'string', 'boolean' ],
+		enum: [ 'all', 'insert', 'contentOnly', false ],
+	},
+	tagName: {
+		type: 'string',
+		default: 'div',
+	},
+	sizeSlug: {
+		type: 'string',
+	},
+	poster: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'video',
+		attribute: 'poster',
+	},
+	allowedVideoProviders: {
+		type: 'array',
+		default: [
+			'youtube',
+			'vimeo',
+			'videopress',
+			'animoto',
+			'tiktok',
+			'wordpress-tv',
+		],
+	},
+};
+
+const v16BlockSupports = {
+	__experimentalOnEnter: true,
+	anchor: true,
+	align: true,
+	html: false,
+	shadow: true,
+	spacing: {
+		padding: true,
+		margin: [ 'top', 'bottom' ],
+		blockGap: true,
+		__experimentalDefaultControls: {
+			padding: true,
+			blockGap: true,
+		},
+	},
+	__experimentalBorder: {
+		color: true,
+		radius: true,
+		style: true,
+		width: true,
+		__experimentalDefaultControls: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
+	},
+	color: {
+		heading: true,
+		text: true,
+		link: true,
+		button: true,
+		background: false,
+		__experimentalSkipSerialization: [ 'gradients' ],
+		enableContrastChecker: false,
+	},
+	dimensions: {
+		aspectRatio: true,
+		minHeight: true,
+		minWidth: true,
+		__experimentalDefaultControls: {
+			minHeight: true,
+		},
+	},
+	typography: {
+		fontSize: true,
+		lineHeight: true,
+		__experimentalFontFamily: true,
+		__experimentalFontWeight: true,
+		__experimentalFontStyle: true,
+		__experimentalTextTransform: true,
+		__experimentalTextDecoration: true,
+		__experimentalLetterSpacing: true,
+		__experimentalDefaultControls: {
+			fontSize: true,
+		},
+	},
+	layout: {
+		allowJustification: false,
+	},
+	interactivity: {
+		clientNavigation: true,
+		interactive: true,
+	},
+	filter: {
+		duotone: true,
+	},
+	allowedBlocks: true,
+};
+
+// Deprecation for blocks that saved the `data-object-fit` and
+// `data-object-position` attributes on the background image/video. They were
+// only read by `object-fit-polyfill`, which was removed in
+// https://github.com/WordPress/gutenberg/pull/34536, so the markup no longer
+// serves a purpose.
+const v16 = {
+	attributes: v16BlockAttributes,
+	supports: v16BlockSupports,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			useFeaturedImage,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			tagName: Tag,
+			sizeSlug,
+			poster,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+		const isEmbedVideoBackground =
+			EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				  ? mediaPosition(focalPoint)
+				  : undefined;
+
+		const backgroundImage = url ? `url(${ url })` : undefined;
+
+		const backgroundPosition = mediaPosition( focalPoint );
+
+		const classes = clsx(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const imgClasses = clsx(
+			'wp-block-cover__image-background',
+			id ? `wp-image-${ id }` : null,
+			{
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+			}
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<Tag { ...useBlockProps.save( { className: classes } ) }>
+				{ ! useFeaturedImage &&
+					isImageBackground &&
+					url &&
+					( isImgElement ? (
+						<img
+							className={ imgClasses }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) : (
+						<div
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
+							className={ imgClasses }
+							style={ { backgroundPosition, backgroundImage } }
+						/>
+					) ) }
+				{ isVideoBackground && url && (
+					<video
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						poster={ poster }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				{ isEmbedVideoBackground && url && (
+					<figure
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'wp-block-cover__embed-background',
+							'wp-block-embed'
+						) }
+					>
+						<div className="wp-block-embed__wrapper">{ url }</div>
+					</figure>
+				) }
+
+				<span
+					aria-hidden="true"
+					className={ clsx(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</Tag>
+		);
+	},
+};
+
 // Deprecation for blocks that store the minimum height in the `minHeight` and
 // `minHeightUnit` attributes rather than in the `dimensions` block support.
 const v15 = {
@@ -2251,6 +2570,7 @@ const v1 = {
 };
 
 export default [
+	v16,
 	v15,
 	v14,
 	v13,

@@ -10,27 +10,6 @@
 				}
 			},
 			"primary": {
-				"bgFill1": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.22, 0.345, 0.914 ],
-						"hex": "#3858e9"
-					}
-				},
-				"bgFill2": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.176, 0.282, 0.851 ],
-						"hex": "#2d48d9"
-					}
-				},
-				"fgFill": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.937, 0.941, 0.949 ],
-						"hex": "#eff0f2"
-					}
-				},
 				"surface2": {
 					"$value": {
 						"colorSpace": "srgb",
@@ -73,13 +52,6 @@
 						"hex": "#0b0070"
 					}
 				},
-				"fgSurface3": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.22, 0.345, 0.914 ],
-						"hex": "#3858e9"
-					}
-				},
 				"fgSurface2": {
 					"$value": {
 						"colorSpace": "srgb",
@@ -92,34 +64,6 @@
 						"colorSpace": "srgb",
 						"components": [ 0.514, 0.655, 1 ],
 						"hex": "#83a7ff"
-					}
-				},
-				"stroke3": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.22, 0.345, 0.914 ],
-						"hex": "#3858e9"
-					}
-				},
-				"stroke4": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.137, 0.212, 0.78 ],
-						"hex": "#2336c7"
-					}
-				},
-				"stroke2": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.612, 0.671, 0.824 ],
-						"hex": "#9cabd2"
-					}
-				},
-				"stroke1": {
-					"$value": {
-						"colorSpace": "srgb",
-						"components": [ 0.69, 0.737, 0.859 ],
-						"hex": "#b0bcdb"
 					}
 				},
 				"bgFillDark": {
@@ -151,6 +95,62 @@
 					}
 				},
 				"fgFillInverted": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.937, 0.941, 0.949 ],
+						"hex": "#eff0f2"
+					}
+				},
+				"bgFill1": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.22, 0.345, 0.914 ],
+						"hex": "#3858e9"
+					}
+				},
+				"fgSurface3": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.22, 0.345, 0.914 ],
+						"hex": "#3858e9"
+					}
+				},
+				"stroke3": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.22, 0.345, 0.914 ],
+						"hex": "#3858e9"
+					}
+				},
+				"stroke4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.137, 0.212, 0.78 ],
+						"hex": "#2336c7"
+					}
+				},
+				"stroke2": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.612, 0.671, 0.824 ],
+						"hex": "#9cabd2"
+					}
+				},
+				"stroke1": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.69, 0.737, 0.859 ],
+						"hex": "#b0bcdb"
+					}
+				},
+				"bgFill2": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.176, 0.282, 0.851 ],
+						"hex": "#2d48d9"
+					}
+				},
+				"fgFill": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.937, 0.941, 0.949 ],
@@ -1266,13 +1266,21 @@
 				},
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider, progressbar, or switch track)."
+				},
+				"neutral-disabled": {
+					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. switch track), in their disabled state."
 				}
 			},
 			"thumb": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
-					"$description": "Background color for thumbs with a neutral tone and normal emphasis."
+					"$value": "{wpds-color.primitive.bg.fgFillDark}",
+					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob when off)."
+				},
+				"neutral-disabled": {
+					"$value": "{wpds-color.primitive.bg.fgFill}",
+					"$description": "Background color for thumbs with a neutral tone and normal emphasis (eg. switch knob), in their disabled state."
 				},
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.stroke3}",
@@ -1293,6 +1301,10 @@
 				"brand-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb), in their disabled state."
+				},
+				"brand-strong": {
+					"$value": "{wpds-color.primitive.primary.fgFill}",
+					"$description": "Background color for thumbs with a brand tone and strong emphasis (eg. switch knob when on)."
 				},
 				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",

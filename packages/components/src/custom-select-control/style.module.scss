@@ -21,10 +21,10 @@
 	}
 
 	@media (min-width: $break-small) {
-		font-size: $font-size-medium;
+		font-size: var(--wpds-typography-font-size-md);
 
 		&:where(.is-small) {
-			font-size: $font-size-x-small;
+			font-size: var(--wpds-typography-font-size-xs);
 		}
 	}
 }
@@ -105,7 +105,7 @@ $sizes: (default, 40px, 12px), (small, 24px, 8px);
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	font-size: $font-size-medium;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 28px;
 	padding-block: 8px;
 	scroll-margin: 4px;

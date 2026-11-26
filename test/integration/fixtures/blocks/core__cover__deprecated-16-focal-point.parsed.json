@@ -1,0 +1,34 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+			"dimRatio": 40,
+			"focalPoint": {
+				"x": 0.3,
+				"y": 0.7
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"align": "center",
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n\t\t<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t",
+				"innerContent": [
+					"\n\t\t<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>\n\t\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\">\n    <img class=\"wp-block-cover__image-background\" alt=\"\" src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" style=\"object-position:30% 70%\" data-object-fit=\"cover\" data-object-position=\"30% 70%\" />\n    <span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim-40 has-background-dim\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\">\n    <img class=\"wp-block-cover__image-background\" alt=\"\" src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" style=\"object-position:30% 70%\" data-object-fit=\"cover\" data-object-position=\"30% 70%\" />\n    <span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim-40 has-background-dim\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n\t\t",
+			null,
+			"\n\t</div>\n</div>\n"
+		]
+	}
+]

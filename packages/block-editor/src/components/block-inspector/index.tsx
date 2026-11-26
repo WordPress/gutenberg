@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
@@ -81,6 +81,13 @@ function StyleInspectorSlots( {
 			/>
 			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
 			<InspectorControls.Slot
+				group="transform"
+				label={ _x(
+					'Transform',
+					'Visual transform styles such as rotate, move and scale'
+				) }
+			/>
+			<InspectorControls.Slot
 				group="elements"
 				label={ __( 'Elements' ) }
 				className="elements-block-support-panel__inner-wrapper"
@@ -151,6 +158,13 @@ function StyleStateInspectorSlots( {
 					<InspectorControls.Slot
 						group="border"
 						label={ __( 'Borders' ) }
+					/>
+					<InspectorControls.Slot
+						group="transform"
+						label={ _x(
+							'Transform',
+							'Visual transform styles such as rotate, move and scale'
+						) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
