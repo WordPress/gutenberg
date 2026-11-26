@@ -267,8 +267,8 @@ function findColorAtPerceptualContrast( {
 	);
 }
 
-const CHROMA_RETENTION_SAMPLES = 32;
-const CHROMA_RETENTION_ITERATIONS = 20;
+const CHROMA_RETENTION_SAMPLES = 4;
+const CHROMA_RETENTION_ITERATIONS = 8;
 
 /**
  * Move a foreground from its preferred position toward its minimum until it
