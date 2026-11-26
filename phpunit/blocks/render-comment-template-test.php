@@ -172,4 +172,73 @@ END;
 			"Inner block inserted by render_block_data isn't named as expected."
 		);
 	}
+
+	/**
+	 * Tests that comment blocks expose the comment pages count.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/48323
+	 *
+	 * @dataProvider data_blocks_exposing_comment_pages_count
+	 *
+	 * @param string $block_markup Markup of the block to render.
+	 */
+	public function test_rendering_block_sets_comment_pages_count( $block_markup ) {
+		global $wp_query;
+
+		// 11 comments at 5 per page: 3 pages.
+		self::factory()->comment->create_post_comments( self::$custom_post->ID, 10 );
+
+		$wp_query->max_num_comment_pages = 0;
+		$this->assertSame( 0, get_comment_pages_count(), 'The comment pages count should start empty.' );
+
+		$block = new WP_Block(
+			parse_blocks( $block_markup )[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$block->render();
+
+		$count                           = get_comment_pages_count();
+		$wp_query->max_num_comment_pages = 0;
+
+		$this->assertSame( 3, $count );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_blocks_exposing_comment_pages_count() {
+		return array(
+			'comment template'            => array( '<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->' ),
+			'comments pagination'         => array( '<!-- wp:comments-pagination --><!-- wp:comments-pagination-numbers /--><!-- /wp:comments-pagination -->' ),
+			'comments pagination next'    => array( '<!-- wp:comments-pagination-next /-->' ),
+			'comments pagination numbers' => array( '<!-- wp:comments-pagination-numbers /-->' ),
+		);
+	}
+
+	/**
+	 * Tests that the Comment Template block sets one comment page without pagination.
+	 */
+	public function test_rendering_comment_template_without_pagination_sets_one_comment_page() {
+		global $wp_query;
+
+		update_option( 'page_comments', false );
+		$wp_query->max_num_comment_pages = 0;
+
+		$block = new WP_Block(
+			parse_blocks( '<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->' )[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$block->render();
+
+		$count                           = get_comment_pages_count();
+		$wp_query->max_num_comment_pages = 0;
+
+		$this->assertSame( 1, $count );
+	}
 }

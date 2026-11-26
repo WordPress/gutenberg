@@ -121,6 +121,12 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Expose the comment pages count for get_comment_pages_count(), like comments_template().
+	global $wp_query;
+	if ( $wp_query instanceof WP_Query ) {
+		$wp_query->max_num_comment_pages = max( 1, (int) $comment_query->max_num_pages );
+	}
+
 	$comment_order = get_option( 'comment_order' );
 
 	if ( 'desc' === $comment_order ) {
