@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Suggestion mode: show an accepted or rejected suggestion as final once the post is saved. The notes sidebar kept reading "Save the post to keep this decision." after the save until the editor was reloaded or the note list happened to be fetched again ([#87438](https://github.com/WordPress/gutenberg/pull/87438)).
 -   Suggestion mode: formatting in an image caption, a quote citation or any other rich text attribute is suggested inline, as it is in a paragraph. It was refused with the overlapping suggestion notice when the attribute already held a suggestion, and otherwise became a whole-attribute proposal that hid suggestions typed afterwards ([#87439](https://github.com/WordPress/gutenberg/pull/87439)).
 -   Suggestion mode: a suggestion card no longer offers Edit, and formatting text you suggested adding opens a formatting suggestion of its own, so the text and its formatting are accepted or rejected separately ([#80433](https://github.com/WordPress/gutenberg/pull/80433)).
 -   Suggestion mode: text typed after turning a format on (Bold, then typing), or typed into formatted text, is suggested with that formatting, as it is outside Suggestion mode ([#80433](https://github.com/WordPress/gutenberg/pull/80433)).
