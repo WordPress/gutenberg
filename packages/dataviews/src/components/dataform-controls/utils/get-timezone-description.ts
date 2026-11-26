@@ -34,7 +34,7 @@ export default function getTimezoneDescription(): string | undefined {
 	}
 
 	return sprintf(
-		/* translators: %s: timezone detail, e.g. "(CEST) Europe/Madrid" or "UTC+3". */
+		/* translators: %s: timezone detail, e.g. "CEST", "(CEST) Europe/Madrid" or "UTC+3". */
 		__( 'Timezone: %s' ),
 		timezoneDetail
 	);

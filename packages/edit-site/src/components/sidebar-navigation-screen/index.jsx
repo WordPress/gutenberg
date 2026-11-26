@@ -111,7 +111,7 @@ export default function SidebarNavigationScreen( {
 						<Stack className="edit-site-sidebar-navigation-screen__preview-badge">
 							<Badge intent="informational">
 								{ sprintf(
-									/* translators: %s: theme name. */
+									/* translators: %s: Theme name. */
 									__( 'Previewing %s' ),
 									previewingThemeName
 								) }

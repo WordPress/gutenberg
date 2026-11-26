@@ -68,7 +68,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				if ( minMinutes === maxMinutes ) {
 					maxMinutes = maxMinutes + 1;
 				}
-				// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
+				// translators: 1: minimum minutes, 2: maximum minutes to read the post.
 				const rangeLabel = _x(
 					'%1$s–%2$s minutes',
 					'Range of minutes to read'

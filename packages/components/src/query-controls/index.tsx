@@ -38,12 +38,12 @@ const defaultOrderByOptions: OrderByOption[] = [
 		value: 'date/asc',
 	},
 	{
-		/* translators: Label for ordering posts by title in ascending order. */
+		/* translators: Label for ordering by title in ascending order. */
 		label: __( 'A → Z' ),
 		value: 'title/asc',
 	},
 	{
-		/* translators: Label for ordering posts by title in descending order. */
+		/* translators: Label for ordering by title in descending order. */
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},

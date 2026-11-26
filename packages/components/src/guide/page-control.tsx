@@ -24,7 +24,7 @@ export default function PageControl( {
 						key={ page }
 						icon={ <PageControlIcon /> }
 						aria-label={ sprintf(
-							/* translators: 1: current page number 2: total number of pages */
+							/* translators: 1: current page number. 2: total number of pages. */
 							__( 'Page %1$d of %2$d' ),
 							page + 1,
 							numberOfPages

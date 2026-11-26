@@ -53,7 +53,7 @@ const permanentlyDeletePost: ActionScriptParts< PostWithPermissions > = {
 								items.length
 							)
 						: sprintf(
-								// translators: %s: The post's title
+								// translators: %s: The item's title.
 								__(
 									'Are you sure you want to permanently delete "%s"?'
 								),

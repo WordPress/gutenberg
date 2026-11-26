@@ -704,7 +704,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01". */
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is: Admin". */
 					__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
 					filter.name,
 					activeElements[ 0 ].label
@@ -732,7 +732,7 @@ const OPERATORS: {
 		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
 			createInterpolateElement(
 				sprintf(
-					/* translators: 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01". */
+					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is not: Admin". */
 					__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
 					filter.name,
 					activeElements[ 0 ].label
