@@ -32,7 +32,7 @@ When the product needs its own component, build it by composing existing compone
 ## Style with props first
 
 -   Use a component's props for variants, sizes and tones instead of restyling it with CSS. For example, use a size prop on `Text`, not a font size in CSS.
--   Adding position, width or margin around a component is fine when it does not change the component's appearance, because sizing and layout are the responsibility of the code that uses it. Check that it does not break wrapping, overflow, spacing, alignment, stacking or interaction.
+-   Adding position or width around a component is fine when it does not change the component's appearance, because sizing and layout are the responsibility of the code that uses it. Space components with `Stack` and not with margins, and use `--wpds-*` tokens for any value you write, as described in the `wp-theme` skill. Check that it does not break wrapping, overflow, alignment, stacking or interaction.
 -   Do not heavily override a component's styles. If an override only reproduces old visuals or stacks on another override, ask whether it is needed or whether the shared component should change.
 -   Do not target internal class names, such as `.components-button` or `.components-popover__content`, or private class names and markup. They are not stable. Use documented props, styling hooks or composition.
 -   If a component looks wrong, suspect a CSS reset or a specificity conflict in your project before accepting a local workaround.
