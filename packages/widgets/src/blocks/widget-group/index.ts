@@ -1,15 +1,17 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import type { Attributes } from './types';
 
 const { name } = metadata;
 export { metadata, name };
 
-export const settings = {
+export const settings: Partial< BlockConfiguration< Attributes > > = {
 	title: __( 'Widget Group' ),
 	description: __(
 		'Create a classic widget layout with a title that’s styled by your theme for your widget areas.'
@@ -26,13 +28,13 @@ export const settings = {
 				blocks: [ '*' ],
 				isMatch( attributes, blocks ) {
 					// Avoid transforming existing `widget-group` blocks.
-					return ! blocks.some(
+					return ! ( blocks as Block[] ).some(
 						( block ) => block.name === 'core/widget-group'
 					);
 				},
 				__experimentalConvert( blocks ) {
 					// Put the selected blocks inside the new Widget Group's innerBlocks.
-					let innerBlocks = blocks.map( ( block ) =>
+					let innerBlocks = ( blocks as Block[] ).map( ( block ) =>
 						cloneSanitizedBlock( block )
 					);
 

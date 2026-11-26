@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Remove the empty `search` query arg from the Patterns URL after resetting the filters or clearing the search ([#87383](https://github.com/WordPress/gutenberg/pull/87383)).
+-   Navigation: Keep selected links readable on hover and keyboard focus when a custom theme changes the selection color ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 
 ## 8.2.0 (2026-11-18)
 

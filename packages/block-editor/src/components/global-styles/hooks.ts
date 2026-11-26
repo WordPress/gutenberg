@@ -223,7 +223,7 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
-		[ 'rotate', 'translate' ].forEach( ( key ) => {
+		[ 'rotate', 'translate', 'scale' ].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.transform = {
 					...updatedSettings.transform,
