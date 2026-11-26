@@ -1,14 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
-	cart,
+	chartBar,
 	color,
-	currencyDollar,
+	comment,
 	download,
+	envelope,
 	globe,
+	lock,
 	moreVertical,
 	payment,
 	reset,
-	store,
+	shipping,
 	tool,
 } from '@wordpress/icons';
 import { Badge } from '../../badge';
@@ -250,42 +252,55 @@ export const InsideACard: Story = {
 
 /**
  * A row can keep the controls that do not fit beside it in a menu. Here the
- * whole row opens the settings of the provider, and the menu holds its
- * other actions. The menu trigger stays visible, and its name says which
- * row it acts on.
+ * whole row opens the settings of the service, and the menu holds its other
+ * actions. The menu trigger stays visible, and its name says which row it
+ * acts on.
  */
 export const WithOverflowMenu: Story = {
 	args: {
-		'aria-label': 'Payment providers',
+		'aria-label': 'Connected services',
 		children: [
 			{
-				key: 'woopayments',
-				name: 'WooPayments',
-				description: 'Cards, Apple Pay and Google Pay, in one place.',
-				status: <Badge intent="stable">Active</Badge>,
+				key: 'payments',
+				name: 'Payments',
+				connected: true,
+				description: 'Take card payments on your site.',
 				icon: payment,
 			},
 			{
-				key: 'cash',
-				name: 'Cash on delivery',
-				description: 'Let customers pay when their order arrives.',
-				status: <Badge>Inactive</Badge>,
-				icon: currencyDollar,
+				key: 'analytics',
+				name: 'Analytics',
+				connected: false,
+				description: 'See how visitors find and use your site.',
+				icon: chartBar,
 			},
-		].map( ( provider ) => (
-			<Item.LinkRow href={ `#${ provider.key }` } key={ provider.key }>
+			{
+				key: 'email',
+				name: 'Email delivery',
+				connected: true,
+				description: 'Send site emails through a dedicated service.',
+				icon: envelope,
+			},
+		].map( ( service ) => (
+			<Item.LinkRow href={ `#${ service.key }` } key={ service.key }>
 				<Item.Media>
-					<Icon icon={ provider.icon } />
+					<Icon icon={ service.icon } />
 				</Item.Media>
-				<Item.Label>{ provider.name }</Item.Label>
-				<Item.Description>{ provider.description }</Item.Description>
-				<Item.Meta>{ provider.status }</Item.Meta>
+				<Item.Label>{ service.name }</Item.Label>
+				<Item.Description>{ service.description }</Item.Description>
+				<Item.Meta>
+					{ service.connected ? (
+						<Badge intent="stable">Connected</Badge>
+					) : (
+						<Badge>Not connected</Badge>
+					) }
+				</Item.Meta>
 				<Item.Actions>
 					<Menu.Root>
 						<Menu.Trigger
 							render={
 								<IconButton
-									label={ `More actions for ${ provider.name }` }
+									label={ `More actions for ${ service.name }` }
 									icon={ moreVertical }
 									variant="minimal"
 									tone="neutral"
@@ -294,13 +309,17 @@ export const WithOverflowMenu: Story = {
 							}
 						/>
 						<Menu.Popup>
-							<Menu.LinkItem href={ `#${ provider.key }-docs` }>
+							<Menu.LinkItem href={ `#${ service.key }-docs` }>
 								<Menu.ItemLabel>
 									View documentation
 								</Menu.ItemLabel>
 							</Menu.LinkItem>
 							<Menu.Item>
-								<Menu.ItemLabel>Hide suggestion</Menu.ItemLabel>
+								<Menu.ItemLabel>
+									{ service.connected
+										? 'Disconnect'
+										: 'Connect' }
+								</Menu.ItemLabel>
 							</Menu.Item>
 						</Menu.Popup>
 					</Menu.Root>
@@ -319,9 +338,7 @@ export const InsideACollapsibleCard: Story = {
 	render: () => (
 		<CollapsibleCard.Root defaultOpen>
 			<CollapsibleCard.Header role="heading" aria-level={ 2 }>
-				<Card.Title>
-					More payment options in the United States
-				</Card.Title>
+				<Card.Title>More settings</Card.Title>
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content>
 				<Stack direction="column" gap="xl">
@@ -329,18 +346,28 @@ export const InsideACollapsibleCard: Story = {
 						<Text
 							variant="heading-sm"
 							render={ <h3 /> }
-							id="item-story-wallets"
+							id="item-story-site"
 						>
-							Wallets &amp; express checkouts
+							Site
 						</Text>
-						<Item.Group aria-labelledby="item-story-wallets">
-							<Item.LinkRow href="#express">
+						<Item.Group aria-labelledby="item-story-site">
+							<Item.LinkRow href="#privacy">
 								<Item.Media>
-									<Icon icon={ cart } />
+									<Icon icon={ lock } />
 								</Item.Media>
-								<Item.Label>Express checkout</Item.Label>
+								<Item.Label>Privacy</Item.Label>
 								<Item.Description>
-									Let customers pay with a saved wallet.
+									Choose who can see your site.
+								</Item.Description>
+								<Item.Chevron />
+							</Item.LinkRow>
+							<Item.LinkRow href="#discussion">
+								<Item.Media>
+									<Icon icon={ comment } />
+								</Item.Media>
+								<Item.Label>Discussion</Item.Label>
+								<Item.Description>
+									Comments, pingbacks and moderation.
 								</Item.Description>
 								<Item.Chevron />
 							</Item.LinkRow>
@@ -350,34 +377,34 @@ export const InsideACollapsibleCard: Story = {
 						<Text
 							variant="heading-sm"
 							render={ <h3 /> }
-							id="item-story-providers"
+							id="item-story-store"
 						>
-							Payment providers
+							Store
 						</Text>
-						<Item.Group aria-labelledby="item-story-providers">
-							<Item.LinkRow href="#marketplace">
+						<Item.Group aria-labelledby="item-story-store">
+							<Item.LinkRow href="#payments">
 								<Item.Media>
-									<Icon icon={ store } />
+									<Icon icon={ payment } />
 								</Item.Media>
-								<Item.Label>Marketplace payments</Item.Label>
+								<Item.Label>Payments</Item.Label>
 								<Item.Description>
-									Split payments between sellers.
+									Choose how customers pay.
 								</Item.Description>
 								<Item.Chevron />
 							</Item.LinkRow>
-							<Item.LinkRow href="#bank-transfer">
+							<Item.LinkRow href="#shipping">
 								<Item.Media>
-									<Icon icon={ currencyDollar } />
+									<Icon icon={ shipping } />
 								</Item.Media>
-								<Item.Label>Direct bank transfer</Item.Label>
+								<Item.Label>Shipping</Item.Label>
 								<Item.Description>
-									Take payments in person by bank transfer.
+									Zones, rates and delivery options.
 								</Item.Description>
 								<Item.Chevron />
 							</Item.LinkRow>
 						</Item.Group>
 					</Stack>
-					<Link href="#more-options">More payment options</Link>
+					<Link href="#all-settings">All settings</Link>
 				</Stack>
 			</CollapsibleCard.Content>
 		</CollapsibleCard.Root>
