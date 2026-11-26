@@ -102,6 +102,17 @@ export type ForegroundScaleConfig = {
 		weakToNormal: number;
 		/** Minimum APCA interval from a resting control to its active state. */
 		normalToActive: number;
+		/**
+		 * Lower normal emphasis toward its minimum when reaching the preferred
+		 * contrast would cost too much chroma. Normal emphasis keeps at least
+		 * `share` of the highest chroma available between its minimum and
+		 * preferred contrast. Paths whose highest chroma is below
+		 * `minimumChroma` are treated as neutral and keep the preferred contrast.
+		 */
+		chromaRetention: {
+			share: number;
+			minimumChroma: number;
+		};
 	};
 	chroma:
 		| {

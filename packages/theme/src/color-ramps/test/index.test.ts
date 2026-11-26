@@ -548,6 +548,47 @@ describe( 'buildRamps', () => {
 		}
 	} );
 
+	it( 'keeps accent chroma in normal emphasis near the light endpoint', () => {
+		const backgroundRamp = buildBgRamp( '#1e1e1e' );
+		const primaryRamp = buildAccentRamp(
+			'primary',
+			DEFAULT_SEED_COLORS.primary,
+			backgroundRamp
+		);
+		const weakContrast = getPerceptualContrastMagnitude(
+			backgroundRamp.ramp.surface2,
+			primaryRamp.ramp.fgSurface3
+		);
+		const normalContrast = getPerceptualContrastMagnitude(
+			backgroundRamp.ramp.surface2,
+			primaryRamp.ramp.fgSurface4
+		);
+
+		expect(
+			get( to( primaryRamp.ramp.fgSurface4, OKLCH ), [ OKLCH, 'c' ] )
+		).toBeGreaterThan( 0.09 );
+		expect( normalContrast - weakContrast ).toBeGreaterThanOrEqual(
+			ACCENT_RAMP_CONFIG.foregroundScale.perceptualTargets.weakToNormal
+		);
+		expect( primaryRamp.warnings ).toBeUndefined();
+	} );
+
+	it( 'keeps neutral normal emphasis at the preferred contrast', () => {
+		const { normalContrast } =
+			BG_RAMP_CONFIG.foregroundScale.perceptualTargets;
+
+		for ( const background of [ '#fcfcfc', '#1e1e1e' ] ) {
+			const backgroundRamp = buildBgRamp( background );
+
+			expect(
+				getPerceptualContrastMagnitude(
+					backgroundRamp.ramp.surface2,
+					backgroundRamp.ramp.fgSurface4
+				)
+			).toBeCloseTo( normalContrast, 0 );
+		}
+	} );
+
 	it( 'separates weak, normal, and active semantic foregrounds', () => {
 		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const ramps = [

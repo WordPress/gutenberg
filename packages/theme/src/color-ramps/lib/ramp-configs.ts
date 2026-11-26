@@ -70,6 +70,10 @@ const FOREGROUND_PERCEPTUAL_TARGETS = {
 	// smaller interval for strong content and interaction states.
 	weakToNormal: 12,
 	normalToActive: 10,
+	// Near black or white, sRGB has little room for chroma. Stop normal
+	// emphasis before it loses most of its color. Neutral paths stay below
+	// the chroma minimum, so this does not move gray text.
+	chromaRetention: { share: 0.8, minimumChroma: 0.04 },
 } as const;
 
 const FOREGROUND_SCALE_STEPS = [

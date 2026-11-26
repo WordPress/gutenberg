@@ -267,6 +267,79 @@ function findColorAtPerceptualContrast( {
 	);
 }
 
+const CHROMA_RETENTION_SAMPLES = 32;
+const CHROMA_RETENTION_ITERATIONS = 20;
+
+/**
+ * Move a foreground from its preferred position toward its minimum until it
+ * keeps the configured share of the highest chroma available in between.
+ * Chroma along a single-hue lightness path rises to a cusp and then falls, so
+ * the search returns the passing lightness closest to the preferred color.
+ *
+ * @param options                     Search inputs.
+ * @param options.getColorAtLightness Color path indexed by OKLCH lightness.
+ * @param options.minimumColor        Weakest allowed foreground.
+ * @param options.preferredColor      Foreground at the preferred contrast.
+ * @param options.share               Share of the highest chroma to keep.
+ * @param options.minimumChroma       Highest chroma below which to do nothing.
+ */
+function findColorRetainingChroma( {
+	getColorAtLightness,
+	minimumColor,
+	preferredColor,
+	share,
+	minimumChroma,
+}: {
+	getColorAtLightness: GetColorForLightness;
+	minimumColor: PlainColorObject;
+	preferredColor: PlainColorObject;
+	share: number;
+	minimumChroma: number;
+} ) {
+	const minimumLightness = get( minimumColor, [ OKLCH, 'l' ] );
+	const preferredLightness = get( preferredColor, [ OKLCH, 'l' ] );
+	if ( minimumLightness === preferredLightness ) {
+		return preferredColor;
+	}
+
+	const getChroma = ( lightness: number ) =>
+		get( getColorAtLightness( lightness ), [ OKLCH, 'c' ] ) || 0;
+	// Index 0 is the preferred color; the last index is the minimum.
+	const samples = Array.from(
+		{ length: CHROMA_RETENTION_SAMPLES + 1 },
+		( _, index ) => {
+			const lightness =
+				preferredLightness +
+				( ( minimumLightness - preferredLightness ) * index ) /
+					CHROMA_RETENTION_SAMPLES;
+			return { lightness, chroma: getChroma( lightness ) };
+		}
+	);
+	const highestChroma = Math.max(
+		...samples.map( ( { chroma } ) => chroma )
+	);
+	const threshold = share * highestChroma;
+	if ( highestChroma < minimumChroma || samples[ 0 ].chroma >= threshold ) {
+		return preferredColor;
+	}
+
+	const passingIndex = samples.findIndex(
+		( { chroma } ) => chroma >= threshold
+	);
+	let failingLightness = samples[ passingIndex - 1 ].lightness;
+	let passingLightness = samples[ passingIndex ].lightness;
+	for ( let i = 0; i < CHROMA_RETENTION_ITERATIONS; i++ ) {
+		const lightness = ( failingLightness + passingLightness ) / 2;
+		if ( getChroma( lightness ) >= threshold ) {
+			passingLightness = lightness;
+		} else {
+			failingLightness = lightness;
+		}
+	}
+
+	return getColorAtLightness( passingLightness );
+}
+
 /**
  * Correct a WCAG shortfall introduced by color serialization. Search only
  * toward the supplied strong color, then fall back to it if no sampled color
@@ -542,6 +615,20 @@ export function buildForegroundScale(
 		strongColor: strongEndpoint,
 		target: requestedNormalContrast,
 	} );
+	if ( requestedNormalContrast > minimumNormalContrast ) {
+		normalColor = findColorRetainingChroma( {
+			getColorAtLightness,
+			minimumColor: findColorAtPerceptualContrast( {
+				background: displayBackground,
+				getColorAtLightness,
+				weakColor: minimumFgSurface4,
+				strongColor: strongEndpoint,
+				target: minimumNormalContrast,
+			} ),
+			preferredColor: normalColor,
+			...config.perceptualTargets.chromaRetention,
+		} );
+	}
 	if (
 		! meetsContrastTarget(
 			normalColor,
