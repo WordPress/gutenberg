@@ -1229,20 +1229,18 @@ _Changelog_
 
 Resolves resource permissions.
 
+Note: New code should call the `canUser` selector with `useSelect` instead, checking only the actions it needs.
+
 _Usage_
 
 ```js
 import { useResourcePermissions } from '@wordpress/core-data';
 
 function PagesList() {
-	const { canCreate, isResolving } = useResourcePermissions( {
+	const { canCreate } = useResourcePermissions( {
 		kind: 'postType',
 		name: 'page',
 	} );
-
-	if ( isResolving ) {
-		return 'Loading ...';
-	}
 
 	return (
 		<div>
@@ -1260,16 +1258,11 @@ function PagesList() {
 import { useResourcePermissions } from '@wordpress/core-data';
 
 function Page( { pageId } ) {
-	const { canCreate, canUpdate, canDelete, isResolving } =
-		useResourcePermissions( {
-			kind: 'postType',
-			name: 'page',
-			id: pageId,
-		} );
-
-	if ( isResolving ) {
-		return 'Loading ...';
-	}
+	const { canCreate, canUpdate, canDelete } = useResourcePermissions( {
+		kind: 'postType',
+		name: 'page',
+		id: pageId,
+	} );
 
 	return (
 		<div>
@@ -1286,7 +1279,7 @@ function Page( { pageId } ) {
 ```
 
 In the above example, when `PagesList` is rendered into an
-application, the appropriate permissions and the resolution details will be retrieved from
+application, the appropriate permissions will be retrieved from
 the store state using `canUser()`, or resolved if missing.
 
 _Parameters_
@@ -1296,7 +1289,7 @@ _Parameters_
 
 _Returns_
 
-- `ResourcePermissionsResolution< IdType >`: Resource permissions and resolution details.
+- `ResourcePermissionsResolution< IdType >`: Resource permissions.
 
 _Changelog_
 

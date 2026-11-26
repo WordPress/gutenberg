@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `useResourcePermissions`: Deprecate the `status`, `isResolving` and `hasResolved` return values; check the permission values instead.
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
@@ -11,6 +15,7 @@
 
 ### Internal
 
+-   Remove the `memize` dependency.
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 9.2.0 (2026-11-18)
