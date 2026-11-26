@@ -1,6 +1,7 @@
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
 import { getMarkerSelector } from '../../inline-markers/marker-selector';
+import { getSuggestionMarkerSelector } from '../../inline-suggestions';
 import type { NoteId } from './types';
 
 const { ownsSelection } = unlock< {
@@ -24,10 +25,10 @@ export function getNoteMarkerSelector( noteId: NoteId ): string {
  *
  * An inline note anchors to its in-content marker, so the thread aligns with
  * the noted text rather than the block, and so does a pending new note through
- * its draft marker. A marker split into several runs (crossing overlaps)
- * resolves to its first run. Anything else falls back to the block itself. An
- * anchor inside collapsed content (e.g. a closed Details) falls back to the
- * closest visible block.
+ * its draft marker, and a suggestion through its markers. A marker split into
+ * several runs (crossing overlaps) resolves to its first run. Anything else
+ * falls back to the block itself. An anchor inside collapsed content (e.g. a
+ * closed Details) falls back to the closest visible block.
  *
  * Resolved at read time, because rich-text re-renders replace the marker.
  *
@@ -40,7 +41,11 @@ export function getNoteAnchorRect(
 	blockEl: HTMLElement
 ): DOMRect {
 	let anchor: Element =
-		blockEl.querySelector( getNoteMarkerSelector( noteId ) ) ?? blockEl;
+		blockEl.querySelector(
+			`${ getNoteMarkerSelector( noteId ) }, ${ getSuggestionMarkerSelector(
+				noteId
+			) }`
+		) ?? blockEl;
 	// Collapsed content still reports the box it would have when expanded,
 	// so its size can't tell it apart. Safari < 17.4 lacks `checkVisibility`.
 	while ( anchor.checkVisibility?.() === false ) {
