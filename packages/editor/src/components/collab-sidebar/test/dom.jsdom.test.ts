@@ -48,6 +48,21 @@ describe( 'getNoteAnchorRect', () => {
 		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 160 );
 	} );
 
+	it( 'anchors a suggestion to its first in-content marker', () => {
+		const blockEl = document.createElement( 'figure' );
+		blockEl.innerHTML =
+			'<img alt="" /><figcaption>A ' +
+			'<mark class="wp-suggestion-del" data-suggestion-id="12">old</mark>' +
+			'<mark class="wp-suggestion-add" data-suggestion-id="12">new</mark>' +
+			' caption</figcaption>';
+		const [ deletion, addition ] = blockEl.querySelectorAll( 'mark' );
+		mockRect( blockEl, 100 );
+		mockRect( deletion, 560 );
+		mockRect( addition, 580 );
+
+		expect( getNoteAnchorRect( 12, blockEl ).top ).toBe( 560 );
+	} );
+
 	it( 'falls back to the block rect for block-level notes', () => {
 		const blockEl = document.createElement( 'p' );
 		blockEl.textContent = 'No marker here';
