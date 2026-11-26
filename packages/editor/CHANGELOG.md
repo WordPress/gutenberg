@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
@@ -10,6 +14,7 @@
 -   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
 -   Block Bindings: When a registered post meta field has no value, the `core/post-meta` source returns an empty value instead of the field label or key. The block shows its empty state, with the field label as the placeholder ([#87389](https://github.com/WordPress/gutenberg/pull/87389)).
+-   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
 
 ### Internal
 

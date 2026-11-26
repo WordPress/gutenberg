@@ -108,7 +108,7 @@ export const saveWidgetAreas =
  */
 export const saveWidgetArea =
 	( widgetAreaId ) =>
-	async ( { dispatch, select, registry } ) => {
+	async ( { select, registry } ) => {
 		const widgets = select.getWidgets();
 
 		const post = registry
@@ -287,17 +287,9 @@ export const saveWidgetArea =
 			{ undoIgnore: true }
 		);
 
-		dispatch( trySaveWidgetArea( widgetAreaId ) );
-
-		registry
-			.dispatch( coreStore )
-			.receiveEntityRecords( KIND, POST_TYPE, post, undefined );
-	};
-
-const trySaveWidgetArea =
-	( widgetAreaId ) =>
-	( { registry } ) => {
-		registry
+		// Sidebar and widget requests can both rewrite the sidebar lists. Finish
+		// this write before saveWidgetAreas starts saving the next area.
+		await registry
 			.dispatch( coreStore )
 			.saveEditedEntityRecord(
 				KIND,
@@ -307,6 +299,10 @@ const trySaveWidgetArea =
 					throwOnError: true,
 				}
 			);
+
+		registry
+			.dispatch( coreStore )
+			.receiveEntityRecords( KIND, POST_TYPE, post, undefined );
 	};
 
 /**
