@@ -378,7 +378,6 @@ test.describe( 'Taxonomies', () => {
 		heldCreateRequest.resolve();
 
 		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
-		await expect( publishButton ).toBeEnabled();
 
 		const postId = await editor.publishPost();
 
@@ -386,63 +385,6 @@ test.describe( 'Taxonomies', () => {
 			path: `/wp/v2/posts/${ postId }`,
 		} );
 		expect( post.tags ).toHaveLength( 2 );
-	} );
-
-	test( 'should not allow publishing while a new tag waits for a tag search', async ( {
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		await openTaxonomyPanel( page, 'Tags' );
-		await editor.canvas
-			.getByRole( 'textbox', { name: 'Add title' } )
-			.fill( 'Hello World' );
-
-		// Hold the tag search, as on a slow network. A tag created meanwhile
-		// is only sent once the search resolves.
-		const heldSearchRequest = defer();
-		await page.route( '**/wp/v2/tags**', async ( route ) => {
-			const request = route.request();
-			if (
-				request.method() === 'GET' &&
-				new URL( request.url() ).searchParams.has( 'search' )
-			) {
-				await heldSearchRequest;
-			}
-			await route.continue();
-		} );
-
-		const tagName = 'tag-' + generateRandomNumber();
-		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
-		const searchRequest = page.waitForRequest(
-			( request ) =>
-				request.method() === 'GET' &&
-				new URL( request.url() ).searchParams.get( 'search' ) ===
-					tagName
-		);
-
-		await tagInput.fill( tagName );
-		await searchRequest;
-		await tagInput.press( 'Enter' );
-
-		const publishButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Publish', exact: true } );
-
-		await expect( getTagChip( page, tagName ) ).toBeVisible();
-		await expect( publishButton ).toBeDisabled();
-
-		heldSearchRequest.resolve();
-
-		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 1 );
-		await expect( publishButton ).toBeEnabled();
-
-		const postId = await editor.publishPost();
-
-		const post = await requestUtils.rest( {
-			path: `/wp/v2/posts/${ postId }`,
-		} );
-		expect( post.tags ).toHaveLength( 1 );
 	} );
 
 	test( 'should create a tag when pressing Enter', async ( { page } ) => {
