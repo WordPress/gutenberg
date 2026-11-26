@@ -1253,7 +1253,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1305,7 +1305,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1482,7 +1482,7 @@ describe( 'block factory', () => {
 							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1532,7 +1532,7 @@ describe( 'block factory', () => {
 							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1699,7 +1699,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/text-block', {
 									value: 'chicken ' + value,
@@ -1742,7 +1742,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
@@ -1790,7 +1790,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
+							// @ts-expect-error The fixture types attributes narrower than Record< string, unknown >.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
