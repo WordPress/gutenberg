@@ -24,7 +24,6 @@ This applies when the project enables the `@wordpress/use-recommended-components
 -   Keep only the messages with the `ruleId` `@wordpress/use-recommended-components`. Each has the `filePath`, `line` and `column` of the import, and a `message` that says what to use instead.
 -   Group the messages by the imported component and count them. Some messages do not name the component, so read the import specifier at the reported line and column. List the most used components first.
 -   Separate three kinds of result. A message that names a `@wordpress/ui` replacement is a candidate for migration. A message that says to write your own CSS, or that the component is planned for deprecation, has no `@wordpress/ui` replacement, so do not migrate it. A flagged `@wordpress/ui` component is not recommended yet, or is marked "Use with caution".
--   For each candidate, link its **Migration Guide** page in the [Storybook](https://wordpress.github.io/gutenberg/), which is under the legacy component. If there is no guide, say so.
 -   If the project uses ESLint's suppressions baseline, suppressed reports are not in the output. Read `eslint-suppressions.json` for the files and counts of the suppressed ones.
 -   Show the inventory to the user, and migrate one component at a time from it.
 
