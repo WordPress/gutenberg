@@ -56,6 +56,7 @@ describe( 'useInspectorControlsTabs', () => {
 			<StylesTab
 				blockName="test/block"
 				clientId="test-client-id"
+				contentClientIds={ [] }
 				hasBlockStyles={ false }
 				isSectionBlock={ false }
 			/>
