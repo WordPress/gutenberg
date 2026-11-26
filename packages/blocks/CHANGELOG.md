@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Add the `textWrap` style property, for the `typography.textWrap` block support ([#87469](https://github.com/WordPress/gutenberg/pull/87469)).
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 -   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
