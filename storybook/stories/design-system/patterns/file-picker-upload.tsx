@@ -1,6 +1,13 @@
+import type { RefObject } from 'react';
 import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
-import { useEffect, useId, useRef, useState } from '@wordpress/element';
+import {
+	createRef,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 import {
 	Badge,
@@ -20,6 +27,8 @@ type Upload = {
 	file: File;
 	status: 'uploading' | 'uploaded' | 'failed';
 	progress: number;
+	/** The row's remove button, so focus can move to it. */
+	removeRef: RefObject< HTMLButtonElement | null >;
 };
 
 /**
@@ -31,7 +40,6 @@ type Upload = {
 export function FilePickerUpload() {
 	const [ uploads, setUploads ] = useState< Upload[] >( [] );
 	const timers = useRef( new Map< string, number >() );
-	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const chooseRef = useRef< HTMLButtonElement >( null );
 	const announcements = useRef< string[] >( [] );
 	const announceTimerRef = useRef< number >( undefined );
@@ -113,6 +121,7 @@ export function FilePickerUpload() {
 			file,
 			status: 'uploading' as const,
 			progress: 0,
+			removeRef: createRef< HTMLButtonElement >(),
 		} ) );
 		setUploads( ( current ) => [ ...current, ...added ] );
 		// The first try for a PDF fails, so "Retry" can be tried.
@@ -141,7 +150,7 @@ export function FilePickerUpload() {
 		// The "Retry" button is about to go, so move focus to the row's
 		// remove button, which now cancels the upload. Its new name may not
 		// be read while it has focus, so say what happens.
-		removeRefs.current.get( upload.id )?.focus();
+		upload.removeRef.current?.focus();
 		announce( `Uploading ${ upload.file.name } again.` );
 	}
 
@@ -160,10 +169,7 @@ export function FilePickerUpload() {
 				: `${ upload.file.name } removed.`
 		);
 		const next = remaining[ index ] ?? remaining[ index - 1 ];
-		( next
-			? removeRefs.current.get( next.id )
-			: chooseRef.current
-		)?.focus();
+		( next ? next.removeRef.current : chooseRef.current )?.focus();
 	}
 
 	const status = {
@@ -194,18 +200,7 @@ export function FilePickerUpload() {
 						{ uploads.map( ( upload ) => (
 							<li key={ upload.id }>
 								<SelectedFile
-									ref={ ( element ) => {
-										if ( element ) {
-											removeRefs.current.set(
-												upload.id,
-												element
-											);
-										} else {
-											removeRefs.current.delete(
-												upload.id
-											);
-										}
-									} }
+									ref={ upload.removeRef }
 									file={ upload.file }
 									status={ status[ upload.status ] }
 									// A failed row shows only its status, so the

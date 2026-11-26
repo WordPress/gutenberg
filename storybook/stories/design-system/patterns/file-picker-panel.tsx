@@ -1,6 +1,7 @@
+import type { RefObject } from 'react';
 import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
-import { useId, useRef, useState } from '@wordpress/element';
+import { createRef, useId, useRef, useState } from '@wordpress/element';
 import { upload } from '@wordpress/icons';
 import {
 	Button,
@@ -15,13 +16,17 @@ import styles from './file-picker.module.css';
 
 const FONT_EXTENSIONS = [ '.ttf', '.otf', '.woff', '.woff2' ];
 
-type Entry = { id: string; file: File };
+type Entry = {
+	id: string;
+	file: File;
+	/** The row's remove button, so focus can move to it after a removal. */
+	removeRef: RefObject< HTMLButtonElement | null >;
+};
 
 export function FilePickerPanel() {
 	const [ entries, setEntries ] = useState< Entry[] >( [] );
 	const [ error, setError ] = useState( '' );
 	const chooseRef = useRef< HTMLButtonElement >( null );
-	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const errorId = useId();
 
 	function addFiles( files: File[] ) {
@@ -31,7 +36,11 @@ export function FilePickerPanel() {
 		const rejected = files.filter( ( file ) => ! isFont( file ) );
 		setEntries( ( current ) => [
 			...current,
-			...fonts.map( ( file ) => ( { id: createId(), file } ) ),
+			...fonts.map( ( file ) => ( {
+				id: createId(),
+				file,
+				removeRef: createRef< HTMLButtonElement >(),
+			} ) ),
 		] );
 		setError(
 			rejected.length
@@ -58,10 +67,7 @@ export function FilePickerPanel() {
 		setError( '' );
 		speak( `${ entry.file.name } removed.` );
 		const next = remaining[ index ] ?? remaining[ index - 1 ];
-		( next
-			? removeRefs.current.get( next.id )
-			: chooseRef.current
-		)?.focus();
+		( next ? next.removeRef.current : chooseRef.current )?.focus();
 	}
 
 	return (
@@ -114,18 +120,7 @@ export function FilePickerPanel() {
 								{ entries.map( ( entry ) => (
 									<li key={ entry.id }>
 										<SelectedFile
-											ref={ ( element ) => {
-												if ( element ) {
-													removeRefs.current.set(
-														entry.id,
-														element
-													);
-												} else {
-													removeRefs.current.delete(
-														entry.id
-													);
-												}
-											} }
+											ref={ entry.removeRef }
 											file={ entry.file }
 											onRemove={ () =>
 												removeEntry( entry )

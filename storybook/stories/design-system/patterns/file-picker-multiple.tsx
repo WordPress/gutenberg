@@ -1,6 +1,7 @@
+import type { RefObject } from 'react';
 import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
-import { useId, useRef, useState } from '@wordpress/element';
+import { createRef, useId, useRef, useState } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 import {
 	Button,
@@ -22,7 +23,12 @@ const ACCEPTED_EXTENSIONS = [ '.pdf', '.jpg', '.jpeg', '.png' ];
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
-type Entry = { id: string; file: File };
+type Entry = {
+	id: string;
+	file: File;
+	/** The row's remove button, so focus can move to it after a removal. */
+	removeRef: RefObject< HTMLButtonElement | null >;
+};
 
 function getPrompt( count: number ) {
 	if ( count >= MAX_FILES ) {
@@ -35,7 +41,6 @@ export function FilePickerMultiple() {
 	const [ entries, setEntries ] = useState< Entry[] >( [] );
 	const [ error, setError ] = useState( '' );
 	const chooseRef = useRef< HTMLButtonElement >( null );
-	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const errorId = useId();
 	const isFull = entries.length >= MAX_FILES;
 
@@ -68,6 +73,7 @@ export function FilePickerMultiple() {
 		const newEntries = accepted.map( ( file ) => ( {
 			id: createId(),
 			file,
+			removeRef: createRef< HTMLButtonElement >(),
 		} ) );
 		setEntries( [ ...entries, ...newEntries ] );
 		const names = ( files: File[] ) =>
@@ -107,10 +113,7 @@ export function FilePickerMultiple() {
 		// Move focus to the next file, or the previous one when the last file
 		// was removed. Without files left, focus the button that adds them.
 		const next = remaining[ index ] ?? remaining[ index - 1 ];
-		( next
-			? removeRefs.current.get( next.id )
-			: chooseRef.current
-		)?.focus();
+		( next ? next.removeRef.current : chooseRef.current )?.focus();
 	}
 
 	return (
@@ -133,18 +136,7 @@ export function FilePickerMultiple() {
 						{ entries.map( ( entry ) => (
 							<li key={ entry.id }>
 								<SelectedFile
-									ref={ ( element ) => {
-										if ( element ) {
-											removeRefs.current.set(
-												entry.id,
-												element
-											);
-										} else {
-											removeRefs.current.delete(
-												entry.id
-											);
-										}
-									} }
+									ref={ entry.removeRef }
 									file={ entry.file }
 									onRemove={ () => removeEntry( entry ) }
 								/>
