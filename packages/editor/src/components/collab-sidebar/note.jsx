@@ -149,12 +149,18 @@ export function Note( {
 				note={ note }
 				labels={ {
 					submit: _x( 'Update', 'verb' ),
-					input: sprintf(
-						// translators: %1$s: note identifier, %2$s: author name.
-						__( 'Edit note %1$s by %2$s' ),
-						note.id,
-						note.author_name
-					),
+					input:
+						note.parent === 0
+							? sprintf(
+									// translators: %s: author name.
+									__( 'Edit note by %s' ),
+									note.author_name
+								)
+							: sprintf(
+									// translators: %s: author name.
+									__( 'Edit reply by %s' ),
+									note.author_name
+								),
 				} }
 			/>
 		);

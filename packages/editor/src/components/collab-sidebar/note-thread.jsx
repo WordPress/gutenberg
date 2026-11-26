@@ -68,9 +68,8 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 							? __( 'Reopen & Reply' )
 							: __( 'Reply' ),
 					input: sprintf(
-						// translators: %1$s: note identifier, %2$s: author name
-						__( 'Reply to note %1$s by %2$s' ),
-						note.id,
+						// translators: %s: author name.
+						__( 'Reply to note by %s' ),
 						note.author_name
 					),
 					placeholder: __( 'Reply or @ mention' ),
