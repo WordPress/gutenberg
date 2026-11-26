@@ -33,10 +33,7 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 		{ density = 'comfortable', render, variant = 'joined', ...restProps },
 		ref
 	) {
-		const context = useMemo(
-			() => ( { density, variant } ),
-			[ density, variant ]
-		);
+		const context = useMemo( () => ( { variant } ), [ variant ] );
 
 		const element = useRender( {
 			defaultTagName: 'ul',

@@ -1,14 +1,14 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { Density, GroupVariant } from './types';
+import type { GroupVariant } from './types';
 
 export type GroupContextValue = {
-	density: Density;
 	variant: GroupVariant;
 };
 
 /**
  * `null` outside an `Item.Group`. A row then renders no list item and uses
- * its own `density` prop.
+ * its own `density` prop. Inside a group, rows inherit the density of the
+ * group through CSS.
  */
 export const GroupContext = createContext< GroupContextValue | null >( null );
 

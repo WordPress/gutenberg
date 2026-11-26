@@ -3,8 +3,8 @@
 
 	@layer components {
 		/*
-		 * Density. Set on a group, and on every row so that a row outside a
-		 * group has it too.
+		 * Density. Set on a group, whose rows inherit it, or on a row
+		 * outside a group.
 		 */
 		.is-comfortable {
 			--_wp-ui-item-padding-block: var(--wpds-dimension-padding-lg);
@@ -44,15 +44,11 @@
 		/*
 		 * Inside `Card.FullBleed` the card is the frame. Only the top line
 		 * of the frame stays, to separate the rows from what precedes them
-		 * in the card, such as its header. The radius is set on the rows
-		 * too, because each row sets its own with its density.
+		 * in the card, such as its header.
 		 */
-		[data-wp-ui-card-fullbleed] > .has-frame,
-		[data-wp-ui-card-fullbleed] > .is-joined > .listitem > .row {
-			--_wp-ui-item-radius: 0px;
-		}
-
 		[data-wp-ui-card-fullbleed] > .has-frame {
+			--_wp-ui-item-radius: 0px;
+
 			border-inline-width: 0;
 			border-block-end-width: 0;
 			background-color: transparent;
@@ -100,7 +96,11 @@
 			/* Keeps the stacking of `.actions` above `.surface` inside the row. */
 			isolation: isolate;
 			display: grid;
-			grid-template-columns: auto minmax(0, 1fr) auto auto;
+			/*
+			 * The meta takes at most a quarter of the row, so that a long
+			 * value wraps and leaves room for the label and the actions.
+			 */
+			grid-template-columns: auto minmax(0, 1fr) fit-content(25%) auto;
 			align-items: center;
 			padding-block: var(--_wp-ui-item-padding-block);
 			padding-inline: var(--_wp-ui-item-padding-inline);
@@ -220,9 +220,10 @@
 			z-index: 0;
 		}
 
-		/* A long word or file name wraps; it does not run under the actions. */
+		/* A long word, file name or URL wraps; it does not run under the actions. */
 		.label,
-		.description {
+		.description,
+		.meta {
 			overflow-wrap: anywhere;
 		}
 

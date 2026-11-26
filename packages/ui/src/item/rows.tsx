@@ -63,11 +63,10 @@ type RowOptions = {
 function useRow( {
 	isActivatable,
 	opensInNewTab = false,
-	density: densityProp = 'comfortable',
+	density = 'comfortable',
 	aria = {},
 }: RowOptions ) {
 	const group = useContext( GroupContext );
-	const density = group?.density ?? densityProp;
 
 	const id = useId();
 	const labelId = `${ id }-label`;
@@ -168,7 +167,8 @@ function useRow( {
 		defenseStyles.div,
 		resetStyles[ 'box-sizing' ],
 		styles.row,
-		styles[ `is-${ density }` ],
+		// Inside a group, the row inherits the density of the group.
+		! group && styles[ `is-${ density }` ],
 		isActivatable && styles[ 'is-activatable' ],
 		// Inside a group, the group or the list item draws the frame.
 		! group && styles[ 'has-frame' ]
