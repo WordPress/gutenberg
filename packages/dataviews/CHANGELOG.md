@@ -7,7 +7,7 @@
 -   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
 -   DataForm: Add a `headingLevel` option to the `card` layout, which renders the card's title as a heading of that level ([#87390](https://github.com/WordPress/gutenberg/pull/87390)).
--   Keep selected and hovered rows, title links, and DataForm panel fields in neutral colors instead of switching to the brand color, and mark selected rows with a darker line. Filter options now match the `Select` and `Menu` items in `@wordpress/ui`, with a check mark for the selected options ([#87452](https://github.com/WordPress/gutenberg/pull/87452)).
+-   Keep selected and hovered rows and grid cards, table header buttons, title links, and DataForm panel fields in neutral colors instead of switching to the brand color, and mark selected rows and cards with a darker line. Filter options now match the `Select` and `Menu` items in `@wordpress/ui`, with a check mark for the selected options ([#87452](https://github.com/WordPress/gutenberg/pull/87452)).
 
 ### Bug Fixes
 
