@@ -143,6 +143,8 @@ export interface DescriptionProps extends Omit<
 	/**
 	 * Supporting text. In `Item.LinkRow` and `Item.ButtonRow` it is also the
 	 * accessible description of the row's control.
+	 *
+	 * Use one `Item.Description` per row.
 	 */
 	children?: ReactNode;
 }
@@ -156,7 +158,8 @@ export interface MetaProps extends Omit< ComponentProps< 'span' >, 'id' > {
 	 * `Item.LinkRow` and `Item.ButtonRow` it is also part of the accessible
 	 * description of the row's control.
 	 *
-	 * Keep it static. Interactive elements belong in `Item.Actions`.
+	 * Keep it static. Interactive elements belong in `Item.Actions`. Use one
+	 * `Item.Meta` per row, and put several values inside it.
 	 */
 	children?: ReactNode;
 }

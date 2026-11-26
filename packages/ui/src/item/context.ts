@@ -12,7 +12,7 @@ export type GroupContextValue = {
  */
 export const GroupContext = createContext< GroupContextValue | null >( null );
 
-export type RowPart = 'label' | 'description' | 'meta' | 'actions';
+export type RowPart = 'label' | 'description' | 'meta' | 'actions' | 'chevron';
 
 export type RowContextValue = {
 	labelId: string;
@@ -33,12 +33,6 @@ export type RowContextValue = {
 	 * shows the new-tab arrow.
 	 */
 	opensInNewTab: boolean;
-	/**
-	 * Whether the row holds controls of its own. A row with controls should
-	 * not also show a chevron: the glyph reads as belonging to the control
-	 * beside it rather than to the row.
-	 */
-	hasActions: boolean;
 };
 
 export const RowContext = createContext< RowContextValue | null >( null );

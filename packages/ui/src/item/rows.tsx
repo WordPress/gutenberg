@@ -74,33 +74,50 @@ function useRow( {
 	const metaId = `${ id }-meta`;
 	const newTabNoticeId = `${ id }-new-tab`;
 
-	// The label is tracked in a ref, not in state. Nothing is rendered from
-	// it; it only feeds the missing-label warning below.
-	const hasLabelRef = useRef( false );
+	// The label, the actions and the chevron are tracked in a ref, not in
+	// state. Nothing is rendered from them; they only feed the warnings.
+	const mountedRef = useRef( {
+		label: false,
+		actions: false,
+		chevron: false,
+	} );
+	// The description and the meta are in state: the control of the row
+	// references them.
 	const [ parts, setParts ] = useState( {
 		description: false,
 		meta: false,
-		actions: false,
 	} );
 
 	const register = useCallback(
 		( part: RowPart ) => {
-			if ( part === 'label' ) {
-				hasLabelRef.current = true;
-				return () => {
-					hasLabelRef.current = false;
-				};
+			if ( part === 'description' || part === 'meta' ) {
+				// A static row does not reference its description and
+				// meta, so it does not need to render again when they
+				// mount.
+				if ( ! isActivatable ) {
+					return () => {};
+				}
+
+				setParts( ( current ) => ( { ...current, [ part ]: true } ) );
+				return () =>
+					setParts( ( current ) => ( {
+						...current,
+						[ part ]: false,
+					} ) );
 			}
 
-			// A static row does not reference its description and meta, so
-			// it does not need to render again when they mount.
-			if ( ! isActivatable && part !== 'actions' ) {
-				return () => {};
+			const mounted = mountedRef.current;
+			mounted[ part ] = true;
+
+			if ( mounted.actions && mounted.chevron ) {
+				warning(
+					'Item.Chevron: a row that holds controls should not also show a chevron. The glyph reads as belonging to the control beside it rather than to the row.'
+				);
 			}
 
-			setParts( ( current ) => ( { ...current, [ part ]: true } ) );
-			return () =>
-				setParts( ( current ) => ( { ...current, [ part ]: false } ) );
+			return () => {
+				mounted[ part ] = false;
+			};
 		},
 		[ isActivatable ]
 	);
@@ -112,7 +129,11 @@ function useRow( {
 	useEffect( () => {
 		// The effects of the parts run before this one, so the label has
 		// registered itself by now if the row has one.
-		if ( isActivatable && ! hasExplicitName && ! hasLabelRef.current ) {
+		if (
+			isActivatable &&
+			! hasExplicitName &&
+			! mountedRef.current.label
+		) {
 			warning(
 				'Item: an <Item.LinkRow> or <Item.ButtonRow> needs an <Item.Label>. Without it the link or button of the row has no accessible name.'
 			);
@@ -127,7 +148,6 @@ function useRow( {
 			register,
 			isActivatable,
 			opensInNewTab,
-			hasActions: parts.actions,
 		} ),
 		[
 			labelId,
@@ -136,7 +156,6 @@ function useRow( {
 			register,
 			isActivatable,
 			opensInNewTab,
-			parts.actions,
 		]
 	);
 
@@ -250,6 +269,15 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
 		ref
 	) {
 		const opensInNewTab = openInNewTab || /^_blank$/i.test( target ?? '' );
+		const hasDestination = !! props.href || !! render;
+
+		useEffect( () => {
+			if ( ! hasDestination ) {
+				warning(
+					'Item.LinkRow: pass an `href`, or a `render` prop that supplies one. Without it the row is not a link, and keyboard users cannot reach it.'
+				);
+			}
+		}, [ hasDestination ] );
 		const row = useRow( {
 			isActivatable: true,
 			opensInNewTab,

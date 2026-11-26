@@ -50,6 +50,32 @@ describe( 'Item layout', () => {
 		expect( rowRect.height ).toBe( listRect.height );
 	} );
 
+	it( 'leaves the space between two actions to the control of the row', async () => {
+		await render(
+			<Item.ButtonRow onClick={ () => {} }>
+				<Item.Label>Soft shadow</Item.Label>
+				<Item.Actions>
+					<Button size="compact">Edit soft shadow</Button>
+					<Button size="compact">Remove soft shadow</Button>
+				</Item.Actions>
+			</Item.ButtonRow>
+		);
+
+		const edit = screen
+			.getByRole( 'button', { name: 'Edit soft shadow' } )
+			.getBoundingClientRect();
+		const remove = screen
+			.getByRole( 'button', { name: 'Remove soft shadow' } )
+			.getBoundingClientRect();
+
+		expect(
+			document.elementFromPoint(
+				( edit.right + remove.left ) / 2,
+				edit.top + edit.height / 2
+			)
+		).toBe( screen.getByRole( 'button', { name: 'Soft shadow' } ) );
+	} );
+
 	it( 'keeps static parts that create their own stacking context under the control of the row', async () => {
 		await render(
 			<div dir="rtl">

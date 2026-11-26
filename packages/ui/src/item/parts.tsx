@@ -1,11 +1,10 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { cloneElement, forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { arrowUpRight, chevronRight } from '@wordpress/icons';
-import warning from '@wordpress/warning';
-import type { ReactElement } from 'react';
 import { Icon } from '../icon';
 import { Text } from '../text';
+import { enforceRenderProps } from '../utils/enforce-render-props';
 import styles from './style.module.css';
 import { useRowContext } from './context';
 import type {
@@ -17,30 +16,17 @@ import type {
 	MetaProps,
 } from './types';
 
-type RenderProp = LabelProps[ 'render' ];
-
 /**
  * The control of the row references the label, the description and the
  * meta by their ids. A `render` element, or the element a `render` function
  * returns, would otherwise replace the id with its own and break the
- * reference, so the id is set on it.
+ * reference.
  *
  * @param render The `render` prop of the part.
  * @param id     The id the row references.
  */
-function withId( render: RenderProp, id: string | undefined ): RenderProp {
-	if ( ! render || ! id ) {
-		return render;
-	}
-
-	if ( typeof render === 'function' ) {
-		return ( props ) =>
-			cloneElement( render( props ) as ReactElement< { id?: string } >, {
-				id,
-			} );
-	}
-
-	return cloneElement( render, { id } );
+function withId< TRender >( render: TRender, id: string | undefined ) {
+	return id ? enforceRenderProps( render, { id } ) : render;
 }
 
 /**
@@ -153,14 +139,9 @@ export const Meta = forwardRef< HTMLSpanElement, MetaProps >( function ItemMeta(
 export const Chevron = forwardRef< SVGSVGElement, ChevronProps >(
 	function ItemChevron( { className, ...props }, ref ) {
 		const context = useRowContext( 'Chevron' );
+		const register = context?.register;
 
-		useEffect( () => {
-			if ( context?.hasActions ) {
-				warning(
-					'Item.Chevron: a row that holds controls should not also show a chevron. The glyph reads as belonging to the control beside it rather than to the row.'
-				);
-			}
-		}, [ context?.hasActions ] );
+		useEffect( () => register?.( 'chevron' ), [ register ] );
 
 		return (
 			<Icon

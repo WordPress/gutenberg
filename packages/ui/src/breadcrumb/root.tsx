@@ -21,7 +21,7 @@ import resetStyles from '../utils/css/resets.module.css';
 import { BreadcrumbItemRenderContext } from './context';
 import { ButtonItem } from './button-item';
 import { CurrentItem } from './current-item';
-import { enforceRenderProps } from './enforce-render-props';
+import { enforceRenderProps } from '../utils/enforce-render-props';
 import { Item } from './item';
 import { getCollapsedLayout } from './layout';
 import { LinkItem } from './link-item';

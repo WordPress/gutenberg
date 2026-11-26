@@ -300,6 +300,12 @@
 			align-items: center;
 			gap: var(--wpds-dimension-gap-sm);
 			margin-inline-start: var(--_wp-ui-item-gap);
+			/* The space between the controls belongs to the row. */
+			pointer-events: none;
+		}
+
+		.actions > * {
+			pointer-events: auto;
 		}
 	}
 

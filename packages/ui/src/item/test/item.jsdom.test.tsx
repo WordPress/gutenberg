@@ -314,6 +314,16 @@ describe( 'Item', () => {
 		expect( console ).toHaveWarned();
 	} );
 
+	it( 'warns when a link row has neither an href nor a render prop', () => {
+		render(
+			<Item.LinkRow>
+				<Item.Label>Billing</Item.Label>
+			</Item.LinkRow>
+		);
+
+		expect( console ).toHaveWarned();
+	} );
+
 	it( 'warns when a row shows a chevron next to its controls', () => {
 		render(
 			<Item.ButtonRow onClick={ () => {} }>
