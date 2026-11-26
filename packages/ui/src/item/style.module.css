@@ -242,6 +242,11 @@
 			color: inherit;
 		}
 
+		/* The label of a link or button row is the visible text of a control. */
+		.is-activatable > .label {
+			color: var(--wpds-color-foreground-interactive-neutral);
+		}
+
 		.row:has(> .surface[data-disabled]) > .label {
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
@@ -251,18 +256,6 @@
 			 */
 			@media (forced-colors: active) {
 				color: GrayText;
-			}
-		}
-
-		/*
-		 * The group, a static row and the actions set a `display` of their
-		 * own, which would override the one the `hidden` attribute sets.
-		 */
-		.group,
-		.row,
-		.actions {
-			&[hidden]:not([hidden="until-found"]) {
-				display: none;
 			}
 		}
 

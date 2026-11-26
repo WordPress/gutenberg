@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Badge } from '../../badge';
-import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Item from '../index';
@@ -37,47 +36,6 @@ export const Joined: Story = {
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>
-		</Item.Group>
-	),
-};
-
-/**
- * Rows that are each a self-contained object are detached, but stay one
- * list.
- */
-export const Detached: Story = {
-	render: () => (
-		<Item.Group aria-label="Connectors" variant="detached">
-			<Item.ContentRow>
-				<Item.Label>Akismet Anti-spam</Item.Label>
-				<Item.Description>
-					Protect your site from spam.
-				</Item.Description>
-				<Item.Actions>
-					<Button
-						variant="outline"
-						size="compact"
-						aria-label="Set up Akismet Anti-spam"
-					>
-						Set up
-					</Button>
-				</Item.Actions>
-			</Item.ContentRow>
-			<Item.ContentRow>
-				<Item.Label>Anthropic</Item.Label>
-				<Item.Description>
-					Text generation with Claude.
-				</Item.Description>
-				<Item.Actions>
-					<Button
-						variant="outline"
-						size="compact"
-						aria-label="Install Anthropic"
-					>
-						Install
-					</Button>
-				</Item.Actions>
-			</Item.ContentRow>
 		</Item.Group>
 	),
 };
