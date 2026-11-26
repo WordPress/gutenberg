@@ -24,6 +24,7 @@
 -   `Tabs`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
 -   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `Notice.List`: Keep words apart across line breaks and block elements, such as paragraphs and list items, when announcing a notice's title and description ([#87350](https://github.com/WordPress/gutenberg/pull/87350)).
+-   `Tabs`: Let a horizontal `Tabs.List` shrink inside a flex container, so tabs that do not fit scroll instead of overflowing the container ([#87400](https://github.com/WordPress/gutenberg/pull/87400)).
 
 ### Internal
 
