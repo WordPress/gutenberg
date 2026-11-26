@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep the hidden actions region just below the viewport, so view transitions no longer show a blank editor ([#87494](https://github.com/WordPress/gutenberg/pull/87494)).
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).

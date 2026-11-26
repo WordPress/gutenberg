@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Keep the admin bar above the editor while the editor opens or closes. Before, the editor header animated over the admin bar ([#87494](https://github.com/WordPress/gutenberg/pull/87494)).
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 -   Keep the sidebar's Dashboard link readable when it has keyboard focus. Before, the admin color scheme's link focus color made the label hard to read on the dark sidebar ([#87419](https://github.com/WordPress/gutenberg/pull/87419)).
 
