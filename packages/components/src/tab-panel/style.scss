@@ -66,6 +66,11 @@
 		height: calc(0 * var(--wpds-border-width-focus));
 		border-radius: 0;
 
+		// Forced colors mode replaces other background colors with `Canvas`.
+		@media (forced-colors: active) {
+			background: CanvasText;
+		}
+
 		// Animation
 		@media not (prefers-reduced-motion) {
 			transition: height 0.1s linear;
@@ -75,10 +80,6 @@
 	// Active.
 	&.is-active::after {
 		height: calc(1 * var(--wpds-border-width-focus));
-
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-		outline-offset: -1px;
 	}
 
 	// Interaction background and focus ring. Horizontal tabs center a
@@ -133,6 +134,10 @@
 			background: currentColor;
 			pointer-events: none;
 
+			@media (forced-colors: active) {
+				background: CanvasText;
+			}
+
 			@media not (prefers-reduced-motion) {
 				transition: width 0.1s linear;
 			}
@@ -141,8 +146,6 @@
 		&.is-active::after,
 		&.is-active .components-tab-panel__tabs-item-label::after {
 			width: var(--wpds-border-width-focus);
-			outline: 2px solid transparent;
-			outline-offset: -1px;
 		}
 	}
 }

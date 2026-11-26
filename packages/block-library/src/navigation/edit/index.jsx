@@ -451,14 +451,36 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
-		canUserUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu,
-		canUserDeleteNavigationMenu,
-		hasResolvedCanUserDeleteNavigationMenu,
-		canUserCreateNavigationMenus,
-		isResolvingCanUserCreateNavigationMenus,
-		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
+
+	// Each permission is `undefined` until it resolves, then `true` or `false`.
+	// The block only uses them while it or its inner blocks are selected, so
+	// skip the requests until then.
+	const isBlockOrInnerBlockSelected = isSelected || isInnerBlockSelected;
+	const {
+		canUserCreateNavigationMenus,
+		canUserUpdateNavigationMenu,
+		canUserDeleteNavigationMenu,
+	} = useSelect(
+		( select ) => {
+			if ( ! isBlockOrInnerBlockSelected ) {
+				return {};
+			}
+
+			const { canUser } = select( coreStore );
+			const resource = { kind: 'postType', name: 'wp_navigation' };
+			return {
+				canUserCreateNavigationMenus: canUser( 'create', resource ),
+				canUserUpdateNavigationMenu: ref
+					? canUser( 'update', { ...resource, id: ref } )
+					: undefined,
+				canUserDeleteNavigationMenu: ref
+					? canUser( 'delete', { ...resource, id: ref } )
+					: undefined,
+			};
+		},
+		[ ref, isBlockOrInnerBlockSelected ]
+	);
 
 	const navMenuResolvedButMissing =
 		hasResolvedNavigationMenus && isNavigationMenuMissing;
@@ -718,8 +740,7 @@ function Navigation( {
 			if (
 				ref &&
 				! navMenuResolvedButMissing &&
-				hasResolvedCanUserUpdateNavigationMenu &&
-				! canUserUpdateNavigationMenu
+				canUserUpdateNavigationMenu === false
 			) {
 				showNavigationMenuPermissionsNotice(
 					__(
@@ -728,11 +749,7 @@ function Navigation( {
 				);
 			}
 
-			if (
-				! ref &&
-				hasResolvedCanUserCreateNavigationMenus &&
-				! canUserCreateNavigationMenus
-			) {
+			if ( ! ref && canUserCreateNavigationMenus === false ) {
 				showNavigationMenuPermissionsNotice(
 					__(
 						'You do not have permission to create Navigation Menus.'
@@ -744,9 +761,7 @@ function Navigation( {
 		isSelected,
 		isInnerBlockSelected,
 		canUserUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu,
 		canUserCreateNavigationMenus,
-		hasResolvedCanUserCreateNavigationMenus,
 		ref,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
@@ -1062,7 +1077,7 @@ function Navigation( {
 						canUserCreateNavigationMenus
 					}
 					isResolvingCanUserCreateNavigationMenus={
-						isResolvingCanUserCreateNavigationMenus
+						canUserCreateNavigationMenus === undefined
 					}
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -1094,23 +1109,21 @@ function Navigation( {
 						) }
 					{ blockEditingMode === 'default' && isEntityAvailable && (
 						<InspectorControls group="advanced">
-							{ hasResolvedCanUserUpdateNavigationMenu &&
-								canUserUpdateNavigationMenu && (
-									<NavigationMenuNameControl />
-								) }
-							{ hasResolvedCanUserDeleteNavigationMenu &&
-								canUserDeleteNavigationMenu && (
-									<NavigationMenuDeleteControl
-										onDelete={ () => {
-											replaceInnerBlocks( clientId, [] );
-											showNavigationMenuStatusNotice(
-												__(
-													'Navigation Menu successfully deleted.'
-												)
-											);
-										} }
-									/>
-								) }
+							{ canUserUpdateNavigationMenu && (
+								<NavigationMenuNameControl />
+							) }
+							{ canUserDeleteNavigationMenu && (
+								<NavigationMenuDeleteControl
+									onDelete={ () => {
+										replaceInnerBlocks( clientId, [] );
+										showNavigationMenuStatusNotice(
+											__(
+												'Navigation Menu successfully deleted.'
+											)
+										);
+									} }
+								/>
+							) }
 							<ManageMenusButton
 								disabled={ isManageMenusButtonDisabled }
 								className="wp-block-navigation-manage-menus-button"
