@@ -16,6 +16,7 @@ import type {
 	SaveDirtyEntitiesOptions,
 } from './private-types';
 import type { DeleteEntityRecordOptions, EntityConfig } from './types';
+import isSafeEntityKey from './utils/is-safe-entity-key';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -95,6 +96,9 @@ export const editMediaEntity =
 			} );
 
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				const path = `${ entityConfig.baseURL }/${ recordId }/edit`;
 				// The REST API responds with the duplicated attachment.
 				const newRecord = ( await __unstableFetch( {

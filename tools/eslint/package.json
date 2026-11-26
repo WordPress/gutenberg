@@ -35,14 +35,14 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"eslint-plugin-storybook": "^10.6.3",
 		"eslint-plugin-testing-library": "^7.16.2",
-		"glob": "^13.0.6",
+		"glob": "^14.0.2",
 		"globals": "^16.0.0",
 		"react": "^19.3.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

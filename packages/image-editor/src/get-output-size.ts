@@ -1,6 +1,6 @@
 import type { ImageEditorState, Size } from './core/types';
 import { getRotatedBBox } from './core/camera';
-import { getImageEdit } from './get-image-edit';
+import { getImageEdit, snapToWholeNumber } from './get-image-edit';
 
 /**
  * The dimensions that the edit from `getImageEdit` would produce on the
@@ -16,7 +16,7 @@ import { getImageEdit } from './get-image-edit';
  */
 export function getOutputSize( state: ImageEditorState ): Size | null {
 	const { image } = state;
-	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
+	if ( ! image || ! ( image.naturalWidth > 0 && image.naturalHeight > 0 ) ) {
 		return null;
 	}
 
@@ -33,10 +33,13 @@ export function getOutputSize( state: ImageEditorState ): Size | null {
 		edit.rotation ?? 0
 	);
 	if ( ! edit.crop ) {
-		return { width: rotated.width, height: rotated.height };
+		return {
+			width: snapToWholeNumber( rotated.width ),
+			height: snapToWholeNumber( rotated.height ),
+		};
 	}
 	return {
-		width: edit.crop.width * rotated.width,
-		height: edit.crop.height * rotated.height,
+		width: snapToWholeNumber( edit.crop.width * rotated.width ),
+		height: snapToWholeNumber( edit.crop.height * rotated.height ),
 	};
 }

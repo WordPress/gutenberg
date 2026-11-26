@@ -172,7 +172,7 @@ export interface BlockListBlockProps {
 	setAttributes: BlockSetAttributes;
 	onReplace: BlockListBlockOnReplace;
 	onRemove: () => void;
-	onInsertBlocksAfter: ( blocks: Block[] ) => void;
+	onInsertBlocksAfter: ( blocks: Block | Block[] ) => void;
 	onMerge: ( forward?: boolean ) => void;
 	toggleSelection: ( isSelectionEnabled?: boolean ) => void;
 }
