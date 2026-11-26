@@ -66,6 +66,11 @@ $z-layers: (
 	// Below the block toolbar.
 	".block-editor-grid-visualizer": 30,
 
+	// While blocks can be dropped in a manual grid, its drop layer is above the
+	// other popovers of the block tools, such as the resize handles of the
+	// selected block, so that it gets every `dragover` over the grid.
+	".block-editor-grid-visualizer.is-dropping-allowed": 32,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 

@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { getLayoutType } from '../../../layouts';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -46,6 +47,7 @@ export function useEventHandlers( {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
+		getBlockAttributes,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -341,6 +343,31 @@ export function useEventHandlers( {
 					}
 					return;
 				}
+
+				// A layout can take over the drag of its blocks, such as a
+				// manual placement grid, which shows the cells the block will
+				// land in. A multi-selection drag follows the pointer in every
+				// layout.
+				const rootClientId = getBlockRootClientId( clientId );
+				const rootLayout = getBlockAttributes( rootClientId )?.layout;
+				if (
+					! isMultiSelectionDrag &&
+					getLayoutType( rootLayout?.type )?.startChildDrag?.(
+						event,
+						{
+							layout: rootLayout,
+							clientId,
+							// A block that can be dragged is in a block list.
+							rootClientId: rootClientId!,
+							blockElement: node,
+							startDraggingBlocks,
+							stopDraggingBlocks,
+						}
+					)
+				) {
+					return;
+				}
+
 				const clientIds = isMultiSelectionDrag
 					? getSelectedBlockClientIds()
 					: [ clientId ];
