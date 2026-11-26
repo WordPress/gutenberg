@@ -57,6 +57,7 @@ test.describe( 'Editor header on a phone', () => {
 		const { id } = await requestUtils.createPost( {
 			title: 'Published',
 			status: 'publish',
+			date_gmt: '2026-01-01T00:00:00',
 		} );
 		await admin.editPost( id );
 
