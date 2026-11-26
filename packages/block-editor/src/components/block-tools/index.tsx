@@ -8,6 +8,7 @@ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordp
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import type { TreeBlock } from '../../store/types';
 import EmptyBlockInserter from './empty-block-inserter';
@@ -312,7 +313,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{ ...props }
-			onKeyDown={ onKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
 			// Popover slots cannot be unmounted during dragging because the
 			// will just be rendered in a fallback popover slot instead.
 			className={ clsx( props.className, {
