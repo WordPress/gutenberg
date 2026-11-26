@@ -2,35 +2,7 @@
 
 > **Status: experimental.** This API may change in any release.
 
-## Mount the Canvas
-
-Keep the editor's state in your own state, and pass it to `useImageEditor` with a function that stores the next one.
-
-```tsx
-import { useState } from '@wordpress/element';
-import {
-	ImageEditorCanvas,
-	createImageEditorState,
-	useImageEditor,
-} from '@wordpress/image-editor';
-
-function MyImageEditor( { src }: { src: string } ) {
-	const [ state, setState ] = useState( () => createImageEditorState() );
-	const controller = useImageEditor( { state, onChange: setState } );
-
-	return (
-		<div style={ { width: 600, height: 400 } }>
-			<ImageEditorCanvas
-				src={ src }
-				controller={ controller }
-				showGrid="interactive"
-			/>
-		</div>
-	);
-}
-```
-
-The canvas fills its parent. Always render it inside a sized container. The canvas loads the image into the state itself, through the controller.
+To mount the canvas, start from the [Quick Start](/packages/image-editor/README.md#quick-start).
 
 ## Add Controls
 
@@ -198,34 +170,39 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `getImageEdit( state )` describes the same result against the full-size image loaded in `state.image`. The edit has an optional `flip`, `rotation` and `crop`, to apply in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
+`getImageEdit( state )` describes the edit against the full-size image loaded in `state.image`: an optional `flip`, `rotation` and `crop`, to apply in that order. The [README](/packages/image-editor/README.md) says what each part measures.
 
-The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
+For example, the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the order they arrive, with the crop in percentages. `mapImageEdit( edit, handlers )` calls one handler for each part the edit has, in the order the parts apply, so the list comes out in the right order:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { getImageEdit } from '@wordpress/image-editor';
+import { getImageEdit, mapImageEdit } from '@wordpress/image-editor';
+import type { Flip } from '@wordpress/image-editor';
+
+type Modifier =
+	| { type: 'flip'; args: { flip: Flip } }
+	| { type: 'rotate'; args: { angle: number } }
+	| {
+			type: 'crop';
+			args: { left: number; top: number; width: number; height: number };
+	  };
 
 const edit = getImageEdit( controller.state );
-const modifiers = [];
-
-if ( edit?.flip ) {
-	modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
-}
-if ( edit?.rotation !== undefined ) {
-	modifiers.push( { type: 'rotate', args: { angle: edit.rotation } } );
-}
-if ( edit?.crop ) {
-	modifiers.push( {
-		type: 'crop',
-		args: {
-			left: edit.crop.x * 100,
-			top: edit.crop.y * 100,
-			width: edit.crop.width * 100,
-			height: edit.crop.height * 100,
-		},
-	} );
-}
+const modifiers = edit
+	? mapImageEdit< Modifier >( edit, {
+			flip: ( flip ) => ( { type: 'flip', args: { flip } } ),
+			rotation: ( angle ) => ( { type: 'rotate', args: { angle } } ),
+			crop: ( { x, y, width, height } ) => ( {
+				type: 'crop',
+				args: {
+					left: x * 100,
+					top: y * 100,
+					width: width * 100,
+					height: height * 100,
+				},
+			} ),
+	  } )
+	: [];
 
 if ( modifiers.length ) {
 	await apiFetch( {
@@ -245,6 +222,33 @@ const file = await exportImage( controller.state, {
 	type: 'image/jpeg',
 	quality: 0.9,
 } );
+```
+
+## Apply an Edit From Code
+
+`applyImageEdit( state, edit )` turns an edit back into a state. With a canvas, store `result.state` like any other change. Without one, export it:
+
+```ts
+import {
+	applyImageEdit,
+	createImageEditorState,
+	exportImage,
+} from '@wordpress/image-editor';
+
+// A quarter turn clockwise, then the top half of the turned photo.
+const result = applyImageEdit(
+	createImageEditorState( {
+		image: { src: photoUrl, naturalWidth: 1600, naturalHeight: 900 },
+	} ),
+	{ rotation: 90, crop: { x: 0, y: 0, width: 1, height: 0.5 } }
+);
+
+// Without strict, only `no-image` or `invalid` can reject.
+if ( 'rejected' in result ) {
+	throw new Error( `The edit was rejected: ${ result.rejected }` );
+}
+
+const file = await exportImage( result.state, { type: 'image/jpeg' } );
 ```
 
 ## Accessibility Notes

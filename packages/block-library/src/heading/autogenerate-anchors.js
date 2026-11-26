@@ -18,10 +18,11 @@ const getTextWithoutMarkup = ( text ) => {
 	const dummyElement = document.createElement( 'div' );
 	dummyElement.innerHTML = text;
 	// Inline math keeps its LaTeX source in a MathML annotation, which
-	// browsers don't display, so leave it out of the anchor.
+	// browsers don't display, so leave it out of the anchor. Leave out
+	// footnote numbers too, which aren't part of the heading text.
 	dummyElement
-		.querySelectorAll( 'annotation' )
-		.forEach( ( annotation ) => annotation.remove() );
+		.querySelectorAll( 'annotation, sup[data-fn]' )
+		.forEach( ( element ) => element.remove() );
 	return dummyElement.innerText;
 };
 

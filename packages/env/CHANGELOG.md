@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 12.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

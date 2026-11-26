@@ -50,6 +50,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				required={ required }
 				checked={ restProps.value !== undefined }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				// A name attribute is needed for the `required` behavior to work.
 				name={ nameAttr }
 				onChange={ () => {} }

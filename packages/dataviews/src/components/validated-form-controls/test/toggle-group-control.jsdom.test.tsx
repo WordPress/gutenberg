@@ -60,4 +60,22 @@ describe( 'ValidatedToggleGroupControl', () => {
 			expect.stringContaining( 'Choose text alignment.' )
 		);
 	} );
+
+	it( 'should expose only the toggle options to assistive technology', async () => {
+		render(
+			<ValidatedToggleGroupControl
+				label="Alignment"
+				value="left"
+				onChange={ () => {} }
+				required
+			>
+				<ToggleGroupControlOption label="Left" value="left" />
+				<ToggleGroupControlOption label="Center" value="center" />
+			</ValidatedToggleGroupControl>
+		);
+
+		await waitFor( () => {
+			expect( screen.getAllByRole( 'radio' ) ).toHaveLength( 2 );
+		} );
+	} );
 } );

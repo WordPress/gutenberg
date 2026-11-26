@@ -4,11 +4,21 @@
 
 ### Enhancements
 
+-   Show the Transform panel on block screens for blocks that support a rotation ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
+## 2.2.0 (2026-11-18)
+
+### Enhancements
+
+-   Add TypeScript declarations for package consumers ([#86354](https://github.com/WordPress/gutenberg/pull/86354)).
 -   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
 
 ### Bug Fixes
 
+-   Font Library: Announce the number of fonts found to screen readers when searching or filtering a font collection ([#86856](https://github.com/WordPress/gutenberg/pull/86856)).
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
+-   Font size presets: Keep a preset's `size` in sync with `fluid.max` when the Maximum is edited with custom fluid values on ([#86277](https://github.com/WordPress/gutenberg/pull/86277)).
+-   Font Library: Ignore leading and trailing spaces in the font search ([#76871](https://github.com/WordPress/gutenberg/pull/76871)).
 
 ## 2.1.0 (2026-11-04)
 

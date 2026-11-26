@@ -36,17 +36,20 @@ const consumer = path.join( directory, 'consumer' );
 mkdirSync( consumer );
 const env = {
 	...process.env,
-	PATH: `${ path.dirname( values.node ) }${ path.delimiter }${
-		process.env.PATH
-	}`,
+	PATH:
+		values.node === process.execPath
+			? process.env.PATH
+			: `${ path.dirname( values.node ) }${ path.delimiter }${
+					process.env.PATH
+				}`,
 	CI: 'true',
 	NO_COLOR: '1',
 };
 // Do not inherit repository-specific runner options in the isolated consumer.
 delete env.NODE_OPTIONS;
 delete env.NODE_PATH;
-/* npm exports every resolved config as npm_config_*, so the repository supply
-   chain policy would otherwise reject the consumer's own tarball install. */
+// npm exports resolved config as npm_config_*, which would override the
+// consumer's .npmrc, including its exception for the packed fixture tarballs.
 for ( const key of Object.keys( env ) ) {
 	if ( key.toLowerCase().startsWith( 'npm_config_' ) ) {
 		delete env[ key ];
@@ -162,6 +165,18 @@ write(
 		overrides: { '@wordpress/eslint-plugin': '$@wordpress/eslint-plugin' },
 	} )
 );
+const fixtureRoot = path.join(
+	root,
+	'tools/validation/fixtures/vitest-consumer'
+);
+write( '.npmrc', readFileSync( path.join( fixtureRoot, '.npmrc' ) ) );
+// npm warns, but does not fail, for settings it does not understand.
+const { stderr } = execute(
+	'npm',
+	[ 'config', 'get', 'min-release-age' ],
+	consumer
+);
+assert.equal( stderr, '' );
 if ( values.lockfile ) {
 	cpSync(
 		path.resolve( values.lockfile ),
@@ -198,10 +213,6 @@ const wpScripts = path.join(
 );
 const command = ( ...args ) =>
 	run( values.node, [ wpScripts, 'test-unit-js', ...args ] );
-const fixtureRoot = path.join(
-	root,
-	'tools/validation/fixtures/vitest-consumer'
-);
 for ( const name of [ 'node.test.mjs', 'dom.test.jsx', 'browser.test.jsx' ] ) {
 	write( name, readFileSync( path.join( fixtureRoot, `${ name }.txt` ) ) );
 }

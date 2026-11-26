@@ -51,6 +51,7 @@ const UnforwardedValidatedFormTokenField = (
 						: ''
 				}
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
 				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>

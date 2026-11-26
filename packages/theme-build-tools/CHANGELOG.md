@@ -4,6 +4,20 @@
 
 ### Internal
 
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 1.1.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Parse CSS `var()` references for PostCSS fallback injection and Stylelint validation, avoiding false positives in strings and URLs ([#83766](https://github.com/WordPress/gutenberg/pull/83766)).
+
+### Internal
+
+-   Update the PostCSS development dependency to `^8.5.33` ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+-   Update the Vite development dependency to 8.3.8 ([#86888](https://github.com/WordPress/gutenberg/pull/86888)).
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
 -   Update the Vite development dependency to 8.3.6 ([#86500](https://github.com/WordPress/gutenberg/pull/86500)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 

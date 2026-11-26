@@ -1,7 +1,7 @@
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
-const { Icon, ...availableIcons } = iconsPackage;
+const { Icon, getAspectRatioIcon, ...availableIcons } = iconsPackage;
 
 export { availableIcons };
 
