@@ -98,7 +98,7 @@
 	display: block;
 	width: 100%;
 	// Block UI appearance.
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	flex-shrink: 3;
 
 	// Raise the specificity.
@@ -201,7 +201,7 @@
 				flex-wrap: wrap;
 			}
 			.components-toolbar-group {
-				background-color: $white;
+				background-color: var(--wpds-color-background-surface-neutral-strong);
 			}
 			// Groups can wrap onto several rows, so each one carries its own
 			// border instead of the toolbar having a single outer border.
