@@ -5,6 +5,56 @@ const {
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
 } = require( '../utils' );
+const {
+	getSprintfPlaceholders,
+	getSprintfArgumentPositions,
+} = require( '../utils/get-sprintf-placeholders' );
+
+/**
+ * Node types of a single sprintf argument that cannot be an array. A single
+ * array argument is used as the list of arguments, so an argument of any other
+ * type, such as a variable, may hold any number of arguments.
+ *
+ * @type {Set<string>}
+ */
+const NON_ARRAY_NODE_TYPES = new Set( [
+	'Literal',
+	'TemplateLiteral',
+	'BinaryExpression',
+	'UnaryExpression',
+	'UpdateExpression',
+] );
+
+/**
+ * Returns the number of arguments passed to sprintf after the format string,
+ * or `null` if it cannot be known.
+ *
+ * @param {Object[]} args Argument nodes after the format string.
+ *
+ * @return {?number} Number of arguments.
+ */
+function getArgumentCount( args ) {
+	if ( args.some( ( arg ) => arg.type === 'SpreadElement' ) ) {
+		return null;
+	}
+
+	if ( args.length === 1 ) {
+		if ( args[ 0 ].type === 'ArrayExpression' ) {
+			const { elements } = args[ 0 ];
+			return elements.some(
+				( element ) => ! element || element.type === 'SpreadElement'
+			)
+				? null
+				: elements.length;
+		}
+
+		if ( ! NON_ARRAY_NODE_TYPES.has( args[ 0 ].type ) ) {
+			return null;
+		}
+	}
+
+	return args.length;
+}
 
 module.exports = {
 	meta: {
@@ -22,6 +72,8 @@ module.exports = {
 				'sprintf format string options must have the same number of placeholders',
 			noOrderedPlaceholders:
 				'Multiple sprintf placeholders should be ordered. Mix of ordered and non-ordered placeholders found.',
+			argumentCountMismatch:
+				'sprintf format string expects {{ expected }} placeholder value argument(s), but {{ actual }} given',
 		},
 	},
 	create( context ) {
@@ -59,6 +111,7 @@ module.exports = {
 				}
 
 				let candidates;
+				let isTranslation = false;
 				switch ( args[ 0 ].type ) {
 					case 'Literal':
 						candidates = [ args[ 0 ].value ].filter( ( arg ) => {
@@ -69,6 +122,7 @@ module.exports = {
 						break;
 
 					case 'CallExpression':
+						isTranslation = true;
 						const argFunctionName = getTranslateFunctionName(
 							args[ 0 ].callee
 						);
@@ -133,7 +187,11 @@ module.exports = {
 						REGEXP_SPRINTF_PLACEHOLDER_UNORDERED
 					);
 
+					// `i18n-ordered-placeholders` reports unordered
+					// placeholders in translatable strings, wherever they
+					// are used.
 					if (
+						! isTranslation &&
 						unorderedMatches &&
 						allMatches &&
 						unorderedMatches.length > 0 &&
@@ -165,6 +223,40 @@ module.exports = {
 						// have the same number.
 						numPlaceholders = allMatches.length;
 					}
+				}
+
+				const actual = getArgumentCount( args.slice( 1 ) );
+
+				if (
+					actual === null ||
+					candidates.some(
+						( candidate ) => typeof candidate !== 'string'
+					)
+				) {
+					return;
+				}
+
+				const requiredCounts = candidates.map(
+					( candidate ) =>
+						getSprintfArgumentPositions(
+							getSprintfPlaceholders( candidate )
+						).requiredArgumentCount
+				);
+
+				// Named placeholders read properties of a single object
+				// argument, so the number of arguments says nothing.
+				if ( requiredCounts.includes( null ) ) {
+					return;
+				}
+
+				const expected = Math.max( ...requiredCounts );
+
+				if ( actual !== expected ) {
+					context.report( {
+						node,
+						messageId: 'argumentCountMismatch',
+						data: { expected, actual },
+					} );
 				}
 			},
 		};

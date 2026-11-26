@@ -53,6 +53,42 @@ sprintf(
 			code: `i18n.sprintf( '%s', 'substitute' )`,
 		},
 		{
+			// Unordered placeholders in translatable strings are reported
+			// by `i18n-ordered-placeholders` instead.
+			code: `
+sprintf(
+	/* translators: 1: number of blocks. 2: average rating. */
+	_n(
+		'This author has %d block, with an average rating of %d.',
+		'This author has %d blocks, with an average rating of %d.',
+		authorBlockCount
+	),
+	authorBlockCount,
+	authorBlockRating
+);`,
+		},
+		{
+			code: `sprintf( '%1$s, %2$s and %1$s', 'foo', 'bar' )`,
+		},
+		{
+			code: `sprintf( __( '%s and %s' ), [ 'foo', 'bar' ] )`,
+		},
+		{
+			code: `sprintf( __( '%s and %s' ), values )`,
+		},
+		{
+			code: `sprintf( __( '%s and %s' ), ...values )`,
+		},
+		{
+			code: `sprintf( '%(first)s and %(second)s', { first, second } )`,
+		},
+		{
+			code: `sprintf( '%.*f', 2, 3.14159 )`,
+		},
+		{
+			code: `sprintf( '100%% of %s', 'foo' )`,
+		},
+		{
 			code: `i18n.sprintf( i18n.__( '%s' ), 'substitute' )`,
 		},
 		{
@@ -114,18 +150,66 @@ sprintf(
 			errors: [ { messageId: 'placeholderMismatch' } ],
 		},
 		{
-			code: `
-sprintf(
-	/* translators: 1: number of blocks. 2: average rating. */
-	_n(
-		'This author has %d block, with an average rating of %d.',
-		'This author has %d blocks, with an average rating of %d.',
-		authorBlockCount
-	),
-	authorBlockCount,
-	authorBlockRating
-);`,
+			code: `sprintf( '%1$s %s', 'foo', 'bar' )`,
 			errors: [ { messageId: 'noOrderedPlaceholders' } ],
+		},
+		{
+			code: `sprintf( __( '%s and %s' ), 'foo' )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 2, actual: 1 },
+				},
+			],
+		},
+		{
+			code: `sprintf( __( '%1$s and %2$s' ), 'foo', 'bar', 'baz' )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 2, actual: 3 },
+				},
+			],
+		},
+		{
+			code: `sprintf( '%3$s', 'foo', 'bar' )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 3, actual: 2 },
+				},
+			],
+		},
+		{
+			code: `sprintf( '%1$s %s', 'foo' )`,
+			errors: [ { messageId: 'noOrderedPlaceholders' } ],
+		},
+		{
+			code: `sprintf( _n( '%1$d block', '%1$d blocks', count ), count, total )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 1, actual: 2 },
+				},
+			],
+		},
+		{
+			code: `sprintf( __( '%s and %s' ), [ 'foo' ] )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 2, actual: 1 },
+				},
+			],
+		},
+		{
+			code: `sprintf( __( '%.*f' ), 2 )`,
+			errors: [
+				{
+					messageId: 'argumentCountMismatch',
+					data: { expected: 2, actual: 1 },
+				},
+			],
 		},
 		{
 			code: `i18n.sprintf()`,

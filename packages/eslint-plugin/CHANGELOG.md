@@ -5,6 +5,14 @@
 ### Breaking Changes
 
 -   Add [`@wordpress/i18n-plural-placeholder`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-plural-placeholder.md) to the recommended i18n ruleset. It reports `_n()` and `_nx()` calls where neither string contains a placeholder for the number ([#87264](https://github.com/WordPress/gutenberg/pull/87264)).
+-   Add [`@wordpress/i18n-ordered-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ordered-placeholders.md) to the recommended i18n ruleset. It reports translatable strings with more than one placeholder where any of them is unordered, such as `'%s of %s'`, and fixes them automatically. `valid-sprintf` no longer reports unordered placeholders in translatable format strings ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Add [`@wordpress/i18n-no-mismatched-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-mismatched-placeholders.md) to the recommended i18n ruleset. It reports `_n()` and `_nx()` calls where the singular and plural strings use different placeholders ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Add [`@wordpress/i18n-no-html-wrapped-strings`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-html-wrapped-strings.md) to the recommended i18n ruleset. It reports translatable strings wrapped in a single HTML element ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `valid-sprintf`: Report calls with more or fewer placeholder values than the format string reads ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
+### New Features
+
+-   Add [`@wordpress/i18n-no-concatenation`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-concatenation.md), which reports translatable strings combined with other text. It is not part of the recommended configuration ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 
 ### Enhancements
 

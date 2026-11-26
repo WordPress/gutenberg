@@ -17,46 +17,55 @@ const DateView = ( { item }: { item: PostWithDate } ) => {
 		item.status ?? ''
 	);
 	if ( isDraftOrPrivate ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: %s: page creation or modification date. */
-				__( '<span>Modified: <time>%s</time></span>' ),
-				getFormattedDate( item.date ?? null )
-			),
-			{
-				span: <span />,
-				time: <time />,
-			}
+		return (
+			<span>
+				{ createInterpolateElement(
+					sprintf(
+						/* translators: %s: page creation or modification date. */
+						__( 'Modified: <time>%s</time>' ),
+						getFormattedDate( item.date ?? null )
+					),
+					{
+						time: <time />,
+					}
+				) }
+			</span>
 		);
 	}
 
 	const isScheduled = item.status === 'future';
 	if ( isScheduled ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: %s: page creation date */
-				__( '<span>Scheduled: <time>%s</time></span>' ),
-				getFormattedDate( item.date ?? null )
-			),
-			{
-				span: <span />,
-				time: <time />,
-			}
+		return (
+			<span>
+				{ createInterpolateElement(
+					sprintf(
+						/* translators: %s: page creation date */
+						__( 'Scheduled: <time>%s</time>' ),
+						getFormattedDate( item.date ?? null )
+					),
+					{
+						time: <time />,
+					}
+				) }
+			</span>
 		);
 	}
 
 	const isPublished = item.status === 'publish';
 	if ( isPublished ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: %s: page creation time */
-				__( '<span>Published: <time>%s</time></span>' ),
-				getFormattedDate( item.date ?? null )
-			),
-			{
-				span: <span />,
-				time: <time />,
-			}
+		return (
+			<span>
+				{ createInterpolateElement(
+					sprintf(
+						/* translators: %s: page creation time */
+						__( 'Published: <time>%s</time>' ),
+						getFormattedDate( item.date ?? null )
+					),
+					{
+						time: <time />,
+					}
+				) }
+			</span>
 		);
 	}
 
@@ -68,16 +77,19 @@ const DateView = ( { item }: { item: PostWithDate } ) => {
 
 	const isPending = item.status === 'pending';
 	if ( isPending ) {
-		return createInterpolateElement(
-			sprintf(
-				/* translators: %s: page creation or modification date. */
-				__( '<span>Modified: <time>%s</time></span>' ),
-				getFormattedDate( dateToDisplay ?? null )
-			),
-			{
-				span: <span />,
-				time: <time />,
-			}
+		return (
+			<span>
+				{ createInterpolateElement(
+					sprintf(
+						/* translators: %s: page creation or modification date. */
+						__( 'Modified: <time>%s</time>' ),
+						getFormattedDate( dateToDisplay ?? null )
+					),
+					{
+						time: <time />,
+					}
+				) }
+			</span>
 		);
 	}
 
