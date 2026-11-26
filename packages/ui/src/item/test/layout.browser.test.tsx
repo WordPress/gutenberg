@@ -157,16 +157,54 @@ describe( 'Item layout', () => {
 			</div>
 		);
 
-		const row = screen.getByTestId( 'row' ).getBoundingClientRect();
-		const label = screen.getByText( 'Webhook' ).getBoundingClientRect();
+		const rowElement = screen.getByTestId( 'row' );
+		const row = rowElement.getBoundingClientRect();
 		const meta = screen.getByTestId( 'meta' ).getBoundingClientRect();
 		const action = screen
 			.getByRole( 'button', { name: 'Remove webhook' } )
 			.getBoundingClientRect();
 
+		expect( meta.width ).toBeLessThanOrEqual( row.width / 4 );
 		expect( action.right ).toBeLessThanOrEqual( row.right );
-		// The meta gives up its room before the label does.
-		expect( label.width ).toBeGreaterThanOrEqual( meta.width );
+		expect( rowElement.scrollWidth ).toBeLessThanOrEqual(
+			rowElement.clientWidth
+		);
+	} );
+
+	it( 'keeps wide actions in a narrow row that has media', async () => {
+		await render(
+			<div style={ { width: 240 } }>
+				<Item.ContentRow data-testid="row">
+					<Item.Media>
+						<span
+							style={ {
+								display: 'block',
+								width: 24,
+								height: 24,
+							} }
+						/>
+					</Item.Media>
+					<Item.Label>Webhook</Item.Label>
+					<Item.Actions>
+						<Button size="compact" style={ { width: 130 } }>
+							Remove webhook
+						</Button>
+					</Item.Actions>
+				</Item.ContentRow>
+			</div>
+		);
+
+		const rowElement = screen.getByTestId( 'row' );
+		const action = screen
+			.getByRole( 'button', { name: 'Remove webhook' } )
+			.getBoundingClientRect();
+
+		expect( action.right ).toBeLessThanOrEqual(
+			rowElement.getBoundingClientRect().right
+		);
+		expect( rowElement.scrollWidth ).toBeLessThanOrEqual(
+			rowElement.clientWidth
+		);
 	} );
 
 	it( 'styles a row by its own control, not by a row nested in its actions', async () => {

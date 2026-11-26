@@ -101,11 +101,8 @@
 			/*
 			 * The meta takes at most a quarter of the row, so that a long
 			 * value wraps and leaves room for the label and the actions.
-			 * The label takes at least as much: the grid sizes the meta
-			 * before it shares out the rest, so without that minimum a
-			 * narrow row would break the label before it wraps the meta.
 			 */
-			grid-template-columns: auto minmax(25%, 1fr) fit-content(25%) auto;
+			grid-template-columns: auto minmax(0, 1fr) fit-content(25%) auto;
 			align-items: center;
 			padding-block: var(--_wp-ui-item-padding-block);
 			padding-inline: var(--_wp-ui-item-padding-inline);

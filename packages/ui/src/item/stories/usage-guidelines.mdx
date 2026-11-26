@@ -14,7 +14,7 @@ The kind of row tells users, and assistive technology, what is interactive.
 -   **Use `Item.ButtonRow` when the whole row runs a command or opens a popup.**
 -   **Use `Item.ContentRow` when only the controls inside the row are interactive.** Clicking the label does nothing.
 
-`Item.LinkRow` and `Item.ButtonRow` need an `Item.Label`, unless the row has an `aria-label` or `aria-labelledby` of its own. The label is the accessible name of the link or button, so assistive technology does not read it on its own: do not render it as a heading.
+`Item.LinkRow` and `Item.ButtonRow` need an `Item.Label`, unless the row has an `aria-label` or `aria-labelledby` of its own. That name replaces the label, so include the visible label text in it. The label is the accessible name of the link or button, so assistive technology does not read it on its own: do not render it as a heading.
 
 ## Put static content in `Item.Meta` and controls in `Item.Actions`
 
