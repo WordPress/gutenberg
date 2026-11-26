@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Color the current sidebar item with the resting brand color, and keep the active brand color for hover and focus ([#87453](https://github.com/WordPress/gutenberg/pull/87453)).
+
 ### Bug Fixes
 
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
