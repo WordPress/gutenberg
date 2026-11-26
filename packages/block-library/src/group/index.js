@@ -6,7 +6,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-import variations from './variations';
+import variations, { registerCanvasVariation } from './variations';
 
 const { name } = metadata;
 
@@ -78,4 +78,8 @@ export const settings = {
 	variations,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+	registerCanvasVariation( name );
+	return block;
+};

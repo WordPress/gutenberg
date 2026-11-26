@@ -54,6 +54,17 @@ const getGroupPlaceholderIcons = ( name = 'group' ) => {
 				<Path d="M0 10a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V10ZM0 27a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V27Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V27Z" />
 			</SVG>
 		),
+		// Two blocks placed freely, not lined up in columns or rows.
+		'group-canvas': (
+			<SVG
+				xmlns="http://www.w3.org/2000/svg"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
+			>
+				<Path d="M0 10a2 2 0 0 1 2-2h22a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm22 18a2 2 0 0 1 2-2h22a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H24a2 2 0 0 1-2-2V28Z" />
+			</SVG>
+		),
 	};
 	return icons?.[ name ];
 };
