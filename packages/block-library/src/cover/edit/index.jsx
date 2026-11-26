@@ -60,9 +60,8 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey, cleanEmptyObject } = unlock(
-	blockEditorPrivateApis
-);
+const { openMediaEditorModalKey, cleanEmptyObject, useIsInFixedGridCell } =
+	unlock( blockEditorPrivateApis );
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -485,6 +484,9 @@ function CoverEdit( {
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	// In a grid cell with a fixed size, the cover fills the cell, so its
+	// minimum height has no effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const [ isMinHeightEnabled ] = useSettings( 'dimensions.minHeight' );
@@ -726,6 +728,7 @@ function CoverEdit( {
 			editMediaButtonRef={ editMediaButtonRef }
 			showEditMediaButton={ showEditMediaButton }
 			isEditMediaDisabled={ isSwappingMedia }
+			isInFixedGridCell={ isInFixedGridCell }
 		/>
 	);
 
@@ -783,9 +786,12 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ hasNonContentControls && isSelected && isMinHeightEnabled && (
-					<ResizableCoverPopover { ...resizableCoverProps } />
-				) }
+				{ hasNonContentControls &&
+					isSelected &&
+					isMinHeightEnabled &&
+					! isInFixedGridCell && (
+						<ResizableCoverPopover { ...resizableCoverProps } />
+					) }
 				<TagName
 					{ ...blockProps }
 					className={ clsx( 'is-placeholder', blockProps.className ) }
@@ -934,9 +940,12 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ hasNonContentControls && isSelected && isMinHeightEnabled && (
-				<ResizableCoverPopover { ...resizableCoverProps } />
-			) }
+			{ hasNonContentControls &&
+				isSelected &&
+				isMinHeightEnabled &&
+				! isInFixedGridCell && (
+					<ResizableCoverPopover { ...resizableCoverProps } />
+				) }
 		</>
 	);
 }

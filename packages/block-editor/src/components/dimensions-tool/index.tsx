@@ -69,7 +69,14 @@ function DimensionsTool( {
 	// as a custom aspect ratio.
 	const aspectRatioValue = hasCustomAspectRatio ? 'custom' : aspectRatio;
 
-	const showScaleControl = aspectRatio || ( width && height );
+	// Scale only matters when the content is cropped, which the aspect ratio or
+	// a width and height do. Without those tools, the caller sizes the content,
+	// so scale always shows.
+	const showScaleControl =
+		( ! tools.includes( 'aspectRatio' ) &&
+			! tools.includes( 'widthHeight' ) ) ||
+		aspectRatio ||
+		( width && height );
 
 	return (
 		<>
