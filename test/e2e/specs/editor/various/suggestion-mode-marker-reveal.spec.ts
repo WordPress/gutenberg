@@ -212,6 +212,51 @@ test.describe( 'Suggestion marker reveal', () => {
 		await expect( bravoThread ).not.toHaveClass( /is-selected/ );
 	} );
 
+	test( "a caption suggestion's floating card lines up with the caption (#87432)", async ( {
+		editor,
+		page,
+	} ) => {
+		// Tall enough that the top of the image and its caption are far apart.
+		const image =
+			'data:image/svg+xml;utf8,' +
+			encodeURIComponent(
+				'<svg xmlns="http://www.w3.org/2000/svg" width="800" height="700"><rect width="800" height="700" fill="#789"/></svg>'
+			);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { url: image, alt: '', caption: 'A caption' },
+		} );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close Settings' } )
+			.click();
+		await switchIntent( page, 'Suggesting' );
+
+		const caption = editor.canvas.getByRole( 'textbox', {
+			name: 'Image caption text',
+		} );
+		await caption.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' edit' );
+		const marker = caption.locator( 'mark.wp-suggestion-add' );
+		await expect( marker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		const card = page
+			.getByRole( 'region', { name: 'Notes' } )
+			.getByRole( 'treeitem' )
+			.filter( { hasText: 'edit' } );
+		await expect( card ).toBeInViewport();
+		await expect
+			.poll( async () => {
+				const [ cardBox, markerBox ] = await Promise.all( [
+					card.boundingBox(),
+					marker.boundingBox(),
+				] );
+				return Math.abs( cardBox!.y - markerBox!.y );
+			} )
+			.toBeLessThan( 4 );
+	} );
+
 	test( 'floating note cards never stack on top of one another', async ( {
 		editor,
 		page,
