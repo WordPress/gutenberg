@@ -50,6 +50,7 @@ import {
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
 	SuggestionNoteGC,
+	SuggestionDecisionRefresh,
 	SuggestionMarkerGuard,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
@@ -558,6 +559,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													<SuggestionStoreInterceptor />
 													<SuggestionUndoGuard />
 													<SuggestionNoteGC />
+													<SuggestionDecisionRefresh />
 													<SuggestionMarkerGuard />
 													<SuggestionAutoSave />
 													<SuggestionAnnotations />
