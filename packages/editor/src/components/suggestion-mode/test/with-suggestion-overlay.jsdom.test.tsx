@@ -54,6 +54,7 @@ vi.hoisted( () => {
 } );
 
 const HOC_BLOCK = 'core/test-suggestion-hoc';
+const CAPTION_BLOCK = 'core/test-suggestion-caption';
 
 beforeAll( () => {
 	registerBlockType( HOC_BLOCK, {
@@ -63,6 +64,18 @@ beforeAll( () => {
 		attributes: {
 			content: { type: 'string', default: '' },
 			level: { type: 'number', default: 2 },
+			metadata: { type: 'object' },
+		},
+		save() {
+			return null;
+		},
+	} );
+	registerBlockType( CAPTION_BLOCK, {
+		apiVersion: 3,
+		title: 'Test caption',
+		category: 'text',
+		attributes: {
+			caption: { type: 'rich-text', source: 'rich-text' },
 			metadata: { type: 'object' },
 		},
 		save() {
@@ -326,6 +339,68 @@ describe( 'withSuggestionOverlay', () => {
 		expect( setAttributes ).not.toHaveBeenCalled();
 		expect( markerOf( registry, block.clientId ) ).toBeUndefined();
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+	} );
+
+	it( 'hands an edit to rich text other than the content to the marker handlers', () => {
+		const setAttributes = vi.fn();
+		const handler = vi.fn();
+
+		function RegisterContentHandler() {
+			const { registerContentHandler } = useSuggestionSession();
+			useEffect(
+				() => registerContentHandler( handler ),
+				[ registerContentHandler ]
+			);
+			return null;
+		}
+
+		const CaptionBlock = withSuggestionOverlay(
+			( { setAttributes: set }: any ) => (
+				<button
+					type="button"
+					onClick={ () =>
+						set( {
+							caption:
+								RichTextData.fromHTMLString( 'Hello world' ),
+						} )
+					}
+				>
+					edit caption
+				</button>
+			)
+		);
+
+		const block = createBlock( CAPTION_BLOCK, {} );
+		const registry = createTestRegistry( 'suggest', [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				caption: RichTextData.fromHTMLString( 'Hello' ),
+			} );
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<RegisterContentHandler />
+					<Connected
+						clientId={ block.clientId }
+						setAttributes={ setAttributes }
+						Component={ CaptionBlock }
+					/>
+				</SuggestionSessionProvider>
+			</RegistryProvider>
+		);
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'edit caption' } )
+		);
+
+		expect( handler ).toHaveBeenCalledTimes( 1 );
+		const request = handler.mock.calls[ 0 ][ 0 ];
+		expect( request.attributeKey ).toBe( 'caption' );
+		expect( String( request.prevContent ) ).toBe( 'Hello' );
+		// Not a whole-attribute proposal, which would hide later markers.
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ) ).toBeUndefined();
 	} );
 
 	it( 'declines an edit that would bury a live marker under a proposal', () => {

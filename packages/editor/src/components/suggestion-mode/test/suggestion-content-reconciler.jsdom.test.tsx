@@ -189,6 +189,40 @@ describe( 'SuggestionContentReconciler', () => {
 		expect( getContent() ).toContain( ' world' );
 	} );
 
+	it( 'writes the markers to the rich text attribute the request names', async () => {
+		const { registry, clientId, getContent } = setup();
+		const caption = RichTextData.fromHTMLString( 'Hello' );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( clientId, { caption } );
+		createSuggestion.mockResolvedValue( { id: 9 } );
+
+		act( () => {
+			overlayRef.current.requestContentSuggestion( {
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+				attributeKey: 'caption',
+				prevContent: caption,
+				plan: insertPlan(),
+			} );
+		} );
+		await flushPromises();
+
+		expect( createSuggestion.mock.calls[ 0 ][ 0 ].operations ).toEqual( [
+			expect.objectContaining( { attribute: 'caption' } ),
+		] );
+		expect(
+			String(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )?.caption
+			)
+		).toMatch(
+			/^Hello<mark [^>]*data-suggestion-id="9"[^>]*> world<\/mark>$/
+		);
+		expect( getContent() ).toBe( 'Hello' );
+	} );
+
 	it( 'does not take a request for a block another entity owns', async () => {
 		const { registry, clientId } = setup();
 		const inner = createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );

@@ -285,6 +285,44 @@ describe( 'SuggestionFormatKeyboard', () => {
 		);
 	} );
 
+	it( 'writes the marker to the rich text attribute the request names', async () => {
+		const { registry, clientId, getContent } = setup();
+		registry.dispatch( blockEditorStore ).updateBlockAttributes( clientId, {
+			caption: RichTextData.fromHTMLString( 'Hello world' ),
+		} );
+		createSuggestion.mockResolvedValue( { id: 9 } );
+		const { prevContent, nextContent, plan } = boldPlan();
+
+		act( () => {
+			overlayRef.current.requestFormatSuggestion( {
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+				attributeKey: 'caption',
+				prevContent,
+				nextContent,
+				plan,
+			} );
+		} );
+		await flushPromises();
+
+		expect( createSuggestion.mock.calls[ 0 ][ 0 ].operations ).toEqual( [
+			expect.objectContaining( {
+				attribute: 'caption',
+				suggestionType: 'format',
+			} ),
+		] );
+		expect(
+			String(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )?.caption
+			)
+		).toMatch(
+			/Hello <mark [^>]*data-suggestion-id="9"[^>]*><strong>world<\/strong><\/mark>/
+		);
+		expect( getContent() ).toBe( 'Hello world' );
+	} );
+
 	it( 'declines synchronously when the plan is not a format plan', () => {
 		const { clientId } = setup();
 

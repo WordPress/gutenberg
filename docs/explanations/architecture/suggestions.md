@@ -345,7 +345,7 @@ The marker itself, its decoration and how it is decided are described under [Inl
 
 #### Edit-driven creation
 
-In Suggestion mode every edit is a suggestion, so there are no toolbar buttons - the act of editing produces the marker. Two `beforeinput`-capture keyboards own the input-event paths (plus `paste`/`cut`-capture handlers), cancelling the native edit and writing the marker instead; two singleton `onChange`-side components (the format keyboard and the content reconciler) own edits that surface only as a fresh `content` value. All of them key the marker to a freshly created `note` comment and bypass the store interceptor so the marker lands in content:
+In Suggestion mode every edit is a suggestion, so there are no toolbar buttons - the act of editing produces the marker. Two `beforeinput`-capture keyboards own the input-event paths (plus `paste`/`cut`-capture handlers), cancelling the native edit and writing the marker instead; two singleton `onChange`-side components (the format keyboard and the content reconciler) own edits that surface only as a fresh value for a rich text attribute (`content`, an image caption, a quote citation). All of them key the marker to a freshly created `note` comment and bypass the store interceptor so the marker lands in content:
 
 | User action | Result |
 |-------------|--------|
