@@ -1,10 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import { closeSmall, link, more, wordpress } from '@wordpress/icons';
+import { link, more, wordpress } from '@wordpress/icons';
 import * as Tabs from '../';
 import * as Tooltip from '../../tooltip';
 import { Icon } from '../../icon';
-import { IconButton } from '../../icon-button';
 
 const meta: Meta< typeof Tabs.Root > = {
 	title: 'Components/@wordpress-ui/Tabs',
@@ -384,8 +383,8 @@ export const MinimalTabsOverflow: StoryObj< typeof Tabs.Root > = {
 };
 
 /**
- * A list next to other content in a flex container shrinks to the remaining
- * space, and the tabs that do not fit scroll.
+ * A list in a flex container shrinks to the available space, and the tabs
+ * that do not fit scroll.
  */
 export const OverflowInFlexContainer: StoryObj< typeof Tabs.Root > = {
 	render: () => (
@@ -393,8 +392,6 @@ export const OverflowInFlexContainer: StoryObj< typeof Tabs.Root > = {
 			<div
 				style={ {
 					display: 'flex',
-					alignItems: 'center',
-					gap: 4,
 					width: 200,
 					padding: 8,
 					resize: 'horizontal',
@@ -402,14 +399,13 @@ export const OverflowInFlexContainer: StoryObj< typeof Tabs.Root > = {
 					border: '1px dashed currentColor',
 				} }
 			>
-				<Tabs.List aria-label="Tabs next to a button">
+				<Tabs.List aria-label="Tabs in a flex container">
 					{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
 						<Tabs.Tab key={ label } value={ label }>
 							{ label }
 						</Tabs.Tab>
 					) ) }
 				</Tabs.List>
-				<IconButton icon={ closeSmall } label="Close" />
 			</div>
 			{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
 				<Tabs.Panel key={ label } value={ label }>
