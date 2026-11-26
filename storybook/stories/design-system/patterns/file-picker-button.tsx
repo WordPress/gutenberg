@@ -18,6 +18,8 @@ export function FilePickerButton() {
 
 	async function onSubmit( event: FormEvent ) {
 		event.preventDefault();
+		// Hide an earlier confirmation, so it isn't read as this result.
+		snackbars.hide();
 		if ( ! file ) {
 			setError( 'Choose a pattern file to import.' );
 			chooseRef.current?.focus();
@@ -30,7 +32,6 @@ export function FilePickerButton() {
 			snackbars.show( `Imported “${ title }” from JSON.` );
 			setFile( undefined );
 		} catch {
-			snackbars.hide();
 			setError(
 				`Couldn’t import ${ file.name }. Choose a pattern exported as JSON.`
 			);
@@ -66,6 +67,7 @@ export function FilePickerButton() {
 										chosen.name
 									).toLowerCase() !== '.json'
 								) {
+									snackbars.hide();
 									setError(
 										`Couldn’t use ${ chosen.name }. Choose a JSON file.`
 									);
