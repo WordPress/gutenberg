@@ -72,10 +72,10 @@ export default function FormDetailsField< Item >( {
 		hasFocusedContentRef.current = true;
 	}, [] );
 
-	// Reveal the errors of every field once focus leaves the details element,
-	// replicating at the container level how validated controls show errors on
-	// their first blur. Moving focus between fields within it doesn't count,
-	// so the natural tab sequence is preserved.
+	// Reveal the errors of every field once focus leaves the details element.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within it doesn't count, so the
+	// natural tab sequence is preserved.
 	const handleFocusOutside = useCallback( () => {
 		// Leaving without ever entering the fields — for instance tabbing past
 		// the summary while collapsed — isn't an interaction to report on.

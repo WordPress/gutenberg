@@ -27,8 +27,7 @@ export interface UseDropZoneProps {
 	onDragLeave?: ( e: DragEvent ) => void;
 	/**
 	 * Called when dragging has ended, on a `dragend` or a drop in the zone,
-	 * or on the first `mousemove` with no button held, for drags that end
-	 * outside the document.
+	 * or on the first `mousemove`, for drags that end outside the document.
 	 */
 	onDragEnd?: ( e: MouseEvent ) => void;
 	/**

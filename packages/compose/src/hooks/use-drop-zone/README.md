@@ -63,7 +63,7 @@ const WithoutWrapperDropZoneElement = () => {
 -   _props.onDragEnter_ `( e: DragEvent ) => void`: Called when the zone is entered.
 -   _props.onDragOver_ `( e: DragEvent ) => void`: Called when the zone is moved within.
 -   _props.onDragLeave_ `( e: DragEvent ) => void`: Called when the zone is left.
--   _props.onDragEnd_ `( e: MouseEvent ) => void`: Called when dragging has ended, on a `dragend` or a drop in the zone, or on the first `mousemove` with no button held, for drags that end outside the document.
+-   _props.onDragEnd_ `( e: MouseEvent ) => void`: Called when dragging has ended, on a `dragend` or a drop in the zone, or on the first `mousemove`, for drags that end outside the document.
 -   _props.onDrop_ `( e: DragEvent ) => void`: Called when dropping in the zone.
 
 _Returns_

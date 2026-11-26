@@ -10,9 +10,10 @@ const MOBILE_VIEWPORT = '@mobile';
  * default state sets.
  */
 export interface GridStyleLayout {
-	columnStart?: number;
+	// A viewport state sets a start to `null` to place the block automatically.
+	columnStart?: number | null;
 	columnSpan?: number;
-	rowStart?: number;
+	rowStart?: number | null;
 	rowSpan?: number;
 	columnCount?: number | null;
 	rowCount?: number | null;

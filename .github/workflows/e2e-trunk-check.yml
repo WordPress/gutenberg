@@ -56,12 +56,12 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # Keeps all test-only code and this workflow's script from the pull
+            # Keeps all test-only code, including the check script, from the pull
             # request, so a test that needs a new helper or test plugin still runs.
             - name: Use trunk's code with the pull request's tests
               run: |
                   git checkout HEAD^1
-                  git checkout "$GITHUB_SHA" -- test/e2e packages/e2e-test-utils-playwright packages/e2e-tests .github/workflows/scripts/e2e-trunk-check.js
+                  git checkout "$GITHUB_SHA" -- test/e2e packages/e2e-test-utils-playwright packages/e2e-tests
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -83,5 +83,6 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
                   PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/results.json
+              # The root package.json comes from trunk, so use the pull request's workspace script directly.
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- node .github/workflows/scripts/e2e-trunk-check.js "$GITHUB_SHA"
+                  npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk -- "$GITHUB_SHA"

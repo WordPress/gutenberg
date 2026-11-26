@@ -184,6 +184,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'blockVisibility', $actual['blocks']['core/group'] ?? array() );
 	}
 
+	public function test_remove_insecure_properties_keeps_text_wrap() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/list' => array(
+							'typography' => array(
+								'textWrap' => 'balance',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSame( 'balance', $actual['styles']['blocks']['core/list']['typography']['textWrap'] ?? null );
+	}
+
 	public function test_get_settings_presets_are_keyed_by_origin() {
 		$default_origin = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -373,6 +392,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'margin'   => true,
 				'padding'  => true,
 			),
+			'transform'  => array(
+				'rotate'    => true,
+				'translate' => true,
+				'scale'     => true,
+			),
 			'typography' => array(
 				'lineHeight'  => true,
 				'textColumns' => true,
@@ -416,6 +440,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
+					),
+					'transform'  => array(
+						'rotate'    => true,
+						'translate' => true,
+						'scale'     => true,
 					),
 					'typography' => array(
 						'lineHeight'  => false,
@@ -581,10 +610,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 						'core/heading'      => array(
-							'color'    => array(
+							'color'      => array(
 								'text' => '#123456',
 							),
-							'elements' => array(
+							'typography' => array(
+								'textWrap' => 'balance',
+							),
+							'elements'   => array(
 								'link' => array(
 									'color'      => array(
 										'text'       => '#111',
@@ -650,7 +682,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$variables = ':root{--wp--preset--color--grey: grey;--wp--preset--gradient--custom-gradient: linear-gradient(135deg,rgba(0,0,0) 0%,rgb(0,0,0) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--big: 41px;--wp--preset--font-family--arial: Arial, serif;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}';
-		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(p){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
+		$styles    = static::$base_styles . 'body{color: var(--wp--preset--color--grey);}a:where(:not(.wp-element-button)){background-color: #333;color: #111;}:root :where(.wp-element-button, .wp-block-button__link){box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.66);}:root :where(.wp-block-cover){min-height: unset;aspect-ratio: 16/9;}:root :where(.wp-block-group){background: var(--wp--preset--gradient--custom-gradient);border-radius: 10px;min-height: 50vh;padding: 24px;}:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #111;}:root :where(.wp-block-heading){color: #123456;text-wrap: balance;}:root :where(.wp-block-heading a:where(:not(.wp-element-button))){background-color: #333;color: #111;font-size: 60px;}:root :where(.wp-block-media-text){text-align: center;}:root :where(p){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(.wp-block-post-date){color: #123456;}:root :where(.wp-block-post-date a:where(:not(.wp-element-button))){background-color: #777;color: #555;}:root :where(.wp-block-post-excerpt){column-count: 2;}:root :where(.wp-block-image){margin-bottom: 30px;}:root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-top-left-radius: 10px;border-bottom-right-radius: 1em;}:root :where(.wp-block-image img, .wp-block-image .components-placeholder){filter: var(--wp--preset--duotone--custom-duotone);}';
 		$presets   = '.has-grey-color{color: var(--wp--preset--color--grey) !important;}.has-grey-background-color{background-color: var(--wp--preset--color--grey) !important;}.has-grey-border-color{border-color: var(--wp--preset--color--grey) !important;}.has-custom-gradient-gradient-background{background: var(--wp--preset--gradient--custom-gradient) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-big-font-size{font-size: var(--wp--preset--font-size--big) !important;}.has-arial-font-family{font-family: var(--wp--preset--font-family--arial) !important;}';
 		$all       = $variables . $styles . $presets;
 
@@ -1600,6 +1632,58 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_variation_rule_from_a_pseudo_node_ignores_the_pseudo_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient' => 'linear-gradient(135deg,#ff0000,#0000ff)',
+							),
+							':hover'     => array(
+								'background' => array( 'backgroundClip' => 'text' ),
+							),
+							'variations' => array(
+								'flashy' => array(
+									'background' => array( 'backgroundClip' => 'padding-box' ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button', ':hover' ),
+				'selector'   => '.wp-block-button:hover',
+				'css'        => '.wp-block-button:hover',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringNotContainsString( 'background-image: unset', $actual_styles );
+	}
+
 	public function test_variation_breakpoint_pseudo_state_reads_the_block_clip() {
 		register_block_style(
 			'core/button',
@@ -1716,6 +1800,208 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;}}',
 			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_text_color_gets_its_fill_back_on_the_color_feature_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/search' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'@mobile'    => array( 'color' => array( 'text' => '#00ff00' ) ),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_text_color_gets_its_fill_back_on_the_color_feature_selector() {
+		register_block_style(
+			'core/search',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/search' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		unregister_block_style( 'core/search', 'flashy' );
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-search.is-style-flashy .wp-block-search__button, .wp-block-search.wp-block-search__no-button.is-style-flashy .wp-block-search__input){color: #00ff00;-webkit-text-fill-color: currentColor;}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_text_clip_check_keeps_the_variation_gradient() {
+		register_block_style(
+			'core/post-navigation-link',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/post-navigation-link' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array(
+									'background' => array( 'gradient' => 'linear-gradient(135deg,#00ff00,#ffff00)' ),
+									'color'      => array( 'text' => '#00ff00' ),
+									'@mobile'    => array( 'color' => array( 'text' => '#0000ff' ) ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		unregister_block_style( 'core/post-navigation-link', 'flashy' );
+
+		// The variation paints its own gradient, so only its mobile text color needs the fill.
+		$this->assertStringContainsString(
+			':root :where(.wp-block-post-navigation-link.is-style-flashy){color: #00ff00;}',
+			$stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-post-navigation-link.is-style-flashy){color: #0000ff;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_pseudo_state_reads_the_default_pseudo_state_clip() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							':hover'  => array(
+								'background' => array(
+									'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+									'backgroundClip' => 'text',
+								),
+							),
+							'@mobile' => array(
+								':hover' => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_variation_breakpoint_pseudo_state_reads_the_variation_pseudo_state_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							'variations' => array(
+								'flashy' => array(
+									':hover'  => array(
+										'background' => array(
+											'gradient' => 'linear-gradient(135deg,#ff0000,#0000ff)',
+											'backgroundClip' => 'text',
+										),
+									),
+									'@mobile' => array(
+										':hover' => array( 'color' => array( 'text' => '#00ff00' ) ),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button' ),
+				'selector'   => '.wp-block-button',
+				'css'        => '.wp-block-button',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$actual_styles
 		);
 	}
 
@@ -3061,7 +3347,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_stylesheet_outputs_rotate_for_block_styles_states_and_variations() {
 		register_block_style(
-			'core/image',
+			'core/group',
 			array(
 				'name'  => 'tilted',
 				'label' => 'Tilted',
@@ -3072,7 +3358,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'blocks' => array(
-						'core/image'  => array(
+						'core/group'  => array(
 							'transform'  => array( 'rotate' => '0.25turn' ),
 							'@mobile'    => array(
 								'transform' => array( 'rotate' => '0' ),
@@ -3100,11 +3386,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		unregister_block_style( 'core/image', 'tilted' );
+		unregister_block_style( 'core/group', 'tilted' );
 
-		$this->assertStringContainsString( ':root :where(.wp-block-image img){rotate: 0.25turn;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img){rotate: 0;}}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-tilted img){rotate: -5deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 0.25turn;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
@@ -3156,7 +3442,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_sanitize_keeps_transform_styles_for_blocks_and_variations_only() {
 		register_block_style(
-			'core/image',
+			'core/group',
 			array(
 				'name'  => 'tilted',
 				'label' => 'Tilted',
@@ -3169,7 +3455,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'transform' => array( 'rotate' => false ),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform' => array( 'rotate' => true ),
 						),
 					),
@@ -3180,7 +3466,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => array( 'transform' => $rotate ),
 					),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform'  => $rotate,
 							'variations' => array(
 								'tilted' => array( 'transform' => $rotate ),
@@ -3190,7 +3476,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
-		unregister_block_style( 'core/image', 'tilted' );
+		unregister_block_style( 'core/group', 'tilted' );
 
 		$this->assertEqualSetsWithIndex(
 			array(
@@ -3198,14 +3484,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'transform' => array( 'rotate' => false ),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform' => array( 'rotate' => true ),
 						),
 					),
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform'  => $rotate,
 							'variations' => array(
 								'tilted' => array( 'transform' => $rotate ),
@@ -3216,6 +3502,307 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			$theme_json->get_raw_data()
 		);
+	}
+
+	/**
+	 * Tests that block offsets output a custom property for each axis they set
+	 * and the `translate` property, for block styles, states and style
+	 * variations, and combine with a rotation.
+	 */
+	public function test_get_stylesheet_outputs_translate_for_block_styles_states_and_variations() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'raised',
+				'label' => 'Raised',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group'  => array(
+							'transform'  => array(
+								'rotate'    => '5deg',
+								'translate' => array(
+									'x' => '10px',
+									'y' => '-50%',
+								),
+							),
+							'@mobile'    => array(
+								'transform' => array( 'translate' => array( 'x' => '0' ) ),
+							),
+							'variations' => array(
+								'raised' => array(
+									'transform' => array( 'translate' => array( 'y' => '-1rem' ) ),
+								),
+							),
+						),
+						'core/button' => array(
+							':hover'  => array(
+								'transform' => array( 'translate' => array( 'y' => '-4px' ) ),
+							),
+							'@mobile' => array(
+								':hover' => array(
+									'transform' => array( 'translate' => array( 'x' => '2px' ) ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/group', 'raised' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){--wp--style--translate-x: 0;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-raised){--wp--style--translate-y: -1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){--wp--style--translate-y: -4px;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){--wp--style--translate-x: 2px;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
+		$this->assertStringNotContainsString( 'transform', $css );
+	}
+
+	/**
+	 * Tests that an offset with an axis that is not a single length or percentage is not output.
+	 *
+	 * @dataProvider data_invalid_translate_values
+	 *
+	 * @param mixed $translate Offset value.
+	 */
+	public function test_get_stylesheet_skips_invalid_translate_values( $translate ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'transform' => array( 'translate' => $translate ),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertStringNotContainsString( 'translate', $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_translate_values() {
+		return array(
+			'string'      => array( '10px 20px' ),
+			'bare number' => array( array( 'x' => '10' ) ),
+			'calc()'      => array( array( 'x' => 'calc(1px + 2px)' ) ),
+			'var()'       => array( array( 'y' => 'var(--offset)' ) ),
+			'list'        => array( array( 'x' => '1px 2px' ) ),
+			'angle'       => array( array( 'x' => '5deg' ) ),
+			'number type' => array( array( 'x' => 10 ) ),
+			'z only'      => array( array( 'z' => '5px' ) ),
+		);
+	}
+
+	/**
+	 * Tests that sanitizing keeps the `x` and `y` offset axes only, and drops an
+	 * offset that is not an object.
+	 */
+	public function test_sanitize_keeps_translate_axes_only() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'translate' => false ),
+				),
+				'styles'   => array(
+					'elements' => array(
+						'link' => array( 'transform' => array( 'translate' => array( 'x' => '1px' ) ) ),
+					),
+					'blocks'   => array(
+						'core/heading' => array(
+							'transform' => array(
+								'translate' => array(
+									'x' => '10px',
+									'z' => '5px',
+								),
+							),
+						),
+						'core/group'   => array(
+							'transform' => array( 'translate' => '10px 20px' ),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertEqualSetsWithIndex(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'translate' => false ),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'translate' => array( 'x' => '10px' ),
+							),
+						),
+					),
+				),
+			),
+			$theme_json->get_raw_data()
+		);
+	}
+
+	/**
+	 * Tests that removing insecure properties keeps a valid offset object, and
+	 * drops an offset with an invalid axis.
+	 *
+	 * @dataProvider data_remove_insecure_properties_translate
+	 *
+	 * @param array      $translate Offset to save.
+	 * @param array|null $expected  Offset expected after removing insecure properties.
+	 */
+	public function test_remove_insecure_properties_keeps_valid_translate( $translate, $expected ) {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate'    => '5deg',
+								'translate' => $translate,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$transform = array( 'rotate' => '5deg' );
+		if ( null !== $expected ) {
+			$transform['translate'] = $expected;
+		}
+		$this->assertSame( $transform, $actual['styles']['blocks']['core/heading']['transform'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_remove_insecure_properties_translate() {
+		return array(
+			'one axis'     => array( array( 'x' => '3rem' ), array( 'x' => '3rem' ) ),
+			'two axes'     => array(
+				array(
+					'x' => '10px',
+					'y' => '-50%',
+				),
+				array(
+					'x' => '10px',
+					'y' => '-50%',
+				),
+			),
+			'calc() axis'  => array( array( 'x' => 'calc(1px + 2px)' ), null ),
+			'invalid axis' => array(
+				array(
+					'x' => '10px',
+					'y' => 'url(x)',
+				),
+				null,
+			),
+		);
+	}
+
+	/**
+	 * Tests that removing insecure properties keeps a single uniform scale,
+	 * and drops any other scale.
+	 *
+	 * @dataProvider data_remove_insecure_properties_scale
+	 *
+	 * @param mixed $scale    Scale to save.
+	 * @param bool  $is_kept  Whether the scale is kept.
+	 */
+	public function test_remove_insecure_properties_keeps_valid_scale( $scale, $is_kept ) {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate' => '5deg',
+								'scale'  => $scale,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$transform = array( 'rotate' => '5deg' );
+		if ( $is_kept ) {
+			$transform['scale'] = $scale;
+		}
+		$this->assertSame( $transform, $actual['styles']['blocks']['core/heading']['transform'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_remove_insecure_properties_scale() {
+		return array(
+			'number'     => array( 1.2, true ),
+			'zero'       => array( 0, true ),
+			'string'     => array( '0.75', true ),
+			'percentage' => array( '120%', true ),
+			'negative'   => array( -1, false ),
+			'two values' => array( '1.2 1.5', false ),
+			'calc()'     => array( 'calc(1 + 0.2)', false ),
+			'var()'      => array( 'var(--scale)', false ),
+		);
+	}
+
+	/**
+	 * Tests that a block's scale outputs the individual `scale` property in
+	 * Global Styles.
+	 */
+	public function test_get_stylesheet_outputs_block_scale() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate' => '5deg',
+								'scale'  => 1.2,
+							),
+						),
+						'core/group'   => array(
+							'transform' => array( 'scale' => 'calc(1 + 1)' ),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-heading){rotate: 5deg;scale: 1.2;}', $stylesheet );
+		$this->assertStringNotContainsString( 'calc(1 + 1)', $stylesheet );
+		$this->assertStringNotContainsString( 'transform', $stylesheet );
 	}
 
 	public function test_get_stylesheet_custom_root_selector() {
@@ -8373,18 +8960,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param string $expected Expected results.
 	 */
 	public function test_process_blocks_custom_css( $input, $expected ) {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(),
-			)
-		);
-		$reflection = new ReflectionMethod( $theme_json, 'process_blocks_custom_css' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$reflection->setAccessible( true );
-		}
-
-		$this->assertSame( $expected, $reflection->invoke( $theme_json, $input['css'], $input['selector'] ) );
+		$this->assertSame( $expected, WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $input['css'], $input['selector'] ) );
 	}
 
 	/**
@@ -8505,20 +9081,20 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 		$styles = $result->get_raw_data()['styles'];
 
-		$this->assertEquals( 'var(--wp--preset--color--primary)', $styles['color']['background'], 'Top level: Assert the originally correct values are still correct.' );
-		$this->assertEquals( 'var(--wp--preset--color--secondary)', $styles['color']['text'], 'Top level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--primary)', $styles['color']['background'], 'Top level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--secondary)', $styles['color']['text'], 'Top level: Assert the originally correct values are still correct.' );
 
-		$this->assertEquals( 'var(--wp--preset--color--pri)', $styles['elements']['link']['color']['background'], 'Element top level: Assert the originally correct values are still correct.' );
-		$this->assertEquals( 'var(--wp--preset--color--sec)', $styles['elements']['link']['color']['text'], 'Element top level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--pri)', $styles['elements']['link']['color']['background'], 'Element top level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--sec)', $styles['elements']['link']['color']['text'], 'Element top level: Assert the originally correct values are still correct.' );
 
-		$this->assertEquals( 'var(--wp--preset--font-size--small)', $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Top block level: Assert the originally correct values are still correct.' );
-		$this->assertEquals( 'var(--wp--preset--color--secondary)', $styles['blocks']['core/post-terms']['color']['background'], 'Top block level: Assert the internal variables are convert to CSS custom variables.' );
+		$this->assertSame( 'var(--wp--preset--font-size--small)', $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Top block level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--secondary)', $styles['blocks']['core/post-terms']['color']['background'], 'Top block level: Assert the internal variables are convert to CSS custom variables.' );
 
-		$this->assertEquals( 'var(--wp--preset--color--p)', $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Elements block level: Assert the originally correct values are still correct.' );
-		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Elements block level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--p)', $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Elements block level: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--s)', $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Elements block level: Assert the originally correct values are still correct.' );
 
-		$this->assertEquals( 'var(--wp--preset--font-size--s)', $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Style variations: Assert the originally correct values are still correct.' );
-		$this->assertEquals( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
+		$this->assertSame( 'var(--wp--preset--font-size--s)', $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Style variations: Assert the originally correct values are still correct.' );
+		$this->assertSame( 'var(--wp--preset--color--s)', $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Style variations: Assert the internal variables are convert to CSS custom variables.' );
 	}
 
 	/*
@@ -8664,48 +9240,48 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$styles = $theme_json::resolve_variables( $theme_json )->get_raw_data()['styles'];
 
-		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
-		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
+		$this->assertSame( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
+		$this->assertSame( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
 
-		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
-		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
+		$this->assertSame( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
+		$this->assertSame( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
 
-		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
-		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
-		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
-		$this->assertEquals(
+		$this->assertSame( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+		$this->assertSame( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
+		$this->assertSame( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
+		$this->assertSame(
 			"linear-gradient(90deg, $primary_color 0%, $secondary_color 35%, var(--wp--undefined--color--secondary) 100%)",
 			$styles['blocks']['core/more']['color']['background'],
 			'Blocks: multiple colors and undefined color'
 		);
-		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
-		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
-		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
-		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+		$this->assertSame( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
+		$this->assertSame( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
+		$this->assertSame( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
+		$this->assertSame( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
 
-		$this->assertEquals(
+		$this->assertSame(
 			"var(--undefined--color--primary, $small_font)",
 			$styles['blocks']['core/comments']['color']['text'],
 			'Blocks: text color with undefined var and fallback'
 		);
-		$this->assertEquals(
+		$this->assertSame(
 			$primary_color,
 			$styles['blocks']['core/comments']['color']['background'],
 			'Blocks: background color with variable and undefined fallback'
 		);
 
-		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
-		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
+		$this->assertSame( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
+		$this->assertSame( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
 		/*
 		 * WP_Theme_JSON_Gutenberg::resolve_variables may be called with merged data from WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()
 		 * WP_Theme_JSON_Resolver_Gutenberg::get_block_data() sets blockGap for supported blocks to `null` if the value is not defined.
 		 */
 		$this->assertNull( $styles['blocks']['core/post-template']['spacing']['blockGap'], 'core/post-template block: blockGap' );
-		$this->assertEquals( $spacing, $styles['blocks']['core/columns']['spacing']['blockGap'], 'core/columns block: blockGap' );
+		$this->assertSame( $spacing, $styles['blocks']['core/columns']['spacing']['blockGap'], 'core/columns block: blockGap' );
 	}
 
 	/**
@@ -8727,7 +9303,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual = $func->invoke( null, 'custom', $selector );
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -8844,7 +9420,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -8881,7 +9457,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$block_nodes       = $func->invoke( null, $theme_json, $selectors );
 		$button_variations = $block_nodes[0]['variations'] ?? array();
 
-		$this->assertEquals( array(), $button_variations );
+		$this->assertSame( array(), $button_variations );
 	}
 
 	/**
@@ -8926,7 +9502,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $button_variations );
+		$this->assertSame( $expected, $button_variations );
 	}
 
 	/**

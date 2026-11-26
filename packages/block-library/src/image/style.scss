@@ -330,9 +330,6 @@
 			min-height: var(--wp--lightbox-image-height);
 			width: var(--wp--lightbox-image-width);
 			height: var(--wp--lightbox-image-height);
-			// The enlarged image copies the image's classes, so it would pick up
-			// a rotation. State styles are important, so this has to be too.
-			rotate: none !important;
 		}
 
 		figcaption {

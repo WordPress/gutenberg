@@ -28,6 +28,144 @@ test.describe( 'Query block', () => {
 		] );
 	} );
 
+	test.describe( 'Query selectors', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-custom-post-types'
+			);
+		} );
+
+		test.beforeEach( async ( { page, editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: { query: { inherit: false, postType: 'post' } },
+				innerBlocks: [
+					{
+						name: 'core/post-template',
+						innerBlocks: [ { name: 'core/post-title' } ],
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Query Loop',
+				} )
+			);
+			await editor.openDocumentSettingsSidebar();
+			await expect(
+				page.getByRole( 'combobox', { name: 'Post type', exact: true } )
+			).toBeVisible();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-custom-post-types'
+			);
+		} );
+
+		for ( const { label, options } of [
+			{
+				label: 'Order by',
+				options: [ 'Newest to oldest', 'Oldest to newest' ],
+			},
+			{ label: 'Sticky posts', options: [ 'Include', 'Exclude' ] },
+		] ) {
+			test( `keeps a saved post unchanged when reselecting ${ label }`, async ( {
+				page,
+				editor,
+			} ) => {
+				const control = page.getByRole( 'combobox', {
+					name: label,
+					exact: true,
+				} );
+				for ( const option of options ) {
+					await control.click();
+					await page
+						.getByRole( 'option', { name: option, exact: true } )
+						.click();
+					await editor.saveDraft();
+					const before = ( await editor.getBlocks() )[ 0 ].attributes
+						.query;
+					await expect
+						.poll( () =>
+							page.evaluate( () =>
+								window.wp.data
+									.select( 'core/editor' )
+									.isEditedPostDirty()
+							)
+						)
+						.toBe( false );
+					await control.click();
+					await page
+						.getByRole( 'option', { name: option, exact: true } )
+						.click();
+					await expect( control ).toHaveAttribute(
+						'aria-expanded',
+						'false'
+					);
+					expect(
+						await page.evaluate( () =>
+							window.wp.data
+								.select( 'core/editor' )
+								.isEditedPostDirty()
+						)
+					).toBe( false );
+					expect(
+						( await editor.getBlocks() )[ 0 ].attributes.query
+					).toEqual( before );
+				}
+			} );
+		}
+
+		test( 'keeps query state when reselecting the current post type', async ( {
+			page,
+			editor,
+		} ) => {
+			for ( const postType of [ 'post', 'page' ] ) {
+				await page.evaluate( ( type ) => {
+					const { getBlocks } =
+						window.wp.data.select( 'core/block-editor' );
+					const block = getBlocks()[ 0 ];
+					window.wp.data
+						.dispatch( 'core/block-editor' )
+						.updateBlockAttributes( block.clientId, {
+							query: {
+								...block.attributes.query,
+								postType: type,
+								taxQuery: { include: { category: [ 1 ] } },
+								parents: [ 123 ],
+								format: [ 'aside' ],
+								sticky: type === 'post' ? 'exclude' : '',
+								author: '1',
+								search: 'Post',
+								offset: 2,
+							},
+						} );
+				}, postType );
+				const before = ( await editor.getBlocks() )[ 0 ].attributes
+					.query;
+				const control = page.getByRole( 'combobox', {
+					name: 'Post type',
+					exact: true,
+				} );
+				await control.click();
+				await page
+					.getByRole( 'option', {
+						name: postType === 'post' ? 'Post' : 'Page',
+						exact: true,
+					} )
+					.click();
+				await expect( control ).toHaveAttribute(
+					'aria-expanded',
+					'false'
+				);
+				expect(
+					( await editor.getBlocks() )[ 0 ].attributes.query
+				).toEqual( before );
+			}
+		} );
+	} );
+
 	test.describe( 'Post Template block movers', () => {
 		test( 'should show vertical movers for blocks inside a grid Post Template', async ( {
 			page,

@@ -2491,8 +2491,6 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
-	// This section is definitely testing things in a non-user centric way,
-	// but I wasn't sure if there was a better way.
 	describe( 'aria attributes', () => {
 		it( 'should add the correct aria attributes to the input as the user interacts with it', async () => {
 			const user = userEvent.setup();
@@ -2513,6 +2511,7 @@ describe( 'FormTokenField', () => {
 			expect( input ).toHaveAttribute( 'aria-autocomplete', 'list' );
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Typing "Pi" will show the "Pistachio" and "Pine" suggestions.
@@ -2522,7 +2521,11 @@ describe( 'FormTokenField', () => {
 			expect( suggestionList ).toBeVisible();
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Select the "Pine" suggestion
@@ -2534,7 +2537,11 @@ describe( 'FormTokenField', () => {
 				{ name: 'Pine', selected: true }
 			);
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).toHaveAttribute(
 				'aria-activedescendant',
 				pineSuggestion.id
@@ -2563,6 +2570,7 @@ describe( 'FormTokenField', () => {
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 		} );
 	} );

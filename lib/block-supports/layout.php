@@ -403,6 +403,8 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 			$child_layout_declarations['grid-column'] = "$column_start";
 		} elseif ( $column_span ) {
 			$child_layout_declarations['grid-column'] = "span $column_span";
+		} elseif ( null !== $viewport_overrides && $has_viewport_property_override( 'columnStart' ) && null === $viewport_overrides['columnStart'] ) {
+			$child_layout_declarations['grid-column'] = 'auto';
 		}
 	}
 
@@ -417,6 +419,8 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 			$child_layout_declarations['grid-row'] = "$row_start";
 		} elseif ( $row_span ) {
 			$child_layout_declarations['grid-row'] = "span $row_span";
+		} elseif ( null !== $viewport_overrides && $has_viewport_property_override( 'rowStart' ) && null === $viewport_overrides['rowStart'] ) {
+			$child_layout_declarations['grid-row'] = 'auto';
 		}
 	}
 
@@ -1003,7 +1007,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		} elseif ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+				/*
+				 * The aspect ratio gives empty rows a height, so cells are roughly square.
+				 * Rows still grow if their content is taller.
+				 */
+				'declarations' => array(
+					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+					'aspect-ratio'       => $column_count . ' / ' . $row_count,
+				),
 			);
 		}
 
@@ -1050,26 +1061,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	}
 
 	return '';
-}
-
-/**
- * Generates an incremental ID that is independent per each different prefix.
- *
- * It is similar to `wp_unique_id`, but each prefix has it's own internal ID
- * counter to make each prefix independent from each other. The ID starts at 1
- * and increments on each call. The returned value is not universally unique,
- * but it is unique across the life of the PHP process and it's stable per
- * prefix.
- *
- * @param string $prefix Prefix for the returned ID.
- * @return string Incremental ID per prefix.
- */
-function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
-	static $id_counters = array();
-	if ( ! array_key_exists( $prefix, $id_counters ) ) {
-			$id_counters[ $prefix ] = 0;
-	}
-	return $prefix . (string) ++$id_counters[ $prefix ];
 }
 
 /**

@@ -3,7 +3,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
 import { useDrawerValidationContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { TitleProps } from './types';
 
 /**

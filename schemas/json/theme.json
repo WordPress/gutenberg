@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- transform: rotate\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -491,7 +491,17 @@
 						"rotate": {
 							"description": "Allow users to set a rotation.",
 							"type": "boolean",
-							"default": true
+							"default": false
+						},
+						"translate": {
+							"description": "Allow users to set an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						},
+						"scale": {
+							"description": "Allow users to set a uniform scale.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -624,7 +634,13 @@
 										"vmax",
 										"svmax",
 										"lvmax",
-										"dvmax"
+										"dvmax",
+										"cqw",
+										"cqh",
+										"cqi",
+										"cqb",
+										"cqmin",
+										"cqmax"
 									],
 									"default": "rem"
 								}
@@ -1225,6 +1241,9 @@
 				"core/navigation-link": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
@@ -1238,6 +1257,12 @@
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -1354,7 +1379,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -1487,6 +1524,10 @@
 								},
 								{ "$ref": "#/definitions/refComplete" }
 							]
+						},
+						"gradient": {
+							"description": "Sets a gradient in the `background-image` CSS property. When `backgroundImage` is also set, the gradient is layered above the image.",
+							"type": "string"
 						}
 					},
 					"additionalProperties": false
@@ -1919,6 +1960,34 @@
 						"rotate": {
 							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
 							"type": "string"
+						},
+						"translate": {
+							"description": "Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`.",
+							"type": "object",
+							"properties": {
+								"x": {
+									"description": "The horizontal offset.",
+									"type": "string"
+								},
+								"y": {
+									"description": "The vertical offset.",
+									"type": "string"
+								}
+							},
+							"additionalProperties": false
+						},
+						"scale": {
+							"description": "Sets the `scale` CSS property. Accepts a single non-negative number, such as `1.2`, or percentage, such as `120%`. One value scales both axes.",
+							"oneOf": [
+								{
+									"type": "number",
+									"minimum": 0
+								},
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+(?:\\.\\d+)?|\\.\\d+)%?$"
+								}
+							]
 						}
 					},
 					"additionalProperties": false
@@ -2013,6 +2082,13 @@
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textWrap": {
+							"description": "Sets the `text-wrap` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
@@ -2366,16 +2442,40 @@
 			"type": "object",
 			"properties": {
 				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2386,22 +2486,58 @@
 			"type": "object",
 			"properties": {
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":required": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-valid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-invalid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				"::placeholder": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2944,6 +3080,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2957,6 +3096,12 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/post-author": {
@@ -3073,7 +3218,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/tag-cloud": {
@@ -3492,6 +3649,9 @@
 						}
 					]
 				},
+				"core/navigation-overlay-close": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -3505,6 +3665,12 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/paragraph": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/playlist-track": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/post-author": {
@@ -3621,7 +3787,19 @@
 				"core/spacer": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/tab-list": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panel": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tab-panels": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/table": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/tabs": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {

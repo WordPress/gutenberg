@@ -3,5 +3,7 @@
  */
 export interface PostWithStatus {
 	status?: string;
+	date?: string | null;
+	password?: string;
 	_links?: Record< string, unknown >;
 }

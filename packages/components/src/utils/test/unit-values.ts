@@ -23,6 +23,12 @@ describe( 'unit-values', () => {
 			${ '10vmin' }          | ${ [ 10, 'vmin' ] }
 			${ '10vmax' }          | ${ [ 10, 'vmax' ] }
 			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
+			${ '10cqw' }           | ${ [ 10, 'cqw' ] }
+			${ '10cqh' }           | ${ [ 10, 'cqh' ] }
+			${ '10cqi' }           | ${ [ 10, 'cqi' ] }
+			${ '10cqb' }           | ${ [ 10, 'cqb' ] }
+			${ '10cqmin' }         | ${ [ 10, 'cqmin' ] }
+			${ '10cqmax' }         | ${ [ 10, 'cqmax' ] }
 			${ '10notacssunit' }   | ${ [ undefined, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
 			${ '10' }              | ${ [ 10, undefined ] }

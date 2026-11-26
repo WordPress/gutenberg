@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import { getRotateForState, getUpdatedRotateStyle } from '../../utils/rotation';
 import { getGridGrowthUpdate } from './get-grid-row-updates';
 import {

@@ -221,4 +221,60 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			);
 		}
 	}
+
+	/**
+	 * A default tab index past the last tab, for example one left behind when
+	 * the default tab was removed, falls back to the first tab so that a panel
+	 * is still shown.
+	 *
+	 * @covers ::block_core_tabs_render_block_callback
+	 *
+	 * @dataProvider data_default_tab_index
+	 *
+	 * @param int $saved_index    Default tab index saved in the block.
+	 * @param int $expected_index Default tab index passed to the front end.
+	 */
+	public function test_should_fall_back_to_first_tab_when_default_tab_index_is_out_of_range( int $saved_index, int $expected_index ): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs {"activeTabIndex":%d} -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Description</button><button type="button" role="tab">Reviews</button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Description"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel {"label":"Reviews"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		$processor = new WP_HTML_Tag_Processor( do_blocks( sprintf( $tabs_block, $saved_index ) ) );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( $expected_index, $context['activeTabIndex'] ?? null );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_default_tab_index(): array {
+		return array(
+			'existing default tab'          => array(
+				'saved_index'    => 1,
+				'expected_index' => 1,
+			),
+			'default tab past the last tab' => array(
+				'saved_index'    => 2,
+				'expected_index' => 0,
+			),
+		);
+	}
 }

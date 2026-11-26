@@ -90,6 +90,14 @@ function BlockSwitcherDropdownMenuContents( {
 	} );
 	const registry = useRegistry();
 	const convertToCanvas = useConvertToCanvas();
+	const filteredBlockTransformations = possibleBlockTransformations.filter(
+		( { name, variationName } ) =>
+			name !== blocks[ 0 ]?.name ||
+			! variationName ||
+			! blockVariationTransformations?.some(
+				( variation ) => variation.name === variationName
+			)
+	);
 	function selectForMultipleBlocks( insertedBlocks: Block[] ) {
 		if ( insertedBlocks.length > 1 ) {
 			multiSelect(
@@ -133,6 +141,22 @@ function BlockSwitcherDropdownMenuContents( {
 		) {
 			return;
 		}
+		const newBlocks = switchToBlockType(
+			blocks[ 0 ],
+			blocks[ 0 ].name,
+			name
+		);
+		if ( newBlocks ) {
+			const [ newBlock, ...rest ] = newBlocks;
+			// Reusing the client ID updates the block in place instead of remounting it.
+			const replacements =
+				newBlock.name === blocks[ 0 ].name
+					? [ { ...newBlock, clientId }, ...rest ]
+					: newBlocks;
+			replaceBlocks( clientIds, replacements );
+			selectForMultipleBlocks( replacements );
+			return;
+		}
 		updateBlockAttributes( clientId, { ...attributes } );
 	}
 	// Pattern transformation through the `Patterns` API.
@@ -151,7 +175,7 @@ function BlockSwitcherDropdownMenuContents( {
 		isSingleBlock &&
 		( isTemplatePart( blocks[ 0 ] ) || isReusableBlock( blocks[ 0 ] ) );
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
+		!! filteredBlockTransformations.length && canRemove && ! isSynced;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
@@ -196,7 +220,7 @@ function BlockSwitcherDropdownMenuContents( {
 				<BlockTransformationsMenu
 					className="block-editor-block-switcher__transforms__menugroup"
 					possibleBlockTransformations={
-						possibleBlockTransformations
+						filteredBlockTransformations
 					}
 					possibleBlockVariationTransformations={
 						blockVariationTransformations

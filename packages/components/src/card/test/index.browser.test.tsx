@@ -323,7 +323,7 @@ describe( 'Card', () => {
 
 		expect(
 			getComputedStyle( screen.getByTestId( 'footer' ) ).justifyContent
-		).toBe( 'flex-end' );
+		).toBe( 'flow-end' );
 	} );
 
 	it( 'makes CardBody scrollable when requested', async () => {

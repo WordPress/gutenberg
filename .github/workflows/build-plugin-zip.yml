@@ -377,7 +377,7 @@ jobs:
               run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
 
             - name: Login to GitHub Container Registry
-              uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+              uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -386,7 +386,7 @@ jobs:
             # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
             # for example) to container registries such as GitHub Container Registry.
             - name: Setup ORAS
-              uses: oras-project/setup-oras@005458ad77f1c8facd38a094e4af2e69e5607ff4 # v2.0.2
+              uses: oras-project/setup-oras@5e2f2482b30b0cb3e14e67f89a80c88c659a7c63 # v2.0.3
 
             # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
             # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.

@@ -81,8 +81,8 @@ export interface PrivateBlockContextValue {
 }
 
 export interface BlockCrashBoundaryProps {
-	/** Rendered in place of the children once they throw. */
-	fallback: ReactNode;
+	/** Rendered in place of the children once they throw, given the error. */
+	fallback: ( error: Error ) => ReactNode;
 	children?: ReactNode;
 }
 
@@ -172,7 +172,7 @@ export interface BlockListBlockProps {
 	setAttributes: BlockSetAttributes;
 	onReplace: BlockListBlockOnReplace;
 	onRemove: () => void;
-	onInsertBlocksAfter: ( blocks: Block[] ) => void;
+	onInsertBlocksAfter: ( blocks: Block | Block[] ) => void;
 	onMerge: ( forward?: boolean ) => void;
 	toggleSelection: ( isSelectionEnabled?: boolean ) => void;
 }
