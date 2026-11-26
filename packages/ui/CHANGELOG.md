@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Add `SearchInput` component, a search field with a search icon and a reset button.
+-   Add `SearchInput` component, a search field with a search icon and a reset button ([#87465](https://github.com/WordPress/gutenberg/pull/87465)).
 
 ### Enhancements
 

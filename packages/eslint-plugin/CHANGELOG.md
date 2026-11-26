@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Allow `SearchInput` from `@wordpress/ui` with the `allowUseWithCaution` option.
+-   `use-recommended-components`: Allow `SearchInput` from `@wordpress/ui` with the `allowUseWithCaution` option ([#87465](https://github.com/WordPress/gutenberg/pull/87465)).
 -   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
 
 ### Internal
