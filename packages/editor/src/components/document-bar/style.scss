@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/breakpoints" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -13,22 +12,26 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
-	background: $gray-100;
+	box-sizing: border-box;
+	// Styled as a neutral outline button, since it opens the command palette.
+	background-color: var(--wpds-color-background-interactive-neutral-weak);
+	border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
-
-	&:hover {
-		background-color: $gray-200;
+	@media not (prefers-reduced-motion) {
+		transition: background-color 0.1s ease-out, border-color 0.1s ease-out;
 	}
 
-	.components-button {
+	&:is(:hover, :has(.editor-document-bar__command:is(:focus-visible, :active))) {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
 
-		@media not (prefers-reduced-motion) {
-			transition: background-color 0.1s ease-out;
+		.editor-document-bar__title {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 
-		&:hover {
-			background: $gray-200;
+		.editor-document-bar__post-type-label {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
@@ -49,7 +52,7 @@
 
 .editor-document-bar__title {
 	overflow: hidden;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	margin: 0 auto;
 	max-width: 70%;
 
@@ -72,7 +75,7 @@
 
 .editor-document-bar__post-type-label {
 	flex: 0;
-	color: $gray-800;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	padding-left: $grid-unit-05;
 
 	@media screen and (max-width: #{ ($break-small) }) {
@@ -83,13 +86,14 @@
 .editor-document-bar__back.components-button.has-icon.has-text {
 	min-width: $button-size;
 	flex-shrink: 0;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	gap: 0;
 	z-index: 1;
 	position: absolute;
 
-	&:hover {
-		color: $gray-900;
+	// Follow the bar's active fill, which also covers hovering this button.
+	.editor-document-bar:is(:hover, :has(.editor-document-bar__command:is(:focus-visible, :active))) & {
+		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		background-color: transparent;
 	}
 }
@@ -100,7 +104,7 @@
 	display: none;
 	pointer-events: none;
 	svg {
-		color: $gray-600;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 	@include break-small {
 		display: flex;

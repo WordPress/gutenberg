@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+-   Use theme colors for the editor header, document bar, save status, publish panel, document outline, and list view sidebar ([#87426](https://github.com/WordPress/gutenberg/pull/87426)).
 
 ### Bug Fixes
 

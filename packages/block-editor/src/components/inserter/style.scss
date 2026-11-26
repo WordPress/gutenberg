@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 $block-inserter-preview-height: 350px;
@@ -60,21 +59,17 @@ $block-inserter-tabs-height: 44px;
 		box-shadow: $elevation-x-small;
 
 		.block-editor-inserter__quick-inserter > * {
-			border-left: $border-width solid $gray-400;
-			border-right: $border-width solid $gray-400;
+			border-left: $border-width solid var(--wpds-color-stroke-surface-neutral);
+			border-right: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 			&:first-child {
-				border-top: $border-width solid $gray-400;
+				border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
-				border-bottom: $border-width solid $gray-400;
+				border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 				border-radius: 0 0 $radius-medium $radius-medium;
-			}
-
-			&.components-button {
-				border: $border-width solid $gray-900;
 			}
 		}
 	}
@@ -110,6 +105,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu {
+	color: var(--wpds-color-foreground-content-neutral);
 	height: 100%;
 	position: relative;
 	overflow: visible;
@@ -136,10 +132,6 @@ $block-inserter-tabs-height: 44px;
 	margin-top: -1px;
 }
 
-.block-editor-inserter__menu.is-bottom::after {
-	border-bottom-color: $white;
-}
-
 .components-popover.block-editor-inserter__popover {
 	z-index: z-index(".components-popover.block-editor-inserter__popover");
 }
@@ -149,13 +141,13 @@ $block-inserter-tabs-height: 44px;
 	position: sticky;
 	top: 0;
 	z-index: 2;
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	border-bottom: 1px solid transparent;
 	@media not ( prefers-reduced-motion ) {
 		transition: border-bottom-color 0.1s linear;
 	}
 	&.is-scrolled {
-		border-bottom-color: $gray-200;
+		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
 	}
 }
 
@@ -182,10 +174,9 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 }
 
-.block-editor-inserter__panel-title,
-.block-editor-inserter__panel-title button {
+.block-editor-inserter__panel-title {
 	margin: 0 $grid-unit-15 0 0;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
@@ -232,7 +223,7 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 	width: $sidebar-width;
 	padding: $grid-unit-20;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-content-neutral);
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -246,7 +237,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__insertable-blocks-at-selection:not(:empty) + .block-editor-inserter__all-blocks:not(:empty) {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-inserter__block-patterns-tabs-container {
@@ -268,15 +259,15 @@ $block-inserter-tabs-height: 44px;
 	padding: 0 $grid-unit-20;
 
 	@include break-medium {
-		border-left: $border-width solid $gray-200;
+		border-left: $border-width solid var(--wpds-color-stroke-surface-neutral);
 		padding: 0;
 		left: $secondary-sidebar-width;
 		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
-		background: $gray-100;
-		border-top: $border-width solid $gray-200;
+		background: var(--wpds-color-background-surface-neutral-weak);
+		border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 		.block-editor-block-patterns-list {
 			padding: 0 $grid-unit-30 $grid-unit-20;
@@ -297,8 +288,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-filter-help {
 	padding: $grid-unit-20;
-	border-top: $border-width solid $gray-300;
-	color: $gray-700;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	min-width: 280px;
 }
 
@@ -309,7 +300,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__preview-content {
-	background: $gray-100;
+	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
 .block-editor-inserter__preview-content-missing {
@@ -317,13 +308,13 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $gray-700;
-	background: $gray-100;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
@@ -364,7 +355,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter-separator {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-inserter__popover.is-quick > .components-popover__content {
@@ -538,7 +529,7 @@ $media-grid-loading-min-height: 500px;
 		// Keeps the footer at its natural height rather than collapsing to make
 		// room for the scrolling grid above.
 		flex-shrink: 0;
-		border-top: $border-width solid $gray-200;
+		border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 		// Even all round, so the button is clear by the same amount top and
 		// bottom whether or not the pager is above it. Matches the 16px the
 		// "Explore all patterns" button has in the Patterns tab.
@@ -546,7 +537,7 @@ $media-grid-loading-min-height: 500px;
 	}
 
 	.block-editor-inserter__media-grid__range {
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 		font-size: $helptext-font-size;
 		white-space: nowrap;
 	}
@@ -571,7 +562,7 @@ $media-grid-loading-min-height: 500px;
 		width: 100%;
 		height: 100%;
 		padding: 0 $grid-unit-20;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 		text-align: center;
 		container-type: inline-size;
 	}
@@ -598,7 +589,7 @@ $media-grid-loading-min-height: 500px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: rgba($white, 0.6);
+		background-color: color-mix(in srgb, var(--wpds-color-background-surface-neutral-strong) 60%, transparent);
 	}
 
 	// The footer button, whether it inserts from the library or attaches to

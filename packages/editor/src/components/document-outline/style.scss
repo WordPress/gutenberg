@@ -51,14 +51,20 @@
 	align-items: flex-start;
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	text-align: left;
 	border-radius: $radius-small;
+
+	// More specific than the admin link colors for these states.
+	&:not([aria-disabled="true"], :disabled):is(:hover, :active, :focus) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
 
 	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;
-		color: $gray-700;
+		// The heading text still describes the document, so keep it legible.
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 
 	&:focus {
@@ -72,15 +78,16 @@
 }
 
 .document-outline__level {
-	background: $gray-300;
-	color: $gray-900;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	border-radius: 3px;
 	font-size: var(--wpds-typography-font-size-md);
 	padding: 1px 6px;
 	margin-right: 4px;
 
 	.is-invalid & {
-		background: $alert-yellow;
+		background: var(--wpds-color-background-surface-caution);
+		color: var(--wpds-color-foreground-content-caution);
 	}
 }
 
@@ -97,5 +104,5 @@
 		padding-right: $grid-unit-40;
 	}
 	text-align: center;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }

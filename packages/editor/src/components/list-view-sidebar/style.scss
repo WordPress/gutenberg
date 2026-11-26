@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -15,7 +14,7 @@
 	height: 100%;
 
 	// Include custom scrollbars, invisible until hovered.
-	@include custom-scrollbars-on-hover(transparent, $gray-600);
+	@include custom-scrollbars-on-hover(transparent, var(--wpds-color-background-thumb-neutral-weak-active));
 	overflow: auto;
 
 	// Only reserve space for scrollbars when there is content to scroll.
@@ -47,7 +46,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: $grid-unit-10;
-	border-bottom: $border-width solid $gray-300;
+	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	padding: $grid-unit-20;
 
 	& > div > span:first-child {
@@ -59,6 +58,6 @@
 	& > div > span {
 		font-size: $helptext-font-size;
 		line-height: $default-line-height;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-content-neutral-weak);
 	}
 }

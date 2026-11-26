@@ -20,7 +20,7 @@ $revision-code-diff-marker-width: 3ch;
 }
 
 .editor-revisions-header__no-revisions {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-md);
 }
 

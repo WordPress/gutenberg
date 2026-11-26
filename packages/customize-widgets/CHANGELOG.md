@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use theme colors for the widget inserter panel ([#87426](https://github.com/WordPress/gutenberg/pull/87426)).
+
 ### Bug Fixes
 
 -   Keep the widget inserter open when Escape is pressed during IME composition ([#87353](https://github.com/WordPress/gutenberg/pull/87353)).
