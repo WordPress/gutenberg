@@ -8,7 +8,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
@@ -57,18 +57,20 @@ export default function QueryInspectorControls( props ) {
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
-	const {
-		postTypesTaxonomiesMap,
-		postTypesSelectOptions,
-		postTypeFormatSupportMap,
-	} = usePostTypes();
+	const { postTypesSelectOptions, postTypeFormatSupportMap } = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
-	const onPostTypeChange = ( newValue ) => {
+	const registry = useRegistry();
+	const onPostTypeChange = async ( newValue ) => {
+		// A reset can run before the post types load, so wait for the record.
+		const newPostType = await registry
+			.resolveSelect( coreStore )
+			.getEntityRecord( 'root', 'postType', newValue )
+			.catch( () => undefined );
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
-		const supportedTaxonomies = postTypesTaxonomiesMap?.[ newValue ];
+		const supportedTaxonomies = newPostType?.taxonomies;
 		if ( !! supportedTaxonomies?.length && !! taxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {
@@ -104,7 +106,7 @@ export default function QueryInspectorControls( props ) {
 		// Post types can register post format support with `add_post_type_support`.
 		// But we need to reset the `format` property when switching to post types
 		// that do not support post formats.
-		const hasFormatSupport = postTypeFormatSupportMap[ newValue ];
+		const hasFormatSupport = newPostType?.supports?.[ 'post-formats' ];
 		if ( ! hasFormatSupport ) {
 			updateQuery.format = [];
 		}

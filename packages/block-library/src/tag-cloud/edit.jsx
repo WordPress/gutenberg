@@ -62,10 +62,15 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			: [ '%', 'px', 'em', 'rem', 'pt' ],
 	} );
 
-	const taxonomies = useSelect(
-		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
-		[]
-	);
+	const taxonomies = useSelect( ( select ) => {
+		const { getTaxonomies, hasFinishedResolution } = select( coreStore );
+		const query = { per_page: -1 };
+		const records = getTaxonomies( query );
+		// A failed request, such as a 403, finishes without records.
+		return hasFinishedResolution( 'getTaxonomies', [ query ] )
+			? ( records ?? [] )
+			: undefined;
+	}, [] );
 
 	const taxonomyItems = [
 		{

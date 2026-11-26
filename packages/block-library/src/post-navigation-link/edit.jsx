@@ -73,12 +73,14 @@ export default function PostNavigationLinkEdit( {
 	} );
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			const filteredTaxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
-			return filteredTaxonomies;
+			const { getTaxonomies, hasFinishedResolution } =
+				select( coreStore );
+			const query = { type: postType, per_page: -1 };
+			const records = getTaxonomies( query );
+			// A failed request, such as a 403, finishes without records.
+			return hasFinishedResolution( 'getTaxonomies', [ query ] )
+				? ( records ?? [] )
+				: undefined;
 		},
 		[ postType ]
 	);
