@@ -83,7 +83,7 @@ export default function DataviewsPatterns() {
 				addQueryArgs( path, {
 					...query,
 					pageNumber: params.page,
-					search: params.search,
+					search: params.search || undefined,
 				} )
 			);
 		},

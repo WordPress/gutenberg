@@ -7,6 +7,11 @@ import {
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from './waveform-utils';
+import type {
+	InitializedWaveformPlayer,
+	WaveformPlayerProps,
+	WaveformTrackMetadata,
+} from './types';
 
 /**
  * Update the metadata of a WaveformPlayer element to reflect current props.
@@ -14,18 +19,18 @@ import {
  * `loadTrack()` owns full track swaps, but it also resets the audio element.
  * This keeps same-source metadata edits lightweight in the editor.
  *
- * @param {Object}  player                - The waveform player.
- * @param {Object}  metadata              - The track metadata.
- * @param {string}  metadata.title        - The track title.
- * @param {string}  metadata.artist       - The artist name.
- * @param {string}  metadata.image        - The track image URL.
- * @param {string}  metadata.imageAlt     - The track image alt text.
- * @param {boolean} showPlayButtonArtwork - Whether to show artwork on the play button.
+ * @param player                - The waveform player.
+ * @param metadata              - The track metadata.
+ * @param metadata.title        - The track title.
+ * @param metadata.artist       - The artist name.
+ * @param metadata.image        - The track image URL.
+ * @param metadata.imageAlt     - The track image alt text.
+ * @param showPlayButtonArtwork - Whether to show artwork on the play button.
  */
 function updatePlayerMetadata(
-	player,
-	{ title, artist, image, imageAlt },
-	showPlayButtonArtwork
+	player: InitializedWaveformPlayer,
+	{ title, artist, image, imageAlt }: WaveformTrackMetadata,
+	showPlayButtonArtwork: boolean
 ) {
 	const { instance, container } = player;
 	const playerArtwork = showPlayButtonArtwork ? undefined : image;
@@ -62,21 +67,21 @@ function updatePlayerMetadata(
  * Renders an audio waveform visualization with play/pause controls.
  * Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props                       - Component props.
- * @param {string}   props.src                   - The audio file URL.
- * @param {string}   props.title                 - The track title.
- * @param {string}   props.artist                - The artist name.
- * @param {string}   props.image                 - The track image URL.
- * @param {string}   props.imageAlt              - The track image alt text.
- * @param {string}   props.color                 - The waveform color.
- * @param {string}   props.gradient              - The waveform gradient.
- * @param {string}   props.backgroundColor       - The waveform background color.
- * @param {string}   props.backgroundGradient    - The waveform background gradient.
- * @param {string}   props.textColor             - The player text color.
- * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} props.onEnded               - Callback when the track finishes playing.
- * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
- * @return {Element} The WaveformPlayer element.
+ * @param props                       - Component props.
+ * @param props.src                   - The audio file URL.
+ * @param props.title                 - The track title.
+ * @param props.artist                - The artist name.
+ * @param props.image                 - The track image URL.
+ * @param props.imageAlt              - The track image alt text.
+ * @param props.color                 - The waveform color.
+ * @param props.gradient              - The waveform gradient.
+ * @param props.backgroundColor       - The waveform background color.
+ * @param props.backgroundGradient    - The waveform background gradient.
+ * @param props.textColor             - The player text color.
+ * @param props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param props.onEnded               - Callback when the track finishes playing.
+ * @param props.showPlayButtonArtwork - Whether to show artwork on the play button.
+ * @return The WaveformPlayer element.
  */
 export function WaveformPlayer( {
 	src,
@@ -92,7 +97,7 @@ export function WaveformPlayer( {
 	waveformStyle,
 	onEnded,
 	showPlayButtonArtwork = false,
-} ) {
+}: WaveformPlayerProps ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
 	// includes an unstable array), which would cause useRefEffect to destroy
@@ -101,7 +106,9 @@ export function WaveformPlayer( {
 	const onEndedEvent = useEvent( onEnded );
 
 	// Ref for the WaveformPlayer instance
-	const playerRef = useRef();
+	const playerRef = useRef< InitializedWaveformPlayer | undefined >(
+		undefined
+	);
 
 	// WaveformPlayer needs an audio source on init, but the source may change
 	// throughout its lifetime.
@@ -143,14 +150,14 @@ export function WaveformPlayer( {
 		textColor,
 	] );
 
-	const ref = useRefEffect(
+	const ref = useRefEffect< HTMLDivElement >(
 		( element ) => {
 			if ( ! hasSrc ) {
 				return;
 			}
 
 			let cancelled = false;
-			let playerDestroy;
+			let playerDestroy: ( () => void ) | undefined;
 
 			function init() {
 				if ( cancelled ) {
@@ -158,7 +165,7 @@ export function WaveformPlayer( {
 				}
 				const latest = getLatestProps();
 				const player = initWaveformPlayer( element, {
-					src: latest.src,
+					src: latest.src!,
 					title: latest.title,
 					artist: latest.artist,
 					image: latest.image,
