@@ -5,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
@@ -12,8 +13,13 @@ const POPOVER_PROPS = {
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { AddSubmenuItem } = unlock( blockLibraryPrivateApis );
 
-export default function LeafMoreMenu( props ) {
+export default function LeafMoreMenu( {
+	updateExpansion,
+	setInsertedBlockClientId,
+	...props
+} ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
@@ -97,6 +103,14 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
+						<AddSubmenuItem
+							clientId={ clientId }
+							onClose={ onClose }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
 						{ attributes?.type === 'page' && attributes?.id && (
 							<MenuItem
 								onClick={ () => {
