@@ -140,6 +140,18 @@ Example:
 }
 ```
 
+#### `getItemHasChildren`: `function`
+
+A function that receives an item and returns whether it has children, or `undefined` when that is not known yet. Rows that can have children get a button that expands or collapses them. The buttons need an ungrouped table with `view.showLevels` set to true, plus `getItemParentId`, `expandedItemIds` and `onChangeExpandedItemIds`.
+
+#### `expandedItemIds`: `string[]`
+
+The ids of the expanded items in a hierarchical table. DataViews does not store them in `view`. Collapsing an item only hides its loaded descendants. They stay selected, and the Select all checkbox in the header still selects them.
+
+#### `onChangeExpandedItemIds`: `function`
+
+A function that DataViews calls with the new list of expanded ids when someone expands or collapses a row, or uses Expand all or Collapse all in the header.
+
 #### `fields`: `Object[]`
 
 The fields describe the visible items for each record in the dataset and how they behave (how to sort them, display them, etc.). See "Fields API" for a description of every property.
@@ -809,6 +821,9 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `onClickItem`
 -   `getItemLevel`
 -   `getItemParentId`
+-   `getItemHasChildren`
+-   `expandedItemIds`
+-   `onChangeExpandedItemIds`
 -   `header`
 
 ## `DataForm`

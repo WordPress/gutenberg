@@ -275,6 +275,22 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		white-space: nowrap;
 	}
 
+	.dataviews-view-table__hierarchy-cell {
+		display: flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-md);
+
+		> :last-child {
+			min-width: 0;
+		}
+	}
+
+	.dataviews-view-table__hierarchy-toggle-slot {
+		display: flex;
+		width: var(--wpds-dimension-size-md);
+		flex-shrink: 0;
+	}
+
 
 	// Density style overrides.
 	&.has-compact-density {
@@ -477,6 +493,13 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		inset-block-start: 0;
 		height: var(--wp-dataviews-table-header-height);
 		min-height: 0;
+	}
+
+	// Start at the tree header's Select all: after the row's start padding, the
+	// Expand all slot and the gap. Expand all stays uncovered.
+	&.is-hierarchy > .dataviews-bulk-actions {
+		inset-inline-start: calc(var(--wpds-dimension-padding-2xl) + var(--wpds-dimension-size-md) + var(--wpds-dimension-gap-md));
+		padding-inline-start: 0;
 	}
 
 	&.is-refreshing {

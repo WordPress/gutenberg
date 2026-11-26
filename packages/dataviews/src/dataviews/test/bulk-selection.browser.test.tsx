@@ -467,3 +467,64 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 		} )
 		.toBe( true );
 } );
+
+it( 'lines up Select all, the row checkboxes and the bulk bar checkbox in a tree', async () => {
+	type Page = { id: string; title: string; parent: string | null };
+	const renderTree = ( items: Page[] ) => (
+		<DataViews
+			data={ items }
+			fields={ [ { id: 'title', label: 'Title', type: 'text' } ] }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [],
+				showLevels: true,
+			} }
+			onChangeView={ () => {} }
+			actions={ [
+				{
+					id: 'edit',
+					label: 'Edit',
+					supportsBulk: true,
+					callback: () => {},
+				},
+			] }
+			getItemParentId={ ( item ) => item.parent }
+			getItemHasChildren={ ( item ) => item.id === '3' }
+			expandedItemIds={ [] }
+			onChangeExpandedItemIds={ () => {} }
+			paginationInfo={ { totalItems: items.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+	const leaves: Page[] = [
+		{ id: '1', title: 'First leaf', parent: null },
+		{ id: '2', title: 'Second leaf', parent: null },
+	];
+	const left = ( name: string ) =>
+		page
+			.getByRole( 'checkbox', { name, exact: true } )
+			.element()
+			.getBoundingClientRect().left;
+
+	const { rerender } = await render( renderTree( leaves ) );
+	await expect
+		.element( page.getByRole( 'button', { name: 'Expand all' } ) )
+		.not.toBeInTheDocument();
+	const start = left( 'Select all' );
+	// The header checkbox lines up with the row checkboxes.
+	expect( left( 'Select First leaf' ) ).toBe( start );
+
+	await rerender(
+		renderTree( [ ...leaves, { id: '3', title: 'Parent', parent: null } ] )
+	);
+	await expect
+		.element( page.getByRole( 'button', { name: 'Expand all' } ) )
+		.toBeVisible();
+	expect( left( 'Select all' ) ).toBe( start );
+
+	await userEvent.click(
+		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+	);
+	await expect.poll( () => left( 'Deselect all' ) ).toBe( start );
+} );
