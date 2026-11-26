@@ -527,6 +527,7 @@ function LayoutPanelPure( {
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
+		isDefaultBlockStyleState( selectedState ) &&
 		allowInheriting &&
 		( ! blockLayoutType ||
 			blockLayoutType === 'default' ||
@@ -590,11 +591,7 @@ function LayoutPanelPure( {
 	const resetInheritToggle = () => onChangeLayout( { type: 'default' } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
-	const hasInheritToggleValue = () =>
-		isViewportLayoutState
-			? ( usedLayout?.type ?? 'default' ) !==
-				( resetLayoutDefaults?.type ?? 'default' )
-			: layout?.type === 'constrained';
+	const hasInheritToggleValue = () => layout?.type === 'constrained';
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
 		( resetLayoutDefaults?.type ?? 'default' );
