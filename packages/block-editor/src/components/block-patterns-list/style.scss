@@ -41,6 +41,8 @@
 		overflow: hidden;
 		border-radius: $radius-medium;
 
+		// Drawn inside the preview, because the list scrolls and would clip
+		// anything outside it.
 		&::after {
 			outline: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 			outline-offset: -$border-width;
@@ -51,23 +53,28 @@
 		}
 	}
 
-	// Hover state
 	&:hover .block-editor-block-preview__container::after {
 		outline-color: var(--wpds-color-stroke-interactive-neutral-active);
 	}
 
-	// Selected. After hover, so hovering keeps the selected outline.
-	&.is-selected .block-editor-block-preview__container::after {
-		outline-color: var(--wpds-color-foreground-interactive-neutral);
-		outline-width: var(--wpds-border-width-focus);
-		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	// The selected and focus rings get a surface-colored band on their inner
+	// side, so they keep their contrast whatever colors the pattern uses.
+	&.is-selected,
+	&[data-focus-visible] {
+		.block-editor-block-preview__container::after {
+			outline-width: var(--wpds-border-width-focus);
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
+			box-shadow: inset 0 0 0 calc(2 * var(--wpds-border-width-focus)) var(--wpds-color-background-surface-neutral-strong);
+		}
 	}
 
-	// Focused state
+	// After hover, so hovering keeps the selected outline.
+	&.is-selected .block-editor-block-preview__container::after {
+		outline-color: var(--wpds-color-foreground-interactive-neutral);
+	}
+
 	&[data-focus-visible] .block-editor-block-preview__container::after {
 		outline-color: var(--wpds-color-stroke-focus);
-		outline-width: var(--wpds-border-width-focus);
-		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 
 	.block-editor-patterns__pattern-details:not(:empty) {

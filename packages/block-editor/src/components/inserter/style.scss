@@ -136,10 +136,6 @@ $block-inserter-tabs-height: 44px;
 	margin-top: -1px;
 }
 
-.block-editor-inserter__menu.is-bottom::after {
-	border-bottom-color: var(--wpds-color-background-surface-neutral-strong);
-}
-
 .components-popover.block-editor-inserter__popover {
 	z-index: z-index(".components-popover.block-editor-inserter__popover");
 }

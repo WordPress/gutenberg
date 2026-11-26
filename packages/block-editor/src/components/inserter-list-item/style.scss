@@ -61,13 +61,8 @@
 
 	&:not(:disabled, [aria-disabled="true"]) {
 		&:hover {
-			.block-editor-block-types-list__item-title {
-				color: var(--wpds-color-foreground-interactive-neutral-active) !important;
-			}
-
-			svg {
-				color: var(--wpds-color-foreground-interactive-neutral-active) !important;
-			}
+			// Icons with registered colors keep them.
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 
 			&::after {
 				content: "";
