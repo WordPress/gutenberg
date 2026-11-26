@@ -133,6 +133,12 @@
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
 	min-inline-size: 0;
+	/*
+	 * Nothing here is cut, so everyone can read all of it, also on a touch
+	 * screen, where a tooltip isn't available. A filename often has no
+	 * spaces, so let it, and the type taken from it, break anywhere.
+	 */
+	overflow-wrap: anywhere;
 }
 
 /*
@@ -148,14 +154,11 @@
 }
 
 /*
- * A filename is never cut, so everyone can read all of it, also on a touch
- * screen, where a tooltip isn't available. A long name wraps, and it can break
- * inside a word, because filenames often have no spaces. On a shared line, the
- * name takes the free space, so the type and size sit at the end of the row.
+ * On a shared line, the name takes the free space, so the type and size sit
+ * at the end of the row.
  */
 .name {
 	flex: 1 1 auto;
-	overflow-wrap: anywhere;
 	/*
 	 * The lines of a wrapped name sit closer to each other than to the type
 	 * and size below them, so the name reads as one item.
