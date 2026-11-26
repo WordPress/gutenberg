@@ -6,7 +6,6 @@ import { throttle } from '@wordpress/compose';
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { isDropTargetValid } from '../use-block-drop-zone';
 import type { BlockDraggableProps } from './types';
@@ -36,7 +35,7 @@ const BlockDraggable = ( {
 				getBlockName,
 				getBlockAttributes,
 				isBlockInsertionPointVisible,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
