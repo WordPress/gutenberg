@@ -419,12 +419,12 @@ function LayoutPanelPure( {
 			} = unlock( select( blockEditorStore ) );
 
 			// Hide the layout controls when the selected blocks use different
-			// layout types, as a change would apply to all of them. Controls
-			// only show when the selected blocks are all the same block type,
-			// so this block's layout support applies to each of them.
+			// layout types, as a change would apply to all of them.
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			let _hasMixedLayoutTypes = false;
 			if ( multiSelectedClientIds.includes( clientId ) ) {
+				// Controls only show when the selected blocks are the same block
+				// type, so they all have the same layout support as this block.
 				const _layoutBlockSupport = getBlockSupport(
 					blockName,
 					layoutBlockSupportKey,
