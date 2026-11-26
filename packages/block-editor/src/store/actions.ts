@@ -616,8 +616,7 @@ export const moveBlocksToPosition =
 			return;
 		}
 
-		// Reject negative or fractional indices: the index must identify a position
-		// in the destination block list after removing the moved blocks.
+		// Ensure the index is a non-negative integer when provided.
 		if (
 			index !== undefined &&
 			( ! Number.isInteger( index ) || index < 0 )
