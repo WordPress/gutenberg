@@ -216,7 +216,7 @@
 			.show-icon-labels & {
 				width: auto;
 				padding: 0 $grid-unit-15;
-				color: inherit;
+				color: var(--wpds-color-foreground-interactive-neutral);
 
 				svg {
 					display: none;
@@ -234,7 +234,7 @@
 				}
 
 				&:hover {
-					color: var(--wp-admin-theme-color);
+					color: var(--wpds-color-foreground-interactive-brand-active);
 
 					&::after {
 						background: none;

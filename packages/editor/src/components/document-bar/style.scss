@@ -22,7 +22,8 @@
 		transition: background-color 0.1s ease-out, border-color 0.1s ease-out;
 	}
 
-	&:hover {
+	&:hover,
+	&:has(.editor-document-bar__command:is(:focus-visible, :active)) {
 		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		border-color: var(--wpds-color-stroke-interactive-neutral-active);
 
