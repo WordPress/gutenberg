@@ -26,7 +26,7 @@
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
--   Inspector: Add the missing inspector group checks to the logic that shows the Styles tab ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
 
 ### Internal
 
