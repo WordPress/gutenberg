@@ -29,7 +29,7 @@ import {
 	getGridItemMeasurements,
 	getGridRectFromPixelRect,
 	getComputedCSS,
-	getGridTracks,
+	getGridTracksFromTemplate,
 	getInserterDragBlockNames,
 } from './utils';
 import { getRotatedBoundingRect } from '../../utils/rotation';
@@ -295,11 +295,11 @@ function useGridCellTiles( {
 		// The tracks shown in the visualizer, which are measured again when
 		// the grid changes size. `getGridInfo()` sets both templates from
 		// the grid's computed style.
-		const columnTracks = getGridTracks(
+		const columnTracks = getGridTracksFromTemplate(
 			String( gridInfo.style.gridTemplateColumns ?? '' ),
 			parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0
 		);
-		const rowTracks = getGridTracks(
+		const rowTracks = getGridTracksFromTemplate(
 			String( gridInfo.style.gridTemplateRows ?? '' ),
 			parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0
 		);
