@@ -14,7 +14,7 @@
 	height: 100%;
 
 	// Include custom scrollbars, invisible until hovered.
-	@include custom-scrollbars-on-hover(transparent, var(--wpds-color-background-thumb-neutral-weak));
+	@include custom-scrollbars-on-hover(transparent, var(--wpds-color-background-thumb-neutral-weak-active));
 	overflow: auto;
 
 	// Only reserve space for scrollbars when there is content to scroll.

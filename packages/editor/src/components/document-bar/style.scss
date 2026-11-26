@@ -91,8 +91,7 @@
 	z-index: 1;
 	position: absolute;
 
-	// Also on the bar's active fill.
-	&:hover,
+	// Follow the bar's active fill, which also covers hovering this button.
 	.editor-document-bar:is(:hover, :has(.editor-document-bar__command:is(:focus-visible, :active))) & {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		background-color: transparent;
