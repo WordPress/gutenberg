@@ -3,12 +3,10 @@
  * its size when a file is chosen. With one line of text, each is the same
  * height as an input. It grows when a long filename wraps.
  *
- * The drop area is a control, so it uses the neutral interactive colors, like
- * an input without a border. Its dashed border marks where a file can go.
+ * The drop area is a control, so it uses the same neutral interactive colors
+ * as an outline `Button`, with a dashed border where a file can go.
  */
 .surface {
-	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
-
 	position: relative;
 	box-sizing: border-box;
 	min-block-size: var(--wpds-dimension-size-lg);
@@ -35,6 +33,15 @@
 	padding-inline-start: var(--wpds-dimension-padding-sm);
 }
 
+/*
+ * Rows and picker buttons share their vertical padding. A picker button also
+ * declares it, so it keeps its padding outside a drop area.
+ */
+.surface,
+.choose {
+	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
+}
+
 /* The picker button fills the drop area, apart from the space the remove button takes. */
 .choose {
 	flex: 1;
@@ -50,6 +57,10 @@
 
 	&[data-disabled] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
 	}
 }
 
@@ -88,9 +99,17 @@
 	background: var(--wpds-color-background-interactive-neutral-weak-active);
 }
 
+/*
+ * `Button` stays focusable when disabled, so the browser doesn't gray it out
+ * in forced-colors mode. Do it here, as `Button` does.
+ */
 .surface:has(> .choose[data-disabled]) {
 	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 	background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+
+	@media (forced-colors: active) {
+		border-color: GrayText;
+	}
 }
 
 /* A 24px box for the add icon or the thumbnail, so both states line up. */
@@ -188,6 +207,15 @@
 
 .weak {
 	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+/* Inside a picker button, weaker text follows the button's own colors. */
+.choose .weak {
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
+}
+
+.choose[data-disabled] .weak {
+	color: inherit;
 }
 
 /*
