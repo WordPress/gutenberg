@@ -454,7 +454,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
-At most two calls upload at once; later calls wait for a free slot. Calls with `isTransportOnly` set skip that limit, because the `@wordpress/upload-media` queue making them applies its own.
+At most two calls upload at once; later calls wait for a free slot. The limit applies to calls, not files: a call with several files still uploads them in parallel. Calls with `isTransportOnly` set skip the limit, because they come from the `@wordpress/upload-media` queue, which has its own.
 
 _Parameters_
 

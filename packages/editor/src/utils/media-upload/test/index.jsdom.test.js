@@ -50,6 +50,14 @@ function finishUpload( upload ) {
 	);
 }
 
+/**
+ * Waits for the upload queue to start the calls waiting for a slot, which it
+ * does in a microtask after a slot is freed.
+ */
+function waitForQueue() {
+	return Promise.resolve();
+}
+
 describe( 'mediaUpload', () => {
 	beforeEach( () => {
 		reset();
@@ -67,12 +75,14 @@ describe( 'mediaUpload', () => {
 		} );
 	} );
 
-	afterEach( () => {
+	afterEach( async () => {
 		// The upload queue lives as long as the module, so finish every upload
 		// a test left running. Each one finished can start a waiting call,
 		// which then shows up as a further `uploadMedia()` call to finish.
+		await waitForQueue();
 		for ( let index = 0; index < uploadMedia.mock.calls.length; index++ ) {
 			finishUpload( startedUpload( index ) );
+			await waitForQueue();
 		}
 	} );
 
@@ -144,24 +154,26 @@ describe( 'mediaUpload', () => {
 			expect( uploadMedia ).toHaveBeenCalledTimes( 2 );
 		} );
 
-		it( 'starts waiting calls in order as uploads finish', () => {
+		it( 'starts waiting calls in order as uploads finish', async () => {
 			mediaUpload( { filesList: [ file( 'a.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'b.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'c.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'd.png' ) ] } );
 
 			finishUpload( startedUpload( 1 ) );
+			await waitForQueue();
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 3 );
 			expect( startedUpload( 2 ).filesList[ 0 ].name ).toBe( 'c.png' );
 
 			finishUpload( startedUpload( 0 ) );
+			await waitForQueue();
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 4 );
 			expect( startedUpload( 3 ).filesList[ 0 ].name ).toBe( 'd.png' );
 		} );
 
-		it( 'keeps later calls waiting until every file of a mixed batch has uploaded or failed', () => {
+		it( 'keeps later calls waiting until every file of a mixed batch has uploaded or failed', async () => {
 			mediaUpload( {
 				filesList: [
 					file( 'a.png' ),
@@ -175,20 +187,23 @@ describe( 'mediaUpload', () => {
 
 			batch.onError( { message: 'a.png failed' } );
 			batch.onFileChange( [ { id: 1 } ] );
+			await waitForQueue();
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 2 );
 
 			batch.onFileChange( [ { id: 1 }, { id: 2 } ] );
+			await waitForQueue();
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 3 );
 		} );
 
-		it( 'does not count a file still showing its temporary blob URL as uploaded', () => {
+		it( 'does not count a file still showing its temporary blob URL as uploaded', async () => {
 			mediaUpload( { filesList: [ file( 'a.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'b.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'c.png' ) ] } );
 
 			startedUpload( 0 ).onFileChange( [ { url: 'blob:a' } ] );
+			await waitForQueue();
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 2 );
 		} );
@@ -269,19 +284,40 @@ describe( 'mediaUpload', () => {
 			);
 		} );
 
-		it( 'starts waiting calls after an upload throws', () => {
+		it( 'starts a waiting call only after the callbacks of the call that freed its slot have run', async () => {
+			const events = [];
+			mediaUpload( {
+				filesList: [ file( 'a.png' ) ],
+				onFileChange: () => events.push( 'a.png finished' ),
+			} );
+			mediaUpload( { filesList: [ file( 'b.png' ) ] } );
+			mediaUpload( { filesList: [ file( 'c.png' ) ] } );
+			uploadMedia.mockImplementationOnce( () =>
+				events.push( 'c.png started' )
+			);
+
+			finishUpload( startedUpload( 0 ) );
+			await waitForQueue();
+
+			expect( events ).toEqual( [ 'a.png finished', 'c.png started' ] );
+		} );
+
+		it( 'throws an upload error to the caller of a call that starts right away, and frees its slot', () => {
 			uploadMedia.mockImplementationOnce( () => {
 				throw new Error( 'Unexpected failure' );
 			} );
 
-			mediaUpload( { filesList: [ file( 'a.png' ) ] } );
+			expect( () =>
+				mediaUpload( { filesList: [ file( 'a.png' ) ] } )
+			).toThrow( 'Unexpected failure' );
+
 			mediaUpload( { filesList: [ file( 'b.png' ) ] } );
 			mediaUpload( { filesList: [ file( 'c.png' ) ] } );
 
 			expect( uploadMedia ).toHaveBeenCalledTimes( 3 );
 		} );
 
-		it( 'reports an upload that throws once started from the queue as an error of its own call', () => {
+		it( 'reports an error thrown by a call started from the queue through its own onError', async () => {
 			const onError = vi.fn();
 			const onWaitingCallError = vi.fn();
 			mediaUpload( { filesList: [ file( 'a.png' ) ], onError } );
@@ -290,15 +326,21 @@ describe( 'mediaUpload', () => {
 				filesList: [ file( 'c.png' ) ],
 				onError: onWaitingCallError,
 			} );
+			mediaUpload( { filesList: [ file( 'd.png' ) ] } );
 			uploadMedia.mockImplementationOnce( () => {
 				throw new Error( 'Unexpected failure' );
 			} );
 
-			expect( () => finishUpload( startedUpload( 0 ) ) ).not.toThrow();
+			finishUpload( startedUpload( 0 ) );
+			await waitForQueue();
+
 			expect( onError ).not.toHaveBeenCalled();
 			expect( onWaitingCallError ).toHaveBeenCalledWith(
 				'Unexpected failure'
 			);
+			// The failed call frees its slot, so the next one starts.
+			expect( uploadMedia ).toHaveBeenCalledTimes( 4 );
+			expect( startedUpload( 3 ).filesList[ 0 ].name ).toBe( 'd.png' );
 			expect( getState() ).toEqual(
 				expect.objectContaining( { completed: 2 } )
 			);
@@ -317,8 +359,9 @@ describe( 'mediaUpload', () => {
 				throw new Error( 'Unexpected failure' );
 			} );
 
-			mediaUpload( { filesList: [ file( 'a.png' ) ] } );
-
+			expect( () =>
+				mediaUpload( { filesList: [ file( 'a.png' ) ] } )
+			).toThrow( 'Unexpected failure' );
 			expect( unlockPostSaving ).toHaveBeenCalled();
 		} );
 	} );

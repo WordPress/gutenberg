@@ -22,9 +22,8 @@ const noop = () => {};
  * every image sub-size, which can exhaust a small pool of PHP workers and fail
  * with 502 errors (see gutenberg#87191).
  *
- * Matches `DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING` in `@wordpress/upload-media`,
- * which is internal to that package's store and not exported. Two rather than
- * one, so that one large file does not hold up every upload queued behind it.
+ * Two keeps that load low on small hosts, while one large file does not hold
+ * up every upload queued behind it, as it would with a limit of one.
  */
 const MAX_CONCURRENT_UPLOADS = 2;
 
@@ -34,9 +33,10 @@ const enqueueUpload = createUploadQueue( MAX_CONCURRENT_UPLOADS );
  * Upload a media file when the file upload button is activated.
  * Wrapper around uploadMedia() that injects the current post ID.
  *
- * At most two calls upload at once; later calls wait for a free slot. Calls
- * with `isTransportOnly` set skip that limit, because the
- * `@wordpress/upload-media` queue making them applies its own.
+ * At most two calls upload at once; later calls wait for a free slot. The
+ * limit applies to calls, not files: a call with several files still uploads
+ * them in parallel. Calls with `isTransportOnly` set skip the limit, because
+ * they come from the `@wordpress/upload-media` queue, which has its own.
  *
  * @param {Object}   $0                   Parameters object passed to the function.
  * @param {?Object}  $0.additionalData    Additional data to include in the request.
@@ -124,6 +124,10 @@ export default function mediaUpload( {
 	}
 	let lastCompletedCount = 0;
 
+	// Whether the upload starts during this `mediaUpload()` call, rather than
+	// later, once a slot is free.
+	let isStartingInCall = true;
+
 	/**
 	 * Sends the files to the server.
 	 *
@@ -153,7 +157,8 @@ export default function mediaUpload( {
 					const entityFiles = files.filter( ( _file ) => _file?.id );
 
 					// Settled before any callback runs, so a callback that
-					// throws cannot keep the slot held.
+					// throws cannot keep the slot held. The queue starts the
+					// next call only after this callback has returned.
 					settledCompletedCount = Math.max(
 						settledCompletedCount,
 						entityFiles.length
@@ -219,10 +224,8 @@ export default function mediaUpload( {
 				throw error;
 			}
 
-			// A queued call can start from inside another call's callback,
-			// where a throw would surface as an error of that other upload.
-			// So the call is failed here instead: every file it has not yet
-			// settled counts as failed, and its slot and save lock are freed.
+			// Every file the call has not yet settled counts as failed, and its
+			// slot and save lock are freed, so that later calls still start.
 			const unsettledCount =
 				filesList.length - settledCompletedCount - failedCount;
 			failedCount = filesList.length;
@@ -230,6 +233,13 @@ export default function mediaUpload( {
 			clearSaveLock();
 			if ( unsettledCount > 0 ) {
 				trackFailure( unsettledCount );
+			}
+
+			// An upload that starts during the `mediaUpload()` call throws to
+			// its caller. One that started later, once a slot was free, has no
+			// caller left to throw to, so it reports the error instead.
+			if ( isStartingInCall ) {
+				throw error;
 			}
 			onError(
 				typeof error?.message === 'string' && error.message
@@ -246,6 +256,10 @@ export default function mediaUpload( {
 	if ( isTransportOnly ) {
 		startUpload();
 	} else {
-		enqueueUpload( startUpload );
+		try {
+			enqueueUpload( startUpload );
+		} finally {
+			isStartingInCall = false;
+		}
 	}
 }
