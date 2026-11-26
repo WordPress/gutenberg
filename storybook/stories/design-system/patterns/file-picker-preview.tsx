@@ -49,23 +49,20 @@ export function useSnackbars() {
  * @param file The chosen file.
  */
 export async function importPattern( file: File ) {
-	const [ data ] = await Promise.all( [
-		file.text().then( ( text ) => {
-			try {
-				return JSON.parse( text );
-			} catch {
-				return null;
-			}
-		} ),
+	const [ text ] = await Promise.all( [
+		file.text(),
 		new Promise( ( resolve ) => setTimeout( resolve, 1500 ) ),
 	] );
-	// Check the fields the Patterns screen requires before it saves a pattern.
+	// `JSON.parse()` throws for a file that isn't JSON. Then check the fields
+	// like the Patterns screen does before it saves a pattern.
+	const data = JSON.parse( text );
 	if (
 		data?.__file !== 'wp_block' ||
 		typeof data.title !== 'string' ||
 		typeof data.content !== 'string' ||
 		! data.title ||
-		! data.content
+		! data.content ||
+		( data.syncStatus && typeof data.syncStatus !== 'string' )
 	) {
 		throw new Error( 'Not a pattern file.' );
 	}
