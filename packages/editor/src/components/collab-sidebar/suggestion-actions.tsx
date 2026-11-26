@@ -507,13 +507,16 @@ export function SuggestionActionButtons( {
  * @param props            Props.
  * @param props.thread     The note thread.
  * @param props.operations Suggestion operations.
+ * @param props.blockName  Name of the block the suggestion changes.
  */
 function ResolvedSuggestionSummary( {
 	thread,
 	operations,
+	blockName,
 }: {
 	thread: any;
 	operations: any[];
+	blockName?: string;
 } ) {
 	// Select only the marker texts: `useSelect` compares arrays element by
 	// element, so strings stay equal across unrelated store updates where
@@ -635,7 +638,12 @@ function ResolvedSuggestionSummary( {
 		[ operations, markerTexts, blockTexts ]
 	);
 
-	return <SuggestionSummary operations={ resolvedOperations } />;
+	return (
+		<SuggestionSummary
+			operations={ resolvedOperations }
+			blockName={ blockName }
+		/>
+	);
 }
 
 /**
@@ -759,6 +767,7 @@ export default function SuggestionActions( {
 			<ResolvedSuggestionSummary
 				thread={ thread }
 				operations={ payload.operations }
+				blockName={ payload.blockName }
 			/>
 			{ ! isResolved && <SuggestionSizeNotice thread={ thread } /> }
 			{ contextLines.map( ( line ) => (
