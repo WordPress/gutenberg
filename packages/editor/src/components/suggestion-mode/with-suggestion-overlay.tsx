@@ -25,6 +25,7 @@
  * #73411 for the marker migration.
  */
 import clsx from 'clsx';
+import { getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -82,6 +83,44 @@ function isStringLike( value: any ): boolean {
 		typeof value.toString === 'function' &&
 		value.toString !== Object.prototype.toString
 	);
+}
+
+/**
+ * The rich text an edit changes: a block's `content`, or any attribute its
+ * type declares as rich text (an image caption, a quote citation).
+ *
+ * @param blockName      Block name.
+ * @param nextAttributes Attributes the block is trying to set.
+ * @param prevAttributes The block's current attributes.
+ * @return The attribute with its value before and after, or null.
+ */
+function findRichTextEdit(
+	blockName: string,
+	nextAttributes: Record< string, any > | null | undefined,
+	prevAttributes: Record< string, any > | null | undefined
+): { attributeKey: string; prevContent: any; nextContent: any } | null {
+	const definitions: Record< string, any > | undefined =
+		getBlockType( blockName )?.attributes;
+	for ( const attributeKey of Object.keys( nextAttributes ?? {} ) ) {
+		const definition = definitions?.[ attributeKey ];
+		if (
+			attributeKey !== 'content' &&
+			definition?.type !== 'rich-text' &&
+			definition?.source !== 'rich-text'
+		) {
+			continue;
+		}
+		const prevContent = prevAttributes?.[ attributeKey ];
+		const nextContent = nextAttributes?.[ attributeKey ];
+		if (
+			isStringLike( prevContent ) &&
+			isStringLike( nextContent ) &&
+			String( prevContent ) !== String( nextContent )
+		) {
+			return { attributeKey, prevContent, nextContent };
+		}
+	}
+	return null;
 }
 
 /**
@@ -220,7 +259,7 @@ function SuggestingBlockEdit( {
 	// text unchanged) and hand it to the single-mount format handler, which
 	// creates the note and writes a `format` marker to the live block instead
 	// of routing the edit into the overlay diff. A format toggle arrives here
-	// as a fresh `content` value with no earlier DOM event to intercept
+	// as a fresh rich text value with no earlier DOM event to intercept
 	// (unlike typing, which the addition keyboard catches on `beforeinput`),
 	// so this per-block `setAttributes` seam is the one point that covers every
 	// source — toolbar button, keyboard shortcut, and the link popover alike.
@@ -232,23 +271,15 @@ function SuggestingBlockEdit( {
 			nextAttributes: Record< string, any >,
 			prevAttributes: Record< string, any > | null | undefined
 		) => {
-			if (
-				! nextAttributes ||
-				! Object.prototype.hasOwnProperty.call(
-					nextAttributes,
-					'content'
-				)
-			) {
+			const edit = findRichTextEdit(
+				name,
+				nextAttributes,
+				prevAttributes
+			);
+			if ( ! edit ) {
 				return false;
 			}
-			const prevContent = prevAttributes?.content;
-			const nextContent = nextAttributes.content;
-			if (
-				! isStringLike( prevContent ) ||
-				! isStringLike( nextContent )
-			) {
-				return false;
-			}
+			const { attributeKey, prevContent, nextContent } = edit;
 			// `authorId` lets the planner recognise the suggester's own
 			// pending `format` marker on the run and extend it instead of
 			// opening a second suggestion over the same words.
@@ -264,6 +295,7 @@ function SuggestingBlockEdit( {
 			return requestFormatSuggestion( {
 				clientId,
 				blockName: name,
+				attributeKey,
 				prevContent,
 				nextContent,
 				plan,
@@ -272,7 +304,7 @@ function SuggestingBlockEdit( {
 		[ clientId, name, authorId, requestFormatSuggestion ]
 	);
 
-	// Detect a text edit that reaches the block as a whole new `content` value
+	// Detect a text edit that reaches the block as a whole new rich text value
 	// with no `beforeinput` for the typing/deletion keyboards to catch (a
 	// committed IME composition, autocorrect, drag-drop, multi-line paste) and
 	// hand it to the single-mount content reconciler, which turns it into inline
@@ -288,23 +320,15 @@ function SuggestingBlockEdit( {
 			nextAttributes: Record< string, any >,
 			prevAttributes: Record< string, any > | null | undefined
 		) => {
-			if (
-				! nextAttributes ||
-				! Object.prototype.hasOwnProperty.call(
-					nextAttributes,
-					'content'
-				)
-			) {
+			const edit = findRichTextEdit(
+				name,
+				nextAttributes,
+				prevAttributes
+			);
+			if ( ! edit ) {
 				return false;
 			}
-			const prevContent = prevAttributes?.content;
-			const nextContent = nextAttributes.content;
-			if (
-				! isStringLike( prevContent ) ||
-				! isStringLike( nextContent )
-			) {
-				return false;
-			}
+			const { attributeKey, prevContent, nextContent } = edit;
 			const plan = planEditMarkers( prevContent, nextContent, {
 				authorId,
 			} );
@@ -330,6 +354,7 @@ function SuggestingBlockEdit( {
 			return requestContentSuggestion( {
 				clientId,
 				blockName: name,
+				attributeKey,
 				prevContent,
 				plan,
 			} );

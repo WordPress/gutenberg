@@ -148,17 +148,17 @@ export default function SuggestionFormatKeyboard() {
 	 * never changes the text, so the DOM offsets map 1:1 onto the marked value.
 	 */
 	const writeContent = useCallback(
-		( clientId: string, content: any ) => {
+		( clientId: string, attributeKey: string, content: any ) => {
 			const liveSelection = readLiveInlineSelection(
 				clientId,
-				'content'
+				attributeKey
 			);
 			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, { content } );
+			updateBlockAttributes( clientId, { [ attributeKey ]: content } );
 			if ( liveSelection ) {
 				selectionChange(
 					clientId,
-					'content',
+					attributeKey,
 					liveSelection.start,
 					liveSelection.end
 				);
@@ -181,12 +181,14 @@ export default function SuggestionFormatKeyboard() {
 		async ( {
 			clientId,
 			blockName,
+			attributeKey = 'content',
 			prevContent,
 			nextContent,
 			plan,
 		}: {
 			clientId: string;
 			blockName: string;
+			attributeKey?: string;
 			prevContent: any;
 			nextContent: any;
 			plan: FormatPlan;
@@ -195,8 +197,9 @@ export default function SuggestionFormatKeyboard() {
 			// Only plans naming an existing marker are routed here.
 			const commentId = plan.extendsId!;
 			const stale = () =>
-				contentKey( getBlockAttributes( clientId )?.content ) !==
-				snapshotKey;
+				contentKey(
+					getBlockAttributes( clientId )?.[ attributeKey ]
+				) !== snapshotKey;
 			if ( stale() ) {
 				notifyDropped();
 				return;
@@ -290,7 +293,7 @@ export default function SuggestionFormatKeyboard() {
 						notifyDropped();
 						return;
 					}
-					writeContent( clientId, restored );
+					writeContent( clientId, attributeKey, restored );
 					await cleanupAbandonedNotes( clientId, [ commentId ] );
 					return;
 				}
@@ -300,7 +303,7 @@ export default function SuggestionFormatKeyboard() {
 					operations: [
 						{
 							type: INLINE_OP_TYPE,
-							attribute: 'content',
+							attribute: attributeKey,
 							suggestionType: SUGGESTION_TYPE_FORMAT,
 							beforeHTML,
 							afterHTML: plan.afterHTML,
@@ -314,7 +317,7 @@ export default function SuggestionFormatKeyboard() {
 					notifyDropped();
 					return;
 				}
-				writeContent( clientId, proposed );
+				writeContent( clientId, attributeKey, proposed );
 				if ( keepForReplies ) {
 					notifyKept();
 				}
@@ -339,18 +342,25 @@ export default function SuggestionFormatKeyboard() {
 	// The queued task: open the format note, then re-validate and write.
 	const runFormatEdit = useCallback(
 		async ( request: any ) => {
-			const { clientId, blockName, prevContent, nextContent, plan } =
-				request;
+			const {
+				clientId,
+				blockName,
+				attributeKey = 'content',
+				prevContent,
+				nextContent,
+				plan,
+			} = request;
 			// A change no suggestion records is written as it is.
 			if ( plan.kind === 'unrecorded' ) {
 				if (
-					contentKey( getBlockAttributes( clientId )?.content ) !==
-					contentKey( prevContent )
+					contentKey(
+						getBlockAttributes( clientId )?.[ attributeKey ]
+					) !== contentKey( prevContent )
 				) {
 					notifyDropped();
 					return;
 				}
-				writeContent( clientId, nextContent );
+				writeContent( clientId, attributeKey, nextContent );
 				return;
 			}
 			// A plan naming an existing marker revises that suggestion instead
@@ -366,8 +376,9 @@ export default function SuggestionFormatKeyboard() {
 			 * abandon before creating a note.
 			 */
 			if (
-				contentKey( getBlockAttributes( clientId )?.content ) !==
-				snapshotKey
+				contentKey(
+					getBlockAttributes( clientId )?.[ attributeKey ]
+				) !== snapshotKey
 			) {
 				notifyDropped();
 				return;
@@ -380,7 +391,7 @@ export default function SuggestionFormatKeyboard() {
 					operations: [
 						{
 							type: INLINE_OP_TYPE,
-							attribute: 'content',
+							attribute: attributeKey,
 							suggestionType: SUGGESTION_TYPE_FORMAT,
 							beforeHTML: plan.beforeHTML,
 							afterHTML: plan.afterHTML,
@@ -400,8 +411,9 @@ export default function SuggestionFormatKeyboard() {
 				 * clobber whatever landed in between — abandon instead.
 				 */
 				if (
-					contentKey( getBlockAttributes( clientId )?.content ) !==
-					snapshotKey
+					contentKey(
+						getBlockAttributes( clientId )?.[ attributeKey ]
+					) !== snapshotKey
 				) {
 					await cleanupAbandonedNotes( clientId, [ id ] );
 					notifyDropped();
@@ -409,6 +421,7 @@ export default function SuggestionFormatKeyboard() {
 				}
 				writeContent(
 					clientId,
+					attributeKey,
 					applyFormatPlan( nextContent, plan, { id, authorId } )
 				);
 			} catch {

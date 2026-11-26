@@ -100,11 +100,13 @@ export default function SuggestionContentReconciler() {
 		async ( {
 			clientId,
 			blockName,
+			attributeKey = 'content',
 			prevContent,
 			plan,
 		}: {
 			clientId: string;
 			blockName: string;
+			attributeKey?: string;
 			prevContent: any;
 			plan: { actions: MarkerAction[] };
 		} ) => {
@@ -116,8 +118,9 @@ export default function SuggestionContentReconciler() {
 			 * abandon before creating any notes.
 			 */
 			if (
-				contentKey( getBlockAttributes( clientId )?.content ) !==
-				snapshotKey
+				contentKey(
+					getBlockAttributes( clientId )?.[ attributeKey ]
+				) !== snapshotKey
 			) {
 				notifyDropped();
 				return;
@@ -142,7 +145,7 @@ export default function SuggestionContentReconciler() {
 						operations: [
 							{
 								type: INLINE_OP_TYPE,
-								attribute: 'content',
+								attribute: attributeKey,
 								suggestionType,
 							},
 						],
@@ -165,8 +168,9 @@ export default function SuggestionContentReconciler() {
 				 * would clobber those changes — abandon instead.
 				 */
 				if (
-					contentKey( getBlockAttributes( clientId )?.content ) !==
-					snapshotKey
+					contentKey(
+						getBlockAttributes( clientId )?.[ attributeKey ]
+					) !== snapshotKey
 				) {
 					await cleanupAbandonedNotes( clientId, ids );
 					notifyDropped();
@@ -177,7 +181,9 @@ export default function SuggestionContentReconciler() {
 					ids,
 				} );
 				requestInterceptorBypass( clientId );
-				updateBlockAttributes( clientId, { content: marked } );
+				updateBlockAttributes( clientId, {
+					[ attributeKey ]: marked,
+				} );
 			} catch {
 				// `createSuggestion` surfaces its own error notice; trash any
 				// notes created before the failure so none are orphaned.
