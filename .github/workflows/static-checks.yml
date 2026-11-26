@@ -145,6 +145,9 @@ jobs:
             - name: Validate package contents
               run: npm run lint:package-contents
 
+            - name: Check block-library frontend styles for admin design tokens
+              run: npm run lint:block-library-frontend-styles
+
             - name: Audit published dependencies
               if: ${{ matrix.annotations }}
               run: npm run lint:published-deps -- --fail-unused-ignores
