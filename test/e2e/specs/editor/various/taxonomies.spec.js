@@ -337,6 +337,56 @@ test.describe( 'Taxonomies', () => {
 		expect( post.tags ).toHaveLength( 2 );
 	} );
 
+	test( 'should not allow publishing until every new tag is assigned', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+
+		const firstTagName = 'tag-a-' + generateRandomNumber();
+		const secondTagName = 'tag-b-' + generateRandomNumber();
+		const tagNames = `${ firstTagName }, ${ secondTagName }`;
+
+		// Hold the second create so it's still in flight
+		// after the first is assigned.
+		const heldCreateRequest = defer();
+		await routeTagCreateRequests( page, async ( route ) => {
+			if ( route.request().postDataJSON()?.name === secondTagName ) {
+				await heldCreateRequest;
+			}
+			await route.continue();
+		} );
+
+		await page
+			.getByRole( 'combobox', { name: 'Add tag' } )
+			.fill( tagNames );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagNames }` } )
+			.click();
+
+		const publishButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
+
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 1 );
+		await expect( publishButton ).toBeDisabled();
+
+		heldCreateRequest.resolve();
+
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
+
+		const postId = await editor.publishPost();
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.tags ).toHaveLength( 2 );
+	} );
+
 	test( 'should create a tag when pressing Enter', async ( { page } ) => {
 		await openTaxonomyPanel( page, 'Tags' );
 
