@@ -46,6 +46,7 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getCellRowspan,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -249,7 +250,13 @@ function TableEdit( {
 		}
 
 		const { sectionName, rowIndex } = selectedCell;
-		const newRowIndex = rowIndex + delta;
+
+		// Insert after all the rows the selected cell covers, so that a row
+		// inserted after a cell with rowspan lands outside of its span.
+		const newRowIndex =
+			delta > 0
+				? rowIndex + getCellRowspan( attributes, selectedCell )
+				: rowIndex;
 
 		setAttributes(
 			insertRow( attributes, {
@@ -304,7 +311,7 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
 		const newColumnIndex = columnIndex + delta;
 
 		setAttributes(
@@ -312,9 +319,10 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column.
+		// Select the cell in the new column.
 		setSelectedCell( {
-			rowIndex: 0,
+			sectionName,
+			rowIndex,
 			columnIndex: newColumnIndex,
 			type: 'cell',
 		} );

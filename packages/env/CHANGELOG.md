@@ -6,6 +6,10 @@
 
 -   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Bug Fixes

@@ -29,7 +29,10 @@ export default function SidebarHeader() {
 	}
 
 	return (
-		<Tabs.List activateOnFocus={ false }>
+		<Tabs.List
+			className="editor-sidebar__panel-tablist"
+			activateOnFocus={ false }
+		>
 			<Tabs.Tab value={ sidebars.document }>{ documentLabel }</Tabs.Tab>
 			<Tabs.Tab value={ sidebars.block }>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }

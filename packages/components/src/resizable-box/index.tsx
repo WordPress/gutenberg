@@ -1,9 +1,21 @@
-import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import {
+	forwardRef,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import clsx from 'clsx';
-import { Resizable } from 're-resizable';
-import type { ResizableProps } from 're-resizable';
-import type { ForwardedRef } from 'react';
+import type { Resizable, ResizableProps } from 're-resizable';
+import type { ForwardedRef, RefObject } from 'react';
 import ResizeTooltip from './resize-tooltip';
+import { TransformAwareResizable } from './transform-aware-resizable';
+import {
+	getViewportVectorTransform,
+	getTransformedHandleStyles,
+} from './utils';
+import type { LinearTransform } from './utils';
 
 const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
 const SIDE_HANDLE_CLASS_NAME = 'components-resizable-box__side-handle';
@@ -78,6 +90,58 @@ const HANDLE_STYLES = {
 	bottomLeft: HANDLE_STYLES_OVERRIDES,
 };
 
+function isSameTransform( m: LinearTransform, n: LinearTransform ) {
+	return (
+		Math.abs( m.a - n.a ) < 1e-6 &&
+		Math.abs( m.b - n.b ) < 1e-6 &&
+		Math.abs( m.c - n.c ) < 1e-6 &&
+		Math.abs( m.d - n.d ) < 1e-6
+	);
+}
+
+function useHandleStyles(
+	resizableRef: RefObject< Resizable | null >,
+	showHandle: boolean
+) {
+	const [ matrix, setMatrix ] = useState< LinearTransform >( {
+		a: 1,
+		b: 0,
+		c: 0,
+		d: 1,
+	} );
+	// A transform is a style, not a prop, so read it after every render.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useLayoutEffect( () => {
+		// Consumers re-render on every move during a drag.
+		if ( ! showHandle || resizableRef.current?.state.isResizing ) {
+			return;
+		}
+		const element = resizableRef.current?.resizable;
+		if ( ! element ) {
+			return;
+		}
+		const next = getViewportVectorTransform( element );
+		setMatrix( ( current ) =>
+			isSameTransform( current, next ) ? current : next
+		);
+	} );
+	return useMemo( () => {
+		const transformed = getTransformedHandleStyles( matrix );
+		if ( ! transformed ) {
+			return HANDLE_STYLES;
+		}
+		return Object.fromEntries(
+			Object.entries( HANDLE_STYLES ).map( ( [ direction, style ] ) => [
+				direction,
+				{
+					...style,
+					...transformed[ direction as keyof typeof transformed ],
+				},
+			] )
+		);
+	}, [ matrix ] );
+}
+
 type ResizableBoxProps = ResizableProps & {
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;
@@ -95,8 +159,11 @@ function UnforwardedResizableBox(
 	}: ResizableBoxProps,
 	ref: ForwardedRef< Resizable >
 ) {
+	const resizableRef = useRef< Resizable >( null );
+	const mergedRef = useMergeRefs( [ ref, resizableRef ] );
+	const handleStyles = useHandleStyles( resizableRef, showHandle );
 	return (
-		<Resizable
+		<TransformAwareResizable
 			className={ clsx(
 				'components-resizable-box__container',
 				showHandle && 'has-show-handle',
@@ -113,13 +180,13 @@ function UnforwardedResizableBox(
 				] )
 			) }
 			handleClasses={ HANDLE_CLASSES }
-			handleStyles={ HANDLE_STYLES }
-			ref={ ref }
+			handleStyles={ handleStyles }
+			ref={ mergedRef }
 			{ ...props }
 		>
 			{ children }
 			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
-		</Resizable>
+		</TransformAwareResizable>
 	);
 }
 
