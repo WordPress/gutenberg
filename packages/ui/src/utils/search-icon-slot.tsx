@@ -1,7 +1,7 @@
 import { search } from '@wordpress/icons';
-import { Icon } from '../../../icon';
-import { InputLayout } from '../input-layout';
-import styles from './style.module.css';
+import { Icon } from '../icon';
+import { InputLayout } from '../form/primitives/input-layout';
+import styles from './css/search-icon-slot.module.css';
 
 export function SearchIconSlot() {
 	return (

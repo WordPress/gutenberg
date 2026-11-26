@@ -79,13 +79,13 @@ describe( 'SearchInput', () => {
 		[ 'Uncontrolled', SearchInput ],
 		[ 'Controlled', ControlledSearchInput ],
 	] )( '%s mode', ( _, Component ) => {
-		it( 'resets the value and focuses the field', async () => {
+		it( 'clears the value and focuses the field', async () => {
 			const onValueChange = vi.fn();
 			await render( <Component onValueChange={ onValueChange } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
 			expect(
-				screen.queryByRole( 'button', { name: 'Reset search' } )
+				screen.queryByRole( 'button', { name: 'Clear search' } )
 			).not.toBeInTheDocument();
 
 			await userEvent.type( searchInput, 'test' );
@@ -95,7 +95,7 @@ describe( 'SearchInput', () => {
 			);
 
 			await userEvent.click(
-				screen.getByRole( 'button', { name: 'Reset search' } )
+				screen.getByRole( 'button', { name: 'Clear search' } )
 			);
 			expect( searchInput ).toHaveValue( '' );
 			expect( searchInput ).toHaveFocus();
@@ -104,16 +104,16 @@ describe( 'SearchInput', () => {
 				expect.anything()
 			);
 			expect(
-				screen.queryByRole( 'button', { name: 'Reset search' } )
+				screen.queryByRole( 'button', { name: 'Clear search' } )
 			).not.toBeInTheDocument();
 		} );
 	} );
 
-	it( 'shows the reset button for an initial value', async () => {
+	it( 'shows the clear button for an initial value', async () => {
 		await render( <SearchInput defaultValue="test" /> );
 
 		expect(
-			screen.getByRole( 'button', { name: 'Reset search' } )
+			screen.getByRole( 'button', { name: 'Clear search' } )
 		).toBeVisible();
 	} );
 
@@ -124,7 +124,7 @@ describe( 'SearchInput', () => {
 		);
 
 		await userEvent.click(
-			screen.getByRole( 'button', { name: 'Reset search' } )
+			screen.getByRole( 'button', { name: 'Clear search' } )
 		);
 
 		expect( onValueChange ).toHaveBeenLastCalledWith(
@@ -134,7 +134,7 @@ describe( 'SearchInput', () => {
 		expect( screen.getByRole( 'searchbox' ) ).toHaveValue( 'test' );
 	} );
 
-	it( 'updates the reset button after a form reset', async () => {
+	it( 'updates the clear button after a form reset', async () => {
 		await render(
 			<form aria-label="Search form">
 				<SearchInput defaultValue="test" />
@@ -144,14 +144,14 @@ describe( 'SearchInput', () => {
 		const searchInput = screen.getByRole( 'searchbox' );
 		await userEvent.clear( searchInput );
 		expect(
-			screen.queryByRole( 'button', { name: 'Reset search' } )
+			screen.queryByRole( 'button', { name: 'Clear search' } )
 		).not.toBeInTheDocument();
 
 		( screen.getByRole( 'form' ) as HTMLFormElement ).reset();
 
 		await waitFor( () =>
 			expect(
-				screen.getByRole( 'button', { name: 'Reset search' } )
+				screen.getByRole( 'button', { name: 'Clear search' } )
 			).toBeVisible()
 		);
 		expect( searchInput ).toHaveValue( 'test' );
@@ -168,11 +168,11 @@ describe( 'SearchInput', () => {
 				</Field.Root>
 			),
 		],
-	] )( 'hides the reset button when %s', async ( _, renderElement ) => {
+	] )( 'hides the clear button when %s', async ( _, renderElement ) => {
 		await render( renderElement() );
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Reset search' } )
+			screen.queryByRole( 'button', { name: 'Clear search' } )
 		).not.toBeInTheDocument();
 	} );
 } );

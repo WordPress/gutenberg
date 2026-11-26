@@ -1,12 +1,6 @@
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
-	@layer components {
-		.search-icon:dir(ltr) {
-			transform: scaleX(-1);
-		}
-	}
-
 	@layer compositions {
 		.search-input input {
 			&::-webkit-search-cancel-button,
@@ -16,7 +10,7 @@
 		}
 
 		/* Also covers a field disabled through `Field.Root`. */
-		.search-input:has(input:is(:disabled, :read-only)) .reset-slot {
+		.search-input:has(input:is(:disabled, :read-only)) .clear-slot {
 			display: none;
 		}
 	}

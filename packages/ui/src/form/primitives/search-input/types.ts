@@ -2,18 +2,8 @@ import type { InputProps } from '../input/types';
 
 export type SearchInputProps = Omit<
 	InputProps,
-	'type' | 'prefix' | 'suffix' | 'value' | 'defaultValue'
+	'type' | 'prefix' | 'suffix'
 > & {
-	/**
-	 * The value of the search field (controlled).
-	 *
-	 * To render an uncontrolled component, use the `defaultValue` prop instead.
-	 */
-	value?: string;
-	/**
-	 * The initial value of the search field (uncontrolled).
-	 */
-	defaultValue?: string;
 	/**
 	 * The accessible name of the search field.
 	 *
