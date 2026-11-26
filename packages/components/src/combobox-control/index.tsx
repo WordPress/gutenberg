@@ -183,8 +183,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		setIsExpanded( true );
 	};
 
-	const isSuggestionsListVisible = isExpanded && ! isLoading;
-
 	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
 		withIgnoreIMEEvents( ( event ) => {
 			let preventDefault = false;
@@ -316,6 +314,8 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
+
+	const isSuggestionsListVisible = isExpanded && ! isLoading;
 
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
