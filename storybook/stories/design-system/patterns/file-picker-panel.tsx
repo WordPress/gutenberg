@@ -34,14 +34,12 @@ export function FilePickerPanel() {
 			FONT_EXTENSIONS.includes( getExtension( file.name ).toLowerCase() );
 		const fonts = files.filter( isFont );
 		const rejected = files.filter( ( file ) => ! isFont( file ) );
-		setEntries( ( current ) => [
-			...current,
-			...fonts.map( ( file ) => ( {
-				id: createId(),
-				file,
-				removeRef: createRef< HTMLButtonElement >(),
-			} ) ),
-		] );
+		const added = fonts.map( ( file ) => ( {
+			id: createId(),
+			file,
+			removeRef: createRef< HTMLButtonElement >(),
+		} ) );
+		setEntries( ( current ) => [ ...current, ...added ] );
 		setError(
 			rejected.length
 				? `Couldn’t add ${ rejected
