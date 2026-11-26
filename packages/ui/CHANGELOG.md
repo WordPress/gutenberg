@@ -27,7 +27,7 @@
 
 ### Documentation
 
--   `CollapsibleCard.Header`: Recommend `role="heading"` and `aria-level` to expose the header as a heading, instead of rendering it as a native `<h1>`–`<h6>` element, which can't contain the `<div>` trigger.
+-   `CollapsibleCard.Header`: Recommend `role="heading"` and `aria-level` to expose the header as a heading, instead of rendering it as a native `<h1>`–`<h6>` element, which can't contain the `<div>` trigger ([#87460](https://github.com/WordPress/gutenberg/pull/87460)).
 
 ### Internal
 
