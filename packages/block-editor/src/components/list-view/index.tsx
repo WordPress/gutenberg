@@ -1,11 +1,6 @@
 import type { CSSProperties, ForwardedRef, KeyboardEvent } from 'react';
 import clsx from 'clsx';
-import {
-	useInstanceId,
-	useMergeRefs,
-	useRefEffect,
-	__experimentalUseFixedWindowList as useFixedWindowList,
-} from '@wordpress/compose';
+import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -33,6 +28,7 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
+import useListViewWindow from './use-list-view-window';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
@@ -135,20 +131,6 @@ function ListViewComponent(
 
 	const { getBlock, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
-	const { visibleBlockCount } = useSelect(
-		( select ) => {
-			const { getGlobalBlockCount, getClientIdsOfDescendants } =
-				select( blockEditorStore );
-			const draggedBlockCount =
-				draggedClientIds?.length > 0
-					? getClientIdsOfDescendants( draggedClientIds ).length + 1
-					: 0;
-			return {
-				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
-			};
-		},
-		[ draggedClientIds ]
-	);
 
 	const { updateBlockSelection } = useBlockSelection();
 
@@ -185,6 +167,7 @@ function ListViewComponent(
 		updateExpansion,
 	} );
 	const elementRef = useRef< HTMLElement >( null );
+	const { ref: listWindowRef, fixedListWindow } = useListViewWindow();
 
 	// Allow handling of copy, cut, and paste events.
 	const clipBoardRef = useClipboardHandler( {
@@ -248,6 +231,7 @@ function ListViewComponent(
 		clipBoardRef,
 		focusOnMountRef,
 		elementRef,
+		listWindowRef,
 		dropZoneRef,
 		ref,
 	] );
@@ -364,22 +348,6 @@ function ListViewComponent(
 			expansionState,
 			firstDraggedBlockIndex,
 		]
-	);
-
-	const [ fixedListWindow ] = useFixedWindowList(
-		elementRef,
-		BLOCK_LIST_ITEM_HEIGHT,
-		visibleBlockCount,
-		{
-			// Ensure that the windowing logic is recalculated when the expanded state changes.
-			// This is necessary because expanding a collapsed block in a short list view can
-			// switch the list view to a tall list view with a scrollbar, and vice versa.
-			// When this happens, the windowing logic needs to be recalculated to ensure that
-			// the correct number of blocks are rendered, by rechecking for a scroll container.
-			expandedState: expansionState,
-			useWindowing: true,
-			windowOverscan: 40,
-		}
 	);
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.

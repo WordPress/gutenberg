@@ -4,9 +4,13 @@
 
 ### Enhancements
 
+-   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
+-   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height ([#87154](https://github.com/WordPress/gutenberg/pull/87154)).
 -   `TimePicker`: Use the WordPress UI select for choosing a month ([#87079](https://github.com/WordPress/gutenberg/pull/87079)).
 -   `QueryControls`: Use the WordPress UI select for the Order by field and show a placeholder when the current sort is missing or unavailable ([#87078](https://github.com/WordPress/gutenberg/pull/87078)).
 -   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
+-   `DropdownMenu`, `Dropdown`: Align menu spacing and dividers with the `Menu` component from `@wordpress/ui`: tighter popover and group padding, dividers inset to line up with item labels, and matching group label styles. This applies to any `Dropdown` that contains `MenuGroup`s ([#87092](https://github.com/WordPress/gutenberg/pull/87092)).
+-   `Tabs`, `TabPanel`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, with the same clearance on every side, and draw the focus ring inside it ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Deprecations
 
@@ -14,8 +18,28 @@
 
 ### Bug Fixes
 
+-   `ConfirmDialog`: Ignore Enter key presses during IME composition ([#87378](https://github.com/WordPress/gutenberg/pull/87378)).
+-   `BoxControl`: Show the side input tooltip above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86805](https://github.com/WordPress/gutenberg/pull/86805)).
+-   `MenuItem`: Show items with `aria-disabled` in the system disabled color in forced colors mode ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
+-   `AlignmentMatrixControl`: Show cell tooltips with the `@wordpress/ui` `Tooltip`, so they appear above `@wordpress/ui` overlays such as `Dialog` and `Popover`. Each cell's accessible name is now its translated label, such as "Top Left", instead of its untranslated value, such as "top left" ([#86807](https://github.com/WordPress/gutenberg/pull/86807)).
 -   `DatePicker`: Outline today's date when another date is selected ([#87172](https://github.com/WordPress/gutenberg/pull/87172)).
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
+-   `ToggleGroupControl`: Show option tooltips above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86804](https://github.com/WordPress/gutenberg/pull/86804)).
+-   `ColorPicker`: Show the typed alpha value in the RGB and HSL Alpha fields. Before, some values such as `29` showed one less ([#87291](https://github.com/WordPress/gutenberg/pull/87291)).
+-   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab. In both orientations, use the design system focus color, which keeps its contrast in the dark theme, and the design system corner radius ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
+-   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
+
+### Internal
+
+-   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+-   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `timezone-mock` development dependency to 1.4.3 ([#87250](https://github.com/WordPress/gutenberg/pull/87250)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+-   Update `@types/highlight-words-core` dependency to 1.2.3 ([#87249](https://github.com/WordPress/gutenberg/pull/87249)).
 
 ## 45.0.0 (2026-11-18)
 
@@ -40,6 +64,7 @@
 
 ### Bug Fixes
 
+-   `TimePicker`: Show the full site time zone in a `Popover` from `@wordpress/ui` that keyboard, touch, and screen reader users can open from the time zone abbreviation, instead of a tooltip that only mouse users could reach. The popover shows above `@wordpress/ui` overlays. Underline the abbreviation only when it opens the popover ([#86806](https://github.com/WordPress/gutenberg/pull/86806)).
 -   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
 -   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).

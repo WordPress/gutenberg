@@ -75,6 +75,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		isLastBranch = true,
 	} = props;
 
 	const { canParentExpand, isParentSynced } = useSelect(
@@ -158,8 +159,11 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
-		const { itemInView } = fixedListWindow;
-		const blockInView = itemInView( blockListPosition );
+		const { start, end, focusedClientId } = fixedListWindow;
+		// A block counts as in view when any row of its subtree is, so the
+		// ancestors of every rendered row stay mounted and Arrow Left can
+		// reach the parent.
+		const blockInView = blockListPosition < end && nextPosition > start;
 
 		const position = index + 1;
 		const updatedPath =
@@ -179,20 +183,18 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		const isSelectedBranch =
 			isBranchSelected || ( isSelected && hasNestedBlocks );
 
-		// To avoid performance issues, we only render blocks that are in view,
-		// or blocks that are selected or dragged. If a block is selected,
-		// it is only counted if it is the first of the block selection.
-		// This prevents the entire tree from being rendered when a branch is
-		// selected, or a user selects all blocks, while still enabling scroll
-		// into view behavior when selecting a block or opening the list view.
-		// The first and last blocks of the list are always rendered, to ensure
-		// that Home and End keys work as expected.
+		const isFirstSelected = clientId === selectedClientIds[ 0 ];
+		const isLastInList = isLastBranch && index === blockCount - 1;
+		// Outside the window a row stays mounted when unmounting it would stop
+		// its drag, drop focus, keep the selection from scrolling into view,
+		// or leave Home and End without the list's first and last rows.
 		const showBlock =
-			isDragged ||
 			blockInView ||
-			( isSelected && clientId === selectedClientIds[ 0 ] ) ||
-			index === 0 ||
-			index === blockCount - 1;
+			isDragged ||
+			clientId === focusedClientId ||
+			isFirstSelected ||
+			( level === 1 && index === 0 ) ||
+			isLastInList;
 
 		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
 
@@ -258,6 +260,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						isLastBranch={ isLastInList }
 					/>
 				) }
 			</AsyncModeProvider>

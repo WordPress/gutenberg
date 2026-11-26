@@ -5,10 +5,8 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
-// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
-// Used under the Unsplash License: https://unsplash.com/license
-const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
+// Served from `storybook/static`.
+const IMAGE_SRC = 'profile-picture.svg';
 
 const meta: Meta< typeof Avatar > = {
 	title: 'Components/@wordpress-ui/Avatar',
@@ -92,7 +90,7 @@ export const Shapes: Story = {
 			<Avatar
 				{ ...args }
 				name="WordPress"
-				src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+				src="wordpress-wmark.svg"
 				shape="square"
 			/>
 		</Stack>
