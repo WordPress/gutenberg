@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Keep keyboard focus inside an open overlay menu after a submenu in it opens or closes, instead of trapping focus in the submenu or letting it leave the overlay ([#86392](https://github.com/WordPress/gutenberg/pull/86392)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
