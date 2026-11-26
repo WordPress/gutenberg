@@ -25,6 +25,7 @@
 -   Writing flow: Keep the browser from deleting into a neighbouring block while the canvas is the editing host, which left the canvas out of step with the block list and crashed the editor ([#87188](https://github.com/WordPress/gutenberg/pull/87188)).
 -   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
+-   Inserter, Document Overview: Show a focus ring when the scrolling tab panel receives keyboard focus, so its tab stop is no longer invisible ([#85738](https://github.com/WordPress/gutenberg/pull/85738)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
