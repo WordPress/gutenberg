@@ -2,17 +2,28 @@ import { useMemo } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 
 /**
+ * The fields requested for each note, as limited by `_fields`.
+ */
+type NoteRecord = {
+	id: number;
+	post: number;
+};
+
+/**
  * Hook to fetch notes counts for a list of post IDs.
  *
  * Notes are stored as comments with type 'note'.
  * This hook fetches all notes for the given posts and returns
  * a map of post ID to notes count.
  *
- * @param {number[]} postIds - Array of post IDs to fetch notes for.
- * @return {{ notesCount: Object, isResolving: boolean }} Object with notesCount map and loading state.
+ * @param postIds Array of post IDs to fetch notes for.
+ * @return Object with notesCount map and loading state.
  */
-export default function useNotesCount( postIds ) {
-	const { records: notes, isResolving } = useEntityRecords(
+export default function useNotesCount( postIds: number[] ): {
+	notesCount: Record< number, number >;
+	isResolving: boolean;
+} {
+	const { records: notes, isResolving } = useEntityRecords< NoteRecord >(
 		'root',
 		'comment',
 		{
@@ -32,7 +43,7 @@ export default function useNotesCount( postIds ) {
 			return {};
 		}
 
-		const counts = {};
+		const counts: Record< number, number > = {};
 		notes.forEach( ( note ) => {
 			const postId = note.post;
 			counts[ postId ] = ( counts[ postId ] || 0 ) + 1;

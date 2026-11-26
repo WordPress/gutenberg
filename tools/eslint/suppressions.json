@@ -7687,11 +7687,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/post-list/use-notes-count.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/resizable-frame/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
