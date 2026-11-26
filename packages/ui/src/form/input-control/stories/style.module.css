@@ -1,0 +1,4 @@
+/* Mirror the search icon in LTR, matching `Combobox`. */
+.search-icon:dir(ltr) {
+	transform: scaleX(-1);
+}

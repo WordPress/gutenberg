@@ -16,11 +16,7 @@
 	font-size: 3em;
 }
 
-// Don't show the drop cap when editing the paragraph's content. It causes a
-// number of bugs in combination with `contenteditable` fields. The caret
-// cannot be set around it, caret position calculation fails in Chrome, and
-// typing at the end of the paragraph doesn't work.
-.has-drop-cap:not(:focus)::first-letter {
+.has-drop-cap::first-letter {
 	float: inline-start;
 	font-size: 8.4em;
 	line-height: 0.68;

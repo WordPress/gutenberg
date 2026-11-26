@@ -8,7 +8,8 @@ import { DEFAULT_RAMPS } from '../lib/default-ramps';
 describe( 'buildAccentRamp', () => {
 	it( 'builds on a prebuilt background ramp', () => {
 		expect(
-			buildAccentRamp( '#cf4339', DEFAULT_RAMPS.background ).ramp
+			buildAccentRamp( 'primary', '#cf4339', DEFAULT_RAMPS.background )
+				.ramp
 		).toHaveProperty( 'bgFill1' );
 	} );
 } );
