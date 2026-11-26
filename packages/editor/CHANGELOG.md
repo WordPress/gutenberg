@@ -6,6 +6,10 @@
 
 -   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 
+### Enhancements
+
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+
 ### Bug Fixes
 
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
@@ -70,7 +74,6 @@
 -   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
--   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
 
 ### Bug Fixes
 
