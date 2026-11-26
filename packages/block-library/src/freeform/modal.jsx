@@ -51,6 +51,15 @@ function ClassicEdit( props ) {
 							styleEl.innerHTML = css;
 							doc.head.appendChild( styleEl );
 						} );
+
+						// TinyMCE uses Escape to move focus from its toolbar back to the editor.
+						editor
+							.getContainer()
+							.addEventListener( 'keydown', ( event ) => {
+								if ( event.key === 'Escape' ) {
+									event.preventDefault();
+								}
+							} );
 					} );
 				},
 			},
