@@ -42,7 +42,6 @@ const EmbedEdit = ( props: EmbedEditProps ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
-		onFocus,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -213,7 +212,6 @@ const EmbedEdit = ( props: EmbedEditProps ) => {
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
-					onFocus={ onFocus }
 					onSubmit={ ( event ) => {
 						if ( event ) {
 							event.preventDefault();
@@ -256,7 +254,6 @@ const EmbedEdit = ( props: EmbedEditProps ) => {
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
 	const {
-		caption,
 		type,
 		allowResponsive,
 		className: classFromPreview,
@@ -288,16 +285,9 @@ const EmbedEdit = ( props: EmbedEditProps ) => {
 					className={ className }
 					url={ url }
 					type={ type }
-					caption={ caption }
-					onCaptionChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
 					isSelected={ isSelected }
 					icon={ icon }
 					label={ label }
-					insertBlocksAfter={ insertBlocksAfter }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
 				/>
 				<Caption
 					attributes={ attributes }

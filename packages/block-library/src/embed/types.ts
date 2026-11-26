@@ -1,6 +1,5 @@
 import type { FormEvent } from 'react';
 import type {
-	Block,
 	BlockEditProps,
 	BlockTypeIcon,
 	BlockVariation,
@@ -63,9 +62,7 @@ export interface UpgradeableEmbedProps extends Partial<
 /**
  * Props of the embed block's edit component.
  */
-export interface EmbedEditProps extends BlockEditProps< EmbedAttributes > {
-	onFocus?: () => void;
-}
+export type EmbedEditProps = BlockEditProps< EmbedAttributes >;
 
 /**
  * Props for `EmbedControls`.
@@ -91,7 +88,6 @@ export interface EmbedPlaceholderProps {
 	cannotEmbed?: boolean;
 	fallback?: () => void;
 	tryAgain: () => void;
-	onFocus?: () => void;
 }
 
 /**
@@ -106,11 +102,6 @@ export interface EmbedPreviewProps {
 	className?: string;
 	icon?: BlockTypeIcon;
 	label: string;
-	caption?: string;
-	onCaptionChange?: ( value: string ) => void;
-	insertBlocksAfter?: ( blocks: Block | Block[] ) => void;
-	attributes?: EmbedAttributes;
-	setAttributes?: EmbedEditProps[ 'setAttributes' ];
 }
 
 /**
