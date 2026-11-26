@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Notes: Remove the internal note ID from the accessible names of the reply and edit fields, and name the edit field of a reply "Edit reply" ([#87442](https://github.com/WordPress/gutenberg/pull/87442)).
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
 -   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
