@@ -51,6 +51,8 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, $elevation-x-small;
 	// Only visible in Windows High Contrast mode.
 	outline: 2px solid transparent;
+	// Set on a side handle of a scaled box, to keep the dot round.
+	scale: var(--wp-components-resizable-box-handle-dot-scale);
 }
 
 // This is the "visible" resize handle for side handles - the line

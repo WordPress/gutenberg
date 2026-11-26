@@ -1024,6 +1024,51 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should append received blocks to the root order', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'RECEIVE_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'wings',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				],
+			} );
+
+			expect( Object.fromEntries( state.order ) ).toEqual( {
+				'': [ 'chicken', 'ribs' ],
+				chicken: [],
+				ribs: [ 'wings' ],
+				wings: [],
+			} );
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
+		} );
+
 		it( 'should replace the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -2309,6 +2354,64 @@ describe( 'state', () => {
 					} );
 
 					expect( state.attributes ).toBe( original.attributes );
+				} );
+
+				it( 'should ignore non-existent blocks among existing ones', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat', 'unknown' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.attributes.get( 'kumquat' ) ).toEqual( {
+						updated: true,
+					} );
+				} );
+
+				it( 'should ignore blocks without updates when attributes are unique by block', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								partial< Block >( {
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+								partial< Block >( {
+									clientId: 'loquat',
+									attributes: {},
+									innerBlocks: [],
+								} ),
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat', 'loquat' ],
+						attributes: {
+							loquat: { updated: true },
+						},
+						options: { uniqueByBlock: true },
+					} );
+
+					expect( state.attributes.get( 'loquat' ) ).toEqual( {
+						updated: true,
+					} );
 				} );
 
 				it( 'should return with same reference if no changes in updates', () => {
@@ -5919,6 +6022,29 @@ describe( 'state', () => {
 									patternName: undefined,
 								},
 							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'removes block editing modes when the `patternName` attribute is removed after an ID without updates', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'unknown', 'group-1' ],
+							attributes: {
+								'group-1': {
+									metadata: {
+										patternName: undefined,
+									},
+								},
+							},
+							options: { uniqueByBlock: true },
 						},
 					],
 					testReducer,

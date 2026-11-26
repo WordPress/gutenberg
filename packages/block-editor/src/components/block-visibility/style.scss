@@ -43,7 +43,7 @@
 	}
 
 	&__description {
-		font-size: $font-size-small;
+		font-size: var(--wpds-typography-font-size-sm);
 		color: $gray-700;
 	}
 }

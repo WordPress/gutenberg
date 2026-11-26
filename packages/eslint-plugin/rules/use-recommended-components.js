@@ -133,7 +133,7 @@ const DENYLIST = {
 		CustomGradientPicker:
 			'Use `GradientPicker` with `clearable={ false }` instead.',
 		CustomSelectControl:
-			'Use `SelectControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide',
+			'`{{ name }}` is deprecated. Use `SelectControl` from `@wordpress/ui` instead, or compose `Select` for the small size. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
