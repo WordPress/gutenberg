@@ -558,7 +558,7 @@ describe( 'Waveform utilities', () => {
 			container.appendChild( playBtn );
 
 			const cleanup = setupPlayButtonAccessibility( container );
-			cleanup?.();
+			cleanup!();
 
 			// After cleanup, events should not change the label.
 			container.dispatchEvent( new CustomEvent( 'waveformplayer:play' ) );
