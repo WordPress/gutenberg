@@ -2,9 +2,12 @@ import { test, expect } from './fixtures';
 import { pressKey, LINE_START_KEY } from './fixtures/keyboard-utils';
 
 test.describe( 'Collaboration - Selection Rendering', () => {
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { page, requestUtils } ) => {
 		// Reset preferences via REST so a mid-test failure doesn't leak
 		// the fixed-toolbar setting (or any other pref) to other tests.
+		// Close the page first: a preference save it still has queued would
+		// otherwise land after the reset.
+		await page.close();
 		await requestUtils.resetPreferences();
 	} );
 
