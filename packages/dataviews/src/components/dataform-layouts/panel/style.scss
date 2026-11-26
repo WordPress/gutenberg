@@ -51,20 +51,13 @@
 .dataforms-layouts-panel__field-trigger--edit-always
 .dataforms-layouts-panel__field-trigger-icon {
 	opacity: 1;
-	fill: currentColor;
-
-	&:hover,
-	&:focus-visible {
-		fill: var(--wpds-color-foreground-interactive-neutral-active);
-	}
 }
 
 .dataforms-layouts-panel__field-trigger-icon {
-	padding: 0;
-	color: var(--wpds-color-foreground-interactive-neutral);
+	// Let the hit area below stretch over the row, not over the button.
+	position: static;
 	flex: 0 0 auto;
 	opacity: 0;
-	border-radius: var(--wpds-border-radius-xs);
 
 	// Stretch the button's hit area over the whole row, so that pointer users
 	// can click anywhere on it while keeping a single focusable trigger.
@@ -76,9 +69,6 @@
 
 	&:focus-visible {
 		opacity: 1;
-		outline:
-			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus);
 	}
 }
 

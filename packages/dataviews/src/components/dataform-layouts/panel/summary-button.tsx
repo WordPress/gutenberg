@@ -1,8 +1,11 @@
 import clsx from 'clsx';
-import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton, so the edit button can use neutral colors.
+	IconButton,
+} from '@wordpress/ui';
 import type {
 	FieldValidity,
 	NormalizedField,
@@ -165,10 +168,12 @@ export default function SummaryButton< Item >( {
 				) }
 			</span>
 			{ ! disabled && (
-				<Button
+				<IconButton
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
+					variant="minimal"
+					tone="neutral"
 					size="small"
 					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
