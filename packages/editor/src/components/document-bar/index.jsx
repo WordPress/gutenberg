@@ -227,7 +227,7 @@ export default function DocumentBar( props ) {
 						}
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
-						<WCText size="body" as="h1">
+						<WCText size="body" as="h1" color="inherit">
 							<span className="editor-document-bar__post-title">
 								{ title
 									? stripHTML( title )

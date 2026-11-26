@@ -12,6 +12,7 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
+	box-sizing: border-box;
 	background-color: var(--wpds-color-background-interactive-neutral);
 	border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 	border-radius: $grid-unit-05;
