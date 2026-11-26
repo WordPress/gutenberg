@@ -64,7 +64,10 @@ This applies when the project enables the `@wordpress/use-recommended-components
 
 This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it.
 
--   Bulk suppressions need ESLint 9.24 or later. Check the installed ESLint version in the project's `package.json` or `node_modules`. If it is older, suggest upgrading ESLint, or set the rule to `warn` for now and skip the baseline.
+-   Bulk suppressions need ESLint 9.24 or later. Check the installed ESLint version, for example with `npm exec --no -- eslint --version`. If it is older, suggest upgrading ESLint. If the user does not want to upgrade, ask them which of these to do instead, and do not choose for them:
+    -   Set the rule to `warn` for now and skip the baseline.
+    -   Migrate the existing usage first, and enable the rule as `error` only after that.
+    -   Turn the rule off for the files that still use the old components, for example with an `ignores` list or a configuration object for those files, and migrate them later.
 -   Do not migrate everything at once. Record the existing reports as a baseline with ESLint's bulk suppressions, for example `npm exec --no -- eslint --suppress-rule @wordpress/use-recommended-components`, and commit the generated suppressions file. New code is then checked, while existing code is migrated gradually.
 -   After you migrate a component, run `npm exec --no -- eslint --prune-suppressions` and commit the reduced suppressions.
--   For an intentional early use of a component, put an `eslint-disable-next-line @wordpress/use-recommended-components` comment above that import specifier, with a reason. This keeps the other components in the import checked.
+-   For an intentional early use of a component, follow the rule's inline exceptions guidance: put an `eslint-disable-next-line` comment with a reason above that import specifier, so the other components in the import stay checked. The rule's [documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/eslint-plugin/docs/rules/use-recommended-components.md) has an example.
