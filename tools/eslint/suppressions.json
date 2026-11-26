@@ -11777,83 +11777,18 @@
 			"count": 1
 		}
 	},
-	"packages/widgets/src/blocks/legacy-widget/edit/control.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/edit/convert-to-blocks-button.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/edit/form.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/edit/index.jsx": {
+	"packages/widgets/src/blocks/legacy-widget/edit/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/widgets/src/blocks/legacy-widget/edit/inspector-card.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/edit/no-preview.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/edit/preview.jsx": {
+	"packages/widgets/src/blocks/legacy-widget/edit/preview.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.jsx": {
+	"packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/blocks/legacy-widget/transforms.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

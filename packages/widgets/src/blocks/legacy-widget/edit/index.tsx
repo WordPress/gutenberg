@@ -15,6 +15,8 @@ import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useEntityRecord } from '@wordpress/core-data';
+import type { BlockEditProps } from '@wordpress/blocks';
+import type { LegacyWidgetAttributes } from '../types';
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
 import Form from './form';
@@ -22,7 +24,19 @@ import Preview from './preview';
 import NoPreview from './no-preview';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 
-export default function Edit( props ) {
+interface LegacyWidgetEditProps extends BlockEditProps< LegacyWidgetAttributes > {
+	isWide?: boolean;
+}
+
+interface WidgetTypeRecord {
+	name?: string;
+	description?: string;
+	id?: string;
+	is_multi?: boolean;
+	[ key: string ]: unknown;
+}
+
+export default function Edit( props: LegacyWidgetEditProps ) {
 	const { id, idBase } = props.attributes;
 	const { isWide = false } = props;
 
@@ -43,7 +57,10 @@ export default function Edit( props ) {
 	);
 }
 
-function Empty( { attributes: { id, idBase }, setAttributes } ) {
+function Empty( {
+	attributes: { id, idBase },
+	setAttributes,
+}: Pick< LegacyWidgetEditProps, 'attributes' | 'setAttributes' > ) {
 	return (
 		<Placeholder
 			icon={ <BlockIcon icon={ brushIcon } /> }
@@ -87,16 +104,23 @@ function NotEmpty( {
 	clientId,
 	isSelected,
 	isWide = false,
-} ) {
-	const [ hasPreview, setHasPreview ] = useState( null );
+}: LegacyWidgetEditProps ) {
+	const [ hasPreview, setHasPreview ] = useState< boolean | null >( null );
 
-	const widgetTypeId = id ?? idBase;
+	const widgetTypeId = ( id ?? idBase )!;
 	const { record: widgetType, hasResolved: hasResolvedWidgetType } =
-		useEntityRecord( 'root', 'widgetType', widgetTypeId );
+		useEntityRecord< WidgetTypeRecord >(
+			'root',
+			'widgetType',
+			widgetTypeId
+		);
 
-	const setInstance = useCallback( ( nextInstance ) => {
-		setAttributes( { instance: nextInstance } );
-	}, [] );
+	const setInstance = useCallback(
+		( nextInstance: Record< string, unknown > ) => {
+			setAttributes( { instance: nextInstance } );
+		},
+		[]
+	);
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
 		return (
@@ -125,20 +149,20 @@ function NotEmpty( {
 				<BlockControls group="other">
 					<ConvertToBlocksButton
 						clientId={ clientId }
-						rawInstance={ instance.raw }
+						rawInstance={ instance!.raw! }
 					/>
 				</BlockControls>
 			) }
 
 			<InspectorControls>
 				<InspectorCard
-					name={ widgetType.name }
-					description={ widgetType.description }
+					name={ widgetType!.name }
+					description={ widgetType!.description }
 				/>
 			</InspectorControls>
 
 			<Form
-				title={ widgetType.name }
+				title={ widgetType!.name }
 				isVisible={ mode === 'edit' }
 				id={ id }
 				idBase={ idBase }
@@ -163,7 +187,7 @@ function NotEmpty( {
 						/>
 					) }
 					{ hasPreview === false && mode === 'preview' && (
-						<NoPreview name={ widgetType.name } />
+						<NoPreview name={ widgetType!.name } />
 					) }
 				</>
 			) }

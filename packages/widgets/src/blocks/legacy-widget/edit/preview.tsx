@@ -9,7 +9,21 @@ import {
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
-export default function Preview( { idBase, instance, isVisible } ) {
+interface PreviewProps {
+	idBase?: string | null;
+	instance?: Record< string, unknown > | null;
+	isVisible?: boolean;
+}
+
+interface RenderWidgetResponse {
+	preview: string;
+}
+
+export default function Preview( {
+	idBase,
+	instance,
+	isVisible,
+}: PreviewProps ) {
 	const [ isLoaded, setIsLoaded ] = useState( false );
 	const [ srcDoc, setSrcDoc ] = useState( '' );
 
@@ -21,7 +35,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 
 		async function fetchPreviewHTML() {
 			const restRoute = `/wp/v2/widget-types/${ idBase }/render`;
-			return await apiFetch( {
+			return await apiFetch< RenderWidgetResponse >( {
 				path: restRoute,
 				method: 'POST',
 				signal: abortController?.signal,
@@ -33,7 +47,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			.then( ( response ) => {
 				setSrcDoc( response.preview );
 			} )
-			.catch( ( error ) => {
+			.catch( ( error: Error ) => {
 				if ( 'AbortError' === error.name ) {
 					// We don't want to log aborted requests.
 					return;
@@ -45,7 +59,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	}, [ idBase, instance ] );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
-	const ref = useRefEffect(
+	const ref = useRefEffect< HTMLIFrameElement >(
 		( iframe ) => {
 			// Only set height if the iframe is loaded,
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
@@ -58,8 +72,8 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			function setHeight() {
 				// Pick the maximum of these two values to account for margin collapsing.
 				const height = Math.max(
-					iframe.contentDocument.documentElement?.offsetHeight ?? 0,
-					iframe.contentDocument.body?.offsetHeight ?? 0
+					iframe.contentDocument!.documentElement?.offsetHeight ?? 0,
+					iframe.contentDocument!.body?.offsetHeight ?? 0
 				);
 
 				// Fallback to a height of 100px if the height cannot be determined.
@@ -69,7 +83,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				iframe.style.height = `${ height !== 0 ? height : 100 }px`;
 			}
 
-			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
+			const { IntersectionObserver } = iframe.ownerDocument.defaultView!;
 
 			// Observe for intersections that might cause a change in the height of
 			// the iframe, e.g. a Widget Area becoming expanded.
@@ -122,7 +136,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 					<iframe
 						ref={ ref }
 						className="wp-block-legacy-widget__edit-preview-iframe"
-						tabIndex="-1"
+						tabIndex={ -1 }
 						title={ __( 'Legacy Widget Preview' ) }
 						srcDoc={ srcDoc }
 						onLoad={ ( event ) => {
@@ -130,7 +144,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 							// such as negative margins in the Gallery Legacy Widget.
 							// It can't be scrolled anyway.
 							// TODO: Ideally, this should be fixed in core.
-							event.target.contentDocument.body.style.overflow =
+							event.currentTarget.contentDocument!.body.style.overflow =
 								'hidden';
 
 							setIsLoaded( true );

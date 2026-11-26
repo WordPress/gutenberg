@@ -1,6 +1,15 @@
 import { createBlock } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
+import type { LegacyWidgetAttributes, RawInstance } from './types';
 
-const legacyWidgetTransforms = [
+interface LegacyWidgetTransformItem {
+	block: string;
+	widget: string;
+	transform?: ( raw: RawInstance ) => Record< string, unknown >;
+	transformBlock?: ( raw: RawInstance ) => Block;
+}
+
+const legacyWidgetTransforms: LegacyWidgetTransformItem[] = [
 	{
 		block: 'core/calendar',
 		widget: 'calendar',
@@ -13,7 +22,7 @@ const legacyWidgetTransforms = [
 		block: 'core/html',
 		widget: 'custom_html',
 		transformBlock: ( { content } ) =>
-			createBlock( 'core/html', {}, [], [ content ] ),
+			createBlock( 'core/html', {}, [], [ content! ] ),
 	},
 	{
 		block: 'core/archives',
@@ -131,7 +140,7 @@ const legacyWidgetTransforms = [
 				columns: number,
 				linkTo,
 				sizeSlug: size,
-				images: ids.map( ( id ) => ( {
+				images: ids!.map( ( id ) => ( {
 					id,
 				} ) ),
 			};
@@ -156,35 +165,41 @@ const legacyWidgetTransforms = [
 			};
 		},
 	},
-].map( ( { block, widget, transform, transformBlock } ) => {
-	return {
-		type: 'block',
-		blocks: [ block ],
-		isMatch: ( { idBase, instance } ) => {
-			return idBase === widget && !! instance?.raw;
-		},
-		transform: ( { instance } ) => {
-			const transformedBlock = transformBlock
-				? transformBlock( instance.raw )
-				: createBlock(
-						block,
-						transform ? transform( instance.raw ) : undefined
-					);
-			if ( ! instance.raw?.title ) {
-				return transformedBlock;
-			}
-			return [
-				createBlock( 'core/heading', {
-					content: instance.raw.title,
-				} ),
-				transformedBlock,
-			];
-		},
-	};
-} );
+];
 
-const transforms = {
-	to: legacyWidgetTransforms,
+const transforms: NonNullable< BlockConfiguration[ 'transforms' ] > = {
+	to: legacyWidgetTransforms.map(
+		( { block, widget, transform, transformBlock } ) => ( {
+			type: 'block',
+			blocks: [ block ],
+			isMatch: ( attributes ) => {
+				const { idBase, instance } =
+					attributes as LegacyWidgetAttributes;
+				return idBase === widget && !! instance?.raw;
+			},
+			transform: ( attributes ) => {
+				// `isMatch` only lets instances with a `raw` value through.
+				const { instance } = attributes as LegacyWidgetAttributes & {
+					instance: { raw: RawInstance };
+				};
+				const transformedBlock = transformBlock
+					? transformBlock( instance.raw )
+					: createBlock(
+							block,
+							transform ? transform( instance.raw ) : undefined
+						);
+				if ( ! instance.raw?.title ) {
+					return transformedBlock;
+				}
+				return [
+					createBlock( 'core/heading', {
+						content: instance.raw.title,
+					} ),
+					transformedBlock,
+				];
+			},
+		} )
+	),
 };
 
 export default transforms;

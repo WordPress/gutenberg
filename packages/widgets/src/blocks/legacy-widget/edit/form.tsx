@@ -7,6 +7,17 @@ import { Popover as WCPopover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import Control from './control';
 
+interface FormProps {
+	title?: string;
+	isVisible: boolean;
+	id?: string | null;
+	idBase?: string | null;
+	instance?: Record< string, unknown > | null;
+	isWide?: boolean;
+	onChangeInstance: ( instance: Record< string, unknown > ) => void;
+	onChangeHasPreview: ( hasPreview: boolean ) => void;
+}
+
 export default function Form( {
 	title,
 	isVisible,
@@ -16,8 +27,8 @@ export default function Form( {
 	isWide,
 	onChangeInstance,
 	onChangeHasPreview,
-} ) {
-	const ref = useRef();
+}: FormProps ) {
+	const ref = useRef< HTMLDivElement >( null );
 
 	const isMediumLargeViewport = useViewportMatch( 'small' );
 
@@ -25,8 +36,12 @@ export default function Form( {
 	// *externally*. For example, if the user performs an undo. To do this, we
 	// keep track of changes made to instance by the control itself and then
 	// ignore those.
-	const outgoingInstances = useRef( new Set() );
-	const incomingInstances = useRef( new Set() );
+	const outgoingInstances = useRef(
+		new Set< Record< string, unknown > | null | undefined >()
+	);
+	const incomingInstances = useRef(
+		new Set< Record< string, unknown > | null | undefined >()
+	);
 
 	const { createNotice } = useDispatch( noticesStore );
 
@@ -55,13 +70,13 @@ export default function Form( {
 						__(
 							'The "%s" block was affected by errors and may not function properly. Check the developer tools for more details.'
 						),
-						idBase || id
+						( idBase || id )!
 					)
 				);
 			},
 		} );
 
-		ref.current.appendChild( control.element );
+		ref.current!.appendChild( control.element );
 
 		return () => {
 			if ( outgoingInstances.current.has( instance ) ) {
