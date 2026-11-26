@@ -573,8 +573,16 @@ export const getInserterMediaCategories = createSelector(
 			) {
 				return false;
 			}
+			// Files are not a MIME type of their own: they cover documents
+			// (`application/*`) and plain text files (`text/*`).
+			const mimeTypePrefixes =
+				category.mediaType === 'file'
+					? [ 'application/', 'text/' ]
+					: [ `${ category.mediaType }/` ];
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
+				mimeTypePrefixes.some( ( prefix ) =>
+					mimeType.startsWith( prefix )
+				)
 			);
 		} );
 	},
