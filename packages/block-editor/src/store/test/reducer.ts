@@ -6490,6 +6490,39 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
+			it( 'ignores editing mode actions on a removed block with a stale controlled client ID', () => {
+				const stateAfterRemoval = dispatchActions(
+					[
+						{
+							type: 'REMOVE_BLOCKS',
+							clientIds: [ 'template-part' ],
+						},
+						{
+							type: 'SET_ZOOM_LEVEL',
+							zoom: 50,
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				const stateAfterStaleAction = dispatchActions(
+					[
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part',
+							mode: 'disabled',
+						},
+					],
+					testReducer,
+					stateAfterRemoval
+				);
+
+				expect( stateAfterStaleAction.derivedBlockEditingModes ).toBe(
+					stateAfterRemoval.derivedBlockEditingModes
+				);
+			} );
+
 			it( 'allows explicitly set blockEditingModes to override the template part editing modes', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[

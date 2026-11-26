@@ -15,7 +15,7 @@ const accentRamps = Object.fromEntries(
 		.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 		.map( ( [ scaleName, seed ] ) => [
 			scaleName,
-			buildAccentRamp( seed, bgRamp ),
+			buildAccentRamp( scaleName, seed, bgRamp ),
 		] )
 );
 
