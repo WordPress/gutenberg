@@ -649,6 +649,15 @@ class WP_Navigation_Block_Renderer {
 		}
 		if ( isset( $attributes['layout']['orientation'] ) && 'vertical' === $attributes['layout']['orientation'] ) {
 			$layout_class .= ' is-vertical';
+
+			// Submenus that open on click can unfold inline in a vertical menu.
+			if (
+				isset( $attributes['submenuDisplay'] ) &&
+				'inline' === $attributes['submenuDisplay'] &&
+				'click' === block_core_navigation_get_submenu_visibility( $attributes )
+			) {
+				$layout_class .= ' has-inline-submenus';
+			}
 		}
 
 		if ( isset( $attributes['layout']['flexWrap'] ) && 'nowrap' === $attributes['layout']['flexWrap'] ) {

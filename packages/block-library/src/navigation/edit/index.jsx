@@ -257,6 +257,7 @@ function Navigation( {
 } ) {
 	const {
 		submenuVisibility,
+		submenuDisplay,
 		overlayMenu,
 		overlay,
 		showSubmenuIcon,
@@ -638,6 +639,10 @@ function Navigation( {
 				'items-justified-left': justifyContent === 'left',
 				'items-justified-center': justifyContent === 'center',
 				'is-vertical': orientation === 'vertical',
+				'has-inline-submenus':
+					orientation === 'vertical' &&
+					submenuVisibility === 'click' &&
+					submenuDisplay === 'inline',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
 				'has-text-color': !! textColor.color || !! textColor?.class,
@@ -875,6 +880,44 @@ function Navigation( {
 										) }
 									</ToggleGroupControl>
 								</ToolsPanelItem>
+
+								{ orientation === 'vertical' &&
+									submenuVisibility === 'click' && (
+										<ToolsPanelItem
+											hasValue={ () =>
+												submenuDisplay !== 'dropdown'
+											}
+											label={ __( 'Submenu Display' ) }
+											onDeselect={ () =>
+												setAttributes( {
+													submenuDisplay: 'dropdown',
+												} )
+											}
+											isShownByDefault
+										>
+											<ToggleGroupControl
+												label={ __(
+													'Submenu Display'
+												) }
+												value={ submenuDisplay }
+												onChange={ ( value ) =>
+													setAttributes( {
+														submenuDisplay: value,
+													} )
+												}
+												isBlock
+											>
+												<ToggleGroupControlOption
+													value="dropdown"
+													label={ __( 'Dropdown' ) }
+												/>
+												<ToggleGroupControlOption
+													value="inline"
+													label={ __( 'Inline' ) }
+												/>
+											</ToggleGroupControl>
+										</ToolsPanelItem>
+									) }
 
 								<ToolsPanelItem
 									hasValue={ () => ! showSubmenuIcon }

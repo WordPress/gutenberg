@@ -52,6 +52,11 @@
 			"enum": [ "hover", "click", "always" ],
 			"default": "hover"
 		},
+		"submenuDisplay": {
+			"type": "string",
+			"enum": [ "dropdown", "inline" ],
+			"default": "dropdown"
+		},
 		"overlayMenu": {
 			"type": "string",
 			"default": "mobile"

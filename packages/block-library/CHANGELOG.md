@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Add a Submenu Display setting to vertical menus, so submenus that open on click can unfold inline instead of floating over the items below them ([#87343](https://github.com/WordPress/gutenberg/pull/87343)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).

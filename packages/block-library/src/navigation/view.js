@@ -239,6 +239,18 @@ const { state, actions } = store(
 			} ),
 			handleMenuFocusout: withSyncEvent( ( event ) => {
 				const { modal, type } = getContext();
+				const { ref } = getElement();
+
+				// Inline submenus unfold within the menu, so they stay open
+				// until toggled. Closing one when focus moves would shift the
+				// items below it, and a click on the next item could miss.
+				if (
+					type === 'submenu' &&
+					ref?.closest( '.has-inline-submenus' )
+				) {
+					return;
+				}
+
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)

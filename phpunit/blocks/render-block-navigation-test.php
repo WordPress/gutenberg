@@ -379,6 +379,49 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Renders a Navigation block containing a submenu and returns whether its
+	 * wrapper has the `has-inline-submenus` class.
+	 *
+	 * @param string $attributes JSON-encoded Navigation block attributes.
+	 * @return bool Whether the wrapper has the class.
+	 */
+	private function has_inline_submenus_class( $attributes ) {
+		$markup = do_blocks( '<!-- wp:navigation ' . $attributes . ' --><!-- wp:navigation-submenu {"label":"About","url":"/about","kind":"custom"} --><!-- wp:navigation-link {"label":"Team","url":"/team","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- /wp:navigation -->' );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		return (bool) $processor->has_class( 'has-inline-submenus' );
+	}
+
+	/**
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
+	 */
+	public function test_inline_submenus_class_added_for_vertical_click_menu() {
+		$this->assertTrue( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuDisplay":"inline","submenuVisibility":"click","layout":{"type":"flex","orientation":"vertical"}}' ) );
+	}
+
+	/**
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
+	 */
+	public function test_inline_submenus_class_not_added_for_hover() {
+		$this->assertFalse( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuDisplay":"inline","submenuVisibility":"hover","layout":{"type":"flex","orientation":"vertical"}}' ) );
+	}
+
+	/**
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
+	 */
+	public function test_inline_submenus_class_not_added_for_horizontal_menu() {
+		$this->assertFalse( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuDisplay":"inline","submenuVisibility":"click"}' ) );
+	}
+
+	/**
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_layout_class
+	 */
+	public function test_inline_submenus_class_not_added_by_default() {
+		$this->assertFalse( $this->has_inline_submenus_class( '{"overlayMenu":"never","submenuVisibility":"click","layout":{"type":"flex","orientation":"vertical"}}' ) );
+	}
+
+	/**
 	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
 	 */
 	public function test_global_styles_custom_css_targets_only_the_navigation_wrapper() {
