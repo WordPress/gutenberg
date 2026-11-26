@@ -1,0 +1,19 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.search-icon:dir(ltr) {
+			transform: scaleX(-1);
+		}
+	}
+
+	@layer compositions {
+		/* The reset button replaces the native clear button. */
+		.search-input input {
+			&::-webkit-search-cancel-button,
+			&::-webkit-search-decoration {
+				appearance: none;
+			}
+		}
+	}
+}

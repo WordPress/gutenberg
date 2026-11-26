@@ -1,21 +1,11 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import { forwardRef } from '@wordpress/element';
-import { search } from '@wordpress/icons';
-import { Icon } from '../../../icon';
 import { Input as InputPrimitive } from '../input';
-import { InputLayout } from '../input-layout';
+import { SearchIconSlot } from '../search-input/search-icon-slot';
 import type { ComboboxInputProps } from './types';
-import styles from './style.module.css';
 
 const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
-	<InputPrimitive
-		prefix={
-			<InputLayout.Slot padding="minimal">
-				<Icon icon={ search } className={ styles[ 'search-icon' ] } />
-			</InputLayout.Slot>
-		}
-		{ ...props }
-	/>
+	<InputPrimitive prefix={ <SearchIconSlot /> } { ...props } />
 );
 
 export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(

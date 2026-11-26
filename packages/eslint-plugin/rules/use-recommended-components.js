@@ -78,6 +78,7 @@ const ALLOWLIST = {
 			'Menu',
 			'Meter',
 			'Popover',
+			'SearchInput',
 			'SearchableSelect',
 			'SearchableSelectControl',
 			'ValidatedInputControl',
