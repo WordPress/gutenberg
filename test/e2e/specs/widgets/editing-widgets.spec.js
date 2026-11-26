@@ -550,6 +550,54 @@ test.describe( 'Widgets screen', () => {
 		} );
 	} );
 
+	test( 'keeps a moved widget in the destination area after saving and reloading', async ( {
+		page,
+		editor,
+		requestUtils,
+		widgetsScreen,
+	} ) => {
+		await requestUtils.addWidgetBlock(
+			'<!-- wp:paragraph --><p>Moved paragraph</p><!-- /wp:paragraph -->',
+			'sidebar-1'
+		);
+		const {
+			widgets: [ widgetId ],
+		} = await requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-1' } );
+		await page.reload();
+
+		await page.getByText( 'Moved paragraph', { exact: true } ).click();
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'Move to widget area' );
+		await page
+			.getByRole( 'menu', { name: 'Move to widget area' } )
+			.getByRole( 'menuitemradio', { name: 'Footer #2' } )
+			.click();
+
+		// Let both writes finish so the reload doesn't interrupt the save.
+		await Promise.all( [
+			...[ 'sidebar-1', 'sidebar-2' ].map( ( id ) =>
+				page.waitForResponse(
+					( response ) =>
+						response.request().method() === 'POST' &&
+						new URL( response.url() ).pathname.endsWith(
+							`/wp/v2/sidebars/${ id }`
+						)
+				)
+			),
+			widgetsScreen.saveWidgets(),
+		] );
+		await page.reload();
+
+		const [ destination, inactive ] = await Promise.all( [
+			requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-2' } ),
+			requestUtils.rest( {
+				path: '/wp/v2/sidebars/wp_inactive_widgets',
+			} ),
+		] );
+		expect( destination.widgets ).toContain( widgetId );
+		expect( inactive.widgets ).not.toContain( widgetId );
+	} );
+
 	test( 'Allows widget deletion to be undone', async ( {
 		page,
 		editor,
