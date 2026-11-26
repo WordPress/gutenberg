@@ -281,11 +281,9 @@ export function getClassNames(
 
 	// If we have a fixed aspect iframe, and it's a responsive embed block.
 	if ( iframe && iframe.height && iframe.width ) {
-		// Division converts the `width` and `height` attribute strings to numbers.
-		const aspectRatio = (
-			( iframe.width as unknown as number ) /
-			( iframe.height as unknown as number )
-		).toFixed( 2 );
+		const aspectRatio = Number(
+			( Number( iframe.width ) / Number( iframe.height ) ).toFixed( 2 )
+		);
 		// Given the actual aspect ratio, find the widest ratio to support it.
 		for (
 			let ratioIndex = 0;
@@ -296,10 +294,7 @@ export function getClassNames(
 			if ( aspectRatio >= potentialRatio.ratio ) {
 				// Evaluate the difference between actual aspect ratio and closest match.
 				// If the difference is too big, do not scale the embed according to aspect ratio.
-				// Subtraction converts both ratio strings to numbers.
-				const ratioDiff =
-					( aspectRatio as unknown as number ) -
-					( potentialRatio.ratio as unknown as number );
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
 				if ( ratioDiff > 0.1 ) {
 					// No close aspect ratio match found.
 					return removeAspectRatioClasses( existingClassNames );

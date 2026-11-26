@@ -74,6 +74,11 @@ describe( 'utils', () => {
 		} );
 	} );
 	describe( 'getClassNames', () => {
+		it( 'should not return aspect ratio class names for iframes with a percentage width', () => {
+			const html = '<iframe height="400" width="100%"></iframe>';
+			expect( getClassNames( html, 'foo' ) ).toEqual( 'foo' );
+		} );
+
 		it( 'should return aspect ratio class names for iframes with width and height', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'wp-embed-aspect-16-9 wp-has-aspect-ratio';
