@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Color the current sidebar item with the resting brand color, and keep the active brand color for hover and focus ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+-   Color the current sidebar item with the resting brand color, and keep the active brand color for hover and focus ([#87453](https://github.com/WordPress/gutenberg/pull/87453)).
 
 ### Bug Fixes
 
