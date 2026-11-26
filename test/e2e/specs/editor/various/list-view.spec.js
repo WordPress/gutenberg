@@ -585,6 +585,40 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
+	test( 'should keep focus in the canvas when the first block is added', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'access+o' );
+		await expect(
+			page.getByRole( 'region', { name: 'Document Overview' } )
+		).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await page.keyboard.type( 'Title' );
+		await page.keyboard.press( 'Enter' );
+
+		// The new block's row used to take focus.
+		await expect(
+			page
+				.getByRole( 'treegrid', {
+					name: 'Block navigation structure',
+				} )
+				.getByRole( 'link', { name: 'Paragraph' } )
+		).toBeVisible();
+
+		await page.keyboard.type( 'Body' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'Body' } },
+			] );
+	} );
+
 	test( 'should duplicate block using keyboard', async ( {
 		editor,
 		pageUtils,
