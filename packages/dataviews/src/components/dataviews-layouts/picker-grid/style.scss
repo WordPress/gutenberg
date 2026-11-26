@@ -131,10 +131,13 @@
 
 		.dataviews-view-picker-grid__field {
 			min-height: var(--wpds-dimension-size-sm);
-			align-items: center;
+			// Keep the label on the first line of a value that wraps.
+			align-items: flex-start;
 
 			.dataviews-view-picker-grid__field-name {
 				width: 35%;
+				// One row tall, so the label centres on the value's first line.
+				line-height: var(--wpds-dimension-size-sm);
 				color: var(--wpds-color-foreground-content-neutral-weak);
 				overflow: hidden;
 				text-overflow: ellipsis;

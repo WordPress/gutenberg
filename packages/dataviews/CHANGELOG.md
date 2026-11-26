@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Align the field label to the first line of its value in the `grid` and `pickerGrid` layouts, instead of centring it against a value that wraps onto several lines.
 -   Hide the disabled filters "Reset" button right after it is clicked with a mouse; it is now only revealed for keyboard focus ([#87351](https://github.com/WordPress/gutenberg/pull/87351)).
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
 -   Keep hiding empty badge fields in the `grid` and `pickerGrid` layouts with the updated `Badge` from `@wordpress/ui` ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
