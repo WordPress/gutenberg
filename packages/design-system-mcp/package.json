@@ -45,7 +45,7 @@
 		"zod": "^4.6.6"
 	},
 	"devDependencies": {
-		"@types/node": "^24.19.2",
+		"@types/node": "^22.20.5",
 		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
