@@ -333,11 +333,13 @@ function TableEdit( {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the cell in the new column.
+		// Select the cell in the new column. The selected cell's `columnIndex`
+		// is its index in the row, not a logical column, and the new cell is
+		// inserted right before or after the selected one in its row.
 		setSelectedCell( {
 			sectionName,
 			rowIndex,
-			columnIndex: newColumnIndex,
+			columnIndex: selectedCell.columnIndex + delta,
 			type: 'cell',
 		} );
 	}
