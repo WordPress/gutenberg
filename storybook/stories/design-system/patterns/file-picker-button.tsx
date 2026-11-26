@@ -12,6 +12,7 @@ export function FilePickerButton() {
 	const [ error, setError ] = useState( '' );
 	const [ isImporting, setIsImporting ] = useState( false );
 	const chooseRef = useRef< HTMLButtonElement >( null );
+	const removeRef = useRef< HTMLButtonElement >( null );
 	const errorId = useId();
 	const snackbars = useSnackbars();
 
@@ -29,6 +30,15 @@ export function FilePickerButton() {
 		try {
 			const title = await importPattern( file );
 			snackbars.show( `Imported “${ title }” from JSON.` );
+			// The row is about to go. If its remove button has focus, move
+			// focus to the button that chooses a file.
+			if (
+				removeRef.current &&
+				removeRef.current ===
+					removeRef.current.ownerDocument.activeElement
+			) {
+				chooseRef.current?.focus();
+			}
 			setFile( undefined );
 		} catch {
 			setError(
@@ -90,6 +100,7 @@ export function FilePickerButton() {
 						/>
 						{ file && (
 							<SelectedFile
+								ref={ removeRef }
 								file={ file }
 								disabled={ isImporting }
 								onRemove={ () => {
