@@ -30,28 +30,6 @@
 	margin-bottom: -$border-width;
 }
 
-.block-editor-tabbed-sidebar__tabpanels {
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
-	min-height: 0;
-	position: relative;
-
-	// Browsers can make a scrolling panel a tab stop, so show where focus is.
-	// The ring is drawn here, outside the scrolling panel, so that it paints
-	// above panel content that sets its own stacking, such as sticky headers.
-	&:has(> .block-editor-tabbed-sidebar__tabpanel:focus-visible)::after {
-		content: "";
-		position: absolute;
-		inset: 0;
-		z-index: 1;
-		pointer-events: none;
-		@include outset-ring__focus();
-		// Keep the ring inside the sidebar, which clips overflowing content.
-		outline-offset: calc(-1 * var(--wpds-border-width-focus));
-	}
-}
-
 .block-editor-tabbed-sidebar__tabpanel {
 	display: flex;
 	flex-grow: 1;
