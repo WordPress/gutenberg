@@ -6,7 +6,7 @@
 		display: flow-root;
 	}
 	background: $white;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	border: $border-width solid $gray-900;
 	padding: $grid-unit-15 - $border-width;
 	max-height: calc(100vh - #{ $border-width } - #{ $border-width });
@@ -98,7 +98,7 @@
 	cursor: var(--wpds-cursor-control);
 
 	&:hover::after {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		border: $border-width solid $gray-600;
 		bottom: 0;
 		content: "";

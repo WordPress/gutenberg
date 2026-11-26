@@ -74,7 +74,7 @@
 	}
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		// Push the inserter toggle and the buttons after it to the end.
 		margin: $grid-unit-15 0 $grid-unit-15 auto;
 

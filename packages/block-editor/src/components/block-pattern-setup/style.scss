@@ -9,7 +9,7 @@
 	justify-content: center;
 	align-items: flex-start;
 	width: 100%;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 
 	&.view-mode-grid {
 		padding-top: $grid-unit-05;
@@ -65,7 +65,7 @@
 
 				.block-editor-block-preview__container {
 					min-height: 100px;
-					border-radius: $radius-medium;
+					border-radius: var(--wpds-border-radius-md);
 					border: $border-width solid $gray-300;
 				}
 

@@ -40,12 +40,12 @@
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: $radius-medium;
+		border-radius: var(--wpds-border-radius-md);
 
 		&::after {
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-medium;
+			border-radius: var(--wpds-border-radius-md);
 			@media not ( prefers-reduced-motion ) {
 				transition: outline 0.1s linear;
 			}

@@ -51,7 +51,7 @@
 	align-items: center;
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	color: var(--wpds-color-foreground-interactive-neutral);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
@@ -263,7 +263,7 @@
 		height: auto;
 
 		&:focus:not(:active) {
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			text-decoration: none;
 		}
 

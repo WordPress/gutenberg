@@ -28,7 +28,7 @@
 		width: 300px;
 		border: $border-width solid $gray-900;
 		background: $white;
-		border-radius: $radius-medium;
+		border-radius: var(--wpds-border-radius-md);
 		outline: none;
 		box-shadow: none;
 		overflow: auto;
@@ -61,7 +61,7 @@
 
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			position: relative;
 			border: $border-width solid transparent;
 

@@ -5,7 +5,7 @@
 $components-custom-gradient-picker__padding: $grid-unit-20; // Center 16px handles in the 48px bar.
 
 .components-custom-gradient-picker__gradient-bar {
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	width: 100%;
 	height: $grid-unit-60;
 	position: relative;

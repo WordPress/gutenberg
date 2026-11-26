@@ -7,7 +7,7 @@
 	cursor: var(--wpds-cursor-control);
 
 	.global-styles-ui-variations_item-preview {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		outline: $border-width solid rgba($black, 0.1);
 		outline-offset: -$border-width;
 		overflow: hidden;

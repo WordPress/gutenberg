@@ -32,7 +32,7 @@
 	z-index: 2;
 	background: $black;
 	font-family: $default-font;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;

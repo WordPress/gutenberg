@@ -17,7 +17,7 @@ $point-size-active: 10px;
 	aspect-ratio: 1;
 
 	border: 1px solid transparent;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	outline: none;
 
 	cursor: var(--wpds-cursor-control);

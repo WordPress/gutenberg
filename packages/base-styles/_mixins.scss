@@ -337,7 +337,7 @@
 	&:focus {
 		color: var(--wp-admin-theme-color--rgb);
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
-		border-radius: variables.$radius-small;
+		border-radius: wpds.var("--wpds-border-radius-sm");
 	}
 }
 
@@ -349,7 +349,7 @@
 	padding: variables.$grid-unit-15 !important;
 	border: variables.$border-width solid colors.$gray-900 !important;
 	box-shadow: none !important;
-	border-radius: variables.$radius-small !important;
+	border-radius: wpds.var("--wpds-border-radius-sm") !important;
 
 	// Fonts smaller than 16px causes mobile safari to zoom.
 	font-size: variables.$mobile-text-min-font-size !important;

@@ -9,7 +9,7 @@
 	flex-direction: column;
 	height: 100%;
 	width: 100%;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 
 	.dataviews-view-list & {
 		.block-editor-block-preview__container {

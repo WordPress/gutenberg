@@ -30,7 +30,7 @@
 	margin-right: $grid-unit-05;
 	transform: translateY(-100%);
 	// Match the placeholder material the block shows when it's empty.
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	background: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.

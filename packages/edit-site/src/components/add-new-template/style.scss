@@ -82,7 +82,7 @@
 
 .edit-site-custom-template-modal__no-results {
 	border: $border-width solid $gray-400;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	padding: $grid-unit-20;
 }
 

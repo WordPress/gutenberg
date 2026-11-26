@@ -23,7 +23,7 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 }
 
 // Fix truncation in flex layout

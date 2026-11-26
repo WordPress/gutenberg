@@ -200,7 +200,7 @@ $block-editor-link-control-number-of-actions: 1;
 		background-color: $gray-100;
 		width: $grid-unit-40;
 		height: $grid-unit-40;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	.block-editor-link-control__preview-icon img {

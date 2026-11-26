@@ -83,7 +83,7 @@
 .editor-collab-sidebar-panel__add-note {
 	position: relative;
 	padding: $grid-unit-20;
-	border-radius: $radius-large;
+	border-radius: var(--wpds-border-radius-lg);
 	border: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	background-color: var(--wpds-color-background-surface-neutral-weak);
 	color: var(--wpds-color-foreground-content-neutral);

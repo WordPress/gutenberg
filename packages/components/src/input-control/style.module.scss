@@ -26,7 +26,7 @@
 .root {
 	box-sizing: border-box;
 	position: relative;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	padding-block-start: 0;
 }
 

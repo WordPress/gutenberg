@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   The `link-reset` and `editor-input-reset` mixins now use the `--wpds-border-radius-sm` design token for their corner radius
 -   The `input-control` and `editor-input-reset` mixins now use the `--wpds-typography-font-size-md` design token for their font size ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 
 ## 15.1.0 (2026-11-18)

@@ -43,8 +43,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-start-start-radius: $radius-small;
-		border-end-start-radius: $radius-small;
+		border-start-start-radius: var(--wpds-border-radius-sm);
+		border-end-start-radius: var(--wpds-border-radius-sm);
 		border-start-end-radius: 0;
 		border-end-end-radius: 0;
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);

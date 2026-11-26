@@ -11,7 +11,7 @@
 
 	// Block UI appearance.
 	border: $border-width solid $gray-900;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	background-color: $white;
 
 	.block-editor-warning__message {

@@ -6,7 +6,7 @@
 	.components-popover__content {
 		border: $border-width solid $gray-300;
 		border-width: $border-width 0 0 $border-width;
-		border-radius: $radius-large;
+		border-radius: var(--wpds-border-radius-lg);
 		background: $white;
 		box-shadow: $elevation-small;
 	}

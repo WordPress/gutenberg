@@ -14,11 +14,11 @@
 		}
 
 		&:first-child {
-			border-radius: $radius-small 0 0 $radius-small;
+			border-radius: var(--wpds-border-radius-sm) 0 0 var(--wpds-border-radius-sm);
 		}
 
 		&:last-child {
-			border-radius: 0 $radius-small $radius-small 0;
+			border-radius: 0 var(--wpds-border-radius-sm) var(--wpds-border-radius-sm) 0;
 		}
 
 		// The focused button should be elevated so the focus ring isn't cropped,
