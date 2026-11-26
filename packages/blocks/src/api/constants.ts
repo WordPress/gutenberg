@@ -261,6 +261,16 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'transform', 'rotate' ],
 		useEngine: true,
 	},
+	translate: {
+		value: [ 'transform', 'translate' ],
+		support: [ 'transform', 'translate' ],
+		useEngine: true,
+	},
+	scale: {
+		value: [ 'transform', 'scale' ],
+		support: [ 'transform', 'scale' ],
+		useEngine: true,
+	},
 	textAlign: {
 		value: [ 'typography', 'textAlign' ],
 		support: [ 'typography', 'textAlign' ],
