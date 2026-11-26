@@ -13,7 +13,8 @@
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
 	box-sizing: border-box;
-	background-color: var(--wpds-color-background-interactive-neutral);
+	// Styled as a neutral outline button, since it opens the command palette.
+	background-color: var(--wpds-color-background-interactive-neutral-weak);
 	border: $border-width solid var(--wpds-color-stroke-interactive-neutral);
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
@@ -22,11 +23,15 @@
 	}
 
 	&:hover {
-		background-color: var(--wpds-color-background-interactive-neutral-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		border-color: var(--wpds-color-stroke-interactive-neutral-active);
 
 		.editor-document-bar__title {
 			color: var(--wpds-color-foreground-interactive-neutral-active);
+		}
+
+		.editor-document-bar__post-type-label {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
@@ -86,7 +91,8 @@
 	z-index: 1;
 	position: absolute;
 
-	&:hover {
+	&:hover,
+	.editor-document-bar:hover & {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		background-color: transparent;
 	}

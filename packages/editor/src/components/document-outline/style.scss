@@ -55,6 +55,11 @@
 	text-align: left;
 	border-radius: $radius-small;
 
+	// More specific than the admin link colors for these states.
+	&:not([aria-disabled="true"], :disabled):is(:hover, :active, :focus) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
 	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;

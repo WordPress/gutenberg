@@ -168,7 +168,7 @@
 			border-radius: $radius-small;
 			// The box paints the background, like the toolbar box does for
 			// its groups.
-			background-color: $white;
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 
 			// The same rule the Toolbar container has for its last group;
 			// this box stands in for it here.
@@ -256,7 +256,7 @@
 			border: $border-width solid $gray-900;
 			padding-right: 6px;
 			padding-left: 6px;
-			background-color: $white;
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 
 			.show-icon-labels & {
 				padding-right: $grid-unit-15;
