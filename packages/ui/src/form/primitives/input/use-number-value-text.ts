@@ -8,10 +8,11 @@ function toValueText(
 }
 
 /**
- * Works around VoiceOver on macOS, which reads a number input with a `max` as
- * a percentage of its range unless it has an `aria-valuetext`.
+ * Works around VoiceOver in Chrome on macOS, which reads a number input with a
+ * `max` as a percentage of its range unless it has an `aria-valuetext`.
+ * Safari is not affected.
  *
- * Remove this hook once VoiceOver reads such an input as its value.
+ * Remove this hook once VoiceOver reads such an input as its value in Chrome.
  *
  * An uncontrolled input's value text follows user edits and form resets, but
  * not a value set directly on the element, which fires no event.

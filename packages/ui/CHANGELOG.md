@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
+-   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver in Chrome on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
 
 ## 0.27.0 (2026-11-18)
 
