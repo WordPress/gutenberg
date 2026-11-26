@@ -1,7 +1,11 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	privateApis as domPrivateApis,
+	type DOMPrivateApis,
+} from '@wordpress/dom';
 import { unlock } from '../lock-unlock';
 
-const { getStyleTransform } = unlock( componentsPrivateApis );
+const { getBorderBoxPointTransform, isStyleTransformAxisAligned } =
+	unlock< DOMPrivateApis >( domPrivateApis );
 
 const BLOCK_SELECTOR = '.block-editor-block-list__block';
 const APPENDER_SELECTOR = '.block-list-appender';
@@ -97,24 +101,6 @@ export function getBlockClientId( node: Node | null ) {
 }
 
 /**
- * Returns whether a computed style rotates or skews an element, so that its
- * edges are no longer parallel to the viewport. Translating and scaling keep
- * them parallel, so they don't count.
- *
- * @param style The computed style of the element.
- * @return Whether the element is rotated or skewed.
- */
-export function isStyleRotated(
-	style: Pick< CSSStyleDeclaration, 'rotate' | 'scale' | 'transform' >
-) {
-	const { a, b, c, d } = getStyleTransform( style );
-	const isAxisAligned =
-		( Math.abs( b ) < 1e-5 && Math.abs( c ) < 1e-5 ) ||
-		( Math.abs( a ) < 1e-5 && Math.abs( d ) < 1e-5 );
-	return ! isAxisAligned;
-}
-
-/**
  * Returns the outermost block element containing the given element that is
  * rotated or skewed, if any.
  *
@@ -130,7 +116,9 @@ export function getOutermostRotatedAncestorBlock( element: Element ) {
 	let rotatedAncestor: Element | undefined;
 	let ancestor = element.parentElement?.closest( BLOCK_SELECTOR );
 	while ( ancestor ) {
-		if ( isStyleRotated( view.getComputedStyle( ancestor ) ) ) {
+		if (
+			! isStyleTransformAxisAligned( view.getComputedStyle( ancestor ) )
+		) {
 			rotatedAncestor = ancestor;
 		}
 		ancestor = ancestor.parentElement?.closest( BLOCK_SELECTOR );
@@ -170,122 +158,6 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
 }
 
-const ANGLE_UNITS: Record< string, number > = {
-	deg: 1,
-	grad: 0.9,
-	rad: 180 / Math.PI,
-	turn: 360,
-};
-
-const ROTATE_AXES: Record< string, [ number, number, number ] > = {
-	'': [ 0, 0, 1 ],
-	x: [ 1, 0, 0 ],
-	y: [ 0, 1, 0 ],
-	z: [ 0, 0, 1 ],
-};
-
-function parseAngle( value: string ) {
-	const match = value.match(
-		/^(-?[\d.]+(?:e[+-]?\d+)?)(deg|grad|rad|turn)$/
-	);
-	return match ? parseFloat( match[ 1 ] ) * ANGLE_UNITS[ match[ 2 ] ] : NaN;
-}
-
-function parseLength( value: string, size: number ) {
-	if ( value.endsWith( '%' ) ) {
-		return ( parseFloat( value ) / 100 ) * size;
-	}
-	return value.endsWith( 'px' ) ? parseFloat( value ) : NaN;
-}
-
-/**
- * Builds the matrix an element's own `translate`, `rotate`, `scale` and
- * `transform` apply to its border box, about its transform origin.
- *
- * @param element Element.
- * @param style   Computed style of the element.
- *
- * @return The matrix, or undefined when the element is not transformed or
- *         a value can't be read.
- */
-function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
-	const {
-		translate = 'none',
-		rotate = 'none',
-		scale = 'none',
-		transform = 'none',
-	} = style;
-
-	if (
-		translate === 'none' &&
-		rotate === 'none' &&
-		scale === 'none' &&
-		transform === 'none'
-	) {
-		return;
-	}
-
-	const { offsetWidth: width, offsetHeight: height } = element;
-	const [ originX, originY ] = style.transformOrigin
-		.split( ' ' )
-		.map( ( value ) => parseFloat( value ) );
-	// CSS applies `translate`, then `rotate`, then `scale`, then `transform`.
-	const matrix = new window.DOMMatrix().translateSelf( originX, originY );
-
-	if ( translate !== 'none' ) {
-		const [ x, y = '0px' ] = translate.split( ' ' );
-		matrix.translateSelf(
-			parseLength( x, width ),
-			parseLength( y, height )
-		);
-	}
-
-	if ( rotate !== 'none' ) {
-		const parts = rotate.split( ' ' );
-		const angle = parseAngle( parts.pop()! );
-		const [ x, y, z ] =
-			ROTATE_AXES[ parts.join( ' ' ) ] ??
-			parts.map( ( value ) => parseFloat( value ) );
-		matrix.rotateAxisAngleSelf( x, y, z, angle );
-	}
-
-	if ( scale !== 'none' ) {
-		const [ x, y = x ] = scale
-			.split( ' ' )
-			.map( ( value ) =>
-				value.endsWith( '%' )
-					? parseFloat( value ) / 100
-					: parseFloat( value )
-			);
-		matrix.scaleSelf( x, y );
-	}
-
-	if ( transform !== 'none' ) {
-		matrix.multiplySelf( new window.DOMMatrix( transform ) );
-	}
-
-	matrix.translateSelf( -originX, -originY );
-
-	// The page is painted flat, so only the 2D part reaches the screen.
-	const { a, b, c, d, e, f } = matrix;
-	return [ a, b, c, d, e, f ].every( Number.isFinite )
-		? new window.DOMMatrix( [ a, b, c, d, e, f ] )
-		: undefined;
-}
-
-function getElementTransform( element: Element ) {
-	const view = element.ownerDocument.defaultView;
-
-	if ( ! view || ! ( 'offsetWidth' in element ) ) {
-		return;
-	}
-
-	return getOwnTransform(
-		element as HTMLElement,
-		view.getComputedStyle( element )
-	);
-}
-
 /**
  * Returns the matrix that maps the untransformed layout of the nearest
  * transformed element, from `element` up, to client coordinates. Blocks
@@ -297,7 +169,7 @@ function getElementTransform( element: Element ) {
  */
 export function getLayoutFrame( element: Element | null ): DOMMatrix | null {
 	for ( let current = element; current; current = current.parentElement ) {
-		const transform = getElementTransform( current );
+		const transform = getBorderBoxPointTransform( current );
 
 		if ( ! transform ) {
 			continue;
@@ -332,7 +204,7 @@ export function getLayoutRect(
 	frame = getLayoutFrame( element.parentElement )
 ) {
 	const rect = element.getBoundingClientRect();
-	const transform = getElementTransform( element );
+	const transform = getBorderBoxPointTransform( element );
 
 	if ( ! transform && ! frame ) {
 		return rect;
@@ -430,7 +302,7 @@ export function extendRectToTop( rect: DOMRect, top: number ) {
  */
 function getPaintedCorners( element: Element, frame: DOMMatrix | null ) {
 	const { x, y, width, height } = getLayoutRect( element, frame );
-	const transform = getElementTransform( element );
+	const transform = getBorderBoxPointTransform( element );
 	const corners = [
 		[ 0, 0 ],
 		[ width, 0 ],
