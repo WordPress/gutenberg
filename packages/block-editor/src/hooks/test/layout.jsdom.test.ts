@@ -4,7 +4,6 @@ import {
 	getLayoutStateOverrides,
 	getResetLayout,
 	getResponsiveLayoutStyles,
-	getUsedLayoutType,
 	hasLayoutPanelControls,
 	useLayoutStyles,
 } from '../layout';
@@ -138,63 +137,6 @@ describe( 'layout', () => {
 					{ type: 'grid' }
 				)
 			).toBeUndefined();
-		} );
-	} );
-
-	describe( 'getUsedLayoutType()', () => {
-		it( 'returns the layout type from the layout attribute', () => {
-			expect(
-				getUsedLayoutType( {
-					layout: { type: 'grid' },
-					layoutBlockSupport: { default: { type: 'flex' } },
-					defaultLayout: { type: 'flex' },
-				} )
-			).toBe( 'grid' );
-		} );
-
-		it( 'falls back to the default layout type', () => {
-			expect(
-				getUsedLayoutType( {
-					layoutBlockSupport: { default: { type: 'flex' } },
-					defaultLayout: { type: 'flex' },
-				} )
-			).toBe( 'flex' );
-		} );
-
-		it( 'falls back to the default layout type when the layout attribute has no type', () => {
-			expect(
-				getUsedLayoutType( {
-					layout: { justifyContent: 'center' },
-					layoutBlockSupport: { default: { type: 'flex' } },
-				} )
-			).toBe( 'flex' );
-		} );
-
-		it( 'returns the flow layout type when there is no layout config', () => {
-			expect( getUsedLayoutType( { layoutBlockSupport: {} } ) ).toBe(
-				'default'
-			);
-		} );
-
-		it( 'returns the layout type set for the selected viewport', () => {
-			expect(
-				getUsedLayoutType( {
-					layout: { type: 'default' },
-					style: { '@mobile': { layout: { type: 'constrained' } } },
-					layoutBlockSupport: {},
-					selectedState: { viewport: '@mobile' },
-				} )
-			).toBe( 'constrained' );
-		} );
-
-		it( 'ignores the layout type set for a viewport outside that viewport', () => {
-			expect(
-				getUsedLayoutType( {
-					layout: { type: 'default' },
-					style: { '@mobile': { layout: { type: 'constrained' } } },
-					layoutBlockSupport: {},
-				} )
-			).toBe( 'default' );
 		} );
 	} );
 

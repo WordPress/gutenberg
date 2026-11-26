@@ -48,8 +48,6 @@ import type {
 	LayoutPanelProps,
 	LayoutTypeSwitcherProps,
 	ResponsiveLayoutStylesOptions,
-	BlockStyle,
-	BlockStyleState,
 } from './types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
@@ -350,48 +348,6 @@ export function getResponsiveLayoutStyles( {
 		.join( '' );
 }
 
-/**
- * Returns the layout type a block uses. In a viewport state, a layout type set
- * for that viewport takes precedence.
- *
- * @param options                    Options.
- * @param options.layout             The block's layout attribute.
- * @param options.style              The block's style attribute.
- * @param options.layoutBlockSupport The block's layout support.
- * @param options.defaultLayout      The layout used when the block has none.
- * @param options.selectedState      The selected style state.
- *
- * @return The layout type name.
- */
-export function getUsedLayoutType( {
-	layout,
-	style,
-	layoutBlockSupport,
-	defaultLayout,
-	selectedState,
-}: {
-	layout?: Layout;
-	style?: BlockStyle;
-	layoutBlockSupport: LayoutBlockSupport;
-	defaultLayout?: Layout;
-	selectedState?: BlockStyleState;
-} ): string {
-	const isViewportLayoutState =
-		hasViewportBlockStyleState( selectedState ) &&
-		! hasPseudoBlockStyleState( selectedState );
-	const stateLayout = isViewportLayoutState
-		? // A style state holds the layout it overrides.
-			( getStyleForState( style, selectedState )?.layout as
-				Layout | undefined )
-		: undefined;
-	const { type, default: { type: defaultType = 'default' } = {} } = {
-		...layoutBlockSupport,
-		...( layout || defaultLayout ),
-		...stateLayout,
-	};
-	return type || defaultType;
-}
-
 function LayoutPanelPure( {
 	layout,
 	style,
@@ -436,14 +392,13 @@ function LayoutPanelPure( {
 				}.default;
 				const layoutTypes = new Set(
 					multiSelectedClientIds.map( ( id: string ) => {
-						const attributes = getBlockAttributes( id ) || {};
-						return getUsedLayoutType( {
-							layout: attributes.layout,
-							style: attributes.style,
-							layoutBlockSupport: _layoutBlockSupport,
-							defaultLayout,
-							selectedState: getSelectedBlockStyleState( id ),
-						} );
+						const blockLayout =
+							getBlockAttributes( id )?.layout || defaultLayout;
+						return (
+							blockLayout?.type ||
+							_layoutBlockSupport.default?.type ||
+							'default'
+						);
 					} )
 				);
 				_hasMixedLayoutTypes = layoutTypes.size > 1;
@@ -568,13 +523,9 @@ function LayoutPanelPure( {
 		...layoutBlockSupport,
 		...usedLayout,
 	};
-	const blockLayoutType = getUsedLayoutType( {
-		layout,
-		style,
-		layoutBlockSupport,
-		defaultLayout: defaultBlockLayout,
-		selectedState,
-	} );
+	const { type, default: { type: defaultType = 'default' } = {} } =
+		blockSupportAndLayout;
+	const blockLayoutType = type || defaultType;
 
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
