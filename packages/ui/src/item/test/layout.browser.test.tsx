@@ -303,6 +303,46 @@ describe( 'Item layout', () => {
 		expect( link.borderEndEndRadius ).not.toBe( '0px' );
 	} );
 
+	it( 'leaves out the line above a group that is flush with the top of a card', async () => {
+		await render(
+			<Card.Root>
+				<Card.Content>
+					<Card.FullBleed>
+						<Item.Group aria-label="At the top">
+							<Item.LinkRow href="#card">
+								<Item.Label>Card payments</Item.Label>
+							</Item.LinkRow>
+						</Item.Group>
+					</Card.FullBleed>
+				</Card.Content>
+			</Card.Root>
+		);
+
+		// The border of the card already separates the rows from the edge.
+		expect(
+			getComputedStyle(
+				screen.getByRole( 'list', { name: 'At the top' } )
+			).borderBlockStartWidth
+		).toBe( '0px' );
+	} );
+
+	it( 'shows a disabled row as disabled when its label renders as a heading', async () => {
+		await render(
+			<>
+				<Item.ButtonRow onClick={ () => {} } disabled>
+					<Item.Label>Span label</Item.Label>
+				</Item.ButtonRow>
+				<Item.ButtonRow onClick={ () => {} } disabled>
+					<Item.Label render={ <h3 /> }>Heading label</Item.Label>
+				</Item.ButtonRow>
+			</>
+		);
+
+		expect(
+			getComputedStyle( screen.getByText( 'Heading label' ) ).color
+		).toBe( getComputedStyle( screen.getByText( 'Span label' ) ).color );
+	} );
+
 	it( 'draws a frame around a row outside a group', async () => {
 		await render(
 			<Item.ContentRow data-testid="row">

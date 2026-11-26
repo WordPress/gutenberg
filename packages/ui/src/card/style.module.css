@@ -47,6 +47,13 @@
 			 */
 			--_wp-ui-card-fullbleed-radius-block-start: 0px;
 			--_wp-ui-card-fullbleed-radius-block-end: 0px;
+			/*
+			 * Whether the `FullBleed` is flush with the top edge of the card,
+			 * as 1 or 0. Content that draws a line to separate itself from
+			 * what precedes it, such as `Item.Group`, leaves the line out at
+			 * the top edge, where the border of the card already draws one.
+			 */
+			--_wp-ui-card-fullbleed-flush-block-start: 0;
 
 			margin-inline: calc(-1 * var(--wp-ui-card-padding));
 			width: calc(100% + 2 * var(--wp-ui-card-padding));
@@ -60,6 +67,7 @@
 		 */
 		.root > :is(.header, .content):first-child > .fullbleed:first-child {
 			--_wp-ui-card-fullbleed-radius-block-start: var(--_wp-ui-card-inner-radius);
+			--_wp-ui-card-fullbleed-flush-block-start: 1;
 
 			margin-block-start: calc(-1 * var(--wp-ui-card-padding));
 		}

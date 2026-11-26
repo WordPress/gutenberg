@@ -44,12 +44,14 @@
 		/*
 		 * Inside `Card.FullBleed` the card is the frame. Only the top line
 		 * of the frame stays, to separate the rows from what precedes them
-		 * in the card, such as its header.
+		 * in the card, such as its header. At the top edge of the card, the
+		 * border of the card draws that line, so the group leaves it out.
 		 */
 		[data-wp-ui-card-fullbleed] > .has-frame {
 			--_wp-ui-item-radius: 0px;
 
 			border-inline-width: 0;
+			border-block-start-width: calc(var(--wpds-border-width-xs) * (1 - var(--_wp-ui-card-fullbleed-flush-block-start, 0)));
 			border-block-end-width: 0;
 			background-color: transparent;
 		}
@@ -243,11 +245,21 @@
 		}
 
 		/* The label of a link or button row is the visible text of a control. */
+		/*
+		 * The label of a link or button row is the visible text of a control.
+		 * `--_gcd-heading-color` carries the color to a label that renders
+		 * as a heading, which the unlayered heading defense would otherwise
+		 * color as static text.
+		 */
 		.is-activatable > .label {
+			--_gcd-heading-color: var(--wpds-color-foreground-interactive-neutral);
+
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		.row:has(> .surface[data-disabled]) > .label {
+			--_gcd-heading-color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 			/*
@@ -255,6 +267,8 @@
 			 * otherwise give it the ordinary text color.
 			 */
 			@media (forced-colors: active) {
+				--_gcd-heading-color: GrayText;
+
 				color: GrayText;
 			}
 		}
