@@ -288,9 +288,13 @@ describe( 'Item', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'names the row by its label when aria-labelledby is empty', () => {
+	it.each( [
+		[ 'an empty aria-labelledby', { 'aria-labelledby': '' } ],
+		[ 'a blank aria-labelledby', { 'aria-labelledby': ' ' } ],
+		[ 'a blank aria-label', { 'aria-label': ' ' } ],
+	] )( 'names the row by its label when it has %s', ( _, props ) => {
 		render(
-			<Item.ButtonRow onClick={ () => {} } aria-labelledby="">
+			<Item.ButtonRow onClick={ () => {} } { ...props }>
 				<Item.Label>Export</Item.Label>
 			</Item.ButtonRow>
 		);
@@ -298,6 +302,22 @@ describe( 'Item', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Export' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'keeps an explicit aria-hidden on the label of a content row', () => {
+		render(
+			<Item.ContentRow>
+				<Item.Label aria-hidden="true">Email updates</Item.Label>
+				<Item.Actions>
+					<input type="checkbox" aria-label="Email notifications" />
+				</Item.Actions>
+			</Item.ContentRow>
+		);
+
+		expect( screen.getByText( 'Email updates' ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
+		);
 	} );
 
 	it( 'supports a disabled button row', async () => {

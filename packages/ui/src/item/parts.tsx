@@ -71,7 +71,9 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 				// The control of an activatable row takes its name from
 				// this element. Without `aria-hidden`, a screen reader
 				// would read the same text a second time after the control.
-				aria-hidden={ context?.isActivatable || undefined }
+				aria-hidden={
+					context?.isActivatable ? true : props[ 'aria-hidden' ]
+				}
 				className={ clsx( styles.label, className ) }
 			/>
 		);

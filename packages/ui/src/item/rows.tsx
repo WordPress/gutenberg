@@ -67,6 +67,13 @@ function useRow( {
 	aria = {},
 }: RowOptions ) {
 	const group = useContext( GroupContext );
+	// A blank naming prop names nothing, so it counts as absent.
+	const ariaLabel = aria[ 'aria-label' ]?.trim()
+		? aria[ 'aria-label' ]
+		: undefined;
+	const ariaLabelledBy = aria[ 'aria-labelledby' ]?.trim()
+		? aria[ 'aria-labelledby' ]
+		: undefined;
 
 	const id = useId();
 	const labelId = `${ id }-label`;
@@ -122,9 +129,7 @@ function useRow( {
 		[ isActivatable ]
 	);
 
-	const hasExplicitName = !! (
-		aria[ 'aria-label' ] || aria[ 'aria-labelledby' ]
-	);
+	const hasExplicitName = !! ( ariaLabel || ariaLabelledBy );
 
 	useEffect( () => {
 		// The effects of the parts run before this one, so the label has
@@ -165,11 +170,9 @@ function useRow( {
 	 * the parts rendered beside it.
 	 */
 	const labelling = {
-		'aria-label': aria[ 'aria-label' ],
+		'aria-label': ariaLabel,
 		'aria-labelledby':
-			// An empty value counts as absent: it would leave the
-			// control without a name.
-			aria[ 'aria-labelledby' ] ||
+			ariaLabelledBy ||
 			( hasExplicitName
 				? undefined
 				: // The new-tab notice is part of the name, as it is in `Link`.
@@ -211,7 +214,7 @@ function useRow( {
 				className={ clsx(
 					defenseStyles.li,
 					styles.listitem,
-					group.variant === 'detached' && styles[ 'has-frame' ]
+					group === 'detached' && styles[ 'has-frame' ]
 				) }
 			>
 				{ /*
@@ -239,7 +242,9 @@ function useRow( {
  *
  * `className` and `style` apply to the row. The `ref`, the `render` prop
  * and all other props apply to the link. Use `render` to compose the row
- * with a router link.
+ * with a router link. Pass `aria-label`, `aria-labelledby` and
+ * `aria-describedby` to the row, not to the `render` element, so that they
+ * combine with the references of the row.
  *
  * With `openInNewTab`, or with `target="_blank"`, the row tells assistive
  * technology that it opens in a new tab, and its `Item.Chevron` shows the

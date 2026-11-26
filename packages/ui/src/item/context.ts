@@ -1,16 +1,12 @@
 import { createContext, useContext } from '@wordpress/element';
 import type { GroupVariant } from './types';
 
-export type GroupContextValue = {
-	variant: GroupVariant;
-};
-
 /**
- * `null` outside an `Item.Group`. A row then renders no list item and uses
- * its own `density` prop. Inside a group, rows inherit the density of the
- * group through CSS.
+ * The variant of the group a row is in, or `null` outside an `Item.Group`.
+ * A row outside a group renders no list item and uses its own `density`
+ * prop. Inside a group, rows inherit the density of the group through CSS.
  */
-export const GroupContext = createContext< GroupContextValue | null >( null );
+export const GroupContext = createContext< GroupVariant | null >( null );
 
 export type RowPart = 'label' | 'description' | 'meta' | 'actions' | 'chevron';
 

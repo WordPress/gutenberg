@@ -1,6 +1,6 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -33,8 +33,6 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 		{ density = 'comfortable', render, variant = 'joined', ...restProps },
 		ref
 	) {
-		const context = useMemo( () => ( { variant } ), [ variant ] );
-
 		const element = useRender( {
 			defaultTagName: 'ul',
 			render,
@@ -58,7 +56,7 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 		} );
 
 		return (
-			<GroupContext.Provider value={ context }>
+			<GroupContext.Provider value={ variant }>
 				{ element }
 			</GroupContext.Provider>
 		);
