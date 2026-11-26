@@ -55,6 +55,7 @@
 			"lineHeight": true,
 			"textAlign": true,
 			"textIndent": true,
+			"textWrap": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

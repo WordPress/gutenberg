@@ -7,8 +7,8 @@ import {
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	ToggleControl,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { Notice, SelectControl } from '@wordpress/ui';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import type { ComponentProps, ReactNode } from 'react';
 import type { FontSize } from '@wordpress/global-styles-engine';
@@ -91,6 +91,7 @@ export function useHasTypographyPanel( settings: StyleSettings | undefined ) {
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
 	const hasTextIndent = useHasTextIndentControl( settings );
+	const hasTextWrap = useHasTextWrapControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
@@ -107,6 +108,7 @@ export function useHasTypographyPanel( settings: StyleSettings | undefined ) {
 		hasFontSize ||
 		hasTextDecoration ||
 		hasTextIndent ||
+		hasTextWrap ||
 		hasWritingMode ||
 		hasTextColumns ||
 		hasTextColor ||
@@ -174,6 +176,10 @@ function useHasTextColumnsControl( settings: StyleSettings | undefined ) {
 
 function useHasTextIndentControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textIndent;
+}
+
+function useHasTextWrapControl( settings: StyleSettings | undefined ) {
+	return settings?.typography?.textWrap;
 }
 
 function useHasTextShadowControl( settings: StyleSettings | undefined ) {
@@ -250,11 +256,21 @@ const DEFAULT_CONTROLS: Record< string, boolean > = {
 	textTransform: true,
 	textDecoration: true,
 	textIndent: true,
+	textWrap: true,
 	writingMode: true,
 	textColumns: true,
 	textShadow: true,
 	textGradient: false,
 };
+
+const TEXT_WRAP_OPTIONS = [
+	{ label: __( 'Default' ), value: '' },
+	{ label: __( 'Wrap' ), value: 'wrap' },
+	{ label: __( 'No wrap' ), value: 'nowrap' },
+	{ label: __( 'Balance' ), value: 'balance' },
+	{ label: __( 'Pretty' ), value: 'pretty' },
+	{ label: __( 'Stable' ), value: 'stable' },
+];
 
 const EMPTY_VALUES: unknown[] = [ undefined, null, '' ];
 
@@ -835,6 +851,36 @@ export default function TypographyPanel( {
 		hasValue( value?.typography?.textDecoration );
 	const resetTextDecoration = () => setTextDecoration( undefined );
 
+	// Text wrap
+	const hasTextWrapControl = useHasTextWrapControl( settings );
+	const inheritedTextWrap = decodeValue(
+		inheritedValue?.typography?.textWrap
+	);
+	const localTextWrap = decodeValue( value?.typography?.textWrap );
+	const setTextWrap = ( newValue?: string ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textWrap' ],
+				hasValue( newValue ) ? newValue : undefined
+			)
+		);
+	};
+	const textWrapItems = TEXT_WRAP_OPTIONS.map( ( option ) =>
+		option.value === '' && inheritedTextWrap
+			? {
+					...option,
+					label: sprintf(
+						/* translators: %s: inherited text wrap value, e.g. "balance". */
+						__( 'Default (%s)' ),
+						inheritedTextWrap
+					),
+				}
+			: option
+	);
+	const hasTextWrapValue = () => hasValue( value?.typography?.textWrap );
+	const resetTextWrap = () => setTextWrap( undefined );
+
 	// Text Orientation
 	const hasWritingModeControl = useHasWritingModeControl( settings );
 	const inheritedWritingMode = decodeValue(
@@ -1238,6 +1284,42 @@ export default function TypographyPanel( {
 						// @ts-expect-error TextDecorationControl takes no input width.
 						__unstableInputWidth="auto"
 					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextWrapControl && (
+				<ToolsPanelItem
+					className="single-column"
+					label={ __( 'Text wrap' ) }
+					hasValue={ hasTextWrapValue }
+					onDeselect={ resetTextWrap }
+					isShownByDefault={ defaultControls.textWrap }
+					panelId={ panelId }
+				>
+					<SelectControl
+						label={ __( 'Text wrap' ) }
+						items={ textWrapItems }
+						value={
+							textWrapItems.find(
+								( item ) =>
+									item.value === ( localTextWrap ?? '' )
+							) ?? textWrapItems[ 0 ]
+						}
+						onValueChange={ ( item ) =>
+							setTextWrap( item?.value ?? undefined )
+						}
+					>
+						{ textWrapItems.map( ( item ) => (
+							<SelectControl.Item
+								key={ item.value }
+								value={ item }
+								label={ item.label }
+							>
+								<SelectControl.ItemLabel>
+									{ item.label }
+								</SelectControl.ItemLabel>
+							</SelectControl.Item>
+						) ) }
+					</SelectControl>
 				</ToolsPanelItem>
 			) }
 			{ hasWritingModeControl && (

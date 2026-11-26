@@ -22,6 +22,7 @@ export const STYLE_LABELS = {
 	'typography.textTransform': __( 'Letter case' ),
 	'typography.textColumns': __( 'Text columns' ),
 	'typography.writingMode': __( 'Orientation' ),
+	'typography.textWrap': __( 'Text wrap' ),
 
 	// Color.
 	'color.text': __( 'Text color' ),

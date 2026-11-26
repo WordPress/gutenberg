@@ -70,6 +70,7 @@
 			"textAlign": true,
 			"textColumns": true,
 			"textIndent": true,
+			"textWrap": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,

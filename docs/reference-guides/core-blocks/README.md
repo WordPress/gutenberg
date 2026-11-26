@@ -375,7 +375,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** [core/heading](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), className, color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, transform (rotate, scale, translate), typography (fitText, fontSize, lineHeight, textAlign, textIndent, textShadow)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), className, color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, transform (rotate, scale, translate), typography (fitText, fontSize, lineHeight, textAlign, textIndent, textShadow, textWrap)
 -	**Attributes:** content, level, levelOptions, placeholder
 
 ## Home Link
@@ -574,7 +574,7 @@ Start with the basic building block of all narrative.
 
 -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, background (backgroundClip, backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textShadow, textWrap), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -763,7 +763,7 @@ Give special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textIndent)
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign, textIndent, textWrap)
 -	**Attributes:** citation, value
 
 ## Query Loop
@@ -1090,7 +1090,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 -	**Name:** [core/verse](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-verse/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
--	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent)
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent, textWrap)
 -	**Attributes:** content
 
 ## Video

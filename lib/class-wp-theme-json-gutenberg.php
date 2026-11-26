@@ -515,6 +515,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textDecoration'           => null,
 			'textIndent'               => null,
 			'textTransform'            => null,
+			'textWrap'                 => null,
 			'textShadow'               => null,
 			'defaultTextShadowPresets' => null,
 			'textShadowPresets'        => null,

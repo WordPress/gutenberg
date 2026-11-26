@@ -316,6 +316,7 @@
 			"textDecoration": true,
 			"textIndent": "subsequent",
 			"textTransform": true,
+			"textWrap": true,
 			"textShadow": true,
 			"defaultTextShadowPresets": true,
 			"textShadowPresets": [
