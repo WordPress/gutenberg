@@ -9,7 +9,7 @@ $panel-title-height: 48px;
 	margin-right: auto;
 
 	.components-panel__body > .components-panel__body-title {
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		margin: 0;
 		height: $panel-title-height;
 		// Create a stacking context and make sure it's higher is than the content.

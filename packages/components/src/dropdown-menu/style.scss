@@ -14,7 +14,7 @@
 
 .components-dropdown-menu__menu {
 	width: 100%;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: $default-line-height;
 

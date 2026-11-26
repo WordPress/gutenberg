@@ -32,7 +32,7 @@
 .components-placeholder__instructions,
 .components-placeholder__label,
 .components-placeholder__fieldset {
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
 	// Global Styles can affect this so we are resetting.
 	letter-spacing: initial;
@@ -69,7 +69,7 @@
 	justify-content: flex-start;
 
 	p {
-		font-family: $default-font;
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 	}
 }

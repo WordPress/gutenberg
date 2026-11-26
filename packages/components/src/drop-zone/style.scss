@@ -82,6 +82,6 @@
 }
 
 .components-drop-zone__content-text {
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
 }

@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
-
 body {
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 }

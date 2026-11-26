@@ -31,7 +31,7 @@
 	width: fit-content;
 	z-index: 2;
 	background: $black;
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	border-radius: $radius-medium;
 	color: $gray-100;
 	text-align: center;

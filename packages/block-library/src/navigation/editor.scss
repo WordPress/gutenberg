@@ -265,7 +265,7 @@ $color-control-label-height: 20px;
 	align-items: center;
 	min-width: $grid-unit-10 * 12;
 	font-size: var(--wpds-typography-font-size-md);
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 
 	.wp-block-navigation.is-selected & {
 		display: none;
@@ -395,7 +395,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__actions {
 	display: flex;
 	font-size: var(--wpds-typography-font-size-md);
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	gap: $grid-unit-15 * 0.5;
 	align-items: center;
 
