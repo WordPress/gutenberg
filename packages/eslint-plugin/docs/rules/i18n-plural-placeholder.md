@@ -2,7 +2,7 @@
 
 `_n()` and `_nx()` choose a plural form from a number, and many languages use the same form for more than one number. Russian, Ukrainian, Serbian, and Croatian, for example, use the form for 1 also for 21, 31, and 101. A singular string that does not show the number, such as "This block", then reads wrong for those numbers.
 
-This rule reports `_n()` and `_nx()` calls where neither the singular nor the plural string contains a placeholder. A self-closing element tag, such as `<Count />`, counts as a placeholder, because `createInterpolateElement` can replace it with the number.
+This rule reports `_n()` and `_nx()` calls where neither the singular nor the plural string contains a placeholder. A self-closing element tag with any name, such as `<BlockCount />`, counts as a placeholder, because `createInterpolateElement` can replace it with the number.
 
 If the strings are not meant to show the number, choose between two separate strings with an explicit check instead. See [Basic Pluralization](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#basic-pluralization) in the WordPress Plugin Handbook.
 

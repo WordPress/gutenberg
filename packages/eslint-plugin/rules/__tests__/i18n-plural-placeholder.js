@@ -25,7 +25,7 @@ ruleTester.run( 'i18n-plural-placeholder', rule, {
 			code: `i18n._n( '%1$d block', '%1$d blocks', count )`,
 		},
 		{
-			code: `_n( '<Count /> block', '<Count /> blocks', count )`,
+			code: `_n( '<BlockCount /> block', '<BlockCount /> blocks', count )`,
 		},
 		{
 			code: `_n( singular, plural, count )`,
