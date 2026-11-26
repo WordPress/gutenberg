@@ -2,7 +2,7 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { AutocompleteGroupProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Groups related items together with an associated label rendered by

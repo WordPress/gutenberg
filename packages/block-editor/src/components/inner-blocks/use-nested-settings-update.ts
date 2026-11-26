@@ -103,12 +103,12 @@ export default function useNestedSettingsUpdate(
 		const layoutType = getLayoutType( layout?.type );
 
 		// These values are not defined for RN, so only include them if they
-		// are defined. When the block doesn't say, its layout can capture the
-		// toolbars of the blocks in it.
+		// are defined. A block captures the toolbars of the blocks in it when
+		// it opts in or when its layout does.
 		if ( captureToolbars !== undefined ) {
-			newSettings.__experimentalCaptureToolbars = captureToolbars;
-		} else if ( layoutType?.capturesToolbars?.( layout ?? undefined ) ) {
-			newSettings.__experimentalCaptureToolbars = true;
+			newSettings.__experimentalCaptureToolbars =
+				captureToolbars ||
+				!! layoutType?.capturesToolbars?.( layout ?? undefined );
 		}
 
 		// Orientation depends on layout,

@@ -17,6 +17,7 @@ import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	getStyleForState,
+	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
@@ -24,6 +25,7 @@ import {
 import { isAxialBlockGapAllowed } from './gap';
 import type { PanelStyle } from '../components/global-styles/types';
 import type { Layout } from '../layouts/types';
+import type { ChildLayout } from '../components/child-layout-control/types';
 import type {
 	DimensionsAttributes,
 	DimensionsHookPanelProps,
@@ -189,6 +191,11 @@ export function DimensionsPanel( {
 					isStateSelected ? undefined : setVisualizedProperty
 				}
 				inheritedValue={ inheritedValue }
+				inheritedChildLayout={
+					hasViewportBlockStyleState( selectedState )
+						? ( style?.layout as ChildLayout | undefined )
+						: undefined
+				}
 			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&

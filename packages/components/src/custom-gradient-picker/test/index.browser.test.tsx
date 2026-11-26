@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { useState } from '@wordpress/element';
+import { Suspense, startTransition, useState } from '@wordpress/element';
 import '../../button/style.scss';
 import '../style.scss';
 import '../../dropdown/style.scss';
@@ -148,6 +148,53 @@ describe( 'CustomGradientPicker', () => {
 	} );
 
 	describe( 'GradientTypePicker angle persistence', () => {
+		it( 'restores the committed linear angle after an update is suspended', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const suspend = vi.fn();
+			const pending = new Promise< never >( () => {} );
+
+			function PendingUpdate(): never {
+				suspend();
+				throw pending;
+			}
+
+			const picker = ( value: string, isPending = false ) => (
+				<Suspense fallback="Loading">
+					<CustomGradientPicker
+						value={ value }
+						onChange={ onChange }
+					/>
+					{ isPending && <PendingUpdate /> }
+				</Suspense>
+			);
+			const { rerender } = await render(
+				picker( 'linear-gradient(45deg,red 0%,blue 100%)' )
+			);
+
+			let update: ReturnType< typeof rerender > | undefined;
+			startTransition( () => {
+				update = rerender(
+					picker( 'linear-gradient(120deg,red 0%,blue 100%)', true )
+				);
+			} );
+			await update;
+			expect( suspend ).toHaveBeenCalled();
+			expect( screen.queryByText( 'Loading' ) ).not.toBeInTheDocument();
+
+			await rerender( picker( 'radial-gradient(red 0%,blue 100%)' ) );
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Type' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.stringContaining( '45deg' )
+			);
+		} );
+
 		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();

@@ -13,7 +13,6 @@ import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import SiteExport from './components/site-export';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
-import { registerCoreBlockBindingsSources } from './bindings/api';
 import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
@@ -38,7 +37,6 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	UploadProgressSnackbar,
-	registerCoreBlockBindingsSources,
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,

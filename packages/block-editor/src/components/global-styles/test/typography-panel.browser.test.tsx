@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
@@ -1132,9 +1132,11 @@ describe( 'TypographyPanel text gradient', () => {
 		await userEvent.click(
 			screen.getByRole( 'button', { name: /Gradient/ } )
 		);
-		expect(
-			await screen.findByText( 'Low contrast gradient' )
-		).toBeVisible();
+		const notice = await screen.findByText( 'Low contrast gradient' );
+		// The popover fades in from opacity 0, which `toBeVisible` counts as
+		// hidden, so wait for the fade to finish.
+		await waitFor( () => expect( notice ).toBePositionedPopover() );
+		expect( notice ).toBeVisible();
 	} );
 
 	it( 'keeps the gradient control usable while a background gradient is set', async () => {

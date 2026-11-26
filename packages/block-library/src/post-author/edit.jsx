@@ -86,7 +86,7 @@ function AuthorCombobox( { value, onChange } ) {
 			currentAuthor = [
 				{
 					value: 0,
-					label: __( '(No author)' ),
+					label: __( '(no author)' ),
 				},
 			];
 		}

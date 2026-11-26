@@ -29,7 +29,11 @@
  *                        checkout that Gutenberg is in, such as at src/wp-content/plugins/gutenberg.
  *                        Add `--pr` to name the pull request that the checkout is working on. Stubs
  *                        generated from uncommitted changes cannot be generated again elsewhere, such
- *                        as in CI, so generate them with `--pr` or `--commit` before pushing.
+ *                        as in CI, so generate them with `--pr` or `--commit` before pushing. Without
+ *                        uncommitted changes, the checkout's commit is recorded along with the pull
+ *                        request, as `--pr` records it, so when the pull request's branch is checked
+ *                        out and pushed, `--checkout --pr` generates the same stubs as `--pr` without
+ *                        fetching anything.
  *
  * A commit is read from the wordpress-develop checkout that Gutenberg is in when it has the commit,
  * and is fetched from GitHub otherwise. The options record the new source in composer.json, which is

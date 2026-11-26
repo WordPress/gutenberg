@@ -354,6 +354,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			} );
 
 		// Open the actions menu.
+		await subMenuItem.hover();
 		await subMenuItemActions.click();
 
 		// usage of `page` is required because the options menu is rendered into a slot
@@ -498,6 +499,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			} );
 
 		// Open the actions menu.
+		await firstMenuItem.hover();
 		await firstItemActions.click();
 
 		// Add the submenu.
@@ -539,6 +541,49 @@ test.describe( 'Navigation block - List view editing', () => {
 					hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 				} )
 		).toBeVisible();
+	} );
+
+	test( `returns focus to the item's Options after adding a submenu link`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Top Level Item 1' } );
+		const optionsButton = row.getByRole( 'button', { name: 'Options' } );
+		const addSubmenuLink = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Add submenu link' } );
+
+		await test.step( 'when the link search is dismissed', async () => {
+			await row.hover();
+			await optionsButton.click();
+			await addSubmenuLink.click();
+			await expect( linkControl.getSearchInput() ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( optionsButton ).toBeFocused();
+		} );
+
+		await test.step( 'when a link is chosen', async () => {
+			await page.keyboard.press( 'Enter' );
+			await addSubmenuLink.click();
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'wordpress.org' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect( optionsButton ).toBeFocused();
+		} );
 	} );
 
 	test( `does not display link interface for blocks that have not just been inserted`, async ( {
@@ -1013,6 +1058,81 @@ test.describe( 'Navigation block - List view editing', () => {
 				return { linkTarget, rel };
 			}, clientId )
 		).toEqual( { linkTarget: undefined, rel: undefined } );
+	} );
+
+	test( 'edits a Social Icon from the List View popover in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content:
+				navMenuBlocksFixture.content +
+				`<!-- wp:social-links -->` +
+				`<ul class="wp-block-social-links">` +
+				`<!-- wp:social-link {"url":"https://wordpress.org/","service":"wordpress"} /-->` +
+				`</ul>` +
+				`<!-- /wp:social-links -->`,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// The popover offers the icon's text and link.
+		await listView.getByRole( 'link', { name: 'WordPress' } ).click();
+
+		const popover = page.locator(
+			'.block-editor-inspector-list-view-content-popover'
+		);
+		await expect(
+			popover.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
+		const urlInput = popover.getByRole( 'combobox', { name: 'Link to' } );
+		await expect( urlInput ).toHaveValue( 'https://wordpress.org/' );
+		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits reach the block.
+		await textInput.fill( 'WP' );
+		await urlInput.fill( 'https://wordpress.org/news/' );
+
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/news/' );
+		const socialLink = editor.canvas.locator(
+			'[data-type="core/social-link"]'
+		);
+		expect(
+			await page.evaluate(
+				( id ) =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getBlockAttributes( id ),
+				await socialLink.getAttribute( 'data-block' )
+			)
+		).toMatchObject( {
+			label: 'WP',
+			url: 'https://wordpress.org/news/',
+		} );
 	} );
 } );
 

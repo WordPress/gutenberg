@@ -161,15 +161,6 @@ export default function useDropZone( {
 					return;
 				}
 
-				// A mouse move with a button held is still part of the drag,
-				// in browsers that send them while dragging.
-				if (
-					event.type === 'mousemove' &&
-					( event as MouseEvent ).buttons !== 0
-				) {
-					return;
-				}
-
 				isDragging = false;
 
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );

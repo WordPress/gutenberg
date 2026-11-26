@@ -52,6 +52,15 @@ export type ControlWithErrorProps = Omit<
 	 */
 	getValidityTarget: () => ValidityTarget | null | undefined;
 	/**
+	 * A function that returns the element users interact with, when it is not
+	 * the validity target. For example, a control that validates a hidden
+	 * stand-in element can return its visible control here.
+	 *
+	 * The validation message is added to the accessible description of this
+	 * element, or of the validity target when this prop is not provided.
+	 */
+	getInteractiveTarget?: () => HTMLElement | null | undefined;
+	/**
 	 * The control component to apply validation to.
 	 *
 	 * As `children` will be cloned with additional props,

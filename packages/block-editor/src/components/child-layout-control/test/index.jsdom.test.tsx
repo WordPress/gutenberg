@@ -73,7 +73,12 @@ describe( 'ChildLayoutControl', () => {
 		panelId: 'client-id',
 	};
 
+	const originalGridInteractivity =
+		window.__experimentalEnableGridInteractivity;
+
 	afterEach( () => {
+		window.__experimentalEnableGridInteractivity =
+			originalGridInteractivity;
 		vi.clearAllMocks();
 	} );
 
@@ -128,6 +133,28 @@ describe( 'ChildLayoutControl', () => {
 		).toHaveValue( 2 );
 	} );
 
+	it( 'shows column and row start controls for auto-placement grids', () => {
+		window.__experimentalEnableGridInteractivity = false;
+
+		renderControl( {
+			parentLayout: {
+				type: 'grid',
+				isManualPlacement: false,
+			},
+			value: {
+				columnStart: 2,
+				rowStart: 3,
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Column start' } )
+		).toHaveValue( 2 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Row start' } )
+		).toHaveValue( 3 );
+	} );
+
 	it( 'sets a numeric span when entering 1 into an empty span control', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
@@ -144,9 +171,6 @@ describe( 'ChildLayoutControl', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( {
-			columnStart: undefined,
-			rowStart: undefined,
-			rowSpan: undefined,
 			columnSpan: 1,
 		} );
 	} );
@@ -202,7 +226,9 @@ describe( 'ChildLayoutControl', () => {
 					name: /Grid placement/,
 				} )
 			);
-			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Column start',
+			} );
 			await user.clear( input );
 			await user.type( input, '3' );
 
@@ -217,8 +243,9 @@ describe( 'ChildLayoutControl', () => {
 			const input = screen.getByRole( 'spinbutton', {
 				name: 'Column span',
 			} );
-			await user.clear( input );
-			await user.type( input, '1' );
+			// Replace the value in one edit.
+			await user.tripleClick( input );
+			await user.keyboard( '1' );
 
 			const change = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( change.columnSpan ).toBe( 1 );
@@ -231,15 +258,16 @@ describe( 'ChildLayoutControl', () => {
 			const onChange = vi.fn();
 			renderControl( { value, onChange, parentLayout } );
 
-			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
-			await user.clear( input );
-			await user.type( input, '1' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Column start',
+			} );
+			// Replace the value in one edit.
+			await user.tripleClick( input );
+			await user.keyboard( '1' );
 
+			// The control sends only what changes, along with the box.
 			expect( onChange.mock.calls.at( -1 )![ 0 ] ).toEqual( {
 				columnStart: 1,
-				rowStart: 1,
-				columnSpan: 2,
-				rowSpan: 1,
 				box,
 			} );
 		} );

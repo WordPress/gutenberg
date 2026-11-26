@@ -5,6 +5,11 @@ import { render } from 'vitest-browser-react';
 import { ThemeProvider } from '../theme-provider';
 import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 import styles from '../style.module.css';
+import { getContrast } from '../color-ramps/lib/color-utils';
+import {
+	SEMANTIC_FOCUS_CONTRAST_PAIRS,
+	getSemanticColorCustomProperty,
+} from '../semantic-color-contrast-pairs';
 // Browser Mode verifies the generated design-token stylesheet itself.
 import '../../prebuilt/css/design-tokens.css';
 
@@ -17,7 +22,7 @@ const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
-const PRIMARY = '#1e90ff';
+const PRIMARY = '#007cba';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
 const FORMER_WARNING_PRIMARY = '#608010';
@@ -90,6 +95,27 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
+	it( 'keeps legacy accent text readable when the brand fill moves away from the seed', async () => {
+		await render(
+			<ThemeProvider
+				color={ { primary: DEFAULT_PRIMARY, background: '#1e1e1e' } }
+			>
+				<span>Legacy accent</span>
+			</ThemeProvider>
+		);
+
+		const child = screen.getByText( 'Legacy accent' );
+		const accent = readProp( child, '--wp-components-color-accent' );
+		expect( accent ).toBe( DEFAULT_PRIMARY );
+		expect( readProp( child, BRAND_BG ) ).not.toBe( accent );
+		expect(
+			getContrast(
+				accent,
+				readProp( child, '--wp-components-color-accent-inverted' )
+			)
+		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
 	it( 'does not define color tokens if neither customized nor inherited', async () => {
 		await render(
 			<ThemeProvider>
@@ -113,7 +139,7 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarnings ).not.toHaveBeenCalled();
 	} );
 
-	it( 'reports low-contrast highlights even when their text is accessible', async () => {
+	it( 'keeps brand highlights visible against their neutral and brand surfaces', async () => {
 		const onColorWarnings =
 			vi.fn<
 				( warnings: readonly ThemeProviderColorWarning[] ) => void
@@ -125,23 +151,29 @@ describe( 'ThemeProvider', () => {
 					background: FORMER_WARNING_BACKGROUND,
 				} }
 				onColorWarnings={ onColorWarnings }
-			/>
+			>
+				<button>Focus contrast sample</button>
+			</ThemeProvider>
 		);
 
-		expect( onColorWarnings ).toHaveBeenCalledWith(
-			expect.arrayContaining( [
-				{
-					type: 'contrast',
-					backgroundToken: 'background.surface.neutral-strong',
-					backgroundColor: '#563b79',
-					foregroundToken:
-						'background.interactive.brand-strong-active',
-					foregroundColor: '#6e8f26',
-					requiredContrast: 3,
-					achievedContrast: expect.closeTo( 2.4462, 4 ),
-				},
-			] )
-		);
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
+		const sample = screen.getByRole( 'button', {
+			name: 'Focus contrast sample',
+		} );
+		for ( const pair of SEMANTIC_FOCUS_CONTRAST_PAIRS ) {
+			expect(
+				getContrast(
+					readProp(
+						sample,
+						getSemanticColorCustomProperty( pair.background )
+					),
+					readProp(
+						sample,
+						getSemanticColorCustomProperty( pair.foreground )
+					)
+				)
+			).toBeGreaterThanOrEqual( 3 );
+		}
 
 		onColorWarnings.mockClear();
 		await rerender(

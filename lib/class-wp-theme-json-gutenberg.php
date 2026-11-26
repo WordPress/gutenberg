@@ -254,7 +254,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
-	 * @since 7.3.0 Added the `transform.rotate` property.
+	 * @since 7.3.0 Added `text-wrap` property.
+	 * @since 7.3.0 Added the `transform.rotate`, `transform.translate` and
+	 *              `transform.scale` properties.
 	 *
 	 * @var array
 	 */
@@ -314,6 +316,10 @@ class WP_Theme_JSON_Gutenberg {
 		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
 		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
 		'rotate'                            => array( 'transform', 'rotate' ),
+		'--wp--style--translate-x'          => array( 'transform', 'translate', 'x' ),
+		'--wp--style--translate-y'          => array( 'transform', 'translate', 'y' ),
+		'translate'                         => array( 'transform', 'translate' ),
+		'scale'                             => array( 'transform', 'scale' ),
 		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
 		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
 		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
@@ -323,6 +329,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'text-indent'                       => array( 'typography', 'textIndent' ),
+		'text-wrap'                         => array( 'typography', 'textWrap' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -409,7 +416,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0 Added `viewport` property.
 	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
-	 * @since 7.3.0 Added `transform.rotate`.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -488,7 +495,9 @@ class WP_Theme_JSON_Gutenberg {
 			'defaultPresets' => null,
 		),
 		'transform'                     => array(
-			'rotate' => null,
+			'rotate'    => null,
+			'translate' => null,
+			'scale'     => null,
 		),
 		'typography'                    => array(
 			'fluid'                    => null,
@@ -557,7 +566,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
-	 * @since 7.3.0 Added `transform.rotate`, for blocks and block style variations only.
+	 * @since 7.3.0 Added `typography.textWrap`.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`, for blocks and block style variations only.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -608,7 +618,12 @@ class WP_Theme_JSON_Gutenberg {
 			'blockGap' => null,
 		),
 		'transform'  => array(
-			'rotate' => null,
+			'rotate'    => null,
+			'translate' => array(
+				'x' => null,
+				'y' => null,
+			),
+			'scale'     => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -623,6 +638,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textIndent'     => null,
 			'textShadow'     => null,
 			'textTransform'  => null,
+			'textWrap'       => null,
 			'writingMode'    => null,
 		),
 		'css'        => null,
@@ -690,7 +706,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 *     @type bool $include_desktop Whether to include the desktop media query. Default false.
 	 * }
-	 * @return array Responsive media queries.
+	 * @return array<string, string> Responsive media queries, keyed by style-state name.
+	 *
+	 * @phpstan-return array{
+	 *     '@mobile'?: non-falsy-string,
+	 *     '@tablet'?: non-falsy-string,
+	 *     '@desktop'?: non-falsy-string,
+	 * }
 	 */
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
 		$breakpoints = self::sanitize_viewport_settings( $viewport_settings );
@@ -951,6 +973,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Processes pseudo-selectors for any node (block or variation).
 	 *
 	 * @since 7.0.0
+	 * @since 7.3.0 Added the `$default_node` parameter.
 	 *
 	 * @param array      $node            The node data (block or variation).
 	 * @param string     $base_selector   The base selector.
@@ -958,9 +981,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string     $block_name      The block name.
 	 * @param array|null $block_metadata  Metadata about the block to get styles for.
 	 * @param array|null $style_variation Style variation metadata.
+	 * @param array|null $default_node    For a breakpoint node, the node outside the breakpoint.
 	 * @return array Array of pseudo-selector declarations.
 	 */
-	private function process_pseudo_selectors( $node, $base_selector, $settings, $block_name, $block_metadata = null, $style_variation = null ) {
+	private function process_pseudo_selectors( $node, $base_selector, $settings, $block_name, $block_metadata = null, $style_variation = null, $default_node = null ) {
 		$pseudo_declarations = array();
 		$add_declarations    = static function ( $selector, $declarations ) use ( &$pseudo_declarations ) {
 			if ( empty( $declarations ) ) {
@@ -989,29 +1013,46 @@ class WP_Theme_JSON_Gutenberg {
 				$base_styles[] = $layer;
 			}
 		}
+		if ( is_array( $block_metadata ) ) {
+			$base_styles[] = self::get_text_clip_base_block_styles( $block_metadata );
+		}
 
 		foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] as $pseudo_selector ) {
 			if ( isset( $node[ $pseudo_selector ] ) ) {
-				$pseudo_node = $node[ $pseudo_selector ];
+				$pseudo_node          = $node[ $pseudo_selector ];
+				$feature_declarations = array();
 
 				if ( is_array( $block_metadata ) ) {
 					$feature_declarations = $this->get_feature_declarations_for_node( $block_metadata, $pseudo_node );
 					$feature_declarations = self::update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name );
 					$feature_declarations = self::update_button_width_declarations( $feature_declarations, $settings );
+				}
 
-					foreach ( $feature_declarations as $feature_selector => $declarations ) {
-						$target_selector   = is_array( $style_variation )
-							? static::get_block_style_variation_feature_selector( $style_variation, $feature_selector )
-							: $feature_selector;
-						$combined_selector = static::append_to_selector( $target_selector, $pseudo_selector );
+				// Mirror of `get_state_base_styles()`: the default pseudo-state comes nearest.
+				$pseudo_base = is_array( $default_node[ $pseudo_selector ] ?? null )
+					? array_merge( array( $default_node[ $pseudo_selector ] ), $base_styles )
+					: $base_styles;
 
-						$add_declarations( $combined_selector, $declarations );
-					}
+				// `$pseudo_node` has lost its feature styles, so check the untouched state.
+				$declarations = static::compute_style_properties( $pseudo_node, $settings, null, null );
+				$declarations = self::get_state_declarations_with_text_clip_escapes(
+					$declarations,
+					$node[ $pseudo_selector ],
+					$pseudo_base,
+					$block_metadata['selectors'] ?? array(),
+					$feature_declarations
+				);
+
+				foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
+					$target_selector   = is_array( $style_variation )
+						? static::get_block_style_variation_feature_selector( $style_variation, $feature_selector )
+						: $feature_selector;
+					$combined_selector = static::append_to_selector( $target_selector, $pseudo_selector );
+
+					$add_declarations( $combined_selector, $individual_feature_declarations );
 				}
 
 				$combined_selector = static::append_to_selector( $base_selector, $pseudo_selector );
-				$declarations      = static::compute_style_properties( $pseudo_node, $settings, null, null );
-				$declarations      = self::get_state_declarations_with_text_clip_escapes( $declarations, $pseudo_node, $base_styles );
 				$add_declarations( $combined_selector, $declarations );
 			}
 		}
@@ -1043,6 +1084,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0
 	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -1072,6 +1114,9 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
+		array( 'transform', 'rotate' ),
+		array( 'transform', 'translate' ),
+		array( 'transform', 'scale' ),
 		array( 'typography', 'lineHeight' ),
 		array( 'typography', 'textColumns' ),
 	);
@@ -1914,9 +1959,7 @@ class WP_Theme_JSON_Gutenberg {
 					$style_selectors = $block_metadata['styleVariations'] ?? array();
 
 					foreach ( $registered_styles[ $block_name ] as $block_style ) {
-						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
-						}
+						$style_selectors[ $block_style['name'] ] ??= static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
 					}
 
 					static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
@@ -2079,6 +2122,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Removed the `$type` parameter`, added the `$types` and `$origins` parameters.
 	 * @since 6.6.0 Added option to skip root layout or block style variation styles.
+	 * @since 7.3.0 Added the private `text_clip_base_blocks` option.
 	 *
 	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
 	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
@@ -2093,6 +2137,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - `skip_root_layout_styles` which omits root layout styles from the generated stylesheet.
 	 *                       - `base_layout_styles` which when true generates only base layout styles without alignment rules. Defaults to false.
 	 *                       - `include_block_style_variations` which includes CSS for block style variations.
+	 *                       - `text_clip_base_blocks` (private) block type styles the nodes layer over, read
+	 *                         only to escape a text clip set there. They are never output.
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
@@ -2115,6 +2161,14 @@ class WP_Theme_JSON_Gutenberg {
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata, $options );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
+		// `get_block_classes()` passes only node metadata to `get_styles_for_block()`.
+		if ( ! empty( $options['text_clip_base_blocks'] ) ) {
+			foreach ( $style_nodes as &$node ) {
+				$node['text_clip_base_blocks'] = $options['text_clip_base_blocks'];
+			}
+			unset( $node );
+		}
 
 		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
 		$root_settings_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
@@ -2287,14 +2341,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom CSS for a single block.
 	 * This function is deprecated; please do not sync to core.
 	 *
-	 * @param array  $css      The block css node.
+	 * @param string $css      The block CSS.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
 	 */
 	public function get_block_custom_css( $css, $selector ) {
 		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_styles_for_block' );
-		return $this->process_blocks_custom_css( $css, $selector );
+		return static::process_blocks_custom_css( $css, $selector );
 	}
 
 	/**
@@ -2696,9 +2750,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				$target = self::get_feature_selector( $feature_selectors, $preset_metadata['path'][0], $selector );
 
-				if ( ! isset( $vars_by_selector[ $target ] ) ) {
-					$vars_by_selector[ $target ] = array();
-				}
+				$vars_by_selector[ $target ] ??= array();
 
 				foreach ( $values_by_slug as $slug => $value ) {
 					$vars_by_selector[ $target ][] = array(
@@ -3258,14 +3310,16 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// The style engine validates transform values.
+			if ( 'transform' === $value_path[0] ) {
+				// Each translate axis and the `translate` declaration come from the whole value.
+				$transform_value = 'translate' === $value_path[1] ? ( $styles['transform']['translate'] ?? null ) : $value;
+				$value           = gutenberg_style_engine_get_styles( array( 'transform' => array( $value_path[1] => $transform_value ) ) )['declarations'][ $css_property ] ?? null;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
-				continue;
-			}
-
-			// Mirrors the style engine, which outputs a single angle only.
-			if ( 'rotate' === $css_property && ( ! is_string( $value ) || ! preg_match( WP_Style_Engine_Gutenberg::VALID_ANGLE_PATTERN, $value ) ) ) {
 				continue;
 			}
 
@@ -3520,11 +3574,9 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		$block_options = $options;
-		if ( ! isset( $block_options['include_block_style_variations'] ) ) {
-			$block_options['include_block_style_variations'] = true;
-		}
-		$block_nodes = self::get_block_nodes( $theme_json, $selectors, $block_options );
+		$block_options                                     = $options;
+		$block_options['include_block_style_variations'] ??= true;
+		$block_nodes                                       = self::get_block_nodes( $theme_json, $selectors, $block_options );
 		foreach ( $block_nodes as $block_node ) {
 			$nodes[] = $block_node;
 		}
@@ -4047,8 +4099,11 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the style objects a state node layers over, nearest first.
 	 *
 	 * Drops the path's state keys (e.g. `@mobile`) from the innermost outward.
+	 * A breakpoint pseudo-state (e.g. `@mobile` `:hover`) also layers over the
+	 * default pseudo-state.
 	 *
 	 * @since 7.2.0
+	 * @since 7.3.0 Includes the default pseudo-state for a breakpoint pseudo-state.
 	 *
 	 * @param string[]             $path     Path to the node within the theme.json tree.
 	 * @param array<string, mixed> $tree     The theme.json tree to read from.
@@ -4059,6 +4114,21 @@ class WP_Theme_JSON_Gutenberg {
 		$state_keys  = self::get_style_state_keys( $settings );
 		$base_path   = $path;
 		$base_styles = array();
+
+		// A breakpoint pseudo-state is output after the default pseudo-state, so that comes nearest.
+		$count = count( $path );
+		if (
+			$count >= 2 &&
+			in_array( $path[ $count - 1 ], array_merge( ...array_values( static::VALID_BLOCK_PSEUDO_SELECTORS ) ), true ) &&
+			array_key_exists( $path[ $count - 2 ], static::get_viewport_media_queries( $settings['viewport'] ?? null ) )
+		) {
+			$default_pseudo_path = $path;
+			unset( $default_pseudo_path[ $count - 2 ] );
+			$layer = _wp_array_get( $tree, array_values( $default_pseudo_path ) );
+			if ( is_array( $layer ) ) {
+				$base_styles[] = $layer;
+			}
+		}
 
 		foreach ( array_reverse( array_keys( $path ) ) as $index ) {
 			if ( ! in_array( $path[ $index ], $state_keys, true ) ) {
@@ -4076,16 +4146,51 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns the block type styles a block node layers over, from the private
+	 * `text_clip_base_blocks` stylesheet option.
+	 *
+	 * A block style variation instance stylesheet is built from the variation
+	 * alone, so it cannot otherwise see a text clip set for its block type.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array $block_metadata Metadata about the block to get styles for.
+	 * @return array<string, mixed> The block type styles, empty when there are none.
+	 */
+	private static function get_text_clip_base_block_styles( array $block_metadata ): array {
+		$path = $block_metadata['path'] ?? array();
+		if ( empty( $block_metadata['text_clip_base_blocks'] ) || 'blocks' !== ( $path[1] ?? null ) || ! isset( $path[2] ) || in_array( 'elements', $path, true ) ) {
+			return array();
+		}
+
+		$base_styles = $block_metadata['text_clip_base_blocks'][ $path[2] ] ?? array();
+
+		return is_array( $base_styles ) ? $base_styles : array();
+	}
+
+	/**
 	 * Adds the declarations a state needs to escape a text clip set below it.
 	 *
-	 * @since 7.2.0
+	 * The text fill reset goes on the block's `color` feature selector and the
+	 * clip escape on its `background` one, where those styles are output.
+	 * Without those selectors, both stay on the state's own selector.
 	 *
-	 * @param array[]              $declarations Declarations generated for the state.
-	 * @param array<string, mixed> $state_style  State style object.
-	 * @param array[]              $base_styles  Style objects the state layers over, nearest first.
+	 * @since 7.2.0
+	 * @since 7.3.0 Added the `$feature_selectors` and `$feature_declarations` parameters.
+	 *
+	 * @param array[]                                     $declarations         Declarations generated for the state.
+	 * @param array<string, mixed>                        $state_style          State style object, as in the theme.json data.
+	 * @param array[]                                     $base_styles          Style objects the state layers over, nearest first.
+	 * @param array<string, string|array<string, string>> $feature_selectors    Optional. The block's feature selectors.
+	 * @param array<string, array[]>                      $feature_declarations Optional. Feature declarations keyed by selector,
+	 *                                                                          which receive the escapes for feature selectors.
 	 * @return array[] Declarations with the escapes applied where needed.
+	 *
+	 * @phpstan-param list<array{ name: non-falsy-string, value: scalar }> $declarations
+	 * @phpstan-param array{ root?: string, ...<string, string|array<string, string>> } $feature_selectors
+	 * @phpstan-return list<array{ name: non-falsy-string, value: scalar }>
 	 */
-	private static function get_state_declarations_with_text_clip_escapes( array $declarations, array $state_style, array $base_styles ): array {
+	private static function get_state_declarations_with_text_clip_escapes( array $declarations, array $state_style, array $base_styles, array $feature_selectors = array(), array &$feature_declarations = array() ): array {
 		$base_clip = '';
 		foreach ( $base_styles as $base_style ) {
 			if ( ! empty( $base_style['background']['backgroundClip'] ) ) {
@@ -4098,16 +4203,29 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$escapes = array_merge(
-			gutenberg_get_state_text_clip_escape( $state_style, $base_clip ),
-			gutenberg_get_state_text_fill_reset( $state_style )
+		$escapes = array(
+			'background' => gutenberg_get_state_text_clip_escape( $state_style, $base_clip ),
+			'color'      => gutenberg_get_state_text_fill_reset( $state_style ),
 		);
 
-		foreach ( $escapes as $name => $value ) {
-			$declarations[] = array(
-				'name'  => $name,
-				'value' => $value,
-			);
+		foreach ( $escapes as $feature => $properties ) {
+			$feature_selector = $feature_selectors[ $feature ] ?? null;
+			if ( is_array( $feature_selector ) ) {
+				$subfeature       = 'color' === $feature ? 'text' : 'root';
+				$feature_selector = $feature_selector[ $subfeature ] ?? $feature_selector['root'] ?? null;
+			}
+
+			foreach ( $properties as $name => $value ) {
+				$declaration = array(
+					'name'  => $name,
+					'value' => $value,
+				);
+				if ( is_string( $feature_selector ) ) {
+					$feature_declarations[ $feature_selector ][] = $declaration;
+				} else {
+					$declarations[] = $declaration;
+				}
+			}
 		}
 
 		return $declarations;
@@ -4133,6 +4251,8 @@ class WP_Theme_JSON_Gutenberg {
 		$responsive_media_queries = static::get_viewport_media_queries( $settings['viewport'] ?? null );
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
+
+		$text_clip_base_block_styles = self::get_text_clip_base_block_styles( $block_metadata );
 
 		// The block's `css` feature selector, used for custom CSS of the block and its style variations.
 		$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
@@ -4160,8 +4280,16 @@ class WP_Theme_JSON_Gutenberg {
 		$style_variation_responsive_pseudo_css = array();
 		$style_variation_layout_metadata       = array();
 		if ( ! $media_query && ! empty( $block_metadata['variations'] ) ) {
+			/*
+			 * Feature selector extraction strips the nodes it reads, so the text clip
+			 * checks read the theme.json data. A block pseudo node lists the variations
+			 * too, so read the block's resting styles.
+			 */
+			$variation_block_node = _wp_array_get( $this->theme_json, array_slice( $block_metadata['path'], 0, 3 ), array() );
+
 			foreach ( $block_metadata['variations'] as $style_variation ) {
-				$style_variation_node = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				$style_variation_node   = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
+				$style_variation_source = $style_variation_node;
 
 				// Generate any feature/subfeature style declarations for the current style variation.
 				$variation_declarations = static::get_feature_declarations_for_node( $block_metadata, $style_variation_node );
@@ -4172,6 +4300,15 @@ class WP_Theme_JSON_Gutenberg {
 				// Update button width declarations for percentage values to use calc() with block gap.
 				$variation_declarations = self::update_button_width_declarations( $variation_declarations, $settings );
 
+				// Compute declarations for remaining styles not covered by feature level selectors.
+				$variation_base_declarations = self::get_state_declarations_with_text_clip_escapes(
+					static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json ),
+					$style_variation_source,
+					array( $variation_block_node, $text_clip_base_block_styles ),
+					$block_metadata['selectors'] ?? array(),
+					$variation_declarations
+				);
+
 				// Combine selectors with style variation's selector and add to overall style variation declarations.
 				foreach ( $variation_declarations as $current_selector => $new_declarations ) {
 					$combined_selectors = static::get_block_style_variation_feature_selector( $style_variation, $current_selector );
@@ -4179,12 +4316,11 @@ class WP_Theme_JSON_Gutenberg {
 					// Add the new declarations to the overall results under the modified selector.
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
 				}
-				// Compute declarations for remaining styles not covered by feature level selectors.
-				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
+				$style_variation_declarations[ $style_variation['selector'] ] = $variation_base_declarations;
 
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
 				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? self::get_block_name_from_metadata_path( $block_metadata ) : null );
-				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
+				$variation_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_source, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
 				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
 
 				// Custom CSS targets the block's `css` feature selector, if any.
@@ -4194,7 +4330,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
-					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $variation_css_selector );
+					$style_variation_custom_css[ $style_variation['selector'] ] = static::process_blocks_custom_css( $style_variation_node['css'], $variation_css_selector );
 				}
 
 				// Store variation metadata and node for layout styles generation.
@@ -4235,6 +4371,17 @@ class WP_Theme_JSON_Gutenberg {
 					$breakpoint_feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $breakpoint_node );
 					$breakpoint_feature_declarations = self::update_paragraph_text_indent_selector( $breakpoint_feature_declarations, $settings, $block_name );
 					$breakpoint_feature_declarations = self::update_button_width_declarations( $breakpoint_feature_declarations, $settings );
+
+					// Process base properties for this breakpoint.
+					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
+					$breakpoint_declarations = self::get_state_declarations_with_text_clip_escapes(
+						$breakpoint_declarations,
+						$style_variation_source[ $breakpoint ],
+						array( $style_variation_source, $variation_block_node, $text_clip_base_block_styles ),
+						$block_metadata['selectors'] ?? array(),
+						$breakpoint_feature_declarations
+					);
+
 					foreach ( $breakpoint_feature_declarations as $feature_selector => $feature_decl ) {
 						$combined_selectors = static::get_block_style_variation_feature_selector( $style_variation, $feature_selector );
 
@@ -4242,19 +4389,12 @@ class WP_Theme_JSON_Gutenberg {
 						$variation_responsive_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
 					}
 
-					// Process base properties for this breakpoint.
-					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
-					$breakpoint_declarations = self::get_state_declarations_with_text_clip_escapes(
-						$breakpoint_declarations,
-						$breakpoint_node,
-						array( $style_variation_node, $node )
-					);
 					if ( ! empty( $breakpoint_declarations ) ) {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
 						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';
 					}
 
-					$breakpoint_pseudo_declarations = $this->process_pseudo_selectors( $breakpoint_node, $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation );
+					$breakpoint_pseudo_declarations = $this->process_pseudo_selectors( $style_variation_source[ $breakpoint ], $style_variation['selector'], $settings, $block_name, $block_metadata, $style_variation, $style_variation_source );
 					foreach ( $breakpoint_pseudo_declarations as $pseudo_selector => $pseudo_declarations ) {
 						if ( empty( $pseudo_declarations ) ) {
 							continue;
@@ -4373,7 +4513,8 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
+		$base_styles   = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
+		$base_styles[] = $text_clip_base_block_styles;
 
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
 			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
@@ -4392,7 +4533,13 @@ class WP_Theme_JSON_Gutenberg {
 			 * so those properties are not output twice.
 			 */
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
-			$declarations = self::get_state_declarations_with_text_clip_escapes( $declarations, $node, $base_styles );
+			$declarations = self::get_state_declarations_with_text_clip_escapes(
+				$declarations,
+				_wp_array_get( $this->theme_json, $block_metadata['path'], array() ),
+				$base_styles,
+				$block_metadata['selectors'] ?? array(),
+				$feature_declarations
+			);
 		}
 
 		$block_rules = '';
@@ -4528,7 +4675,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {
-			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
+			$block_rules .= static::process_blocks_custom_css( $node['css'], $css_selector );
 		}
 
 		// 8. Wrap the entire block output in a media query if this is a responsive node.
@@ -5901,25 +6048,27 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Returns the selectors metadata for a block.
 	 *
-	 * @param object $block_type    The block type.
-	 * @param string $root_selector The block's root selector.
+	 * @param WP_Block_Type $block_type    The block type.
+	 * @param string        $root_selector The block's root selector.
 	 *
-	 * @return object The custom selectors set by the block.
+	 * @return array<string, string|array<string, string>> The custom selectors set by the block.
+	 *
+	 * @phpstan-return array{ root?: string, ...<string, string|array<string, string>> }
 	 */
 	protected static function get_block_selectors( $block_type, $root_selector ) {
 		if ( ! empty( $block_type->selectors ) ) {
 			return $block_type->selectors;
 		}
 
-		$selectors = array( 'root' => $root_selector );
+		$feature_selectors = array();
 		foreach ( static::BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS as $key => $feature ) {
 			$feature_selector = wp_get_block_css_selector( $block_type, $key );
 			if ( null !== $feature_selector ) {
-				$selectors[ $feature ] = array( 'root' => $feature_selector );
+				$feature_selectors[ $feature ] = array( 'root' => $feature_selector );
 			}
 		}
 
-		return $selectors;
+		return array( 'root' => $root_selector ) + $feature_selectors;
 	}
 
 	/**
@@ -5961,7 +6110,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array<string, array[]> The style declarations for the node's features with custom
 	 *                                selectors, keyed by selector.
 	 *
-	 * @phpstan-param array{ selectors?: array<string, string|array<string, string>> } $metadata
+	 * @phpstan-param array{ selectors?: array{ root?: string, ...<string, string|array<string, string>> } } $metadata
 	 * @phpstan-return array<string, list<array{ name: non-falsy-string, value: scalar }>>
 	 */
 	protected function get_feature_declarations_for_node( $metadata, &$node ) {
@@ -6326,8 +6475,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string|null The block name or null if not found.
 	 */
 	private static function get_block_name_from_metadata_path( $block_metadata ) {
-		if ( isset( $block_metadata['path'] ) ) {
-			return $block_metadata['path'][2];
-		}
+		return $block_metadata['path'][2] ?? null;
 	}
 }

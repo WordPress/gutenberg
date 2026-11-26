@@ -5,7 +5,7 @@ import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 

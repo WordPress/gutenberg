@@ -13,10 +13,19 @@ import { useInstanceId } from '@wordpress/compose';
 import BlockControls from '../block-controls';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	hasViewportBlockStyleState,
+} from '../../hooks/block-style-state';
+import { isPlainObject } from '../../utils/object';
+import type { ChildLayoutBlockStyle } from '../../hooks/types';
 import type { GridItemMoverProps, GridItemMoversProps } from './types';
 
 export function GridItemMovers( {
-	layout,
+	style,
+	selectedState,
+	isResponsiveEditing,
 	parentLayout,
 	onChange,
 	gridClientId,
@@ -24,6 +33,19 @@ export function GridItemMovers( {
 }: GridItemMoversProps ) {
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const hasViewportState = hasViewportBlockStyleState( selectedState );
+	const viewportStyle = hasViewportState
+		? getStyleForState( style, {
+				viewport: selectedState?.viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )
+		: undefined;
+	const layout = {
+		...( isPlainObject( style?.layout ) ? style.layout : {} ),
+		...( isPlainObject( viewportStyle?.layout )
+			? ( viewportStyle as ChildLayoutBlockStyle ).layout
+			: {} ),
+	};
 
 	// Moving a block placed freely by whole cells keeps its box, so it keeps
 	// its shape. A viewport that sets its own place needs its box too.
@@ -42,9 +64,28 @@ export function GridItemMovers( {
 		// Items move only within a grid with a column count.
 		columnCount!
 	);
+	function moveToCell( column: number, row: number ) {
+		// Block order is shared by all viewports.
+		if ( hasViewportState ) {
+			return;
+		}
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ blockClientId ],
+			gridClientId,
+			gridClientId,
+			getNumberOfBlocksBeforeCell( column, row )
+		);
+	}
 
 	return (
-		<BlockControls group="parent">
+		<BlockControls
+			group={
+				isResponsiveEditing && hasViewportState
+					? 'style-state'
+					: 'parent'
+			}
+		>
 			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
 				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
 					<GridItemMover
@@ -57,16 +98,7 @@ export function GridItemMovers( {
 								columnStart: columnStart - 1,
 								box,
 							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart - 1,
-									rowStart
-								)
-							);
+							moveToCell( columnStart - 1, rowStart );
 						} }
 					/>
 				</div>
@@ -82,16 +114,7 @@ export function GridItemMovers( {
 								rowStart: rowStart - 1,
 								box,
 							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart,
-									rowStart - 1
-								)
-							);
+							moveToCell( columnStart, rowStart - 1 );
 						} }
 					/>
 					<GridItemMover
@@ -105,16 +128,7 @@ export function GridItemMovers( {
 								rowStart: rowStart + 1,
 								box,
 							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart,
-									rowStart + 1
-								)
-							);
+							moveToCell( columnStart, rowStart + 1 );
 						} }
 					/>
 				</div>
@@ -129,16 +143,7 @@ export function GridItemMovers( {
 								columnStart: columnStart + 1,
 								box,
 							} );
-							__unstableMarkNextChangeAsNotPersistent();
-							moveBlocksToPosition(
-								[ blockClientId ],
-								gridClientId,
-								gridClientId,
-								getNumberOfBlocksBeforeCell(
-									columnStart + 1,
-									rowStart
-								)
-							);
+							moveToCell( columnStart + 1, rowStart );
 						} }
 					/>
 				</div>
@@ -147,7 +152,7 @@ export function GridItemMovers( {
 	);
 }
 
-function GridItemMover( {
+export function GridItemMover( {
 	className,
 	icon,
 	label,

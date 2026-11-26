@@ -220,6 +220,66 @@ test.describe( 'Block Notes: floating notes', () => {
 		} );
 	} );
 
+	test( 'shows a note shared by several blocks beside the first', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		for ( const content of [
+			'First shared',
+			SPACER_TEXT,
+			'Last shared',
+		] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+		const first = getParagraph( editor, 'First shared' );
+		const last = getParagraph( editor, 'Last shared' );
+		await editor.selectBlocks( first, last );
+		await blockNoteUtils.addNote( 'Shared note' );
+		const thread = getThread( page, 'Shared note' );
+		await expectBelow( last, first );
+
+		await blockNoteUtils.deselect();
+		await last.click();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expectAligned( thread, first );
+	} );
+
+	test( 'deselects a thread only when focus leaves its block', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		// A sibling makes the canvas the editing host while the block is selected.
+		for ( const content of [ 'Sibling', 'Noted' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+		await blockNoteUtils.addNote( 'Test note' );
+		const thread = getThread( page, 'Test note' );
+
+		await thread.click();
+		await getParagraph( editor, 'Noted' ).click();
+		// The thread checks where focus went in a timeout after it blurs.
+		await page.evaluate(
+			() => new Promise( ( resolve ) => setTimeout( resolve ) )
+		);
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		// The canvas keeps its caret in the block once focus leaves it.
+		await thread.click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.focus();
+		await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
+	} );
+
 	test( 'follows its block when blocks are reordered', async ( {
 		editor,
 		page,
@@ -351,7 +411,8 @@ test.describe( 'Block Notes: floating notes', () => {
 		await test.step( 'An editor notice shifts the canvas', async () => {
 			const notice = page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Test notice', { exact: true } );
+				.locator( '.notices-inline-notices__notice' )
+				.filter( { hasText: 'Test notice' } );
 			const initialTop = await getNotedTop();
 
 			// Moves the canvas without resizing anything inside it.
@@ -365,10 +426,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			await expect( notice ).toBeVisible();
 			// A notes column beside the canvas would cut the notice short.
-			const noticeBox = await page
-				.locator( '.notices-inline-notices__notice' )
-				.filter( { hasText: 'Test notice' } )
-				.boundingBox();
+			const noticeBox = await notice.boundingBox();
 			const canvasBox = await page
 				.locator( 'iframe[name="editor-canvas"]' )
 				.boundingBox();
@@ -973,6 +1031,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		test( 'yields to All notes when the canvas is too narrow', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			await page.setViewportSize( { width: 900, height: 900 } );
 			await editor.insertBlock( {
@@ -985,7 +1044,7 @@ test.describe( 'Block Notes: floating notes', () => {
 				.getByRole( 'button', { name: 'Document Overview' } )
 				.click();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await pageUtils.pressKeys( 'primaryAlt+M' );
 
 			await expect(
 				getAllNotes( page ).getByRole( 'textbox', {

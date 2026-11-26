@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget frame: keep the card padding below a framed body when a footer follows, so the widget's last line no longer sits on the footer divider ([#87238](https://github.com/WordPress/gutenberg/pull/87238)).
+
+### Internal
+
+-   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 0.12.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).
+
+### Internal
+
+-   Widget footer: stop setting `rel="noopener noreferrer"` on actions that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86486](https://github.com/WordPress/gutenberg/pull/86486)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.11.0 (2026-11-04)
+
 -   Widget footer: keep one strip height (text line plus padding) whatever affordances it holds, so a compact control or a runtime action no longer moves the divider or shrinks the body ([#85237](https://github.com/WordPress/gutenberg/pull/85237)).
 
 ### Breaking Changes

@@ -15,16 +15,15 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_transform_support( $block_type ) {
+	if ( ! block_has_support( $block_type, 'transform', false ) ) {
+		return;
+	}
+
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	// Check for existing style attribute definition e.g. from block.json.
-	if ( array_key_exists( 'style', $block_type->attributes ) ) {
-		return;
-	}
-
-	if ( block_has_support( $block_type, 'transform', false ) ) {
+	if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
@@ -32,96 +31,61 @@ function gutenberg_register_transform_support( $block_type ) {
 }
 
 /**
- * Renders a block's transform styles.
+ * Adds inline styles for transform features to the incoming attributes array.
+ * This will be applied to the block markup in the front-end.
  *
- * Features are output as inline styles on the block wrapper. When the block
- * has a transform feature selector, e.g. `.wp-block-image img`, they are
- * output instead to the block supports stylesheet under that selector, so the
- * wrapper and anything else in it, such as a caption, are left as they are.
- * A feature that skips serialization is left for the block to apply.
- *
- * State styles, such as `:hover` or `@mobile`, are rendered by the block
- * states support.
- *
- * @param string $block_content Rendered block content.
- * @param array  $block         Block object.
- * @return string Filtered block content.
+ * @param WP_Block_Type $block_type       Block type.
+ * @param array         $block_attributes Block attributes.
+ * @return array Transform inline styles.
  */
-function gutenberg_render_transform_support( $block_content, $block ) {
-	if ( empty( $block_content ) || empty( $block['blockName'] ) ) {
-		return $block_content;
+function gutenberg_apply_transform_support( $block_type, $block_attributes ) {
+	if (
+		! block_has_support( $block_type, 'transform', false ) ||
+		wp_should_skip_block_supports_serialization( $block_type, 'transform' )
+	) {
+		return array();
 	}
 
-	$transform = $block['attrs']['style']['transform'] ?? null;
-	if ( empty( $transform ) || ! is_array( $transform ) ) {
-		return $block_content;
+	$transform = $block_attributes['style']['transform'] ?? null;
+	if ( ! is_array( $transform ) ) {
+		return array();
 	}
 
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	if ( ! $block_type || ! block_has_support( $block_type, 'transform', false ) ) {
-		return $block_content;
-	}
-
-	$inline_styles   = array();
-	$selector_styles = array();
-
-	foreach ( array( 'rotate' ) as $feature ) {
+	foreach ( array_keys( $transform ) as $feature ) {
 		if (
-			! isset( $transform[ $feature ] ) ||
 			! block_has_support( $block_type, array( 'transform', $feature ), false ) ||
 			wp_should_skip_block_supports_serialization( $block_type, 'transform', $feature )
 		) {
-			continue;
-		}
-
-		$selector = wp_get_block_css_selector( $block_type, array( 'transform', $feature ) ) ?? wp_get_block_css_selector( $block_type, 'transform' );
-		if ( $selector ) {
-			$selector_styles[ $selector ][ $feature ] = $transform[ $feature ];
-		} else {
-			$inline_styles[ $feature ] = $transform[ $feature ];
+			unset( $transform[ $feature ] );
 		}
 	}
 
-	$processor = new WP_HTML_Tag_Processor( $block_content );
-	if ( ! $processor->next_tag() ) {
-		return $block_content;
+	return gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
+}
+
+/**
+ * Returns transform inline styles for block attributes, like the JS
+ * `getTransformClassesAndStyles()`. Does not check block support or skipped
+ * serialization.
+ *
+ * @since 7.3.0
+ *
+ * @param array $block_attributes Block attributes.
+ * @return array Array with a `style` key, present only when non-empty.
+ */
+function gutenberg_get_transform_classes_and_styles( $block_attributes ) {
+	if ( ! is_array( $block_attributes ) ) {
+		return array();
 	}
 
-	$inline_css = gutenberg_style_engine_get_styles( array( 'transform' => $inline_styles ) )['css'] ?? '';
-	if ( ! empty( $inline_css ) ) {
-		$existing_style = $processor->get_attribute( 'style' );
-		$existing_style = is_string( $existing_style ) && '' !== trim( $existing_style ) ? rtrim( trim( $existing_style ), ';' ) . ';' : '';
-		$processor->set_attribute( 'style', $existing_style . $inline_css );
+	$transform = $block_attributes['style']['transform'] ?? null;
+	if ( ! is_array( $transform ) ) {
+		return array();
 	}
 
-	$css_rules = array();
-	foreach ( $selector_styles as $selector => $styles ) {
-		$declarations = gutenberg_style_engine_get_styles( array( 'transform' => $styles ) )['declarations'] ?? array();
-		if ( ! empty( $declarations ) ) {
-			$css_rules[] = array(
-				'selector'     => $selector,
-				'declarations' => $declarations,
-			);
-		}
-	}
+	$styles = gutenberg_style_engine_get_styles( array( 'transform' => $transform ) );
 
-	if ( ! empty( $css_rules ) ) {
-		$class_name = wp_unique_id_from_values( $css_rules, 'wp-transform-' );
-		foreach ( $css_rules as $index => $css_rule ) {
-			$css_rules[ $index ]['selector'] = gutenberg_build_state_selector( ".$class_name", $css_rule['selector'], '', $block['blockName'] );
-		}
-
-		gutenberg_style_engine_get_stylesheet_from_css_rules(
-			$css_rules,
-			array(
-				'context'  => 'block-supports',
-				'prettify' => false,
-			)
-		);
-		$processor->add_class( $class_name );
-	}
-
-	return $processor->get_updated_html();
+	return empty( $styles['css'] ) ? array() : array( 'style' => $styles['css'] );
 }
 
 // Register the block support.
@@ -129,10 +93,6 @@ WP_Block_Supports::get_instance()->register(
 	'transform',
 	array(
 		'register_attribute' => 'gutenberg_register_transform_support',
+		'apply'              => 'gutenberg_apply_transform_support',
 	)
 );
-
-if ( function_exists( 'wp_render_transform_support' ) ) {
-	remove_filter( 'render_block', 'wp_render_transform_support' );
-}
-add_filter( 'render_block', 'gutenberg_render_transform_support', 10, 2 );
