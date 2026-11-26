@@ -27,6 +27,7 @@
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
+-   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
 
 ### Internal
 
