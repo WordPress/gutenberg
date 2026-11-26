@@ -22,7 +22,7 @@
 -   Writing flow: Bring back the editor header and block toolbar that iOS slides off screen when the on-screen keyboard opens, once the canvas stops scrolling ([#87316](https://github.com/WordPress/gutenberg/pull/87316)).
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
--   Block tree reducer: Return `undefined` when retrieving a removed block with a stale controlled client ID, preventing blocks from being traversed without a client ID ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
+-   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 
 ### Internal
 
