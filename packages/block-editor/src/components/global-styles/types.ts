@@ -103,6 +103,8 @@ export interface StyleSettings {
 	};
 	transform?: Record< string, unknown > & {
 		rotate?: boolean;
+		translate?: boolean;
+		scale?: boolean;
 	};
 	typography?: TypographyStyleSettings;
 }
@@ -209,7 +211,11 @@ export interface PanelStyle {
 	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
-	transform?: Record< string, StyleValue >;
+	transform?: {
+		rotate?: StyleValue;
+		translate?: { x?: string; y?: string };
+		scale?: number | string;
+	};
 	elements?: Record< string, PanelStyle >;
 	css?: string;
 	[ state: `:${ string }` ]: PanelStyle | undefined;
@@ -515,6 +521,8 @@ export interface TransformPanelProps {
 	onChange: ( value: PanelStyle ) => void;
 	/** The styles inherited from global styles. */
 	inheritedValue?: PanelStyle;
+	/** The default state styles, set only while another state is selected. */
+	baseValue?: PanelStyle;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
 	/** ID of the panel. */

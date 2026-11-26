@@ -255,7 +255,7 @@ export function GalleryDynamicView( {
 	innerBlocksProps,
 	...galleryProps
 } ) {
-	const { attributes } = galleryProps;
+	const { attributes, multiGallerySelection } = galleryProps;
 	const {
 		sourceDescriptor,
 		dynamicImageBlocks,
@@ -298,7 +298,7 @@ export function GalleryDynamicView( {
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
+			{ blockEditingMode === 'default' && ! multiGallerySelection && (
 				<>
 					<BlockControls group="other">
 						<ToolbarButton

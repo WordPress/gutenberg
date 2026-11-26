@@ -11,6 +11,7 @@ export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
 	alpha?: number; // base fraction of Cmax at target (default 0.62)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
+	preserveSeedSaturation?: boolean; // retain the seed's relative gamut occupancy
 	// Continuous taper around the seed (desaturate both sides slightly)
 	radiusLight?: number; // distance in L where kLight is reached (default 0.20)
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
@@ -93,7 +94,9 @@ export function createChromaTaper(
 
 		// Intended chroma from local capacity, tempered by seed vividness
 		const cIntendedBase = alpha * cmaxTarget;
-		const cWithCarry = cIntendedBase * seedCarry;
+		const cWithCarry = options.preserveSeedSaturation
+			? Math.max( cIntendedBase * seedCarry, cmaxTarget * seedRelative )
+			: cIntendedBase * seedCarry;
 
 		// Gentle, symmetric desaturation vs distance in L
 		const t = continuousTaper( lSeed, lTarget, {
@@ -169,7 +172,32 @@ function continuousTaper(
 
 // Leave headroom above sRGB's maximum chroma of about 0.32.
 const MAX_CHROMA = 0.45;
+// Seed searches query the same lightness and hue repeatedly. Cache only the
+// sRGB gamut, which every ramp uses, so other gamuts cannot share a key.
+const MAX_CACHED_CHROMAS = 1000;
+const maxChromaCache = new Map< string, number >();
 function getMaxChromaAtLH(
+	l: number,
+	h: number,
+	gamutSpace: ColorSpace
+): number {
+	if ( gamutSpace !== sRGB ) {
+		return computeMaxChromaAtLH( l, h, gamutSpace );
+	}
+	const key = `${ l } ${ h }`;
+	const cached = maxChromaCache.get( key );
+	if ( cached !== undefined ) {
+		return cached;
+	}
+	const chroma = computeMaxChromaAtLH( l, h, gamutSpace );
+	if ( maxChromaCache.size >= MAX_CACHED_CHROMAS ) {
+		maxChromaCache.clear();
+	}
+	maxChromaCache.set( key, chroma );
+	return chroma;
+}
+
+function computeMaxChromaAtLH(
 	l: number,
 	h: number,
 	gamutSpace: ColorSpace

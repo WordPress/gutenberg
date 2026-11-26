@@ -406,7 +406,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				);
 			}
 
-			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.editor.registerCoreBlockBindingsSources();';
+			/*
+			 * The experimental blocks are registered as the classic site editor
+			 * registers them, so that both site editors offer the same blocks.
+			 * The function is only defined in the Gutenberg plugin.
+			 */
+			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.blockLibrary.__experimentalRegisterExperimentalCoreBlocks?.( { enableFSEBlocks: true } ); wp.editor.registerCoreBlockBindingsSources();';
 			wp_add_inline_script(
 				'wp-block-library',
 				$load_blocks_scripts,

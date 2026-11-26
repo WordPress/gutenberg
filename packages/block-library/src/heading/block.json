@@ -60,7 +60,9 @@
 		},
 		"shadow": true,
 		"transform": {
-			"rotate": true
+			"rotate": true,
+			"translate": true,
+			"scale": true
 		},
 		"spacing": {
 			"margin": true,
