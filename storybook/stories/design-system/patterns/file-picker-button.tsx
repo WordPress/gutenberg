@@ -5,7 +5,6 @@ import { useId, useRef, useState } from '@wordpress/element';
 import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
 import { importPattern, useSnackbars } from './file-picker-preview';
-import previewStyles from './file-picker-preview.module.css';
 import styles from './file-picker.module.css';
 
 export function FilePickerButton() {
@@ -41,10 +40,7 @@ export function FilePickerButton() {
 	}
 
 	return (
-		<form
-			onSubmit={ onSubmit }
-			className={ previewStyles[ 'with-snackbars' ] }
-		>
+		<form onSubmit={ onSubmit }>
 			<Stack direction="column" gap="lg">
 				<Fieldset.Root>
 					<Fieldset.Legend>Pattern file (Required)</Fieldset.Legend>

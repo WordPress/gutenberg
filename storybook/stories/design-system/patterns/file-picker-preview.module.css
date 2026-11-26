@@ -1,26 +1,14 @@
 /*
- * Styles for the preview only: a frame for the snackbars and the
- * Media Library stand-in. A WordPress screen has its own for both.
+ * Styles for the preview only: where the snackbars sit, and the Media
+ * Library stand-in. A WordPress screen has its own for both.
  */
 
+/*
+ * The snackbars sit below the example, in the page flow, so a long one never
+ * covers the controls.
+ */
 .snackbars:global(.components-snackbar-list) {
-	inset-block-start: auto;
-	inset-inline-end: 0;
-	inset-block-end: 0;
-	inset-inline-start: 0;
-	width: auto;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.snackbars :global(.components-snackbar) {
-	margin-inline: auto;
-}
-
-.with-snackbars {
-	position: relative;
-	min-block-size: 14rem;
+	position: static;
 }
 
 /* A Media Library item: the whole row picks the image. */
