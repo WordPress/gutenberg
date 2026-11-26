@@ -8,11 +8,13 @@ const LayoutCardComponent = ( {
 	withSummary,
 	isCollapsible,
 	isOpened,
+	headingLevel,
 }: {
 	withHeader: boolean;
 	withSummary: boolean;
 	isCollapsible: boolean;
 	isOpened?: boolean;
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
 	type Customer = {
 		name: string;
@@ -165,12 +167,14 @@ const LayoutCardComponent = ( {
 		withHeader: header,
 		isCollapsible: collapsible,
 		isOpened: opened,
+		headingLevel: level,
 	}: {
 		summary?: string | string[] | { id: string; visibility: 'always' }[];
 		withSummary?: boolean;
 		withHeader?: boolean;
 		isCollapsible?: boolean;
 		isOpened?: boolean;
+		headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	} ) => {
 		return {
 			type: 'card' as const,
@@ -181,6 +185,7 @@ const LayoutCardComponent = ( {
 						withHeader: true as const,
 						isCollapsible: collapsible,
 						isOpened: opened,
+						headingLevel: level,
 					} ),
 		};
 	};
@@ -197,6 +202,7 @@ const LayoutCardComponent = ( {
 						withSummary,
 						isCollapsible,
 						isOpened,
+						headingLevel,
 					} ),
 					label: 'Customer',
 					description:
@@ -262,6 +268,7 @@ const LayoutCardComponent = ( {
 						withSummary,
 						isCollapsible,
 						isOpened,
+						headingLevel,
 					} ),
 					children: [ 'fileSize', 'dimensions', 'fileType' ],
 				},
@@ -274,12 +281,13 @@ const LayoutCardComponent = ( {
 						withSummary,
 						isCollapsible,
 						isOpened: isOpened ?? false,
+						headingLevel,
 					} ),
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader, withSummary, isCollapsible, isOpened ]
+		[ withHeader, withSummary, isCollapsible, isOpened, headingLevel ]
 	);
 
 	return (
