@@ -18,6 +18,9 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"addMoreText": {
+			"type": "boolean"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
