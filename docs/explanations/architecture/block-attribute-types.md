@@ -17,6 +17,8 @@ The server checks attribute values with the REST API's JSON Schema code. Before 
 | `datetime` | `string`, `format: date-time` |
 | `url` | `string`, `format: uri` |
 
+The REST API sanitizes `uri` but doesn't validate it, so a `url` attribute accepts any string, including relative paths and `#anchor`. The editor follows the same rules.
+
 The REST API and the Abilities API stay JSON Schema.
 
 ## Adding a type
