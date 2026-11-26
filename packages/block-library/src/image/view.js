@@ -760,22 +760,12 @@ const { state, actions, callbacks } = store(
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
 				} = imageRef;
-				// A transform turns, moves or scales the figure around its centre,
-				// which its bounding box keeps, so place the image from there.
-				const figure = imageRef.offsetParent ?? imageRef;
-				const figureRect = figure.getBoundingClientRect();
-				const figureCenterX = figureRect.x + figureRect.width / 2;
-				const figureCenterY = figureRect.y + figureRect.height / 2;
-				let screenPosX =
-					figureCenterX -
-					figure.offsetWidth / 2 +
-					figure.clientLeft +
-					imageRef.offsetLeft;
-				let screenPosY =
-					figureCenterY -
-					figure.offsetHeight / 2 +
-					figure.clientTop +
-					imageRef.offsetTop;
+				// A transform keeps the image's on-screen centre, so place it from there.
+				const imageRect = imageRef.getBoundingClientRect();
+				const imageCenterX = imageRect.x + imageRect.width / 2;
+				const imageCenterY = imageRect.y + imageRect.height / 2;
+				let screenPosX = imageCenterX - originalWidth / 2;
+				let screenPosY = imageCenterY - originalHeight / 2;
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
@@ -890,14 +880,13 @@ const { state, actions, callbacks } = store(
 
 				// A scale grows the figure around its centre, so the zoom starts
 				// from the scaled image.
+				const figure = imageRef.offsetParent ?? imageRef;
 				const figureScale =
 					parseFloat( window.getComputedStyle( figure ).scale ) || 1;
 				screenPosX =
-					figureCenterX +
-					( screenPosX - figureCenterX ) * figureScale;
+					imageCenterX + ( screenPosX - imageCenterX ) * figureScale;
 				screenPosY =
-					figureCenterY +
-					( screenPosY - figureCenterY ) * figureScale;
+					imageCenterY + ( screenPosY - imageCenterY ) * figureScale;
 
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
