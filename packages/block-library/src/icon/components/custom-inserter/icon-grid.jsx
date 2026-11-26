@@ -26,6 +26,7 @@ const IconGridItem = memo(
 				className="wp-block-icon__inserter-grid-icons-list-item"
 				onClick={ () => onChange( icon.name ) }
 				variant={ isSelected ? 'primary' : undefined }
+				aria-current={ isSelected }
 				__next40pxDefaultSize
 			>
 				<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
