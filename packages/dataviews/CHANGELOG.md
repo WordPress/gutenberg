@@ -25,6 +25,7 @@
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+-   Use the same translator comment as other places that use the same string ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
 
 ## 22.1.0 (2026-11-18)
 
