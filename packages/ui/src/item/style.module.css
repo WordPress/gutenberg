@@ -203,7 +203,7 @@
 		 * The row drops its tint while a control in `.actions` is hovered,
 		 * so that the hover style of that control stays visible.
 		 */
-		.is-activatable:hover:not(:has(.actions:hover)):not(:has(.surface[data-disabled])) {
+		.is-activatable:hover:not(:has(> .actions:hover)):not(:has(> .surface[data-disabled])) {
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
@@ -242,7 +242,7 @@
 			color: inherit;
 		}
 
-		.row:has(.surface[data-disabled]) .label {
+		.row:has(> .surface[data-disabled]) > .label {
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
@@ -250,7 +250,7 @@
 		 * Without a description the label takes both rows, as the parts
 		 * around it do, so that it centers against a taller part.
 		 */
-		.row:not(:has(.description)) .label {
+		.row:not(:has(> .description)) > .label {
 			grid-row: 1 / span 2;
 		}
 

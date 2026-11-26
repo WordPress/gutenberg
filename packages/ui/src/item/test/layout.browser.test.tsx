@@ -165,6 +165,36 @@ describe( 'Item layout', () => {
 		expect( label.width ).toBeGreaterThan( 40 );
 	} );
 
+	it( 'styles a row by its own control, not by a row nested in its actions', async () => {
+		await render(
+			<>
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Label>Plain</Item.Label>
+				</Item.ButtonRow>
+				<Item.ButtonRow onClick={ () => {} }>
+					<Item.Label>Outer</Item.Label>
+					<Item.Actions>
+						{ /* A popup mounted in the subtree of the row. */ }
+						<div>
+							<Item.ButtonRow onClick={ () => {} } disabled>
+								<Item.Label>Inner</Item.Label>
+								<Item.Description>
+									Unavailable.
+								</Item.Description>
+							</Item.ButtonRow>
+						</div>
+					</Item.Actions>
+				</Item.ButtonRow>
+			</>
+		);
+
+		const plain = getComputedStyle( screen.getByText( 'Plain' ) );
+		const outer = getComputedStyle( screen.getByText( 'Outer' ) );
+
+		expect( outer.color ).toBe( plain.color );
+		expect( outer.gridRowEnd ).toBe( plain.gridRowEnd );
+	} );
+
 	it( 'keeps the browser cursor on a link row, and the control cursor on a button row', async () => {
 		await render(
 			<ThemeProvider cursor={ { control: 'default' } }>

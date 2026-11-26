@@ -121,42 +121,35 @@ export interface MediaProps extends ComponentProps< 'span' > {
 	children?: ReactNode;
 }
 
-/*
- * `id` is left out: the row references this part by an id of its own.
- */
-export interface LabelProps extends Omit< ComponentProps< 'span' >, 'id' > {
+export interface LabelProps extends ComponentProps< 'span' > {
 	/**
 	 * The name of the thing the row represents. In `Item.LinkRow` and
 	 * `Item.ButtonRow` this is the accessible name of the row's control, so
 	 * it must be text and must not contain interactive elements.
+	 *
+	 * In `Item.LinkRow` and `Item.ButtonRow` the row sets the `id` of this
+	 * part, which its control references.
 	 */
 	children?: ReactNode;
 }
 
-/*
- * `id` is left out: the row references this part by an id of its own.
- */
-export interface DescriptionProps extends Omit<
-	ComponentProps< 'span' >,
-	'id'
-> {
+export interface DescriptionProps extends ComponentProps< 'span' > {
 	/**
 	 * Supporting text. In `Item.LinkRow` and `Item.ButtonRow` it is also the
-	 * accessible description of the row's control.
+	 * accessible description of the row's control, and the row sets the `id`
+	 * of this part.
 	 *
 	 * Use one `Item.Description` per row.
 	 */
 	children?: ReactNode;
 }
 
-/*
- * `id` is left out: the row references this part by an id of its own.
- */
-export interface MetaProps extends Omit< ComponentProps< 'span' >, 'id' > {
+export interface MetaProps extends ComponentProps< 'span' > {
 	/**
 	 * Trailing status or detail, such as a `Badge` or a current value. In
 	 * `Item.LinkRow` and `Item.ButtonRow` it is also part of the accessible
-	 * description of the row's control.
+	 * description of the row's control, and the row sets the `id` of this
+	 * part.
 	 *
 	 * Keep it static. Interactive elements belong in `Item.Actions`. Use one
 	 * `Item.Meta` per row, and put several values inside it.
@@ -176,5 +169,5 @@ export interface ActionsProps extends ComponentProps< 'span' > {
 
 export type ChevronProps = Omit<
 	ComponentProps< 'svg' >,
-	'children' | 'render'
+	'children' | 'render' | 'width' | 'height'
 >;

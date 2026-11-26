@@ -167,7 +167,9 @@ function useRow( {
 	const labelling = {
 		'aria-label': aria[ 'aria-label' ],
 		'aria-labelledby':
-			aria[ 'aria-labelledby' ] ??
+			// An empty value counts as absent: it would leave the
+			// control without a name.
+			aria[ 'aria-labelledby' ] ||
 			( hasExplicitName
 				? undefined
 				: // The new-tab notice is part of the name, as it is in `Link`.

@@ -17,13 +17,14 @@ import type {
 } from './types';
 
 /**
- * The control of the row references the label, the description and the
- * meta by their ids. A `render` element, or the element a `render` function
- * returns, would otherwise replace the id with its own and break the
- * reference.
+ * The control of a link or button row references the label, the
+ * description and the meta by their ids. A `render` element, or the element
+ * a `render` function returns, would otherwise replace the id with its own
+ * and break the reference. A static row references nothing, so it leaves
+ * the id to the consumer.
  *
  * @param render The `render` prop of the part.
- * @param id     The id the row references.
+ * @param id     The id the row references, if it references one.
  */
 function withId< TRender >( render: TRender, id: string | undefined ) {
 	return id ? enforceRenderProps( render, { id } ) : render;
@@ -56,6 +57,7 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 	function ItemLabel( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Label' );
 		const register = context?.register;
+		const id = context?.isActivatable ? context.labelId : props.id;
 
 		useEffect( () => register?.( 'label' ), [ register ] );
 
@@ -64,8 +66,8 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 				ref={ ref }
 				variant="body-md"
 				{ ...props }
-				render={ withId( render, context?.labelId ) }
-				id={ context?.labelId }
+				render={ withId( render, id ) }
+				id={ id }
 				// The control of an activatable row takes its name from
 				// this element. Without `aria-hidden`, a screen reader
 				// would read the same text a second time after the control.
@@ -84,6 +86,7 @@ export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
 	function ItemDescription( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Description' );
 		const register = context?.register;
+		const id = context?.isActivatable ? context.descriptionId : props.id;
 
 		useEffect( () => register?.( 'description' ), [ register ] );
 
@@ -92,8 +95,8 @@ export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
 				ref={ ref }
 				variant="body-sm"
 				{ ...props }
-				render={ withId( render, context?.descriptionId ) }
-				id={ context?.descriptionId }
+				render={ withId( render, id ) }
+				id={ id }
 				className={ clsx( styles.description, className ) }
 			/>
 		);
@@ -113,15 +116,16 @@ export const Meta = forwardRef< HTMLSpanElement, MetaProps >( function ItemMeta(
 ) {
 	const context = useRowContext( 'Meta' );
 	const register = context?.register;
+	const id = context?.isActivatable ? context.metaId : props.id;
 
 	useEffect( () => register?.( 'meta' ), [ register ] );
 
 	return useRender( {
 		defaultTagName: 'span',
-		render: withId( render, context?.metaId ),
+		render: withId( render, id ),
 		ref,
 		props: mergeProps< 'span' >( props, {
-			id: context?.metaId,
+			id,
 			className: styles.meta,
 		} ),
 	} );

@@ -273,6 +273,33 @@ describe( 'Item', () => {
 		portal.remove();
 	} );
 
+	it( 'keeps the id of the label of a content row, so a control can reference it', () => {
+		render(
+			<Item.ContentRow>
+				<Item.Label id="notifications">Notifications</Item.Label>
+				<Item.Actions>
+					<input type="checkbox" aria-labelledby="notifications" />
+				</Item.Actions>
+			</Item.ContentRow>
+		);
+
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Notifications' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'names the row by its label when aria-labelledby is empty', () => {
+		render(
+			<Item.ButtonRow onClick={ () => {} } aria-labelledby="">
+				<Item.Label>Export</Item.Label>
+			</Item.ButtonRow>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Export' } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'supports a disabled button row', async () => {
 		const user = userEvent.setup();
 		const open = vi.fn();
@@ -293,14 +320,17 @@ describe( 'Item', () => {
 	it( 'hides the media from assistive technology', () => {
 		render(
 			<Item.LinkRow href="/zones">
-				<Item.Media>
+				<Item.Media data-testid="media">
 					<span>Globe</span>
 				</Item.Media>
 				<Item.Label>Zones</Item.Label>
 			</Item.LinkRow>
 		);
 
-		expect( screen.getByText( 'Globe' ) ).toBeInTheDocument();
+		expect( screen.getByTestId( 'media' ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
+		);
 		expect( screen.getByRole( 'link' ) ).toHaveAccessibleName( 'Zones' );
 	} );
 
