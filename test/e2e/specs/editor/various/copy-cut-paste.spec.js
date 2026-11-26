@@ -384,6 +384,9 @@ test.describe( 'Copy/cut/paste (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'primary+c' );
+		// Collapse first: Firefox on Linux only collapses the selection on
+		// Ctrl+ArrowLeft, without moving to the start of the line.
+		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
@@ -447,6 +450,9 @@ test.describe( 'Copy/cut/paste (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'primary+c' );
+		// Collapse first: Firefox on Linux only collapses the selection on
+		// Ctrl+ArrowLeft, without moving to the start of the line.
+		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
