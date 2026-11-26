@@ -23,14 +23,17 @@ export default {
 	component: DataForm,
 };
 
+// Served from `storybook/static`.
+const IMAGE_URL = 'landscape.svg';
+
 // Sample data for media fields
 const sampleMediaItem: MediaItem = {
 	id: 123,
 	date: '2024-01-15T10:30:00',
 	date_gmt: '2024-01-15T10:30:00',
 	guid: {
-		raw: 'https://cldup.com/cXyG__fTLN.jpg',
-		rendered: 'https://cldup.com/cXyG__fTLN.jpg',
+		raw: IMAGE_URL,
+		rendered: IMAGE_URL,
 	},
 	modified: '2024-01-15T10:30:00',
 	modified_gmt: '2024-01-15T10:30:00',
@@ -52,7 +55,7 @@ const sampleMediaItem: MediaItem = {
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
 	class_list: [ 'post-123', 'attachment' ],
-	alt_text: 'A beautiful sample image',
+	alt_text: 'Sun above green hills',
 	caption: {
 		raw: 'A caption for the image',
 		rendered: '<p>A caption for the image</p>\n',
@@ -62,15 +65,15 @@ const sampleMediaItem: MediaItem = {
 		rendered:
 			'<p>This is a detailed description of the sample image. It contains useful information about what the image depicts and its context.</p>',
 	},
-	mime_type: 'image/jpeg',
+	mime_type: 'image/svg+xml',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+	source_url: IMAGE_URL,
 	media_details: {
-		file: 'sample-image.jpg',
-		width: 1920,
-		height: 1080,
-		filesize: 524288,
+		file: 'landscape.svg',
+		width: 1200,
+		height: 600,
+		filesize: 273,
 		image_meta: {
 			aperture: '2.8',
 			credit: '',
@@ -85,24 +88,7 @@ const sampleMediaItem: MediaItem = {
 			orientation: '1',
 			keywords: [],
 		},
-		sizes: {
-			thumbnail: {
-				file: 'sample-image-150x150.jpg',
-				width: 150,
-				height: 150,
-				filesize: 8192,
-				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
-			medium: {
-				file: 'sample-image-300x169.jpg',
-				width: 300,
-				height: 169,
-				filesize: 24576,
-				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
-		},
+		sizes: {},
 	},
 	missing_image_sizes: [],
 	_embedded: {
@@ -262,7 +248,9 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	mime_type: 'image/jpeg',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://example.com/this-image-does-not-exist.jpg',
+	// Data that is not an image fails to load without a request. The data ends
+	// with a file name for the file name field.
+	source_url: 'data:image/jpeg,/this-image-does-not-exist.jpg',
 	media_details: {
 		file: 'broken-image.jpg',
 		width: 1920,

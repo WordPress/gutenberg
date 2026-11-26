@@ -10,7 +10,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 }
 
 a,

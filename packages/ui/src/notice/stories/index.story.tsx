@@ -18,6 +18,7 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.Actions': Notice.Actions,
 		'Notice.CloseIconButton': Notice.CloseIconButton,
 		'Notice.ActionButton': Notice.ActionButton,
+		'Notice.ActionButtonLink': Notice.ActionButtonLink,
 		'Notice.ActionLink': Notice.ActionLink,
 	},
 	parameters: {
@@ -108,6 +109,38 @@ export const NonDismissible: Story = {
 };
 
 /**
+ * Pass `openInNewTab` to `Notice.ActionLink` or `Notice.ActionButtonLink` for external destinations. This adds `target="_blank"` and an accessible new-tab indicator.
+ *
+ * Prefer `Notice.ActionLink` for navigation. Use `Notice.ActionButtonLink` only when button prominence is intentional. See the [Usage Guidelines](?path=/docs/design-system-components-button-usage-guidelines--docs) for when to use `Button`, `Link`, or `ButtonLink`.
+ */
+export const WithExternalLink: Story = {
+	args: {
+		intent: 'info',
+		children: [
+			<Notice.Title key="title">Documentation available</Notice.Title>,
+			<Notice.Description key="description">
+				Read the full guide on WordPress.org to learn more.
+			</Notice.Description>,
+			<Notice.Actions key="actions">
+				<Notice.ActionButtonLink
+					href="https://wordpress.org/documentation/"
+					openInNewTab
+				>
+					Open documentation
+				</Notice.ActionButtonLink>
+				<Notice.ActionLink
+					href="https://wordpress.org/support/"
+					openInNewTab
+				>
+					Get support
+				</Notice.ActionLink>
+			</Notice.Actions>,
+			<Notice.CloseIconButton key="closeIconButton" />,
+		],
+	},
+};
+
+/**
  * Pass `icon={ null }` to hide the default decorative icon.
  */
 export const WithoutIcon: Story = {
@@ -140,7 +173,7 @@ export const WithoutActions: Story = {
 /**
  * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and blend with the notice colors.
  *
- * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
+ * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink`, `Notice.ActionButtonLink` or `Notice.ActionButton`.
  */
 export const WithLinkInDescription: Story = {
 	args: {

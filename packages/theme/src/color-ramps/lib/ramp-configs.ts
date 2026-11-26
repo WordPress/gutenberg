@@ -1,4 +1,9 @@
+import {
+	MINIMUM_NON_TEXT_CONTRAST,
+	MINIMUM_TEXT_CONTRAST,
+} from '../../semantic-color-contrast-pairs.ts';
 import type { RampStepConfig, RampConfig, RampDirection } from './types.ts';
+import { getContrastReferences } from './utils.ts';
 import type { TaperChromaOptions } from './taper-chroma.ts';
 
 const lightnessConstraintForegroundHighContrast = (
@@ -201,7 +206,7 @@ const BASE_RAMP_CONFIG: RampConfig = {
 	fgFill: {
 		contrast: {
 			reference: 'bgFill1',
-			additionalReferences: [ 'bgFill2' ],
+			additionalReferences: [ { reference: 'bgFill2', target: 4.5 } ],
 			followDirection: 'best',
 			target: 4.5,
 		},
@@ -237,6 +242,9 @@ const withNearGrayChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
 				taperChromaOptions: {
 					...step.taperChromaOptions,
 					preserveNearGrayTint: true,
+					preserveSeedSaturation:
+						step.taperChromaOptions === BG_SURFACE_TAPER_CHROMA ||
+						step.taperChromaOptions === STROKE_TAPER_CHROMA,
 				},
 			}
 		: step;
@@ -323,4 +331,83 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 		...BASE_RAMP_CONFIG.fgSurface4,
 		taperChromaOptions: undefined,
 	},
+};
+
+// PRIMARY_RAMP: seed => surface2 => surface1, surface3 => bgFill1 => ...
+// The surfaces keep the lightness pinned from the background ramp, so the
+// fills, focus ring and brand text can use the public brand surface as a
+// contrast reference. Before the elevation swap for darker ramps, that is
+// `surface1` for lighter ramps and `surface3` for darker ones.
+function createPrimaryRampConfig(
+	brandSurface: 'surface1' | 'surface3'
+): RampConfig {
+	// Add each surface target the step does not already meet or exceed.
+	const withSurfaceTargets = (
+		config: RampStepConfig,
+		target: number
+	): RampStepConfig => {
+		const existing = getContrastReferences( config.contrast );
+		return {
+			...config,
+			contrast: {
+				...config.contrast,
+				additionalReferences: [
+					...( config.contrast.additionalReferences ?? [] ),
+					...( [ 'neutralSurface', brandSurface ] as const )
+						.filter(
+							( reference ) =>
+								! existing.some(
+									( current ) =>
+										current.reference === reference &&
+										current.target >= target
+								)
+						)
+						.map( ( reference ) => ( { reference, target } ) ),
+				],
+			},
+		};
+	};
+
+	return {
+		...ACCENT_RAMP_CONFIG,
+		surface2: {
+			...ACCENT_RAMP_CONFIG.surface2,
+			contrast: {
+				...ACCENT_RAMP_CONFIG.surface2.contrast,
+				reference: 'seed',
+			},
+		},
+		bgFill1: withSurfaceTargets(
+			{
+				sameAsIfPossible: 'seed',
+				contrast: {
+					reference: 'neutralSurface',
+					target: MINIMUM_NON_TEXT_CONTRAST,
+					followDirection: 'main',
+				},
+			},
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		bgFill2: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.bgFill2,
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		stroke3: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.stroke3,
+			MINIMUM_NON_TEXT_CONTRAST
+		),
+		fgSurface3: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.fgSurface3,
+			MINIMUM_TEXT_CONTRAST
+		),
+		fgSurface4: withSurfaceTargets(
+			ACCENT_RAMP_CONFIG.fgSurface4,
+			MINIMUM_TEXT_CONTRAST
+		),
+	};
+}
+
+export const PRIMARY_RAMP_CONFIGS: Record< RampDirection, RampConfig > = {
+	lighter: createPrimaryRampConfig( 'surface1' ),
+	darker: createPrimaryRampConfig( 'surface3' ),
 };

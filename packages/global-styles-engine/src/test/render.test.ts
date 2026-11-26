@@ -321,6 +321,24 @@ describe( 'global styles renderer', () => {
 		it( 'should return a ruleset', () => {
 			const tree: GlobalStylesConfig = {
 				settings: {
+					dimensions: {
+						aspectRatios: {
+							default: [
+								{
+									name: 'Square - 1:1',
+									slug: 'square',
+									ratio: '1',
+								},
+							],
+							theme: [
+								{
+									name: 'Wide - 16:9',
+									slug: '16-9',
+									ratio: '16/9',
+								},
+							],
+						},
+					},
 					color: {
 						palette: {
 							custom: [
@@ -380,7 +398,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( generateCustomProperties( tree, blockSelectors ) ).toEqual(
-				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
+				':root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
 	} );
@@ -1228,6 +1246,35 @@ describe( 'global styles renderer', () => {
 					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
 				);
 			} );
+
+			it( 'reads the default pseudo state clip for a breakpoint pseudo state', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									':hover': textGradient,
+									'@mobile': {
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
 		} );
 
 		describe( 'block style variation instances over a block type text clip', () => {
@@ -1859,7 +1906,7 @@ describe( 'global styles renderer', () => {
 				settings: {},
 				styles: {
 					blocks: {
-						'core/image': {
+						'core/button': {
 							transform: {
 								rotate: '0.25turn',
 							},
@@ -1874,10 +1921,10 @@ describe( 'global styles renderer', () => {
 			} as unknown as GlobalStylesConfig;
 
 			const blockSelectors = {
-				'core/image': {
-					selector: '.wp-block-image',
+				'core/button': {
+					selector: '.wp-block-button',
 					featureSelectors: {
-						transform: '.wp-block-image img',
+						transform: '.wp-block-button .wp-block-button__link',
 					},
 				},
 			};
@@ -1893,8 +1940,126 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-image img){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-image img){rotate: -15deg;}}'
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){rotate: -15deg;}}'
 			);
+		} );
+
+		it( 'outputs a translation with a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							transform: {
+								rotate: '5deg',
+								translate: { x: '10px', y: '-50%' },
+							},
+							'@mobile': {
+								transform: {
+									translate: { y: '1rem' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					featureSelectors: {
+						transform: '.wp-block-button .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}'
+			);
+		} );
+
+		it( 'outputs a scale with a rotation on the block', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: {
+								rotate: '5deg',
+								scale: 1.2,
+							},
+							'@mobile': {
+								transform: {
+									scale: '90%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': {
+					selector: '.wp-block-heading',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-heading){rotate: 5deg;scale: 1.2;}@media (width <= 480px){:root :where(.wp-block-heading){scale: 90%;}}'
+			);
+		} );
+
+		it( 'outputs no scale that is not a single non-negative number or percentage', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: { scale: 'calc(1 + 1)' },
+						},
+						'core/group': {
+							transform: { scale: -1 },
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': { selector: '.wp-block-heading' },
+				'core/group': { selector: '.wp-block-group' },
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).not.toContain( 'scale' );
 		} );
 
 		it( 'handles responsive feature selector styles', () => {
