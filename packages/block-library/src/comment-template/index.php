@@ -121,9 +121,9 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Expose the comment pages count for get_comment_pages_count(), like comments_template().
+	// Expose the comment pages count for get_comment_pages_count() on the main post, like comments_template().
 	global $wp_query;
-	if ( $wp_query instanceof WP_Query ) {
+	if ( $wp_query instanceof WP_Query && is_singular() && get_queried_object_id() === (int) $block->context['postId'] ) {
 		$wp_query->max_num_comment_pages = max( 1, (int) $comment_query->max_num_pages );
 	}
 

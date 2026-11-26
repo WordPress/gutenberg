@@ -28,9 +28,9 @@ function render_block_core_comments_pagination_next( $attributes, $content, $blo
 	$label            = ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
 	$pagination_arrow = get_comments_pagination_arrow( $block, 'next' );
 
-	// Expose the comment pages count for get_comment_pages_count().
+	// Expose the comment pages count for get_comment_pages_count() on the main post.
 	global $wp_query;
-	if ( $max_page && $wp_query instanceof WP_Query ) {
+	if ( $max_page && $wp_query instanceof WP_Query && is_singular() && get_queried_object_id() === (int) $block->context['postId'] ) {
 		$wp_query->max_num_comment_pages = $max_page;
 	}
 
