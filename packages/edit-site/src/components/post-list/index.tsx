@@ -35,11 +35,11 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 /**
  * A post as listed, with the hierarchy level the REST API adds when ordering
- * by hierarchy and the number of notes left on it.
+ * by hierarchy and the number of notes left on it, unset until that arrives.
  */
 type PostListItem = Post & {
 	level?: number;
-	notesCount: number;
+	notesCount?: number;
 };
 
 const EMPTY_ARRAY: PostListItem[] = [];
@@ -197,7 +197,7 @@ export default function PostList( { postType }: { postType: string } ) {
 		(): PostListItem[] | undefined =>
 			records?.map( ( record: Post ) => ( {
 				...record,
-				notesCount: notesCount[ record.id ] ?? 0,
+				notesCount: notesCount[ record.id ],
 			} ) ),
 		[ records, notesCount ]
 	);

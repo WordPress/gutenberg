@@ -17,10 +17,11 @@ type NoteRecord = {
  * a map of post ID to notes count.
  *
  * @param postIds Array of post IDs to fetch notes for.
- * @return Object with notesCount map and whether the counts are still loading.
+ * @return Object with the notes count of each post, undefined until the
+ *         counts arrive or when they fail to, and whether they are loading.
  */
 export default function useNotesCount( postIds: number[] ): {
-	notesCount: Record< number, number >;
+	notesCount: Record< number, number | undefined >;
 	isLoading: boolean;
 } {
 	const { records: notes, hasResolved } = useEntityRecords< NoteRecord >(
@@ -38,21 +39,29 @@ export default function useNotesCount( postIds: number[] ): {
 		}
 	);
 
+	// The query is idle for a render before it starts resolving, so wait for
+	// it to resolve rather than only while it is resolving.
+	const isLoading = postIds.length > 0 && ! hasResolved;
+
 	const notesCount = useMemo( () => {
-		if ( ! notes || notes.length === 0 ) {
+		// Still loading, or the request failed: the counts are unknown.
+		if ( isLoading || ! notes ) {
 			return {};
 		}
 
+		// Every requested post gets a count, 0 when it has no notes.
 		const counts: Record< number, number > = {};
+		postIds.forEach( ( postId ) => {
+			counts[ postId ] = 0;
+		} );
 		notes.forEach( ( note ) => {
-			const postId = note.post;
-			counts[ postId ] = ( counts[ postId ] || 0 ) + 1;
+			if ( note.post in counts ) {
+				counts[ note.post ]++;
+			}
 		} );
 
 		return counts;
-	}, [ notes ] );
+	}, [ isLoading, notes, postIds ] );
 
-	// The query is idle for a render before it starts resolving, so wait for
-	// it to resolve rather than only while it is resolving.
-	return { notesCount, isLoading: postIds.length > 0 && ! hasResolved };
+	return { notesCount, isLoading };
 }
