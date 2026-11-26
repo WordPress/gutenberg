@@ -55,6 +55,8 @@ interface EncodeWidgetResponse {
  * using React for this, we ensure that we have complete control over the DOM
  * and do not accidentally remove any elements that a third party widget script
  * has attached an event listener to.
+ *
+ * @property {Element} element The control's DOM element.
  */
 export default class Control {
 	id?: string | null;
@@ -69,12 +71,17 @@ export default class Control {
 	form!: HTMLFormElement;
 	content!: HTMLDivElement;
 
-	handleFormChange = debounce( () => {
-		if ( this.idBase ) {
-			this.saveForm();
-		}
-	}, 200 );
-
+	/**
+	 * Creates and loads a new control.
+	 *
+	 * @param params
+	 * @param params.id
+	 * @param params.idBase
+	 * @param params.instance
+	 * @param params.onChangeInstance
+	 * @param params.onChangeHasPreview
+	 * @param params.onError
+	 */
 	constructor( {
 		id,
 		idBase,
@@ -96,6 +103,10 @@ export default class Control {
 		// a fake but unique number.
 		this.number = ++lastNumber;
 
+		this.handleFormChange = debounce(
+			this.handleFormChange.bind( this ),
+			200
+		);
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 
 		this.initDOM();
@@ -132,7 +143,7 @@ export default class Control {
 						class: 'id_base',
 						type: 'hidden',
 						name: 'id_base',
-						value: this.idBase ?? this.id ?? '',
+						value: ( this.idBase ?? this.id )!,
 					} ),
 					el( 'input', {
 						class: 'widget-width',
@@ -223,7 +234,7 @@ export default class Control {
 
 				// If we don't have an instance, perform a save right away. This
 				// happens when creating a new Legacy Widget block.
-				if ( ! this.instance?.hash ) {
+				if ( ! this.instance!.hash ) {
 					const { instance } = await encodeWidget( {
 						idBase: this.idBase,
 						instance: this.instance,
@@ -245,6 +256,16 @@ export default class Control {
 			}
 		} catch ( error ) {
 			this.onError( error );
+		}
+	}
+
+	/**
+	 * Perform a save when a multi widget's form is changed. Non-multi widgets are
+	 * saved manually.
+	 */
+	handleFormChange() {
+		if ( this.idBase ) {
+			this.saveForm();
 		}
 	}
 
@@ -294,38 +315,34 @@ export default class Control {
 	/**
 	 * The widget's instance object.
 	 */
-	get instance() {
+	get instance(): Record< string, unknown > | null | undefined {
 		return this._instance;
 	}
 
 	/**
 	 * The widget's instance object.
 	 */
-	set instance( instance ) {
+	set instance( instance: Record< string, unknown > ) {
 		if ( this._instance !== instance ) {
 			this._instance = instance;
-			if ( instance ) {
-				this.onChangeInstance( instance );
-			}
+			this.onChangeInstance( instance );
 		}
 	}
 
 	/**
 	 * Whether or not the widget can be previewed.
 	 */
-	get hasPreview() {
+	get hasPreview(): boolean | null {
 		return this._hasPreview;
 	}
 
 	/**
 	 * Whether or not the widget can be previewed.
 	 */
-	set hasPreview( hasPreview ) {
+	set hasPreview( hasPreview: boolean ) {
 		if ( this._hasPreview !== hasPreview ) {
 			this._hasPreview = hasPreview;
-			if ( hasPreview !== null ) {
-				this.onChangeHasPreview( hasPreview );
-			}
+			this.onChangeHasPreview( hasPreview );
 		}
 	}
 }
@@ -409,7 +426,7 @@ function isEmptyNode( node: Node ): boolean {
 	switch ( node.nodeType ) {
 		case Node.TEXT_NODE:
 			// Text nodes are empty if it's entirely whitespace.
-			return ( node.nodeValue ?? '' ).trim() === '';
+			return node.nodeValue!.trim() === '';
 		case Node.ELEMENT_NODE: {
 			// Elements that are "embedded content" are not empty.
 			// https://dev.w3.org/html5/spec-LC/content-models.html#embedded-content-0

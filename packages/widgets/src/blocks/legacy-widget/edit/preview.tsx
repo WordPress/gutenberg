@@ -72,8 +72,8 @@ export default function Preview( {
 			function setHeight() {
 				// Pick the maximum of these two values to account for margin collapsing.
 				const height = Math.max(
-					iframe.contentDocument?.documentElement?.offsetHeight ?? 0,
-					iframe.contentDocument?.body?.offsetHeight ?? 0
+					iframe.contentDocument!.documentElement?.offsetHeight ?? 0,
+					iframe.contentDocument!.body?.offsetHeight ?? 0
 				);
 
 				// Fallback to a height of 100px if the height cannot be determined.
@@ -83,12 +83,7 @@ export default function Preview( {
 				iframe.style.height = `${ height !== 0 ? height : 100 }px`;
 			}
 
-			const defaultView = iframe.ownerDocument?.defaultView;
-			if ( ! defaultView?.IntersectionObserver ) {
-				return;
-			}
-
-			const { IntersectionObserver } = defaultView;
+			const { IntersectionObserver } = iframe.ownerDocument.defaultView!;
 
 			// Observe for intersections that might cause a change in the height of
 			// the iframe, e.g. a Widget Area becoming expanded.
@@ -149,12 +144,8 @@ export default function Preview( {
 							// such as negative margins in the Gallery Legacy Widget.
 							// It can't be scrolled anyway.
 							// TODO: Ideally, this should be fixed in core.
-							const iframeTarget =
-								event.currentTarget as HTMLIFrameElement;
-							if ( iframeTarget.contentDocument?.body ) {
-								iframeTarget.contentDocument.body.style.overflow =
-									'hidden';
-							}
+							event.currentTarget.contentDocument!.body.style.overflow =
+								'hidden';
 
 							setIsLoaded( true );
 						} }

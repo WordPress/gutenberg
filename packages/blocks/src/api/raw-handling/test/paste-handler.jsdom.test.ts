@@ -1,8 +1,16 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { pasteHandler, serialize } from '@wordpress/blocks';
-import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
-import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
-import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import type { Block } from '../../../types';
+// Dynamically import block-library modules so TypeScript does not traverse outside rootDir.
+const { init: initAndRegisterImageBlock } = await import(
+	`${ '../../../../../block-library/src/image' }`
+);
+const { init: initAndRegisterTableBlock } = await import(
+	`${ '../../../../../block-library/src/table' }`
+);
+const { init: initAndRegisterVideoBlock } = await import(
+	`${ '../../../../../block-library/src/video' }`
+);
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -87,7 +95,7 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingColspan,
 			tagName: 'p',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -127,7 +135,7 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingRowspan,
 			tagName: 'p',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -176,7 +184,7 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: tableWithCellAlignments,
 			tagName: 'p',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -292,8 +300,9 @@ describe( 'pasteHandler', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',
 			tagName: 'p',
+			// @ts-expect-error Deliberate legacy option.
 			preserveWhiteSpace: false,
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -323,7 +332,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" width="77" height="77" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -346,7 +355,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<figure><img src="https://example.com/i.jpg" width="120" height="80" /></figure>',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -360,7 +369,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<a data-flickr-embed="true" href="https://www.flickr.com/photos/x/123/"><img src="https://live.staticflickr.com/65535/123_b.jpg" width="1024" height="683" alt="pexels" /></a>',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -385,7 +394,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" width="120" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -400,7 +409,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" height="80" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -415,7 +424,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" width="100" height="0" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -428,7 +437,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" width="50%" height="auto" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 
@@ -441,7 +450,7 @@ describe( 'pasteHandler — core/image', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" />',
 			mode: 'BLOCKS',
-		} );
+		} ) as Block[];
 
 		expect( console ).toHaveLogged();
 

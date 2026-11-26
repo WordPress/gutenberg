@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useEntityRecord } from '@wordpress/core-data';
 import type { BlockEditProps } from '@wordpress/blocks';
-import type { LegacyWidgetAttributes } from '../index';
+import type { LegacyWidgetAttributes } from '../types';
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
 import Form from './form';
@@ -107,7 +107,7 @@ function NotEmpty( {
 }: LegacyWidgetEditProps ) {
 	const [ hasPreview, setHasPreview ] = useState< boolean | null >( null );
 
-	const widgetTypeId = id ?? idBase ?? '';
+	const widgetTypeId = ( id ?? idBase )!;
 	const { record: widgetType, hasResolved: hasResolvedWidgetType } =
 		useEntityRecord< WidgetTypeRecord >(
 			'root',
@@ -119,7 +119,7 @@ function NotEmpty( {
 		( nextInstance: Record< string, unknown > ) => {
 			setAttributes( { instance: nextInstance } );
 		},
-		[ setAttributes ]
+		[]
 	);
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
@@ -142,9 +142,6 @@ function NotEmpty( {
 	}
 
 	const mode = idBase && ! isSelected ? 'preview' : 'edit';
-	const rawInstance = (
-		instance as { raw?: Record< string, unknown > } | null | undefined
-	 )?.raw;
 
 	return (
 		<>
@@ -152,20 +149,20 @@ function NotEmpty( {
 				<BlockControls group="other">
 					<ConvertToBlocksButton
 						clientId={ clientId }
-						rawInstance={ rawInstance }
+						rawInstance={ instance!.raw! }
 					/>
 				</BlockControls>
 			) }
 
 			<InspectorControls>
 				<InspectorCard
-					name={ widgetType?.name }
-					description={ widgetType?.description }
+					name={ widgetType!.name }
+					description={ widgetType!.description }
 				/>
 			</InspectorControls>
 
 			<Form
-				title={ widgetType?.name }
+				title={ widgetType!.name }
 				isVisible={ mode === 'edit' }
 				id={ id }
 				idBase={ idBase }
@@ -190,7 +187,7 @@ function NotEmpty( {
 						/>
 					) }
 					{ hasPreview === false && mode === 'preview' && (
-						<NoPreview name={ widgetType?.name } />
+						<NoPreview name={ widgetType!.name } />
 					) }
 				</>
 			) }

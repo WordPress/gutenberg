@@ -3,12 +3,9 @@ import type { BlockConfiguration } from '@wordpress/blocks';
 import metadata from './block.json';
 import edit from './edit';
 import transforms from './transforms';
+import type { LegacyWidgetAttributes } from './types';
 
-export interface LegacyWidgetAttributes extends Record< string, unknown > {
-	id?: string | null;
-	idBase?: string | null;
-	instance?: Record< string, unknown > | null;
-}
+export type { LegacyWidgetAttributes, RawInstance } from './types';
 
 const { name } = metadata;
 export { metadata, name };

@@ -3,15 +3,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-interface RawInstance extends Record< string, unknown > {
-	title?: string;
-	text?: string;
-}
+import type { RawInstance } from '../types';
 
 interface ConvertToBlocksButtonProps {
 	clientId: string;
-	rawInstance?: RawInstance;
+	rawInstance: RawInstance;
 }
 
 export default function ConvertToBlocksButton( {
@@ -23,20 +19,17 @@ export default function ConvertToBlocksButton( {
 	return (
 		<ToolbarButton
 			onClick={ () => {
-				if ( ! rawInstance ) {
-					return;
-				}
 				if ( rawInstance.title ) {
 					replaceBlocks( clientId, [
 						createBlock( 'core/heading', {
 							content: rawInstance.title,
 						} ),
-						...rawHandler( { HTML: rawInstance.text ?? '' } ),
+						...rawHandler( { HTML: rawInstance.text! } ),
 					] );
 				} else {
 					replaceBlocks(
 						clientId,
-						rawHandler( { HTML: rawInstance.text ?? '' } )
+						rawHandler( { HTML: rawInstance.text! } )
 					);
 				}
 			} }

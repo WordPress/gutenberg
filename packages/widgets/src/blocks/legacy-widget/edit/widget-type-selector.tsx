@@ -34,7 +34,7 @@ export default function WidgetTypeSelector( {
 	}
 
 	if ( widgetTypes.length === 0 ) {
-		return <>{ __( 'There are no widgets available.' ) }</>;
+		return __( 'There are no widgets available.' );
 	}
 
 	const items = [
@@ -59,13 +59,11 @@ export default function WidgetTypeSelector( {
 				if ( value ) {
 					const selected = widgetTypes.find(
 						( widgetType ) => widgetType.id === value
-					);
-					if ( selected ) {
-						onSelect( {
-							selectedId: selected.id,
-							isMulti: selected.is_multi,
-						} );
-					}
+					)!;
+					onSelect( {
+						selectedId: selected.id,
+						isMulti: selected.is_multi,
+					} );
 				} else {
 					onSelect( { selectedId: null } );
 				}
