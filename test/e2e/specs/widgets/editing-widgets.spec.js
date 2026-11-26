@@ -123,7 +123,7 @@ test.describe( 'Widgets screen', () => {
 		await addedParagraphBlockInSecondWidgetArea.click();
 		await page.keyboard.type( 'Third Paragraph' );
 
-		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+		const expectedWidgetAreas = {
 			'sidebar-1': [
 				{
 					name: 'core/paragraph',
@@ -146,6 +146,20 @@ test.describe( 'Widgets screen', () => {
 					attributes: { content: 'Third Paragraph' },
 				},
 			],
+		};
+		await expect
+			.poll( widgetsScreen.getWidgetAreaBlocks )
+			.toMatchObject( expectedWidgetAreas );
+
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+		await page.reload();
+
+		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+			...expectedWidgetAreas,
+			wp_inactive_widgets: [],
 		} );
 	} );
 
@@ -573,18 +587,9 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'menuitemradio', { name: 'Footer #2' } )
 			.click();
 
-		// Let both writes finish so the reload doesn't interrupt the save.
-		await Promise.all( [
-			...[ 'sidebar-1', 'sidebar-2' ].map( ( id ) =>
-				page.waitForResponse(
-					( response ) =>
-						response.request().method() === 'POST' &&
-						new URL( response.url() ).pathname.endsWith(
-							`/wp/v2/sidebars/${ id }`
-						)
-				)
-			),
-			widgetsScreen.saveWidgets(),
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
 		] );
 		await page.reload();
 
@@ -815,5 +820,25 @@ class WidgetsScreen {
 			},
 			{ box: true }
 		);
+	};
+
+	/**
+	 * Let the requested writes finish so a reload doesn't interrupt them.
+	 *
+	 * @param {string[]} sidebarIds Sidebar writes to wait for.
+	 */
+	saveWidgetsAndWaitForSidebars = async ( sidebarIds ) => {
+		await Promise.all( [
+			...sidebarIds.map( ( id ) =>
+				this.#page.waitForResponse(
+					( response ) =>
+						response.request().method() === 'POST' &&
+						new URL( response.url() ).pathname.endsWith(
+							`/wp/v2/sidebars/${ id }`
+						)
+				)
+			),
+			this.saveWidgets(),
+		] );
 	};
 }
