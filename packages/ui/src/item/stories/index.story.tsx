@@ -1,17 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	chartBar,
+	cog,
 	color,
 	comment,
 	download,
 	envelope,
-	globe,
+	image,
 	lock,
 	moreVertical,
 	payment,
+	people,
+	post,
 	reset,
-	shipping,
-	tool,
 } from '@wordpress/icons';
 import { Badge } from '../../badge';
 import { Button } from '../../button';
@@ -54,29 +55,28 @@ type Story = StoryObj< typeof Item.Group >;
  */
 export const Default: Story = {
 	args: {
-		'aria-label': 'Shipping',
+		'aria-label': 'Settings',
 		children: [
-			<Item.LinkRow href="#zones" key="zones">
+			<Item.LinkRow href="#users" key="users">
 				<Item.Media>
-					<Icon icon={ globe } />
+					<Icon icon={ people } />
 				</Item.Media>
-				<Item.Label>Shipping zones</Item.Label>
+				<Item.Label>Users</Item.Label>
 				<Item.Description>
-					A geographic region where a set of shipping methods is
-					offered.
+					Choose who can access your site, and what they can do.
 				</Item.Description>
 				<Item.Meta>
-					<Badge intent="informational">4 zones</Badge>
+					<Badge intent="informational">4 users</Badge>
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>,
-			<Item.LinkRow href="#settings" key="settings">
+			<Item.LinkRow href="#general" key="general">
 				<Item.Media>
-					<Icon icon={ tool } />
+					<Icon icon={ cog } />
 				</Item.Media>
-				<Item.Label>Shipping settings</Item.Label>
+				<Item.Label>General</Item.Label>
 				<Item.Description>
-					Calculations, shipping destination, and debug mode.
+					Site title, tagline, language, and time zone.
 				</Item.Description>
 				<Item.Chevron />
 			</Item.LinkRow>,
@@ -215,11 +215,11 @@ export const InsideACard: Story = {
 	render: ( args ) => (
 		<Card.Root>
 			<Card.Header>
-				<Card.Title render={ <h2 /> } id="gateways">
-					Payment gateways
+				<Card.Title render={ <h2 /> } id="notifications">
+					Notifications
 				</Card.Title>
 				<Text variant="body-sm">
-					Connect the services that process payments.
+					Choose how you hear about activity on your site.
 				</Text>
 			</Card.Header>
 			<Card.Content>
@@ -230,19 +230,19 @@ export const InsideACard: Story = {
 		</Card.Root>
 	),
 	args: {
-		'aria-labelledby': 'gateways',
+		'aria-labelledby': 'notifications',
 		children: [
-			<Item.LinkRow href="#card" key="card">
-				<Item.Label>Card payments</Item.Label>
+			<Item.LinkRow href="#email" key="email">
+				<Item.Label>Email</Item.Label>
 				<Item.Meta>
-					<Badge intent="stable">Enabled</Badge>
+					<Badge intent="stable">On</Badge>
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>,
-			<Item.LinkRow href="#bank" key="bank">
-				<Item.Label>Bank transfer</Item.Label>
+			<Item.LinkRow href="#push" key="push">
+				<Item.Label>Push notifications</Item.Label>
 				<Item.Meta>
-					<Badge>Inactive</Badge>
+					<Badge>Off</Badge>
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>,
@@ -377,28 +377,28 @@ export const InsideACollapsibleCard: Story = {
 						<Text
 							variant="heading-sm"
 							render={ <h3 /> }
-							id="item-story-store"
+							id="item-story-content"
 						>
-							Store
+							Content
 						</Text>
-						<Item.Group aria-labelledby="item-story-store">
-							<Item.LinkRow href="#payments">
+						<Item.Group aria-labelledby="item-story-content">
+							<Item.LinkRow href="#writing">
 								<Item.Media>
-									<Icon icon={ payment } />
+									<Icon icon={ post } />
 								</Item.Media>
-								<Item.Label>Payments</Item.Label>
+								<Item.Label>Writing</Item.Label>
 								<Item.Description>
-									Choose how customers pay.
+									Default category and post format.
 								</Item.Description>
 								<Item.Chevron />
 							</Item.LinkRow>
-							<Item.LinkRow href="#shipping">
+							<Item.LinkRow href="#media">
 								<Item.Media>
-									<Icon icon={ shipping } />
+									<Icon icon={ image } />
 								</Item.Media>
-								<Item.Label>Shipping</Item.Label>
+								<Item.Label>Media</Item.Label>
 								<Item.Description>
-									Zones, rates and delivery options.
+									Image sizes and upload folders.
 								</Item.Description>
 								<Item.Chevron />
 							</Item.LinkRow>
@@ -422,14 +422,14 @@ export const Standalone: StoryObj< typeof Item.LinkRow > = {
 			<Item.Media>
 				<Icon icon={ download } />
 			</Item.Media>
-			<Item.Label>Billing history</Item.Label>
+			<Item.Label>Export</Item.Label>
 			<Item.Description>
-				Invoices and receipts for this site.
+				Download your posts, pages, and media.
 			</Item.Description>
 			<Item.Chevron />
 		</Item.LinkRow>
 	),
 	args: {
-		href: '#billing',
+		href: '#export',
 	},
 };

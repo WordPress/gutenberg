@@ -18,9 +18,9 @@ import type { GroupProps } from './types';
  *
  * function MyComponent() {
  * 	return (
- * 		<Item.Group aria-label="Payment gateways">
- * 			<Item.LinkRow href="/card">
- * 				<Item.Label>Card payments</Item.Label>
+ * 		<Item.Group aria-label="Settings">
+ * 			<Item.LinkRow href="/settings/general">
+ * 				<Item.Label>General</Item.Label>
  * 				<Item.Chevron />
  * 			</Item.LinkRow>
  * 		</Item.Group>

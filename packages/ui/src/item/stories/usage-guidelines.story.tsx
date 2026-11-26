@@ -21,18 +21,18 @@ type Story = StoryObj;
  */
 export const Joined: Story = {
 	render: () => (
-		<Item.Group aria-label="Payments">
-			<Item.LinkRow href="#card">
-				<Item.Label>Card payments</Item.Label>
+		<Item.Group aria-label="Features">
+			<Item.LinkRow href="#comments">
+				<Item.Label>Comments</Item.Label>
 				<Item.Meta>
 					<Badge intent="stable">Enabled</Badge>
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>
-			<Item.LinkRow href="#bank">
-				<Item.Label>Bank transfer</Item.Label>
+			<Item.LinkRow href="#pingbacks">
+				<Item.Label>Pingbacks</Item.Label>
 				<Item.Meta>
-					<Badge>Inactive</Badge>
+					<Badge>Disabled</Badge>
 				</Item.Meta>
 				<Item.Chevron />
 			</Item.LinkRow>
