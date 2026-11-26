@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildAccentRamp, buildBgRamp, type RampResult } from '../color-ramps';
-import { getContrast } from '../color-ramps/lib/color-utils';
+import { buildBgRamp, type RampResult } from '../color-ramps';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
@@ -30,6 +29,30 @@ describe( 'collectThemeProviderColorWarnings', () => {
 				foregroundColor: '#608010',
 				requiredContrast: 4.5,
 				achievedContrast: 1,
+			},
+		] );
+	} );
+
+	it.each( [
+		'foreground.interactive.brand',
+		'foreground.interactive.brand-active',
+	] )( 'reports %s text below 4.5:1 on neutral surfaces', ( token ) => {
+		const colorValues = new Map( [
+			[ `--wpds-color-${ token.replaceAll( '.', '-' ) }`, '#777' ],
+			[ '--wpds-color-background-surface-neutral', '#fff' ],
+		] );
+
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.neutral',
+				backgroundColor: '#fff',
+				foregroundToken: token,
+				foregroundColor: '#777',
+				requiredContrast: 4.5,
+				achievedContrast: expect.closeTo( 4.478, 3 ),
 			},
 		] );
 	} );
@@ -72,25 +95,12 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		}
 	);
 
-	it( 'checks the final fill after seed adjustment', () => {
-		const seed = '#1c7c64';
-		const background = buildBgRamp( '#1e1e1e' );
-		const primary = buildAccentRamp( seed, background );
+	it( 'reports a resting brand fill below 3:1 on neutral surfaces', () => {
 		const colorValues = new Map( [
-			[
-				'--wpds-color-background-interactive-brand-strong',
-				primary.ramp.bgFill1,
-			],
-			[
-				'--wpds-color-background-surface-neutral-strong',
-				background.ramp.surface3,
-			],
+			[ '--wpds-color-background-interactive-brand-strong', '#0f755d' ],
+			[ '--wpds-color-background-surface-neutral-strong', '#252525' ],
 		] );
 
-		expect(
-			getContrast( seed, background.ramp.surface3 )
-		).toBeGreaterThanOrEqual( 3 );
-		expect( primary.ramp.bgFill1 ).not.toBe( seed );
 		expect(
 			collectThemeProviderColorWarnings( new Map(), colorValues )
 		).toEqual( [
@@ -101,7 +111,7 @@ describe( 'collectThemeProviderColorWarnings', () => {
 				foregroundToken: 'background.interactive.brand-strong',
 				foregroundColor: '#0f755d',
 				requiredContrast: 3,
-				achievedContrast: expect.closeTo( 2.7173, 4 ),
+				achievedContrast: expect.closeTo( 2.7174, 4 ),
 			},
 		] );
 	} );

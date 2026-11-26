@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
@@ -44,9 +43,14 @@ interface NavigateParams {
  * gates the inspector's edit affordance and `onNavigateToPreviousEntityRecord`
  * gates the document bar's back button.
  *
+ * @param postType Post type rendered in the canvas, if the route names one.
+ * @param postId   Post ID rendered in the canvas, if the route names one.
  * @return The two callbacks, for spreading into the editor settings.
  */
-export default function useNavigateToEntityRecord() {
+export default function useNavigateToEntityRecord(
+	postType?: string,
+	postId?: string
+) {
 	const navigate = useNavigate() as Navigate;
 	const search = useSearch( { strict: false } ) as { focusMode?: unknown };
 	const registry = useRegistry();
@@ -63,20 +67,33 @@ export default function useNavigateToEntityRecord() {
 			 * Stash the block selected in the entity being left, so returning to
 			 * it can restore the user's place. The edits hold the external
 			 * client ID, which `onChangeSelection` has already resolved.
+			 *
+			 * The entity being left is the one the canvas shows. A route that
+			 * names none shows the homepage, which the editor resolves the same
+			 * way.
 			 */
-			const currentPostType = (
-				registry.select( editorStore ) as any
-			 ).getCurrentPostType();
-			const currentPostId = (
-				registry.select( editorStore ) as any
-			 ).getCurrentPostId();
-			const edits = registry
-				.select( coreStore )
-				.getEntityRecordEdits(
-					'postType',
-					currentPostType,
-					currentPostId
-				) as { selection?: { selectionStart?: { clientId?: string } } };
+			const homePage =
+				postType || postId
+					? null
+					: ( unlock(
+							registry.select( coreStore )
+						).getHomePage() as {
+							postType?: string;
+							postId?: string;
+						} | null );
+			const currentPostType = postType || homePage?.postType;
+			const currentPostId = postId || homePage?.postId;
+			const edits = (
+				currentPostType && currentPostId
+					? registry
+							.select( coreStore )
+							.getEntityRecordEdits(
+								'postType',
+								currentPostType,
+								currentPostId
+							)
+					: undefined
+			) as { selection?: { selectionStart?: { clientId?: string } } };
 			const selectedBlock = edits?.selection?.selectionStart?.clientId;
 
 			if ( selectedBlock ) {
@@ -120,7 +137,7 @@ export default function useNavigateToEntityRecord() {
 				} );
 			}
 		},
-		[ navigate, registry, getEntityLink ]
+		[ navigate, registry, getEntityLink, postType, postId ]
 	);
 
 	/*

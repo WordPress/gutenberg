@@ -29,7 +29,7 @@ let entityEdits: {
 
 function Navigation( { viewport }: { viewport?: string } ) {
 	const { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord } =
-		useNavigateToEntityRecord();
+		useNavigateToEntityRecord( 'page', '42' );
 
 	return (
 		<>
@@ -115,16 +115,10 @@ describe( 'nested entity navigation', () => {
 		originalState = window.history.state;
 		entityEdits = {};
 
-		// Substitute only the editor's selected entity and its link. Navigation,
+		// Substitute only the entity's edits and its link. Navigation,
 		// route state, browser history and the hook itself remain real.
 		vi.mocked( useRegistry ).mockReturnValue( {
-			select: ( store: { name: string } ) =>
-				store.name === 'core/editor'
-					? {
-							getCurrentPostType: () => 'page',
-							getCurrentPostId: () => 42,
-						}
-					: { getEntityRecordEdits: () => entityEdits },
+			select: () => ( { getEntityRecordEdits: () => entityEdits } ),
 		} as unknown as ReturnType< typeof useRegistry > );
 		vi.mocked( useSelect ).mockReturnValue( () => '/template-part' );
 	} );
