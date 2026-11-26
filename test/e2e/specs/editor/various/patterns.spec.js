@@ -1560,6 +1560,67 @@ test.describe( 'Synced pattern - entity navigation', () => {
 		// The pattern block should still be selected.
 		await expect( patternBlock ).toHaveClass( /is-selected/ );
 	} );
+
+	test( 'should return to the post after deleting the pattern being edited', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern to delete',
+			content:
+				'<!-- wp:paragraph -->\n<p>Pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Open the pattern from the post.
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await editor.selectBlocks( patternBlock );
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Pattern to delete',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		// Delete the pattern being edited.
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		// We should land back on the post, not on the deleted pattern.
+		await expect(
+			page.getByText( '"Pattern to delete" deleted.' ).first()
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
+		await expect(
+			editorTopBar.getByRole( 'button', { name: 'Back' } )
+		).toBeHidden();
+	} );
 } );
 
 test.describe( 'Synced pattern - read-only access', () => {
