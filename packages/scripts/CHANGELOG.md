@@ -5,6 +5,7 @@
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+-   Update `copy-webpack-plugin` to `^14.0.0` to pull in a patched `serialize-javascript` release ([#87479](https://github.com/WordPress/gutenberg/pull/87479)).
 
 ## 37.2.0 (2026-11-18)
 
