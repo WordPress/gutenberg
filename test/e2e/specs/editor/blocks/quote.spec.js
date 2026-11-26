@@ -328,6 +328,25 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
+	test( 'can be converted to verse with a citation', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/quote' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await editor.clickBlockToolbarButton( 'Select parent block: Quote' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
+		await page.keyboard.type( 'cite' );
+		await editor.transformBlockTo( 'core/verse' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:verse -->
+<pre class="wp-block-verse">one<br>two<br>cite</pre>
+<!-- /wp:verse -->`
+		);
+	} );
+
 	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( 'one' );
