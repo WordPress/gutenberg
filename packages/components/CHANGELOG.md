@@ -11,6 +11,7 @@
 -   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 -   `DropdownMenu`, `Dropdown`: Align menu spacing and dividers with the `Menu` component from `@wordpress/ui`: tighter popover and group padding, dividers inset to line up with item labels, and matching group label styles. This applies to any `Dropdown` that contains `MenuGroup`s ([#87092](https://github.com/WordPress/gutenberg/pull/87092)).
 -   `Tabs`, `TabPanel`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, with the same clearance on every side, and draw the focus ring inside it ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `Panel`, `ToolsPanel`: Use the `--wpds-color-*` tokens for surfaces, dividers, labels, icons, and controls, so they follow the active theme ([#87427](https://github.com/WordPress/gutenberg/pull/87427)).
 
 ### Deprecations
 
@@ -29,9 +30,11 @@
 -   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab. In both orientations, use the design system focus color, which keeps its contrast in the dark theme, and the design system corner radius ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 -   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
+-   `Panel`: Keep `PanelHeader` 48px tall, including its bottom border, inside containers that apply the `reset` mixin, such as the editor sidebar ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 
 ### Internal
 
+-   `ResizableBox`: Read CSS transforms with private helpers from `@wordpress/dom` ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).

@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
 -   Show undo and redo in the header on phones, and move Preview and View post to the Options menu there ([#87368](https://github.com/WordPress/gutenberg/pull/87368)).
 
 ### Bug Fixes
@@ -15,8 +16,11 @@
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `PostTaxonomiesFlatTermSelector`, `PostTaxonomiesHierarchicalTermSelector`: Prevent saving the post while a new term is being created, so the term isn't left out of the saved post ([#87321](https://github.com/WordPress/gutenberg/pull/87321)).
 -   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
+-   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
+-   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 
 ### Internal
 

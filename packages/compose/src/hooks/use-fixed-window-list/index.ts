@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
+import deprecated from '@wordpress/deprecated';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
 import useEvent from '../use-event';
 
@@ -44,6 +45,10 @@ export default function useFixedWindowList(
 	FixedWindowList,
 	React.Dispatch< React.SetStateAction< FixedWindowList > >,
 ] {
+	deprecated( 'wp.compose.__experimentalUseFixedWindowList', {
+		since: '7.3',
+	} );
+
 	const {
 		windowOverscan,
 		useWindowing = true,
