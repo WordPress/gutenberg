@@ -130,7 +130,7 @@ function LinkControl( {
 
 	/**
 	 * Sets the open/closed state of the Advanced Settings Drawer,
-	 * optionlly persisting the state to the user's preferences.
+	 * optionally persisting the state to the user's preferences.
 	 *
 	 * Note that Block Editor components can be consumed by non-WordPress
 	 * environments which may not have preferences setup.

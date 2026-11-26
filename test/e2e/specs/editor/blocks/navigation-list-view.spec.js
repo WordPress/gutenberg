@@ -543,6 +543,49 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 	} );
 
+	test( `returns focus to the item's Options after adding a submenu link`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Top Level Item 1' } );
+		const optionsButton = row.getByRole( 'button', { name: 'Options' } );
+		const addSubmenuLink = page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', { name: 'Add submenu link' } );
+
+		await test.step( 'when the link search is dismissed', async () => {
+			await row.hover();
+			await optionsButton.click();
+			await addSubmenuLink.click();
+			await expect( linkControl.getSearchInput() ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( optionsButton ).toBeFocused();
+		} );
+
+		await test.step( 'when a link is chosen', async () => {
+			await page.keyboard.press( 'Enter' );
+			await addSubmenuLink.click();
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'wordpress.org' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect( optionsButton ).toBeFocused();
+		} );
+	} );
+
 	test( `does not display link interface for blocks that have not just been inserted`, async ( {
 		page,
 		editor,

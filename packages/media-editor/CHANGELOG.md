@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEditor`: Ignore keyboard shortcuts and Escape-to-close handling during IME composition ([#87354](https://github.com/WordPress/gutenberg/pull/87354)).
+
 ## 0.23.0 (2026-11-18)
 
 ### Enhancements
