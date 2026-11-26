@@ -984,6 +984,12 @@ describe( 'DataForm component', () => {
 			// No toggle describes it, so it mustn't be hidden from assistive
 			// technology.
 			expect( isInaccessible( summary ) ).toBe( false );
+			// The summary is a div, which a span can't contain.
+			// eslint-disable-next-line testing-library/no-node-access
+			const summaryList = summary.closest(
+				'.dataforms-layouts-card__field-summary'
+			);
+			expect( summaryList?.parentElement?.tagName ).toBe( 'DIV' );
 		} );
 
 		it( 'does not render an empty card for an editable field without an edit control', () => {

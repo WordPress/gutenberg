@@ -134,8 +134,11 @@ function HeaderContent< Item >( {
 					</CollapsibleCard.HeaderDescription>
 				) : (
 					// A static card has no toggle for the description to
-					// describe, so it is plain, readable text instead.
+					// describe, so it is plain, readable text instead. It renders
+					// as a div because the summary is a div, which a span can't
+					// contain.
 					<Text
+						render={ <div /> }
 						variant="body-md"
 						className="dataforms-layouts-card__field-header-content-description"
 					>
