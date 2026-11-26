@@ -8,6 +8,7 @@
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 -   Refetch a post type's registered meta when its `getPostType` or `getEntityRecord( 'root', 'postType', … )` resolution is invalidated, so meta registered after the editor loads shows up in block bindings ([#87263](https://github.com/WordPress/gutenberg/pull/87263)).
+-   `getEntityRecord`: Don't request the entity configs when no entity name is given, such as when a Cover block outside a post reads the featured image ([#87388](https://github.com/WordPress/gutenberg/pull/87388)).
 
 ### Internal
 

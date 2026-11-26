@@ -75,6 +75,11 @@ export const getEntityRecord =
 		registry,
 		resolveSelect,
 	}: CoreDataThunkArgs ) => {
+		// No entity matches a missing name, so don't request the configs.
+		if ( ! name ) {
+			return;
+		}
+
 		const configs: Array< EntityConfig > =
 			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
