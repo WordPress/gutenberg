@@ -680,6 +680,101 @@ test.describe( 'Gallery', () => {
 	} );
 } );
 
+test.describe( 'Gallery (server-side uploads)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// Force the traditional server-side upload path, mirroring a site
+		// where the `wp_client_side_media_processing_enabled` filter returns
+		// false or the browser lacks client-side processing support.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	// Each image in a gallery uploads through a `mediaUpload()` call of its
+	// own, so this is the case the limit across calls exists for
+	// (see gutenberg#87191).
+	test( 'uploads at most two images to the server at once', async ( {
+		admin,
+		editor,
+		page,
+		galleryBlockUtils,
+	} ) => {
+		const imageCount = 6;
+		let inFlightCount = 0;
+		let peakInFlightCount = 0;
+		let finishedCount = 0;
+
+		// Matches `POST /wp/v2/media` whether the REST API is reached through
+		// pretty permalinks or the `rest_route` query argument.
+		const isMediaCollection = ( url ) =>
+			( url.searchParams.get( 'rest_route' ) ?? url.pathname ).endsWith(
+				'/wp/v2/media'
+			);
+		const isMediaUpload = ( request ) =>
+			request.method() === 'POST' &&
+			isMediaCollection( new URL( request.url() ) );
+
+		// An upload counts as in flight from the moment the editor sends it
+		// until its response has arrived (or it failed).
+		const onUploadSettled = ( request ) => {
+			if ( isMediaUpload( request ) ) {
+				inFlightCount--;
+				finishedCount++;
+			}
+		};
+		page.on( 'requestfinished', onUploadSettled );
+		page.on( 'requestfailed', onUploadSettled );
+		await page.route( isMediaCollection, async ( route ) => {
+			if ( ! isMediaUpload( route.request() ) ) {
+				return route.fallback();
+			}
+			inFlightCount++;
+			peakInFlightCount = Math.max( peakInFlightCount, inFlightCount );
+			// Hold each upload briefly, so that uploads the editor lets run at
+			// the same time are sure to overlap. The request is then sent on
+			// unchanged, because an intercepted request does not expose the
+			// file in its multipart body to send again from here.
+			await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+			await route.continue();
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Gallery',
+		} );
+		await galleryBlockUtils.uploadMultiple(
+			galleryBlock.getByTestId( 'form-file-upload-input' ),
+			imageCount
+		);
+
+		// Every image ends up uploaded, replacing its temporary blob URL.
+		const images = galleryBlock.getByRole( 'img' );
+		await expect( images ).toHaveCount( imageCount );
+		for ( let index = 0; index < imageCount; index++ ) {
+			await expect( images.nth( index ) ).toHaveAttribute(
+				'src',
+				/^https?:\/\//,
+				{ timeout: 30_000 }
+			);
+		}
+
+		await expect.poll( () => finishedCount ).toBe( imageCount );
+		expect( peakInFlightCount ).toBeLessThanOrEqual( 2 );
+	} );
+} );
+
 class GalleryBlockUtils {
 	constructor( { page } ) {
 		this.page = page;
@@ -698,5 +793,22 @@ class GalleryBlockUtils {
 		await inputElement.setInputFiles( tmpFileName );
 
 		return fileName;
+	}
+
+	async uploadMultiple( inputElement, count ) {
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-image-' )
+		);
+		const tmpFileNames = [];
+		for ( let index = 0; index < count; index++ ) {
+			const tmpFileName = path.join(
+				tmpDirectory,
+				randomUUID() + '.png'
+			);
+			await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
+			tmpFileNames.push( tmpFileName );
+		}
+
+		await inputElement.setInputFiles( tmpFileNames );
 	}
 }
