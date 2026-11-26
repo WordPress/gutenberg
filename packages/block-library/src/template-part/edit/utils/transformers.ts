@@ -6,16 +6,34 @@ import {
 	getPossibleBlockTransformations,
 	switchToBlockType,
 } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
+
+interface WidgetEntity {
+	id: string;
+	id_base: string;
+	instance: {
+		raw: {
+			content: string;
+		};
+	};
+	_embedded: {
+		about: Array< {
+			is_multi?: boolean;
+		} >;
+	};
+}
 
 /**
  * Converts a widget entity record into a block.
  *
- * @param {Object} widget The widget entity record.
- * @return {Object} a block (converted from the entity record).
+ * @param widget The widget entity record.
+ * @return a block (converted from the entity record).
  */
-export function transformWidgetToBlock( widget ) {
+export function transformWidgetToBlock(
+	widget: WidgetEntity
+): Block | undefined {
 	if ( widget.id_base !== 'block' ) {
-		let attributes;
+		let attributes: Record< string, unknown >;
 		if ( widget._embedded.about[ 0 ].is_multi ) {
 			attributes = {
 				idBase: widget.id_base,
@@ -44,7 +62,7 @@ export function transformWidgetToBlock( widget ) {
 
 	if ( block.name === 'core/widget-group' ) {
 		return createBlock(
-			getGroupingBlockName(),
+			getGroupingBlockName()!,
 			undefined,
 			transformInnerBlocks( block.innerBlocks )
 		);
@@ -64,10 +82,10 @@ export function transformWidgetToBlock( widget ) {
 /**
  * Switch Legacy Widget to the first matching transformation block.
  *
- * @param {Object} block Legacy Widget block object
- * @return {Object|undefined} a block
+ * @param block Legacy Widget block object
+ * @return a block
  */
-function switchLegacyWidgetType( block ) {
+function switchLegacyWidgetType( block: Block ): Block | undefined {
 	const transforms = getPossibleBlockTransformations( [ block ] ).filter(
 		( item ) => {
 			// The block without any transformations can't be a wildcard.
@@ -76,10 +94,14 @@ function switchLegacyWidgetType( block ) {
 			}
 
 			const hasWildCardFrom = item.transforms?.from?.find(
-				( from ) => from.blocks && from.blocks.includes( '*' )
+				( from ) =>
+					'blocks' in from &&
+					from.blocks &&
+					from.blocks.includes( '*' )
 			);
 			const hasWildCardTo = item.transforms?.to?.find(
-				( to ) => to.blocks && to.blocks.includes( '*' )
+				( to ) =>
+					'blocks' in to && to.blocks && to.blocks.includes( '*' )
 			);
 
 			// Skip wildcard transformations.
@@ -91,10 +113,10 @@ function switchLegacyWidgetType( block ) {
 		return undefined;
 	}
 
-	return switchToBlockType( block, transforms[ 0 ].name );
+	return switchToBlockType( block, transforms[ 0 ].name )?.[ 0 ];
 }
 
-function transformInnerBlocks( innerBlocks = [] ) {
+function transformInnerBlocks( innerBlocks: Block[] = [] ): Block[] {
 	return innerBlocks
 		.flatMap( ( block ) => {
 			if ( block.name === 'core/legacy-widget' ) {
@@ -107,5 +129,5 @@ function transformInnerBlocks( innerBlocks = [] ) {
 				transformInnerBlocks( block.innerBlocks )
 			);
 		} )
-		.filter( ( block ) => !! block );
+		.filter( ( block ): block is Block => !! block );
 }

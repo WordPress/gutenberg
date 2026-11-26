@@ -1,43 +1,49 @@
 import { capitalCase } from 'change-case';
 import { store as coreDataStore } from '@wordpress/core-data';
+import type { WpTemplatePart } from '@wordpress/core-data';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { decodeEntities } from '@wordpress/html-entities';
 import initBlock from '../utils/init-block';
+import type { BlockModule } from '../utils/types';
 import metadata from './block.json';
 import edit from './edit';
 import { enhanceTemplatePartVariations } from './variations';
+import type { TemplatePartAttributes } from './types';
 
 const { name } = metadata;
 export { metadata, name };
 
-export const settings = {
-	icon: symbolFilled,
-	__experimentalLabel: ( { slug, theme } ) => {
-		// Attempt to find entity title if block is a template part.
-		// Require slug to request, otherwise entity is uncreated and will throw 404.
-		if ( ! slug ) {
-			return;
-		}
+export const settings: Partial< BlockConfiguration< TemplatePartAttributes > > =
+	{
+		icon: symbolFilled,
+		__experimentalLabel: ( { slug, theme }: TemplatePartAttributes ) => {
+			// Attempt to find entity title if block is a template part.
+			// Require slug to request, otherwise entity is uncreated and will throw 404.
+			if ( ! slug ) {
+				return;
+			}
 
-		const { getCurrentTheme, getEditedEntityRecord } =
-			select( coreDataStore );
-		const entity = getEditedEntityRecord(
-			'postType',
-			'wp_template_part',
-			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
-		);
-		if ( ! entity ) {
-			return;
-		}
+			const { getCurrentTheme, getEditedEntityRecord } =
+				select( coreDataStore );
+			const entity = getEditedEntityRecord(
+				'postType',
+				'wp_template_part',
+				( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
+			) as unknown as WpTemplatePart | undefined;
+			if ( ! entity ) {
+				return;
+			}
 
-		return (
-			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
-		);
-	},
-	edit,
-};
+			return (
+				decodeEntities( entity.title as unknown as string ) ||
+				capitalCase( entity.slug || '' )
+			);
+		},
+		edit,
+	};
 
 export const init = () => {
 	addFilter(
@@ -55,10 +61,19 @@ export const init = () => {
 		'blockEditor.__unstableCanInsertBlockType',
 		'core/block-library/removeTemplatePartsFromPostTemplates',
 		(
-			canInsert,
-			blockType,
-			rootClientId,
-			{ getBlock, getBlockParentsByBlockName }
+			canInsert: boolean,
+			blockType: BlockConfiguration,
+			rootClientId: string,
+			{
+				getBlock,
+				getBlockParentsByBlockName,
+			}: {
+				getBlock: ( clientId: string ) => Block | null;
+				getBlockParentsByBlockName: (
+					clientId: string,
+					blockName: string | string[]
+				) => string[];
+			}
 		) => {
 			if ( blockType.name !== 'core/template-part' ) {
 				return canInsert;
@@ -79,5 +94,9 @@ export const init = () => {
 		}
 	);
 
-	return initBlock( { name, metadata, settings } );
+	return initBlock( {
+		name,
+		metadata: metadata as BlockModule[ 'metadata' ],
+		settings: settings as BlockModule[ 'settings' ],
+	} );
 };
