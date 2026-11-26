@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight, textColumns",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- transform: rotate\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -475,6 +475,33 @@
 								"required": [ "name", "slug", "shadow" ],
 								"additionalProperties": false
 							}
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
+		"settingsTransformProperties": {
+			"type": "object",
+			"properties": {
+				"transform": {
+					"description": "Settings related to transforms.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Allow users to set a rotation.",
+							"type": "boolean",
+							"default": false
+						},
+						"translate": {
+							"description": "Allow users to set an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						},
+						"scale": {
+							"description": "Allow users to set a uniform scale.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -979,6 +1006,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsViewportProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
@@ -996,6 +1024,7 @@
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTransformProperties" },
 				{ "$ref": "#/definitions/settingsTypographyProperties" },
 				{ "$ref": "#/definitions/settingsCustomProperties" }
 			]
@@ -1013,6 +1042,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"viewport",
 				"custom"
@@ -1030,6 +1060,7 @@
 				"position",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography",
 				"custom"
 			]
@@ -1922,6 +1953,45 @@
 					},
 					"additionalProperties": false
 				},
+				"transform": {
+					"description": "Transform styles. Only blocks and block style variations support them.",
+					"type": "object",
+					"properties": {
+						"rotate": {
+							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
+							"type": "string"
+						},
+						"translate": {
+							"description": "Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`.",
+							"type": "object",
+							"properties": {
+								"x": {
+									"description": "The horizontal offset.",
+									"type": "string"
+								},
+								"y": {
+									"description": "The vertical offset.",
+									"type": "string"
+								}
+							},
+							"additionalProperties": false
+						},
+						"scale": {
+							"description": "Sets the `scale` CSS property. Accepts a single non-negative number, such as `1.2`, or percentage, such as `120%`. One value scales both axes.",
+							"oneOf": [
+								{
+									"type": "number",
+									"minimum": 0
+								},
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+(?:\\.\\d+)?|\\.\\d+)%?$"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
 				"typography": {
 					"description": "Typography styles.",
 					"type": "object",
@@ -2040,6 +2110,7 @@
 				"outline",
 				"shadow",
 				"spacing",
+				"transform",
 				"typography"
 			]
 		},
@@ -2275,25 +2346,67 @@
 			"type": "object",
 			"properties": {
 				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":any-link": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":link": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":visited": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2329,16 +2442,40 @@
 			"type": "object",
 			"properties": {
 				":active": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":hover": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2349,22 +2486,58 @@
 			"type": "object",
 			"properties": {
 				":focus": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":required": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-valid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				":user-invalid": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				},
 				"::placeholder": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+					"allOf": [
+						{ "$ref": "#/definitions/stylesPropertiesComplete" },
+						{
+							"type": "object",
+							"properties": { "transform": false }
+						}
+					]
 				}
 			}
 		},
@@ -2638,6 +2811,7 @@
 					"additionalProperties": {
 						"type": "object",
 						"properties": {
+							"transform": false,
 							"spacing": {
 								"type": "object",
 								"properties": {
@@ -3880,6 +4054,7 @@
 			"styles": {
 				"type": "object",
 				"properties": {
+					"transform": false,
 					"spacing": {
 						"type": "object",
 						"properties": {

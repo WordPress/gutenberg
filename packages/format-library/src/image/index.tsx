@@ -205,20 +205,32 @@ function Edit( {
 					alt: string;
 					width: number;
 				} ) => {
-					onChange(
-						insertObject( value, {
-							type: name,
-							attributes: {
-								className: `wp-image-${ id }`,
-								style: `width: ${ Math.min(
-									imgWidth,
-									150
-								) }px;`,
-								url,
-								alt,
-							},
-						} )
-					);
+					const newImage = {
+						type: name,
+						attributes: {
+							className: `wp-image-${ id }`,
+							style: `width: ${ Math.min( imgWidth, 150 ) }px;`,
+							url,
+							alt,
+						},
+					};
+
+					let newValue: RichTextValue;
+					// Swap the image in place, so its formats, like a link, stay.
+					if ( isObjectActive && value.start !== undefined ) {
+						const replacements = value.replacements.slice();
+						replacements[ value.start ] = newImage;
+						newValue = {
+							...value,
+							replacements,
+							start: value.end,
+							end: value.end,
+						};
+					} else {
+						newValue = insertObject( value, newImage );
+					}
+
+					onChange( newValue );
 					onFocus();
 				} }
 				render={ ( { open }: { open: () => void } ) => (

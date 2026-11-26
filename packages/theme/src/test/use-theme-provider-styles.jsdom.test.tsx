@@ -133,7 +133,24 @@ describe( 'useThemeProviderStyles', () => {
 				result.current.themeProviderStyles[
 					'--wpds-color-background-interactive-brand-strong'
 				]
-			).toBe( '#1e90ff' );
+			).toBe( '#1189f8' );
+		} );
+
+		it( 'keeps white legacy accent text when it fits the legacy accent', () => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( {
+					color: { primary: '#007cba', background: '#aaa' },
+				} )
+			);
+			const styles = result.current.themeProviderStyles;
+
+			// The semantic text color does not fit the legacy accent.
+			expect(
+				styles[ '--wpds-color-foreground-interactive-brand-strong' ]
+			).not.toBe( '#fff' );
+			expect( styles[ '--wp-components-color-accent-inverted' ] ).toBe(
+				'#fff'
+			);
 		} );
 
 		it( 'emits neutral interactive background state properties from the background ramp', () => {

@@ -126,6 +126,41 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.not.toHaveAttribute( 'aria-sort' );
 } );
 
+it( 'does not move focus when the selection is cleared without an interaction', async () => {
+	const renderTable = ( selection: string[] ) => (
+		<DataViews
+			data={ posts }
+			fields={ fields }
+			view={ {
+				type: 'table',
+				titleField: 'title',
+				fields: [ 'author' ],
+			} }
+			onChangeView={ () => {} }
+			actions={ actions }
+			selection={ selection }
+			onChangeSelection={ () => {} }
+			paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+			defaultLayouts={ { table: true } }
+		/>
+	);
+	const { rerender } = await render( renderTable( [ '1', '2' ] ) );
+	const { ownerDocument } = page.getByRole( 'table' ).element();
+	await expect
+		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.toBeVisible();
+	( ownerDocument.activeElement as HTMLElement | null )?.blur();
+
+	await rerender( renderTable( [] ) );
+
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.toBeVisible();
+	expect( ownerDocument.activeElement ).toBe( ownerDocument.body );
+} );
+
 it( 'blocks focus on bulk actions and covers column headings while loading', async () => {
 	const { rerender } = await render( <SelectableTable /> );
 	const user = userEvent.setup();
@@ -416,7 +451,7 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 	page.getByRole( 'gridcell' ).first().element().focus();
 	await user.keyboard( '{ArrowDown}{ArrowDown}{ArrowUp}{Tab}{Tab}' );
 	const checkbox = page.getByRole( 'checkbox', {
-		name: 'Post 1',
+		name: 'Select Post 1',
 		exact: true,
 	} );
 	await expect.element( checkbox ).toHaveFocus();
