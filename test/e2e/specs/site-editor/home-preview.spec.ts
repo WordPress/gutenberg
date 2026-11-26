@@ -15,6 +15,7 @@ test.describe( 'Home preview', () => {
 			page_on_front: 0,
 		} );
 		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -27,8 +28,10 @@ test.describe( 'Home preview', () => {
 	} ) => {
 		await admin.visitSiteEditor();
 
+		// The extensible site editor shows the site to browse, with a button
+		// naming what it opens; the classic one makes the canvas the button.
 		const editButton = page.getByRole( 'button', {
-			name: 'Edit',
+			name: isSiteEditorV2 ? 'Edit Template' : 'Edit',
 			exact: true,
 		} );
 		await editButton.click();
@@ -58,7 +61,7 @@ test.describe( 'Home preview', () => {
 		await admin.visitSiteEditor();
 
 		const editButton = page.getByRole( 'button', {
-			name: 'Edit',
+			name: isSiteEditorV2 ? 'Edit Page' : 'Edit',
 			exact: true,
 		} );
 		await editButton.click();
@@ -71,6 +74,49 @@ test.describe( 'Home preview', () => {
 				: /[?&]canvas=edit(&|$)/
 		);
 		await expect( editButton ).toBeHidden();
+	} );
+
+	test( 'opens the page browsed to in the preview for editing', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		test.skip(
+			! isSiteEditorV2,
+			'Only the extensible site editor lets the home preview be browsed.'
+		);
+
+		const post = await requestUtils.createPost( {
+			title: 'Browsed post',
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor();
+
+		const previewFrame = page.locator( 'iframe[title="Site Preview"]' );
+		const preview = previewFrame.contentFrame();
+		const getPreviewUrl = async () =>
+			(
+				await ( await previewFrame.elementHandle() )?.contentFrame()
+			)?.url();
+
+		await preview.getByRole( 'link', { name: 'Browsed post' } ).click();
+
+		// The post opens in the preview, which keeps hiding the admin bar.
+		await expect
+			.poll( getPreviewUrl )
+			.toMatch(
+				new RegExp( `(${ post.id }|browsed-post).*wp_site_preview=1` )
+			);
+		await expect( preview.locator( '#wpadminbar' ) ).toHaveCount( 0 );
+
+		await page
+			.getByRole( 'button', { name: 'Edit Post', exact: true } )
+			.click();
+
+		await expect( page ).toHaveURL(
+			new RegExp( `[?&]p=%2Ftypes%2Fpost%2Fedit%2F${ post.id }(&|$)` )
+		);
 	} );
 
 	// The classic site editor has no equivalent of a route that names a post

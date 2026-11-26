@@ -9,6 +9,7 @@ import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
 import SitePreview from './site-preview';
+import BrowsePreview from './browse-preview';
 import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
@@ -151,6 +152,17 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	// Nothing for the editor to open, so show the site the route configures.
 	if ( ! hasEntity && isBlockTheme === false ) {
 		return <SitePreview />;
+	}
+
+	// The route shows the site as it is, so let the user browse it and choose
+	// what to edit.
+	if (
+		canvas.isPreview &&
+		canvas.isBrowsable &&
+		resolvesHomePage &&
+		isBlockTheme
+	) {
+		return <BrowsePreview />;
 	}
 
 	// Show spinner while loading the editor module, and until it is known which
