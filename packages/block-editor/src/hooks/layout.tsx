@@ -390,18 +390,15 @@ function LayoutPanelPure( {
 					...layoutSettings,
 					..._layoutBlockSupport,
 				}.default;
-				const layoutTypes = new Set(
-					multiSelectedClientIds.map( ( id: string ) => {
-						const blockLayout =
-							getBlockAttributes( id )?.layout || defaultLayout;
-						return (
-							blockLayout?.type ||
-							_layoutBlockSupport.default?.type ||
-							'default'
-						);
-					} )
+				const getLayoutTypeForBlock = ( id: string ) =>
+					( getBlockAttributes( id )?.layout || defaultLayout )
+						?.type ||
+					_layoutBlockSupport.default?.type ||
+					'default';
+				const layoutType = getLayoutTypeForBlock( clientId );
+				_hasMixedLayoutTypes = multiSelectedClientIds.some(
+					( id: string ) => getLayoutTypeForBlock( id ) !== layoutType
 				);
-				_hasMixedLayoutTypes = layoutTypes.size > 1;
 			}
 
 			return {
