@@ -1000,6 +1000,7 @@ describe( 'blocks', () => {
 				);
 
 				expect( block?.attributes.id ).toEqual( { type: 'string' } );
+				expect( block?.deprecated ).toHaveLength( 2 );
 				block?.deprecated?.forEach( ( deprecation ) => {
 					expect( deprecation.attributes?.id ).toEqual( {
 						type: 'string',
