@@ -84,18 +84,27 @@ function useRow( {
 		actions: false,
 	} );
 
-	const register = useCallback( ( part: RowPart ) => {
-		if ( part === 'label' ) {
-			hasLabelRef.current = true;
-			return () => {
-				hasLabelRef.current = false;
-			};
-		}
+	const register = useCallback(
+		( part: RowPart ) => {
+			if ( part === 'label' ) {
+				hasLabelRef.current = true;
+				return () => {
+					hasLabelRef.current = false;
+				};
+			}
 
-		setParts( ( current ) => ( { ...current, [ part ]: true } ) );
-		return () =>
-			setParts( ( current ) => ( { ...current, [ part ]: false } ) );
-	}, [] );
+			// A static row does not reference its description and meta, so
+			// it does not need to render again when they mount.
+			if ( ! isActivatable && part !== 'actions' ) {
+				return () => {};
+			}
+
+			setParts( ( current ) => ( { ...current, [ part ]: true } ) );
+			return () =>
+				setParts( ( current ) => ( { ...current, [ part ]: false } ) );
+		},
+		[ isActivatable ]
+	);
 
 	const hasExplicitName = !! (
 		aria[ 'aria-label' ] || aria[ 'aria-labelledby' ]
@@ -141,12 +150,15 @@ function useRow( {
 		'aria-label': aria[ 'aria-label' ],
 		'aria-labelledby':
 			aria[ 'aria-labelledby' ] ??
-			( aria[ 'aria-label' ]
+			( hasExplicitName
 				? undefined
 				: // The new-tab notice is part of the name, as it is in `Link`.
 					join( labelId, opensInNewTab && newTabNoticeId ) ),
 		'aria-describedby': join(
 			aria[ 'aria-describedby' ],
+			// An explicit name replaces the notice, so it is kept as a
+			// description instead.
+			hasExplicitName && opensInNewTab && newTabNoticeId,
 			parts.description && descriptionId,
 			parts.meta && metaId
 		),
@@ -181,7 +193,15 @@ function useRow( {
 					group.variant === 'detached' && styles[ 'has-frame' ]
 				) }
 			>
-				{ content }
+				{ /*
+				 * The group ends at its list items. A row rendered further
+				 * down, such as in a popup opened from `Item.Actions`, is
+				 * not an item of this list. React passes context through
+				 * portals, so it has to be reset here.
+				 */ }
+				<GroupContext.Provider value={ null }>
+					{ content }
+				</GroupContext.Provider>
 			</li>
 		);
 	}

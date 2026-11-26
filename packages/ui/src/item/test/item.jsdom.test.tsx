@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from '@wordpress/element';
+import { createPortal, createRef } from '@wordpress/element';
 import { Badge } from '../../badge';
 import { Button } from '../../button';
 import * as Item from '../index';
@@ -229,6 +229,48 @@ describe( 'Item', () => {
 		expect(
 			screen.getByRole( 'link', { name: 'Card payments' } )
 		).toHaveAccessibleDescription( 'Updated today. Accept cards. Enabled' );
+	} );
+
+	it( 'keeps the new-tab notice when the link row has an explicit name', () => {
+		render(
+			<Item.LinkRow
+				href="https://wordpress.org"
+				target="_blank"
+				aria-label="Open billing"
+			>
+				<Item.Label>Billing</Item.Label>
+			</Item.LinkRow>
+		);
+
+		expect(
+			screen.getByRole( 'link', { name: 'Open billing' } )
+		).toHaveAccessibleDescription( '(opens in a new tab)' );
+	} );
+
+	it( 'renders a row in a portal as a standalone row, not as an item of the outer group', () => {
+		const portal = document.createElement( 'div' );
+		document.body.appendChild( portal );
+
+		render(
+			<Item.Group aria-label="Outer">
+				<Item.ContentRow>
+					<Item.Label>Soft shadow</Item.Label>
+					<Item.Actions>
+						{ createPortal(
+							<Item.ContentRow>
+								<Item.Label>In a popup</Item.Label>
+							</Item.ContentRow>,
+							portal
+						) }
+					</Item.Actions>
+				</Item.ContentRow>
+			</Item.Group>
+		);
+
+		expect(
+			within( portal ).queryByRole( 'listitem' )
+		).not.toBeInTheDocument();
+		portal.remove();
 	} );
 
 	it( 'supports a disabled button row', async () => {

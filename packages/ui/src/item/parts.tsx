@@ -69,8 +69,9 @@ export const Media = forwardRef< HTMLSpanElement, MediaProps >(
 export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 	function ItemLabel( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Label' );
+		const register = context?.register;
 
-		useEffect( () => context?.register( 'label' ), [ context ] );
+		useEffect( () => register?.( 'label' ), [ register ] );
 
 		return (
 			<Text
@@ -96,8 +97,9 @@ export const Label = forwardRef< HTMLSpanElement, LabelProps >(
 export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
 	function ItemDescription( { className, render, ...props }, ref ) {
 		const context = useRowContext( 'Description' );
+		const register = context?.register;
 
-		useEffect( () => context?.register( 'description' ), [ context ] );
+		useEffect( () => register?.( 'description' ), [ register ] );
 
 		return (
 			<Text
@@ -124,8 +126,9 @@ export const Meta = forwardRef< HTMLSpanElement, MetaProps >( function ItemMeta(
 	ref
 ) {
 	const context = useRowContext( 'Meta' );
+	const register = context?.register;
 
-	useEffect( () => context?.register( 'meta' ), [ context ] );
+	useEffect( () => register?.( 'meta' ), [ register ] );
 
 	return useRender( {
 		defaultTagName: 'span',
@@ -183,8 +186,9 @@ export const Chevron = forwardRef< SVGSVGElement, ChevronProps >(
 export const Actions = forwardRef< HTMLSpanElement, ActionsProps >(
 	function ItemActions( { render, ...props }, ref ) {
 		const context = useRowContext( 'Actions' );
+		const register = context?.register;
 
-		useEffect( () => context?.register( 'actions' ), [ context ] );
+		useEffect( () => register?.( 'actions' ), [ register ] );
 
 		return useRender( {
 			defaultTagName: 'span',

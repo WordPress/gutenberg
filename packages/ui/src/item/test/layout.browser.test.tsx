@@ -63,6 +63,7 @@ describe( 'Item layout', () => {
 								height: 32,
 								position: 'relative',
 								transform: 'translateZ(0)',
+								zIndex: 2,
 							} }
 						/>
 					</Item.Media>
@@ -82,6 +83,34 @@ describe( 'Item layout', () => {
 		expect( elementAtCenterOf( screen.getByTestId( 'media' ) ) ).toBe(
 			row
 		);
+	} );
+
+	it( 'wraps a long label without a space, so it does not run under the actions', async () => {
+		await render(
+			<div style={ { width: 240 } }>
+				<Item.ContentRow>
+					<Item.Label>
+						featuredimagefortheannualreport2026final.png
+					</Item.Label>
+					<Item.Actions>
+						<Button size="compact">Remove image</Button>
+					</Item.Actions>
+				</Item.ContentRow>
+			</div>
+		);
+
+		// The text, not the box of the label: overflowing text paints
+		// outside the box.
+		const range = document.createRange();
+		range.selectNodeContents(
+			screen.getByText( 'featuredimagefortheannualreport2026final.png' )
+		);
+		const label = range.getBoundingClientRect();
+		const action = screen
+			.getByRole( 'button', { name: 'Remove image' } )
+			.getBoundingClientRect();
+
+		expect( label.right ).toBeLessThanOrEqual( action.left );
 	} );
 
 	it( 'keeps the browser cursor on a link row, and the control cursor on a button row', async () => {

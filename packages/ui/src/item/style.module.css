@@ -207,6 +207,25 @@
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
+		/*
+		 * Each static part is a stacking context at level 0, below the
+		 * link or button of the row, even when it holds an element with a
+		 * positive `z-index` of its own.
+		 */
+		.media,
+		.label,
+		.description,
+		.meta,
+		.chevron {
+			z-index: 0;
+		}
+
+		/* A long word or file name wraps; it does not run under the actions. */
+		.label,
+		.description {
+			overflow-wrap: anywhere;
+		}
+
 		.media {
 			grid-column: 1;
 			grid-row: 1 / span 2;
