@@ -1048,6 +1048,51 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( '__unstableSaveForPreview()', () => {
+		it( 'autosaves before the autosaves have loaded', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				status: 'publish',
+			};
+			const postType = {
+				...postTypeEntity,
+				supports: { autosave: true },
+			};
+			const requests = [];
+			apiFetch.setFetchHandler( async ( { path, data, ...options } ) => {
+				if ( path.startsWith( '/wp/v2/types/post' ) ) {
+					return { json: () => Promise.resolve( postType ) };
+				}
+				const method = getMethod( options );
+				if ( path.startsWith( `/wp/v2/posts/${ postId }/autosaves` ) ) {
+					requests.push( method );
+					return method === 'POST' ? { ...post, ...data } : [];
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 1 } );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).__unstableSaveForPreview();
+
+			expect( requests ).toEqual( [ 'GET', 'POST' ] );
+		} );
+	} );
+
 	describe( 'trashPost()', () => {
 		it( 'trashes a post', async () => {
 			const post = {
