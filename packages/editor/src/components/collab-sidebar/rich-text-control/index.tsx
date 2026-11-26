@@ -237,7 +237,6 @@ export default function RichTextControl( {
 			start: number | undefined,
 			end: number | undefined
 		) => setSelection( { start, end } ),
-		__unstableIsSelected: isSelected,
 		preserveWhiteSpace: !! preserveWhiteSpace,
 		placeholder,
 		__unstableDisableFormats: disableFormats,

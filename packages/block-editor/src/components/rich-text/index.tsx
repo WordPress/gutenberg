@@ -465,7 +465,6 @@ function RichTextWrapper(
 		selectionEnd,
 		onSelectionChange,
 		placeholder: bindingsPlaceholder || placeholder,
-		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: [ tagName ],

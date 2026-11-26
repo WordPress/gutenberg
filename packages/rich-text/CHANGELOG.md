@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `__unstableUseRichText`: Remove the `__unstableIsSelected` prop. A field is selected when it has both `selectionStart` and `selectionEnd` ([#31804](https://github.com/WordPress/gutenberg/pull/31804)).
+
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).

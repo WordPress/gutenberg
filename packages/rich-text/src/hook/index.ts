@@ -54,12 +54,13 @@ function useRichTextBase( {
 	preserveWhiteSpace,
 	onChange,
 	__unstableDisableFormats: disableFormats,
-	__unstableIsSelected: isSelected,
 	__unstableDependencies = [],
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 }: RichTextBaseProps ) {
+	const isSelected =
+		selectionStart !== undefined && selectionEnd !== undefined;
 	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ), undefined );
 	const ref = useRef< HTMLElement >( undefined );
