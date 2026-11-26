@@ -11792,11 +11792,6 @@
 			"count": 1
 		}
 	},
-	"packages/widgets/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/workflow/src/components/workflow-menu.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
