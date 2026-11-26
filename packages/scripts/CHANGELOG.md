@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 37.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).

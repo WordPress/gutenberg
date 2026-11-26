@@ -271,7 +271,7 @@ Renders a document outline component.
 _Parameters_
 
 - _props_ `Object`: Props.
-- _props.onSelect_ `Function`: Function to be called when an outline item is selected
+- _props.onSelect_ `[() => void]`: Function to be called when an outline item is selected
 - _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
 
 _Returns_
@@ -1546,6 +1546,18 @@ _Returns_
 
 Undocumented declaration.
 
+### registerCoreBlockBindingsSources
+
+Function to register core block bindings sources provided by the editor.
+
+_Usage_
+
+```js
+import { registerCoreBlockBindingsSources } from '@wordpress/editor';
+
+registerCoreBlockBindingsSources();
+```
+
 ### registerEntityAction
 
 > **Deprecated** since Gutenberg 24.3. Register the action in PHP on the `wp_entity_actions_api_init` action instead, with a script module for its JavaScript parts.
@@ -1691,7 +1703,7 @@ Warns the user if there are unsaved changes before leaving the editor. Compatibl
 
 _Returns_
 
-- `React.ReactNode`: The component.
+- The component.
 
 ### URLInput
 

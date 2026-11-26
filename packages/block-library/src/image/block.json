@@ -139,9 +139,6 @@
 		},
 		"shadow": {
 			"__experimentalSkipSerialization": true
-		},
-		"transform": {
-			"rotate": true
 		}
 	},
 	"selectors": {

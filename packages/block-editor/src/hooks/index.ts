@@ -25,7 +25,6 @@ import fitText from './fit-text';
 import border from './border';
 import customCSS from './custom-css';
 import position from './position';
-import transform from './transform';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
@@ -72,7 +71,6 @@ createBlockListBlockFilter( [
 	border,
 	customCSS,
 	position,
-	transform,
 	blockStyleVariation,
 	childLayout,
 	layout,
@@ -105,6 +103,7 @@ export { getShadowClassesAndStyles } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
+export { getTransformClassesAndStyles } from './use-transform-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { setBackgroundStyleDefaults } from './background';
