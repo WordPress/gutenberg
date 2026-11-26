@@ -23,10 +23,6 @@ export default meta;
 
 type Story = StoryObj< typeof SearchInput >;
 
-/**
- * The field is named "Search" by default. Pass an `aria-label` and a
- * `placeholder` that describe what is being searched.
- */
 export const Default: Story = {};
 
 /**
