@@ -226,7 +226,9 @@ describe( 'ChildLayoutControl', () => {
 					name: /Grid placement/,
 				} )
 			);
-			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Column start',
+			} );
 			await user.clear( input );
 			await user.type( input, '3' );
 
@@ -241,8 +243,9 @@ describe( 'ChildLayoutControl', () => {
 			const input = screen.getByRole( 'spinbutton', {
 				name: 'Column span',
 			} );
-			await user.clear( input );
-			await user.type( input, '1' );
+			// Replace the value in one edit.
+			await user.tripleClick( input );
+			await user.keyboard( '1' );
 
 			const change = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( change.columnSpan ).toBe( 1 );
@@ -255,15 +258,16 @@ describe( 'ChildLayoutControl', () => {
 			const onChange = vi.fn();
 			renderControl( { value, onChange, parentLayout } );
 
-			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
-			await user.clear( input );
-			await user.type( input, '1' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Column start',
+			} );
+			// Replace the value in one edit.
+			await user.tripleClick( input );
+			await user.keyboard( '1' );
 
+			// The control sends only what changes, along with the box.
 			expect( onChange.mock.calls.at( -1 )![ 0 ] ).toEqual( {
 				columnStart: 1,
-				rowStart: 1,
-				columnSpan: 2,
-				rowSpan: 1,
 				box,
 			} );
 		} );
