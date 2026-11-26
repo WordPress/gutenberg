@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
@@ -35,8 +36,13 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 import { addUnavailableItem } from '../../../utils/add-unavailable-item';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
-		props;
+	const {
+		attributes,
+		clientId,
+		setQuery,
+		isSingular,
+		shouldExcludeCurrentPost,
+	} = props;
 	const { query } = attributes;
 	const {
 		order,
@@ -67,11 +73,14 @@ export default function QueryInspectorControls( props ) {
 			.resolveSelect( coreStore )
 			.getEntityRecord( 'root', 'postType', newValue )
 			.catch( () => undefined );
+		// The filters can change while waiting, so clean up the latest ones.
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const latestTaxQuery = getBlockAttributes( clientId )?.query.taxQuery;
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
 		// by removing any not supported taxonomy from the query.
 		const supportedTaxonomies = newPostType?.taxonomies;
-		if ( !! supportedTaxonomies && !! taxQuery ) {
+		if ( !! supportedTaxonomies && !! latestTaxQuery ) {
 			// Shared utility to build taxQuery based on supported taxonomies.
 			const buildTaxQuery = ( _taxQuery ) => {
 				return Object.entries( _taxQuery || {} ).reduce(
@@ -85,11 +94,15 @@ export default function QueryInspectorControls( props ) {
 				);
 			};
 			const updatedTaxQuery = {};
-			const builtIncludeTaxQuery = buildTaxQuery( taxQuery.include );
+			const builtIncludeTaxQuery = buildTaxQuery(
+				latestTaxQuery.include
+			);
 			if ( !! Object.keys( builtIncludeTaxQuery ).length ) {
 				updatedTaxQuery.include = builtIncludeTaxQuery;
 			}
-			const builtExcludeTaxQuery = buildTaxQuery( taxQuery.exclude );
+			const builtExcludeTaxQuery = buildTaxQuery(
+				latestTaxQuery.exclude
+			);
 			if ( !! Object.keys( builtExcludeTaxQuery ).length ) {
 				updatedTaxQuery.exclude = builtExcludeTaxQuery;
 			}

@@ -95,13 +95,18 @@ export const mapToIHasNameAndId = ( entities, path ) => {
  */
 export const usePostTypes = () => {
 	const postTypes = useSelect( ( select ) => {
-		const { getPostTypes } = select( coreStore );
+		const { getPostTypes, hasFinishedResolution } = select( coreStore );
 		const excludedPostTypes = [ 'attachment' ];
-		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
+		const query = { per_page: -1 };
+		const records = getPostTypes( query );
+		// A failed request, such as a 403, finishes without records.
+		if ( ! hasFinishedResolution( 'getPostTypes', [ query ] ) ) {
+			return;
+		}
+		return ( records ?? [] ).filter(
 			( { viewable, slug } ) =>
 				viewable && ! excludedPostTypes.includes( slug )
 		);
-		return filteredPostTypes;
 	}, [] );
 	const postTypesTaxonomiesMap = useMemo( () => {
 		if ( ! postTypes?.length ) {
