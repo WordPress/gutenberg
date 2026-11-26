@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import '../../../store';
+import type { BlockSaveProps, RawBlock } from '../../../types';
 import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,
@@ -11,6 +12,8 @@ import {
 import { createBlock } from '../../factory';
 import serialize from '../../serializer';
 
+const raw = ( block: Partial< RawBlock > ) => block as RawBlock;
+
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		apiVersion: 3,
@@ -19,7 +22,8 @@ describe( 'block parser', () => {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit || null,
+		save: ( { attributes }: BlockSaveProps< { fruit?: string } > ) =>
+			attributes.fruit || null,
 		category: 'text',
 		title: 'block title',
 	};
@@ -34,12 +38,13 @@ describe( 'block parser', () => {
 				source: 'html',
 			},
 		},
-		save: ( { attributes } ) => attributes.content || null,
+		save: ( { attributes }: BlockSaveProps< { content?: string } > ) =>
+			attributes.content || null,
 	};
 
 	afterEach( () => {
-		setFreeformContentHandlerName( undefined );
-		setUnregisteredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( '' );
+		setUnregisteredTypeHandlerName( '' );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -56,7 +61,13 @@ describe( 'block parser', () => {
 						selector: 'div',
 					},
 				},
-				save: ( { attributes } ) => (
+				save: ( {
+					attributes,
+				}: BlockSaveProps< {
+					className?: string;
+					fruit?: string;
+				} > ) => (
+					// @ts-expect-error Testing invalid HTML attribute 'class'
 					// eslint-disable-next-line react/no-unknown-property
 					<div class={ attributes.className }>
 						{ attributes.fruit }
@@ -64,15 +75,17 @@ describe( 'block parser', () => {
 				),
 			} );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML:
-					'<div class="custom-class another-custom-class">Bananas</div>',
-				attrs: { fruit: 'Bananas' },
-			} );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML:
+						'<div class="custom-class another-custom-class">Bananas</div>',
+					attrs: { fruit: 'Bananas' },
+				} )
+			);
 
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				className: 'custom-class another-custom-class',
 			} );
@@ -91,21 +104,28 @@ describe( 'block parser', () => {
 				supports: {
 					ariaLabel: true,
 				},
-				save: ( { attributes } ) => (
+				save: ( {
+					attributes,
+				}: BlockSaveProps< {
+					ariaLabel?: string;
+					fruit?: string;
+				} > ) => (
 					<div aria-label={ attributes.ariaLabel }>
 						{ attributes.fruit }
 					</div>
 				),
 			} );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: '<div aria-label="custom-label">Bananas</div>',
-				attrs: { fruit: 'Bananas' },
-			} );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: '<div aria-label="custom-label">Bananas</div>',
+					attrs: { fruit: 'Bananas' },
+				} )
+			);
 
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				ariaLabel: 'custom-label',
 			} );
@@ -124,19 +144,23 @@ describe( 'block parser', () => {
 				supports: {
 					anchor: true,
 				},
-				save: ( { attributes } ) => (
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { anchor?: string; fruit?: string } > ) => (
 					<div id={ attributes.anchor }>{ attributes.fruit }</div>
 				),
 			} );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: '<div id="custom-anchor">Bananas</div>',
-				attrs: { fruit: 'Bananas' },
-			} );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: '<div id="custom-anchor">Bananas</div>',
+					attrs: { fruit: 'Bananas' },
+				} )
+			);
 
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				anchor: 'custom-anchor',
 			} );
@@ -145,24 +169,28 @@ describe( 'block parser', () => {
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: 'Bananas',
-				attrs: { fruit: 'Bananas' },
-			} );
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: 'Bananas',
+					attrs: { fruit: 'Bananas' },
+				} )
+			);
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: '',
-			} );
-			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( {} );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: '',
+				} )
+			);
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {} );
 		} );
 
 		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
@@ -172,35 +200,45 @@ describe( 'block parser', () => {
 			);
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: 'Bananas',
-				attrs: { fruit: 'Bananas' },
-			} );
-			expect( block.name ).toBe( 'core/unregistered-block' );
-			expect( block.attributes.content ).toContain( 'wp:test-block' );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: 'Bananas',
+					attrs: { fruit: 'Bananas' },
+				} )
+			);
+			expect( block?.name ).toBe( 'core/unregistered-block' );
+			expect(
+				( block?.attributes as Record< string, string > ).content
+			).toContain( 'wp:test-block' );
 		} );
 
 		it( 'should fall back to the freeform content handler if block type not specified', () => {
 			registerBlockType( 'core/freeform', unknownBlockSettings );
 			setFreeformContentHandlerName( 'core/freeform' );
 
-			const block = parseRawBlock( {
-				innerHTML: 'content',
+			const block = parseRawBlock(
+				raw( {
+					innerHTML: 'content',
+				} )
+			);
+			expect( block?.name ).toEqual( 'core/freeform' );
+			expect( block?.attributes ).toEqual( {
+				content: '<p>content</p>',
 			} );
-			expect( block.name ).toEqual( 'core/freeform' );
-			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
 		it( 'skips adding paragraph tags if freeform block is set to core/html', () => {
 			registerBlockType( 'core/html', unknownBlockSettings );
 			setFreeformContentHandlerName( 'core/html' );
 
-			const block = parseRawBlock( {
-				innerHTML: 'content',
-			} );
-			expect( block.name ).toEqual( 'core/html' );
-			expect( block.attributes ).toEqual( { content: 'content' } );
+			const block = parseRawBlock(
+				raw( {
+					innerHTML: 'content',
+				} )
+			);
+			expect( block?.name ).toEqual( 'core/html' );
+			expect( block?.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'skips adding paragraph tags if __unstableSkipAutop is passed as an option', () => {
@@ -208,22 +246,24 @@ describe( 'block parser', () => {
 			setFreeformContentHandlerName( 'core/freeform' );
 
 			const block = parseRawBlock(
-				{
+				raw( {
 					innerHTML: 'content',
-				},
+				} ),
 				{
 					__unstableSkipAutop: true,
 				}
 			);
-			expect( block.name ).toEqual( 'core/freeform' );
-			expect( block.attributes ).toEqual( { content: 'content' } );
+			expect( block?.name ).toEqual( 'core/freeform' );
+			expect( block?.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = parseRawBlock( {
-				blockName: 'core/test-block',
-				innerHTML: '',
-			} );
+			const block = parseRawBlock(
+				raw( {
+					blockName: 'core/test-block',
+					innerHTML: '',
+				} )
+			);
 			expect( block ).toBeUndefined();
 		} );
 		describe( 'fall back to an older version of the block if the current one is invalid', () => {
@@ -237,7 +277,11 @@ describe( 'block parser', () => {
 							selector: 'div',
 						},
 					},
-					save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
+					save: ( {
+						attributes,
+					}: BlockSaveProps< { fruit?: string } > ) => (
+						<div>{ attributes.fruit }</div>
+					),
 					deprecated: [
 						{
 							attributes: {
@@ -247,10 +291,12 @@ describe( 'block parser', () => {
 									selector: 'span',
 								},
 							},
-							save: ( { attributes } ) => (
+							save: ( {
+								attributes,
+							}: BlockSaveProps< { fruit?: string } > ) => (
 								<span>{ attributes.fruit }</span>
 							),
-							migrate: ( attributes ) => ( {
+							migrate: ( attributes: { fruit?: string } ) => ( {
 								fruit: 'Big ' + attributes.fruit,
 							} ),
 						},
@@ -258,14 +304,18 @@ describe( 'block parser', () => {
 				} );
 			} );
 			it( 'handle deprecation and log', () => {
-				const block = parseRawBlock( {
-					blockName: 'core/test-block',
-					innerHTML: '<span>Bananas</span>',
-					attrs: { fruit: 'Bananas' },
+				const block = parseRawBlock(
+					raw( {
+						blockName: 'core/test-block',
+						innerHTML: '<span>Bananas</span>',
+						attrs: { fruit: 'Bananas' },
+					} )
+				);
+				expect( block?.name ).toEqual( 'core/test-block' );
+				expect( block?.attributes ).toEqual( {
+					fruit: 'Big Bananas',
 				} );
-				expect( block.name ).toEqual( 'core/test-block' );
-				expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
-				expect( block.isValid ).toBe( true );
+				expect( block?.isValid ).toBe( true );
 				expect( console ).toHaveInformed();
 				expect( console ).toHaveLoggedWith(
 					'Updated Block: %s',
@@ -274,16 +324,18 @@ describe( 'block parser', () => {
 			} );
 			it( 'handle deprecation but not log', () => {
 				const block = parseRawBlock(
-					{
+					raw( {
 						blockName: 'core/test-block',
 						innerHTML: '<span>Bananas</span>',
 						attrs: { fruit: 'Bananas' },
-					},
+					} ),
 					{ __unstableSkipMigrationLogs: true }
 				);
-				expect( block.name ).toEqual( 'core/test-block' );
-				expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
-				expect( block.isValid ).toBe( true );
+				expect( block?.name ).toEqual( 'core/test-block' );
+				expect( block?.attributes ).toEqual( {
+					fruit: 'Big Bananas',
+				} );
+				expect( block?.isValid ).toBe( true );
 				expect( console ).not.toHaveInformed();
 			} );
 		} );
@@ -303,7 +355,10 @@ describe( 'block parser', () => {
 					url: { type: 'string' },
 					chicken: { type: 'string' },
 				},
-				save: ( { attributes } ) => attributes.content,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< Record< string, unknown > > ) =>
+					( attributes.content as string ) ?? null,
 				category: 'text',
 				title: 'test block',
 			} );
@@ -340,7 +395,10 @@ describe( 'block parser', () => {
 						source: 'text',
 					},
 				},
-				save: ( { attributes } ) => attributes.content,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< Record< string, unknown > > ) =>
+					( attributes.content as string ) ?? null,
 				category: 'text',
 				title: 'test block',
 			} );
@@ -475,7 +533,10 @@ describe( 'block parser', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.content,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< Record< string, unknown > > ) =>
+					( attributes.content as string ) ?? null,
 			} );
 
 			const content = '$foo = "My "escaped" text.";';
@@ -491,6 +552,7 @@ describe( 'block parser', () => {
 			apiVersion: 3,
 			category: 'text',
 			title: 'Custom HTML',
+			attributes: {},
 			save: () => null,
 		};
 
@@ -504,7 +566,8 @@ describe( 'block parser', () => {
 					source: 'html',
 				},
 			},
-			save: ( { attributes } ) => attributes.content || null,
+			save: ( { attributes }: BlockSaveProps< { content?: string } > ) =>
+				attributes.content || null,
 		};
 
 		it( 'should retain innerContent and mark the block valid', () => {

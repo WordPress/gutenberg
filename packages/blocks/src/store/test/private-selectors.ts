@@ -1,26 +1,43 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
+import type { BlockStoreState } from '../types';
+import { partial, type DeepPartial } from './fixtures/types';
 import {
 	getBlockKeyboardShortcuts,
 	getSupportedStyles,
 } from '../private-selectors';
 
-const keyBlocksByName = ( blocks ) =>
-	blocks.reduce(
-		( result, block ) => ( { ...result, [ block.name ]: block } ),
+const keyBlocksByName = (
+	blocks: Array< { name: string; [ key: string ]: unknown } >
+) =>
+	blocks.reduce<
+		Record< string, { name: string; [ key: string ]: unknown } >
+	>(
+		( result, block ) => ( {
+			...result,
+			[ block.name ]: block,
+		} ),
 		{}
 	);
 
 describe( 'private selectors', () => {
 	describe( 'getSupportedStyles', () => {
-		const getState = ( blocks ) => {
-			return deepFreeze( {
-				blockTypes: keyBlocksByName( blocks ),
-			} );
+		const getState = (
+			blocks: Array< { name: string; [ key: string ]: unknown } >
+		) => {
+			return partial< BlockStoreState >(
+				deepFreeze( {
+					blockTypes: keyBlocksByName( blocks ),
+				} )
+			);
 		};
 
 		it( 'return the list of globally supported panels (no block name)', () => {
-			const supports = getSupportedStyles( getState( [] ) );
+			const supports = getSupportedStyles(
+				getState( [] ),
+				undefined,
+				undefined
+			);
 
 			expect( supports ).toEqual( [
 				'background',
@@ -45,7 +62,11 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'return the list of globally supported panels including link specific styles', () => {
-			const supports = getSupportedStyles( getState( [] ), null, 'link' );
+			const supports = getSupportedStyles(
+				getState( [] ),
+				undefined,
+				'link'
+			);
 
 			expect( supports ).toEqual( [
 				'background',
@@ -80,7 +101,7 @@ describe( 'private selectors', () => {
 		it( 'return the list of globally supported panels including heading specific styles', () => {
 			const supports = getSupportedStyles(
 				getState( [] ),
-				null,
+				undefined,
 				'heading'
 			);
 
@@ -117,7 +138,8 @@ describe( 'private selectors', () => {
 		it( 'return an empty list for unknown blocks', () => {
 			const supports = getSupportedStyles(
 				getState( [] ),
-				'unkown/block'
+				'unkown/block',
+				undefined
 			);
 
 			expect( supports ).toEqual( [] );
@@ -131,14 +153,19 @@ describe( 'private selectors', () => {
 						supports: {},
 					},
 				] ),
-				'core/example-block'
+				'core/example-block',
+				undefined
 			);
 
 			expect( supports ).toEqual( [] );
 		} );
 
 		it( 'return the list of globally supported panels for text element (textIndent should be excluded)', () => {
-			const supports = getSupportedStyles( getState( [] ), null, 'text' );
+			const supports = getSupportedStyles(
+				getState( [] ),
+				undefined,
+				'text'
+			);
 
 			expect( supports ).toEqual( [
 				'background',
@@ -183,7 +210,8 @@ describe( 'private selectors', () => {
 						},
 					},
 				] ),
-				'core/example-block'
+				'core/example-block',
+				undefined
 			);
 
 			expect( supports ).toEqual( [
@@ -211,7 +239,8 @@ describe( 'private selectors', () => {
 						},
 					},
 				] ),
-				'core/paragraph'
+				'core/paragraph',
+				undefined
 			);
 
 			expect( supports ).toEqual( [ 'fontSize', 'textIndent' ] );
@@ -222,14 +251,24 @@ describe( 'private selectors', () => {
 		const shortcut = {
 			name: 'test/shortcut',
 			description: 'Test shortcut.',
-			keyCombination: { modifier: 'access', character: '1' },
+			keyCombination: { modifier: 'access' as const, character: '1' },
 		};
 
-		const getState = ( { blockTypes = [], blockVariations = {} } = {} ) =>
-			deepFreeze( {
-				blockTypes: keyBlocksByName( blockTypes ),
-				blockVariations,
-			} );
+		const getState = ( {
+			blockTypes = [],
+			blockVariations = {},
+		}: {
+			blockTypes?: Array< { name: string; [ key: string ]: unknown } >;
+			blockVariations?: DeepPartial<
+				BlockStoreState[ 'blockVariations' ]
+			>;
+		} = {} ) =>
+			partial< BlockStoreState >(
+				deepFreeze( {
+					blockTypes: keyBlocksByName( blockTypes ),
+					blockVariations,
+				} )
+			);
 
 		it( 'returns an empty list when no block declares a shortcut', () => {
 			expect(

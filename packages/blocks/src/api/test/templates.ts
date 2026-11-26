@@ -6,12 +6,14 @@ import {
 	unregisterBlockType,
 	registerBlockType,
 } from '../registration';
+import type { Block } from '../../types';
 import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
+	type TemplateItem,
 } from '../templates';
 
-const noop = () => {};
+const noop = () => null;
 
 describe( 'templates', () => {
 	afterEach( () => {
@@ -52,7 +54,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'return true if the template matches the blocks', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
 				[ 'core/test-block-2' ],
@@ -66,7 +68,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'return true if the template matches the blocks with nested blocks', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2', {}, [ [ 'core/test-block' ] ] ],
 				[ 'core/test-block-2' ],
@@ -82,7 +84,10 @@ describe( 'templates', () => {
 		} );
 
 		it( "return false if the template length doesn't match the blocks length", () => {
-			const template = [ [ 'core/test-block' ], [ 'core/test-block-2' ] ];
+			const template: TemplateItem[] = [
+				[ 'core/test-block' ],
+				[ 'core/test-block-2' ],
+			];
 			const blockList = [
 				createBlock( 'core/test-block' ),
 				createBlock( 'core/test-block-2' ),
@@ -94,7 +99,7 @@ describe( 'templates', () => {
 		} );
 
 		it( "return false if the nested template doesn't match the blocks", () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2', {}, [ [ 'core/test-block' ] ] ],
 				[ 'core/test-block-2' ],
@@ -114,12 +119,12 @@ describe( 'templates', () => {
 
 	describe( 'synchronizeBlocksWithTemplate', () => {
 		it( 'should create blocks for each template entry', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
 				[ 'core/test-block-2' ],
 			];
-			const blockList = [];
+			const blockList: Block[] = [];
 			expect(
 				synchronizeBlocksWithTemplate( blockList, template )
 			).toMatchObject( [
@@ -130,10 +135,10 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should create nested blocks', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block', {}, [ [ 'core/test-block-2' ] ] ],
 			];
-			const blockList = [];
+			const blockList: Block[] = [];
 			expect(
 				synchronizeBlocksWithTemplate( blockList, template )
 			).toMatchObject( [
@@ -145,7 +150,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should append blocks if more blocks in the template', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
 				[ 'core/test-block-2' ],
@@ -164,7 +169,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should replace blocks if not matching blocks are found', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
 				[ 'core/test-block-2' ],
@@ -193,7 +198,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should remove blocks if extra blocks are found', () => {
-			const template = [ [ 'core/test-block' ] ];
+			const template: TemplateItem[] = [ [ 'core/test-block' ] ];
 
 			const block1 = createBlock( 'core/test-block' );
 			const block2 = createBlock( 'core/test-block' );
@@ -204,7 +209,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should replace unregistered blocks from template with core/missing block', () => {
-			const template = [
+			const template: TemplateItem[] = [
 				[ 'core/test-block' ],
 				[ 'core/test-block-2' ],
 				[ 'core/test-faker' ],
@@ -228,10 +233,9 @@ describe( 'templates', () => {
 				title: 'cover block',
 			} );
 
-			const [ block ] = synchronizeBlocksWithTemplate(
-				[],
-				[ [ 'core/cover', { minHeight: 100, minHeightUnit: 'vh' } ] ]
-			);
+			const [ block ] = synchronizeBlocksWithTemplate( [], [
+				[ 'core/cover', { minHeight: 100, minHeightUnit: 'vh' } ],
+			] as TemplateItem[] );
 
 			expect( block.attributes ).toEqual( {
 				style: { dimensions: { minHeight: '100vh' } },

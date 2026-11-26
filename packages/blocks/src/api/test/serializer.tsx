@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createElement, Component } from '@wordpress/element';
+import type { Block, BlockSaveProps, BlockType } from '../../types';
 import '../../store';
 import serialize, {
 	getCommentAttributes,
@@ -20,8 +21,8 @@ import { createBlock } from '../';
 
 describe( 'block serializer', () => {
 	afterEach( () => {
-		setFreeformContentHandlerName( undefined );
-		setUnregisteredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( '' );
+		setUnregisteredTypeHandlerName( '' );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -29,7 +30,9 @@ describe( 'block serializer', () => {
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
-			const fruitBlockSave = ( { attributes } ) =>
+			const fruitBlockSave = ( {
+				attributes,
+			}: BlockSaveProps< { fruit?: string } > ) =>
 				createElement( 'div', null, attributes.fruit );
 
 			it( 'should return element as string if save returns element', () => {
@@ -37,7 +40,7 @@ describe( 'block serializer', () => {
 					{
 						name: 'core/fruit',
 						save: fruitBlockSave,
-					},
+					} as unknown as BlockType,
 					{ fruit: 'Bananas' }
 				);
 
@@ -49,6 +52,7 @@ describe( 'block serializer', () => {
 					apiVersion: 3,
 					title: 'Fruit',
 					category: 'widgets',
+					attributes: {},
 					save: fruitBlockSave,
 				} );
 
@@ -64,7 +68,9 @@ describe( 'block serializer', () => {
 			it( 'should return element as string', () => {
 				const saved = getSaveContent(
 					{
-						save: class extends Component {
+						save: class extends Component<
+							BlockSaveProps< { fruit?: string } >
+						> {
 							render() {
 								return createElement(
 									'div',
@@ -74,7 +80,7 @@ describe( 'block serializer', () => {
 							}
 						},
 						name: 'core/fruit',
-					},
+					} as unknown as BlockType,
 					{ fruit: 'Bananas' }
 				);
 
@@ -85,7 +91,7 @@ describe( 'block serializer', () => {
 
 	describe( 'getCommentAttributes()', () => {
 		it( 'should return an empty set if no attributes provided', () => {
-			const attributes = getCommentAttributes( {}, {} );
+			const attributes = getCommentAttributes( {} as BlockType, {} );
 
 			expect( attributes ).toEqual( {} );
 		} );
@@ -105,7 +111,7 @@ describe( 'block serializer', () => {
 							type: 'string',
 						},
 					},
-				},
+				} as unknown as BlockType,
 				{
 					fruit: 'bananas',
 					category: 'food',
@@ -130,7 +136,7 @@ describe( 'block serializer', () => {
 							type: 'string',
 						},
 					},
-				},
+				} as unknown as BlockType,
 				{
 					fruit: 'bananas',
 					ripeness: undefined,
@@ -152,7 +158,7 @@ describe( 'block serializer', () => {
 							type: 'string',
 						},
 					},
-				},
+				} as unknown as BlockType,
 				{
 					blob: 'blob://false-url.com',
 					url: 'http://real-url.com',
@@ -280,7 +286,10 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { fruit?: string } > ) =>
+					attributes.fruit || null,
 			} );
 			setFreeformContentHandlerName( 'core/freeform' );
 			const block = createBlock( 'core/freeform', {
@@ -301,7 +310,10 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { fruit?: string } > ) =>
+					attributes.fruit || null,
 			} );
 			setFreeformContentHandlerName( 'core/freeform' );
 			const block = createBlock( 'core/freeform', {
@@ -326,7 +338,10 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { fruit?: string } > ) =>
+					attributes.fruit || null,
 			} );
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 			const block = createBlock( 'core/unregistered-block', {
@@ -342,9 +357,15 @@ describe( 'block serializer', () => {
 				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
-				attributes: { content: 'string' },
-				save: ( { attributes } ) =>
-					createElement( 'blockquote', {}, attributes.content ),
+				attributes: { content: { type: 'string' } },
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { content?: string } > ) =>
+					createElement(
+						'blockquote',
+						{},
+						attributes.content as React.ReactNode
+					),
 			} );
 
 			const block = {
@@ -368,9 +389,15 @@ describe( 'block serializer', () => {
 				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
-				attributes: { content: 'string' },
-				save: ( { attributes } ) =>
-					createElement( 'blockquote', {}, attributes.content ),
+				attributes: { content: { type: 'string' } },
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { content?: string } > ) =>
+					createElement(
+						'blockquote',
+						{},
+						attributes.content as React.ReactNode
+					),
 			} );
 
 			// missing attributes as a result of a failed parse
@@ -386,6 +413,7 @@ describe( 'block serializer', () => {
 				apiVersion: 3,
 				category: 'text',
 				title: 'Custom HTML',
+				attributes: {},
 				save: () => null,
 			} );
 			registerBlockType( 'core/fruit', {
@@ -397,7 +425,10 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { fruit?: string } > ) =>
+					attributes.fruit || null,
 			} );
 
 			const block = createBlock(
@@ -420,6 +451,7 @@ describe( 'block serializer', () => {
 				apiVersion: 3,
 				category: 'text',
 				title: 'Custom HTML',
+				attributes: {},
 				save: () => null,
 			} );
 			registerBlockType( 'core/fruit', {
@@ -431,7 +463,10 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save: ( { attributes } ) => attributes.fruit,
+				save: ( {
+					attributes,
+				}: BlockSaveProps< { fruit?: string } > ) =>
+					attributes.fruit || null,
 			} );
 
 			const block = createBlock(
@@ -471,7 +506,13 @@ describe( 'block serializer', () => {
 						type: 'string',
 					},
 				},
-				save( { attributes } ) {
+				save( {
+					attributes,
+				}: BlockSaveProps< {
+					throw?: boolean;
+					content?: string;
+					stuff?: string;
+				} > ) {
 					if ( attributes.throw ) {
 						throw new Error();
 					}
@@ -533,18 +574,20 @@ describe( 'block serializer', () => {
 						source: 'text',
 					},
 				},
-				save( { attributes } ) {
-					return attributes.content;
+				save( { attributes }: BlockSaveProps< { content?: string } > ) {
+					return attributes.content || null;
 				},
 				category: 'text',
 				title: 'block title',
 			};
 			registerBlockType( 'core/chicken', blockType );
-			const block = {
+			const block: Block< { content?: string } > = {
+				clientId: 'test-client-id',
 				name: 'core/chicken',
 				attributes: {
 					content: 'chicken',
 				},
+				innerBlocks: [],
 				isValid: true,
 			};
 			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
