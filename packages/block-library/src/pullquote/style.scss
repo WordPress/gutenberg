@@ -51,6 +51,10 @@
 .wp-block-pullquote.has-text-align-center blockquote {
 	text-align: center;
 }
+// Ensure that we are reasonably specific to override theme defaults.
+.wp-block-pullquote.has-text-align-justify blockquote {
+	text-align: justify;
+}
 
 // .is-style-solid-color is deprecated.
 // This selector has not been scoped with `:root :where`, as global styles

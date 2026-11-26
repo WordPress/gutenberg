@@ -10,6 +10,7 @@ import {
 	getValidTextAlignments,
 	addAssignedTextAlign,
 	getTextAlignControlGroup,
+	getTextAlignmentControls,
 } from '../text-align';
 
 const noop = () => {};
@@ -73,6 +74,17 @@ describe( 'textAlign', () => {
 			expect(
 				getValidTextAlignments( [ 'left', 'right', 'foo' ] )
 			).toEqual( [ 'left', 'right' ] );
+		} );
+	} );
+
+	describe( 'getTextAlignmentControls()', () => {
+		it( 'should not offer a toolbar control for justify', () => {
+			expect(
+				getTextAlignmentControls( getValidTextAlignments( true ) ).map(
+					( { align } ) => align
+				)
+			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getTextAlignmentControls( [ 'justify' ] ) ).toEqual( [] );
 		} );
 	} );
 
@@ -169,7 +181,7 @@ describe( 'textAlign', () => {
 						textAlign: true,
 					},
 				},
-			} );
+			} as unknown as BlockConfiguration );
 
 			const props = addAssignedTextAlign(
 				{
