@@ -27,16 +27,20 @@ import type { FullBleedProps } from './types';
  *
  * Must be used as a direct child of `Card.Content` or `Card.Header`.
  */
+const FULL_BLEED_PROPS = {
+	className: styles.fullbleed,
+	// A hook for components that draw a frame of their own, such as
+	// `Item.Group`. Edge to edge in a card, they drop that frame.
+	'data-wp-ui-card-fullbleed': '',
+};
+
 export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
 	function CardFullBleed( { render, ...props }, ref ) {
 		const element = useRender( {
 			defaultTagName: 'div',
 			render,
 			ref,
-			props: mergeProps< 'div' >(
-				{ className: styles.fullbleed },
-				props
-			),
+			props: mergeProps< 'div' >( FULL_BLEED_PROPS, props ),
 		} );
 
 		return element;
