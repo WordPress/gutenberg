@@ -398,6 +398,19 @@ const inserterMediaCategories = [
 		mediaType: 'audio',
 		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
 	} ),
+	// Documents, archives and other non-media files, inserted as File blocks.
+	createCoreMediaCategory( {
+		name: 'files',
+		labels: {
+			name: __( 'Files' ),
+			search_items: __( 'Search files' ),
+		},
+		mediaType: 'file',
+		getQuery: ( query ) => ( {
+			...query,
+			media_type: [ 'application', 'text' ],
+		} ),
+	} ),
 	{
 		name: 'openverse',
 		labels: {

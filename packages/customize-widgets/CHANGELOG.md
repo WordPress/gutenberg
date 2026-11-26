@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the widget inserter open when Escape is pressed during IME composition ([#87353](https://github.com/WordPress/gutenberg/pull/87353)).
+
 ## 6.2.0 (2026-11-18)
 
 ### Bug Fixes
