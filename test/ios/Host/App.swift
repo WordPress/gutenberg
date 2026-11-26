@@ -36,6 +36,8 @@ struct WebView: UIViewRepresentable {
 		let view = WKWebView( frame: .zero, configuration: configuration )
 		view.allowsBackForwardNavigationGestures = true
 		view.isInspectable = true
+		// Like GutenbergKit, a drag down into the keyboard hides it.
+		view.scrollView.keyboardDismissMode = .interactive
 		view.load( URLRequest( url: url ) )
 		return view
 	}

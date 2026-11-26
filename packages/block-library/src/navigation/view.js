@@ -202,6 +202,13 @@ const { state, actions } = store(
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
 					if ( event.key === 'Escape' ) {
+						// Ignore an Escape during IME composition, meant to cancel
+						// unconfirmed CJK text. On Safari, the final key of a
+						// composition can have `isComposing: false`, so also check
+						// `keyCode === 229`.
+						if ( event.isComposing || event.keyCode === 229 ) {
+							return;
+						}
 						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );

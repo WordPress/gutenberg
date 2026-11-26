@@ -32,15 +32,16 @@ export type Ramp = {
 
 export type RampDirection = 'lighter' | 'darker';
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
+export type ReferenceName = keyof Ramp | 'seed' | 'neutralSurface';
+
 export type ContrastRequirement = {
-	/** The reference color against which to calculate the contrast */
-	reference: keyof Ramp | 'seed';
-	/**
-	 * Other colors against which the generated color must meet the same target.
-	 * The solver uses the reference with the least contrast headroom for the
-	 * selected direction.
-	 */
-	additionalReferences?: readonly ( keyof Ramp | 'seed' )[];
+	/** The primary contrast relationship for this step. */
+	reference: ReferenceName;
+	/** Other references may require a different minimum contrast. */
+	additionalReferences?: readonly {
+		reference: ReferenceName;
+		target: number;
+	}[];
 	/**
 	 * Which direction should the algorithm search a matching color in:
 	 * - main: follow the same direction as the ramp's main direction
@@ -76,7 +77,7 @@ export type RampStepConfig = {
 	 * the contrast requirements. This reduces the number of unique colors
 	 * in the ramp and improves consistency.
 	 */
-	sameAsIfPossible?: keyof Ramp;
+	sameAsIfPossible?: keyof Ramp | 'seed';
 };
 
 export type RampConfig = Record< keyof Ramp, RampStepConfig >;
