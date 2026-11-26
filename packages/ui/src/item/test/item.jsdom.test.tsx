@@ -304,6 +304,18 @@ describe( 'Item', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'names a link row by its label when its aria-label is blank', () => {
+		render(
+			<Item.LinkRow href="/export" aria-label=" ">
+				<Item.Label>Export</Item.Label>
+			</Item.LinkRow>
+		);
+
+		expect(
+			screen.getByRole( 'link', { name: 'Export' } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'keeps an explicit aria-hidden on the label of a content row', () => {
 		render(
 			<Item.ContentRow>

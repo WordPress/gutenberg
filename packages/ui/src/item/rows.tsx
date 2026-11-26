@@ -268,9 +268,6 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
 			render,
 			style,
 			target,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			'aria-describedby': ariaDescribedBy,
 			...props
 		},
 		ref
@@ -289,11 +286,9 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
 			isActivatable: true,
 			opensInNewTab,
 			density,
-			aria: {
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				'aria-describedby': ariaDescribedBy,
-			},
+			// The row reads the naming props, and its labelling is applied
+			// after the consumer props, so they need no separate handling.
+			aria: props,
 		} );
 
 		const link = useRender( {
@@ -351,26 +346,15 @@ export const LinkRow = forwardRef< HTMLAnchorElement, LinkRowProps >(
  */
 export const ButtonRow = forwardRef< HTMLButtonElement, ButtonRowProps >(
 	function ItemButtonRow(
-		{
-			children,
-			className,
-			density,
-			style,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			'aria-describedby': ariaDescribedBy,
-			...props
-		},
+		{ children, className, density, style, ...props },
 		ref
 	) {
 		const row = useRow( {
 			isActivatable: true,
 			density,
-			aria: {
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				'aria-describedby': ariaDescribedBy,
-			},
+			// The row reads the naming props, and its labelling is applied
+			// after the consumer props, so they need no separate handling.
+			aria: props,
 		} );
 
 		return row.wrap(

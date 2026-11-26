@@ -195,6 +195,35 @@ describe( 'Item layout', () => {
 		expect( outer.gridRowEnd ).toBe( plain.gridRowEnd );
 	} );
 
+	it( 'hides a group, a content row and actions that have the hidden attribute', async () => {
+		await render(
+			<>
+				<Item.Group aria-label="Optional" hidden data-testid="group">
+					<Item.ContentRow>
+						<Item.Label>In a hidden group</Item.Label>
+					</Item.ContentRow>
+				</Item.Group>
+				<Item.ContentRow hidden data-testid="row">
+					<Item.Label>Hidden row</Item.Label>
+				</Item.ContentRow>
+				<Item.ContentRow>
+					<Item.Label>Visible row</Item.Label>
+					<Item.Actions hidden data-testid="actions">
+						<Button>Hidden action</Button>
+					</Item.Actions>
+				</Item.ContentRow>
+			</>
+		);
+
+		// `toBeVisible` trusts the attribute. The computed style shows
+		// whether a `display` of the component overrides it.
+		for ( const testId of [ 'group', 'row', 'actions' ] ) {
+			expect(
+				getComputedStyle( screen.getByTestId( testId ) ).display
+			).toBe( 'none' );
+		}
+	} );
+
 	it( 'keeps the browser cursor on a link row, and the control cursor on a button row', async () => {
 		await render(
 			<ThemeProvider cursor={ { control: 'default' } }>

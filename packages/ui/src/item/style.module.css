@@ -244,6 +244,26 @@
 
 		.row:has(> .surface[data-disabled]) > .label {
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+			/*
+			 * The label is not the disabled control, so forced colors would
+			 * otherwise give it the ordinary text color.
+			 */
+			@media (forced-colors: active) {
+				color: GrayText;
+			}
+		}
+
+		/*
+		 * The group, a static row and the actions set a `display` of their
+		 * own, which would override the one the `hidden` attribute sets.
+		 */
+		.group,
+		.row,
+		.actions {
+			&[hidden]:not([hidden="until-found"]) {
+				display: none;
+			}
 		}
 
 		/*
