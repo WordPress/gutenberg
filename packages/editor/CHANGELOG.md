@@ -20,7 +20,7 @@
 -   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
 -   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
 -   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
--   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#](https://github.com/WordPress/gutenberg/pull/)).
+-   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
 
 ### Internal
 
