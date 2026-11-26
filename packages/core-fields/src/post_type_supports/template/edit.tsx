@@ -6,9 +6,9 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/ui';
 import { getItemTitle } from '../../shared/title/get-item-title';
-import { unlock } from '../../lock-unlock';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import type { PostWithTemplate } from './types';
+import { hasTemplateFromReadingSettings } from './utils';
 
 type TemplateEditProps = DataFormControlProps< PostWithTemplate >;
 
@@ -58,8 +58,8 @@ function getSelectedItem< T extends { value: string } >(
 }
 
 /**
- * Whether the post is the front page or the posts page, which are assigned
- * a template by the reading settings rather than by this field.
+ * Whether the template of the post can be switched, see the `isDisabled`
+ * of the field.
  *
  * @param postType The post type.
  * @param postId   The post id.
@@ -70,22 +70,11 @@ function useCanSwitchTemplate(
 	postId: number | string | undefined
 ): boolean {
 	return useSelect(
-		( select ) => {
+		( select ) =>
 			// Without an id, as for several posts edited at once, the caller
 			// decides which of the posts take the template.
-			if ( ! postId ) {
-				return true;
-			}
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreStore )
-			);
-			const singlePostId = String( postId );
-			const isPostsPage = getPostsPageId() === singlePostId;
-			const isFrontPage =
-				postType === 'page' && getHomePage()?.postId === singlePostId;
-
-			return ! isPostsPage && ! isFrontPage;
-		},
+			! postId ||
+			! hasTemplateFromReadingSettings( select, postType, postId ),
 		[ postId, postType ]
 	);
 }

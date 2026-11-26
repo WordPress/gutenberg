@@ -216,7 +216,17 @@ describe( 'post_type_supports', () => {
 		expect( postTypeSupports.parent ).toEqual( {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
+			isDisabled: expect.any( Function ),
 		} );
+	} );
+
+	it( 'locks the parent of a page that would be its own parent', () => {
+		const isDisabled = postTypeSupports.parent.isDisabled as ( args: {
+			item: { id?: number; parent?: number };
+		} ) => boolean;
+		expect( isDisabled( { item: { id: 1, parent: 1 } } ) ).toBe( true );
+		expect( isDisabled( { item: { id: 1, parent: 2 } } ) ).toBe( false );
+		expect( isDisabled( { item: { parent: 1 } } ) ).toBe( false );
 	} );
 
 	it( 'stores the removal of the featured image as no media', () => {
@@ -233,7 +243,15 @@ describe( 'post_type_supports', () => {
 		expect( postTypeSupports.template ).toEqual( {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
+			isDisabled: expect.any( Function ),
 		} );
+	} );
+
+	it( 'leaves the template of several posts to each of them', () => {
+		const isDisabled = postTypeSupports.template.isDisabled as ( args: {
+			item: { type: string };
+		} ) => boolean;
+		expect( isDisabled( { item: { type: 'page' } } ) ).toBe( false );
 	} );
 
 	it( 'reads the decoded title', () => {
