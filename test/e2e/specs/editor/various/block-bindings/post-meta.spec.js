@@ -14,6 +14,42 @@ async function expectResolvedClipboard( page ) {
 	expect( clipboardHtml ).toContain( '<p>Bound <strong>text</strong></p>' );
 }
 
+async function expectSerializedParagraphClipboard( page, attributes ) {
+	await expect
+		.poll( () =>
+			page.evaluate( async () => {
+				const text = await navigator.clipboard.readText();
+				return {
+					hasOpeningComment: text.startsWith( '<!-- wp:paragraph ' ),
+					hasClosingComment: text
+						.trimEnd()
+						.endsWith( '<!-- /wp:paragraph -->' ),
+					blocks: window.wp.blocks.parse( text ).map( ( block ) => ( {
+						name: block.name,
+						isValid: block.isValid,
+						attributes: {
+							...block.attributes,
+							content: String( block.attributes.content ),
+						},
+						innerBlocks: block.innerBlocks,
+					} ) ),
+				};
+			} )
+		)
+		.toMatchObject( {
+			hasOpeningComment: true,
+			hasClosingComment: true,
+			blocks: [
+				{
+					name: 'core/paragraph',
+					isValid: true,
+					attributes,
+					innerBlocks: [],
+				},
+			],
+		} );
+}
+
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -464,7 +500,14 @@ test.describe( 'Post Meta source', () => {
 				}
 
 				if ( browserName === 'chromium' ) {
-					await expectResolvedClipboard( page );
+					if ( copyMethod === 'menu' ) {
+						await expectSerializedParagraphClipboard( page, {
+							content: 'Bound <strong>text</strong>',
+							metadata: { bindings },
+						} );
+					} else {
+						await expectResolvedClipboard( page );
+					}
 				}
 				expect( await editor.getBlocks() ).toMatchObject( [
 					boundParagraph,
@@ -502,18 +545,17 @@ test.describe( 'Post Meta source', () => {
 				} );
 			} );
 			const style = { typography: { fontSize: '23px' } };
+			const bindings = {
+				content: {
+					source: 'core/post-meta',
+					args: { key: 'movie_field' },
+				},
+			};
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: {
 					style,
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: { key: 'movie_field' },
-							},
-						},
-					},
+					metadata: { bindings },
 				},
 			} );
 			await editor.insertBlock( {
@@ -531,11 +573,11 @@ test.describe( 'Post Meta source', () => {
 				.getByRole( 'menuitem' )
 				.filter( { has: page.getByText( 'Copy', { exact: true } ) } )
 				.click();
-			await expect
-				.poll( () =>
-					page.evaluate( () => navigator.clipboard.readText() )
-				)
-				.toBe( 'Bound text' );
+			await expectSerializedParagraphClipboard( page, {
+				content: 'Bound text',
+				style,
+				metadata: { bindings },
+			} );
 			await page.keyboard.press( 'Escape' );
 
 			await paragraphs.last().click();
@@ -544,12 +586,20 @@ test.describe( 'Post Meta source', () => {
 				.getByRole( 'menuitem', { name: 'Paste styles' } )
 				.click();
 			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{ name: 'core/paragraph', attributes: { style } },
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: '',
+						style,
+						metadata: { bindings },
+					},
+				},
 				{
 					name: 'core/paragraph',
 					attributes: { content: 'Target', style },
 				},
 			] );
+			await expect( paragraphs.last() ).toHaveText( 'Target' );
 		} );
 
 		test( 'should copy resolved text in a mixed block selection without changing the original blocks', async ( {
