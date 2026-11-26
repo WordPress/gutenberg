@@ -14,5 +14,10 @@
 				appearance: none;
 			}
 		}
+
+		/* Also covers a field disabled through `Field.Root`. */
+		.search-input:has(input:is(:disabled, :read-only)) .reset-slot {
+			display: none;
+		}
 	}
 }

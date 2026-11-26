@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useRef, useState } from '@wordpress/element';
+import { useIsomorphicLayoutEffect, useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { IconButton } from '../../../icon-button';
@@ -16,12 +16,7 @@ import type { SearchInputProps } from './types';
  * in both controlled and uncontrolled mode.
  */
 function clearInput( input: HTMLInputElement ) {
-	// React tracks the value through the instance's `value` property, so the
-	// prototype setter is needed for React to see the change.
-	Object.getOwnPropertyDescriptor(
-		Object.getPrototypeOf( input ),
-		'value'
-	)?.set?.call( input, '' );
+	input.setRangeText( '', 0, input.value.length );
 	input.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 }
 
@@ -35,14 +30,12 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 	function UnforwardedSearchInput(
 		{
 			className,
-			'aria-label': ariaLabel = __( 'Search' ),
+			'aria-label': ariaLabel,
 			placeholder = __( 'Search' ),
 			autoComplete = 'off',
 			value,
 			defaultValue,
 			onValueChange,
-			disabled,
-			readOnly,
 			...restProps
 		},
 		ref
@@ -53,6 +46,27 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 		const [ uncontrolledHasValue, setUncontrolledHasValue ] =
 			useState( !! defaultValue );
 		const hasValue = isControlled ? value !== '' : uncontrolledHasValue;
+		const [ hasLabelElement, setHasLabelElement ] = useState( false );
+
+		// A default `aria-label` would override an associated `<label>`.
+		useIsomorphicLayoutEffect( () => {
+			setHasLabelElement( !! inputRef.current?.labels?.length );
+		}, [] );
+
+		useEffect( () => {
+			const form = inputRef.current?.form;
+			if ( ! form ) {
+				return;
+			}
+			// The form restores its fields only after the `reset` event, and
+			// without an `input` event.
+			const onFormReset = () =>
+				setTimeout( () =>
+					setUncontrolledHasValue( !! inputRef.current?.value )
+				);
+			form.addEventListener( 'reset', onFormReset );
+			return () => form.removeEventListener( 'reset', onFormReset );
+		}, [] );
 
 		const onReset = () => {
 			const input = inputRef.current;
@@ -68,7 +82,10 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 				ref={ mergedRef }
 				type="search"
 				className={ clsx( styles[ 'search-input' ], className ) }
-				aria-label={ ariaLabel }
+				aria-label={
+					ariaLabel ??
+					( hasLabelElement ? undefined : __( 'Search' ) )
+				}
 				placeholder={ placeholder }
 				autoComplete={ autoComplete }
 				value={ value }
@@ -77,14 +94,13 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 					setUncontrolledHasValue( nextValue !== '' );
 					onValueChange?.( nextValue, eventDetails );
 				} }
-				disabled={ disabled }
-				readOnly={ readOnly }
 				prefix={ <SearchIconSlot /> }
 				suffix={
-					hasValue &&
-					! disabled &&
-					! readOnly && (
-						<InputLayout.Slot padding="minimal">
+					hasValue && (
+						<InputLayout.Slot
+							padding="minimal"
+							className={ styles[ 'reset-slot' ] }
+						>
 							<IconButton
 								icon={ closeSmall }
 								label={ __( 'Reset search' ) }

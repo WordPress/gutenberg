@@ -17,9 +17,8 @@ export type SearchInputProps = Omit<
 	/**
 	 * The accessible name of the search field.
 	 *
-	 * A label associated through `Field.Label` takes precedence.
-	 *
-	 * @default 'Search'
+	 * Defaults to "Search" when the field has no associated `<label>`, such as
+	 * a `Field.Label`.
 	 */
 	'aria-label'?: string;
 	/**
