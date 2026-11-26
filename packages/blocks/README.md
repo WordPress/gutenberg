@@ -876,6 +876,10 @@ _Returns_
 
 - `Block[]`: Updated Block list.
 
+### TemplateItem
+
+A block template entry: the block name, then optional attributes and inner block template.
+
 ### unregisterBlockBindingsSource
 
 Unregisters a block bindings source by providing its name.

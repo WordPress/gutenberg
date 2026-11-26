@@ -5,10 +5,13 @@
 ### New Features
 
 -   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `transform.translate` setting ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add the `transform.scale` setting ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 
 ### Bug Fixes
 
 -   Type Definitions: Add `customFontSize` and `lineHeight` to `TypographySettings`, `gradient` to `GlobalStylesStyles[ 'color' ]`, and `':hover'` state to `GlobalStylesStyles[ 'blocks' ]` ([#87122](https://github.com/WordPress/gutenberg/pull/87122)).
+-   A breakpoint pseudo-state, such as `@mobile` `:hover`, undoes a text gradient set by the default pseudo-state when it sets a box clip or text color ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 
 ### Internal
 
