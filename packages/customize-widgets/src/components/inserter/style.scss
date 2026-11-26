@@ -17,6 +17,7 @@
 
 .customize-widgets-layout__inserter-panel {
 	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
 // The panel header has its own close button, so with no tabs to show the
@@ -39,6 +40,8 @@
 
 	.customize-widgets-layout__inserter-panel-header-title {
 		margin: 0;
+		// Override the admin heading color.
+		color: inherit;
 	}
 }
 

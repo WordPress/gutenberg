@@ -51,14 +51,14 @@
 	align-items: flex-start;
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	text-align: left;
 	border-radius: $radius-small;
 
 	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;
-		color: $gray-700;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	&:focus {
@@ -97,5 +97,5 @@
 		padding-right: $grid-unit-40;
 	}
 	text-align: center;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
