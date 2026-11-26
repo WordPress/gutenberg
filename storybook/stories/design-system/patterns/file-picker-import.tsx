@@ -3,6 +3,7 @@ import { useId, useState } from '@wordpress/element';
 import { Button, Stack, ValidityIndicator } from '@wordpress/ui';
 import { importPattern, useSnackbars } from './file-picker-preview';
 import previewStyles from './file-picker-preview.module.css';
+import styles from './file-picker.module.css';
 
 export function FilePickerImport() {
 	const [ isImporting, setIsImporting ] = useState( false );
@@ -55,7 +56,7 @@ export function FilePickerImport() {
 					</Button>
 				) }
 			/>
-			<div aria-live="polite">
+			<div aria-live="polite" className={ styles.error }>
 				{ error && (
 					<ValidityIndicator
 						id={ errorId }

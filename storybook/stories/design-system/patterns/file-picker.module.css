@@ -197,6 +197,14 @@
 	list-style: none;
 }
 
+/*
+ * An error names the file, and a filename can be one long word, so let it
+ * break anywhere instead of making the page scroll sideways.
+ */
+.error {
+	overflow-wrap: anywhere;
+}
+
 /* The `DropZone` overlay covers the nearest positioned ancestor. */
 .drop-target {
 	position: relative;

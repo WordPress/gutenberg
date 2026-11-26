@@ -150,7 +150,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 			<Fieldset.Description>
 				Drop one PNG here, or choose a file.
 			</Fieldset.Description>
-			<div aria-live="polite">
+			<div aria-live="polite" className={ styles.error }>
 				{ error && (
 					<ValidityIndicator
 						id={ errorId }

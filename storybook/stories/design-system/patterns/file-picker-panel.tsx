@@ -105,6 +105,8 @@ export function FilePickerPanel() {
 						<>
 							<Stack
 								render={ <ul /> }
+								// Safari drops the list role when the markers are hidden.
+								role="list"
 								direction="column"
 								gap="sm"
 								className={ styles.list }
@@ -153,7 +155,7 @@ export function FilePickerPanel() {
 							</EmptyState.Root>
 						</Stack>
 					) }
-					<div aria-live="polite">
+					<div aria-live="polite" className={ styles.error }>
 						{ error && (
 							<ValidityIndicator
 								id={ errorId }

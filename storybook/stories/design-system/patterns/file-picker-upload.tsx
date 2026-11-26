@@ -49,8 +49,8 @@ export function FilePickerUpload() {
 
 	/*
 	 * Uploads added together finish together, and each `speak()` call
-	 * replaces the previous message. Collect the results of one moment and
-	 * announce them at once.
+	 * replaces the previous message. Collect the messages of one moment and
+	 * announce them at once, in order, so the latest action is read last.
 	 */
 	function announce( message: string ) {
 		announcements.current.push( message );
@@ -140,7 +140,7 @@ export function FilePickerUpload() {
 		// remove button, which now cancels the upload. Its new name may not
 		// be read while it has focus, so say what happens.
 		removeRefs.current.get( upload.id )?.focus();
-		speak( `Uploading ${ upload.file.name } again.` );
+		announce( `Uploading ${ upload.file.name } again.` );
 	}
 
 	function remove( upload: Upload ) {
@@ -152,7 +152,7 @@ export function FilePickerUpload() {
 		setUploads( ( current ) =>
 			current.filter( ( item ) => item.id !== upload.id )
 		);
-		speak(
+		announce(
 			upload.status === 'uploading'
 				? `Upload of ${ upload.file.name } canceled.`
 				: `${ upload.file.name } removed.`
@@ -185,6 +185,8 @@ export function FilePickerUpload() {
 						render={ <ul /> }
 						direction="column"
 						gap="sm"
+						// Safari drops the list role when the markers are hidden.
+						role="list"
 						className={ styles.list }
 					>
 						{ uploads.map( ( upload ) => (
@@ -287,7 +289,7 @@ export function FilePickerUpload() {
 				Drop photos or PDFs here, or choose them. Each file uploads as
 				soon as you add it.
 			</Fieldset.Description>
-			<div aria-live="polite">
+			<div aria-live="polite" className={ styles.error }>
 				{ error && (
 					<ValidityIndicator
 						id={ errorId }

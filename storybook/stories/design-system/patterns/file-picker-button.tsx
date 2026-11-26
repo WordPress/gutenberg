@@ -6,6 +6,7 @@ import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
 import { importPattern, useSnackbars } from './file-picker-preview';
 import previewStyles from './file-picker-preview.module.css';
+import styles from './file-picker.module.css';
 
 export function FilePickerButton() {
 	const [ file, setFile ] = useState< File >();
@@ -104,7 +105,7 @@ export function FilePickerButton() {
 					<Fieldset.Description>
 						A JSON file exported from another site.
 					</Fieldset.Description>
-					<div aria-live="polite">
+					<div aria-live="polite" className={ styles.error }>
 						{ error && (
 							<ValidityIndicator
 								id={ errorId }

@@ -124,6 +124,8 @@ export function FilePickerMultiple() {
 				{ entries.length > 0 && (
 					<Stack
 						render={ <ul /> }
+						// Safari drops the list role when the markers are hidden.
+						role="list"
 						direction="column"
 						gap="sm"
 						className={ styles.list }
@@ -189,7 +191,7 @@ export function FilePickerMultiple() {
 			<Fieldset.Description>
 				{ `Drop up to ${ MAX_FILES } PDF, JPEG, or PNG files here, or choose them. Each file can be up to ${ formatFileSize( MAX_FILE_SIZE ) }.` }
 			</Fieldset.Description>
-			<div aria-live="polite">
+			<div aria-live="polite" className={ styles.error }>
 				{ error && (
 					<ValidityIndicator
 						id={ errorId }
