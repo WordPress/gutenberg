@@ -1,22 +1,15 @@
 import type { ReactNode } from 'react';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner as WCSpinner } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { lazy, Suspense, useMemo } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
-const {
-	Editor: PrivateEditor,
-	BackButton,
-	PreferencesModal,
-	ToolsMoreMenuGroup,
-	SiteExport,
-	UploadProgressSnackbar,
-} = unlock( editorPrivateApis );
+// Reads `wp.editor` when it loads, so it is loaded once the editor assets are.
+const EditorUI = lazy( () => import( './editor-ui' ) );
 
 interface EditorProps {
 	postType?: string;
@@ -129,39 +122,17 @@ export function Editor( {
 
 	// Render the editor when ready
 	return (
-		<>
-			<PrivateEditor
+		<Suspense fallback={ null }>
+			<EditorUI
 				postType={ resolvedPostType }
 				postId={ resolvedPostId }
 				templateId={ templateId }
 				settings={ finalSettings }
-				styles={ finalSettings.styles }
+				backButton={ backButton }
 				onActionPerformed={ onActionPerformed }
 				initialViewport={ initialViewport }
 				renderingMode={ renderingMode }
-			>
-				{ backButton && <BackButton>{ backButton }</BackButton> }
-				{ /*
-				   Opened from the editor's own menu and from the command the editor
-				   registers, both of which exist only while it is mounted. Renders
-				   nothing until one of them opens it.
-				 */ }
-				<PreferencesModal />
-				{ /*
-				   Self-gated: renders only while editing a template or template
-				   part, the entities the exported theme is made of.
-				 */ }
-				<ToolsMoreMenuGroup>
-					<SiteExport />
-				</ToolsMoreMenuGroup>
-			</PrivateEditor>
-			{ /*
-			   Renders nothing: it manages a notice that the host's snackbar
-			   list displays. Mounted here rather than in boot so that pages
-			   without an editor don't load it. A sibling of the editor so it
-			   stays mounted while switching between entities.
-			 */ }
-			<UploadProgressSnackbar />
-		</>
+			/>
+		</Suspense>
 	);
 }
