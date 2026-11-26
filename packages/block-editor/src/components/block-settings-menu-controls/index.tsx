@@ -16,6 +16,10 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityViewportMenuItem } from '../block-visibility';
+import {
+	ConvertToCanvasMenuItem,
+	useCanConvertToCanvas,
+} from '../grid/convert-to-canvas';
 import type {
 	BlockSettingsMenuControlsProps,
 	BlockSettingsMenuControlsSlotProps,
@@ -69,6 +73,10 @@ const BlockSettingsMenuControlsSlot = ( {
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
 		canToggleSelectedBlocksVisibility && ! isContentOnly;
+	// Shown for an unsynced pattern's section too, which it detaches.
+	const showConvertToCanvasButton = useCanConvertToCanvas(
+		selectedClientIds.length === 1 ? selectedClientIds[ 0 ] : undefined
+	);
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -92,7 +100,8 @@ const BlockSettingsMenuControlsSlot = ( {
 					// @ts-expect-error Compares the negated fill count with 0, true without fills.
 					! fills?.length > 0 &&
 					! showConvertToGroupButton &&
-					! showLockButton
+					! showLockButton &&
+					! showConvertToCanvasButton
 				) {
 					return null;
 				}
@@ -118,6 +127,12 @@ const BlockSettingsMenuControlsSlot = ( {
 						{ canEdit && showVisibilityButton && (
 							<BlockVisibilityViewportMenuItem
 								clientIds={ selectedClientIds }
+							/>
+						) }
+						{ showConvertToCanvasButton && (
+							<ConvertToCanvasMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
 							/>
 						) }
 						{ fills }

@@ -12,9 +12,15 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import {
+	canConvertToCanvas,
+	useConvertToCanvas,
+} from '../grid/convert-to-canvas';
+import type { Layout } from '../../layouts/types';
+import type { GridItemAttributes } from '../grid/types';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
@@ -82,6 +88,8 @@ function BlockSwitcherDropdownMenuContents( {
 		clientIds,
 		blocks,
 	} );
+	const registry = useRegistry();
+	const convertToCanvas = useConvertToCanvas();
 	const filteredBlockTransformations = possibleBlockTransformations.filter(
 		( { name, variationName } ) =>
 			name !== blocks[ 0 ]?.name ||
@@ -106,6 +114,33 @@ function BlockSwitcherDropdownMenuContents( {
 		selectForMultipleBlocks( newBlocks );
 	}
 	function onBlockVariationTransform( name: string ) {
+		// The selected variation is one of the transformations.
+		const { attributes } = blockVariationTransformations!.find(
+			( { name: variationName } ) => variationName === name
+		)!;
+		// A container switched to a manual placement grid keeps where its
+		// blocks are, unless they already have places in the grid.
+		const { clientId, innerBlocks } = blocks[ 0 ];
+		// Variation attributes are untyped; `layout` is a block's layout.
+		const layout = attributes?.layout as Layout | undefined;
+		const isManualGrid =
+			layout?.type === 'grid' && layout?.isManualPlacement;
+		const hasPlacedBlocks = innerBlocks.some(
+			( { attributes: { style } } ) => {
+				// Block attributes are untyped; `style` is a grid item's style.
+				const itemLayout = ( style as GridItemAttributes[ 'style' ] )
+					?.layout;
+				return itemLayout?.columnStart || itemLayout?.rowStart;
+			}
+		);
+		if (
+			isManualGrid &&
+			! hasPlacedBlocks &&
+			canConvertToCanvas( registry.select, clientId ) &&
+			convertToCanvas( clientId, { attributes } )
+		) {
+			return;
+		}
 		const newBlocks = switchToBlockType(
 			blocks[ 0 ],
 			blocks[ 0 ].name,
@@ -116,21 +151,13 @@ function BlockSwitcherDropdownMenuContents( {
 			// Reusing the client ID updates the block in place instead of remounting it.
 			const replacements =
 				newBlock.name === blocks[ 0 ].name
-					? [
-							{ ...newBlock, clientId: blocks[ 0 ].clientId },
-							...rest,
-						]
+					? [ { ...newBlock, clientId }, ...rest ]
 					: newBlocks;
 			replaceBlocks( clientIds, replacements );
 			selectForMultipleBlocks( replacements );
 			return;
 		}
-		updateBlockAttributes( blocks[ 0 ].clientId, {
-			// The selected variation is one of the transformations.
-			...blockVariationTransformations!.find(
-				( { name: variationName } ) => variationName === name
-			)!.attributes,
-		} );
+		updateBlockAttributes( clientId, { ...attributes } );
 	}
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks: Block[] ) {
