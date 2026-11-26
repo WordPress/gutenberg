@@ -539,7 +539,6 @@ export type ChildLayoutBlockStyle = BlockStyle & { layout?: ChildLayout };
 export interface ChildLayoutControlsPureProps {
 	clientId: string;
 	style?: ChildLayoutBlockStyle;
-	setAttributes: ( attributes: Record< string, unknown > ) => void;
 }
 
 export interface GridToolsProps extends ChildLayoutControlsPureProps {
