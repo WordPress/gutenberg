@@ -9,6 +9,7 @@ Build tool for WordPress plugins.
 - **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
+- **Translator Comments**: Keeps `translators:` comments next to the `__()`, `_x()`, `_n()` and `_nx()` calls they describe in the transpiled and unminified output, so `wp i18n make-pot` can extract them from the built files
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
 - **Watch Mode**: Incremental rebuilds during development
 
@@ -61,6 +62,10 @@ wp-build --no-script-debug
 Builds only the minified `.min.js` and `.min.css` files, leaving out the non-minified copies used when `SCRIPT_DEBUG` is enabled. The generated registration code then loads the minified files even with `SCRIPT_DEBUG` on. Code that registers files from the build directory by hand should check the `has_debug_assets` key of the array that `build/constants.php` returns, the same way. The flag is ignored in watch mode.
 
 `wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
+
+Without the non-minified files, `wp i18n make-pot` (which WordPress.org also runs to import plugin strings) skips `*.min.js` and reads JavaScript strings only from the `*.min.js.map` source maps. Ship those maps with the plugin, and do not exclude `*.map` in `.distignore`, or the plugin's JavaScript strings cannot be translated. This works because the maps embed the JavaScript that `wp-build` compiles each package to; `make-pot` cannot parse TypeScript, so it finds no strings in a source map that embeds TypeScript sources. Routes and widgets are built without source maps, so their strings are not extracted from a `--no-script-debug` build.
+
+Gutenberg's own build does not support the flag yet. Its `lib/client-assets.php` registers some stylesheets by hand without checking `has_debug_assets`, so a Gutenberg build made with `--no-script-debug` requests missing non-minified files when `SCRIPT_DEBUG` is enabled.
 
 ### Build Concurrency
 

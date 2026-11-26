@@ -29,6 +29,7 @@ import { inferStyleDependencies } from './style-dependencies.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import { translatorCommentsPlugin } from './translator-comments-plugin.mjs';
 import {
 	getAllRoutes,
 	getRouteFiles,
@@ -1302,6 +1303,9 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		// Keeps translator comments in `build` and `build-module`, which the
+		// script and module bundles are built from.
+		translatorCommentsPlugin(),
 		dsTokenFallbacksJs,
 		wasmInlinePlugin,
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
@@ -1636,6 +1640,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 						},
 						resolve: { conditionNames: developmentConditions },
 						plugins: [
+							translatorCommentsPlugin(),
 							styleRuntimeAliasPlugin(),
 							wordpressExternalsPlugin(
 								'route.min',
@@ -1709,6 +1714,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 					},
 					resolve: { conditionNames: developmentConditions },
 					plugins: [
+						translatorCommentsPlugin(),
 						...createStyleBundlingPlugins( routeDir ),
 						wordpressExternalsPlugin(
 							'content.min',
@@ -1849,6 +1855,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 						},
 						resolve: { conditionNames: developmentConditions },
 						plugins: [
+							translatorCommentsPlugin(),
 							...createStyleBundlingPlugins( widgetDir ),
 							wordpressExternalsPlugin(
 								'render.min',
@@ -1922,6 +1929,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 						},
 						resolve: { conditionNames: developmentConditions },
 						plugins: [
+							translatorCommentsPlugin(),
 							styleRuntimeAliasPlugin(),
 							wordpressExternalsPlugin(
 								'widget.min',

@@ -1,12 +1,4 @@
-interface WidgetIdAttributes {
-	__internalWidgetId?: string;
-	[ key: string ]: unknown;
-}
-
-interface BlockWithWidgetIdAttributes {
-	attributes?: WidgetIdAttributes;
-	[ key: string ]: unknown;
-}
+import type { WidgetBlock } from './types';
 
 /**
  * Get the internal widget id from block.
@@ -14,10 +6,8 @@ interface BlockWithWidgetIdAttributes {
  * @param block The block.
  * @return The internal widget id.
  */
-export function getWidgetIdFromBlock(
-	block: BlockWithWidgetIdAttributes
-): string | undefined {
-	return block.attributes?.__internalWidgetId;
+export function getWidgetIdFromBlock( block: WidgetBlock ): string | undefined {
+	return block.attributes.__internalWidgetId;
 }
 
 /**
@@ -27,10 +17,10 @@ export function getWidgetIdFromBlock(
  * @param widgetId The widget id.
  * @return The updated block.
  */
-export function addWidgetIdToBlock< T extends BlockWithWidgetIdAttributes >(
+export function addWidgetIdToBlock< T extends Partial< WidgetBlock > >(
 	block: T,
 	widgetId: string
-): T {
+): T & WidgetBlock {
 	return {
 		...block,
 		attributes: {

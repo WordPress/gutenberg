@@ -24,6 +24,32 @@ describe( 'getTransformClassesAndStyles', () => {
 		).toEqual( { style: { rotate: '15deg' } } );
 	} );
 
+	it( 'returns an offset as the axis it sets', () => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { translate: { y: '2rem' } } },
+			} )
+		).toEqual( {
+			style: {
+				'--wp--style--translate-y': '2rem',
+				translate:
+					'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
+			},
+		} );
+	} );
+
+	it.each( [
+		[ 1.2, '1.2' ],
+		[ 0, '0' ],
+		[ '120%', '120%' ],
+	] )( 'returns a %s scale as an inline style', ( scale, expected ) => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { scale } },
+			} )
+		).toEqual( { style: { scale: expected } } );
+	} );
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
@@ -107,5 +133,25 @@ describe( 'getStateInheritedValue', () => {
 				{ viewport: '@mobile', pseudo: ':hover' }
 			).transform
 		).toEqual( { rotate: '15deg' } );
+	} );
+
+	it( 'layers offset axes one by one', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { translate: { x: '5px' } } },
+				{ transform: { translate: { y: '20px' } } },
+				mobile
+			).transform
+		).toEqual( { translate: { x: '5px', y: '20px' } } );
+	} );
+
+	it( 'starts a state scale from the block scale', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { rotate: '5deg', scale: '120%' } },
+				{ transform: { scale: 0.8 } },
+				mobile
+			).transform
+		).toEqual( { rotate: '5deg', scale: 0.8 } );
 	} );
 } );
