@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { BlockType } from '../../types';
+import { partial } from '../../store/test/fixtures/types';
 import '../../store';
 import { createBlock } from '../factory';
 import {
@@ -21,30 +22,6 @@ import {
 } from '../utils';
 
 const noop = () => null;
-
-type DeepPartial<
-	T,
-	Depth extends unknown[] = [],
-> = Depth[ 'length' ] extends 7
-	? T
-	: T extends ( ...args: never[] ) => unknown
-		? T
-		: T extends Node
-			? T
-			: T extends Map< infer K, infer V >
-				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
-				: T extends object
-					? {
-							[ P in keyof T ]?: DeepPartial<
-								T[ P ],
-								[ ...Depth, unknown ]
-							>;
-						}
-					: T;
-
-function partial< T >( fixture: DeepPartial< T > ): T {
-	return fixture as T;
-}
 
 describe( 'block helpers', () => {
 	afterEach( () => {

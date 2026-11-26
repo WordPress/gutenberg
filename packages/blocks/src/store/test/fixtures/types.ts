@@ -19,3 +19,7 @@ export type DeepPartial<
 								>;
 							}
 						: T;
+
+export function partial< T >( fixture: DeepPartial< T > ): T {
+	return fixture as T;
+}

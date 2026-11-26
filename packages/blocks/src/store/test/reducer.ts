@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import type { Action } from '../types';
-import type { DeepPartial } from './fixtures/types';
+import { partial } from './fixtures/types';
 import type {
 	BlockCategory,
 	BlockStyle,
@@ -26,10 +26,6 @@ import {
 	groupingBlockName,
 	DEFAULT_CATEGORIES,
 } from '../reducer';
-
-function partial< T >( fixture: DeepPartial< T > ) {
-	return fixture as T;
-}
 
 const emptyAction = {} as Action;
 

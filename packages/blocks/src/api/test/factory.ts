@@ -24,30 +24,7 @@ import {
 	setGroupingBlockName,
 } from '../registration';
 import { logged as warningLoggedSet } from '../../../../warning/src/utils';
-
-type DeepPartial<
-	T,
-	Depth extends unknown[] = [],
-> = Depth[ 'length' ] extends 7
-	? T
-	: T extends ( ...args: never[] ) => unknown
-		? T
-		: T extends Node
-			? T
-			: T extends Map< infer K, infer V >
-				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
-				: T extends object
-					? {
-							[ P in keyof T ]?: DeepPartial<
-								T[ P ],
-								[ ...Depth, unknown ]
-							>;
-						}
-					: T;
-
-function partial< T >( fixture: DeepPartial< T > ): T {
-	return fixture as T;
-}
+import { partial } from '../../store/test/fixtures/types';
 
 const noop = () => null;
 const transformNoop = () => [] as Block[];
@@ -1276,7 +1253,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							// @ts-expect-error Simplified transform callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1328,7 +1305,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified transform callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1502,10 +1479,10 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1552,10 +1529,10 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1722,7 +1699,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/text-block', {
 									value: 'chicken ' + value,
@@ -1765,7 +1742,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
@@ -1813,7 +1790,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							// @ts-expect-error Simplified callback signature.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
@@ -1874,7 +1851,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
-							// @ts-expect-error Transform callback expects single block attributes and innerBlocks.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform(
 								attributes: Record< string, unknown >,
 								innerBlocks: Block[]
@@ -1933,7 +1910,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
 							isMultiBlock: true,
-							// @ts-expect-error Multi-block transform callback expects array parameters.
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							transform(
 								blocksAttributes: Array<
 									Record< string, unknown >
@@ -2016,7 +1993,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
-							// @ts-expect-error Convert callback expects Block | Block[].
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							__experimentalConvert( blocks: Block[] ) {
 								const groupInnerBlocks = blocks.map(
 									( { name, attributes, innerBlocks } ) => {
@@ -2096,7 +2073,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
-							// @ts-expect-error Convert callback expects Block | Block[].
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2161,7 +2138,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
 							isMultiBlock: true,
-							// @ts-expect-error Convert callback expects Block | Block[].
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2223,7 +2200,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/image-block' ],
 							isMultiBlock: true,
-							// @ts-expect-error Convert callback expects Block | Block[].
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2285,7 +2262,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
-							// @ts-expect-error Convert callback expects Block | Block[].
+							// @ts-expect-error BlockBlockTransform does not narrow on isMultiBlock.
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),

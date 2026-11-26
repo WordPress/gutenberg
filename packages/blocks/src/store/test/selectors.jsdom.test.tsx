@@ -2,7 +2,7 @@ import { describe, expect, it, test } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { RichTextData } from '@wordpress/rich-text';
 import type { BlockStoreState } from '../types';
-import type { DeepPartial } from './fixtures/types';
+import { partial } from './fixtures/types';
 import type { BlockType } from '../../types';
 import {
 	getBlockSupport,
@@ -14,10 +14,6 @@ import {
 	getCategories,
 	getActiveBlockVariation,
 } from '../selectors';
-
-function partial< T >( fixture: DeepPartial< T > ): T {
-	return fixture as T;
-}
 
 const keyBlocksByName = (
 	blocks: Array< { name: string; [ key: string ]: unknown } >

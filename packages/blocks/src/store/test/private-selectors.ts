@@ -1,15 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import type { BlockStoreState } from '../types';
-import type { DeepPartial } from './fixtures/types';
+import { partial, type DeepPartial } from './fixtures/types';
 import {
 	getBlockKeyboardShortcuts,
 	getSupportedStyles,
 } from '../private-selectors';
-
-function partial< T >( fixture: DeepPartial< T > ): T {
-	return fixture as T;
-}
 
 const keyBlocksByName = (
 	blocks: Array< { name: string; [ key: string ]: unknown } >

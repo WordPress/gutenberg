@@ -33,32 +33,9 @@ import { store as blocksStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 import type { BlockConfiguration, BlockType } from '../../types';
+import { partial } from '../../store/test/fixtures/types';
 
 type BlockSettings = Parameters< typeof registerBlockType >[ 1 ];
-
-type DeepPartial<
-	T,
-	Depth extends unknown[] = [],
-> = Depth[ 'length' ] extends 7
-	? T
-	: T extends ( ...args: never[] ) => unknown
-		? T
-		: T extends Node
-			? T
-			: T extends Map< infer K, infer V >
-				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
-				: T extends object
-					? {
-							[ P in keyof T ]?: DeepPartial<
-								T[ P ],
-								[ ...Depth, unknown ]
-							>;
-						}
-					: T;
-
-function partial< T >( fixture: DeepPartial< T > ) {
-	return fixture as T;
-}
 
 const noop = () => null;
 
@@ -68,15 +45,12 @@ const pick = ( obj: object, keys: Array< string > ) =>
 	);
 
 describe( 'blocks', () => {
-	const defaultBlockSettings = {
+	const defaultBlockSettings = partial< BlockSettings >( {
 		apiVersion: 3,
-		get attributes() {
-			return {};
-		},
 		save: noop,
 		category: 'text',
 		title: 'block title',
-	};
+	} );
 
 	afterEach( () => {
 		const registeredNames = Object.keys(
