@@ -26,7 +26,7 @@
 		// keeping selection legible even for bullet-only items.
 		&.is-selected,
 		&:hover {
-			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
 		// Selection outline only renders in Windows High Contrast mode.

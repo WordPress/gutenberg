@@ -182,8 +182,12 @@
 			svg {
 				color: var(--wpds-color-foreground-interactive-brand);
 			}
-			&:hover {
+			&:hover,
+			&:focus {
 				background: var(--wpds-color-background-interactive-brand-weak-active);
+				svg {
+					color: var(--wpds-color-foreground-interactive-brand-active);
+				}
 			}
 		}
 
@@ -235,7 +239,7 @@
 	&:hover,
 	&[data-active-item],
 	&:focus {
-		background-color: var(--wpds-color-background-interactive-brand-weak-active);
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		color: var(--wpds-color-foreground-interactive-neutral-active);
 
 		.dataviews-filters__search-widget-listitem-description {
@@ -332,7 +336,7 @@
 	border-radius: var(--wpds-border-radius-lg);
 	font-size: 11px;
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-background-surface-neutral-strong);
-	color: var(--wpds-color-foreground-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-brand-strong);
 	box-sizing: border-box;
 }
 

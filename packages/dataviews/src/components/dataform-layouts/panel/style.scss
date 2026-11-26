@@ -26,7 +26,7 @@
 	}
 
 	&:not(.is-disabled):hover {
-		color: var(--wpds-color-foreground-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 
 		.dataforms-layouts-panel__field-trigger-icon {
 			opacity: 1;
@@ -34,7 +34,7 @@
 
 		.dataforms-layouts-panel__field-label,
 		.dataforms-layouts-panel__field-placeholder {
-			color: var(--wpds-color-foreground-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 		}
 	}
 
@@ -55,13 +55,13 @@
 
 	&:hover,
 	&:focus-visible {
-		fill: var(--wpds-color-foreground-interactive-brand);
+		fill: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 }
 
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
-	color: var(--wpds-color-foreground-interactive-brand);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	flex: 0 0 auto;
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);

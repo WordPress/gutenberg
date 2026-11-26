@@ -110,7 +110,8 @@
 		color: var(--wpds-color-foreground-interactive-neutral);
 
 		&:hover {
-			color: var(--wpds-color-foreground-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+			text-decoration: underline;
 		}
 		@include link-reset();
 	}
@@ -123,9 +124,10 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral);
 		&:hover {
-			color: var(--wpds-color-foreground-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+			text-decoration: underline;
 		}
 	}
 }
@@ -134,7 +136,8 @@
 	cursor: var(--wpds-cursor-control);
 	color: var(--wpds-color-foreground-interactive-neutral);
 	&:hover {
-		color: var(--wpds-color-foreground-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+		text-decoration: underline;
 	}
 	@include link-reset();
 }

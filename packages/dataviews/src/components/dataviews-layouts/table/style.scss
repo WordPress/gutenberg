@@ -135,13 +135,13 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		}
 
 		&.is-selected {
-			--dataviews-view-table-row-background: var(--wpds-color-background-interactive-brand-weak-active);
+			--dataviews-view-table-row-background: var(--wpds-color-background-interactive-neutral-weak-active);
 			background-color: var(--dataviews-view-table-row-background);
-			color: var(--wpds-color-foreground-content-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 
 			&,
 			& + tr {
-				--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-brand);
+				--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-neutral);
 			}
 		}
 
