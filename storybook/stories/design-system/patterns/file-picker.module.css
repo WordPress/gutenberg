@@ -19,8 +19,9 @@
 }
 
 /*
- * A row shows a file that is already chosen, so it isn't a drop target. Its
- * padding matches the picker button's, so a row and a drop area line up.
+ * A row shows a file that is already chosen, so its border is solid, not
+ * dashed like the drop area's. Its padding matches the picker button's, so a
+ * row and a drop area line up.
  */
 .row {
 	border-style: solid;
