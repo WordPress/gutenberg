@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Show the image preview for attachments with `media_type` `image` and an empty `mime_type` ([#87207](https://github.com/WordPress/gutenberg/pull/87207)).
+
 ## 6.2.0 (2026-11-18)
 
 ### Enhancements

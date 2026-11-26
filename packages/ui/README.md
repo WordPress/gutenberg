@@ -239,27 +239,6 @@ Components that wrap native form elements may still support native event handler
 
 For guidance on implementing this pattern in new components, see [Controlled and uncontrolled props](https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/CONTRIBUTING.md#controlled-and-uncontrolled-props).
 
-### Static keyboard shortcuts
-
-Use `KeyboardShortcut` for a shortcut shown as static help text, such as an entry in a keyboard shortcuts dialog. It renders visual keycaps and one visually hidden, readable text alternative. Product layouts can provide `className` and `keyClassName` without changing the shortcut's accessible text.
-
-```tsx
-import { KeyboardShortcut } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
-
-<KeyboardShortcut
-	keyCombination={ { modifier: 'primaryShift', character: ',' } }
-/>;
-<KeyboardShortcut
-	keyCombination={ { character: '[[' } }
-	label={ __( 'Left bracket twice' ) }
-/>;
-```
-
-For a group of keys, pass an array as `character`; a translated `label` describing the group is required. The label is optional for a single key, which uses the `@wordpress/keycodes` formatter even without a modifier. Readable key names come from the version of `keycodes` supplied at runtime; use its matching updated release for the translated Backslash, Plus, and Minus names.
-
-This is a static display. For an interactive button or menu item with a shortcut, keep using its `shortcut` prop and the existing interactive shortcut utilities.
-
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

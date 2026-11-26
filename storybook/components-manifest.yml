@@ -823,14 +823,6 @@
             - as
             - children
             - size
-- name: KeyboardShortcut
-  props:
-      - className
-      - keyClassName
-      - keyCombination
-      - label
-      - render
-      - style
 - name: KeyboardShortcuts
   props:
       - bindGlobal

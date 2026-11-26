@@ -4,8 +4,8 @@
 
 ### Bug Fixes
 
+-   `MediaEditor`: Ignore keyboard shortcuts and Escape-to-close handling during IME composition ([#87354](https://github.com/WordPress/gutenberg/pull/87354)).
 -   Expose readable text for shortcut keycaps, including arrow groups and the Plus and Minus zoom keys ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
-
 
 ## 0.23.0 (2026-11-18)
 

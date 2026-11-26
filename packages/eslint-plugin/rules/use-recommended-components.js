@@ -35,7 +35,6 @@ const ALLOWLIST = {
 			'Input',
 			'InputControl',
 			'InputLayout',
-			'KeyboardShortcut',
 			'KeyboardShortcutDescription',
 			'KeyboardShortcutDisplay',
 			'Link',

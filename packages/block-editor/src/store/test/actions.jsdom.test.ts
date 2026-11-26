@@ -1813,7 +1813,7 @@ describe( 'actions', () => {
 					mediaType: 'b',
 				} )( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
-					'Category should have `mediaType` property that is one of `image|audio|video`.'
+					'Category should have `mediaType` property that is one of `image|audio|video|file`.'
 				);
 			} );
 			it( 'has fetch function', () => {

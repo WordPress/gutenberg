@@ -1,11 +1,31 @@
-import type { ComponentProps } from 'react';
 import { Modal } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { KeyboardShortcut } from '@wordpress/ui';
+import {
+	displayShortcutList,
+	shortcutAriaLabel,
+	type WPKeycodeModifier,
+} from '@wordpress/keycodes';
+import { VisuallyHidden } from '@wordpress/ui';
 
 type ShortcutEntry = {
 	description: string;
-} & ComponentProps< typeof KeyboardShortcut >;
+} & (
+	| {
+			keyCombination: {
+				character: string;
+				modifier?: WPKeycodeModifier | null;
+			};
+			label?: string;
+	  }
+	| {
+			keyCombination: {
+				character: string[];
+				modifier?: WPKeycodeModifier | null;
+			};
+			label: string;
+	  }
+);
 
 const SHORTCUTS: ShortcutEntry[] = [
 	{
@@ -84,21 +104,61 @@ export default function MediaEditorKeyboardShortcutsModal( {
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map( ( { description, ...shortcut }, index ) => (
-					<li
-						key={ index }
-						className="media-editor-keyboard-shortcuts-modal__shortcut"
-					>
-						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
-							{ description }
-						</span>
-						<KeyboardShortcut
-							{ ...shortcut }
-							className="media-editor-keyboard-shortcuts-modal__shortcut-term"
-							keyClassName="media-editor-keyboard-shortcuts-modal__shortcut-key"
-						/>
-					</li>
-				) ) }
+				{ SHORTCUTS.map(
+					( { description, keyCombination, label }, index ) => {
+						const { character, modifier } = keyCombination;
+						const normalizedModifier = modifier ?? 'undefined';
+						const characters = Array.isArray( character )
+							? character
+							: [ character ];
+						const formatted = displayShortcutList[
+							normalizedModifier
+						]( characters[ 0 ] ?? '' );
+						const prefix = formatted.slice( 0, -1 );
+						const keys = Array.isArray( character )
+							? [ ...prefix, ...character ]
+							: formatted;
+
+						return (
+							<li
+								key={ index }
+								className="media-editor-keyboard-shortcuts-modal__shortcut"
+							>
+								<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
+									{ description }
+								</span>
+								<kbd
+									className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+									dir="ltr"
+								>
+									<VisuallyHidden render={ <span /> }>
+										{ label ||
+											shortcutAriaLabel[
+												normalizedModifier
+											]( characters.join( '' ) ) }
+									</VisuallyHidden>
+									<span aria-hidden="true">
+										{ keys.map( ( key, keyIndex ) =>
+											key === '+' &&
+											keyIndex < prefix.length ? (
+												<Fragment key={ keyIndex }>
+													{ key }
+												</Fragment>
+											) : (
+												<kbd
+													key={ keyIndex }
+													className="media-editor-keyboard-shortcuts-modal__shortcut-key"
+												>
+													{ key }
+												</kbd>
+											)
+										) }
+									</span>
+								</kbd>
+							</li>
+						);
+					}
+				) }
 			</ul>
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 		</Modal>

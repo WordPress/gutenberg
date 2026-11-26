@@ -14,7 +14,6 @@ export * as EmptyState from './empty-state';
 export * from './form';
 export * from './icon';
 export * from './icon-button';
-export * from './keyboard-shortcut';
 export * from './link';
 export * as Menu from './menu';
 export * as Meter from './meter';
