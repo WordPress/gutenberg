@@ -7668,14 +7668,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/post-list/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/post-list/quick-edit-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
