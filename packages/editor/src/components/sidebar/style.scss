@@ -3,8 +3,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .components-panel__header.editor-sidebar__panel-tabs {
-	// Size the row from its tabs so the bottom border rounds like the inserter's at fractional scales.
-	height: auto;
 	padding-left: 0;
 	padding-right: $grid-unit-10;
 
