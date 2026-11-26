@@ -47,41 +47,31 @@ export function getExtension( name: string ) {
 }
 
 /**
- * Creates a URL for an image preview and revokes it when the file changes.
- *
- * @param file The chosen file.
+ * Shows a thumbnail for an image, or a file icon for any other file. The
+ * preview URL is revoked when the file changes.
  */
-function usePreviewUrl( file: File ) {
-	const [ url, setUrl ] = useState< string >();
+function FileThumbnail( { file }: { file: File } ) {
+	const [ previewUrl, setPreviewUrl ] = useState< string >();
 
 	useEffect( () => {
 		if ( ! file.type.startsWith( 'image/' ) ) {
-			setUrl( undefined );
+			setPreviewUrl( undefined );
 			return;
 		}
 		const objectUrl = URL.createObjectURL( file );
-		setUrl( objectUrl );
+		setPreviewUrl( objectUrl );
 		return () => URL.revokeObjectURL( objectUrl );
 	}, [ file ] );
 
-	return url;
-}
-
-/**
- * Shows a thumbnail for an image, or a file icon for any other file.
- */
-function FileThumbnail( { file }: { file: File } ) {
-	const previewUrl = usePreviewUrl( file );
-	// Some images, such as HEIC photos, can't be shown in every browser.
-	const [ brokenUrl, setBrokenUrl ] = useState< string >();
-
 	return (
 		<span className={ styles.thumbnail }>
-			{ previewUrl && previewUrl !== brokenUrl ? (
+			{ previewUrl ? (
 				<img
 					src={ previewUrl }
 					alt=""
-					onError={ () => setBrokenUrl( previewUrl ) }
+					// Some images, such as HEIC photos, can't be shown in
+					// every browser. Show the file icon for them.
+					onError={ () => setPreviewUrl( undefined ) }
 				/>
 			) : (
 				<Icon icon={ fileIcon } />
