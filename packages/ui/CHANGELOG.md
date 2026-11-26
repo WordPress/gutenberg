@@ -33,6 +33,10 @@
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 
+### Bug Fixes
+
+-   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver in Chrome on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes

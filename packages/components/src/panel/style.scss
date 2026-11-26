@@ -14,6 +14,11 @@
 	> .components-panel__body:last-child {
 		border-bottom-width: 0;
 	}
+
+	// A last header has no bottom border, so it is one pixel shorter.
+	> .components-panel__header:last-child {
+		height: $grid-unit-60 - $border-width;
+	}
 }
 
 .components-panel + .components-panel {
@@ -41,9 +46,11 @@
 	padding: 0 $grid-unit-20;
 	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
-	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
-	box-sizing: content-box;
-	height: $grid-unit-60 - $border-width;
+	// Include the bottom border in the height. The `reset` mixin sets
+	// `box-sizing` on descendants with the same specificity, so a content-box
+	// height would lose a pixel inside containers that apply it.
+	box-sizing: border-box;
+	height: $grid-unit-60;
 
 	h2 {
 		margin: 0;
