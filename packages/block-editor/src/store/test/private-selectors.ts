@@ -17,6 +17,7 @@ import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,
+	wasBlockJustInsertedFromInserter,
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
 	getListViewClientIdsTree,
@@ -118,6 +119,36 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'wasBlockJustInsertedFromInserter', () => {
+		it( 'should be true for the blocks last inserted from an inserter', () => {
+			const state = partial< State >( {
+				lastBlockInserted: {
+					clientIds: [ '123456' ],
+					isFromInserter: true,
+				},
+			} );
+
+			expect( wasBlockJustInsertedFromInserter( state, '123456' ) ).toBe(
+				true
+			);
+			expect( wasBlockJustInsertedFromInserter( state, '78910' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should be false for blocks inserted in other ways', () => {
+			const state = partial< State >( {
+				lastBlockInserted: {
+					clientIds: [ '123456' ],
+				},
+			} );
+
+			expect( wasBlockJustInsertedFromInserter( state, '123456' ) ).toBe(
+				false
+			);
 		} );
 	} );
 
