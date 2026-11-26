@@ -20,6 +20,7 @@ export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	onSave: onSaved,
 	quickEditForm,
 } ) {
 	const isBulk = postId.length > 1;
@@ -148,6 +149,7 @@ export function QuickEditModal( {
 		} else {
 			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
+		onSaved?.();
 		closeModal?.();
 	};
 

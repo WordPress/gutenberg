@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TransformPanel from '../transform-panel';
+import { useState } from '@wordpress/element';
+import TransformPanel, { getScaleAsNumber } from '../transform-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -461,6 +462,301 @@ describe( 'TransformPanel offsets', () => {
 
 		expect( onChange ).toHaveBeenCalledWith( {
 			transform: { rotate: undefined, translate: undefined },
+		} );
+	} );
+} );
+
+describe( 'getScaleAsNumber', () => {
+	it.each( [
+		[ 1.2, 1.2 ],
+		[ '1.2', 1.2 ],
+		[ '120%', 1.2 ],
+		[ '.5', 0.5 ],
+		[ 0, 0 ],
+	] )( 'reads %s as %s', ( value, scale ) => {
+		expect( getScaleAsNumber( value ) ).toBe( scale );
+	} );
+
+	it.each( [ -1, '-1', '1.2 1.5', 'calc(1 + 1)', 'var(--x)', '2x', NaN ] )(
+		'does not read %s',
+		( value ) => {
+			expect( getScaleAsNumber( value ) ).toBeUndefined();
+		}
+	);
+} );
+
+describe( 'TransformPanel scale', () => {
+	const scaleSettings = { transform: { scale: true } };
+
+	it( 'writes the scale as a number', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'1.25'
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: 1.25 },
+		} );
+	} );
+
+	it( 'shows an inherited percentage and leaves it unchanged when the field loses focus', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				inheritedValue={ { transform: { scale: '120%' } } }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton', { name: 'Scale' } );
+		expect( input ).toHaveValue( 1.2 );
+		await user.click( input );
+		await user.tab();
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'removes the scale when the field is cleared', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { scale: 1.5 } } }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.clear( screen.getByRole( 'spinbutton', { name: 'Scale' } ) );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: undefined },
+		} );
+	} );
+
+	it( 'never writes a negative scale', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'-2'
+		);
+
+		expect( onChange ).not.toHaveBeenCalledWith( {
+			transform: { scale: -2 },
+		} );
+	} );
+
+	function ControlledScalePanel( {
+		inheritedValue,
+		onChange,
+	}: {
+		inheritedValue?: { transform: { scale: number } };
+		onChange: ( value: unknown ) => void;
+	} ) {
+		const [ value, setValue ] = useState( {} );
+		return (
+			<TransformPanel
+				value={ value }
+				inheritedValue={ inheritedValue }
+				settings={ scaleSettings }
+				onChange={ ( nextValue ) => {
+					onChange( nextValue );
+					setValue( nextValue );
+				} }
+			/>
+		);
+	}
+
+	async function pressAndRecord(
+		user: ReturnType< typeof userEvent.setup >,
+		keys: string[],
+		onChange: ReturnType< typeof vi.fn >
+	) {
+		const input = screen.getByRole( 'spinbutton', { name: 'Scale' } );
+		const slider = screen.getByRole( 'slider', { name: 'Scale' } );
+		const stored = [];
+		for ( const key of keys ) {
+			await user.keyboard( key );
+			stored.push( onChange.mock.lastCall?.[ 0 ]?.transform?.scale );
+			expect( input ).toHaveValue( stored.at( -1 ) );
+			expect( slider ).toHaveValue( `${ stored.at( -1 ) }` );
+		}
+		return stored;
+	}
+
+	it.each( [
+		[ 'ArrowUp', '{ArrowUp}', [ 1.01, 1.02, 1.03 ] ],
+		[ 'ArrowDown', '{ArrowDown}', [ 0.99, 0.98, 0.97 ] ],
+		[ 'Shift+ArrowUp', '{Shift>}{ArrowUp}{/Shift}', [ 1.1, 1.2, 1.3 ] ],
+		[ 'Shift+ArrowDown', '{Shift>}{ArrowDown}{/Shift}', [ 0.9, 0.8, 0.7 ] ],
+	] )(
+		'steps %s from the unscaled size in an empty field',
+		async ( _key, key, expected ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			render( <ControlledScalePanel onChange={ onChange } /> );
+
+			await user.click(
+				screen.getByRole( 'spinbutton', { name: 'Scale' } )
+			);
+
+			expect(
+				await pressAndRecord( user, [ key, key, key ], onChange )
+			).toEqual( expected );
+		}
+	);
+
+	it( 'steps up then down from a typed scale', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render( <ControlledScalePanel onChange={ onChange } /> );
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'1.5'
+		);
+
+		expect(
+			await pressAndRecord(
+				user,
+				[
+					'{ArrowUp}',
+					'{ArrowUp}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+				],
+				onChange
+			)
+		).toEqual( [ 1.51, 1.52, 1.51, 1.5, 1.49 ] );
+	} );
+
+	it( 'steps up then down from an inherited scale', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<ControlledScalePanel
+				inheritedValue={ { transform: { scale: 1.2 } } }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'spinbutton', { name: 'Scale' } ) );
+
+		expect(
+			await pressAndRecord(
+				user,
+				[
+					'{ArrowUp}',
+					'{ArrowUp}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+					'{ArrowDown}',
+				],
+				onChange
+			)
+		).toEqual( [ 1.21, 1.22, 1.21, 1.2, 1.19 ] );
+	} );
+
+	it( 'starts the slider from the unscaled size', () => {
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const slider = screen.getByRole( 'slider', { name: 'Scale' } );
+		expect( slider ).toHaveValue( '1' );
+		expect( slider ).toHaveAttribute( 'min', '0' );
+		expect( slider ).toHaveAttribute( 'max', '3' );
+
+		fireEvent.change( slider, { target: { value: '1.5' } } );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: 1.5 },
+		} );
+	} );
+
+	it( 'keeps a typed scale beyond the slider range', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton', { name: 'Scale' } );
+		await user.type( input, '4.5' );
+		await user.tab();
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: 4.5 },
+		} );
+	} );
+
+	it( 'shows a stored percentage as a number on both controls', () => {
+		render(
+			<TransformPanel
+				value={ { transform: { scale: '150%' } } }
+				settings={ scaleSettings }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } )
+		).toHaveValue( 1.5 );
+		expect( screen.getByRole( 'slider', { name: 'Scale' } ) ).toHaveValue(
+			'1.5'
+		);
+	} );
+
+	it( 'removes the scale on reset', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { scale: 1.5 } } }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform options' } )
+		);
+		await user.click( screen.getByRole( 'menuitem', { name: /Scale/ } ) );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: undefined },
 		} );
 	} );
 } );
