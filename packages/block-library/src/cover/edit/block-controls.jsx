@@ -27,6 +27,8 @@ export default function CoverBlockControls( {
 	toggleUseFeaturedImage,
 	onClearMedia,
 	onSelectEmbedUrl,
+	isEmbedUrlInputOpen,
+	setIsEmbedUrlInputOpen,
 	onEditMedia,
 	editMediaButtonRef,
 	showEditMediaButton,
@@ -51,7 +53,6 @@ export default function CoverBlockControls( {
 	const [ isMinHeightEnabled ] = useSettings( 'dimensions.minHeight' );
 	const minHeight = style?.dimensions?.minHeight;
 	const [ prevMinHeight, setPrevMinHeight ] = useState( minHeight );
-	const [ isEmbedUrlInputOpen, setIsEmbedUrlInputOpen ] = useState( false );
 	const isMinFullHeight =
 		minHeight === FULL_HEIGHT && ! style?.dimensions?.aspectRatio;
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';

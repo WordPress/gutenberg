@@ -6,6 +6,7 @@
 
 -   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
 -   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
+-   Cover: Offer "Embed video from URL" in the Media control of the block settings sidebar, as in the block toolbar ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ### Bug Fixes
 

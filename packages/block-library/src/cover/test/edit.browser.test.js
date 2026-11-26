@@ -451,6 +451,24 @@ describe( 'Cover block', () => {
 					} )
 				).toBeInTheDocument();
 			} );
+			test( 'offers to embed a video from the media control', async () => {
+				await createAndSelectBlock();
+
+				await activateWithKeyboard(
+					within(
+						screen.getByRole( 'tabpanel', { name: 'Content' } )
+					).getByRole( 'button', { name: 'Add media' } )
+				);
+				await activateWithKeyboard(
+					await screen.findByRole( 'menuitem', {
+						name: 'Embed video from URL',
+					} )
+				);
+
+				expect(
+					await screen.findByRole( 'textbox', { name: 'Video URL' } )
+				).toBeInTheDocument();
+			} );
 			test( 'displays media settings panel if url is set', async () => {
 				await setup( {
 					url: 'http://localhost/my-image.jpg',
