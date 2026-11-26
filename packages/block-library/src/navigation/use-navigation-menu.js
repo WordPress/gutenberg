@@ -1,18 +1,8 @@
-import {
-	store as coreStore,
-	useResourcePermissions,
-	useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {
-	const permissions = useResourcePermissions( {
-		kind: 'postType',
-		name: 'wp_navigation',
-		id: ref,
-	} );
-
 	const {
 		navigationMenu,
 		isNavigationMenuResolved,
@@ -23,19 +13,6 @@ export default function useNavigationMenu( ref ) {
 		},
 		[ ref ]
 	);
-
-	const {
-		// Can the user create navigation menus?
-		canCreate: canCreateNavigationMenus,
-
-		// Can the user update the specific navigation menu with the given post ID?
-		canUpdate: canUpdateNavigationMenu,
-
-		// Can the user delete the specific navigation menu with the given post ID?
-		canDelete: canDeleteNavigationMenu,
-		isResolving: isResolvingPermissions,
-		hasResolved: hasResolvedPermissions,
-	} = permissions;
 
 	const {
 		records: navigationMenus,
@@ -59,17 +36,6 @@ export default function useNavigationMenu( ref ) {
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		canSwitchNavigationMenu,
-		canUserCreateNavigationMenus: canCreateNavigationMenus,
-		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
-		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
-		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu: ref
-			? hasResolvedPermissions
-			: undefined,
-		canUserDeleteNavigationMenu: canDeleteNavigationMenu,
-		hasResolvedCanUserDeleteNavigationMenu: ref
-			? hasResolvedPermissions
-			: undefined,
 	};
 }
 
