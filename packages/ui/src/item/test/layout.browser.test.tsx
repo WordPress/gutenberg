@@ -144,11 +144,14 @@ describe( 'Item layout', () => {
 			<div style={ { width: 320 } }>
 				<Item.ContentRow data-testid="row">
 					<Item.Label>Webhook</Item.Label>
-					<Item.Meta>
+					<Item.Meta data-testid="meta">
 						https://example.com/hooks/abcdefghijklmnopqrstuvwxyz0123456789
 					</Item.Meta>
 					<Item.Actions>
-						<Button size="compact">Remove webhook</Button>
+						{ /* A fixed width, so that the result does not depend on the fonts. */ }
+						<Button size="compact" style={ { width: 160 } }>
+							Remove webhook
+						</Button>
 					</Item.Actions>
 				</Item.ContentRow>
 			</div>
@@ -156,13 +159,14 @@ describe( 'Item layout', () => {
 
 		const row = screen.getByTestId( 'row' ).getBoundingClientRect();
 		const label = screen.getByText( 'Webhook' ).getBoundingClientRect();
+		const meta = screen.getByTestId( 'meta' ).getBoundingClientRect();
 		const action = screen
 			.getByRole( 'button', { name: 'Remove webhook' } )
 			.getBoundingClientRect();
 
 		expect( action.right ).toBeLessThanOrEqual( row.right );
-		// The label keeps room for its own text.
-		expect( label.width ).toBeGreaterThan( 40 );
+		// The meta gives up its room before the label does.
+		expect( label.width ).toBeGreaterThanOrEqual( meta.width );
 	} );
 
 	it( 'styles a row by its own control, not by a row nested in its actions', async () => {
