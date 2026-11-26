@@ -8,7 +8,9 @@ import { ElementsEdit } from '../elements';
 import { BorderPanel } from '../border';
 import { DimensionsPanel } from '../dimensions';
 import { BackgroundImagePanel } from '../background';
+import { BlockStyleStateProvider } from '../block-style-state';
 import type { PanelStyle } from '../../components/global-styles/types';
+import type { BlockStyleState } from '../types';
 
 interface PanelSpyProps {
 	inheritedValue?: PanelStyle;
@@ -542,5 +544,95 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual(
 			{}
 		);
+	} );
+} );
+
+describe( 'TypographyPanel inherits the block font size for a selected state', () => {
+	const tablet = { viewport: '@tablet', pseudo: 'default' };
+	const tabletHover = { viewport: '@tablet', pseudo: ':hover' };
+
+	/**
+	 * Renders the hook for a state and returns the font size it passes to the
+	 * panel as inherited. Global Styles resolve Large for every state.
+	 *
+	 * @param attributes    The block's typography attributes.
+	 * @param selectedState Selected block style state.
+	 * @return The inherited font size passed to the panel.
+	 */
+	function getInheritedFontSize(
+		attributes: Record< string, unknown >,
+		selectedState: Required< BlockStyleState >
+	) {
+		mockUseSelectImpl.fn = () => ( {
+			className: undefined,
+			...attributes,
+		} );
+		mockInheritedReturn.value = {
+			typography: { fontSize: 'var:preset|font-size|large' },
+		};
+
+		render(
+			<BlockStyleStateProvider value={ selectedState }>
+				<TypographyPanel
+					clientId="block-1"
+					name="core/button"
+					setAttributes={ () => {} }
+					settings={ { typography: { fontSize: true } } }
+				/>
+			</BlockStyleStateProvider>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls.at( -1 )!;
+		return props.inheritedValue?.typography?.fontSize;
+	}
+
+	test( 'a viewport inherits the default state size over Global Styles', () => {
+		expect( getInheritedFontSize( { fontSize: 'small' }, tablet ) ).toBe(
+			'var:preset|font-size|small'
+		);
+	} );
+
+	test( 'a viewport falls back to Global Styles when the block sets no size', () => {
+		expect( getInheritedFontSize( {}, tablet ) ).toBe(
+			'var:preset|font-size|large'
+		);
+	} );
+
+	test( 'a viewport and pseudo state inherits the default viewport pseudo state first', () => {
+		expect(
+			getInheritedFontSize(
+				{
+					style: {
+						typography: { fontSize: '14px' },
+						':hover': { typography: { fontSize: '24px' } },
+						'@tablet': { typography: { fontSize: '20px' } },
+					},
+				},
+				tabletHover
+			)
+		).toBe( '24px' );
+	} );
+
+	test( 'a viewport and pseudo state then inherits the viewport, before the default state', () => {
+		expect(
+			getInheritedFontSize(
+				{
+					style: {
+						typography: { fontSize: '14px' },
+						'@tablet': { typography: { fontSize: '20px' } },
+					},
+				},
+				tabletHover
+			)
+		).toBe( '20px' );
+	} );
+
+	test( 'a viewport and pseudo state falls back to the default state size', () => {
+		expect(
+			getInheritedFontSize(
+				{ style: { typography: { fontSize: '14px' } } },
+				tabletHover
+			)
+		).toBe( '14px' );
 	} );
 } );

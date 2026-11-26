@@ -492,15 +492,9 @@ export default function TypographyPanel( {
 	// preset preselects its chip at rest while a local literal value
 	// renders as a literal in the custom-size input.
 	const rawLocalFontSize = value?.typography?.fontSize;
-	// While a state is selected, the block's default state style applies to
-	// it unless overridden, ahead of Global Styles.
-	const rawInheritedFontSize =
-		baseValue?.typography?.fontSize ?? inheritedValue?.typography?.fontSize;
+	const rawInheritedFontSize = inheritedValue?.typography?.fontSize;
 	const rawFontSizeForDisplay = rawLocalFontSize ?? rawInheritedFontSize;
 	const fontSize = decodeValue( rawFontSizeForDisplay );
-	const inheritedFontSizeDecoded = decodeValue( rawInheritedFontSize );
-	const isFontSizePlaceholder =
-		! hasValue( rawLocalFontSize ) && hasValue( rawInheritedFontSize );
 
 	// Extract the slug from the CSS custom property if it exists.
 	const extractSlug = ( rawValue: StyleValue ) => {
@@ -521,7 +515,6 @@ export default function TypographyPanel( {
 		return undefined;
 	};
 	const currentFontSizeSlug = extractSlug( rawFontSizeForDisplay );
-	const inheritedFontSizeSlug = extractSlug( rawInheritedFontSize );
 
 	const setFontSize = (
 		newValue?: string | number,
@@ -538,29 +531,6 @@ export default function TypographyPanel( {
 				hasValue( actualValue ) ? actualValue : undefined
 			)
 		);
-	};
-	// Display-without-commit interceptor: at-rest, the inner
-	// `FontSizePickerToggleGroup` fires `onChange( undefined )` when the
-	// user activates the already-preselected (inherited) chip. Treat
-	// that as the user's "accept this inherited value" affordance and
-	// commit the inherited value to local. Once committed (no longer
-	// at-rest), the same `undefined` payload represents a normal
-	// deselect, so we let it pass through unchanged. The custom-size
-	// input does not emit `undefined` on focus or activation, so this
-	// hook is correctly scoped to the ToggleGroup activation path.
-	const setFontSizeWithInheritedCommit = (
-		newValue?: string | number,
-		metadata?: { slug?: string }
-	) => {
-		if ( isFontSizePlaceholder && newValue === undefined && ! metadata ) {
-			if ( inheritedFontSizeSlug ) {
-				setFontSize( undefined, { slug: inheritedFontSizeSlug } );
-			} else {
-				setFontSize( inheritedFontSizeDecoded );
-			}
-			return;
-		}
-		setFontSize( newValue, metadata );
 	};
 	const hasFontSize = () => hasValue( value?.typography?.fontSize );
 	const resetFontSize = () => setFontSize( undefined );
@@ -1069,7 +1039,9 @@ export default function TypographyPanel( {
 					<FontSizePicker
 						value={ currentFontSizeSlug || fontSize }
 						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
-						onChange={ setFontSizeWithInheritedCommit }
+						// Clearing the custom size calls `onChange( undefined )`,
+						// which leaves the size unset so it keeps inheriting.
+						onChange={ setFontSize }
 						// The picker reads the slug, name and size of each preset.
 						fontSizes={
 							mergedFontSizes as ComponentProps<

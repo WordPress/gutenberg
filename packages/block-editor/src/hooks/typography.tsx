@@ -16,9 +16,13 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
+import { setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import {
+	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
@@ -26,6 +30,7 @@ import {
 import useBlockColorContrastWarning from './contrast-checker';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
+	BlockStyleState,
 	ResetAllContext,
 	ResetAllFilter,
 	StyleInspectorControlProps,
@@ -157,6 +162,52 @@ function attributesToStyle( attributes: TypographyAttributes ): PanelStyle {
 	};
 }
 
+/**
+ * Returns the font size a selected state inherits from the block's own
+ * styles, in the order the block's state CSS applies (see `states.php`).
+ * The block's state rules outrank Global Styles, so the result comes before
+ * the Global Styles value.
+ *
+ * A viewport and pseudo state, such as Tablet + Hover, inherits the pseudo
+ * state of the default viewport first: its `:hover` selector is more specific
+ * than the viewport's own rule. Then come the viewport and the default state.
+ *
+ * @param style         The block's `style` attribute.
+ * @param baseValue     The block's default state style.
+ * @param selectedState Selected block style state.
+ * @return The inherited font size, when the block sets one.
+ */
+function getBlockInheritedFontSize(
+	style: TypographyAttributes[ 'style' ],
+	baseValue: PanelStyle,
+	selectedState: BlockStyleState
+) {
+	if ( isDefaultBlockStyleState( selectedState ) ) {
+		return undefined;
+	}
+
+	const layers: Array< PanelStyle | undefined > = [];
+	if (
+		hasViewportBlockStyleState( selectedState ) &&
+		hasPseudoBlockStyleState( selectedState )
+	) {
+		layers.push(
+			getStyleForState( style, {
+				...selectedState,
+				viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
+			} ) as PanelStyle | undefined,
+			getStyleForState( style, {
+				...selectedState,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} ) as PanelStyle | undefined
+		);
+	}
+	layers.push( baseValue );
+
+	return layers.find( ( layer ) => layer?.typography?.fontSize !== undefined )
+		?.typography?.fontSize;
+}
+
 function TypographyInspectorControl( {
 	children,
 	resetAllFilter,
@@ -249,7 +300,7 @@ export function TypographyPanel( {
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-	const { value: inheritedValue } = useResolvedStyle(
+	const { value: resolvedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState
@@ -276,6 +327,21 @@ export function TypographyPanel( {
 			gradient,
 		]
 	);
+
+	const inheritedValue = useMemo( () => {
+		const inheritedFontSize = getBlockInheritedFontSize(
+			style,
+			baseValue,
+			selectedState
+		);
+		return inheritedFontSize === undefined
+			? resolvedValue
+			: ( setImmutably(
+					resolvedValue,
+					[ 'typography', 'fontSize' ],
+					inheritedFontSize
+				) as PanelStyle );
+	}, [ style, baseValue, selectedState, resolvedValue ] );
 
 	const value = useMemo(
 		() =>
