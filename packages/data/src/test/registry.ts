@@ -409,14 +409,9 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					(
-						registry.select( coreDataStore ) as unknown as {
-							hasFinishedResolution: (
-								storeName: string,
-								selectorName: string
-							) => boolean;
-						}
-					 ).hasFinishedResolution( 'demo', 'getValue' ),
+					registry
+						.select( coreDataStore )
+						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();
@@ -442,14 +437,9 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					(
-						registry.select( coreDataStore ) as unknown as {
-							hasFinishedResolution: (
-								storeName: string,
-								selectorName: string
-							) => boolean;
-						}
-					 ).hasFinishedResolution( 'demo', 'getValue' ),
+					registry
+						.select( coreDataStore )
+						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();

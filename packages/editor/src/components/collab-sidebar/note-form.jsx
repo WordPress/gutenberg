@@ -6,7 +6,11 @@ import {
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+import {
+	displayShortcut,
+	isKeyboardEvent,
+	withIgnoreIMEEvents,
+} from '@wordpress/keycodes';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { sanitizeNoteContent } from './utils/display';
 import noteMentionCompleter from './note-mention-completer';
@@ -84,7 +88,7 @@ export function NoteForm( {
 				event.preventDefault();
 				submit();
 			} }
-			onKeyDown={ ( event ) => {
+			onKeyDown={ withIgnoreIMEEvents( ( event ) => {
 				if ( isKeyboardEvent.primary( event, 'Enter' ) ) {
 					event.preventDefault();
 					submit();
@@ -96,7 +100,7 @@ export function NoteForm( {
 					// Passing event for reply forms.
 					onCancel( event );
 				}
-			} }
+			} ) }
 		>
 			<RichTextControl
 				id={ inputId }
