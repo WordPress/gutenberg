@@ -12,15 +12,12 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
-import { getScreenTransform, getStyleTransform } from './resizable-box/utils';
 
 export const privateApis = {};
 lock( privateApis, {
 	ContentEditableControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
-	getScreenTransform,
-	getStyleTransform,
 	Tabs,
 	// Retained for older bundled consumers. Check compatibility before removal.
 	get Menu() {
