@@ -100,13 +100,12 @@ export const usePostTypes = () => {
 		const query = { per_page: -1 };
 		const records = getPostTypes( query );
 		// A failed request, such as a 403, finishes without records.
-		if ( ! hasFinishedResolution( 'getPostTypes', [ query ] ) ) {
-			return;
-		}
-		return ( records ?? [] ).filter(
-			( { viewable, slug } ) =>
-				viewable && ! excludedPostTypes.includes( slug )
-		);
+		return hasFinishedResolution( 'getPostTypes', [ query ] )
+			? ( records ?? [] ).filter(
+					( { viewable, slug } ) =>
+						viewable && ! excludedPostTypes.includes( slug )
+				)
+			: undefined;
 	}, [] );
 	const postTypesTaxonomiesMap = useMemo( () => {
 		if ( ! postTypes?.length ) {
