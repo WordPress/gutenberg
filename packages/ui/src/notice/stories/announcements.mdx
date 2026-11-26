@@ -22,7 +22,9 @@ By default, the live regions render inside the list. For app-wide notifications 
 
 <Canvas of={ NoticeStories.DynamicNotices } />
 
-The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. The supplied text is preserved. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+Set `spokenMessage` on `Notice.Root` to choose what the list announces. Write a complete, punctuated message that includes the relevant title and description and leaves out action labels and technical details. Set it whenever the title or description contains more than plain text, its wording depends on CSS, or part of the message is rendered outside the notice.
+
+Without `spokenMessage`, the list falls back to the plain text of `Notice.Title` and `Notice.Description`. It joins them with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. It leaves out `Notice.Actions`, including any descriptions inside it, dismiss buttons, and content hidden with `hidden` or `aria-hidden="true"`. The fallback is meant for plain-text notices. How it reads any other content can change, so don't rely on it.
 
 Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
 
@@ -32,6 +34,7 @@ Announcements are `polite` by default, including error notices. Set `politeness=
 		<Notice.Root
 			key={ notice.id }
 			intent={ notice.intent }
+			spokenMessage={ notice.spokenMessage }
 			politeness={ notice.isUrgent ? 'assertive' : 'polite' }
 		>
 			<Notice.Title>{ notice.title }</Notice.Title>
