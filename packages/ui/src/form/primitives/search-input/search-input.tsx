@@ -59,8 +59,6 @@ export const SearchInput = forwardRef< HTMLInputElement, SearchInputProps >(
 			if ( ! input ) {
 				return;
 			}
-			// The reset button unmounts once the field is empty, so move focus
-			// to the field first.
 			input.focus();
 			clearInput( input );
 		};
