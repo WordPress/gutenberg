@@ -1,7 +1,6 @@
 @use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 $block-inserter-preview-height: 350px;
@@ -190,18 +189,6 @@ $block-inserter-tabs-height: 44px;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.block-editor-inserter__panel-title button {
-	color: var(--wpds-color-foreground-interactive-neutral);
-
-	&:not(:disabled, [aria-disabled="true"]):is(
-		:hover,
-		:active,
-		:focus-visible
-	) {
-		color: var(--wpds-color-foreground-interactive-neutral-active);
-	}
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
@@ -611,7 +598,7 @@ $media-grid-loading-min-height: 500px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: rgba($white, 0.6);
+		background-color: color-mix(in srgb, var(--wpds-color-background-surface-neutral-strong) 60%, transparent);
 	}
 
 	// The footer button, whether it inserts from the library or attaches to

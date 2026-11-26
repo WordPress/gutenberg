@@ -62,11 +62,11 @@
 	&:not(:disabled, [aria-disabled="true"]) {
 		&:hover {
 			.block-editor-block-types-list__item-title {
-				color: var(--wpds-color-foreground-interactive-brand-active) !important;
+				color: var(--wpds-color-foreground-interactive-neutral-active) !important;
 			}
 
 			svg {
-				color: var(--wpds-color-foreground-interactive-brand-active) !important;
+				color: var(--wpds-color-foreground-interactive-neutral-active) !important;
 			}
 
 			&::after {
@@ -78,7 +78,7 @@
 				left: 0;
 				right: 0;
 				border-radius: $radius-small;
-				background: var(--wpds-color-background-interactive-brand-weak-active);
+				background: var(--wpds-color-background-interactive-neutral-weak-active);
 				// This fixes drag-and-drop in Firefox.
 				pointer-events: none;
 			}

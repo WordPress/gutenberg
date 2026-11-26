@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/breakpoints" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
@@ -128,7 +127,7 @@ html.interface-interface-skeleton__html-container {
 	overflow: hidden;
 
 	@include break-medium() {
-		box-shadow: -$border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: -$border-width 0 0 0 var(--wpds-color-stroke-surface-neutral);
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
@@ -138,7 +137,7 @@ html.interface-interface-skeleton__html-container {
 	right: 0;
 
 	@include break-medium() {
-		box-shadow: $border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: $border-width 0 0 0 var(--wpds-color-stroke-surface-neutral);
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
@@ -146,22 +145,22 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+	box-shadow: 0 $border-width 0 0 var(--wpds-color-stroke-surface-neutral);
 	z-index: z-index(".interface-interface-skeleton__header");
-	color: $gray-900;
+	color: var(--wpds-color-foreground-content-neutral);
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 }
 
 .interface-interface-skeleton__footer {
 	height: auto; // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $gray-200;
-	color: $gray-900;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	z-index: z-index(".interface-interface-skeleton__footer");
 
 	// On Mobile the footer is hidden
@@ -178,8 +177,8 @@ html.interface-interface-skeleton__html-container {
 	bottom: auto;
 	left: auto;
 	right: 0;
-	color: $gray-900;
-	background: $white;
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 	width: 100vw;
 
 	@include break-medium() {
@@ -195,7 +194,7 @@ html.interface-interface-skeleton__html-container {
 			top: $admin-bar-height-big;
 
 			@include break-medium() {
-				border-left: $border-width solid $gray-300;
+				border-left: $border-width solid var(--wpds-color-stroke-surface-neutral);
 				top: $admin-bar-height;
 
 				.is-fullscreen-mode & {
