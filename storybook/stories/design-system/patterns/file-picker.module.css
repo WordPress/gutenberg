@@ -1,12 +1,4 @@
 /*
- * Let the fieldset shrink to its container, so long filenames truncate.
- * Remove this once `Fieldset.Root` resets it (#87300).
- */
-.field {
-	min-inline-size: 0;
-}
-
-/*
  * The drop area and the selected-file rows share one surface, so a field
  * keeps its size and shape when a file is chosen. Each holds one line, so it
  * is the same height as an input.

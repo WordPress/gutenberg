@@ -72,7 +72,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 			// The drop target covers the whole field, so the overlay has room for
 			// its icon and label, and a file dropped on the legend or description
 			// doesn't open in the browser tab.
-			className={ `${ styles.field } ${ styles[ 'drop-target' ] }` }
+			className={ styles[ 'drop-target' ] }
 			disabled={ disabled }
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }

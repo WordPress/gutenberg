@@ -46,7 +46,7 @@ export function FilePickerMenu() {
 	}
 
 	return (
-		<Fieldset.Root className={ styles.field }>
+		<Fieldset.Root>
 			<Fieldset.Legend>Featured image</Fieldset.Legend>
 			{ /*
 			 * Wrap the whole menu, not the item: the item unmounts when the
