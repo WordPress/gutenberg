@@ -20,7 +20,6 @@ type Upload = {
 	file: File;
 	status: 'uploading' | 'uploaded' | 'failed';
 	progress: number;
-	attempt: number;
 };
 
 /**
@@ -75,10 +74,8 @@ export function FilePickerUpload() {
 		timers.current.delete( id );
 	}
 
-	function start( id: string, file: File, attempt: number ) {
+	function start( id: string, file: File, fails: boolean ) {
 		let progress = 0;
-		const fails =
-			attempt === 1 && getExtension( file.name ).toLowerCase() === '.pdf';
 		const timer = window.setInterval( () => {
 			progress += 20;
 			if ( fails && progress >= 60 ) {
@@ -116,10 +113,16 @@ export function FilePickerUpload() {
 			file,
 			status: 'uploading' as const,
 			progress: 0,
-			attempt: 1,
 		} ) );
 		setUploads( ( current ) => [ ...current, ...added ] );
-		added.forEach( ( { id, file } ) => start( id, file, 1 ) );
+		// The first try for a PDF fails, so "Retry" can be tried.
+		added.forEach( ( { id, file } ) =>
+			start(
+				id,
+				file,
+				getExtension( file.name ).toLowerCase() === '.pdf'
+			)
+		);
 		if ( added.length ) {
 			announce(
 				added.length === 1
@@ -133,9 +136,8 @@ export function FilePickerUpload() {
 		update( upload.id, {
 			status: 'uploading',
 			progress: 0,
-			attempt: upload.attempt + 1,
 		} );
-		start( upload.id, upload.file, upload.attempt + 1 );
+		start( upload.id, upload.file, false );
 		// The "Retry" button is about to go, so move focus to the row's
 		// remove button, which now cancels the upload. Its new name may not
 		// be read while it has focus, so say what happens.
@@ -183,10 +185,10 @@ export function FilePickerUpload() {
 				{ uploads.length > 0 && (
 					<Stack
 						render={ <ul /> }
-						direction="column"
-						gap="sm"
 						// Safari drops the list role when the markers are hidden.
 						role="list"
+						direction="column"
+						gap="sm"
 						className={ styles.list }
 					>
 						{ uploads.map( ( upload ) => (
