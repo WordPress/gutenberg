@@ -25,6 +25,10 @@
 -   `Tabs`: Show an outline only on the keyboard-focused tab in forced colors mode, not on a hovered tab ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `Notice.List`: Keep words apart across line breaks and block elements, such as paragraphs and list items, when announcing a notice's title and description ([#87350](https://github.com/WordPress/gutenberg/pull/87350)).
 
+### Documentation
+
+-   `CollapsibleCard.Header`: Recommend `role="heading"` and `aria-level` to expose the header as a heading, instead of rendering it as a native `<h1>`–`<h6>` element, which can't contain the `<div>` trigger ([#87460](https://github.com/WordPress/gutenberg/pull/87460)).
+
 ### Internal
 
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
@@ -32,6 +36,10 @@
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+### Bug Fixes
+
+-   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver in Chrome on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed ([#87115](https://github.com/WordPress/gutenberg/pull/87115)).
 
 ## 0.27.0 (2026-11-18)
 
