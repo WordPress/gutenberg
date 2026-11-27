@@ -36,7 +36,7 @@ export default function RootSinglePage() {
 	const isFullScreen = canvas && ! canvas.isPreview;
 
 	useRouteTitle();
-	useAdminMenuSync();
+	useAdminMenuSync( isFullScreen ? canvas.postType : undefined );
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 

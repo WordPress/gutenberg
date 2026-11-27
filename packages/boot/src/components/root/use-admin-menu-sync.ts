@@ -1,6 +1,8 @@
+import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { findClosestMenuItem } from '../navigation/path-matching';
+import { store as bootStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useRouter } = unlock( routePrivateApis );
@@ -56,10 +58,25 @@ function getPageLinks( menu: HTMLElement, currentUrl: URL ) {
  * Clicks on admin menu links that point at the current page are handled by
  * the router instead of reloading the page, and the `current` menu item is
  * updated when the route changes.
+ *
+ * When an entity is open in the editor, the highlight uses the route that
+ * lists its post type. Edit routes like `/types/wp_template/edit/…` don't
+ * start with the list route (`/templates`), so matching on the URL alone
+ * would only highlight Editor.
+ *
+ * @param editedPostType Post type of the entity open in the editor, if any.
  */
-export default function useAdminMenuSync() {
+export default function useAdminMenuSync( editedPostType?: string ) {
 	const router = useRouter();
 	const { pathname } = useLocation();
+	const listPath = useSelect(
+		( select ) =>
+			editedPostType
+				? select( bootStore ).getEntityLink( editedPostType )
+				: undefined,
+		[ editedPostType ]
+	);
+	const menuPath = listPath ?? pathname;
 
 	useEffect( () => {
 		const menu = document.getElementById( 'adminmenu' );
@@ -108,7 +125,7 @@ export default function useAdminMenuSync() {
 
 		const links = getPageLinks( menu, new URL( window.location.href ) );
 		const match = findClosestMenuItem(
-			pathname,
+			menuPath,
 			links.map( ( { to }, index ) => ( {
 				id: String( index ),
 				label: '',
@@ -127,5 +144,5 @@ export default function useAdminMenuSync() {
 				link.removeAttribute( 'aria-current' );
 			}
 		} );
-	}, [ pathname ] );
+	}, [ menuPath ] );
 }
