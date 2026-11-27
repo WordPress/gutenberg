@@ -122,12 +122,14 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
  * we want the descendant style to take priority, and this is done by loading it after, in DOM order.
  *
  * @since 6.6.0 Element block support class and styles are generated via the `render_block_data` filter instead of `pre_render_block`
+ * @since 7.3.0 Added the `$source_block` parameter.
  *
- * @param array $parsed_block The parsed block.
+ * @param array      $parsed_block The parsed block.
+ * @param array|null $source_block Optional. The block before any `render_block_data` filter changed it. Default null.
  *
  * @return array The same parsed block with elements classname added if appropriate.
  */
-function gutenberg_render_elements_support_styles( $parsed_block ) {
+function gutenberg_render_elements_support_styles( $parsed_block, $source_block = null ) {
 	/*
 	 * The generation of element styles and classname were moved to the
 	 * `render_block_data` filter in 6.6.0 to avoid filtered attributes
@@ -178,8 +180,15 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// @phpstan-ignore arguments.count (WordPress 7.0 requires the block, which 7.1 no longer takes and ignores.)
-	$class_name         = wp_get_elements_class_name( $parsed_block );
+	/*
+	 * Count copies of the same block, not all blocks, so each instance keeps a
+	 * unique class that doesn't change when other blocks render before it, as
+	 * with client-side navigation. Hash the unfiltered block, so classes other
+	 * filters add here don't change it.
+	 */
+	$class_name         = wp_unique_prefixed_id(
+		wp_unique_id_from_values( $source_block ?? $parsed_block, 'wp-elements-' ) . '-'
+	);
 	$updated_class_name = isset( $parsed_block['attrs']['className'] ) ? $parsed_block['attrs']['className'] . " $class_name" : $class_name;
 
 	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
@@ -310,4 +319,4 @@ remove_filter( 'render_block', 'wp_render_elements_class_name', 10 );
 remove_filter( 'render_block_data', 'wp_render_elements_support_styles', 10 );
 
 add_filter( 'render_block', 'gutenberg_render_elements_class_name', 10, 2 );
-add_filter( 'render_block_data', 'gutenberg_render_elements_support_styles', 10, 1 );
+add_filter( 'render_block_data', 'gutenberg_render_elements_support_styles', 10, 2 );

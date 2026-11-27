@@ -764,7 +764,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertMatchesRegularExpression(
-			'/:root :where\(p\.is-style-clip-text-color--[0-9a-f]{8}\)\{color: #00aa00;-webkit-text-fill-color: currentColor;\}/',
+			'/:root :where\(p\.is-style-clip-text-color--[0-9a-f]{8}-\d+\)\{color: #00aa00;-webkit-text-fill-color: currentColor;\}/',
 			$actual
 		);
 	}
@@ -804,7 +804,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertMatchesRegularExpression(
-			'/:root :where\(\.is-style-clip-section--[0-9a-f]{8} p\)\{color: #aa00aa;-webkit-text-fill-color: currentColor;\}/',
+			'/:root :where\(\.is-style-clip-section--[0-9a-f]{8}-\d+ p\)\{color: #aa00aa;-webkit-text-fill-color: currentColor;\}/',
 			$actual
 		);
 	}
@@ -841,7 +841,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertMatchesRegularExpression(
-			'/@media \(width <= 480px\)\{:root :where\(p\.is-style-clip-mobile--[0-9a-f]{8}\)\{color: #0000aa;-webkit-text-fill-color: currentColor;\}\}/',
+			'/@media \(width <= 480px\)\{:root :where\(p\.is-style-clip-mobile--[0-9a-f]{8}-\d+\)\{color: #0000aa;-webkit-text-fill-color: currentColor;\}\}/',
 			$actual
 		);
 	}
@@ -879,7 +879,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		}
 
 		$this->assertMatchesRegularExpression(
-			'/:root :where\(\.wp-block-button\.is-style-clip-hover--[0-9a-f]{8} \.wp-block-button__link:hover\)\{color: #aa0000;-webkit-text-fill-color: currentColor;\}/',
+			'/:root :where\(\.wp-block-button\.is-style-clip-hover--[0-9a-f]{8}-\d+ \.wp-block-button__link:hover\)\{color: #aa0000;-webkit-text-fill-color: currentColor;\}/',
 			$actual
 		);
 	}
@@ -919,6 +919,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			unregister_block_style( 'core/paragraph', 'no-clip' );
 		}
 
-		$this->assertMatchesRegularExpression( '/:root :where\(p\.is-style-no-clip--[0-9a-f]{8}\)\{color: #00aa00;\}/', $actual );
+		$this->assertMatchesRegularExpression( '/:root :where\(p\.is-style-no-clip--[0-9a-f]{8}-\d+\)\{color: #00aa00;\}/', $actual );
 	}
 }

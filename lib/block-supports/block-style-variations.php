@@ -88,12 +88,14 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
  * different filter.
  *
  * @since 6.6.0
+ * @since 7.3.0 Added the `$source_block` parameter.
  *
- * @param array $parsed_block The parsed block.
+ * @param array      $parsed_block The parsed block.
+ * @param array|null $source_block Optional. The block before any `render_block_data` filter changed it. Default null.
  *
  * @return array The parsed block with block style variation classname added.
  */
-function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
+function gutenberg_render_block_style_variation_support_styles( $parsed_block, $source_block = null ) {
 	$classes    = $parsed_block['attrs']['className'] ?? null;
 	$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
 
@@ -123,11 +125,14 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
 
 	/*
-	 * Hash the block instead of using a per-request counter, so the class name
-	 * doesn't change with the number of blocks rendered before it. Client-side
-	 * navigation keeps blocks outside the router region, with their old classes.
+	 * Count copies of the same block, not all blocks, so each instance keeps a
+	 * unique class that doesn't change when other blocks render before it, as
+	 * with client-side navigation. Hash the unfiltered block, because other
+	 * supports add counter-based classes in this filter.
 	 */
-	$variation_instance = wp_unique_id_from_values( $parsed_block, $variation . '--' );
+	$variation_instance = wp_unique_prefixed_id(
+		wp_unique_id_from_values( $source_block ?? $parsed_block, $variation . '--' ) . '-'
+	);
 	$class_name         = "is-style-$variation_instance";
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
@@ -249,9 +254,9 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 
 	/*
 	 * Matches a class prefixed by `is-style`, followed by the
-	 * variation slug, then `--`, and finally a hash.
+	 * variation slug, then `--`, a hash, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--[0-9a-f]{8})\b/', $block_class_name, $matches );
+	preg_match( '/\bis-style-(\S+?--[0-9a-f]{8}-\d+)\b/', $block_class_name, $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;
@@ -295,7 +300,7 @@ if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
 }
 
 // Add Gutenberg filters and action.
-add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles' );
+add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 
