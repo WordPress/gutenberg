@@ -36,6 +36,30 @@ describe( 'useBlockVisibility', () => {
 		vi.clearAllMocks();
 	} );
 
+	it( 'queries saved ranges in the canvas and keeps the legacy viewport classification', () => {
+		const query = '(782px < width <= 1024px), (width <= 480px)';
+		vi.mocked( useMediaQuery ).mockImplementation(
+			( value ) => value === query
+		);
+		const { result } = renderHook( () =>
+			useBlockVisibility( {
+				blockVisibility: {
+					viewportRanges: {
+						version: 1,
+						hidden: [
+							{ id: 'desktop', min: 782, max: 1024 },
+							{ id: 'mobile', min: null, max: 480 },
+						],
+					},
+				},
+				view: window,
+			} )
+		);
+		expect( useMediaQuery ).toHaveBeenCalledWith( query, window );
+		expect( result.current.isBlockCurrentlyHidden ).toBe( true );
+		expect( result.current.currentViewport ).toBe( 'desktop' );
+	} );
+
 	describe( 'Device type overrides', () => {
 		it( 'should return true when deviceType is Mobile and block is hidden on mobile', () => {
 			setupViewport( { isMobileViewport: false } );

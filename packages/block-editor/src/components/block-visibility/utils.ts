@@ -11,6 +11,12 @@ import type {
 	ViewportBreakpoints,
 } from './use-block-visibility';
 import type { BlockWithVisibility } from './types';
+import {
+	formatSavedViewportRange,
+	getConfiguredViewportRanges,
+	getSavedViewportRanges,
+	viewportRangeKey,
+} from './ranges';
 
 type ViewportVisibility = Exclude< BlockVisibility, boolean >;
 
@@ -63,8 +69,7 @@ function isBlockHiddenForViewport(
 	}
 
 	// Get viewport configuration from nested structure.
-	// As before, `null` passes the check above and throws here.
-	const viewportConfig = blockVisibility!.viewport;
+	const viewportConfig = blockVisibility?.viewport;
 
 	// If no viewport config, block is not hidden for any specific viewport.
 	if ( ! viewportConfig || 'object' !== typeof viewportConfig ) {
@@ -165,27 +170,36 @@ export function getBlockVisibilityLabel(
 		return __( 'Block is hidden' );
 	}
 
-	// `true` has no viewports, so it reads as unset here.
-	if ( ( blockVisibility as ViewportVisibility )?.viewport ) {
-		// Hidden on specific viewports - list them
-		const hiddenViewports = getBlockVisibilityViewportEntries(
-			viewportSettings
+	const hiddenViewports: string[] = getBlockVisibilityViewportEntries(
+		viewportSettings
+	)
+		.filter(
+			( [ , { key } ] ) =>
+				( blockVisibility as ViewportVisibility ).viewport?.[ key ] ===
+				false
 		)
-			.filter(
-				( [ key ] ) =>
-					( blockVisibility as ViewportVisibility ).viewport?.[
-						key as BlockVisibilityViewport
-					] === false
-			)
-			.map( ( [ , viewport ] ) => viewport.label );
-
-		if ( hiddenViewports.length > 0 ) {
-			return sprintf(
-				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				hiddenViewports.join( ', ' )
+		.map( ( [ , viewport ] ) => viewport.label );
+	const ranges = getSavedViewportRanges( blockVisibility );
+	if ( ranges.length ) {
+		const labels = new Map(
+			getConfiguredViewportRanges( viewportSettings ).map( ( range ) => [
+				viewportRangeKey( range ),
+				range.label,
+			] )
+		);
+		for ( const range of ranges ) {
+			hiddenViewports.push(
+				labels.get( viewportRangeKey( range ) ) ??
+					formatSavedViewportRange( range )
 			);
 		}
+	}
+	if ( hiddenViewports.length ) {
+		return sprintf(
+			/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+			__( 'Block is hidden on %s' ),
+			hiddenViewports.join( ', ' )
+		);
 	}
 
 	return null;

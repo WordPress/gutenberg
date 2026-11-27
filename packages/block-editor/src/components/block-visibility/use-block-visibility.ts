@@ -1,25 +1,20 @@
 import { useMediaQuery } from '@wordpress/compose';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { BlockVisibilityViewport } from './constants';
+import { getSavedViewportRanges, getViewportRangeMediaQuery } from './ranges';
+import type {
+	BlockVisibility,
+	ViewportRange,
+	ViewportSettings,
+} from './ranges';
 import { unlock } from '../../lock-unlock';
 
 /**
  * Viewport breakpoints keyed by viewport. Desktop has no breakpoint: it
  * applies above the largest configured one.
  */
-export type ViewportBreakpoints = Partial<
-	Record< 'mobile' | 'tablet', string >
->;
-
-/**
- * Block visibility metadata: `false` hides the block on all viewports,
- * per-viewport `false` flags hide it on specific viewports.
- */
-export type BlockVisibility =
-	| boolean
-	| {
-			viewport?: Partial< Record< BlockVisibilityViewport, boolean > >;
-	  };
+export type ViewportBreakpoints = ViewportSettings;
+export type { BlockVisibility } from './ranges';
 
 const { getViewportBreakpoints } = unlock< {
 	getViewportBreakpoints: (
@@ -99,6 +94,15 @@ export function isBlockHidden(
 	);
 }
 
+export function useViewportRangeVisibility(
+	ranges: ViewportRange[],
+	view?: Window
+): boolean {
+	const query = ranges.map( getViewportRangeMediaQuery ).join( ', ' );
+	const matches = useMediaQuery( query || undefined, view );
+	return !! query && matches;
+}
+
 /**
  * Returns information about the current block visibility state.
  *
@@ -114,14 +118,19 @@ export default function useBlockVisibility( {
 	...options
 }: UseBlockVisibilityOptions = {} ): {
 	isBlockCurrentlyHidden: boolean;
+	isHiddenByRange: boolean;
 	currentViewport: BlockVisibilityViewport;
 } {
 	const currentViewport = useCurrentViewport( options );
+	const isHiddenByRange = useViewportRangeVisibility(
+		getSavedViewportRanges( blockVisibility ),
+		options.view
+	);
 	return {
-		isBlockCurrentlyHidden: isBlockHidden(
-			blockVisibility,
-			currentViewport
-		),
+		isBlockCurrentlyHidden:
+			isHiddenByRange ||
+			isBlockHidden( blockVisibility, currentViewport ),
+		isHiddenByRange,
 		currentViewport,
 	};
 }

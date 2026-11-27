@@ -18,25 +18,22 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { FormEvent } from 'react';
-import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import {
-	getBlockVisibilityViewportEntries,
+	applyVisibilityChanges,
+	getVisibilityOptions,
+	getVisibilityOptionState,
+} from './visibility-options';
+import {
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from './utils';
 import type { TreeBlock } from '../../store/types';
 import type { BlockVisibilityModalProps } from './types';
-import type { ViewportBreakpoints } from './use-block-visibility';
+import type { ViewportSettings } from './ranges';
 
 type CheckboxStates = Record< string, boolean | null >;
-
-const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
-	[ BLOCK_VISIBILITY_VIEWPORTS.mobile.key ]: false,
-	[ BLOCK_VISIBILITY_VIEWPORTS.tablet.key ]: false,
-	[ BLOCK_VISIBILITY_VIEWPORTS.desktop.key ]: false,
-};
 
 const EMPTY_BLOCKS: TreeBlock[] = [];
 
@@ -77,40 +74,36 @@ export default function BlockVisibilityModal( {
 		( select ) =>
 			// The `viewport` setting holds the breakpoints.
 			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.viewport as ViewportBreakpoints | undefined,
+				?.viewport as ViewportSettings | undefined,
 		[]
 	);
-	const viewportEntries = useMemo(
-		() => getBlockVisibilityViewportEntries( viewportSettings ),
-		[ viewportSettings ]
-	);
-
-	const initialViewportValues = useMemo( () => {
-		if ( blocks?.length === 0 ) {
-			return {
-				hideEverywhere: false,
-				// No viewport is checked.
-				viewportChecked: {} as CheckboxStates,
-			};
+	const { options, currentViewportValues } = useMemo( () => {
+		const values = blocks.map(
+			( block ) => block.attributes?.metadata?.blockVisibility
+		);
+		const blockOptions = getVisibilityOptions( viewportSettings, values );
+		const viewportChecked: CheckboxStates = {};
+		for ( const option of blockOptions ) {
+			viewportChecked[ option.key ] = option.legacy
+				? getViewportCheckboxState( blocks, option.legacy )
+				: getVisibilityOptionState( values, option );
 		}
-
-		const viewportValues: CheckboxStates = {};
-
-		viewportEntries.forEach( ( [ , { key } ] ) => {
-			viewportValues[ key ] = getViewportCheckboxState( blocks, key );
-		} );
-
 		return {
-			hideEverywhere: getHideEverywhereCheckboxState( blocks ),
-			viewportChecked: viewportValues,
+			options: blockOptions,
+			currentViewportValues: {
+				hideEverywhere: getHideEverywhereCheckboxState( blocks ),
+				viewportChecked,
+			},
 		};
-	}, [ blocks, viewportEntries ] );
+	}, [ blocks, viewportSettings ] );
 
+	// Compare against what the dialog opened with, and apply changes to the latest block attributes.
+	const [ initialViewportValues ] = useState( currentViewportValues );
 	const [ viewportChecked, setViewportChecked ] = useState(
-		initialViewportValues?.viewportChecked ?? {}
+		initialViewportValues.viewportChecked
 	);
 	const [ hideEverywhere, setHideEverywhere ] = useState(
-		initialViewportValues?.hideEverywhere ?? false
+		initialViewportValues.hideEverywhere
 	);
 
 	const handleViewportCheckboxChange = useCallback(
@@ -156,21 +149,23 @@ export default function BlockVisibilityModal( {
 		[ viewportChecked ]
 	);
 
-	const isDirty = useMemo( () => {
-		if ( hideEverywhere !== initialViewportValues.hideEverywhere ) {
-			return true;
+	const changedOptions = useMemo( () => {
+		const changes: Record< string, boolean > = {};
+		for ( const { key } of options ) {
+			const checked = viewportChecked[ key ];
+			if (
+				typeof checked === 'boolean' &&
+				checked !== initialViewportValues.viewportChecked[ key ]
+			) {
+				changes[ key ] = checked;
+			}
 		}
-		return viewportEntries.some(
-			( [ , { key } ] ) =>
-				viewportChecked[ key ] !==
-				initialViewportValues.viewportChecked[ key ]
-		);
-	}, [
-		hideEverywhere,
-		viewportChecked,
-		initialViewportValues,
-		viewportEntries,
-	] );
+		return changes;
+	}, [ options, viewportChecked, initialViewportValues ] );
+	const hideEverywhereChanged =
+		hideEverywhere !== initialViewportValues.hideEverywhere;
+	const isDirty =
+		hideEverywhereChanged || Object.keys( changedOptions ).length > 0;
 
 	const hasIndeterminateValues = useMemo( () => {
 		if ( hideEverywhere === null ) {
@@ -184,33 +179,31 @@ export default function BlockVisibilityModal( {
 	const handleSubmit = useCallback(
 		( event: FormEvent ) => {
 			event.preventDefault();
-			const newVisibility = hideEverywhere
-				? false
-				: {
-						viewport: viewportEntries.reduce(
-							( acc, [ , { key } ] ) => {
-								if ( viewportChecked[ key ] ) {
-									// Values are inverted to hide the block on the selected viewport.
-									// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
-									// so 'false' means hide the block on the selected viewport.
-									acc[ key ] = false;
-								}
-								return acc;
-							},
-							// The reducer fills the empty object.
-							{} as Record< string, boolean >
-						),
-					};
+			if ( ! isDirty ) {
+				return;
+			}
 			const attributesByClientId = Object.fromEntries(
-				blocks.map( ( { clientId, attributes } ) => [
-					clientId,
-					{
-						metadata: cleanEmptyObject( {
-							...attributes?.metadata,
-							blockVisibility: newVisibility,
-						} ),
-					},
-				] )
+				blocks.map( ( { clientId, attributes } ) => {
+					const previous = attributes?.metadata?.blockVisibility;
+					const blockVisibility =
+						hideEverywhere === true ||
+						( previous === false && ! hideEverywhereChanged )
+							? false
+							: applyVisibilityChanges(
+									previous,
+									options,
+									changedOptions
+								);
+					return [
+						clientId,
+						{
+							metadata: cleanEmptyObject( {
+								...attributes?.metadata,
+								blockVisibility,
+							} ),
+						},
+					];
+				} )
 			);
 			updateBlockAttributes( clientIds, attributesByClientId, {
 				uniqueByBlock: true,
@@ -229,11 +222,13 @@ export default function BlockVisibilityModal( {
 			clientIds,
 			createSuccessNotice,
 			hideEverywhere,
+			hideEverywhereChanged,
+			isDirty,
 			noticeMessage,
 			onClose,
 			updateBlockAttributes,
-			viewportEntries,
-			viewportChecked,
+			options,
+			changedOptions,
 		]
 	);
 
@@ -266,57 +261,45 @@ export default function BlockVisibilityModal( {
 								label={ __( 'Omit from published content' ) }
 								checked={ hideEverywhere === true }
 								indeterminate={ hideEverywhere === null }
-								onChange={ ( checked ) => {
-									setHideEverywhere( checked );
-									// Reset viewport checkboxes when hide everywhere is checked.
-									setViewportChecked(
-										DEFAULT_VIEWPORT_CHECKBOX_VALUES
-									);
-								} }
+								onChange={ setHideEverywhere }
 							/>
 							{ hideEverywhere !== true && (
 								<ul className="block-editor-block-visibility-modal__sub-options">
-									{ viewportEntries.map(
-										( [ , { label, icon, key } ] ) => (
-											<li
-												key={ key }
-												className="block-editor-block-visibility-modal__options-item"
-											>
-												<WCCheckboxControl
-													label={ sprintf(
-														// translators: %s: The viewport name.
-														__( 'Hide on %s' ),
-														label
-													) }
-													checked={
-														viewportChecked[
-															key
-														] ?? false
-													}
-													indeterminate={
-														viewportChecked[
-															key
-														] === null
-													}
-													onChange={ ( checked ) =>
-														handleViewportCheckboxChange(
-															key,
-															checked
-														)
-													}
-												/>
-												<WCIcon
-													icon={ icon }
-													className={ clsx( {
-														'block-editor-block-visibility-modal__options-icon--checked':
-															viewportChecked[
-																key
-															],
-													} ) }
-												/>
-											</li>
-										)
-									) }
+									{ options.map( ( { label, icon, key } ) => (
+										<li
+											key={ key }
+											className="block-editor-block-visibility-modal__options-item"
+										>
+											<WCCheckboxControl
+												label={ sprintf(
+													// translators: %s: The viewport name.
+													__( 'Hide on %s' ),
+													label
+												) }
+												checked={
+													viewportChecked[ key ] ??
+													false
+												}
+												indeterminate={
+													viewportChecked[ key ] ===
+													null
+												}
+												onChange={ ( checked ) =>
+													handleViewportCheckboxChange(
+														key,
+														checked
+													)
+												}
+											/>
+											<WCIcon
+												icon={ icon }
+												className={ clsx( {
+													'block-editor-block-visibility-modal__options-icon--checked':
+														viewportChecked[ key ],
+												} ) }
+											/>
+										</li>
+									) ) }
 								</ul>
 							) }
 						</li>

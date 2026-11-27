@@ -6,6 +6,40 @@
  */
 
 /**
+ * Builds a media query for one saved block visibility range.
+ *
+ * @param mixed $range Saved range with exclusive minimum and inclusive maximum pixel bounds.
+ * @return string|null Media query, or null for invalid data.
+ */
+function gutenberg_get_block_visibility_range_media_query( $range ) {
+	if ( ! is_array( $range ) || ! is_string( $range['id'] ?? null ) || ! preg_match( '/^[a-z][a-z0-9-]*$/D', $range['id'] ) || ! array_key_exists( 'min', $range ) || ! array_key_exists( 'max', $range ) ) {
+		return null;
+	}
+
+	$min = $range['min'];
+	$max = $range['max'];
+	foreach ( array( $min, $max ) as $bound ) {
+		if ( null !== $bound && ( ( ! is_int( $bound ) && ! is_float( $bound ) ) || ! is_finite( $bound ) || $bound <= 0 ) ) {
+			return null;
+		}
+	}
+	if ( null !== $min && null !== $max && $max <= $min ) {
+		return null;
+	}
+
+	if ( null === $min && null === $max ) {
+		return '@media (width >= 0px)';
+	}
+	if ( null === $min ) {
+		return sprintf( '@media (width <= %spx)', wp_json_encode( $max ) );
+	}
+	if ( null === $max ) {
+		return sprintf( '@media (width > %spx)', wp_json_encode( $min ) );
+	}
+	return sprintf( '@media (%spx < width <= %spx)', wp_json_encode( $min ), wp_json_encode( $max ) );
+}
+
+/**
  * Render nothing if the block is hidden, or add viewport visibility styles.
  *
  * @param string $block_content Rendered block content.
@@ -34,66 +68,46 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	}
 
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
-		// Get viewport configuration from nested structure.
-		$viewport_config = $block_visibility['viewport'] ?? null;
+		$visibility_queries = array();
+		$viewport_config    = $block_visibility['viewport'] ?? null;
 
-		// If no viewport config, return unchanged.
-		if ( ! is_array( $viewport_config ) || empty( $viewport_config ) ) {
-			return $block_content;
-		}
-
-		$viewport_settings      = gutenberg_get_global_settings( array( 'viewport' ) );
-		$viewport_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
-			$viewport_settings,
-			array(
-				'include_desktop' => true,
-			)
-		);
-
-		/*
-		 * Viewport media queries are keyed by style-state names (`@mobile`,
-		 * `@tablet`, and `@desktop`). Block visibility metadata and generated
-		 * classes use plain viewport names, so map the keys at this boundary.
-		 */
-		$block_visibility_media_queries = array();
-		foreach ( $viewport_media_queries as $viewport_state => $media_query ) {
-			$block_visibility_media_queries[ ltrim( $viewport_state, '@' ) ] = $media_query;
-		}
-		$viewport_media_queries = $block_visibility_media_queries;
-
-		$hidden_on = array();
-
-		// Collect which viewport the block is hidden on (only known viewport sizes).
-		foreach ( $viewport_config as $viewport_config_size => $is_visible ) {
-			if ( false === $is_visible && isset( $viewport_media_queries[ $viewport_config_size ] ) ) {
-				$hidden_on[] = $viewport_config_size;
+		if ( is_array( $viewport_config ) && $viewport_config ) {
+			$viewport_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				gutenberg_get_global_settings( array( 'viewport' ) ),
+				array( 'include_desktop' => true )
+			);
+			foreach ( $viewport_media_queries as $state => $media_query ) {
+				$viewport = ltrim( $state, '@' );
+				if ( false === ( $viewport_config[ $viewport ] ?? null ) ) {
+					$visibility_queries[ 'wp-block-hidden-' . $viewport ] = $media_query;
+				}
 			}
 		}
 
-		// If no viewport sizes have visibility set to false, return unchanged.
-		if ( empty( $hidden_on ) ) {
+		$saved_ranges = $block_visibility['viewportRanges'] ?? null;
+		if ( 1 === ( $saved_ranges['version'] ?? null ) && is_array( $saved_ranges['hidden'] ?? null ) ) {
+			foreach ( $saved_ranges['hidden'] as $range ) {
+				$media_query = gutenberg_get_block_visibility_range_media_query( $range );
+				if ( null !== $media_query ) {
+					// Two blocks can use the same range ID with different saved bounds.
+					$visibility_queries[ 'wp-block-hidden-range-' . md5( $media_query ) ] = $media_query;
+				}
+			}
+		}
+
+		if ( ! $visibility_queries ) {
 			return $block_content;
 		}
 
-		// Maintain consistent order of viewport sizes for class name generation.
-		sort( $hidden_on );
-
-		$css_rules   = array();
-		$class_names = array();
-
-		foreach ( $hidden_on as $hidden_viewport_size ) {
-			/*
-			 * If these values ever become user-defined,
-			 * they should be sanitized and kebab-cased.
-			 */
-			$visibility_class = 'wp-block-hidden-' . $hidden_viewport_size;
-			$class_names[]    = $visibility_class;
-			$css_rules[]      = array(
+		ksort( $visibility_queries );
+		$css_rules = array();
+		foreach ( $visibility_queries as $visibility_class => $media_query ) {
+			$css_rules[] = array(
 				'selector'     => '.' . $visibility_class,
 				'declarations' => array(
 					'display' => 'none !important',
 				),
-				'rules_group'  => $viewport_media_queries[ $hidden_viewport_size ],
+				'rules_group'  => $media_query,
 			);
 		}
 
@@ -108,7 +122,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		if ( ! empty( $block_content ) ) {
 			$processor = new WP_HTML_Tag_Processor( $block_content );
 			if ( $processor->next_tag() ) {
-				$processor->add_class( implode( ' ', $class_names ) );
+				$processor->add_class( implode( ' ', array_keys( $visibility_queries ) ) );
 
 				/*
 				 * Set all IMG tags to be `fetchpriority=auto` so that wp_get_loading_optimization_attributes() won't add

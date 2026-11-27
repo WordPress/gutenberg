@@ -2,6 +2,13 @@
 	"title": "Style variation name",
 	"description": "Style variation description",
 	"settings": {
+		"viewport": {
+			"ranges": [
+				{
+					"label": "Block visibility viewport label"
+				}
+			]
+		},
 		"typography": {
 			"fontSizes": [
 				{

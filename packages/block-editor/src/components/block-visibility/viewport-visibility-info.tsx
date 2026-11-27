@@ -4,7 +4,10 @@ import { unseen } from '@wordpress/icons';
 import { Notice } from '@wordpress/ui';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
-import useBlockVisibility from './use-block-visibility';
+import useBlockVisibility, {
+	useViewportRangeVisibility,
+} from './use-block-visibility';
+import { getSavedViewportRanges } from './ranges';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
@@ -69,12 +72,13 @@ export default function ViewportVisibilityInfo( {
 	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
 	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
 
-	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
-		blockVisibility: currentBlockVisibility,
-		deviceType: selectedDeviceType,
-		viewportSettings,
-		view: canvasView,
-	} );
+	const { isBlockCurrentlyHidden, isHiddenByRange, currentViewport } =
+		useBlockVisibility( {
+			blockVisibility: currentBlockVisibility,
+			deviceType: selectedDeviceType,
+			viewportSettings,
+			view: canvasView,
+		} );
 
 	/*
 	 * Selector to check if any parent (immediate or further up the chain) is hidden at current viewport.
@@ -91,11 +95,31 @@ export default function ViewportVisibilityInfo( {
 		},
 		[ clientId, currentViewport ]
 	);
+	const parentRanges = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockAttributes } =
+				select( blockEditorStore );
+			return clientId
+				? getBlockParents( clientId ).flatMap( ( parentId ) =>
+						getSavedViewportRanges(
+							getBlockAttributes( parentId )?.metadata
+								?.blockVisibility
+						)
+					)
+				: [];
+		},
+		[ clientId ]
+	);
+	const isParentHiddenByRange = useViewportRangeVisibility(
+		parentRanges,
+		canvasView
+	);
 
 	if ( ! (
 		isBlockCurrentlyHidden ||
 		hasParentHiddenEverywhere ||
-		isBlockParentHiddenAtViewport
+		isBlockParentHiddenAtViewport ||
+		isParentHiddenByRange
 	) ) {
 		return null;
 	}
@@ -106,6 +130,8 @@ export default function ViewportVisibilityInfo( {
 		// Block is currently hidden - check if hidden everywhere or at specific viewport
 		if ( currentBlockVisibility === false ) {
 			label = __( 'Hidden' );
+		} else if ( isHiddenByRange ) {
+			label = __( 'Hidden at this viewport width' );
 		} else {
 			const viewportLabel =
 				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
@@ -121,6 +147,8 @@ export default function ViewportVisibilityInfo( {
 	// Parent is hidden - check if hidden everywhere or at specific viewport
 	if ( hasParentHiddenEverywhere ) {
 		label = __( 'Parent hidden' );
+	} else if ( isParentHiddenByRange ) {
+		label = __( 'Parent hidden at this viewport width' );
 	} else if ( isBlockParentHiddenAtViewport ) {
 		const viewportLabel =
 			BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
