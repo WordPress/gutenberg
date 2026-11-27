@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
+-   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
 
 ### Bug Fixes
 
@@ -36,10 +37,6 @@
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
-
-### Enhancements
-
--   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
 
 ## 12.2.0 (2026-11-18)
 
