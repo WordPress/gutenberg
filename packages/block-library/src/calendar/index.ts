@@ -17,9 +17,4 @@ export const settings: BlockModule< CalendarAttributes >[ 'settings' ] = {
 	transforms,
 };
 
-export const init = () =>
-	initBlock( {
-		name,
-		metadata,
-		settings,
-	} );
+export const init = () => initBlock( { name, metadata, settings } );
