@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
+import { additionalEntityConfigLoaders } from '../entities';
 import { store as coreDataStore } from '../index';
 import type * as ET from '../entity-types';
 import { unlock } from '../lock-unlock';
@@ -124,6 +125,84 @@ describe( 'getEntityRecord', () => {
 			title: post.title,
 		} );
 		expect( triggerFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not wait for the site entity config to resolve other root entities', async () => {
+		const widget = { name: 'core/stats' };
+		apiFetchMock.mockImplementation( ( { path } ) =>
+			path.startsWith( '/wp/v2/settings' )
+				? new Promise( () => {} )
+				: Promise.resolve( {
+						async json() {
+							return widget;
+						},
+					} )
+		);
+
+		const { getEntityConfig, getEntityRecord } =
+			registry.resolveSelect( coreDataStore );
+		await expect(
+			getEntityConfig( 'root', 'widgetModule' )
+		).resolves.toBeUndefined();
+
+		registry.dispatch( coreDataStore ).addEntities( [
+			{
+				kind: 'root',
+				name: 'widgetModule',
+				key: 'name',
+				baseURL: '/wp/v2/widget-modules',
+			},
+		] );
+
+		await expect(
+			getEntityRecord( 'root', 'widgetModule', 'core/stats' )
+		).resolves.toEqual( widget );
+	} );
+} );
+
+describe( 'getEntityConfig', () => {
+	let registry: ReturnType< typeof createRegistry >;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		apiFetchMock.mockReset();
+	} );
+
+	it( 'loads the site entity config with the setting labels', async () => {
+		apiFetchMock.mockResolvedValue( {
+			schema: { properties: { title: { title: 'Title' } } },
+		} );
+
+		await expect(
+			registry
+				.resolveSelect( coreDataStore )
+				.getEntityConfig( 'root', 'site' )
+		).resolves.toMatchObject( { meta: { labels: { title: 'Title' } } } );
+	} );
+
+	it( 'loads each named loader of a kind', async () => {
+		const userConfig = { kind: 'root', name: 'testUser', baseURL: '/' };
+		const loader = {
+			kind: 'root',
+			name: 'testUser',
+			loadEntities: async () => [ userConfig ],
+		};
+		additionalEntityConfigLoaders.push( loader );
+		apiFetchMock.mockResolvedValue( {} );
+
+		try {
+			const { getEntityConfig } = registry.resolveSelect( coreDataStore );
+			await getEntityConfig( 'root', 'site' );
+
+			await expect(
+				getEntityConfig( 'root', 'testUser' )
+			).resolves.toEqual( userConfig );
+		} finally {
+			additionalEntityConfigLoaders.splice(
+				additionalEntityConfigLoaders.indexOf( loader ),
+				1
+			);
+		}
 	} );
 } );
 
