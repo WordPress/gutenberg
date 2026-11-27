@@ -9,7 +9,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
+import { Dialog } from '@wordpress/ui';
 import FormTokenField from '../';
+import Modal from '../../modal';
+
+globalThis.wpVitest.mockCSSSupports();
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -1162,6 +1166,63 @@ describe( 'FormTokenField', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( onChangeSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should close the suggestion list first, and then a parent Modal, when the Escape key is pressed', async () => {
+			const user = userEvent.setup();
+			const onRequestClose = vi.fn();
+
+			render(
+				<Modal title="Modal" onRequestClose={ onRequestClose }>
+					<FormTokenFieldWithState
+						suggestions={ [ 'Black', 'Ash', 'Onyx', 'Ebony' ] }
+					/>
+				</Modal>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ony' );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.keyboard( '[Escape]' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( onRequestClose ).not.toHaveBeenCalled();
+
+			await user.keyboard( '[Escape]' );
+			expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should close the suggestion list first, and then a parent `@wordpress/ui` Dialog, when the Escape key is pressed', async () => {
+			const user = userEvent.setup();
+			const onOpenChange = vi.fn();
+
+			render(
+				<Dialog.Root open onOpenChange={ onOpenChange }>
+					<Dialog.Popup>
+						<Dialog.Title>Dialog</Dialog.Title>
+						<FormTokenFieldWithState
+							suggestions={ [ 'Black', 'Ash', 'Onyx', 'Ebony' ] }
+						/>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			const input = await screen.findByRole( 'combobox' );
+
+			await user.type( input, 'ony' );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.keyboard( '[Escape]' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( onOpenChange ).not.toHaveBeenCalled();
+
+			await user.keyboard( '[Escape]' );
+			expect( onOpenChange ).toHaveBeenCalledTimes( 1 );
+			expect( onOpenChange ).toHaveBeenCalledWith(
+				false,
+				expect.anything()
+			);
 		} );
 
 		it( 'should hide the suggestion list on an empty input', async () => {

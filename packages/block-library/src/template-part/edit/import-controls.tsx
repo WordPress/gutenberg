@@ -1,4 +1,6 @@
+import type { FormEvent } from 'react';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -12,14 +14,26 @@ import { SelectControl } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
-import { transformWidgetToBlock } from './utils/transformers';
+import {
+	transformWidgetToBlock,
+	type WidgetEntity,
+} from './utils/transformers';
+import type { TemplatePartAttributes } from '../types';
 
 const SIDEBARS_QUERY = {
 	per_page: -1,
 	_fields: 'id,name,description,status,widgets',
 };
 
-export function TemplatePartImportControls( { area, setAttributes } ) {
+interface TemplatePartImportControlsProps {
+	area?: string;
+	setAttributes: BlockEditProps< TemplatePartAttributes >[ 'setAttributes' ];
+}
+
+export function TemplatePartImportControls( {
+	area,
+	setAttributes,
+}: TemplatePartImportControlsProps ) {
 	const [ selectedSidebar, setSelectedSidebar ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
 
@@ -75,7 +89,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		return null;
 	}
 
-	async function createFromWidgets( event ) {
+	async function createFromWidgets( event: FormEvent ) {
 		event.preventDefault();
 
 		if ( isBusy || ! selectedSidebar ) {
@@ -86,18 +100,18 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 
 		const sidebar = options.find(
 			( { value } ) => value === selectedSidebar
-		);
+		)!;
 		const { getWidgets } = registry.resolveSelect( coreStore );
 
 		// The widgets API always returns a successful response.
-		const widgets = await getWidgets( {
+		const widgets = ( await getWidgets( {
 			sidebar: sidebar.value,
 			_embed: 'about',
-		} );
+		} ) )!;
 
-		const skippedWidgets = new Set();
+		const skippedWidgets = new Set< string >();
 		const blocks = widgets.flatMap( ( widget ) => {
-			const block = transformWidgetToBlock( widget );
+			const block = transformWidgetToBlock( widget as WidgetEntity );
 
 			// Skip the block if we have no matching transformations.
 			if ( ! block ) {
