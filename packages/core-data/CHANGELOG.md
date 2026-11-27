@@ -11,11 +11,8 @@
 
 ### Internal
 
--   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
-
-### Internal
-
 -   Export 'getViewConfig' as a public selector on the core data store ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 9.2.0 (2026-11-18)
 
