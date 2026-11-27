@@ -309,6 +309,23 @@ describe( 'validateSkills', () => {
 		);
 	} );
 
+	test( 'validates the skills that packages ship', async () => {
+		const repositoryRoot = await createRepository( {
+			'.agents/skills/testing/SKILL.md': VALID_SOURCE,
+			'packages/ui/skills/testing/SKILL.md': VALID_SOURCE,
+			'packages/ui/skills/renamed/SKILL.md': VALID_SOURCE,
+			'packages/theme/README.md': '',
+		} );
+
+		await expect( validateSkills( { repositoryRoot } ) ).resolves.toEqual( [
+			{
+				file: 'packages/ui/skills/renamed/SKILL.md',
+				line: 2,
+				message: expect.stringContaining( 'match the skill' ),
+			},
+		] );
+	} );
+
 	test( 'reports each problem with its file', async () => {
 		const repositoryRoot = await createRepository( {
 			'.agents/skills/testing/SKILL.md': VALID_SOURCE,

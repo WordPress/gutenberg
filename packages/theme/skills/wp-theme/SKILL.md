@@ -1,6 +1,7 @@
 ---
 name: wp-theme
 description: Use when styling an interface with WordPress Design System design tokens (`--wpds-*` CSS custom properties), replacing legacy color variables, or setting up `ThemeProvider` from `@wordpress/theme`.
+compatibility: "Use `@wordpress/theme` in a JavaScript or TypeScript project. Node.js 22.13 or later is needed to run its tools."
 ---
 
 # Style with `@wordpress/theme`

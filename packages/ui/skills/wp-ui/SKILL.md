@@ -1,6 +1,7 @@
 ---
 name: wp-ui
 description: Use when creating or changing an interface with the WordPress Design System components from `@wordpress/ui`, including choosing components, composing them, and styling them. For replacing `@wordpress/components`, use wp-ui-migration.
+compatibility: "Use `@wordpress/ui` in a JavaScript or TypeScript project. Node.js 22.13 or later is needed to run its tools."
 ---
 
 # Build interfaces with `@wordpress/ui`

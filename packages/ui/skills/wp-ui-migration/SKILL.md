@@ -1,6 +1,7 @@
 ---
 name: wp-ui-migration
 description: Use when replacing a `@wordpress/components` component with its `@wordpress/ui` counterpart in a plugin, theme, or application, or when deciding whether such a migration is worth doing.
+compatibility: "Use `@wordpress/ui` in a JavaScript or TypeScript project. Node.js 22.13 or later is needed to run its tools."
 ---
 
 # Migrate from `@wordpress/components` to `@wordpress/ui`

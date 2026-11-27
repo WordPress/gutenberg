@@ -3,7 +3,10 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { load } from 'js-yaml';
 
-const SKILLS_DIRECTORY = '.agents/skills';
+// The repository's own skill catalog, and the skills that packages ship.
+const CATALOG_DIRECTORY = '.agents/skills';
+const PACKAGES_DIRECTORY = 'packages';
+const PACKAGE_SKILLS_DIRECTORY = 'skills';
 const SKILL_FILE = 'SKILL.md';
 const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const NAME_MAX_LENGTH = 64;
@@ -225,15 +228,30 @@ export function validateSkill( { directoryName, source } ) {
 }
 
 /**
- * Validates every skill in the repository's skill catalog.
+ * Validates every skill in one directory of skills.
  *
- * @param {Object} options                Validation options.
- * @param {string} options.repositoryRoot Repository root directory.
+ * @param {Object}  options                 Validation options.
+ * @param {string}  options.repositoryRoot  Repository root directory.
+ * @param {string}  options.skillsDirectory Directory of skills, relative to the root.
+ * @param {boolean} options.optional        Whether the directory may not exist.
  * @return {Promise<Array<SkillError & {file: string}>>} The errors found, with the file each is in.
  */
-export async function validateSkills( { repositoryRoot } ) {
-	const skillsDirectory = path.join( repositoryRoot, SKILLS_DIRECTORY );
-	const entries = await readdir( skillsDirectory, { withFileTypes: true } );
+async function validateSkillsDirectory( {
+	repositoryRoot,
+	skillsDirectory,
+	optional = false,
+} ) {
+	let entries;
+	try {
+		entries = await readdir( path.join( repositoryRoot, skillsDirectory ), {
+			withFileTypes: true,
+		} );
+	} catch ( error ) {
+		if ( optional && error.code === 'ENOENT' ) {
+			return [];
+		}
+		throw error;
+	}
 	const errors = [];
 
 	for ( const entry of entries ) {
@@ -242,7 +260,7 @@ export async function validateSkills( { repositoryRoot } ) {
 		}
 
 		const relativeDirectory = path.posix.join(
-			SKILLS_DIRECTORY,
+			skillsDirectory,
 			entry.name
 		);
 
@@ -282,6 +300,52 @@ export async function validateSkills( { repositoryRoot } ) {
 		}
 	}
 
+	return errors;
+}
+
+/**
+ * Validates every skill in the repository: the `.agents/skills` catalog, and
+ * the skills that packages ship in `packages/<package>/skills`.
+ *
+ * @param {Object} options                Validation options.
+ * @param {string} options.repositoryRoot Repository root directory.
+ * @return {Promise<Array<SkillError & {file: string}>>} The errors found, with the file each is in.
+ */
+export async function validateSkills( { repositoryRoot } ) {
+	const packages = await readdir(
+		path.join( repositoryRoot, PACKAGES_DIRECTORY ),
+		{ withFileTypes: true }
+	).catch( ( error ) => {
+		if ( error.code === 'ENOENT' ) {
+			return [];
+		}
+		throw error;
+	} );
+
+	const errors = [
+		...( await validateSkillsDirectory( {
+			repositoryRoot,
+			skillsDirectory: CATALOG_DIRECTORY,
+		} ) ),
+	];
+
+	for ( const entry of packages ) {
+		if ( ! entry.isDirectory() ) {
+			continue;
+		}
+		errors.push(
+			...( await validateSkillsDirectory( {
+				repositoryRoot,
+				skillsDirectory: path.posix.join(
+					PACKAGES_DIRECTORY,
+					entry.name,
+					PACKAGE_SKILLS_DIRECTORY
+				),
+				optional: true,
+			} ) )
+		);
+	}
+
 	return errors.sort(
 		( a, b ) => a.file.localeCompare( b.file ) || a.line - b.line
 	);
@@ -300,13 +364,13 @@ async function runValidateSkills() {
 			console.error( `${ file }:${ line }: ${ message }` );
 		}
 		console.error(
-			`\nFound ${ errors.length } problem(s) in ${ SKILLS_DIRECTORY }.`
+			`\nFound ${ errors.length } problem(s) in the skill directories.`
 		);
 		process.exitCode = 1;
 		return;
 	}
 
-	console.log( `All skills in ${ SKILLS_DIRECTORY } are valid.` );
+	console.log( 'All skills are valid.' );
 }
 
 if (

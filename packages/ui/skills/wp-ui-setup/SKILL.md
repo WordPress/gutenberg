@@ -1,6 +1,7 @@
 ---
 name: wp-ui-setup
 description: "Use when setting up a project to use `@wordpress/ui` and to migrate from `@wordpress/components`: loading its setup styles, and configuring the ESLint rule that flags components that have a recommended replacement."
+compatibility: "Use `@wordpress/ui` in a JavaScript or TypeScript project. Node.js 22.13 or later is needed to run its tools."
 ---
 
 # Set up a project for `@wordpress/ui`
