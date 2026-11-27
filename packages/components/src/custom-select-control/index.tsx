@@ -1,6 +1,7 @@
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import CustomSelect from './custom-select';
 import CustomSelectItem from './item';
@@ -43,10 +44,19 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 /**
  * `CustomSelectControl` is a dropdown for selecting a single option from a
  * list, with support for custom styling.
+ *
+ * @deprecated Use `SelectControl` from `@wordpress/ui` instead.
  */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {
+	deprecated( 'wp.components.CustomSelectControl', {
+		since: '7.3',
+		version: '7.6',
+		alternative: 'SelectControl from @wordpress/ui',
+		link: 'https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide',
+	} );
+
 	const {
 		// Prevent passing legacy props to internal component.
 		__next40pxDefaultSize: _next40pxDefaultSize,

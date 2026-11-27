@@ -10,6 +10,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllMenus();
 	} );

@@ -273,9 +273,17 @@ _Returns_
 
 - `Element`: Element.
 
+### BlockStyle
+
+A block's `style` attribute, or a part of it.
+
 ### BlockStyles
 
 Undocumented declaration.
+
+### BlockStyleState
+
+The viewport and pseudo state whose styles a block's controls edit.
 
 ### BlockTitle
 
@@ -651,6 +659,18 @@ _Returns_
 
 - `Object`: The style object for the selected state, if found.
 
+### getTransformClassesAndStyles
+
+Provides the inline styles for a block's transform support attributes.
+
+_Parameters_
+
+- _attributes_ `StyleAttributes`: Block attributes.
+
+_Returns_
+
+- Transform block support derived inline styles.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support attributes.
@@ -815,6 +835,14 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
+
+### MediaUploadFunction
+
+A media upload function, flagged when it is the provider's interceptor.
+
+### MediaUploadOptions
+
+Parameters of the media upload function.
 
 ### MultiSelectScrollIntoView
 

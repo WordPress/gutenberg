@@ -630,3 +630,111 @@ describe( 'getCSSRules', () => {
 		] );
 	} );
 } );
+
+describe( 'rotate', () => {
+	it( 'should output the individual rotate property for a single angle', () => {
+		expect( compileCSS( { transform: { rotate: '-0.25turn' } } ) ).toEqual(
+			'rotate: -0.25turn;'
+		);
+	} );
+
+	it.each( [ '45', 'calc(10deg + 5deg)', 'var(--angle)', 'x 45deg' ] )(
+		'should output nothing for %s',
+		( rotate ) => {
+			expect( compileCSS( { transform: { rotate } } ) ).toEqual( '' );
+		}
+	);
+
+	it( 'should output nothing for a numeric rotation', () => {
+		// @ts-expect-error Test that a number is not a rotation.
+		expect( compileCSS( { transform: { rotate: 0 } } ) ).toEqual( '' );
+	} );
+} );
+
+describe( 'translate', () => {
+	it( 'should output a custom property per axis and the translate property', () => {
+		expect(
+			compileCSS( { transform: { translate: { x: '10px', y: '-50%' } } } )
+		).toEqual(
+			'--wp--style--translate-x: 10px; --wp--style--translate-y: -50%; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
+	} );
+
+	it( 'should leave a missing axis to other styles and ignore other keys', () => {
+		expect(
+			// @ts-expect-error Test that keys other than x and y are ignored.
+			compileCSS( { transform: { translate: { y: '2rem', z: '5px' } } } )
+		).toEqual(
+			'--wp--style--translate-y: 2rem; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
+	} );
+
+	it( 'should combine with a rotation', () => {
+		expect(
+			compileCSS( {
+				transform: { rotate: '15deg', translate: { x: '1em' } },
+			} )
+		).toEqual(
+			'rotate: 15deg; --wp--style--translate-x: 1em; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
+	} );
+
+	it.each( [
+		[ 'a string', '10px 20px' ],
+		[ 'a bare number', { x: '10' } ],
+		[ 'a number type', { x: 10 } ],
+		[ 'calc()', { x: '10px', y: 'calc(1px + 2px)' } ],
+		[ 'var()', { x: 'var(--offset)' } ],
+		[ 'a list', { x: '1px 2px' } ],
+		[ 'an angle', { x: '5deg' } ],
+		[ 'a z axis only', { z: '5px' } ],
+	] )( 'should output nothing for %s', ( _, translate ) => {
+		// @ts-expect-error Test that invalid offsets output nothing.
+		expect( compileCSS( { transform: { translate } } ) ).toEqual( '' );
+	} );
+} );
+
+describe( 'scale', () => {
+	it.each( [
+		[ 1.2, '1.2' ],
+		[ 0, '0' ],
+		[ '0.75', '0.75' ],
+		[ '.5', '.5' ],
+		[ '120%', '120%' ],
+	] )(
+		'should output the individual scale property for %s',
+		( scale, css ) => {
+			expect( compileCSS( { transform: { scale } } ) ).toEqual(
+				`scale: ${ css };`
+			);
+		}
+	);
+
+	it( 'should combine with a rotation and an offset', () => {
+		expect(
+			compileCSS( {
+				transform: {
+					rotate: '15deg',
+					translate: { x: '1em' },
+					scale: 1.5,
+				},
+			} )
+		).toEqual(
+			'rotate: 15deg; --wp--style--translate-x: 1em; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0); scale: 1.5;'
+		);
+	} );
+
+	it.each( [
+		[ 'a negative number', -1 ],
+		[ 'a negative string', '-0.5' ],
+		[ 'two values', '1.2 1.5' ],
+		[ 'calc()', 'calc(1 + 0.2)' ],
+		[ 'var()', 'var(--scale)' ],
+		[ 'a length', '2px' ],
+		[ 'an object', { x: 1.2 } ],
+		[ 'Infinity', Infinity ],
+	] )( 'should output nothing for %s', ( _, scale ) => {
+		// @ts-expect-error Test that invalid scales output nothing.
+		expect( compileCSS( { transform: { scale } } ) ).toEqual( '' );
+	} );
+} );

@@ -5,7 +5,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalText as WCText,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
@@ -121,7 +121,7 @@ export default function BlockBindingsAttributeControl( {
 		displayText =
 			// A found source has a name.
 			compatibleFields?.[ boundSourceName as string ]?.find( ( field ) =>
-				fastDeepEqual( field.args, args )
+				fastDeepEqual( field.args || { key: field.key }, args )
 			)?.label ||
 			source?.label ||
 			boundSourceName;
@@ -145,7 +145,7 @@ export default function BlockBindingsAttributeControl( {
 				<Menu.Trigger
 					disabled={ ! hasCompatibleFields }
 					// @ts-expect-error The trigger passes its children to the item.
-					render={ <Item /> }
+					render={ <WCItem /> }
 				>
 					<VStack
 						className="block-editor-bindings__item"

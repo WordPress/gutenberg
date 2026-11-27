@@ -27,7 +27,27 @@ export interface ImageEdit {
  * value are treated as no crop. Matches the historical threshold used by
  * the legacy `use-save-image.js` (which compared against `99.9` percent).
  */
-const CROP_TOLERANCE = 0.001;
+export const CROP_TOLERANCE = 0.001;
+
+/**
+ * How close a value must be to a whole number to be read as that number.
+ * Working the edit back out of the state leaves floating-point noise, such
+ * as a crop edge at 7e-8 instead of 0 or a width of 1439.9999999999998
+ * pixels. A millionth, of the image or of a pixel, is far below anything
+ * a person can set, so a value that close to a whole number is that number.
+ */
+const WHOLE_NUMBER_TOLERANCE = 1e-6;
+
+/**
+ * `value`, or the whole number it is within `WHOLE_NUMBER_TOLERANCE` of.
+ *
+ * @param value A fraction of the image, or a size in pixels.
+ * @return The value without floating-point noise next to a whole number.
+ */
+export function snapToWholeNumber( value: number ): number {
+	const whole = Math.round( value );
+	return Math.abs( value - whole ) < WHOLE_NUMBER_TOLERANCE ? whole : value;
+}
 
 /**
  * The person's edit, described against the image loaded in `state.image`.
@@ -74,7 +94,7 @@ export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
 	const edit: ImageEdit = {};
 	const { image } = state;
 
-	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
+	if ( ! image || ! ( image.naturalWidth > 0 && image.naturalHeight > 0 ) ) {
 		return null;
 	}
 
@@ -128,10 +148,10 @@ export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
 	const fullY = snapY + offsetY;
 
 	// Fractions of the full AABB — the crop frame after rotate.
-	const x = fullX / fullW;
-	const y = fullY / fullH;
-	const width = widthPx / fullW;
-	const height = heightPx / fullH;
+	const x = snapToWholeNumber( fullX / fullW );
+	const y = snapToWholeNumber( fullY / fullH );
+	const width = snapToWholeNumber( widthPx / fullW );
+	const height = snapToWholeNumber( heightPx / fullH );
 
 	const coversFullFrame =
 		x <= CROP_TOLERANCE &&

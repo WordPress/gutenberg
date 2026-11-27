@@ -5,9 +5,18 @@
 
 	@layer components {
 		.badge {
+			display: inline-block;
 			padding-inline: var(--wpds-dimension-padding-sm);
 			padding-block: var(--wpds-dimension-padding-xs);
 			border-radius: var(--wpds-border-radius-lg);
+		}
+
+		.label {
+			display: inline-block;
+			max-width: 100%;
+			overflow: inherit;
+			text-overflow: inherit;
+			vertical-align: top;
 		}
 
 		.infotip-trigger {
