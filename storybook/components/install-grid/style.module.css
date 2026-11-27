@@ -52,6 +52,7 @@
 	width: 32px;
 	height: 32px;
 	border-radius: 8px;
+	background: #6b7280;
 	color: #fff;
 	font-size: 12px;
 	font-weight: 700;
@@ -61,14 +62,14 @@
 	padding-top: 24px;
 }
 
-.root .steps {
+.root .panel ol {
 	margin: 16px 0 40px;
 	padding: 0;
 	list-style: none;
 	counter-reset: step;
 }
 
-.root .steps li {
+.root .panel ol li {
 	display: flex;
 	align-items: flex-start;
 	gap: 12px;
@@ -76,7 +77,7 @@
 	counter-increment: step;
 }
 
-.root .steps li::before {
+.root .panel ol li::before {
 	display: inline-flex;
 	flex: none;
 	align-items: center;
@@ -88,8 +89,8 @@
 	content: counter(step);
 }
 
-.root .steps code,
-.root .file code {
+.root .panel ol code,
+.root .panel p code {
 	padding: 1px 4px;
 }
 
@@ -97,8 +98,4 @@
 	width: 32px;
 	height: 32px;
 	object-fit: contain;
-}
-
-.root .file {
-	margin: 0 0 8px;
 }
