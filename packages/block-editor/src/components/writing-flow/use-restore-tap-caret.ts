@@ -14,12 +14,15 @@ export default function useRestoreTapCaret() {
 		// A mounted element's document has a window, with a selection.
 		const selection = ownerDocument.defaultView!.getSelection()!;
 		let caret: Range | undefined;
-		let field: Node | undefined;
+		let field: HTMLElement | undefined;
 
 		function onFocusIn( event: FocusEvent ) {
-			field = event.target as Node;
+			field = event.target as HTMLElement;
+			// Only a field that is its own editing host, not a block without
+			// text, which drops the caret on purpose.
 			caret =
 				event.relatedTarget === node &&
+				field.contentEditable === 'true' &&
 				selection.rangeCount &&
 				field.contains( selection.anchorNode )
 					? selection.getRangeAt( 0 ).cloneRange()
