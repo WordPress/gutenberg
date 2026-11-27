@@ -56,7 +56,7 @@ function render_block_core_latest_posts( $attributes ) {
 	);
 
 	$block_core_latest_posts_excerpt_length = $attributes['excerptLength'];
-	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
+	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', PHP_INT_MAX );
 
 	$categories = $attributes['categories'] ?? null;
 	if ( ! empty( $categories ) && is_array( $categories ) ) {
@@ -229,7 +229,7 @@ function render_block_core_latest_posts( $attributes ) {
 		setup_postdata( $previous_post );
 	}
 
-	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
+	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', PHP_INT_MAX );
 
 	$layout             = $attributes['layout'] ?? array();
 	$legacy_layout_type = (
