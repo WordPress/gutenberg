@@ -269,7 +269,9 @@ function gutenberg_block_bindings_prepare_bound_inner_blocks( $blocks ) {
  *
  * A block fails when the `allowedBlocks` of the bound block's type or
  * attributes leaves it out, or when its own `parent` or `ancestor` leaves out
- * the bound block. Inner blocks of the supplied blocks are not checked.
+ * the bound block. HTML outside any block counts as a Classic block
+ * (`core/freeform`), unless it is only whitespace. Inner blocks of the
+ * supplied blocks are not checked.
  *
  * @since 7.3.0
  *
@@ -283,15 +285,16 @@ function gutenberg_block_bindings_are_inner_blocks_allowed( $blocks, $block_inst
 		$block_instance->attributes['allowedBlocks'] ?? null,
 	);
 	foreach ( $blocks as $block ) {
-		if ( null === $block['blockName'] ) {
+		$block_name = $block['blockName'] ?? 'core/freeform';
+		if ( null === $block['blockName'] && '' === trim( $block['innerHTML'] ) ) {
 			continue;
 		}
 		foreach ( $allowed_lists as $allowed_blocks ) {
-			if ( is_array( $allowed_blocks ) && ! in_array( $block['blockName'], $allowed_blocks, true ) ) {
+			if ( is_array( $allowed_blocks ) && ! in_array( $block_name, $allowed_blocks, true ) ) {
 				return false;
 			}
 		}
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		if ( ! $block_type ) {
 			continue;
 		}

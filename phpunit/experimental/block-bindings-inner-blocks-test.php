@@ -623,6 +623,29 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Two', $output );
 	}
 
+	public function test_supplied_html_outside_blocks_keeps_own_inner_blocks_when_the_classic_block_is_not_allowed() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --><h2>Two</h2>';
+		$output      = do_blocks( '<!-- wp:group {"allowedBlocks":["core/paragraph"],"metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'One', $output );
+		$this->assertStringNotContainsString( 'Two', $output );
+	}
+
+	public function test_supplied_html_outside_blocks_renders_when_the_classic_block_is_allowed() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --><h2>Two</h2>';
+		$output      = do_blocks( '<!-- wp:group {"allowedBlocks":["core/paragraph","core/freeform"],"metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+		$this->assertStringContainsString( '>One</p>', $output );
+		$this->assertStringContainsString( '<h2>Two</h2>', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
+	public function test_supplied_html_outside_blocks_renders_when_the_bound_block_allows_any_block() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --><h2>Two</h2>';
+		$output      = $this->render_group();
+		$this->assertStringContainsString( '<h2>Two</h2>', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
 	public function test_supplied_block_missing_from_the_allowed_blocks_of_the_block_type_keeps_own_inner_blocks() {
 		register_block_type( 'test/host', array( 'allowed_blocks' => array( 'core/paragraph' ) ) );
 		$add_inner_blocks = static function ( $supported_attributes, $block_type ) {
