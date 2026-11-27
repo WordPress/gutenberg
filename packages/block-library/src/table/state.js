@@ -349,10 +349,13 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 							)
 						);
 
+						const isHeaderSection = sectionName === 'head';
+
 						return {
 							...inheritedAttributes,
 							content: '',
-							tag: sectionName === 'head' ? 'th' : 'td',
+							tag: isHeaderSection ? 'th' : 'td',
+							...( isHeaderSection && { scope: 'col' } ),
 						};
 					} )
 					.filter( ( _, index ) => ! coveredColumns.has( index ) ),
@@ -460,12 +463,15 @@ export function insertColumn( state, { columnIndex } ) {
 						return row;
 					}
 
+					const isHeaderSection = sectionName === 'head';
+
 					return {
 						cells: [
 							...row.cells.slice( 0, columnIndex ),
 							{
 								content: '',
-								tag: sectionName === 'head' ? 'th' : 'td',
+								tag: isHeaderSection ? 'th' : 'td',
+								...( isHeaderSection && { scope: 'col' } ),
 							},
 							...row.cells.slice( columnIndex ),
 						],
