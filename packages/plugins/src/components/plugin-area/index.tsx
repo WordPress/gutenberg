@@ -61,9 +61,6 @@ function PluginArea( {
 } ) {
 	const store = useMemo( () => {
 		let lastValue: WPPlugin[] = [];
-		// A namespace per scope: `removeAction` removes every callback
-		// registered under a namespace, so areas sharing one would unsubscribe
-		// each other when one of them unmounts.
 		const namespace = scope
 			? `core/plugins/plugin-area/${ scope }`
 			: 'core/plugins/plugin-area';
