@@ -3081,7 +3081,47 @@
 					]
 				},
 				"core/navigation-overlay-close": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"variations": {
+									"$ref": "#/definitions/stylesBlockVariationsWithPseudoProperties"
+								}
+							}
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements", "variations" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
@@ -3650,7 +3690,44 @@
 					]
 				},
 				"core/navigation-overlay-close": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"

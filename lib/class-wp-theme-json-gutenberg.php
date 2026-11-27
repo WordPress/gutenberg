@@ -672,11 +672,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * The valid pseudo-selectors that can be used for blocks.
 	 *
 	 * @since 7.0.0
+	 * @since 7.3.0 Added `core/navigation-overlay-close`.
 	 * @var array
 	 */
 	const VALID_BLOCK_PSEUDO_SELECTORS = array(
-		'core/button'          => array( ':hover', ':focus', ':focus-visible', ':active' ),
-		'core/navigation-link' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/button'                   => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/navigation-link'          => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		'core/navigation-overlay-close' => array( ':hover', ':focus', ':focus-visible', ':active' ),
 	);
 
 	/**

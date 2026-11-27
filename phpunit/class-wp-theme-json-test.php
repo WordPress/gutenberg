@@ -9947,6 +9947,40 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that pseudo selectors are processed for the Navigation Overlay
+	 * Close block.
+	 */
+	public function test_navigation_overlay_close_pseudo_selectors_are_processed() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation-overlay-close' => array(
+							'color'          => array(
+								'text' => 'black',
+							),
+							':hover'         => array(
+								'color' => array(
+									'background' => 'yellow',
+								),
+							),
+							':focus-visible' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-navigation-overlay-close){color: black;}:root :where(.wp-block-navigation-overlay-close:hover){background-color: yellow;}:root :where(.wp-block-navigation-overlay-close:focus-visible){color: red;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
 	 * Test that block pseudo selectors are processed correctly within variations.
 	 */
 	public function test_block_variation_pseudo_selectors_are_processed() {

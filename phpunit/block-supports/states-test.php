@@ -742,6 +742,35 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a Navigation Overlay Close block gets the styles of its hover
+	 * state.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_navigation_overlay_close_renders_hover_state_styles() {
+		$this->ensure_block_registered( 'core/navigation-overlay-close' );
+
+		$block = array(
+			'blockName' => 'core/navigation-overlay-close',
+			'attrs'     => array(
+				'style' => array(
+					':hover' => array(
+						'color' => array( 'background' => '#ff6900' ),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( '<button class="wp-block-navigation-overlay-close" type="button">Close</button>', $block );
+
+		$this->assertSame( 1, preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches ), 'The block should get a states class.' );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString( '.' . $matches[0] . ':hover{background-color:#ff6900 !important;', $actual_stylesheet );
+	}
+
+	/**
 	 * Tests that background-image reset is not added when the state also sets a legacy gradient.
 	 *
 	 * @covers ::gutenberg_get_state_declarations_with_background_resets
