@@ -18,17 +18,12 @@ export function InstallGrid( { children }: { children: ReactNode } ) {
 
 	return (
 		<div className={ styles.root }>
-			<div
-				className={ styles.tiles }
-				role="radiogroup"
-				aria-label="AI tool"
-			>
+			<div className={ styles.tiles } role="group" aria-label="AI tool">
 				{ tools.map( ( t, index ) => (
 					<button
 						key={ t.props.label }
 						type="button"
-						role="radio"
-						aria-checked={ t === tool }
+						aria-pressed={ t === tool }
 						className={ styles.tile }
 						onClick={ () => setSelected( index ) }
 					>

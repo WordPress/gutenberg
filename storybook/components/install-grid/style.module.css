@@ -35,7 +35,7 @@
 	background: #f0f0f1;
 }
 
-.tile[aria-checked="true"] {
+.tile[aria-pressed="true"] {
 	border-color: #3858e9;
 	background: #fff;
 }
