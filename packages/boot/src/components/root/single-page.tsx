@@ -3,6 +3,7 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
@@ -15,6 +16,7 @@ import EditorFullscreenMode, {
 	useIsEditorFullscreenMode,
 } from '../editor-fullscreen-mode';
 import { unlock } from '../../lock-unlock';
+import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
 import useAdminMenuSync from './use-admin-menu-sync';
@@ -38,6 +40,12 @@ export default function RootSinglePage() {
 		?.routeContentModule as string | undefined;
 	const isEditorCanvas = canvas && ! canvas.isPreview;
 	const isFullscreenMode = useIsEditorFullscreenMode();
+	// Other single-page screens, such as Fonts or Connectors, have their own
+	// save flows. Only pages that edit entities in the canvas get the button.
+	const showSaveButton = useSelect(
+		( select ) => select( bootStore ).hasEntityLinks(),
+		[]
+	);
 
 	useRouteTitle();
 	useAdminMenuSync( isEditorCanvas ? canvas.postType : undefined );
@@ -74,9 +82,11 @@ export default function RootSinglePage() {
 						>
 							<UnsavedChangesWarning />
 							<SavePanel />
-							<Page.HeaderActionsFill>
-								<SaveButton isFullWidth={ false } />
-							</Page.HeaderActionsFill>
+							{ showSaveButton && (
+								<Page.HeaderActionsFill>
+									<SaveButton isFullWidth={ false } />
+								</Page.HeaderActionsFill>
+							) }
 							<SnackbarNotices
 								className={ styles[ 'notices-snackbar' ] }
 							/>
