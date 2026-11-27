@@ -46,6 +46,14 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
+
+	/**
+	 * Set to true when the provider calls `flushLocalUpdates` before it applies
+	 * each remote update to the document. The sync manager then keeps local
+	 * updates off the typing hot path while no remote peer is present. Without
+	 * it, the sync manager applies every local update at once.
+	 */
+	supportsDeferredUpdates?: boolean;
 }
 
 /**
@@ -95,6 +103,15 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * Applies the local updates that the sync manager holds back while no
+	 * remote peer is present. A provider that calls this before it applies each
+	 * remote update to `ydoc` can set `supportsDeferredUpdates` on its result.
+	 * Otherwise a remote update that arrives first can be overwritten.
+	 * Older sync managers do not provide this callback.
+	 */
+	flushLocalUpdates?: () => void;
 
 	/**
 	 * The Yjs module used by the editor. Providers must use this instance

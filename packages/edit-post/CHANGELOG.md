@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 9.2.0 (2026-11-18)
+
+## 9.1.0 (2026-11-04)
+
 ### Enhancements
 
 -   Meta Boxes: Use the design system outline for the panel toggle's keyboard focus ring ([#85355](https://github.com/WordPress/gutenberg/pull/85355)).

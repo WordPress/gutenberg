@@ -117,6 +117,17 @@ export const WithNoExistingGradients: GradientPickerStory = {
 	},
 };
 
+/**
+ * Without presets or a Clear button, only the custom gradient editor is shown.
+ * This replaces the deprecated `CustomGradientPicker`.
+ */
+export const CustomGradientOnly: GradientPickerStory = {
+	render: Template,
+	args: {
+		clearable: false,
+	},
+};
+
 export const DuplicateGradients: GradientPickerStory = {
 	render: Template,
 	args: {

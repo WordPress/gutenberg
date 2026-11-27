@@ -9,7 +9,6 @@ import {
 import { withFilters } from '@wordpress/components';
 import {
 	SearchableChipSelectControl,
-	Spinner,
 	Stack,
 	VisuallyHidden,
 } from '@wordpress/ui';
@@ -95,7 +94,8 @@ export function FlatTermSelector( { slug } ) {
 	const pendingTermsRef = useRef( new Set() );
 	const registry = useRegistry();
 
-	const { editPost } = useDispatch( editorStore );
+	const { editPost, lockPostSaving, unlockPostSaving } =
+		useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
@@ -270,44 +270,51 @@ export function FlatTermSelector( { slug } ) {
 		pendingTermsRef.current.add( pendingTerm.value );
 		setValues( ( currentValues ) => [ ...currentValues, pendingTerm ] );
 
-		let savedTerm;
+		// Lock saving until the term is assigned, so the post isn't saved
+		// without it.
+		lockPostSaving( pendingTerm.value );
 		try {
-			savedTerm = await findOrCreateTerm( name );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-			// Nothing was assigned, so only the shown term has to go.
+			let savedTerm;
+			try {
+				savedTerm = await findOrCreateTerm( name );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				// Nothing was assigned, so only the shown term has to go.
+				pendingTermsRef.current.delete( pendingTerm.value );
+				setValues( ( currentValues ) =>
+					currentValues.filter(
+						( item ) => ! isSameTerm( item, pendingTerm )
+					)
+				);
+				return false;
+			}
+
+			// The term was removed while it was being created.
+			if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
+				return false;
+			}
+
 			pendingTermsRef.current.delete( pendingTerm.value );
 			setValues( ( currentValues ) =>
-				currentValues.filter(
-					( item ) => ! isSameTerm( item, pendingTerm )
-				)
+				currentValues
+					// An existing term can come back for a name that only differs
+					// by case or accent, and it may already be shown.
+					.filter(
+						( item ) =>
+							isSameTerm( item, pendingTerm ) ||
+							! isSameTerm( item, savedTerm )
+					)
+					.map( ( item ) =>
+						isSameTerm( item, pendingTerm ) ? savedTerm : item
+					)
 			);
-			return false;
+			assignTerm( itemToTermId( savedTerm ) );
+			return true;
+		} finally {
+			unlockPostSaving( pendingTerm.value );
 		}
-
-		// The term was removed while it was being created.
-		if ( ! pendingTermsRef.current.has( pendingTerm.value ) ) {
-			return false;
-		}
-
-		pendingTermsRef.current.delete( pendingTerm.value );
-		setValues( ( currentValues ) =>
-			currentValues
-				// An existing term can come back for a name that only differs
-				// by case or accent, and it may already be shown.
-				.filter(
-					( item ) =>
-						isSameTerm( item, pendingTerm ) ||
-						! isSameTerm( item, savedTerm )
-				)
-				.map( ( item ) =>
-					isSameTerm( item, pendingTerm ) ? savedTerm : item
-				)
-		);
-		assignTerm( itemToTermId( savedTerm ) );
-		return true;
 	}
 
 	async function createTerms( names ) {
@@ -447,10 +454,9 @@ export function FlatTermSelector( { slug } ) {
 				onInputValueChange={ onInputValueChange }
 				statusContent={
 					isSearching ? (
-						<Stack direction="row" gap="sm" align="center">
-							<Spinner />
+						<SearchableChipSelectControl.LoadingIndicator>
 							{ __( 'Searching…' ) }
-						</Stack>
+						</SearchableChipSelectControl.LoadingIndicator>
 					) : (
 						suggestions.length > 0 && (
 							<VisuallyHidden>

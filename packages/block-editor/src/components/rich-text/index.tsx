@@ -13,7 +13,7 @@ import {
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
@@ -568,8 +568,10 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
-		onReplace,
+		// An unsynced pattern completes to an array of blocks.
+		onReplace: onReplace
+			? ( blocks ) => onReplace( blocks.flat() )
+			: undefined,
 		completers: autocompleters,
 		record: value,
 		onChange,
@@ -662,7 +664,7 @@ function RichTextWrapper(
 			{ isSelected && (
 				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<InputEventContext.Provider value={ inputEvents }>
-						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+						<WCPopover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
 
@@ -673,7 +675,7 @@ function RichTextWrapper(
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
 							/>
-						</Popover.__unstableSlotNameProvider>
+						</WCPopover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }

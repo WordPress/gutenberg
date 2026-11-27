@@ -246,10 +246,7 @@ const getNavigationCommandLoaderPerTemplate = (
 		const commands = useMemo< CommandConfig[] >( () => {
 			if (
 				! canCreateTemplate ||
-				// TODO: Fix the classic-theme guard separately from the TypeScript migration.
-				// See https://github.com/WordPress/gutenberg/issues/85754.
-				// @ts-expect-error Preserve the existing boolean/string comparison during migration.
-				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
+				( ! isBlockBasedTheme && templateType !== 'wp_template_part' )
 			) {
 				return [];
 			}

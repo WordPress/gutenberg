@@ -1,10 +1,9 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .components-panel {
-	background: $white;
-	border: $border-width solid $gray-200;
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -15,6 +14,11 @@
 	> .components-panel__body:last-child {
 		border-bottom-width: 0;
 	}
+
+	// A last header has no bottom border, so it is one pixel shorter.
+	> .components-panel__header:last-child {
+		height: $grid-unit-60 - $border-width;
+	}
 }
 
 .components-panel + .components-panel {
@@ -22,8 +26,8 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $gray-200;
-	border-bottom: $border-width solid $gray-200;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 	h3 {
 		margin: 0 0 0.5em;
@@ -42,9 +46,11 @@
 	padding: 0 $grid-unit-20;
 	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
-	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
-	box-sizing: content-box;
-	height: $grid-unit-60 - $border-width;
+	// Include the bottom border in the height. The `reset` mixin sets
+	// `box-sizing` on descendants with the same specificity, so a content-box
+	// height would lose a pixel inside containers that apply it.
+	box-sizing: border-box;
+	height: $grid-unit-60;
 
 	h2 {
 		margin: 0;
@@ -80,7 +86,7 @@
 // Hover States
 .components-panel__body > .components-panel__body-title:hover {
 	// Override the default button hover style
-	background: $gray-100;
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
 	border: none;
 }
 
@@ -90,7 +96,7 @@
 	width: 100%;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-align: left;
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	@media not (prefers-reduced-motion) {
 		transition: 0.1s background ease-in-out;
@@ -103,12 +109,33 @@
 		border-radius: 0;
 	}
 
+	&:not(:disabled, [aria-disabled="true"]):is(
+		:hover,
+		:active,
+		:focus-visible
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+
+		.components-panel__icon {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+		}
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		.components-panel__icon {
+			color: var(--wpds-color-foreground-interactive-neutral-weak-disabled);
+		}
+	}
+
 	.components-panel__arrow {
 		position: absolute;
 		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
-		color: $gray-900;
+		color: inherit;
 		fill: currentColor;
 
 		@media not (prefers-reduced-motion) {
@@ -126,7 +153,7 @@
 }
 
 .components-panel__icon {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	margin: -2px 0 -2px 6px;
 }
 

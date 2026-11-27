@@ -14,6 +14,7 @@ exports[`MenuItem > should match snapshot when all props provided 1`] = `
   </span>
   <span
     class="components-menu-item__shortcut"
+    dir="ltr"
   >
     mod+shift+alt+w
   </span>
@@ -76,6 +77,7 @@ exports[`MenuItem > should match snapshot when isSelected and role are optionall
   </span>
   <span
     class="components-menu-item__shortcut"
+    dir="ltr"
   >
     mod+shift+alt+w
   </span>

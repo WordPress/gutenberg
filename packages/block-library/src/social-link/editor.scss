@@ -44,3 +44,8 @@
 	// Corresponds to the size of the text control input in the block inspector.
 	width: 250px;
 }
+
+// `URLInput` has a minimum width for popovers, which is wider than the sidebar.
+.wp-block-social-link__url-input.block-editor-url-input.is-full-width {
+	min-width: 0;
+}

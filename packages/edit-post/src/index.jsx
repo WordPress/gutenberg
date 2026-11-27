@@ -14,16 +14,15 @@ import {
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
+	registerCoreBlockBindingsSources,
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const {
-	BackButton: __experimentalMainDashboardButton,
-	registerCoreBlockBindingsSources,
-} = unlock( editorPrivateApis );
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 const { enablePreloadMultiUse, clearPreloadedData } = unlock(
 	apiFetch.privateApis
@@ -70,6 +69,7 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: false,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,
@@ -113,7 +113,7 @@ export function initializeEditor(
 	// `finished` by the time React mounts — no `setTimeout(0)`
 	// resolution dance on first render. Multi-use lets a single
 	// preloaded URL back several selectors (e.g. /wp/v2/settings GET +
-	// OPTIONS serves `getEntitiesConfig`, `canUser`, `getEntityRecord`).
+	// OPTIONS serves `getEntityConfig`, `canUser`, `getEntityRecord`).
 	enablePreloadMultiUse();
 	const preloadedResolutions = preloadResolutions( postType, postId );
 
@@ -168,9 +168,9 @@ async function preloadResolutions( postType, postId ) {
 	try {
 		await Promise.all( [
 			core.getCurrentUser(),
-			core.getEntitiesConfig( 'postType' ),
-			core.getEntitiesConfig( 'taxonomy' ),
-			core.getEntitiesConfig( 'root' ),
+			core.getEntityConfig( 'postType', postType ),
+			core.getEntityConfig( 'taxonomy', 'category' ),
+			core.getEntityConfig( 'root', 'site' ),
 			core.getEntityRecords( 'root', 'taxonomy' ),
 			core.getCurrentTheme(),
 			// Forward-resolver alias of `getCurrentTheme` with its own

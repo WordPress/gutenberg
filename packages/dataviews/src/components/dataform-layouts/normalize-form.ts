@@ -105,6 +105,9 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					layout.isCollapsible === undefined
 						? true
 						: layout.isCollapsible,
+				...( layout.headingLevel && {
+					headingLevel: layout.headingLevel,
+				} ),
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

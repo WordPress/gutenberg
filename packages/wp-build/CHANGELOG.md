@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them. The generated registration code loads the minified files even when `SCRIPT_DEBUG` is enabled if the build has no unminified files ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+
+### Bug Fixes
+
+-   Keep `translators:` comments next to their `__()`, `_x()`, `_n()` and `_nx()` calls in the transpiled and unminified output, so `wp i18n make-pot` extracts them from the built files ([#87189](https://github.com/WordPress/gutenberg/pull/87189)).
+
+### Internal
+
+-   The generated registration PHP now picks the `SCRIPT_DEBUG` file extension with an `if` that also checks the new `has_debug_assets` key of `build/constants.php`, in every build. Tools that post-process the generated PHP may need updating; read `has_debug_assets` instead of matching the template code ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 0.28.0 (2026-11-18)
+
+### Enhancements
+
+-   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
+
+### Bug Fixes
+
+-   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page. Plugins shipping the build now pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
+-   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+-   Let a full-page screen show the admin bar again. The page template's rule that hides it now loads after the page's own styles, so it has zero specificity to keep it overridable ([#86992](https://github.com/WordPress/gutenberg/pull/86992)).
+-   Load a `wp-admin` page's scripts and styles only on its own screen, not on a Core screen whose screen ID matches the page slug. The `dashboard` page no longer hides the content of the Core Dashboard (`index.php`) ([#86995](https://github.com/WordPress/gutenberg/pull/86995)).
+
+### Internal
+
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.27.0 (2026-11-04)
+
 ### Enhancements
 
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
@@ -13,6 +47,8 @@
 
 ### Internal
 
+-   Pass `false` instead of an empty string as `$src` in `wp_register_script()` in page templates ([#86106](https://github.com/WordPress/gutenberg/pull/86106)).
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 -   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
 -   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).

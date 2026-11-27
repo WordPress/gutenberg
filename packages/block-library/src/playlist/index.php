@@ -24,7 +24,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
-	if ( ! empty( $block->inner_blocks ) ) {
+	if ( count( $block->inner_blocks ) > 0 ) {
 		foreach ( $block->inner_blocks as $inner_block ) {
 			if ( 'core/playlist-track' === $inner_block->name ) {
 				$track_attributes = $inner_block->attributes;

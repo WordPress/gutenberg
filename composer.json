@@ -24,6 +24,13 @@
 		},
 		"lock": false
 	},
+	"extra": {
+		"phpstan/extension-installer": {
+			"ignore": [
+				"phpstan/phpstan-strict-rules"
+			]
+		}
+	},
 	"require-dev": {
 		"phpcompatibility/phpcompatibility-wp": "^2.1.3",
 		"wp-coding-standards/wpcs": "^3.4.1",
@@ -33,8 +40,9 @@
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "1.4.3",
-		"phpstan/phpstan": "2.3.4",
-		"phpstan/phpstan-phpunit": "2.1.1",
+		"phpstan/phpstan": "2.3.7",
+		"phpstan/phpstan-phpunit": "2.1.2",
+		"phpstan/phpstan-strict-rules": "2.1.2",
 		"php-stubs/wordpress-stubs": "@dev",
 		"php-stubs/wordpress-tests-stubs": "7.1.0",
 		"szepeviktor/phpstan-wordpress": "2.0.4"
@@ -67,8 +75,24 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
-		"phpstan": "@php tools/phpstan/generate-wordpress-stubs.php && phpstan analyse --memory-limit=2G",
-		"phpstan:baselines": "@phpstan --configuration=phpstan.neon.dist --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
+		"phpstan": [
+			"@phpstan:default",
+			"@phpstan:strict"
+		],
+		"phpstan:default": "@php tools/phpstan/generate-wordpress-stubs.php --quiet && phpstan analyse --memory-limit=2G",
+		"phpstan:strict": "@php tools/phpstan/generate-wordpress-stubs.php --quiet && phpstan analyse --configuration=phpstan-strict.neon.dist --memory-limit=2G",
+		"phpstan:baselines": [
+			"@phpstan:default --configuration=phpstan.neon.dist --generate-baseline=tools/phpstan/baseline.neon --allow-empty-baseline",
+			"@phpstan:strict --generate-baseline=tools/phpstan/baseline-strict.neon --allow-empty-baseline"
+		],
+		"phpstan:fix": [
+			"@phpstan:default --configuration=phpstan.neon.dist --fix",
+			"@phpstan:default --configuration=phpstan.neon.dist"
+		],
+		"phpstan:fix:strict": [
+			"@phpstan:strict --fix",
+			"@phpstan:strict"
+		],
 		"phpstan:generate-wordpress-stubs": "@php tools/phpstan/generate-wordpress-stubs.php",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"

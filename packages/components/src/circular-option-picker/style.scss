@@ -98,6 +98,24 @@ $color-palette-circle-spacing: 12px;
 			// Render the selected checkmark above the selected option.
 			z-index: 2;
 			pointer-events: none;
+
+			// `ColorPalette` picks a color that contrasts with the swatch, which
+			// forced colors replace with `Canvas`.
+			@media (forced-colors: active) {
+				color: CanvasText;
+			}
+		}
+	}
+
+	// Opt back in to color adjustment so that forced colors remove the
+	// `box-shadow`, which would otherwise fill the option with the pressed
+	// Button's text color. Also replace the Button's fill and its text color,
+	// which forced colors use for the ring around the option.
+	&.components-button.is-pressed {
+		@media (forced-colors: active) {
+			forced-color-adjust: auto;
+			background: Canvas !important;
+			color: ButtonText !important;
 		}
 	}
 

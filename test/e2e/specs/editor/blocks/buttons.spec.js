@@ -252,7 +252,6 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noopener',
 							linkTarget: '_blank',
 						},
 					},
@@ -286,7 +285,7 @@ test.describe( 'Buttons', () => {
 						attributes: {
 							text: 'WordPress',
 							url: 'https://www.wordpress.org/',
-							rel: 'noopener nofollow',
+							rel: 'nofollow',
 							linkTarget: '_blank',
 						},
 					},
@@ -859,6 +858,37 @@ test.describe( 'Buttons', () => {
 				listView.getByRole( 'button', { name: 'Add Button' } )
 			).toBeHidden();
 		} );
+	} );
+
+	test( 'hides the List View tab when several Buttons blocks are selected', async ( {
+		editor,
+		page,
+	} ) => {
+		const buttonsBlock = {
+			name: 'core/buttons',
+			innerBlocks: [ { name: 'core/button' } ],
+		};
+		await editor.insertBlock( buttonsBlock );
+		await editor.insertBlock( buttonsBlock );
+		const buttonsBlocks = editor.canvas.getByRole( 'document', {
+			name: 'Block: Buttons',
+		} );
+		await editor.selectBlocks( buttonsBlocks.first() );
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const listViewTab = settings.getByRole( 'tab', { name: 'List View' } );
+		await expect( listViewTab ).toBeVisible();
+
+		await editor.selectBlocks(
+			buttonsBlocks.first(),
+			buttonsBlocks.last()
+		);
+
+		await expect( settings.getByText( '2 Blocks' ) ).toBeVisible();
+		await expect( listViewTab ).toBeHidden();
 	} );
 
 	test( 'keeps the usual inspector outside a Navigation block', async ( {

@@ -19,6 +19,6 @@ describe( 'DEFAULT_RAMPS', () => {
 	)( 'holds the ramp of the default %s seed', ( rampName, seed ) => {
 		expect(
 			DEFAULT_RAMPS[ rampName as keyof typeof DEFAULT_SEED_COLORS ]
-		).toEqual( buildAccentRamp( seed, bgRamp ) );
+		).toEqual( buildAccentRamp( rampName, seed, bgRamp ) );
 	} );
 } );

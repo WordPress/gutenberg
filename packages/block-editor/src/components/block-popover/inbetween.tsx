@@ -1,11 +1,18 @@
 import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import {
+	getClearLine,
+	getLayoutFrame,
+	getLayoutRect,
+	getVisibleGap,
+	toClientRect,
+} from '../../utils/dom';
 import type { BlockPopoverInbetweenProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
@@ -77,11 +84,14 @@ function BlockPopoverInbetween( {
 		return {
 			contextElement,
 			getBoundingClientRect() {
+				// A transformed block keeps its place in the layout, so the
+				// insertion point stays in the gap between layout boxes.
+				const frame = getLayoutFrame( contextElement!.parentElement );
 				const previousRect = previousElement
-					? previousElement.getBoundingClientRect()
+					? getLayoutRect( previousElement, frame )
 					: null;
 				const nextRect = nextElement
-					? nextElement.getBoundingClientRect()
+					? getLayoutRect( nextElement, frame )
 					: null;
 
 				// At least one of the elements exists, see the check above.
@@ -147,7 +157,38 @@ function BlockPopoverInbetween( {
 					width = Math.max( width, 0 );
 				}
 
-				return new window.DOMRect( left, top, width, height );
+				const rect = toClientRect(
+					frame,
+					new window.DOMRect( left, top, width, height )
+				);
+
+				// Centre the line in the space left between the painted
+				// blocks, or shorten it to clear them. The block still lands
+				// in the layout gap.
+				if (
+					isVertical &&
+					operation !== 'group' &&
+					previousElement &&
+					nextElement
+				) {
+					return (
+						getVisibleGap(
+							previousElement,
+							nextElement,
+							frame,
+							rect
+						) ??
+						getClearLine(
+							previousElement,
+							nextElement,
+							frame,
+							rect
+						) ??
+						rect
+					);
+				}
+
+				return rect;
 			},
 		};
 	}, [
@@ -225,7 +266,7 @@ function BlockPopoverInbetween( {
 	//
 	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
-		<Popover
+		<WCPopover
 			ref={ popoverScrollRef }
 			animate={ false }
 			anchor={ popoverAnchor }
@@ -251,7 +292,7 @@ function BlockPopoverInbetween( {
 			<div className="block-editor-block-popover__inbetween-container">
 				{ children }
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }
 

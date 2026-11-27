@@ -18,6 +18,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .npmpackagejsonlintrc.json
     ├── phpcs.xml.dist
     ├── phpstan.neon.dist
+    ├── phpstan-strict.neon.dist
     │   Dot files and config files used to configure the various linting tools
     │   used in the repository (PHP, JS, styles...).
     │
@@ -128,7 +129,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Configuration files for the ESLint linter.
     │
     ├── tools/phpstan
-    │   Configuration files for the PHPStan analysis.
+    │   Configuration files for the PHPStan analysis, and the script that reports its results in CI.
     │
     ├── tools/webpack
     │   Configuration files for the webpack build.

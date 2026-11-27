@@ -3,11 +3,12 @@ import type { SelectFunction } from '@wordpress/data';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import type { TreeBlock } from '../../store/types';
 import EmptyBlockInserter from './empty-block-inserter';
@@ -82,6 +83,7 @@ export default function BlockTools( {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
+		getBlockIndex,
 		getBlockRootClientId,
 		getBlockEditingMode,
 		getBlockName,
@@ -126,7 +128,9 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+				const firstClientId = clientIds[ 0 ];
+				const rootClientId = getBlockRootClientId( firstClientId );
+				const previousIndex = getBlockIndex( firstClientId );
 				const direction = isMatch( 'core/block-editor/move-up', event )
 					? 'up'
 					: 'down';
@@ -135,9 +139,9 @@ export default function BlockTools( {
 				} else {
 					moveBlocksDown( clientIds, rootClientId );
 				}
-				const blockLength = Array.isArray( clientIds )
-					? clientIds.length
-					: 1;
+				if ( getBlockIndex( firstClientId ) === previousIndex ) {
+					return;
+				}
 				const message = sprintf(
 					// translators: %d: Number of blocks moved.
 					_n(
@@ -145,7 +149,7 @@ export default function BlockTools( {
 						'%d blocks moved.',
 						clientIds.length
 					),
-					blockLength
+					clientIds.length
 				);
 				speak( message );
 			}
@@ -297,7 +301,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			{ ...props }
-			onKeyDown={ onKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
 			// Popover slots cannot be unmounted during dragging because the
 			// will just be rendered in a fallback popover slot instead.
 			className={ clsx( props.className, {
@@ -328,7 +332,7 @@ export default function BlockTools( {
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode && ! hasFixedToolbar && (
-					<Popover.Slot
+					<WCPopover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }
 					/>
@@ -337,7 +341,7 @@ export default function BlockTools( {
 					{ children }
 				</MultiBlockFormatEdit>
 				{ /* Used for inline rich text popovers. */ }
-				<Popover.Slot
+				<WCPopover.Slot
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>

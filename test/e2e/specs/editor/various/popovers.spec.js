@@ -20,5 +20,24 @@ test.describe( 'popovers', () => {
 			await moreMenuToggleButton.click();
 			await expect( moreMenu ).toBeHidden();
 		} );
+
+		test( 'closes when the editor canvas is clicked', async ( {
+			editor,
+			page,
+		} ) => {
+			const moreMenu = page.locator( 'role=menu[name="Options"i]' );
+			const moreMenuToggleButton = page.locator(
+				'role=button[name="Options"i]'
+			);
+
+			await moreMenuToggleButton.click();
+			await expect( moreMenu ).toBeVisible();
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+
+			await expect( moreMenu ).toBeHidden();
+		} );
 	} );
 } );

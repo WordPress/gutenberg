@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add `transform.translate`, which outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each `x` or `y` length or percentage, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. Any other value outputs nothing ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add `transform.scale`, which outputs the individual `scale` property for a single non-negative number or percentage, and nothing for any other value ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+
+## 3.2.0 (2026-11-18)
+
+### New Features
+
+-   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
+
+### Bug Fixes
+
+-   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).
+-   Add the `background.backgroundAttachment`, `outline`, `shadow` and `typography.textIndent` styles the engine already generates to the `Style` type ([#85097](https://github.com/WordPress/gutenberg/pull/85097)).
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85205](https://github.com/WordPress/gutenberg/pull/85205)).
+
+## 3.1.0 (2026-11-04)
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes

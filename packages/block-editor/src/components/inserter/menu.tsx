@@ -10,7 +10,7 @@ import {
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover as WCPopover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
@@ -24,6 +24,10 @@ import { MediaTab } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
+import {
+	reusableBlocksSelectKey,
+	selectBlockPatternsKey,
+} from '../../store/private-keys';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 import { unlock } from '../../lock-unlock';
@@ -49,14 +53,31 @@ function InserterMenu(
 	}: InserterMenuProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
-		const { isZoomOut, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+	const {
+		isZoomOutMode,
+		hasSectionRootClientId,
+		hasPatternSource,
+		hasMediaCategories,
+	} = useSelect( ( select ) => {
+		const {
+			isZoomOut,
+			getSectionRootClientId,
+			getSettings,
+			getInserterMediaCategories,
+		} = unlock( select( blockEditorStore ) );
+		const settings = getSettings();
 
 		return {
 			isZoomOutMode: isZoomOut(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			// Checks for a source of patterns rather than for loaded patterns,
+			// so the tab does not appear late while they are fetched.
+			hasPatternSource:
+				!! settings[ selectBlockPatternsKey ] ||
+				!! settings[ reusableBlocksSelectKey ] ||
+				!! settings.__experimentalBlockPatterns?.length ||
+				!! settings.__experimentalReusableBlocks?.length,
+			hasMediaCategories: !! getInserterMediaCategories()?.length,
 		};
 	}, [] );
 
@@ -126,26 +147,28 @@ function InserterMenu(
 			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
-			window.requestAnimationFrame( () => {
-				if (
-					! shouldFocusBlock &&
-					! blockTypesTabRef.current?.contains(
-						// @ts-expect-error Bug: a callback ref has no `current`.
-						ref.current.ownerDocument.activeElement
-					)
-				) {
-					// There has been a focus loss, so focus the first button in the block types tab
-					// @ts-expect-error Bug: the tab has no button when it shows no results.
-					blockTypesTabRef.current?.querySelector( 'button' ).focus();
-				}
-			} );
+			if ( ! shouldFocusBlock ) {
+				window.requestAnimationFrame( () => {
+					// Null when the inserter closed before this frame.
+					const tab = blockTypesTabRef.current;
+					// Focus moved elsewhere, e.g. into the canvas, is not lost.
+					if (
+						tab &&
+						tab.ownerDocument.activeElement ===
+							tab.ownerDocument.body
+					) {
+						// There has been a focus loss, so focus the first button in the block types tab
+						// @ts-expect-error Bug: the tab has no button when it shows no results.
+						tab.querySelector( 'button' ).focus();
+					}
+				} );
+			}
 		},
 		[
 			hideInsertionPoint,
 			onInsertBlocks,
 			maybeCloseInserter,
 			onSelect,
-			ref,
 			shouldFocusBlock,
 		]
 	);
@@ -352,13 +375,25 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
-	// Focus first active tab, if any
+	// With only the Blocks tab, the tab list is hidden.
+	const hasSingleTab = ! hasPatternSource && ! hasMediaCategories;
+
+	// Focus first active tab, if any, or the search when the tabs are hidden.
 	const tabsRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( ! tabsRef.current ) {
 			return;
 		}
 		const frame = window.requestAnimationFrame( () => {
+			if ( hasSingleTab ) {
+				tabsRef.current
+					?.closest( '.block-editor-tabbed-sidebar' )
+					?.querySelector< HTMLElement >(
+						'.block-editor-inserter__search input'
+					)
+					?.focus();
+				return;
+			}
 			tabsRef.current
 				?.querySelector< HTMLElement >(
 					'[role="tab"][aria-selected="true"]'
@@ -366,13 +401,14 @@ function InserterMenu(
 				?.focus();
 		} );
 		return () => window.cancelAnimationFrame( frame );
-	}, [] );
+	}, [ hasSingleTab ] );
 
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel,
 				'is-zoom-out': isZoomOutMode,
+				'has-single-tab': hasSingleTab,
 			} ) }
 			ref={ ref }
 		>
@@ -398,35 +434,45 @@ function InserterMenu(
 								</>
 							),
 						},
-						{
-							name: 'patterns',
-							title: __( 'Patterns' ),
-							panelRef: patternsPanelRef,
-							panel: (
-								<>
-									{ inserterSearch }
-									{ selectedTab === 'patterns' &&
-										! delayedFilterValue &&
-										patternsTab }
-								</>
-							),
-						},
-						{
-							name: 'media',
-							title: __( 'Media' ),
-							panelRef: mediaPanelRef,
-							panel: (
-								<>
-									{ inserterSearch }
-									{ mediaTab }
-								</>
-							),
-						},
+						// The widget editors, for one, have neither patterns nor
+						// media categories, which would leave these tabs empty.
+						...( hasPatternSource
+							? [
+									{
+										name: 'patterns',
+										title: __( 'Patterns' ),
+										panelRef: patternsPanelRef,
+										panel: (
+											<>
+												{ inserterSearch }
+												{ selectedTab === 'patterns' &&
+													! delayedFilterValue &&
+													patternsTab }
+											</>
+										),
+									},
+								]
+							: [] ),
+						...( hasMediaCategories
+							? [
+									{
+										name: 'media',
+										title: __( 'Media' ),
+										panelRef: mediaPanelRef,
+										panel: (
+											<>
+												{ inserterSearch }
+												{ mediaTab }
+											</>
+										),
+									},
+								]
+							: [] ),
 					] }
 				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<Popover
+				<WCPopover
 					className="block-editor-inserter__preview-container__popover"
 					placement="right-start"
 					offset={ { mainAxis: 16, crossAxis: 16 } }
@@ -434,7 +480,7 @@ function InserterMenu(
 					animate={ false }
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
-				</Popover>
+				</WCPopover>
 			) }
 		</div>
 	);

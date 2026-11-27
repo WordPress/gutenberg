@@ -1,0 +1,184 @@
+{
+	"wpds-typography": {
+		"font-family": {
+			"heading": {
+				"$type": "fontFamily",
+				"$value": "SF Pro",
+				"$description": "Headings font family",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_FAMILY" ]
+				}
+			},
+			"body": {
+				"$type": "fontFamily",
+				"$value": "SF Pro",
+				"$description": "Body font family",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_FAMILY" ]
+				}
+			},
+			"mono": {
+				"$type": "fontFamily",
+				"$value": "Menlo",
+				"$description": "Monospace font family",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_FAMILY" ]
+				}
+			}
+		},
+		"font-size": {
+			"xs": {
+				"$type": "dimension",
+				"$value": {
+					"value": 11,
+					"unit": "px"
+				},
+				"$description": "Extra small font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				},
+				"$description": "Small font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": {
+					"value": 13,
+					"unit": "px"
+				},
+				"$description": "Medium font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": {
+					"value": 15,
+					"unit": "px"
+				},
+				"$description": "Large font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				},
+				"$description": "Extra large font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			},
+			"2xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"$description": "2X large font size",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_SIZE" ]
+				}
+			}
+		},
+		"line-height": {
+			"xs": {
+				"$type": "dimension",
+				"$value": {
+					"value": 16,
+					"unit": "px"
+				},
+				"$description": "Extra small line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				},
+				"$description": "Small line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": {
+					"value": 24,
+					"unit": "px"
+				},
+				"$description": "Medium line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": {
+					"value": 28,
+					"unit": "px"
+				},
+				"$description": "Large line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 32,
+					"unit": "px"
+				},
+				"$description": "Extra large line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			},
+			"2xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 40,
+					"unit": "px"
+				},
+				"$description": "2X large line height",
+				"$extensions": {
+					"com.figma.scopes": [ "LINE_HEIGHT" ]
+				}
+			}
+		},
+		"font-weight": {
+			"default": {
+				"$type": "number",
+				"$value": 400,
+				"$description": "Baseline text weight for body copy and UI text",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_STYLE" ]
+				}
+			},
+			"emphasis": {
+				"$type": "number",
+				"$value": 600,
+				"$description": "Elevated text weight for labels, controls, and headings",
+				"$extensions": {
+					"com.figma.scopes": [ "FONT_STYLE" ]
+				}
+			}
+		}
+	}
+}

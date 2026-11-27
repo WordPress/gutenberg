@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep the open save panel visible when the window loses focus. ([#87519](https://github.com/WordPress/gutenberg/pull/87519)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 11.2.0 (2026-11-18)
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 11.1.0 (2026-11-04)
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+
 ## 11.0.0 (2026-10-20)
 
 ### Breaking Changes

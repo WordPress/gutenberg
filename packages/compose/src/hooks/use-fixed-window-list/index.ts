@@ -1,5 +1,6 @@
 import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
+import deprecated from '@wordpress/deprecated';
 import { PAGEUP, PAGEDOWN, HOME, END } from '@wordpress/keycodes';
 import useEvent from '../use-event';
 
@@ -44,6 +45,10 @@ export default function useFixedWindowList(
 	FixedWindowList,
 	React.Dispatch< React.SetStateAction< FixedWindowList > >,
 ] {
+	deprecated( 'wp.compose.__experimentalUseFixedWindowList', {
+		since: '7.3',
+	} );
+
 	const {
 		windowOverscan,
 		useWindowing = true,
@@ -180,11 +185,13 @@ export default function useFixedWindowList(
 		if ( ! useWindowing ) {
 			return;
 		}
-		const scrollContainer = getScrollContainer( elementRef.current );
-		if ( ! scrollContainer ) {
+		const element = elementRef.current;
+		const initialContainer = getScrollContainer( element );
+		if ( ! initialContainer ) {
 			return;
 		}
-		const { defaultView } = scrollContainer.ownerDocument;
+		let scrollContainer = initialContainer;
+		const { defaultView, documentElement } = scrollContainer.ownerDocument;
 		// `scroll` and `resize` already fire at about the rendering rate, so
 		// there is nothing to gain from debouncing them.
 		const onMeasure = () => measureWindow();
@@ -195,7 +202,24 @@ export default function useFixedWindowList(
 		defaultView?.addEventListener( 'resize', onMeasure );
 		defaultView?.addEventListener( 'keydown', onKeyDown );
 
+		let observer: ResizeObserver | undefined;
+		if ( initialContainer === documentElement ) {
+			observer = new ResizeObserver( () => {
+				const nextContainer = getScrollContainer( element );
+				if ( nextContainer && nextContainer !== scrollContainer ) {
+					scrollContainer.removeEventListener( 'scroll', onMeasure );
+					scrollContainer = nextContainer;
+					scrollContainer.addEventListener( 'scroll', onMeasure );
+					onMeasure();
+				}
+			} );
+			for ( let node = element; node; node = node.parentElement ) {
+				observer.observe( node );
+			}
+		}
+
 		return () => {
+			observer?.disconnect();
 			scrollContainer.removeEventListener( 'scroll', onMeasure );
 			defaultView?.removeEventListener( 'resize', onMeasure );
 			defaultView?.removeEventListener( 'keydown', onKeyDown );
