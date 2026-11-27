@@ -9,6 +9,19 @@ import type { GridDropBlock, GridDropPlacement } from './types';
 
 type ManualGridDropItem = GridDropBlock & GridDropPlacement;
 
+/**
+ * Returns a callback that applies a manual grid drop.
+ *
+ * The callback updates each dropped block's grid position and spans for its
+ * selected style state.
+ * For default viewport drops, it places dropped blocks among existing siblings
+ * by starting row, then by starting column, so the DOM follows the grid's
+ * reading order. The existing siblings keep their relative order.
+ *
+ * @param gridClientId Client ID of the destination grid.
+ * @param numColumns   Number of columns in the destination grid.
+ * @return Drop handler that takes the placed items and source root client ID.
+ */
 export function useManualGridDrop( gridClientId: string, numColumns: number ) {
 	const registry = useRegistry();
 	const { getBlockAttributes, getBlockOrder, getBlockRootClientId } =
