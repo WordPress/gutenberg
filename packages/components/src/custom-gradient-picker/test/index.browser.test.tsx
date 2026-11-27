@@ -556,6 +556,44 @@ describe( 'CustomGradientBar', () => {
 		expect( blue ).toHaveFocus();
 	} );
 
+	it( 'keeps focus on a moved control point when the parent renders before applying the move', async () => {
+		const user = userEvent.setup();
+		const points = [
+			{ position: 50, color: 'rgb(255,0,0)' },
+			{ position: 50, color: 'rgb(0,0,255)' },
+		];
+		const props = {
+			background: 'linear-gradient(90deg, red, blue)',
+			hasGradient: true,
+			onChange: vi.fn(),
+		};
+		const view = await render(
+			<CustomGradientBar { ...props } value={ points } />
+		);
+		screen
+			.getByRole( 'button', {
+				name: /position 50% with color code rgb\(255,0,0\)/,
+			} )
+			.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		await view.rerender(
+			<CustomGradientBar { ...props } value={ [ ...points ] } />
+		);
+		await view.rerender(
+			<CustomGradientBar
+				{ ...props }
+				value={ [ points[ 1 ], { ...points[ 0 ], position: 60 } ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /position 60% with color code rgb\(255,0,0\)/,
+			} )
+		).toHaveFocus();
+	} );
+
 	it( 'moves a control point when dragged from above its handle', async () => {
 		const onChange = vi.fn();
 

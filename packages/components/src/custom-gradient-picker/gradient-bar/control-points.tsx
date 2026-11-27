@@ -128,6 +128,7 @@ type KeyboardMove = {
 	button: HTMLButtonElement;
 	point: ControlPoint;
 	rank: number;
+	previousControlPoints: ControlPoint[];
 };
 
 function isSamePoint( first: ControlPoint, second: ControlPoint ) {
@@ -219,14 +220,17 @@ function ControlPoints( {
 			position
 		);
 		const point = newControlPoints[ index ];
-		keyboardMoveRef.current = {
-			button,
-			point,
-			// A stable sort keeps identical points in this order.
-			rank: newControlPoints
-				.slice( 0, index )
-				.filter( ( other ) => isSamePoint( other, point ) ).length,
-		};
+		if ( point.position !== controlPoints[ index ].position ) {
+			keyboardMoveRef.current = {
+				button,
+				point,
+				// A stable sort keeps identical points in this order.
+				rank: newControlPoints
+					.slice( 0, index )
+					.filter( ( other ) => isSamePoint( other, point ) ).length,
+				previousControlPoints: controlPoints,
+			};
+		}
 		onChange( newControlPoints );
 	};
 
@@ -234,11 +238,18 @@ function ControlPoints( {
 	// focused button keeps the old index. Move focus to the moved point.
 	useLayoutEffect( () => {
 		const move = keyboardMoveRef.current;
-		keyboardMoveRef.current = undefined;
+		// The parent can render again before it applies the new value.
 		if (
 			! move ||
-			move.button !== move.button.ownerDocument.activeElement
+			( controlPoints.length === move.previousControlPoints.length &&
+				controlPoints.every( ( point, index ) =>
+					isSamePoint( point, move.previousControlPoints[ index ] )
+				) )
 		) {
+			return;
+		}
+		keyboardMoveRef.current = undefined;
+		if ( ! move.button.matches( ':focus' ) ) {
 			return;
 		}
 		const targetIndex = controlPoints
