@@ -25,9 +25,15 @@ jobs:
                       .github/scripts
                       packages/block-library/src
                   persist-credentials: false
-            - name: Add block labels
+            - name: Write block label rules from block.json
+              id: blocks
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
               with:
                   script: |
-                      const labelBlocks = require( './.github/scripts/label-blocks.cjs' );
-                      await labelBlocks( { github, context, core } );
+                      const blockLabelerConfig = require( './.github/scripts/block-labeler-config.cjs' );
+                      await blockLabelerConfig( { github, context, core } );
+            - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+              with:
+                  configuration-path: ${{ steps.blocks.outputs.path }}
+                  dot: true
+                  sync-labels: false

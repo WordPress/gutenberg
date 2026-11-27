@@ -1,13 +1,12 @@
 /**
- * Adds [Block] labels to a pull request for the blocks whose folders it changes.
+ * Writes an actions/labeler config with a [Block] label rule for each block folder.
  * A block's label matches its folder name or block.json title, else its parent block's.
- * Never removes labels, and adds none when the PR changes more than 3 blocks (a refactor).
+ * Run it with sync-labels off, so block labels are only ever added, never removed.
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
 
 const SRC = 'packages/block-library/src';
-const MAX = 3;
 
 // Blocks whose label has another name.
 const EXCEPTIONS = {
@@ -44,48 +43,31 @@ function labelFor( dir, labels ) {
 }
 
 module.exports = async ( { github, context, core } ) => {
-	const { owner, repo } = context.repo;
-	const pullNumber = context.payload.pull_request.number;
-	const files = await github.paginate( github.rest.pulls.listFiles, {
-		owner,
-		repo,
-		pull_number: pullNumber,
-		per_page: 100,
-	} );
-	const dirs = new Set(
-		files
-			.map(
-				( { filename } ) =>
-					filename.match(
-						/^packages\/block-library\/src\/([a-z0-9-]+)\//
-					)?.[ 1 ]
-			)
-			.filter( Boolean )
-	);
-	if ( ! dirs.size ) {
-		return;
-	}
 	const labels = (
 		await github.paginate( github.rest.issues.listLabelsForRepo, {
-			owner,
-			repo,
+			...context.repo,
 			per_page: 100,
 		} )
 	)
 		.map( ( { name } ) => name )
 		.filter( ( name ) => name.startsWith( '[Block] ' ) );
-	const found = [
-		...new Set( [ ...dirs ].map( ( dir ) => labelFor( dir, labels ) ) ),
-	].filter( Boolean );
-	if ( ! found.length || found.length > MAX ) {
-		core.info( `Block labels found: ${ found.length }. Adding none.` );
-		return;
+	const folders = {};
+	for ( const dir of fs.readdirSync( SRC ).sort() ) {
+		const label = labelFor( dir, labels );
+		if ( label ) {
+			( folders[ label ] ??= [] ).push( dir );
+		}
 	}
-	core.info( `Adding: ${ found.join( ', ' ) }` );
-	await github.rest.issues.addLabels( {
-		owner,
-		repo,
-		issue_number: pullNumber,
-		labels: found,
-	} );
+	// A PR changing more than 3 blocks at once (a refactor) gets none.
+	let config = 'changed-files-labels-limit: 3\n';
+	for ( const [ label, dirs ] of Object.entries( folders ) ) {
+		config += `\n'${ label.replace( /'/g, "''" ) }':\n    - changed-files:\n          - any-glob-to-any-file:\n`;
+		for ( const dir of dirs ) {
+			config += `                - '${ SRC }/${ dir }/**'\n`;
+		}
+	}
+	const file = path.join( process.env.RUNNER_TEMP, 'labeler-blocks.yml' );
+	fs.writeFileSync( file, config );
+	core.info( config );
+	core.setOutput( 'path', file );
 };
