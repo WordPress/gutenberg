@@ -174,12 +174,20 @@ function ListViewComponent(
 		selectBlock: selectEditorBlock,
 	} );
 
+	// Rows added after mount, like the first block of an empty post, must not
+	// take focus from the canvas.
+	const hasRows = clientIdsTree.length > 0 || showAppender;
+	const [ canFocusOnMount, setCanFocusOnMount ] = useState( hasRows );
+	if ( canFocusOnMount && ! hasRows ) {
+		setCanFocusOnMount( false );
+	}
+
 	const focusOnMountRef = useRefEffect(
 		( node: HTMLElement ) => {
 			// A list that mounts as a side effect of selecting a block, the
 			// block inspector's for one, would pull focus out of whatever the
 			// user is editing, so taking focus is opt-in.
-			if ( ! focusOnMount ) {
+			if ( ! focusOnMount || ! canFocusOnMount ) {
 				return;
 			}
 
@@ -224,7 +232,7 @@ function ListViewComponent(
 				controller.abort();
 			};
 		},
-		[ focusOnMount, getSelectedBlockClientIds ]
+		[ focusOnMount, canFocusOnMount, getSelectedBlockClientIds ]
 	);
 
 	const treeGridRef = useMergeRefs( [
@@ -351,7 +359,7 @@ function ListViewComponent(
 	);
 
 	// If there are no blocks to show and we're not showing the appender, do not render the list view.
-	if ( ! clientIdsTree.length && ! showAppender ) {
+	if ( ! hasRows ) {
 		return null;
 	}
 

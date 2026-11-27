@@ -221,6 +221,8 @@ test.describe( 'Block Renaming', () => {
 					name: 'Options',
 				} );
 
+			// The row mounts its options menu on hover.
+			await headingItem.hover();
 			await headingItemActions.click();
 
 			// usage of `page` is required because the options menu is rendered

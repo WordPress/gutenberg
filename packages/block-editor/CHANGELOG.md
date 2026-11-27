@@ -35,6 +35,7 @@
 -   Block toolbar: Show the toolbar of a block inside a tilted container above the container, lined up with the selected block. A quarter turn in the plane of the page keeps the toolbar in place ([#86885](https://github.com/WordPress/gutenberg/pull/86885)).
 -   In-between inserter: Insert in the gap under the pointer between the children of a rotated, moved or scaled container ([#86892](https://github.com/WordPress/gutenberg/pull/86892)).
 -   Layout: In a multiselection, hide the layout controls when the selected blocks use different layout types ([#87423](https://github.com/WordPress/gutenberg/pull/87423)).
+-   List View: Don't take focus when the first block is added to an empty post ([#87493](https://github.com/WordPress/gutenberg/pull/87493)).
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
