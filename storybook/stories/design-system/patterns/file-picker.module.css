@@ -1,7 +1,8 @@
 /*
- * The drop area and the selected-file rows share one shape, so a field keeps
- * its size when a file is chosen. With one line of text, each is the same
- * height as an input. It grows when a long filename wraps.
+ * The drop area and the selected-file rows share one shape. An empty drop
+ * area is the height of an input. A chosen file is taller, with a larger
+ * thumbnail and its type and size below its name, so the change reads as
+ * intentional.
  *
  * The drop area is a control, so it uses the same neutral interactive colors
  * as an outline `Button`, with a dashed border where a file can go.
@@ -21,25 +22,27 @@
 
 /*
  * A row shows a file that is already chosen. It isn't a control itself, so it
- * uses surface colors and a solid border. Its padding matches the picker
- * button's, so a row and a drop area line up.
+ * uses surface colors and a solid border. Its padding matches a picker
+ * button that shows a chosen file, so a row and a drop area line up.
  */
 .row {
 	border-style: solid;
 	border-color: var(--wpds-color-stroke-surface-neutral);
 	background: var(--wpds-color-background-surface-neutral-strong);
 	color: var(--wpds-color-foreground-content-neutral);
-	padding-block: var(--file-picker-padding-block);
-	padding-inline-start: var(--wpds-dimension-padding-sm);
+	padding-block: var(--file-row-padding);
+	padding-inline-start: var(--file-row-padding);
 }
 
 /*
- * Rows and picker buttons share their vertical padding. A picker button also
- * declares it, so it keeps its padding outside a drop area.
+ * The padding of a picker button that prompts for a file, and of a chosen
+ * file. A picker button also declares them, so it keeps its padding outside
+ * a drop area.
  */
 .surface,
 .choose {
 	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
+	--file-row-padding: calc(var(--wpds-dimension-padding-md) - var(--wpds-border-width-xs));
 }
 
 /* The picker button fills the drop area, apart from the space the remove button takes. */
@@ -62,6 +65,12 @@
 			color: GrayText;
 		}
 	}
+}
+
+/* A picker button that shows a chosen file has the same padding as a row. */
+.choose:has(> .summary) {
+	padding-block: var(--file-row-padding);
+	padding-inline-start: var(--file-row-padding);
 }
 
 /*
@@ -94,6 +103,19 @@
 	padding-inline-end: calc(var(--wpds-dimension-padding-md) - var(--wpds-dimension-padding-xs));
 }
 
+/*
+ * Center the remove button on the first line of the name, as the actions in a
+ * DataViews table are.
+ */
+.row > .remove {
+	margin-block-start: calc((var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-sm)) / 2);
+}
+
+/* In a drop area, the picker button holds the padding, so add it here. */
+.surface:has(> .choose) > .remove {
+	margin-block-start: calc(var(--file-row-padding) + (var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-sm)) / 2);
+}
+
 .surface:has(> .choose:not([data-disabled]):hover) {
 	border-color: var(--wpds-color-stroke-interactive-neutral-active);
 	background: var(--wpds-color-background-interactive-neutral-weak-active);
@@ -112,17 +134,31 @@
 	}
 }
 
-/* A 24px box for the add icon or the thumbnail, so both states line up. */
-.thumbnail {
+/* A box for the add icon in a picker button that prompts for a file. */
+.prompt-icon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex: none;
 	inline-size: var(--wpds-dimension-size-sm);
 	block-size: var(--wpds-dimension-size-sm);
+}
+
+/*
+ * The thumbnail of a chosen file, as tall as the name and the type and size
+ * below it. A file that isn't an image shows its icon on a weak background.
+ */
+.thumbnail {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: var(--wpds-dimension-size-lg);
+	block-size: var(--wpds-dimension-size-lg);
 	overflow: hidden;
 	/* One step smaller than the row's radius, so it nests inside it. */
 	border-radius: var(--wpds-border-radius-xs);
+	background: var(--wpds-color-background-surface-neutral-weak);
 
 	& img {
 		inline-size: 100%;
@@ -153,15 +189,15 @@
 }
 
 /*
- * The filename and what follows it, such as the type and size. They share one
- * line when they fit. Otherwise, what follows moves below the name.
+ * The filename, and what follows it on the line below, such as the type and
+ * size. With a one-line name, both lines are as tall as the thumbnail. Every
+ * row has this layout, whatever the length of its name.
  */
 .text {
 	display: flex;
 	flex: 1;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-sm);
 	min-inline-size: 0;
 	/*
 	 * Nothing here is cut, so everyone can read all of it, also on a touch
@@ -172,23 +208,19 @@
 }
 
 /*
- * What follows the name in a row: the type and size, a progress bar, or a
- * status and its buttons. It moves below the name as one group, so a status
- * and its "Retry" button stay together.
+ * What follows the name: the type and size, a progress bar, or a status and
+ * its buttons. It keeps the height of a line of text while a progress bar
+ * takes its place.
  */
 .trailing {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
+	min-block-size: var(--wpds-typography-line-height-xs);
 }
 
-/*
- * On a shared line, the name takes the free space, so the type and size sit
- * at the end of the row.
- */
 .name {
-	flex: 1 1 auto;
 	/*
 	 * The lines of a wrapped name sit closer to each other than to the type
 	 * and size below them, so the name reads as one item.
@@ -219,12 +251,11 @@
 }
 
 /*
- * While a file uploads, a short progress bar takes the place of its type and
- * size, at about the same width, so the name doesn't jump when it finishes.
+ * While a file uploads, a progress bar takes the place of its type and size,
+ * across the width of the name.
  */
 .progress {
-	flex: none;
-	inline-size: calc(var(--wpds-dimension-size-lg) * 2);
+	flex: 1;
 	/*
 	 * The bar is 1.5px tall. Centered at that height, it would start on a
 	 * fraction of a pixel, and look thicker in some rows than in others. A
@@ -256,89 +287,4 @@
 .select {
 	inline-size: 100%;
 	justify-content: space-between;
-}
-
-/*
- * Temporary: two layouts to compare with the one above, where each row
- * decides on its own whether its details fit next to its name. See
- * `file-row-layouts.story.tsx`.
- *
- * In both, the thumbnail and the remove button align with the first line of
- * the name, as the media and actions do in a DataViews table.
- */
-.layout-stacked .name,
-.layout-inline .name {
-	padding-block-start: calc((var(--wpds-dimension-size-sm) - var(--wpds-typography-line-height-xs)) / 2);
-}
-
-/*
- * In the single-file drop area, the remove button sits outside the picker
- * button, so it moves down by the picker button's padding.
- */
-.surface:has(.layout-stacked, .layout-inline) > .remove {
-	margin-block-start: var(--file-picker-padding-block);
-}
-
-/* Option A: the details are always below the name. */
-.layout-stacked .text {
-	flex-direction: column;
-	flex-wrap: nowrap;
-	align-items: flex-start;
-}
-
-.layout-stacked .name {
-	flex: none;
-}
-
-/* Keep the second line's height while a progress bar takes its place. */
-.layout-stacked .trailing {
-	min-block-size: var(--wpds-typography-line-height-xs);
-}
-
-/*
- * Option B: the details always share the name's first line, and only the name
- * wraps. The name's line keeps the height of the thumbnail, so a row with a
- * short name is as tall as an input.
- */
-.layout-inline {
-	container-type: inline-size;
-}
-
-.layout-inline .text {
-	flex-wrap: nowrap;
-	align-items: flex-start;
-}
-
-.layout-inline .name {
-	flex: 1 1 0;
-	min-inline-size: 0;
-	padding-block-end: calc((var(--wpds-dimension-size-sm) - var(--wpds-typography-line-height-xs)) / 2);
-}
-
-.layout-inline .trailing {
-	flex: none;
-	flex-wrap: nowrap;
-	min-block-size: var(--wpds-dimension-size-sm);
-}
-
-/*
- * In a narrow field, the details would leave the name too little room, so
- * every row puts them below the name, as in option A. The field's width
- * decides this, not the name, so all rows in a list change together.
- */
-@container (inline-size < 400px) {
-	.layout-inline .text {
-		flex-direction: column;
-	}
-
-	.layout-inline .name {
-		flex: none;
-		inline-size: 100%;
-		padding-block-end: 0;
-	}
-
-	.layout-inline .trailing {
-		flex-wrap: wrap;
-		min-block-size: var(--wpds-typography-line-height-xs);
-	}
 }

@@ -71,8 +71,8 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 - **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the picker button when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
 - **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". An otherwise valid file dropped on a full field gets the limit message.
-- **Show the whole filename.** Don't cut a long name with an ellipsis. A tooltip can't bring the rest back on a touch screen, and two files with the same start then look the same. Let the name wrap, and let it break inside a word, because filenames often have no spaces. A row is the height of an input while its text fits on one line, and it grows when the text needs more.
-- **Show the file type next to the name.** The type and size sit at the end of the row, so people can tell `report.pdf` from `report.png` at a glance. When they don't fit beside the name, they move below it.
+- **Show the whole filename.** Don't cut a long name with an ellipsis. A tooltip can't bring the rest back on a touch screen, and two files with the same start then look the same. Let the name wrap, and let it break inside a word, because filenames often have no spaces. A long name makes only its own row taller.
+- **Show the file type below the name.** The type and size sit on their own line, so people can tell `report.pdf` from `report.png` at a glance. Every row has the same layout, whatever the length of its name, and the thumbnail and the remove button line up with the first line of the name.
 - **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
 
 ## Upload status

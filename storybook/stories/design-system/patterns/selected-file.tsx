@@ -53,22 +53,6 @@ export function getExtension( name: string ) {
 }
 
 /**
- * How a row lays out its name and details. Temporary, to compare layouts for
- * long names. See `file-row-layouts.story.tsx`.
- *
- * - `wrap`: the details share the name's line while both fit, and move below
- *   it otherwise. Each row decides on its own.
- * - `stacked`: the details are always below the name.
- * - `inline`: the details always share the name's first line, and only the
- *   name wraps. In a narrow field, every row switches to `stacked`.
- */
-export type FileRowLayout = 'wrap' | 'stacked' | 'inline';
-
-function getLayoutClassName( layout: FileRowLayout ) {
-	return layout === 'wrap' ? '' : styles[ `layout-${ layout }` ];
-}
-
-/**
  * Shows a thumbnail for an image, or a file icon for any other file. The
  * preview URL is revoked when the file changes.
  *
@@ -132,26 +116,19 @@ function FileDetails( {
 }
 
 /**
- * Shows a thumbnail or a file icon, the filename, and the file type and size.
- * They share one line when they fit. In a narrow space, the type and size
- * move below the name, and a long name wraps, so it is never cut.
+ * Shows a thumbnail or a file icon, the filename, and the file type and size
+ * below the name. A long name wraps, so it is never cut.
  *
  * It renders only phrasing content, so it can be the content of a button.
  */
-export function FileSummary( {
-	file,
-	layout = 'wrap',
-}: {
-	file: File;
-	layout?: FileRowLayout;
-} ) {
+export function FileSummary( { file }: { file: File } ) {
 	return (
 		<Stack
 			render={ <span /> }
 			direction="row"
-			align={ layout === 'wrap' ? 'center' : 'flex-start' }
-			gap="sm"
-			className={ `${ styles.summary } ${ getLayoutClassName( layout ) }` }
+			align="flex-start"
+			gap="md"
+			className={ styles.summary }
 		>
 			<FileThumbnail file={ file } />
 			<span className={ styles.text }>
@@ -189,15 +166,10 @@ export const SelectedFile = forwardRef<
 		 * of the type and size, and the name is weaker until it's gone.
 		 */
 		progress?: React.ReactNode;
-		/**
-		 * Buttons after the status, such as "Retry". They stay with the status,
-		 * so both move below the name together in a narrow row.
-		 */
+		/** Buttons after the status, such as "Retry", on the same line. */
 		actions?: React.ReactNode;
 		/** Whether the remove button is disabled. */
 		disabled?: boolean;
-		/** How the name and details are laid out. Defaults to `wrap`. */
-		layout?: FileRowLayout;
 	}
 >( function UnforwardedSelectedFile(
 	{
@@ -209,18 +181,15 @@ export const SelectedFile = forwardRef<
 		progress,
 		actions,
 		disabled,
-		layout = 'wrap',
 	},
 	ref
 ) {
 	return (
 		<Stack
 			direction="row"
-			align={ layout === 'wrap' ? 'center' : 'flex-start' }
-			gap="sm"
-			className={ `${ styles.surface } ${
-				styles.row
-			} ${ getLayoutClassName( layout ) }` }
+			align="flex-start"
+			gap="md"
+			className={ `${ styles.surface } ${ styles.row }` }
 		>
 			<FileThumbnail file={ file } />
 			<div className={ styles.text }>
@@ -242,6 +211,7 @@ export const SelectedFile = forwardRef<
 			</div>
 			<IconButton
 				ref={ ref }
+				className={ styles.remove }
 				icon={ closeSmall }
 				label={ removeLabel ?? `Remove ${ file.name }` }
 				variant="minimal"

@@ -271,7 +271,7 @@ export function FilePickerUpload() {
 									align="center"
 									gap="sm"
 								>
-									<span className={ styles.thumbnail }>
+									<span className={ styles[ 'prompt-icon' ] }>
 										<Icon icon={ plus } />
 									</span>
 									<Text className={ styles.prompt }>

@@ -94,8 +94,8 @@ export function FilePickerDropZone( { disabled = false } ) {
 				render={ ( { openFileDialog } ) => (
 					<Stack
 						direction="row"
-						align="center"
-						gap="sm"
+						align="flex-start"
+						gap="xs"
 						className={ styles.surface }
 					>
 						<Button
@@ -121,7 +121,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 									align="center"
 									gap="sm"
 								>
-									<span className={ styles.thumbnail }>
+									<span className={ styles[ 'prompt-icon' ] }>
 										<Icon icon={ plus } />
 									</span>
 									<Text className={ styles.prompt }>
