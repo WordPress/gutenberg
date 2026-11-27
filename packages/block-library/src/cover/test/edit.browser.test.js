@@ -666,5 +666,165 @@ describe( 'Cover block', () => {
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
+
+		describe( 'with a gradient overlay', () => {
+			const PALE_GRADIENT =
+				'linear-gradient(135deg,#ffffff 0%,#fff5cc 100%)';
+			const DEEP_GRADIENT =
+				'linear-gradient(135deg,#000033 0%,#220000 100%)';
+			const gradientSettings = {
+				...defaultSettings,
+				__experimentalFeatures: {
+					color: {
+						...defaultSettings.__experimentalFeatures.color,
+						gradients: {
+							default: [
+								{
+									name: 'Pale',
+									slug: 'pale',
+									gradient: PALE_GRADIENT,
+								},
+								{
+									name: 'Deep',
+									slug: 'deep',
+									gradient: DEEP_GRADIENT,
+								},
+							],
+						},
+					},
+				},
+			};
+
+			async function setupWithGradient( attributes ) {
+				await setup( attributes, gradientSettings, [
+					createBlock( 'core/paragraph' ),
+				] );
+				const coverBlock = screen.getByLabelText( 'Block: Cover' );
+				await selectBlock( 'Block: Cover' );
+				await openStylesTabIfAvailable();
+				return coverBlock;
+			}
+
+			test( 'should follow the colors of the selected gradient', async () => {
+				const coverBlock = await setupWithGradient( {
+					overlayColor: 'black',
+				} );
+				await userEvent.click( screen.getByText( 'Overlay' ) );
+				await userEvent.click(
+					screen.getByRole( 'tab', { name: 'Gradient' } )
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'option', { name: 'Gradient: Pale' } )
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+
+				await userEvent.click(
+					screen.getByRole( 'option', { name: 'Gradient: Deep' } )
+				);
+				await waitFor( () =>
+					expect( coverBlock ).not.toHaveClass( 'is-light' )
+				);
+			} );
+
+			test( 'should follow the overlay color again after replacing the gradient with a color', async () => {
+				const coverBlock = await setupWithGradient( {
+					gradient: 'deep',
+				} );
+				await userEvent.click( screen.getByText( 'Overlay' ) );
+				await userEvent.click(
+					screen.getByRole( 'tab', { name: 'Color' } )
+				);
+				await userEvent.click(
+					screen.getByRole( 'option', { name: 'White' } )
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+			} );
+
+			test( 'should use the gradient when the overlay opacity changes', async () => {
+				const coverBlock = await setupWithGradient( {
+					customGradient: PALE_GRADIENT,
+					isDark: true,
+				} );
+
+				await userEvent.fill(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					'60'
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+			} );
+
+			test( 'should read the colors of a gradient using CSS variables', async () => {
+				document.documentElement.style.setProperty(
+					'--test-cover-pale',
+					'#ffffff'
+				);
+				const coverBlock = await setupWithGradient( {
+					customGradient:
+						'linear-gradient(var(--test-cover-pale) 0%,var(--test-cover-pale) 100%)',
+					isDark: true,
+				} );
+
+				await userEvent.fill(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					'60'
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+				document.documentElement.style.removeProperty(
+					'--test-cover-pale'
+				);
+			} );
+
+			test( 'should see through a transparent gradient at full opacity', async () => {
+				const coverBlock = await setupWithGradient( {
+					customGradient:
+						'linear-gradient(rgba(0,0,0,0) 0%,rgba(0,0,0,0) 100%)',
+					dimRatio: 50,
+					isDark: true,
+				} );
+
+				await userEvent.fill(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					'100'
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+			} );
+
+			test( 'should blend the gradient with a dark image', async () => {
+				vi.mocked( getMediaColor ).mockResolvedValue( '#000000' );
+				const coverBlock = await setupWithGradient( {
+					customGradient: PALE_GRADIENT,
+					dimRatio: 50,
+					isDark: true,
+					url: 'https://example.org/image.png',
+				} );
+
+				await userEvent.fill(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					'90'
+				);
+				await waitFor( () =>
+					expect( coverBlock ).toHaveClass( 'is-light' )
+				);
+			} );
+		} );
 	} );
 } );
