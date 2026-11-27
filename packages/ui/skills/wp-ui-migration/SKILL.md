@@ -35,7 +35,7 @@ This applies when the project enables the `@wordpress/use-recommended-components
 
 ## 4. Read the migration guide, then compare contracts
 
--   Look for the component's **Migration Guide** page in the Storybook, under the legacy component. Use it for renamed props, changed callbacks and removed behavior.
+-   Look for a migration guide in the installed `@wordpress/components` package, at `src/<component-folder>/stories/migration-guide.mdx`, where the folder is the legacy component's name in kebab-case, such as `src/checkbox-control/stories/migration-guide.mdx`. Find the package directory with `node -p "require('path').dirname(require.resolve('@wordpress/components/package.json'))"`. Links to the Storybook, such as those in ESLint messages, are not readable by agents, so read the file instead. Use the guide for renamed props, changed callbacks and removed behavior. Not every component has a guide, and the package is not installed when WordPress provides `@wordpress/components` at runtime.
 -   Without a guide, or to check one, compare the old and new component yourself: accepted values and defaults, controlled and uncontrolled state, callback arguments, rendered semantics, ref targets, styling hooks, keyboard and focus behavior, and submitted form values.
 -   Do not assume props keep their names. For example, `onChange` can become a differently named callback with a different argument.
 -   Check extension points your code exposes to others, such as SlotFill children and render callbacks. An adapter that handles your own callers may not handle values that other plugins pass.

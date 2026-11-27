@@ -31,4 +31,4 @@ The `@wordpress/use-recommended-components` rule in `@wordpress/eslint-plugin` f
 
 ## 4. Verify
 
-Import a legacy component that the rule flags, such as one that has a Migration Guide in the Storybook, in a scratch file and confirm that ESLint reports it. Remove the file. Report any step you could not run.
+Import a legacy component that the rule flags, such as `CheckboxControl`, in a scratch file and confirm that ESLint reports it. Remove the file. Report any step you could not run.
