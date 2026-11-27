@@ -28,7 +28,7 @@ export function registerSkills( server: McpServer ): void {
 								: `${ skill.name }/${ file.path }`,
 						description:
 							file.path === 'SKILL.md'
-								? skill.frontmatter.description
+								? String( skill.frontmatter.description )
 								: undefined,
 						mimeType: 'text/markdown',
 					} ) )

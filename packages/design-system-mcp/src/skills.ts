@@ -1,3 +1,4 @@
+import { load } from 'js-yaml';
 import type { Skill, SkillFile } from './types.ts';
 
 /**
@@ -12,33 +13,24 @@ export function skillUri( name: string, path: string ): string {
 }
 
 /**
- * Parse the flat `key: value` frontmatter of a `SKILL.md` file. Values may be
- * plain or double-quoted on a single line. Nested YAML is not supported,
- * because the skills this server publishes do not use it.
+ * Parse the YAML frontmatter of a `SKILL.md` file.
  *
  * @param markdown - The contents of `SKILL.md`.
- * @return The frontmatter fields, or null when there is no frontmatter.
+ * @return The frontmatter fields, or null when there is no frontmatter or it
+ *         is not a YAML mapping.
  */
 export function parseFrontmatter(
 	markdown: string
-): Record< string, string > | null {
+): Record< string, unknown > | null {
 	const match = markdown.match( /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/ );
 	if ( ! match ) {
 		return null;
 	}
 
-	const fields: Record< string, string > = {};
-	for ( const line of match[ 1 ].split( /\r?\n/ ) ) {
-		const field = line.match( /^([A-Za-z0-9_-]+):\s*(.*)$/ );
-		if ( ! field ) {
-			continue;
-		}
-		const raw = field[ 2 ].trim();
-		fields[ field[ 1 ] ] = raw.startsWith( '"' )
-			? ( JSON.parse( raw ) as string )
-			: raw;
-	}
-	return fields;
+	const fields = load( match[ 1 ] );
+	return fields && typeof fields === 'object' && ! Array.isArray( fields )
+		? ( fields as Record< string, unknown > )
+		: null;
 }
 
 /**

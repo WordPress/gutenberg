@@ -74,6 +74,6 @@ export interface Skill {
 	/** The skill name, which is also its directory name. */
 	name: string;
 	/** The `SKILL.md` frontmatter. */
-	frontmatter: Record< string, string >;
+	frontmatter: Record< string, unknown >;
 	files: SkillFile[];
 }

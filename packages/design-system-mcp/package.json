@@ -42,9 +42,11 @@
 	"dependencies": {
 		"@cfworker/json-schema": "^4.1.1",
 		"@modelcontextprotocol/server": "2.0.0-alpha.2",
+		"js-yaml": "^4.3.2",
 		"zod": "^4.6.6"
 	},
 	"devDependencies": {
+		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^22.20.5",
 		"vitest": "^5.1.1"
 	},
