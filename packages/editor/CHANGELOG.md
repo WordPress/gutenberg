@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+### New Features
+
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+
+### Enhancements
+
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep the form to add a term usable after creating a term fails, instead of ignoring every later attempt ([#87498](https://github.com/WordPress/gutenberg/pull/87498)).
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep categories checked while a new one is being created, and match category names containing HTML entities when searching or adding ([#87517](https://github.com/WordPress/gutenberg/pull/87517)).
+-   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
+-   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
+-   Undo: Clicking below the content of an empty post no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+-   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `PostTaxonomiesFlatTermSelector`, `PostTaxonomiesHierarchicalTermSelector`: Prevent saving the post while a new term is being created, so the term isn't left out of the saved post ([#87321](https://github.com/WordPress/gutenberg/pull/87321)).
+-   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
+-   Show `auto` as the canvas height in the viewport status in the editor footer for patterns, template parts and navigation menus ([#87375](https://github.com/WordPress/gutenberg/pull/87375)).
+-   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
+-   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
+-   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
+-   `DocumentTools`: Fix arrow key navigation in the toolbar below the medium breakpoint ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
+-   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
+## 16.2.0 (2026-11-18)
+
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
@@ -11,6 +53,9 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
+-   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -23,6 +68,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Editor: Escape Openverse metadata in image captions.
 
 ### Internal
 
@@ -360,6 +406,12 @@
 
 ## 14.34.0 (2025-10-29)
 
+## 14.33.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)
@@ -388,6 +440,12 @@
 
 ## 14.20.0 (2025-03-13)
 
+## 14.19.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.19.0 (2025-02-28)
 
 ## 14.18.0 (2025-02-12)
@@ -414,6 +472,12 @@
 
 ## 14.9.0 (2024-10-03)
 
+## 14.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)
@@ -433,6 +497,12 @@
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)
+
+## 14.0.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 14.0.0 (2024-05-31)
 
@@ -459,6 +529,12 @@
 
 ## 13.29.0 (2024-02-21)
 
+## 13.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.28.0 (2024-02-09)
 
 ## 13.27.0 (2024-01-24)
@@ -481,6 +557,12 @@
 
 ## 13.20.0 (2023-10-05)
 
+## 13.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.19.0 (2023-09-20)
 
 ## 13.18.0 (2023-08-31)
@@ -494,6 +576,12 @@
 ## 13.14.0 (2023-07-05)
 
 ## 13.13.0 (2023-06-23)
+
+## 13.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.12.0 (2023-06-07)
 
@@ -512,6 +600,12 @@
 ## 13.5.0 (2023-03-01)
 
 ## 13.4.0 (2023-02-15)
+
+## 13.3.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.3.0 (2023-02-01)
 

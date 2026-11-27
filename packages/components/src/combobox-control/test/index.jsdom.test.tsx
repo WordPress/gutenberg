@@ -1,9 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
+import { Dialog } from '@wordpress/ui';
 import _ComboboxControl from '..';
+import Dropdown from '../../dropdown';
+import Modal from '../../modal';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
+
+globalThis.wpVitest.mockCSSSupports();
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -75,6 +80,211 @@ const ControlledComboboxControl = ( {
 		</>
 	);
 };
+
+describe( 'ComboboxControl popup relationship', () => {
+	it( 'only references rendered suggestions', async () => {
+		const user = userEvent.setup();
+		const props = { options: timezones, label: defaultLabelText };
+		const { rerender } = render( <ComboboxControl { ...props } /> );
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+
+		await user.type( input, 'European' );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).toHaveAttribute(
+			'aria-controls',
+			screen.getByRole( 'listbox' ).id
+		);
+		expect( input ).toHaveAttribute(
+			'aria-activedescendant',
+			screen.getByRole( 'option', { selected: true } ).id
+		);
+
+		rerender( <ComboboxControl { ...props } isLoading /> );
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveValue( 'European' );
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+
+		rerender( <ComboboxControl { ...props } /> );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).toHaveAttribute(
+			'aria-controls',
+			screen.getByRole( 'listbox' ).id
+		);
+		expect( input ).toHaveAttribute(
+			'aria-activedescendant',
+			screen.getByRole( 'option', { selected: true } ).id
+		);
+
+		await user.keyboard( '[Escape]' );
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+	} );
+} );
+
+describe( 'ComboboxControl Escape key', () => {
+	it( 'closes the suggestions list first, and then a parent Modal', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( onRequestClose ).not.toHaveBeenCalled();
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes the suggestions list first, and then a parent `@wordpress/ui` Dialog', async () => {
+		const user = userEvent.setup();
+		const onOpenChange = vi.fn();
+		render(
+			<Dialog.Root open onOpenChange={ onOpenChange }>
+				<Dialog.Popup>
+					<Dialog.Title>Dialog</Dialog.Title>
+					<ComboboxControl
+						options={ timezones }
+						label={ defaultLabelText }
+					/>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+		const input = await screen.findByRole( 'combobox', {
+			name: defaultLabelText,
+		} );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( onOpenChange ).not.toHaveBeenCalled();
+
+		await user.keyboard( '[Escape]' );
+		expect( onOpenChange ).toHaveBeenCalledTimes( 1 );
+		expect( onOpenChange ).toHaveBeenCalledWith( false, expect.anything() );
+	} );
+
+	it( 'closes a parent Modal when Escape is pressed on the Reset button', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+					allowReset
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		await user.keyboard( '[Enter]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+		// `Modal` constrains tabbing, which finds no tabbable elements in
+		// jsdom, so move focus to the Reset button directly.
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		act( () => resetButton.focus() );
+		expect( resetButton ).toHaveFocus();
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes the suggestions list first, and then a parent Dropdown', async () => {
+		const user = userEvent.setup();
+		const { unmount } = render(
+			<Dropdown
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggle
+					</button>
+				) }
+				renderContent={ () => (
+					<ComboboxControl
+						options={ timezones }
+						label={ defaultLabelText }
+					/>
+				) }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const input = await screen.findByRole( 'combobox', {
+			name: defaultLabelText,
+		} );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toBeInTheDocument();
+
+		await user.keyboard( '[Escape]' );
+		await waitFor( () => expect( input ).not.toBeInTheDocument() );
+
+		// Clean up remaining effects, like the delayed popover positioning.
+		unmount();
+	} );
+
+	it( 'ends the search first, and then closes a parent Modal, while results are loading', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+					value={ timezones[ 0 ].value }
+					isLoading
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		await user.keyboard( 'x' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).toHaveValue( 'x' );
+
+		await user.keyboard( '[Escape]' );
+		expect( input ).toHaveValue( timezones[ 0 ].label );
+		expect( onRequestClose ).not.toHaveBeenCalled();
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
 
 describe.each( [
 	[ 'uncontrolled', ComboboxControl ],

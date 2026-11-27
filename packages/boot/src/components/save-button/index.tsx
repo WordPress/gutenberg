@@ -1,14 +1,16 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	privateApis as coreDataPrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	ariaKeyShortcut,
 	displayShortcut,
 	shortcutAriaLabel,
 } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
 import {
 	KeyboardShortcutDescription,
@@ -18,6 +20,9 @@ import {
 } from '@wordpress/ui';
 import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
+import { unlock } from '../../lock-unlock';
+
+const { EntitiesSavedStates } = unlock( coreDataPrivateApis );
 
 export default function SaveButton() {
 	const [ isSaveViewOpen, setIsSaveViewOpened ] = useState( false );

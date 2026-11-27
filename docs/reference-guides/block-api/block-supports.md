@@ -1080,6 +1080,56 @@ supports: {
 }
 ```
 
+## transform
+
+_**Note:** Since WordPress 7.3._
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties:
+    -   `rotate`: type `boolean`, default value `false`
+    -   `translate`: type `boolean`, default value `false`
+    -   `scale`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, `settings.transform.translate`, `settings.transform.scale` or `settings.appearanceTools`.
+
+Each feature is output as its own CSS property, such as `rotate`, `translate` or `scale`, and never as the `transform` shorthand. This way a rotation, an offset and a scale combine with each other and with any `transform` a theme or block already applies.
+
+```js
+supports: {
+	transform: {
+		rotate: true, // Enable the rotation control.
+		translate: true, // Enable the X and Y offset controls.
+		scale: true, // Enable the scale control.
+	}
+}
+```
+
+An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen. A scale does the same: it grows or shrinks the block around its center without changing the layout around it.
+
+Each axis is set on its own, like margin sides. An offset outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each axis it sets, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. An axis left out comes from the styles below it, such as Global Styles, a block style variation or the block's default offset under a state, and is `0` when none sets it. When a user changes one axis in the block editor, only that axis is saved. The two custom properties are registered with `@property` and do not inherit, so a nested block does not take its parent's offset.
+
+Transforms are saved as an inline style on the block wrapper. To apply them to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`, and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
+
+When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
+
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate`, `translate` or `scale` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. An axis can be left out. A scale is a single non-negative number, such as `1.2`, or percentage, such as `"120%"`, that scales both axes. For example:
+
+```js
+attributes: {
+    style: {
+        transform: {
+            rotate: "15deg",
+            translate: {
+                x: "10px",
+                y: "-50%",
+            },
+            scale: 1.2,
+        }
+    }
+}
+```
+
 ## typography
 
 -   Type: `Object`

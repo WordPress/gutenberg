@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add private helpers that read CSS transforms, and a dependency on `@wordpress/private-apis` ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
+
+## 5.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `safeHTML`: Also strip script URLs and the `object`, `embed`, `base`, `meta`, `noscript` and `template` elements, sandbox iframes that the same-origin policy doesn't isolate, and no longer return markup that changes when it is parsed again ([#86176](https://github.com/WordPress/gutenberg/pull/86176)).

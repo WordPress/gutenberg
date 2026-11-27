@@ -54,11 +54,7 @@ function BlockBindingsSourceFieldsListItem( {
 					[ attribute ]: checked ? itemBindings : undefined,
 				} );
 			} }
-			checked={
-				fastDeepEqual( args, field.args ) ??
-				// Deprecate key dependency in 7.0.
-				field.key === args?.key
-			}
+			checked={ fastDeepEqual( args, itemBindings.args ) }
 		>
 			<Menu.ItemLabel>{ field.label }</Menu.ItemLabel>
 			<Menu.ItemDescription>{ values[ attribute ] }</Menu.ItemDescription>
@@ -101,8 +97,10 @@ export default function BlockBindingsSourceFieldsList( {
 					{ fields.map( ( field: BlockBindingsField ) => (
 						<BlockBindingsSourceFieldsListItem
 							key={
-								sourceKey + JSON.stringify( field.args ) ||
-								field.key
+								sourceKey +
+								JSON.stringify(
+									field.args || { key: field.key }
+								)
 							}
 							args={ args }
 							attribute={ attribute }

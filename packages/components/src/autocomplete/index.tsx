@@ -5,7 +5,12 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useEvent,
+	useInstanceId,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -382,37 +387,38 @@ export function useAutocompleteProps< TReplacement = RichTextValue >(
 	options: Omit< UseAutocompleteProps< TReplacement >, 'contentRef' >
 ) {
 	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef =
-		useRef< ( event: KeyboardEvent ) => void >( undefined );
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
-	onKeyDownRef.current = onKeyDown;
+	const onKeyDownEvent = useEvent( onKeyDown );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: Event ) {
-				onKeyDownRef.current?.( event as KeyboardEvent );
-			}
-			// Capture phase. When the autocomplete popover is open,
-			// Up/Down/Enter/Escape must navigate the completion list —
-			// they shouldn't be consumed by ancestor handlers (e.g.
-			// block-editor's writing-flow) for block navigation, block
-			// splitting, or "move out of parent" actions. Those handlers
-			// fire at bubble phase and gate on `event.defaultPrevented`,
-			// so firing in capture lets us preventDefault first when the
-			// popover is active.
-			return subscribeOwnedListener(
-				element,
-				'keydown',
-				_onKeyDown,
-				true
-			);
-		}, [] ),
+		useRefEffect(
+			( element: HTMLElement ) => {
+				function _onKeyDown( event: Event ) {
+					onKeyDownEvent( event as KeyboardEvent );
+				}
+				// Capture phase. When the autocomplete popover is open,
+				// Up/Down/Enter/Escape must navigate the completion list —
+				// they shouldn't be consumed by ancestor handlers (e.g.
+				// block-editor's writing-flow) for block navigation, block
+				// splitting, or "move out of parent" actions. Those handlers
+				// fire at bubble phase and gate on `event.defaultPrevented`,
+				// so firing in capture lets us preventDefault first when the
+				// popover is active.
+				return subscribeOwnedListener(
+					element,
+					'keydown',
+					_onKeyDown,
+					true
+				);
+			},
+			[ onKeyDownEvent ]
+		),
 	] );
 
 	// We only want to show the popover if the user has typed something.

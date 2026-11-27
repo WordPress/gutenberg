@@ -1,0 +1,110 @@
+import clsx from 'clsx';
+import { useState, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import {
+	BlockControls,
+	__experimentalGetElementClassName,
+	RichText,
+} from '@wordpress/block-editor';
+import { ToolbarButton } from '@wordpress/components';
+import { caption as captionIcon } from '@wordpress/icons';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import type { CaptionProps } from './types';
+
+export function Caption( {
+	attributeKey = 'caption',
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+	placeholder = __( 'Add caption' ),
+	label = __( 'Caption text' ),
+	showToolbarButton = true,
+	excludeElementClassName,
+	className,
+	readOnly,
+	tagName = 'figcaption',
+	addLabel = __( 'Add caption' ),
+	removeLabel = __( 'Remove caption' ),
+	icon = captionIcon,
+	...props
+}: CaptionProps ) {
+	const caption = attributes[ attributeKey ] as string | undefined;
+	const isCaptionEmpty = RichText.isEmpty( caption );
+	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
+
+	// We need to show the caption when changes come from
+	// history navigation(undo/redo).
+	if ( ! isCaptionEmpty && ! showCaption ) {
+		setShowCaption( true );
+	}
+
+	if ( ! isSelected && isCaptionEmpty && showCaption ) {
+		setShowCaption( false );
+	}
+
+	// Focus the caption when we click to add one.
+	const ref = useCallback(
+		( node: HTMLElement | null ) => {
+			if ( node && isCaptionEmpty ) {
+				node.focus();
+			}
+		},
+		[ isCaptionEmpty ]
+	);
+
+	return (
+		<>
+			{ showToolbarButton && (
+				<BlockControls group="block">
+					<ToolbarButton
+						onClick={ () => {
+							setShowCaption( ! showCaption );
+							if ( showCaption && caption ) {
+								setAttributes( {
+									[ attributeKey ]: undefined,
+								} );
+							}
+						} }
+						icon={ icon }
+						isPressed={ showCaption }
+						label={ showCaption ? removeLabel : addLabel }
+					/>
+				</BlockControls>
+			) }
+			{ showCaption &&
+				( ! RichText.isEmpty( caption ) || isSelected ) && (
+					<RichText
+						identifier={ attributeKey }
+						tagName={ tagName }
+						className={ clsx(
+							className,
+							excludeElementClassName
+								? ''
+								: __experimentalGetElementClassName( 'caption' )
+						) }
+						ref={ ref }
+						aria-label={ label }
+						placeholder={ placeholder }
+						value={ caption }
+						onChange={ ( value ) =>
+							setAttributes( { [ attributeKey ]: value } )
+						}
+						inlineToolbar
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock(
+												getDefaultBlockName()!
+											)
+										)
+								: undefined
+						}
+						readOnly={ readOnly }
+						{ ...props }
+					/>
+				) }
+		</>
+	);
+}

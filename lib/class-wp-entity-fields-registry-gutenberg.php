@@ -8,6 +8,17 @@
 class WP_Entity_Fields_Registry_Gutenberg extends WP_Entity_Fields_Registry {
 
 	/**
+	 * Whether the registry is firing the `wp_entity_fields_api_init` action, the
+	 * only time register(), update(), unregister(), and register_collection() run.
+	 *
+	 * Declared here too for the WordPress versions whose registry predates
+	 * core#16009, see doing_entity_fields_api_init().
+	 *
+	 * @var bool
+	 */
+	protected $initializing = false;
+
+	/**
 	 * Returns the shared registry instance.
 	 *
 	 * This class intentionally does not redeclare the static `$instance`
@@ -148,6 +159,72 @@ class WP_Entity_Fields_Registry_Gutenberg extends WP_Entity_Fields_Registry {
 		}
 
 		return $valid;
+	}
+
+	/*
+	 * The methods below override those of WordPress versions that ship the
+	 * registry before core#16009, which checked doing_action() and so let a
+	 * do_action() call of `wp_entity_fields_api_init` from outside the
+	 * registry register fields. They can be removed once the plugin requires
+	 * a WordPress version that includes it.
+	 */
+
+	/**
+	 * Fires the `wp_entity_fields_api_init` action, on the first read of the
+	 * registered fields once `init` has completed.
+	 *
+	 * See WP_Entity_Fields_Registry::initialize(). It sets `$initializing`
+	 * while the action fires, the only time fields can be registered.
+	 */
+	protected function initialize() {
+		if ( $this->initialized ) {
+			return;
+		}
+
+		if ( ! did_action( 'init' ) || doing_action( 'init' ) ) {
+			// The notice names the method of the base class, whichever runs.
+			_doing_it_wrong(
+				'WP_Entity_Fields_Registry::initialize',
+				__( 'The registered fields cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `wp_entity_fields_api_init`.', 'gutenberg' ),
+				'7.2.0'
+			);
+			return;
+		}
+
+		// Set before firing, so a callback reading the registry to inspect
+		// the fields it updates does not fire the action again.
+		$this->initialized = true;
+
+		$this->initializing = true;
+		try {
+			/** This action is documented in lib/compat/wordpress-7.2/class-wp-entity-fields-registry.php */
+			do_action( 'wp_entity_fields_api_init' );
+		} finally {
+			$this->initializing = false;
+		}
+	}
+
+	/**
+	 * Checks that the registry is firing the `wp_entity_fields_api_init` action,
+	 * as register(), update(), unregister(), and register_collection() require.
+	 *
+	 * The registry tracks its own firing rather than check doing_action(), so
+	 * firing the action again with do_action() does not reopen it once read.
+	 *
+	 * @param string $method The calling method, for the notice.
+	 * @return bool Whether the action is firing.
+	 */
+	protected function doing_entity_fields_api_init( $method ) {
+		if ( $this->initializing ) {
+			return true;
+		}
+
+		_doing_it_wrong(
+			$method,
+			__( 'Fields can only be registered, updated, and unregistered on the `wp_entity_fields_api_init` action.', 'gutenberg' ),
+			'7.2.0'
+		);
+		return false;
 	}
 }
 

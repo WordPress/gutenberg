@@ -145,8 +145,11 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
  *
  * @since 7.3.0
  *
- * @param array $block_attributes Block attributes.
- * @return array Array with `class` and `style` keys, each present only when non-empty.
+ * @param array<string, mixed> $block_attributes Block attributes.
+ * @return array<string, string> Array with `class` and `style` keys, each present only when non-empty.
+ *
+ * @phpstan-param array{ style?: array{ color?: array<string, mixed>, ...<string, mixed> }, ...<string, mixed> } $block_attributes
+ * @phpstan-return array{ class?: non-empty-string, style?: non-empty-string }
  */
 function gutenberg_get_color_classes_and_styles( $block_attributes ) {
 	if ( ! is_array( $block_attributes ) ) {

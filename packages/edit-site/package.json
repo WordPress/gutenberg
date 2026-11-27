@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "8.1.0",
+	"version": "8.2.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -70,6 +70,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",
@@ -81,15 +82,24 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/views": "file:../views",
 		"@wordpress/widgets": "file:../widgets",
-		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

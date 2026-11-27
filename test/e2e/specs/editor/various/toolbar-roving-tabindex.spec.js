@@ -136,6 +136,71 @@ test.describe( 'Toolbar roving tabindex', () => {
 	} );
 } );
 
+test.describe( 'Document tools roving tabindex', () => {
+	// Undo and redo aren't rendered below 782px.
+	test.use( { viewport: { width: 700, height: 700 } } );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'moves focus to the next visible tool when undo and redo are not displayed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Block Inserter' );
+
+		await page.keyboard.press( 'ArrowRight' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+
+	test( 'does not leave focus on an element removed from the tab order', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		for ( let i = 0; i < 4; i++ ) {
+			await page.keyboard.press( 'ArrowRight' );
+			await expect
+				.poll( () =>
+					page.evaluate( () => document.activeElement?.tabIndex )
+				)
+				.toBe( 0 );
+		}
+	} );
+
+	test( 'stays reachable with Shift+Tab and Alt+F10 after an arrow key press', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.not.toBe( 'Document Overview' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+
+		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+} );
+
 class ToolbarRovingTabindexUtils {
 	constructor( { editor, page, pageUtils } ) {
 		this.editor = editor;
