@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update `moment-timezone` to `^0.5.48` for IANA timezone data 2025b, so sites in zones whose rules changed since 2023, such as Paraguay and Kazakhstan, show dates in the right local time ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
+
 ## 6.2.0 (2026-11-18)
 
 ## 6.1.0 (2026-11-04)

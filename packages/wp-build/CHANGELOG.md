@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Update `moment-timezone` to `^0.5.48`, so builds ship IANA timezone data 2025b instead of 2023c ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
 -   Keep `translators:` comments next to their `__()`, `_x()`, `_n()` and `_nx()` calls in the transpiled and unminified output, so `wp i18n make-pot` extracts them from the built files ([#87189](https://github.com/WordPress/gutenberg/pull/87189)).
 
 ### Internal
