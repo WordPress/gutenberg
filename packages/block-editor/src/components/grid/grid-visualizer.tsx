@@ -10,10 +10,7 @@ import {
 	createPortal,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalUseDropZone as useDropZone,
-	useEvent,
-} from '@wordpress/compose';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import {
@@ -42,10 +39,8 @@ import {
 	getStyleForState,
 } from '../../hooks/block-style-state';
 import { isPlainObject } from '../../utils/object';
-import type { BlockStyleState } from '../../hooks/types';
 import type {
 	AutoGridVisualizerProps,
-	GetGridDropRects,
 	GridDropBlock,
 	GridDropPlacement,
 	GridInfo,
@@ -227,18 +222,13 @@ function ManualGridVisualizer( {
 		( select ) => select( blockEditorStore ).isDraggingBlocks(),
 		[]
 	);
-	const getDropRects = useGridDropRects( gridElement, gridInfo, isDragging );
 	const dropZoneRef = useGridVisualizerDropZone(
 		gridClientId,
-		getDropRects,
+		gridElement,
 		gridInfo,
+		isDragging,
 		setHighlightedItems
 	);
-	useEffect( () => {
-		if ( ! isDragging ) {
-			setHighlightedItems( null );
-		}
-	}, [ isDragging ] );
 
 	const gridItemStyles = useSelect(
 		( select ) => {
@@ -347,94 +337,6 @@ function ManualGridVisualizer( {
 	);
 }
 
-function useGridDropRects(
-	gridElement: Element,
-	gridInfo: GridInfo,
-	isDragging: boolean
-): GetGridDropRects {
-	const { refsMap } = useContext( BlockRefs );
-	const measurementsRef = useRef< {
-		gridElement: Element;
-		gridInfo: GridInfo;
-		trackSizes?: GridDropTrackSizes | null;
-		sizes: Map<
-			string,
-			{
-				attributes: object;
-				selectedState: BlockStyleState | undefined;
-				spans: GridDropSpans;
-			}
-		>;
-	} | null >( null );
-
-	useEffect( () => {
-		if ( ! isDragging ) {
-			measurementsRef.current = null;
-		}
-	}, [ isDragging ] );
-
-	return useEvent< GetGridDropRects >(
-		( blocks, column, row, preserveRelativePositions ) => {
-			if (
-				measurementsRef.current?.gridElement !== gridElement ||
-				measurementsRef.current.gridInfo !== gridInfo
-			) {
-				measurementsRef.current = {
-					gridElement,
-					gridInfo,
-					sizes: new Map(),
-				};
-			}
-			const measurements = measurementsRef.current;
-			const items = blocks.map(
-				( { clientId, attributes, selectedState, layout } ) => {
-					let size = measurements.sizes.get( clientId );
-					if (
-						! size ||
-						size.attributes !== attributes ||
-						size.selectedState?.viewport !==
-							selectedState?.viewport ||
-						size.selectedState?.pseudo !== selectedState?.pseudo
-					) {
-						const blockElement = refsMap.get( clientId );
-						// Items already in this grid retain their size, including user overrides.
-						const incomingElement =
-							blockElement?.parentElement === gridElement
-								? undefined
-								: blockElement;
-						if (
-							incomingElement &&
-							measurements.trackSizes === undefined
-						) {
-							measurements.trackSizes =
-								getManualGridDropTrackSizes( gridElement );
-						}
-						size = {
-							attributes,
-							selectedState,
-							spans: getManualGridDropSpans(
-								incomingElement,
-								layout,
-								gridInfo.numColumns,
-								measurements.trackSizes
-							),
-						};
-						measurements.sizes.set( clientId, size );
-					}
-					return { spans: size.spans, layout };
-				}
-			);
-			return getManualGridDropRects(
-				items,
-				column,
-				row,
-				gridInfo.numColumns,
-				preserveRelativePositions
-			);
-		}
-	);
-}
-
 function GridVisualizerCell( {
 	color,
 	column,
@@ -462,8 +364,9 @@ function GridVisualizerCell( {
 
 function useGridVisualizerDropZone(
 	gridClientId: string,
-	getDropRects: GetGridDropRects,
+	gridElement: Element,
 	gridInfo: GridInfo,
+	isDragging: boolean,
 	setHighlightedItems: Dispatch<
 		SetStateAction< GridDropPlacement[] | null >
 	>
@@ -485,18 +388,36 @@ function useGridVisualizerDropZone(
 		getDraggedBlockClientIds,
 		getSelectedBlockStyleState,
 	} = unlock( useSelect( blockEditorStore ) );
-	const dropRef = useRef< {
-		items: ( GridDropBlock & GridDropPlacement )[];
-		sourceRootClientId: string | null;
-		preserveRelativePositions: boolean;
+	const dropCacheRef = useRef< {
+		clientIds: string[];
+		gridElement: Element;
 		gridInfo: GridInfo;
-		column: number;
-		row: number;
+		trackSizes?: GridDropTrackSizes | null;
+		blocks: Map<
+			string,
+			GridDropBlock & {
+				layout: Record< string, unknown >;
+				spans: GridDropSpans;
+			}
+		>;
+		preview?: {
+			items: ( GridDropBlock & GridDropPlacement )[];
+			sourceRootClientId: string | null;
+			preserveRelativePositions: boolean;
+			column: number;
+			row: number;
+		};
 	} | null >( null );
 	const { stopDragging, hideInsertionPoint } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const commitDrop = useManualGridDrop( gridClientId, gridInfo.numColumns );
+	useEffect( () => {
+		if ( ! isDragging ) {
+			dropCacheRef.current = null;
+			setHighlightedItems( null );
+		}
+	}, [ isDragging, setHighlightedItems ] );
 
 	function getDrop( event: DragEvent ) {
 		const clientIds: string[] = getDraggedBlockClientIds();
@@ -525,19 +446,6 @@ function useGridVisualizerDropZone(
 				! canRemoveBlocks( clientIds ) )
 		) {
 			return;
-		}
-		const blocks: GridDropBlock[] = [];
-		for ( const clientId of clientIds ) {
-			const attributes = getBlockAttributes( clientId );
-			if ( ! attributes ) {
-				return;
-			}
-			blocks.push( {
-				clientId,
-				attributes,
-				selectedState: getSelectedBlockStyleState( clientId ),
-				layout: {},
-			} );
 		}
 		const sourceLayout = sourceRootClientId
 			? getBlockAttributes( sourceRootClientId )?.layout
@@ -612,62 +520,105 @@ function useGridVisualizerDropZone(
 		if ( ! column || ! row ) {
 			return;
 		}
-		const previousDrop = dropRef.current;
 		if (
-			previousDrop &&
-			previousDrop.sourceRootClientId === sourceRootClientId &&
-			previousDrop.preserveRelativePositions ===
-				preserveRelativePositions &&
-			previousDrop.gridInfo === gridInfo &&
-			previousDrop.column === column &&
-			previousDrop.row === row &&
-			previousDrop.items.length === blocks.length &&
-			previousDrop.items.every( ( item, index ) => {
-				const block = blocks[ index ];
-				return (
-					item.clientId === block.clientId &&
-					item.attributes === block.attributes &&
-					item.selectedState?.viewport ===
-						block.selectedState?.viewport &&
-					item.selectedState?.pseudo === block.selectedState?.pseudo
-				);
-			} )
+			dropCacheRef.current?.clientIds !== clientIds ||
+			dropCacheRef.current.gridElement !== gridElement ||
+			dropCacheRef.current.gridInfo !== gridInfo
 		) {
-			return previousDrop;
+			dropCacheRef.current = {
+				clientIds,
+				gridElement,
+				gridInfo,
+				blocks: new Map(),
+			};
 		}
-		for ( const block of blocks ) {
-			const style = isPlainObject( block.attributes.style )
-				? block.attributes.style
+		const cache = dropCacheRef.current;
+		for ( const clientId of clientIds ) {
+			const attributes = getBlockAttributes( clientId );
+			if ( ! attributes ) {
+				return;
+			}
+			const selectedState = getSelectedBlockStyleState( clientId );
+			const cachedBlock = cache.blocks.get( clientId );
+			if (
+				cachedBlock &&
+				cachedBlock.attributes === attributes &&
+				cachedBlock.selectedState?.viewport ===
+					selectedState?.viewport &&
+				cachedBlock.selectedState?.pseudo === selectedState?.pseudo
+			) {
+				continue;
+			}
+			const style = isPlainObject( attributes.style )
+				? attributes.style
 				: undefined;
 			const stateStyle = getStyleForState( style, {
-				...block.selectedState,
+				...selectedState,
 				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
 			} );
-			block.layout = {
+			const layout = {
 				...( isPlainObject( style?.layout ) ? style.layout : {} ),
 				...( isPlainObject( stateStyle?.layout )
 					? stateStyle.layout
 					: {} ),
 			};
+			const element = refsMap.get( clientId );
+			// Items already in this grid retain their size, including user overrides.
+			const incomingElement =
+				element?.parentElement === gridElement ? undefined : element;
+			if ( incomingElement && cache.trackSizes === undefined ) {
+				cache.trackSizes = getManualGridDropTrackSizes( gridElement );
+			}
+			cache.blocks.set( clientId, {
+				clientId,
+				attributes,
+				selectedState,
+				layout,
+				spans: getManualGridDropSpans(
+					incomingElement,
+					layout,
+					gridInfo.numColumns,
+					cache.trackSizes
+				),
+			} );
+			cache.preview = undefined;
 		}
-		const rects = getDropRects(
+		const previousDrop = cache.preview;
+		if (
+			previousDrop &&
+			previousDrop.sourceRootClientId === sourceRootClientId &&
+			previousDrop.preserveRelativePositions ===
+				preserveRelativePositions &&
+			previousDrop.column === column &&
+			previousDrop.row === row
+		) {
+			return previousDrop;
+		}
+		const blocks = clientIds.map( ( clientId ) =>
+			cache.blocks.get( clientId )!
+		);
+		const rects = getManualGridDropRects(
 			blocks,
 			column,
 			row,
+			gridInfo.numColumns,
 			preserveRelativePositions
 		);
-		dropRef.current = {
-			items: blocks.map( ( block, index ) => ( {
-				...block,
-				rect: rects[ index ],
-			} ) ),
+		cache.preview = {
+			items: blocks.map(
+				( { clientId, attributes, selectedState }, index ) => ( {
+					clientId,
+					attributes,
+					selectedState,
+					rect: rects[ index ],
+				} )
+			),
 			sourceRootClientId,
 			preserveRelativePositions,
-			gridInfo,
 			column,
 			row,
 		};
-		return dropRef.current;
+		return cache.preview;
 	}
 
 	function highlightDrop( event: DragEvent ) {
@@ -676,7 +627,9 @@ function useGridVisualizerDropZone(
 
 	function clearHighlight() {
 		setHighlightedItems( null );
-		dropRef.current = null;
+		if ( dropCacheRef.current ) {
+			dropCacheRef.current.preview = undefined;
+		}
 	}
 
 	return useDropZone( {

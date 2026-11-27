@@ -154,29 +154,18 @@ export interface GridVisualizerCellPosition {
 }
 
 /**
- * A dragged block and its resolved layout style.
+ * A dragged block's data for committing a drop.
  */
 export interface GridDropBlock {
 	clientId: string;
 	attributes: Record< string, unknown >;
 	selectedState: BlockStyleState | undefined;
-	layout: Record< string, unknown >;
 }
 
 export interface GridDropPlacement {
 	clientId: string;
 	rect: GridRect;
 }
-
-/**
- * Measures dragged blocks once and places their footprints at the hovered cell.
- */
-export type GetGridDropRects = (
-	blocks: GridDropBlock[],
-	column: number,
-	row: number,
-	preserveRelativePositions: boolean
-) => GridRect[];
 
 export interface AutoGridVisualizerProps {
 	gridInfo: GridInfo;

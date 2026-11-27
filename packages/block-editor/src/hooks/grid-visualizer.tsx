@@ -27,28 +27,34 @@ function GridLayoutSync( props: GridLayoutSyncProps ) {
 }
 
 function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
+	const isManualGrid =
+		layout.isManualPlacement &&
+		window.__experimentalEnableGridInteractivity;
 	const { isVisible, blockVisibility, deviceType, viewportSettings } =
 		useSelect(
 			( select ) => {
 				const {
 					isBlockSelected,
 					hasSelectedInnerBlock,
-					isDraggingBlocks,
+					getDraggedBlockClientIds,
 					getTemplateLock,
 					getBlockEditingMode,
 					getBlockAttributes,
 					getSettings,
 				} = select( blockEditorStore );
+				const draggedBlockCount = getDraggedBlockClientIds().length;
+				const isMultiBlockCanvasDrag =
+					isManualGrid && draggedBlockCount > 1;
 
 				// These calls are purposely ordered from least expensive to most expensive.
-				// Hides the visualizer in cases where the user is not or cannot interact with it.
-				// Also hide if a child block is selected, because layout-child.tsx will render
-				// the visualizer in that case (with proper childGridClientId handling).
+				// Selected child controls normally render the overlay. The Canvas
+				// owns it during multi-selection drags, including mixed block types.
 				if (
-					( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
+					( ! draggedBlockCount && ! isBlockSelected( clientId ) ) ||
 					getTemplateLock( clientId ) ||
 					getBlockEditingMode( clientId ) !== 'default' ||
-					hasSelectedInnerBlock( clientId )
+					( ! isMultiBlockCanvasDrag &&
+						hasSelectedInnerBlock( clientId ) )
 				) {
 					return { isVisible: false };
 				}
@@ -70,7 +76,7 @@ function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 						settings?.__experimentalFeatures?.viewport,
 				};
 			},
-			[ clientId ]
+			[ clientId, isManualGrid ]
 		);
 
 	// Get the block's DOM element to derive the canvas iframe window,

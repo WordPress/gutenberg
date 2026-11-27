@@ -410,6 +410,8 @@ function GridTools( {
 	isManualPlacement,
 	parentLayout,
 }: GridToolsProps ) {
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
 	const {
 		rootClientId,
 		isVisible,
@@ -429,13 +431,16 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				getDraggedBlockClientIds,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
+			// The Canvas renders the overlay during a multi-selection drag.
 			if (
 				getTemplateLock( _rootClientId ) ||
-				getBlockEditingMode( _rootClientId ) !== 'default'
+				getBlockEditingMode( _rootClientId ) !== 'default' ||
+				( isManualGrid && getDraggedBlockClientIds().length > 1 )
 			) {
 				return {
 					rootClientId: _rootClientId,
@@ -465,7 +470,7 @@ function GridTools( {
 				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isManualGrid ]
 	);
 
 	// Get the block's DOM element to derive the canvas iframe window,
@@ -550,18 +555,17 @@ function GridTools( {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualPlacement &&
-				window.__experimentalEnableGridInteractivity && (
-					<GridItemMovers
-						style={ style }
-						selectedState={ selectedState }
-						isResponsiveEditing={ isResponsiveEditing }
-						parentLayout={ parentLayout }
-						onChange={ updateLayout }
-						gridClientId={ rootClientId }
-						blockClientId={ clientId }
-					/>
-				) }
+			{ isManualGrid && (
+				<GridItemMovers
+					style={ style }
+					selectedState={ selectedState }
+					isResponsiveEditing={ isResponsiveEditing }
+					parentLayout={ parentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
+				/>
+			) }
 		</>
 	);
 }

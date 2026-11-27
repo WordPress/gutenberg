@@ -7,7 +7,7 @@ import type { ChildLayoutBlockStyle } from '../../hooks/types';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import type { GridDropBlock, GridDropPlacement } from './types';
 
-type ManualGridDropItem = Omit< GridDropBlock, 'layout' > & GridDropPlacement;
+type ManualGridDropItem = GridDropBlock & GridDropPlacement;
 
 export function useManualGridDrop( gridClientId: string, numColumns: number ) {
 	const registry = useRegistry();
