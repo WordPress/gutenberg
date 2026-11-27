@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Tabs: Load the images in the panels that are not shown first only once the block is near the viewport, instead of with the page ([#87114](https://github.com/WordPress/gutenberg/pull/87114)).
+
 ### Bug Fixes
 
 -   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).

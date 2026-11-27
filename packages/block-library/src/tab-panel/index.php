@@ -51,6 +51,35 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
 	$tag_processor->set_attribute( 'data-wp-on--beforematch', 'actions.handleBeforeMatch' );
 
+	/*
+	 * A browser fetches every IMG it finds while parsing the page, whether or
+	 * not the panel holding it is shown. So the images in a panel that is not
+	 * the default tab are lazy-loaded, which keeps them from being fetched
+	 * while their panel is hidden. The view script loads them when the Tabs
+	 * block comes near the viewport, ahead of a tab being opened. They are
+	 * marked, so that it only loads the images that were made lazy here.
+	 *
+	 * An IMG that already has a `loading` or `fetchpriority` attribute is left
+	 * as it is, as is every IMG in a panel that cannot be matched to a tab.
+	 */
+	$tabs_list        = $block->context['core/tabs-list'] ?? array();
+	$active_tab_index = $block->context['core/tabs-active-tab-index'] ?? 0;
+	$tab_index        = array_search( $tab_id, $tabs_list, true );
+
+	if (
+		false !== $tab_index &&
+		$tab_index !== $active_tab_index &&
+		false !== stripos( $content, '<img' ) &&
+		wp_lazy_loading_enabled( 'img', 'core/tab-panel' )
+	) {
+		while ( $tag_processor->next_tag( 'IMG' ) ) {
+			if ( null === $tag_processor->get_attribute( 'loading' ) && null === $tag_processor->get_attribute( 'fetchpriority' ) ) {
+				$tag_processor->set_attribute( 'loading', 'lazy' );
+				$tag_processor->set_attribute( 'data-tab-panel-lazy', true );
+			}
+		}
+	}
+
 	return (string) $tag_processor->get_updated_html();
 }
 

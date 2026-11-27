@@ -62,6 +62,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `core/tabs-list`
 - `core/tabs-id`
+- `core/tabs-active-tab-index`
 
 ## Block Markup
 
