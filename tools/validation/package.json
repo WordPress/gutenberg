@@ -45,6 +45,7 @@
 	},
 	"scripts": {
 		"check-installed-deps": "node ./check-installed-deps.mjs",
+		"check-block-library-frontend-styles": "node ./check-block-library-frontend-styles.ts",
 		"check-licenses": "node ./check-licenses.mjs",
 		"check-private-apis": "node ./check-private-apis.mjs",
 		"dependency-audit": "dependency-audit --collapse-root-cause \"../../packages/*\"",
