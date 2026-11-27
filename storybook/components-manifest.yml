@@ -970,6 +970,15 @@
             - render
             - style
             - variant
+      - name: Notice.ActionButtonLink
+        props:
+            - children
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+            - variant
       - name: Notice.ActionLink
         props:
             - children
@@ -1016,6 +1025,22 @@
             - className
             - render
             - style
+- name: Page
+  props:
+      - actions
+      - ariaLabel
+      - badges
+      - breadcrumbs
+      - children
+      - className
+      - components
+      - hasPadding
+      - headingLevel
+      - navigation
+      - showSidebarToggle
+      - subTitle
+      - title
+      - visual
 - name: Popover
   props:
       - __unstableForcePosition

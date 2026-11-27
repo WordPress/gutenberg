@@ -7,3 +7,11 @@
 	background: var(--wpds-made-up-color);
 }
 
+.escaped {
+	color: v\61r(--wpds-nonexistent-token);
+}
+
+.case-variants {
+	color: VAR(--wpds-nonexistent-token);
+	gap: VaR(--wpds-dimension-gap-SM);
+}

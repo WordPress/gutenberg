@@ -4,5 +4,8 @@
 	"compilerOptions": {
 		"types": [ "gutenberg-env" ]
 	},
-	"references": [ { "path": "../deprecated/tsconfig.build.json" } ]
+	"references": [
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../private-apis/tsconfig.build.json" }
+	]
 }
