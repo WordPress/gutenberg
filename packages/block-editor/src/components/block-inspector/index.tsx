@@ -4,19 +4,22 @@ import {
 	getUnregisteredTypeHandlerName,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion, Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
+import { pencil } from '@wordpress/icons';
 import type { ReactNode } from 'react';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
 	Menu,
+	Stack,
 	Text,
 } from '@wordpress/ui';
 import EditContents from './edit-contents';
 import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
+import { BlockRenameModal, useBlockRename } from '../block-rename';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
@@ -199,6 +202,7 @@ function BlockInspector() {
 		showStateOnCanvas,
 		isResponsiveEditing,
 		blockStatesEditingEnabled,
+		canEdit,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -214,6 +218,7 @@ function BlockInspector() {
 			getSelectedBlockStyleState,
 			isSelectedBlockStyleStateShownOnCanvas,
 			isResponsiveEditing: _isResponsiveEditing,
+			canEditBlock,
 		} = unlock( select( blockEditorStore ) );
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -254,6 +259,9 @@ function BlockInspector() {
 			),
 			isResponsiveEditing: _isResponsiveEditing(),
 			blockStatesEditingEnabled: getSettings().blockStatesEditingEnabled,
+			canEdit: _renderedBlockClientId
+				? canEditBlock( _renderedBlockClientId )
+				: false,
 		};
 	}, [] );
 
@@ -389,6 +397,7 @@ function BlockInspector() {
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
 				blockStatesEditingEnabled={ blockStatesEditingEnabled }
+				canEdit={ canEdit }
 				// @ts-expect-error The single block view ignores `isBlockStyleStateSelected`.
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
@@ -451,8 +460,15 @@ const BlockInspectorSingleBlock = ( {
 	showStateOnCanvas,
 	isResponsiveEditing,
 	blockStatesEditingEnabled = true,
+	canEdit = false,
 }: BlockInspectorSingleBlockProps ) => {
+	const [ isRenaming, setIsRenaming ] = useState( false );
 	const listViewRef = useRef< HTMLDivElement >( null );
+	const { canRename } = useBlockRename( blockName );
+	const showRenameButton =
+		canEdit && canRename && blockEditingMode !== 'contentOnly';
+	const showStatesControl =
+		blockEditingMode === 'default' && blockStatesEditingEnabled;
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
@@ -509,34 +525,54 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards as boolean }
 				clientId={ renderedBlockClientId }
 				controls={
-					blockEditingMode === 'default' &&
-					blockStatesEditingEnabled && (
-						<BlockStatesControl
-							name={ blockName }
-							value={ selectedBlockStyleState }
-							onChange={ onBlockStyleStateChange }
-						>
-							<Menu.Group>
-								<Menu.CheckboxItem
-									checked={ showStateOnCanvas }
-									closeOnClick={ false }
-									// Previewing is only meaningful while a
-									// non-default pseudo state is selected.
-									disabled={
-										! hasPseudoBlockStyleState(
-											selectedBlockStyleState
-										)
-									}
-									onCheckedChange={
-										onShowStateOnCanvasChange
-									}
+					( showRenameButton || showStatesControl ) && (
+						<Stack direction="row" align="center" gap="xs">
+							{ showRenameButton && (
+								<>
+									<Button
+										size="small"
+										icon={ pencil }
+										label={ __( 'Rename' ) }
+										onClick={ () => setIsRenaming( true ) }
+									/>
+									{ isRenaming && (
+										<BlockRenameModal
+											clientId={ renderedBlockClientId }
+											onClose={ () =>
+												setIsRenaming( false )
+											}
+										/>
+									) }
+								</>
+							) }
+							{ showStatesControl && (
+								<BlockStatesControl
+									name={ blockName }
+									value={ selectedBlockStyleState }
+									onChange={ onBlockStyleStateChange }
 								>
-									<Menu.ItemLabel>
-										{ __( 'Preview on canvas' ) }
-									</Menu.ItemLabel>
-								</Menu.CheckboxItem>
-							</Menu.Group>
-						</BlockStatesControl>
+									<Menu.Group>
+										<Menu.CheckboxItem
+											checked={ showStateOnCanvas }
+											closeOnClick={ false }
+											// Previewing is only meaningful while a non-default pseudo state is selected.
+											disabled={
+												! hasPseudoBlockStyleState(
+													selectedBlockStyleState
+												)
+											}
+											onCheckedChange={
+												onShowStateOnCanvasChange
+											}
+										>
+											<Menu.ItemLabel>
+												{ __( 'Preview on canvas' ) }
+											</Menu.ItemLabel>
+										</Menu.CheckboxItem>
+									</Menu.Group>
+								</BlockStatesControl>
+							) }
+						</Stack>
 					)
 				}
 			/>
