@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 import removeAccents from 'remove-accents';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -9,8 +10,8 @@ import {
 	Composite,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
-import { search } from '@wordpress/icons';
-import { Checkbox, Radio, RadioGroup, VisuallyHidden } from '@wordpress/ui';
+import { check, search } from '@wordpress/icons';
+import { Icon, VisuallyHidden } from '@wordpress/ui';
 import { getCurrentValue } from './utils';
 import type { Filter, NormalizedFilter, View, Option } from '../../types';
 import useElements from '../../hooks/use-elements';
@@ -52,26 +53,15 @@ function generateFilterElementCompositeItemId(
 	return `${ prefix }-${ filterElementValue }`;
 }
 
-const MultiSelectionOption = ( { selected }: { selected: boolean } ) => (
-	<Checkbox
-		checked={ selected }
-		readOnly
-		aria-hidden
-		tabIndex={ -1 }
-		className="dataviews-filters__selection-indicator"
-	/>
-);
-
-const SingleSelectionOption = ( { selected }: { selected: boolean } ) => (
-	<RadioGroup
-		value={ selected ? 'selected' : null }
-		readOnly
-		aria-hidden
-		tabIndex={ -1 }
-		render={ <span className="dataviews-filters__selection-indicator" /> }
+// Mirrors the selection indicator of the `Select` items in `@wordpress/ui`.
+const SelectionIndicator = ( { selected }: { selected: boolean } ) => (
+	<span
+		className={ clsx( 'dataviews-filters__selection-indicator', {
+			'is-selected': selected,
+		} ) }
 	>
-		<Radio value="selected" tabIndex={ -1 } />
-	</RadioGroup>
+		<Icon icon={ check } size={ 20 } />
+	</span>
 );
 
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
@@ -182,16 +172,13 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 						/>
 					}
 				>
-					{ filter.singleSelection && (
-						<SingleSelectionOption
-							selected={ currentValue === element.value }
-						/>
-					) }
-					{ ! filter.singleSelection && (
-						<MultiSelectionOption
-							selected={ currentValue.includes( element.value ) }
-						/>
-					) }
+					<SelectionIndicator
+						selected={
+							filter.singleSelection
+								? currentValue === element.value
+								: currentValue.includes( element.value )
+						}
+					/>
 					<span
 						className="dataviews-filters__search-widget-listitem-value"
 						title={ element.label }
@@ -280,18 +267,13 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 							setValueOnClick={ false }
 							focusOnHover
 						>
-							{ filter.singleSelection && (
-								<SingleSelectionOption
-									selected={ currentValue === element.value }
-								/>
-							) }
-							{ ! filter.singleSelection && (
-								<MultiSelectionOption
-									selected={ currentValue.includes(
-										element.value
-									) }
-								/>
-							) }
+							<SelectionIndicator
+								selected={
+									filter.singleSelection
+										? currentValue === element.value
+										: currentValue.includes( element.value )
+								}
+							/>
 							<span
 								className="dataviews-filters__search-widget-listitem-value"
 								title={ element.label }

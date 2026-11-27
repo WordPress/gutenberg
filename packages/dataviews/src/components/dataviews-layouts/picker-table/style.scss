@@ -33,16 +33,9 @@
 	.dataviews-view-table__row {
 		cursor: var(--wpds-cursor-control);
 
-		&.is-selected {
-			background-color: var(--wpds-color-background-interactive-brand-weak-active);
-		}
-
+		&.is-selected,
 		&.is-hovered {
-			background-color: var(--wpds-color-background-interactive-brand-weak-active);
-		}
-
-		&.is-selected.is-hovered {
-			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 	}
 }

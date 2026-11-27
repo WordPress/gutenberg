@@ -3,7 +3,9 @@
 @use "../../../dataviews/style" as *;
 
 .dataviews-view-grid {
-	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+	// The top padding keeps the selection ring of the first row, drawn outside
+	// the preview, from being clipped by the scroll container.
+	padding: calc(var(--wpds-border-width-xs) + var(--wpds-border-width-sm)) var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	display: flex;
 	flex-direction: column;
 	gap: var(--wpds-dimension-gap-xl);
@@ -81,10 +83,12 @@
 				color: var(--wpds-color-foreground-content-neutral);
 			}
 		}
-		&.is-selected .dataviews-view-grid__media::after {
-			box-shadow:
-				inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-brand),
-				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
+		// Draw the selection ring outside the preview, so that it sits on the
+		// page background and stays visible whatever the preview shows. The
+		// outline follows the rounded corners of the preview.
+		&.is-selected .dataviews-view-grid__media {
+			outline: var(--wpds-border-width-xs) solid var(--wpds-color-foreground-interactive-neutral);
+			outline-offset: var(--wpds-border-width-sm);
 		}
 		.dataviews-view-grid__media:focus::after {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);

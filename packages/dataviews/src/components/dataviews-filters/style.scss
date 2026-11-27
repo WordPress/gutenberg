@@ -118,7 +118,7 @@
 		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
@@ -164,31 +164,37 @@
 		align-items: center;
 		justify-content: center;
 		background: transparent;
+		color: var(--wpds-color-foreground-interactive-neutral);
 		cursor: var(--wpds-cursor-control);
-
-		svg {
-			color: var(--wpds-color-foreground-interactive-neutral);
-		}
 
 		&:hover,
 		&:focus {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
 			background: var(--wpds-color-background-interactive-neutral-weak-active);
-			svg {
-				color: var(--wpds-color-foreground-interactive-neutral-active);
-			}
 		}
 
 		&.has-values {
-			svg {
-				color: var(--wpds-color-foreground-interactive-brand);
-			}
-			&:hover {
+			color: var(--wpds-color-foreground-interactive-brand);
+
+			&:hover,
+			&:focus {
+				color: var(--wpds-color-foreground-interactive-brand-active);
 				background: var(--wpds-color-background-interactive-brand-weak-active);
 			}
 		}
 
 		&:focus-visible {
 			@include outset-ring__focus();
+		}
+	}
+
+	// The remove icon follows the state of the chip, like the icon and the
+	// label of a `Button` from `@wordpress/ui`.
+	.dataviews-filters__summary-chip:is(:hover:not(.is-not-clickable), :focus-visible, [aria-expanded="true"]) ~ .dataviews-filters__summary-chip-remove {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+
+		&.has-values {
+			color: var(--wpds-color-foreground-interactive-brand-active);
 		}
 	}
 }
@@ -213,17 +219,27 @@
 
 .dataviews-filters__selection-indicator {
 	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: var(--wpds-dimension-size-2xs);
 	pointer-events: none;
+
+	&:not(.is-selected) {
+		opacity: 0;
+	}
 }
 
+// Mirrors the items of `Select` and `Menu` in `@wordpress/ui`.
 .dataviews-filters__search-widget-listitem {
 	display: flex;
 	align-items: center;
-	gap: var(--wpds-dimension-gap-md);
+	gap: var(--wpds-dimension-gap-xs);
 	border-radius: var(--wpds-border-radius-sm);
 	box-sizing: border-box;
-	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
-	cursor: default;
+	padding-block: var(--wpds-dimension-padding-xs);
+	padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-dimension-padding-xs)) var(--wpds-dimension-padding-sm);
+	cursor: var(--wpds-cursor-control);
 	min-height: var(--wpds-dimension-size-md);
 	@include body-medium();
 	color: var(--wpds-color-foreground-interactive-neutral);
@@ -235,11 +251,18 @@
 	&:hover,
 	&[data-active-item],
 	&:focus {
-		background-color: var(--wpds-color-background-interactive-brand-weak-active);
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+		background-color: var(--wpds-color-background-interactive-brand-strong-active);
+		color: var(--wpds-color-foreground-interactive-brand-strong-active);
+		outline: none;
 
 		.dataviews-filters__search-widget-listitem-description {
-			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
+			color: inherit;
+		}
+
+		@media (forced-colors: active) {
+			forced-color-adjust: none;
+			background-color: Highlight;
+			color: HighlightText;
 		}
 	}
 
@@ -332,7 +355,7 @@
 	border-radius: var(--wpds-border-radius-lg);
 	font-size: 11px;
 	outline: var(--wpds-border-width-focus) solid var(--wpds-color-background-surface-neutral-strong);
-	color: var(--wpds-color-foreground-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-brand-strong);
 	box-sizing: border-box;
 }
 
