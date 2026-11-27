@@ -92,6 +92,41 @@ function getInnerBlocksTemplate( attributes ) {
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
+/**
+ * Gets the pixel size of a CSS length unit in the element's document.
+ *
+ * @param {HTMLElement|null|undefined} element Element used to resolve the unit.
+ * @param {string}                     unit    CSS length unit.
+ * @return {number|undefined} Pixels per unit, if it can be resolved.
+ */
+function getPixelsPerUnit( element, unit ) {
+	if ( ! element ) {
+		return undefined;
+	}
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return undefined;
+	}
+
+	switch ( unit ) {
+		case 'px':
+			return 1;
+		case 'em':
+			return parseFloat( view.getComputedStyle( element ).fontSize );
+		case 'rem':
+			return parseFloat(
+				view.getComputedStyle( element.ownerDocument.documentElement )
+					.fontSize
+			);
+		case 'vw':
+			return view.innerWidth / 100;
+		case 'vh':
+			return view.innerHeight / 100;
+		default:
+			return undefined;
+	}
+}
+
 function CoverEdit( {
 	attributes,
 	clientId,
@@ -776,23 +811,10 @@ function CoverEdit( {
 				parseQuantityAndUnitFromRawValue( minHeight );
 			// The resize handle can be outside the canvas iframe. Resolve units
 			// against the Cover itself, independently of its content's height.
-			const element = ref.current;
-			const view = element?.ownerDocument.defaultView;
-			const pixelsPerUnit = {
-				px: 1,
-				em:
-					view &&
-					parseFloat( view.getComputedStyle( element ).fontSize ),
-				rem:
-					view &&
-					parseFloat(
-						view.getComputedStyle(
-							element.ownerDocument.documentElement
-						).fontSize
-					),
-				vw: view && view.innerWidth / 100,
-				vh: view && view.innerHeight / 100,
-			}[ minHeightUnit ];
+			const pixelsPerUnit = getPixelsPerUnit(
+				ref.current,
+				minHeightUnit
+			);
 			// Keep the existing pixel fallback for custom units that cannot be
 			// resolved here, or when their reference dimension is zero.
 			resizeUnitRef.current =
