@@ -17,9 +17,4 @@ export const settings: BlockModule< CategoriesAttributes >[ 'settings' ] = {
 	variations,
 };
 
-export const init = () =>
-	initBlock( {
-		name,
-		metadata,
-		settings,
-	} );
+export const init = () => initBlock( { name, metadata, settings } );
