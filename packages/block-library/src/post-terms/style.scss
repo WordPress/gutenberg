@@ -5,4 +5,9 @@
 	.wp-block-post-terms__separator {
 		white-space: pre-wrap;
 	}
+
+	// Keep each term at its own width instead of stretching it across the column.
+	:where(&.is-layout-grid) {
+		justify-items: start;
+	}
 }

@@ -1,3 +1,5 @@
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { postCategories, postTerms } from '@wordpress/icons';
 
 const variationIconMap = {
@@ -21,4 +23,54 @@ export default function enhanceVariations( settings, name ) {
 		...settings,
 		variations,
 	};
+}
+
+/**
+ * Block spacing only spaces terms apart in Flex and Grid layouts, so it is
+ * turned off in the other layouts. The control is hidden and the layout hook
+ * outputs no gap styles.
+ *
+ * @param {unknown} result    Value set by an earlier filter.
+ * @param {string}  path      Setting path.
+ * @param {string}  clientId  Block client ID.
+ * @param {string}  blockName Block name.
+ * @return {unknown} The setting value, or `null` to turn Block spacing off.
+ */
+export function hideBlockGapOutsideFlexAndGrid(
+	result,
+	path,
+	clientId,
+	blockName
+) {
+	if ( blockName !== 'core/post-terms' || path !== 'spacing.blockGap' ) {
+		return result;
+	}
+	const layoutType =
+		select( blockEditorStore ).getBlockAttributes( clientId )?.layout?.type;
+	return [ 'flex', 'grid' ].includes( layoutType ) ? result : null;
+}
+
+/**
+ * In Flex and Grid the layout's own Justification controls where the terms sit,
+ * so the toolbar text alignment is hidden to avoid two controls for one thing.
+ * An alignment set in another layout is carried over to Justification.
+ *
+ * @param {unknown} result    Value set by an earlier filter.
+ * @param {string}  path      Setting path.
+ * @param {string}  clientId  Block client ID.
+ * @param {string}  blockName Block name.
+ * @return {unknown} The setting value, or `false` to hide the alignment control.
+ */
+export function hideTextAlignInFlexAndGrid(
+	result,
+	path,
+	clientId,
+	blockName
+) {
+	if ( blockName !== 'core/post-terms' || path !== 'typography.textAlign' ) {
+		return result;
+	}
+	const layoutType =
+		select( blockEditorStore ).getBlockAttributes( clientId )?.layout?.type;
+	return [ 'flex', 'grid' ].includes( layoutType ) ? false : result;
 }
