@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import ResizableBox from '..';
 
@@ -6,14 +6,18 @@ function nextFrame() {
 	return new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
 }
 
+function getBottomHandle( container: HTMLElement ) {
+	return container.querySelector(
+		'.components-resizable-box__side-handle.components-resizable-box__handle-bottom'
+	) as HTMLElement;
+}
+
 async function dragBottomHandle(
 	container: HTMLElement,
 	deltaX: number,
 	deltaY: number
 ) {
-	const handle = container.querySelector(
-		'.components-resizable-box__side-handle.components-resizable-box__handle-bottom'
-	) as HTMLElement;
+	const handle = getBottomHandle( container );
 	const rect = handle.getBoundingClientRect();
 	const start = {
 		clientX: rect.x + rect.width / 2,
@@ -34,6 +38,17 @@ async function dragBottomHandle(
 		await nextFrame();
 	}
 	window.dispatchEvent( new MouseEvent( 'mouseup', end ) );
+	return end;
+}
+
+// The stylesheet isn't loaded, so place the handle on the box's bottom edge
+// the way it is in the editor.
+function placeBottomHandle() {
+	const style = document.createElement( 'style' );
+	style.textContent =
+		'.components-resizable-box__handle-bottom { bottom: 0; left: 0; width: 100%; }';
+	document.head.append( style );
+	onTestFinished( () => style.remove() );
 }
 
 async function renderBox( style?: React.CSSProperties ) {
@@ -67,4 +82,38 @@ describe( 'TransformAwareResizable', () => {
 			Math.abs( onResizeStop.mock.calls[ 0 ][ 3 ].height - 100 )
 		).toBeLessThanOrEqual( 2 );
 	} );
+
+	it.each( [
+		[ 'scaled below a third', { scale: '0.3' }, 0 ],
+		[ 'scaled to a fifth', { scale: '0.2' }, 0 ],
+		[ 'scaled and rotated', { scale: '0.25', rotate: '20deg' }, 20 ],
+	] )(
+		'keeps the handle under the pointer inside a growing parent %s',
+		async ( _, style, degrees ) => {
+			placeBottomHandle();
+			const { container } = await render(
+				<div style={ { padding: 200 } }>
+					<div style={ style }>
+						<ResizableBox
+							defaultSize={ { width: 200, height: 200 } }
+						/>
+					</div>
+				</div>
+			);
+			const angle = ( degrees * Math.PI ) / 180;
+			const end = await dragBottomHandle(
+				container,
+				-30 * Math.sin( angle ),
+				30 * Math.cos( angle )
+			);
+			const handle = getBottomHandle( container ).getBoundingClientRect();
+			// Along the handle's axis: the growing parent also drifts it sideways.
+			const overshoot =
+				-( handle.x + handle.width / 2 - end.clientX ) *
+					Math.sin( angle ) +
+				( handle.y + handle.height / 2 - end.clientY ) *
+					Math.cos( angle );
+			expect( Math.abs( overshoot ) ).toBeLessThanOrEqual( 2 );
+		}
+	);
 } );
