@@ -13,10 +13,9 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useResizeObserver } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { Link, Text } from '@wordpress/ui';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -338,14 +337,6 @@ const ResizableAvatar = ( {
 	selectedStyleState,
 	hasSelectedStyleState,
 } ) => {
-	const [ isResizing, setIsResizing ] = useState( false );
-	const [ pixelSize, setPixelSize ] = useState( {} );
-	const setResizeObserved = useResizeObserver( ( [ entry ] ) => {
-		if ( ! isResizing && entry?.borderBoxSize?.[ 0 ] ) {
-			const [ box ] = entry.borderBoxSize;
-			setPixelSize( { width: box.inlineSize, height: box.blockSize } );
-		}
-	} );
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const activeSize = getActiveAvatarSize(
@@ -353,10 +344,6 @@ const ResizableAvatar = ( {
 		selectedStyleState,
 		hasSelectedStyleState
 	);
-	const currentRenderedSize =
-		pixelSize.width && ! isResizing
-			? Math.round( pixelSize.width )
-			: activeSize;
 	const doubledSizedSrc = addQueryArgs(
 		removeQueryArgs( avatar?.src, [ 's' ] ),
 		{
@@ -364,31 +351,22 @@ const ResizableAvatar = ( {
 		}
 	);
 	return (
-		<div
-			{ ...blockProps }
-			className={ clsx( blockProps.className, {
-				'is-resizing': isResizing,
-			} ) }
-		>
+		<div { ...blockProps }>
 			<AvatarLinkWrapper isLink={ attributes.isLink }>
 				<ResizableBox
 					size={ {
-						width: currentRenderedSize,
-						height: currentRenderedSize,
+						width: activeSize,
+						height: activeSize,
 					} }
 					showHandle={ isSelected }
-					onResizeStart={ () => {
-						setIsResizing( true );
-					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
-						setIsResizing( false );
 						setAttributes(
 							getUpdatedAvatarSizeAttributes(
 								attributes,
 								selectedStyleState,
 								hasSelectedStyleState,
 								parseInt(
-									currentRenderedSize +
+									activeSize +
 										( delta.height || delta.width ),
 									10
 								)
@@ -406,7 +384,6 @@ const ResizableAvatar = ( {
 					maxWidth={ avatar.maxSize }
 				>
 					<img
-						ref={ setResizeObserved }
 						src={ doubledSizedSrc }
 						alt={ avatar.alt }
 						className={ clsx(
