@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+- Template field: Disable the field for the front page and the posts page, whose template comes from the reading settings ([#87541](https://github.com/WordPress/gutenberg/pull/87541)).
 - Author fields: Show initials when the author's profile image is unavailable ([#85208](https://github.com/WordPress/gutenberg/pull/85208)).
 
 ### Bug Fixes
