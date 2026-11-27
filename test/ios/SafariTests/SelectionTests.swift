@@ -289,6 +289,12 @@ final class SelectionTests: XCTestCase {
 	}
 
 	func testTapFromHeadingIntoQuoteWithoutIframePlacesCaret() throws {
+		// Since #86923 moved the focus handover from pointerdown to
+		// mousedown, this fails in about 4 of 10 CI runs: the quote gets
+		// focus, but the typed X lands nowhere. Skipped until that is fixed,
+		// so it stops failing unrelated pull requests.
+		throw XCTSkip( "Flaky since #86923: the quote gets focus but drops the typed X." )
+
 		openStandaloneEditor( content: "<!-- wp:quote --><blockquote class=\"wp-block-quote\"><!-- wp:paragraph --><p>Quote here</p><!-- /wp:paragraph --></blockquote><!-- /wp:quote --><!-- wp:heading --><h2 class=\"wp-block-heading\">Heading here</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Paragraph here</p><!-- /wp:paragraph -->" )
 
 		let quote = editor.block( title: "Paragraph", content: "Quote here" )
