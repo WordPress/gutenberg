@@ -1,0 +1,194 @@
+import { describe, expect, it } from 'vitest';
+import {
+	getStyleLinearTransform,
+	isStyleTransformAxisAligned,
+} from '../transforms';
+
+function round( matrix: Record< string, number > ) {
+	return Object.fromEntries(
+		Object.entries( matrix ).map( ( [ key, value ] ) => [
+			key,
+			Math.round( value * 1000 ) / 1000 + 0,
+		] )
+	);
+}
+
+describe( 'isStyleTransformAxisAligned', () => {
+	it.each( [
+		[ 'none', 'none', 'none' ],
+		[ '0deg', 'none', 'none' ],
+		[ '90deg', 'none', 'none' ],
+		[ '180deg', 'none', 'none' ],
+		[ '270deg', 'none', 'none' ],
+		[ '360deg', 'none', 'none' ],
+		[ '-180deg', 'none', 'none' ],
+		[ '0.5turn', 'none', 'none' ],
+		[ '200grad', 'none', 'none' ],
+		[ '3.14159rad', 'none', 'none' ],
+		[ 'x 30deg', 'none', 'none' ],
+		[ '0 0 -1 90deg', 'none', 'none' ],
+		[ '0 0 0 45deg', 'none', 'none' ],
+		[ 'none', '2 0.5', 'none' ],
+		[ 'none', 'none', 'matrix(1, 0, 0, 1, 40, 20)' ],
+		[ 'none', 'none', 'matrix(1.5, 0, 0, 0.5, 0, 0)' ],
+		[ 'none', 'none', 'matrix(0, 1, -1, 0, 0, 0)' ],
+		[ '45deg', 'none', 'matrix(0.7071, -0.7071, 0.7071, 0.7071, 0, 0)' ],
+	] )(
+		'keeps the axes aligned for rotate %s, scale %s and transform %s',
+		( rotate, scale, transform ) => {
+			expect(
+				isStyleTransformAxisAligned( { rotate, scale, transform } )
+			).toBe( true );
+		}
+	);
+
+	it.each( [
+		[ '12deg', 'none', 'none' ],
+		[ '45deg', 'none', 'none' ],
+		[ '-0.1rad', 'none', 'none' ],
+		[ 'z 45deg', 'none', 'none' ],
+		[ '1 1 0 45deg', 'none', 'none' ],
+		[ '0 0 -1 45deg', 'none', 'none' ],
+		[
+			'x 60deg',
+			'none',
+			'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+		],
+		[ '45deg', '2 3', 'none' ],
+		[ 'none', 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
+		[ 'none', 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
+		[
+			'none',
+			'none',
+			'matrix3d(0.978, 0.208, 0, 0, -0.208, 0.978, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+		],
+	] )(
+		'moves the edges off axis for rotate %s, scale %s and transform %s',
+		( rotate, scale, transform ) => {
+			expect(
+				isStyleTransformAxisAligned( { rotate, scale, transform } )
+			).toBe( false );
+		}
+	);
+} );
+
+describe( 'getStyleLinearTransform', () => {
+	it( 'returns the identity for no transform', () => {
+		expect(
+			getStyleLinearTransform( {
+				rotate: 'none',
+				scale: 'none',
+				transform: 'none',
+			} )
+		).toEqual( { a: 1, b: 0, c: 0, d: 1 } );
+	} );
+
+	it( 'applies `rotate`, then `scale`, then `transform`', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: '90deg',
+					scale: '2 3',
+					transform: 'matrix(1, 0, 1, 1, 0, 0)',
+				} )
+			)
+		).toEqual( { a: 0, b: 2, c: -3, d: 2 } );
+	} );
+
+	it( 'projects a turn out of the page', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: 'none',
+					transform: 'none',
+				} )
+			)
+		).toEqual( { a: 1, b: 0, c: 0, d: 0.5 } );
+	} );
+
+	it( 'combines `rotate` and a 3D `transform` before flattening', () => {
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: 'none',
+					transform:
+						'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+				} )
+			)
+		).toEqual( { a: 0.5, b: 0.75, c: 0, d: 0.5 } );
+	} );
+
+	it.each( [
+		[ 'x 90deg', { a: 1, b: 0, c: 0, d: 0 } ],
+		[ '1 1 0 90deg', { a: 0.5, b: 0.5, c: 0.5, d: 0.5 } ],
+	] )(
+		'flattens %s exactly, as the browser serializes it',
+		( rotate, expected ) => {
+			const matrix = getStyleLinearTransform( {
+				rotate,
+				scale: 'none',
+				transform: 'none',
+			} );
+			expect( matrix ).toEqual( expected );
+			expect( matrix.a * matrix.d - matrix.b * matrix.c ).toBe( 0 );
+		}
+	);
+
+	it( 'applies the z part of `scale` between turns out of the page', () => {
+		// rotateY( 60deg ) sends x into z, scale stretches z by 3, and
+		// rotateX( 60deg ) brings it back as y: 3 * sin( 60deg ) ^ 2 = 2.25.
+		expect(
+			round(
+				getStyleLinearTransform( {
+					rotate: 'x 60deg',
+					scale: '2 1 3',
+					transform:
+						'matrix3d(0.5, 0, -0.866025, 0, 0, 1, 0, 0, 0.866025, 0, 0.5, 0, 0, 0, 0, 1)',
+				} )
+			)
+		).toEqual( { a: 1, b: 2.25, c: 0, d: 0.5 } );
+	} );
+
+	it( 'reads a turn in the page without rounding it', () => {
+		const radiansPerUnit = {
+			deg: Math.PI / 180,
+			grad: Math.PI / 200,
+			rad: 1,
+			turn: 2 * Math.PI,
+		};
+		for ( const [ unit, factor ] of Object.entries( radiansPerUnit ) ) {
+			for ( let step = -16; step <= 16; step++ ) {
+				const value = ( step * 22.5 ) / factor / ( 180 / Math.PI );
+				const angle = value * factor;
+				const { a, b, c, d } = getStyleLinearTransform( {
+					rotate: `${ value }${ unit }`,
+					scale: 'none',
+					transform: 'none',
+				} );
+				// `+ 0` only folds a signed zero, which `===` ignores.
+				expect( [ a, b, c + 0, d ] ).toEqual( [
+					Math.cos( angle ),
+					Math.sin( angle ),
+					-Math.sin( angle ) + 0,
+					Math.cos( angle ),
+				] );
+			}
+		}
+	} );
+
+	it( 'reads every angle unit', () => {
+		for ( const rotate of [ '0.25turn', '100grad', '1.5708rad' ] ) {
+			expect(
+				round(
+					getStyleLinearTransform( {
+						rotate,
+						scale: '',
+						transform: '',
+					} )
+				)
+			).toEqual( { a: 0, b: 1, c: -1, d: 0 } );
+		}
+	} );
+} );
