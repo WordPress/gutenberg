@@ -568,8 +568,10 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
-		onReplace,
+		// An unsynced pattern completes to an array of blocks.
+		onReplace: onReplace
+			? ( blocks ) => onReplace( blocks.flat() )
+			: undefined,
 		completers: autocompleters,
 		record: value,
 		onChange,
