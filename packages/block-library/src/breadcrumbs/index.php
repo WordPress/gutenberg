@@ -116,11 +116,9 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// Add the posts page or the post type archive link if applicable.
-		if ( 'post' === $post_type ) {
-			$posts_page_item = block_core_breadcrumbs_get_posts_page_item();
-			if ( $posts_page_item ) {
-				$breadcrumb_items[] = $posts_page_item;
-			}
+		$posts_page_item = 'post' === $post_type ? block_core_breadcrumbs_get_posts_page_item() : null;
+		if ( $posts_page_item ) {
+			$breadcrumb_items[] = $posts_page_item;
 		} else {
 			$post_type_object = get_post_type_object( $post_type );
 			$archive_link     = get_post_type_archive_link( $post_type );

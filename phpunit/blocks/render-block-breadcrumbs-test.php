@@ -603,4 +603,43 @@ class Tests_Blocks_Render_Breadcrumbs extends WP_UnitTestCase {
 
 		$this->assertSame( $this->item( 'News', 'https://example.org/blog/' ), $trail[1] );
 	}
+
+	/**
+	 * @dataProvider data_page_for_posts_without_static_front_page
+	 *
+	 * @param bool $keep_page_for_posts Whether `page_for_posts` is left set from an earlier static front page setup.
+	 */
+	public function test_single_post_without_posts_page_keeps_filtered_post_type_archive_link( $keep_page_for_posts ) {
+		update_option( 'show_on_front', 'posts' );
+		if ( ! $keep_page_for_posts ) {
+			update_option( 'page_for_posts', 0 );
+		}
+		$filter = static function ( $link, $post_type ) {
+			return 'post' === $post_type ? 'https://example.org/blog/' : $link;
+		};
+		add_filter( 'post_type_archive_link', $filter, 10, 2 );
+
+		$this->assertSame(
+			array(
+				$this->home_item(),
+				$this->item( get_post_type_object( 'post' )->labels->archives, 'https://example.org/blog/' ),
+				$this->parent_category_item(),
+				$this->item( 'Child Category', get_term_link( self::$child_category_id, 'category' ) ),
+				$this->item( 'Breadcrumb Post' ),
+			),
+			$this->get_single_post_trail( self::$post_id )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_page_for_posts_without_static_front_page() {
+		return array(
+			'page_for_posts is not set'   => array( false ),
+			'page_for_posts is still set' => array( true ),
+		);
+	}
 }
