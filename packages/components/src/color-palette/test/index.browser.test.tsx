@@ -462,11 +462,24 @@ describe( 'ColorPalette', () => {
 			}
 		);
 
-		it( 'renders origins that share a slug', async () => {
-			const consoleError = vi.spyOn( console, 'error' );
-			await render(
+		it( 'keeps focus on an origin that stays in place when other origins share its slug', async () => {
+			const user = userEvent.setup();
+			const green = { slug: 'green', name: 'Green', color: '#0f0' };
+			const first = { ...theme, slug: 'shared' };
+			const second = { ...custom, slug: 'shared' };
+			const third = { slug: 'extra', name: 'Extra', colors: [ green ] };
+			const view = await render(
 				<ColorPalette
-					colors={ [ theme, { ...custom, slug: 'theme' } ] }
+					colors={ [ first, second, third ] }
+					onChange={ vi.fn() }
+					disableCustomColors
+				/>
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Blue' } ) );
+
+			await view.rerender(
+				<ColorPalette
+					colors={ [ third, second, first ] }
 					onChange={ vi.fn() }
 					disableCustomColors
 				/>
@@ -474,16 +487,12 @@ describe( 'ColorPalette', () => {
 
 			expect(
 				within(
-					screen.getByRole( 'group', { name: 'Theme' } )
-				).getByRole( 'option', { name: 'Red' } )
-			).toBeVisible();
-			expect(
-				within(
 					screen.getByRole( 'group', { name: 'Custom' } )
 				).getByRole( 'option', { name: 'Blue' } )
+			).toHaveFocus();
+			expect(
+				screen.getByRole( 'option', { name: 'Red' } )
 			).toBeVisible();
-			expect( consoleError ).not.toHaveBeenCalled();
-			consoleError.mockRestore();
 		} );
 	} );
 

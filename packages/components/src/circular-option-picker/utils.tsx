@@ -25,20 +25,22 @@ export function resolveCircularOptionPickerPresentation(
 }
 
 /**
- * Returns a React key for each option group. A group with a slug keeps its
- * identity when groups are reordered or removed. Repeated slugs get an
- * occurrence suffix, and groups without a slug fall back to their index.
+ * Returns a React key for each option group. A group with a unique slug keeps
+ * its identity when groups are reordered or removed. Groups without a slug, or
+ * with a slug that another group also uses, fall back to their index.
  */
 export function getOptionGroupKeys( groups: Array< { slug?: string } > ) {
-	const occurrences = new Map< string, number >();
-	return groups.map( ( { slug }, index ) => {
-		if ( typeof slug !== 'string' ) {
-			return `index-${ index }`;
+	const slugCounts = new Map< string, number >();
+	for ( const { slug } of groups ) {
+		if ( typeof slug === 'string' ) {
+			slugCounts.set( slug, ( slugCounts.get( slug ) ?? 0 ) + 1 );
 		}
-		const occurrence = occurrences.get( slug ) ?? 0;
-		occurrences.set( slug, occurrence + 1 );
-		return `slug-${ slug }-${ occurrence }`;
-	} );
+	}
+	return groups.map( ( { slug }, index ) =>
+		typeof slug === 'string' && slugCounts.get( slug ) === 1
+			? `slug-${ slug }`
+			: `index-${ index }`
+	);
 }
 
 /**
