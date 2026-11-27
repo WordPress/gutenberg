@@ -85,13 +85,28 @@ export function getImageAttributes( gallery, attributes, media ) {
 			? { linkTarget: attributes.linkTarget, rel: attributes.rel }
 			: getUpdatedLinkTargetSettings( gallery.linkTarget, gallery );
 
-	return {
-		...pickRelevantMediaFiles( media, gallery.sizeSlug ),
+	// An image with its own link destination also keeps its own "Enlarge on
+	// click" setting, which is not part of the destination.
+	const linkAttributes = {
 		...getHrefAndDestination(
 			media,
 			gallery.linkTo,
 			attributes.linkDestination
 		),
+		...( attributes.linkDestination && {
+			lightbox: attributes.lightbox,
+		} ),
+	};
+
+	// An image keeps its own aspect ratio unless the gallery sets one.
+	const galleryAspectRatio = getAspectRatioAttributes( gallery.aspectRatio );
+	const aspectRatioAttributes = galleryAspectRatio.aspectRatio
+		? galleryAspectRatio
+		: { aspectRatio: attributes.aspectRatio, scale: attributes.scale };
+
+	return {
+		...pickRelevantMediaFiles( media, gallery.sizeSlug ),
+		...linkAttributes,
 		...linkTargetAttributes,
 		className: attributes.className || undefined,
 		sizeSlug: gallery.sizeSlug,
@@ -100,6 +115,6 @@ export function getImageAttributes( gallery, attributes, media ) {
 				? attributes.caption
 				: media.caption?.raw,
 		alt: attributes.alt || media.alt_text,
-		...getAspectRatioAttributes( gallery.aspectRatio ),
+		...aspectRatioAttributes,
 	};
 }

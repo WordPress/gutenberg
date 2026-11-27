@@ -70,4 +70,55 @@ describe( 'getImageAttributes', () => {
 			alt: 'Own alt',
 		} );
 	} );
+
+	it( 'keeps the "Enlarge on click" setting of an image transformed into the gallery', () => {
+		expect(
+			getImageAttributes(
+				GALLERY,
+				{
+					id: 1,
+					caption: '',
+					linkDestination: 'none',
+					lightbox: { enabled: true },
+				},
+				MEDIA
+			)
+		).toMatchObject( {
+			linkDestination: 'none',
+			lightbox: { enabled: true },
+		} );
+	} );
+
+	it( 'applies the gallery lightbox to an added image without a link destination', () => {
+		expect(
+			getImageAttributes(
+				{ ...GALLERY, linkTo: 'lightbox' },
+				{ id: 1, caption: '' },
+				MEDIA
+			)
+		).toMatchObject( {
+			linkDestination: 'none',
+			lightbox: { enabled: true },
+		} );
+	} );
+
+	it( 'keeps the aspect ratio of an image transformed into a gallery without one', () => {
+		expect(
+			getImageAttributes(
+				{ ...GALLERY, aspectRatio: 'auto' },
+				{ id: 1, caption: '', aspectRatio: '16/9', scale: 'cover' },
+				MEDIA
+			)
+		).toMatchObject( { aspectRatio: '16/9', scale: 'cover' } );
+	} );
+
+	it( 'applies the gallery aspect ratio to an image transformed into the gallery', () => {
+		expect(
+			getImageAttributes(
+				GALLERY,
+				{ id: 1, caption: '', aspectRatio: '16/9', scale: 'contain' },
+				MEDIA
+			)
+		).toMatchObject( { aspectRatio: '4/3', scale: 'cover' } );
+	} );
 } );
