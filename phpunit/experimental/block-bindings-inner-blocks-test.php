@@ -340,6 +340,31 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Nested own</p>', $output );
 	}
 
+	public function test_value_the_bound_block_rejects_spends_no_budget() {
+		$this->value_callback = function ( $source_args ) {
+			$variant = $source_args['variant'] ?? null;
+			if ( 'rejected' === $variant ) {
+				return '<!-- wp:heading --><h2>Rejected</h2><!-- /wp:heading -->';
+			}
+			if ( 'allowed' === $variant ) {
+				return '<!-- wp:paragraph --><p>Allowed</p><!-- /wp:paragraph -->';
+			}
+			return '<!-- wp:group {"allowedBlocks":["core/paragraph"],"metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '","args":{"variant":"rejected"}}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Rejected own</p><!-- /wp:paragraph --></div><!-- /wp:group -->'
+				. $this->bound_group_markup( array( 'variant' => 'allowed' ) );
+		};
+		$budget               = static function () {
+			return 1;
+		};
+		add_filter( 'block_bindings_inner_blocks_budget', $budget );
+		$output = $this->render_group();
+		remove_filter( 'block_bindings_inner_blocks_budget', $budget );
+
+		$this->assertStringContainsString( '>Rejected own</p>', $output );
+		$this->assertStringNotContainsString( 'Rejected</h2>', $output );
+		$this->assertStringContainsString( '>Allowed</p>', $output );
+		$this->assertStringNotContainsString( 'Nested own', $output );
+	}
+
 	public function test_bindings_with_other_attributes_inside_the_value_resolve() {
 		$this->value = '<!-- wp:group {"tagName":"section","metadata":{"bindings":{"innerBlocks":{"source":"' . self::SOURCE . '"}}}} --><section class="wp-block-group"><!-- wp:paragraph --><p>Nested own</p><!-- /wp:paragraph --></section><!-- /wp:group -->';
 		$output      = $this->render_group();
