@@ -1115,24 +1115,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comment-author-avatar/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-author-avatar/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-author-avatar/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/comment-author-name/deprecated.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
