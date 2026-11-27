@@ -2691,12 +2691,16 @@ function getBlockTreeBlock(
 		return state.blocks.tree.get( clientId ) as TreeBlock | undefined;
 	}
 
-	const controlledTree = state.blocks.tree.get( `controlled||${ clientId }` );
-	const regularTree = state.blocks.tree.get( clientId );
+	const regularTree = state.blocks.tree.get( clientId ) as
+		TreeBlock | undefined;
+	if ( ! regularTree ) {
+		return undefined;
+	}
 
-	// A stale controlled ID has no regular entry, leaving no client ID.
+	const controlledTree = state.blocks.tree.get( `controlled||${ clientId }` );
+
 	return {
-		...( regularTree as TreeBlock ),
+		...regularTree,
 		innerBlocks: controlledTree?.innerBlocks,
 	};
 }
