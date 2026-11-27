@@ -11,6 +11,9 @@ import SavePanel from '../save-panel';
 import SaveButton from '../save-button';
 import CanvasRenderer from '../canvas-renderer';
 import PluginArea from '../plugin-area';
+import EditorFullscreenMode, {
+	useIsEditorFullscreenMode,
+} from '../editor-fullscreen-mode';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
@@ -33,10 +36,11 @@ export default function RootSinglePage() {
 		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
-	const isFullScreen = canvas && ! canvas.isPreview;
+	const isEditorCanvas = canvas && ! canvas.isPreview;
+	const isFullscreenMode = useIsEditorFullscreenMode();
 
 	useRouteTitle();
-	useAdminMenuSync( isFullScreen ? canvas.postType : undefined );
+	useAdminMenuSync( isEditorCanvas ? canvas.postType : undefined );
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
@@ -47,6 +51,9 @@ export default function RootSinglePage() {
 		<SlotFillProvider>
 			<Tooltip.Provider>
 				<PluginArea />
+				{ isEditorCanvas && (
+					<EditorFullscreenMode isActive={ isFullscreenMode } />
+				) }
 				<ThemeProvider
 					isRoot
 					color={ { ...themeColors, background: '#f8f8f8' } }
@@ -61,7 +68,7 @@ export default function RootSinglePage() {
 									[ styles[ 'has-canvas' ] ]:
 										!! canvas || canvas === null,
 									[ styles[ 'has-full-canvas' ] ]:
-										isFullScreen,
+										isEditorCanvas,
 								}
 							) }
 						>
@@ -87,6 +94,9 @@ export default function RootSinglePage() {
 										<div className={ styles.canvas }>
 											<CanvasRenderer
 												canvas={ canvas }
+												showBackButton={
+													isFullscreenMode
+												}
 												routeContentModule={
 													routeContentModule
 												}

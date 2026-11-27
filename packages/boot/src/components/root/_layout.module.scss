@@ -287,6 +287,11 @@
 	}
 }
 
+// Fullscreen mode hides the admin menu.
+:global(body.is-fullscreen-mode) .layout-single-page.has-full-canvas .canvas {
+	inset-inline-start: 0;
+}
+
 @media (max-width: #{breakpoints.$break-medium}) {
 	.stage,
 	.inspector,

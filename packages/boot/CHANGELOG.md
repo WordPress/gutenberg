@@ -6,6 +6,7 @@
 
 -   In single-page mode, wp-admin menu links that point at the current page navigate between its routes without reloading, and the current menu item follows the route.
 -   In single-page mode, the button to review and save changes is shown in the page header.
+-   In single-page mode, the editor has a fullscreen mode that hides the admin menu. It is on by default, and can be toggled from the editor's options menu or with a keyboard shortcut.
 
 ### Enhancements
 
