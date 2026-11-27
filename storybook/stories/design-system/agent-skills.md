@@ -16,7 +16,7 @@ Agents only read skills from their own skills directory, such as `.claude/skills
 
 ## npm
 
-npm does not link skills from dependencies yet. Use the community [`skills` CLI](https://github.com/vercel-labs/skills), which reads your `package.json` dependencies and links their skills into your agent directories:
+As of npm 12.2, npm does not link skills from dependencies. Use the community [`skills` CLI](https://github.com/vercel-labs/skills), which reads your `package.json` dependencies and links their skills into your agent directories:
 
 ```bash
 npm install @wordpress/ui @wordpress/theme
@@ -84,7 +84,7 @@ See the pnpm documentation on [agent skills](https://pnpm.io/agent-skills) and t
 
 ## Yarn
 
-Yarn does not link skills from dependencies yet. With Yarn, use the same `skills` CLI as npm:
+As of Yarn 4.19, Yarn does not link skills from dependencies. With Yarn, use the same `skills` CLI as npm:
 
 ```bash
 yarn add @wordpress/ui @wordpress/theme
