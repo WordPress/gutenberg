@@ -42,6 +42,10 @@
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 
+### Bug Fixes
+
+-   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
