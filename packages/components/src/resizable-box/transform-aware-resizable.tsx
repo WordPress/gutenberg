@@ -23,6 +23,7 @@ type TransformedDrag = {
 	frame?: number;
 	settles: number;
 	isSettling: boolean;
+	lowGains: number;
 	cannotFollow?: boolean;
 };
 
@@ -31,6 +32,9 @@ type TransformedDrag = {
 const MIN_GAIN = 0.2;
 const MAX_GAIN = 2;
 const MAX_SETTLES = 10;
+// One sample can catch a consumer's re-render half done, such as a centred
+// image moving back to the centre, so a low gain must repeat.
+const LOW_GAINS_TO_STOP_FOLLOWING = 2;
 
 /**
  * Keeps the dragged handle under the pointer when the box or an ancestor is
@@ -67,6 +71,7 @@ export class TransformAwareResizable extends Resizable {
 				matrix,
 				handleElement: event.currentTarget,
 				gain: 1,
+				lowGains: 0,
 				settles: 0,
 				isSettling: false,
 			};
@@ -127,9 +132,15 @@ export class TransformAwareResizable extends Resizable {
 				}
 			);
 			if ( gain !== undefined && gain < MIN_GAIN ) {
-				drag.cannotFollow = true;
-			} else if ( gain !== undefined && gain <= MAX_GAIN ) {
-				drag.gain = gain;
+				drag.lowGains++;
+				if ( drag.lowGains >= LOW_GAINS_TO_STOP_FOLLOWING ) {
+					drag.cannotFollow = true;
+				}
+			} else if ( gain !== undefined ) {
+				drag.lowGains = 0;
+				if ( gain <= MAX_GAIN ) {
+					drag.gain = gain;
+				}
 			}
 		}
 		drag.last = { size, handle };
