@@ -17,7 +17,7 @@ Without the MCP server, an AI agent may produce a functional and convincing resu
 
 ## Setup
 
-See installing instructions also in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai--docs#setup).
+For an interactive setup guide, pick your AI tool in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai--docs#setup) to see only the instructions for it.
 
 ### Claude Code
 
