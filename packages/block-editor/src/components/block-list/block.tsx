@@ -33,7 +33,12 @@ import {
 	getAttributeChanges,
 	applyAttributeChanges,
 } from '../../utils/multi-selection-attributes';
-import { isBlockHidden } from '../block-visibility/use-block-visibility';
+import {
+	isBlockHidden,
+	useViewportRangeVisibility,
+} from '../block-visibility/use-block-visibility';
+import { getSavedViewportRanges } from '../block-visibility/ranges';
+import { CanvasWindowContext } from '../iframe/canvas-window-context';
 import { CurrentViewport } from './';
 import { unlock } from '../../lock-unlock';
 import type { InitialPosition, TreeBlock } from '../../store/types';
@@ -904,6 +909,11 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	);
 
 	const currentViewport = useContext( CurrentViewport );
+	const canvasView = useContext( CanvasWindowContext );
+	const isHiddenByRange = useViewportRangeVisibility(
+		getSavedViewportRanges( selectedProps?.blockVisibility ),
+		canvasView
+	);
 
 	// Users of the editor.BlockListBlock filter used to be able to
 	// access the block prop.
@@ -968,10 +978,9 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		supportsSplitting,
 	} = selectedProps;
 
-	const isBlockCurrentlyHidden = isBlockHidden(
-		selectedProps.blockVisibility,
-		currentViewport
-	);
+	const isBlockCurrentlyHidden =
+		isHiddenByRange ||
+		isBlockHidden( selectedProps.blockVisibility, currentViewport );
 
 	const privateContext = {
 		isPreviewMode,

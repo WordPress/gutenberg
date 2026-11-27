@@ -11,6 +11,7 @@
 
 ### Enhancements
 
+-   Block visibility: Offer theme-defined viewport ranges in the Hide block dialog ([#87559](https://github.com/WordPress/gutenberg/pull/87559)).
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
@@ -38,14 +39,11 @@
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
-
-### Bug Fixes
-
--   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ## 20.1.0 (2026-11-18)
 

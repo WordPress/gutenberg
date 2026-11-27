@@ -979,6 +979,30 @@
 							"type": "string",
 							"default": "782px",
 							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+						},
+						"ranges": {
+							"description": "Ordered viewport ranges offered by the Hide block dialog. Each range starts above the preceding upper bound and includes its own upper bound. The final range must have a null upper bound.",
+							"type": "array",
+							"minItems": 1,
+							"items": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "string",
+										"pattern": "^[a-z][a-z0-9-]*$"
+									},
+									"label": {
+										"type": "string",
+										"minLength": 1
+									},
+									"maxWidth": {
+										"type": [ "string", "null" ],
+										"pattern": "^\\d+(?:\\.\\d+)?px$"
+									}
+								},
+								"required": [ "id", "label", "maxWidth" ],
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false

@@ -37,6 +37,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { getSavedViewportRanges } from '../components/block-visibility/ranges';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -1105,7 +1106,10 @@ export const isBlockHiddenEverywhere = ( state: State, clientId: string ) => {
 	const attributes = state.blocks.attributes.get( clientId );
 	const blockVisibility = attributes?.metadata?.blockVisibility;
 
-	if ( blockVisibility === false ) {
+	if (
+		blockVisibility === false ||
+		getSavedViewportRanges( blockVisibility ).length > 0
+	) {
 		return true;
 	}
 	return false;

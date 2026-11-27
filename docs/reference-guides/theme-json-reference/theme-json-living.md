@@ -242,6 +242,7 @@ Viewport breakpoint settings used for responsive block styles and block visibili
 | -------- | ----------- | ---- | ------- |
 | mobile | Maximum viewport width for mobile styles. | `string` | `"480px"` |
 | tablet | Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint. | `string` | `"782px"` |
+| ranges | Ordered viewport ranges offered by the Hide block dialog. Each range starts above the preceding upper bound and includes its own upper bound. The final range must have a null upper bound. | `[ { id, label, maxWidth } ]` |  |
 
 ---
 

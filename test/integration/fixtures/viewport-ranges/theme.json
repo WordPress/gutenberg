@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"settings": {
+		"viewport": {
+			"mobile": "480px",
+			"tablet": "782px",
+			"ranges": [
+				{ "id": "mobile", "label": "Mobile", "maxWidth": "480px" },
+				{ "id": "tablet", "label": "Tablet", "maxWidth": "782px" },
+				{ "id": "desktop", "label": "Desktop", "maxWidth": "1024px" },
+				{
+					"id": "desktop-large",
+					"label": "Desktop large",
+					"maxWidth": null
+				}
+			]
+		}
+	}
+}

@@ -523,6 +523,7 @@ class WP_Theme_JSON_Gutenberg {
 		'viewport'                      => array(
 			'mobile' => null,
 			'tablet' => null,
+			'ranges' => null,
 		),
 	);
 
@@ -715,7 +716,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * }
 	 */
 	public static function get_viewport_media_queries( $viewport_settings = null, $options = array() ) {
-		$breakpoints = self::sanitize_viewport_settings( $viewport_settings );
+		$breakpoints = self::sanitize_viewport_breakpoints( $viewport_settings );
 
 		$responsive_media_queries = array();
 
@@ -820,7 +821,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param mixed $viewport_settings Viewport settings from theme.json.
 	 * @return array Sanitized viewport breakpoint settings.
 	 */
-	private static function sanitize_viewport_settings( $viewport_settings ) {
+	private static function sanitize_viewport_breakpoints( $viewport_settings ) {
 		if ( ! is_array( $viewport_settings ) ) {
 			return static::DEFAULT_VIEWPORT_BREAKPOINTS;
 		}
@@ -851,6 +852,77 @@ class WP_Theme_JSON_Gutenberg {
 		if ( isset( $breakpoints['tablet'] ) && $breakpoints['mobile']['px'] < $breakpoints['tablet']['px']
 		) {
 			$sanitized['tablet'] = $breakpoints['tablet']['value'];
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Preserves legacy breakpoints and the optional block visibility ranges.
+	 *
+	 * @param mixed $viewport_settings Viewport settings from theme.json.
+	 * @return array Sanitized viewport settings.
+	 */
+	private static function sanitize_viewport_settings( $viewport_settings ) {
+		$ranges = self::sanitize_viewport_ranges( $viewport_settings['ranges'] ?? null );
+		if ( ! $ranges ) {
+			return self::sanitize_viewport_breakpoints( $viewport_settings );
+		}
+
+		// A layer that defines visibility ranges alone inherits legacy breakpoints.
+		$settings           = array_key_exists( 'mobile', $viewport_settings ) || array_key_exists( 'tablet', $viewport_settings )
+			? self::sanitize_viewport_breakpoints( $viewport_settings )
+			: array();
+		$settings['ranges'] = $ranges;
+		return $settings;
+	}
+
+	/**
+	 * Validates the entire ordered list to guarantee contiguous viewport ranges.
+	 *
+	 * @param mixed $ranges Block visibility ranges from theme.json.
+	 * @return array Validated ranges, or an empty list for invalid configuration.
+	 */
+	private static function sanitize_viewport_ranges( $ranges ) {
+		if ( ! is_array( $ranges ) || ! $ranges || array_values( $ranges ) !== $ranges ) {
+			return array();
+		}
+
+		$sanitized = array();
+		$ids       = array();
+		$previous  = 0;
+		foreach ( $ranges as $index => $range ) {
+			if ( ! is_array( $range ) || ! array_key_exists( 'maxWidth', $range ) ) {
+				return array();
+			}
+			$id    = $range['id'] ?? null;
+			$label = is_string( $range['label'] ?? null ) ? trim( $range['label'] ) : '';
+			$max   = $range['maxWidth'];
+			if ( ! is_string( $id ) || ! preg_match( '/^[a-z][a-z0-9-]*$/D', $id ) || isset( $ids[ $id ] ) || '' === $label ) {
+				return array();
+			}
+
+			if ( count( $ranges ) - 1 === $index ) {
+				if ( null !== $max ) {
+					return array();
+				}
+			} else {
+				if ( ! is_string( $max ) || ! preg_match( '/^\d+(?:\.\d+)?px$/D', $max ) ) {
+					return array();
+				}
+				$width = (float) substr( $max, 0, -2 );
+				if ( ! is_finite( $width ) || $width <= $previous ) {
+					return array();
+				}
+				$previous = $width;
+			}
+
+			$ids[ $id ]  = true;
+			$sanitized[] = array(
+				'id'       => $id,
+				'label'    => $label,
+				'maxWidth' => $max,
+			);
 		}
 
 		return $sanitized;
@@ -4816,6 +4888,10 @@ class WP_Theme_JSON_Gutenberg {
 	public function merge( $incoming ) {
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
+		if ( isset( $incoming_data['settings']['viewport']['ranges'] ) ) {
+			// Each list describes the whole viewport. Replace it instead of merging by index.
+			$this->theme_json['settings']['viewport']['ranges'] = $incoming_data['settings']['viewport']['ranges'];
+		}
 
 		/*
 		 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor

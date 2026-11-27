@@ -1301,6 +1301,98 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_visibility_ranges_inherit_legacy_breakpoints_and_replace_lower_layer_ranges() {
+		$theme_ranges = array(
+			array(
+				'id'       => 'small',
+				'label'    => 'Small',
+				'maxWidth' => '480px',
+			),
+			array(
+				'id'       => 'desktop',
+				'label'    => 'Desktop',
+				'maxWidth' => '1024px',
+			),
+			array(
+				'id'       => 'large',
+				'label'    => 'Large',
+				'maxWidth' => null,
+			),
+		);
+		$child_ranges = array(
+			array(
+				'id'       => 'small',
+				'label'    => 'Small',
+				'maxWidth' => '960px',
+			),
+			array(
+				'id'       => 'desktop',
+				'label'    => 'Desktop',
+				'maxWidth' => null,
+			),
+		);
+		$theme        = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'tablet' => '900px',
+						'ranges' => $theme_ranges,
+					),
+				),
+			)
+		);
+		$theme->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array( 'viewport' => array( 'ranges' => $child_ranges ) ),
+				)
+			)
+		);
+		$settings = $theme->get_settings()['viewport'];
+		$this->assertSame(
+			array(
+				'tablet' => '900px',
+				'ranges' => $child_ranges,
+			),
+			$settings
+		);
+		$this->assertSame(
+			array(
+				'@tablet'  => '@media (width <= 900px)',
+				'@desktop' => '@media (width > 900px)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $settings, array( 'include_desktop' => true ) )
+		);
+	}
+
+	public function test_invalid_visibility_ranges_fall_back_to_legacy_breakpoints() {
+		$theme = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'tablet' => '64rem',
+						'ranges' => array(
+							array(
+								'id'       => 'mobile',
+								'label'    => 'Mobile',
+								'maxWidth' => '480px',
+							),
+							array(
+								'id'       => 'mobile',
+								'label'    => 'Desktop',
+								'maxWidth' => null,
+							),
+						),
+					),
+				),
+			)
+		);
+		$this->assertSame( array( 'tablet' => '64rem' ), $theme->get_settings()['viewport'] );
+	}
+
 	public function test_get_stylesheet_uses_custom_viewport_breakpoints_for_responsive_block_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

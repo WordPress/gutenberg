@@ -129,6 +129,88 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when no visibility attribute is present.' );
 	}
 
+	public function test_saved_viewport_ranges_keep_their_bounds_and_legacy_rules() {
+		$this->register_visibility_block_with_support( 'test/saved-visibility', array( 'visibility' => true ) );
+		$block      = array( 'blockName' => 'test/saved-visibility' );
+		$visibility = array(
+			'viewport'       => array( 'mobile' => false ),
+			'viewportRanges' => array(
+				'version' => 1,
+				'hidden'  => array(
+					array(
+						'id'  => 'desktop',
+						'min' => 782,
+						'max' => 1024,
+					),
+				),
+			),
+		);
+		$block['attrs']['metadata']['blockVisibility'] = $visibility;
+		$standard                                      = gutenberg_render_block_visibility_support( '<p>Content</p>', $block );
+		$block['attrs']['metadata']['blockVisibility']['viewportRanges']['hidden'][0]['max'] = 1200;
+		$resized = gutenberg_render_block_visibility_support( '<p>Content</p>', $block );
+		$this->assertStringContainsString( 'wp-block-hidden-mobile', $standard );
+		$this->assertStringContainsString( 'wp-block-hidden-range-', $standard );
+		$this->assertNotSame( $standard, $resized, 'Saved rules with the same ID and different bounds must get different classes.' );
+
+		$css = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString( '@media (782px < width <= 1024px){', $css );
+		$this->assertStringContainsString( '@media (782px < width <= 1200px){', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){.wp-block-hidden-mobile', $css );
+	}
+
+	/** @dataProvider data_invalid_saved_viewport_ranges */
+	public function test_invalid_saved_viewport_range_has_no_effect( $range ) {
+		$this->register_visibility_block_with_support( 'test/invalid-visibility', array( 'visibility' => true ) );
+		$block = array(
+			'blockName' => 'test/invalid-visibility',
+			'attrs'     => array(
+				'metadata' => array(
+					'blockVisibility' => array(
+						'viewportRanges' => array(
+							'version' => 1,
+							'hidden'  => array( $range ),
+						),
+					),
+				),
+			),
+		);
+		$this->assertSame( '<p>Content</p>', gutenberg_render_block_visibility_support( '<p>Content</p>', $block ) );
+		$this->assertSame( '', gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' ) );
+	}
+
+	public static function data_invalid_saved_viewport_ranges() {
+		return array(
+			'non numeric bound' => array(
+				array(
+					'id'  => 'large',
+					'min' => '1024px',
+					'max' => null,
+				),
+			),
+			'inverted bounds'   => array(
+				array(
+					'id'  => 'desktop',
+					'min' => 1024,
+					'max' => 782,
+				),
+			),
+			'unsupported ID'    => array(
+				array(
+					'id'  => 'Desktop large',
+					'min' => 1024,
+					'max' => null,
+				),
+			),
+			'missing bound'     => array(
+				array(
+					'id'  => 'large',
+					'min' => 1024,
+				),
+			),
+		);
+	}
+
 	public function test_block_visibility_support_generated_css_with_mobile_viewport_size() {
 		$this->register_visibility_block_with_support(
 			'test/viewport-mobile',
