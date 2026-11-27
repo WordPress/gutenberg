@@ -180,7 +180,7 @@ Make these changes in one pull request, so that the recommendation sources stay 
 
 - Follow [Component status](/packages/ui/CONTRIBUTING.md#component-status) to mark the new component `recommended`, move the `manifest` tag from the legacy story to the new one, update the `use-recommended-components` allowlist, and regenerate the manifest snapshot.
 - Mark the legacy component `not-recommended` in its story, and add it to the rule's `DENYLIST` with a message that names the replacement. A `not-recommended` status and a denylist entry always change together.
-- Finish the migration guide and link it from the [rule documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md#migration-guides).
+- Finish the migration guide and link it from the [rule documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md#migration-guides). Before its first `##` heading, add a "Requires `@wordpress/ui` X or later." note naming the release that will ship the recommendation. When a later edit to the guide uses a newer API, raise that version.
 - Remove the early-adoption directives from the trial migrations, and add the remaining legacy imports to `tools/eslint/suppressions.json`.
 - Add changelog entries for changes that package consumers see, such as new lint errors from `@wordpress/eslint-plugin`.
 
