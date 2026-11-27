@@ -373,22 +373,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			return;
 		}
 
-		if (
-			baseEdits.status &&
-			baseEdits.status !== 'future' &&
-			record?.status === 'future' &&
-			new Date( record.date ) > new Date()
-		) {
-			baseEdits.date = null;
-		}
-		if (
-			baseEdits.status &&
-			baseEdits.status === 'private' &&
-			record?.password
-		) {
-			baseEdits.password = '';
-		}
-
 		editEntityRecord( 'postType', postType, postId, baseEdits );
 	};
 	return (
