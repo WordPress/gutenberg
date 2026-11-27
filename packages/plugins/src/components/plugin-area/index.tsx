@@ -1,5 +1,4 @@
 import memoize from 'memize';
-import { useInstanceId } from '@wordpress/compose';
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
@@ -60,12 +59,14 @@ function PluginArea( {
 	scope?: string;
 	onError?: ( name: WPPlugin[ 'name' ], error: Error ) => void;
 } ) {
-	// A namespace of this instance's own: `removeAction` removes every
-	// callback registered under a namespace, so instances sharing one would
-	// unsubscribe each other when one of them unmounts.
-	const namespace = useInstanceId( PluginArea, 'core/plugins/plugin-area' );
 	const store = useMemo( () => {
 		let lastValue: WPPlugin[] = [];
+		// A namespace per scope: `removeAction` removes every callback
+		// registered under a namespace, so areas sharing one would unsubscribe
+		// each other when one of them unmounts.
+		const namespace = scope
+			? `core/plugins/plugin-area/${ scope }`
+			: 'core/plugins/plugin-area';
 
 		return {
 			subscribe(
@@ -91,7 +92,7 @@ function PluginArea( {
 				return lastValue;
 			},
 		};
-	}, [ scope, namespace ] );
+	}, [ scope ] );
 
 	const plugins = useSyncExternalStore(
 		store.subscribe,
