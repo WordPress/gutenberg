@@ -17,6 +17,9 @@ describe( 'polyfill build', () => {
 				path.join( buildDirectory, file ),
 				'utf8'
 			);
+			// Rolldown's debug comments would add local module paths.
+			expect( script ).not.toContain( 'node_modules' );
+
 			const context = vm.createContext( {
 				DOMException,
 				URL,
