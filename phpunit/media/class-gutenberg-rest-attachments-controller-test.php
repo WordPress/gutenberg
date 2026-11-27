@@ -1174,6 +1174,37 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that sideloading a scaled main file in another format updates
+	 * the attachment's MIME type.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_scaled_in_another_format_updates_mime_type() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/webp' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=photo-scaled.webp' );
+		$request->set_param( 'image_size', 'scaled' );
+		$request->set_param( 'convert_format', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.webp' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'image/webp', get_post_mime_type( $attachment_id ) );
+	}
+
+	/**
 	 * Verifies that the scaled sideload filename filter works correctly
 	 * and prevents WordPress from adding numeric suffixes to -scaled filenames.
 	 *
