@@ -221,6 +221,19 @@ describe( 'Entity record types', () => {
 			site?.[ 'gutenberg-experiments' ] satisfies unknown;
 			// @ts-expect-error -- a core setting keeps its own type.
 			site?.title satisfies number | undefined;
+
+			// `_fields` can name a plugin's setting, which stays `unknown`,
+			// alongside core settings, which keep their types.
+			const projected = select( coreStore ).getEntityRecord(
+				'root',
+				'site',
+				undefined,
+				{ _fields: 'title,gutenberg-experiments' }
+			);
+			projected?.title satisfies string | undefined;
+			projected?.[ 'gutenberg-experiments' ] satisfies unknown;
+			// @ts-expect-error -- `posts_per_page` was not requested.
+			projected?.posts_per_page;
 		};
 	} );
 

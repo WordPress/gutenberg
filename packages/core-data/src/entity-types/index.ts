@@ -578,5 +578,38 @@ type ProjectedRecord< RecordType, Paths > = [ Paths ] extends [ never ]
 				]: K extends Paths
 					? RecordType[ K ]
 					: DeepPartial< RecordType[ K ] >;
-			}
+			} & ProjectedIndexedFields< RecordType, Paths >
 		: never;
+
+/**
+ * The fields `_fields` names that only a string index signature covers, such
+ * as a plugin's setting on the `site` record. They keep the index signature's
+ * value type, so `_fields: 'gutenberg-experiments'` can still read that
+ * setting. A record without an index signature gains nothing.
+ */
+type ProjectedIndexedFields< RecordType, Paths > =
+	string extends keyof RecordType
+		? {
+				[
+					K in Exclude<
+						TopLevelField< Paths & string >,
+						DeclaredKeys< RecordType >
+					>
+				]: K extends Paths
+					? RecordType[ K & keyof RecordType ]
+					: DeepPartial< RecordType[ K & keyof RecordType ] >;
+			}
+		: unknown;
+
+/**
+ * The keys a record declares by name, leaving out its index signatures.
+ */
+type DeclaredKeys< RecordType > = keyof {
+	[
+		K in keyof RecordType as string extends K
+			? never
+			: number extends K
+				? never
+				: K
+	]: unknown;
+};
