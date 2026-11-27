@@ -667,4 +667,47 @@ describe( 'Cover block', () => {
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
 		} );
 	} );
+
+	describe( 'isDark with a featured image', () => {
+		afterEach( () => {
+			vi.mocked( getMediaColor ).mockReset();
+		} );
+
+		test( 'recomputes the isDark class on an editable canvas', async () => {
+			vi.mocked( getMediaColor ).mockResolvedValue( '#000000' );
+
+			await setup( {
+				useFeaturedImage: true,
+				dimRatio: 50,
+				isDark: false,
+			} );
+
+			await waitFor( () =>
+				expect(
+					screen.getByLabelText( 'Block: Cover' )
+				).not.toHaveClass( 'is-light' )
+			);
+		} );
+
+		test( 'leaves the isDark class alone on a preview canvas', async () => {
+			vi.mocked( getMediaColor ).mockResolvedValue( '#000000' );
+
+			await setup(
+				{
+					useFeaturedImage: true,
+					dimRatio: 50,
+					isDark: false,
+				},
+				{ ...defaultSettings, isPreviewMode: true }
+			);
+
+			await act( async () => {
+				await Promise.resolve();
+			} );
+			expect( getMediaColor ).not.toHaveBeenCalled();
+			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+				'is-light'
+			);
+		} );
+	} );
 } );
