@@ -801,6 +801,43 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
+		it( 'names clickable media after the item when the title is hidden', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						mediaField: 'image',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			expect(
+				screen.getByRole( 'button', { name: data[ 0 ].title } )
+			).toHaveClass( 'dataviews-column-primary__media' );
+		} );
+
+		it( 'names clickable media "Navigate to item" when there is no title field', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: undefined,
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			expect(
+				screen.getAllByRole( 'button', { name: 'Navigate to item' } )
+			).toHaveLength( data.length );
+		} );
+
 		it( 'should render actions column if actions are supported and passed in', () => {
 			render( <DataViewWrapper actions={ actions } /> );
 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();

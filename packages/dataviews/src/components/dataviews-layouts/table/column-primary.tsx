@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactElement } from 'react';
+import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 import type { MediaAspectRatio, NormalizedField } from '../../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
@@ -9,6 +10,7 @@ function ColumnPrimary< Item >( {
 	titleField,
 	mediaField,
 	mediaAspectRatio,
+	mediaLabel,
 	descriptionField,
 	onClickItem,
 	renderItemLink,
@@ -19,6 +21,7 @@ function ColumnPrimary< Item >( {
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	mediaAspectRatio?: MediaAspectRatio;
+	mediaLabel?: string;
 	descriptionField?: NormalizedField< Item >;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
@@ -43,6 +46,16 @@ function ColumnPrimary< Item >( {
 			Math.round( ( 32 * ratioWidth ) / ratioHeight )
 		) }px`;
 	}
+	const isMediaClickable =
+		isItemClickable( item ) && ( !! onClickItem || !! renderItemLink );
+	// Without a title shown, the media is the only control for the item, so
+	// name it like the grid does.
+	let mediaAriaLabel;
+	if ( isMediaClickable ) {
+		mediaAriaLabel = titleField
+			? titleField.getValueFormatted( { item, field: titleField } )
+			: mediaLabel || __( 'Navigate to item' );
+	}
 	return (
 		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
 			{ mediaField && (
@@ -52,13 +65,7 @@ function ColumnPrimary< Item >( {
 					onClickItem={ onClickItem }
 					renderItemLink={ renderItemLink }
 					className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media"
-					aria-label={
-						isItemClickable( item ) &&
-						( !! onClickItem || !! renderItemLink ) &&
-						!! titleField
-							? titleField.getValue?.( { item } )
-							: undefined
-					}
+					aria-label={ mediaAriaLabel }
 				>
 					<mediaField.render
 						item={ item }
