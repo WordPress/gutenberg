@@ -8,7 +8,7 @@
 -   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 -   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 -   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
--   Block attributes can use the `datetime` and `url` types. The parser keeps a `datetime` value only if the server would accept it, and any string as a `url`.
+-   Block attributes can use the `datetime` and `url` types. The parser keeps a `datetime` value only if the server would accept it, and any string as a `url` ([#87563](https://github.com/WordPress/gutenberg/pull/87563)).
 
 ### Bug Fixes
 
