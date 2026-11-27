@@ -1,4 +1,3 @@
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -26,35 +25,26 @@ export function useUserGlobalStyles( id: string | number | undefined ) {
 				id,
 			} );
 
-			let record;
-			if (
-				/*
-				 * Test that the OPTIONS request for user capabilities is complete
-				 * before fetching the global styles entity record.
-				 * This is to avoid fetching the global styles entity unnecessarily.
-				 */
-				typeof userCanEditGlobalStyles === 'boolean'
-			) {
-				/*
-				 * Fetch the global styles entity record based on the user's capabilities.
-				 * The default context is `edit` for users who can edit global styles.
-				 * Otherwise, the context is `view`.
-				 */
-				if ( userCanEditGlobalStyles ) {
-					record = getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						id
-					);
-				} else {
-					record = getEntityRecord( 'root', 'globalStyles', id, {
-						context: 'view',
-					} );
-				}
+			/*
+			 * Test that the OPTIONS request for user capabilities is complete
+			 * before fetching the global styles entity record.
+			 * This is to avoid fetching the global styles entity unnecessarily.
+			 */
+			if ( typeof userCanEditGlobalStyles !== 'boolean' ) {
+				return { userGlobalStyles: undefined };
 			}
 
+			/*
+			 * Fetch the global styles entity record based on the user's capabilities.
+			 * The default context is `edit` for users who can edit global styles.
+			 * Otherwise, the context is `view`.
+			 */
 			return {
-				userGlobalStyles: record,
+				userGlobalStyles: userCanEditGlobalStyles
+					? getEditedEntityRecord( 'root', 'globalStyles', id )
+					: getEntityRecord( 'root', 'globalStyles', id, {
+							context: 'view',
+						} ),
 			};
 		},
 		[ id ]
@@ -67,10 +57,8 @@ export function useUserGlobalStyles( id: string | number | undefined ) {
 			};
 		}
 
-		const user = userGlobalStyles as GlobalStylesConfig;
-
 		return {
-			user,
+			user: userGlobalStyles,
 		};
 	}, [ userGlobalStyles ] );
 }

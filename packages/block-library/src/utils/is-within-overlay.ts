@@ -1,6 +1,5 @@
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { WpTemplatePart } from '@wordpress/core-data';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
 
 /**
@@ -41,10 +40,9 @@ export function isWithinNavigationOverlay(): boolean {
 			postId
 		);
 
-		// A missing record is `false`, whose `area` reads as `undefined` too.
 		return (
-			( templatePart as Partial< WpTemplatePart > | undefined )?.area ===
-			NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+			!! templatePart &&
+			templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 		);
 	}
 

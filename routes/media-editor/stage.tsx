@@ -159,12 +159,11 @@ function MediaEditorRoute() {
 
 	const media = useSelect(
 		( select ) =>
-			/* The record of an attachment is always assignable to `Media`. */
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'attachment',
 				attachmentId
-			) as Media | false,
+			),
 		[ attachmentId ]
 	);
 	// The actions check `permissions`, which isn't part of the record.
