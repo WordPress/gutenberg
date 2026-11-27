@@ -213,9 +213,15 @@ describe( 'MediaEditorPanel', () => {
 		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
 			'plugin/broken,plugin/fine'
 		);
-		expect(
-			screen.getByRole( 'region', { name: 'Broken' } )
-		).toHaveTextContent( 'The "Broken" panel could not be shown' );
+		const notice = screen.getByRole( 'region', { name: 'Broken' } );
+		expect( notice ).toHaveTextContent(
+			'The "Broken" panel could not be shown'
+		);
+		// The cause, beside the editor's own copy.
+		expect( notice ).toHaveTextContent( 'Broken panel' );
+		expect( notice ).toHaveTextContent(
+			'The rest of the editor keeps working.'
+		);
 		expect(
 			screen.getByRole( 'region', { name: 'Fine' } )
 		).toHaveTextContent( 'Fine content' );

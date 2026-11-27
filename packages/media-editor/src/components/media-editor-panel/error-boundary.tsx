@@ -11,16 +11,23 @@ interface Props {
 }
 
 interface State {
-	error: Error | null;
+	error: unknown;
 }
 
-function getMessage( title: string ) {
+function getMessage( title: string, error: unknown ) {
+	// A boundary catches whatever was thrown, which is not always an `Error`.
+	const message =
+		typeof error === 'string'
+			? error
+			: ( error as { message?: unknown } | null )?.message;
 	return {
 		title: sprintf(
 			/* translators: %s: the panel's title. */
 			__( 'The "%s" panel could not be shown' ),
 			title
 		),
+		// The panel's own words for what went wrong, when it gave any.
+		cause: typeof message === 'string' ? message.trim() : '',
 		description: __(
 			'The rest of the editor keeps working. Reloading the page may help.'
 		),
@@ -37,23 +44,33 @@ export default class MediaEditorPanelErrorBoundary extends Component<
 > {
 	state: State = { error: null };
 
-	static getDerivedStateFromError( error: Error ): State {
+	static getDerivedStateFromError( error: unknown ): State {
 		return { error };
 	}
 
-	componentDidCatch() {
-		const { title, description } = getMessage( this.props.title );
-		speak( `${ title }. ${ description }`, 'assertive' );
+	componentDidCatch( error: unknown ) {
+		const { title, cause, description } = getMessage(
+			this.props.title,
+			error
+		);
+		speak(
+			[ `${ title }.`, cause, description ].filter( Boolean ).join( ' ' ),
+			'assertive'
+		);
 	}
 
 	render() {
 		if ( ! this.state.error ) {
 			return this.props.children;
 		}
-		const { title, description } = getMessage( this.props.title );
+		const { title, cause, description } = getMessage(
+			this.props.title,
+			this.state.error
+		);
 		return (
 			<Notice.Root intent="error">
 				<Notice.Title>{ title }</Notice.Title>
+				{ cause && <Notice.Description>{ cause }</Notice.Description> }
 				<Notice.Description>{ description }</Notice.Description>
 			</Notice.Root>
 		);
