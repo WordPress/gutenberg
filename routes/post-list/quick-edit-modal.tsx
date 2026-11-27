@@ -111,15 +111,6 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements.filter(
-							( element: { value: string } ) =>
-								element.value !== 'trash'
-						),
-					};
-				}
 				if ( field.id === 'featured_media' && field.Edit ) {
 					return {
 						...field,
