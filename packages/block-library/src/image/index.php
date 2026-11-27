@@ -127,9 +127,41 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$output = $processor->get_updated_html();
 	if ( ! empty( $figcaption_span ) ) {
-		return substr( $output, 0, $figcaption_span->start ) . substr( $output, $figcaption_span->start + $figcaption_span->length );
+		$output = substr( $output, 0, $figcaption_span->start ) . substr( $output, $figcaption_span->start + $figcaption_span->length );
 	}
-	return $output;
+
+	return block_core_image_add_figure_role( $output );
+}
+
+/**
+ * Removes the `figure` role from an Image block that has no caption.
+ *
+ * Without a caption, the `figure` element tells screen reader users nothing
+ * beyond the image itself, but some screen readers still announce "figure"
+ * before every image. The element is kept so theme styles still apply.
+ *
+ * @since 7.3.0
+ *
+ * @param string $block_content The rendered Image block markup.
+ *
+ * @return string The markup, with `role="none"` on a `figure` that has no caption.
+ */
+function block_core_image_add_figure_role( $block_content ) {
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+
+	if ( ! $processor->next_tag( 'FIGURE' ) || null !== $processor->get_attribute( 'role' ) ) {
+		return $block_content;
+	}
+
+	$processor->set_bookmark( 'figure' );
+	if ( $processor->next_tag( 'FIGCAPTION' ) ) {
+		return $block_content;
+	}
+
+	$processor->seek( 'figure' );
+	$processor->set_attribute( 'role', 'none' );
+
+	return $processor->get_updated_html();
 }
 
 /**

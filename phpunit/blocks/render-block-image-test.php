@@ -97,7 +97,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block );
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
-		$this->assertSame( '<figure class="wp-block-image"><img class="wp-image-456" src="canola.jpg"/></figure>', $rendered_block );
+		$this->assertSame( '<figure role="none" class="wp-block-image"><img class="wp-image-456" src="canola.jpg"/></figure>', $rendered_block );
 	}
 
 	public function test_should_keep_figcaption_if_it_is_not_empty() {
@@ -124,7 +124,52 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block );
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
-		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"/></figure>', $rendered_block );
+		$this->assertSame( '<figure role="none" class="wp-block-image"><img src="canola.jpg"/></figure>', $rendered_block );
+	}
+
+	/**
+	 * @covers ::block_core_image_add_figure_role
+	 */
+	public function test_should_add_role_none_to_figure_without_caption() {
+		$content       = '<figure class="wp-block-image"><img src="canola.jpg" alt="A field of canola"/></figure>';
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+		$parsed_block  = $parsed_blocks[0];
+		$block         = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image( array(), $content, $block );
+		$this->assertSame( '<figure role="none" class="wp-block-image"><img src="canola.jpg" alt="A field of canola"/></figure>', $rendered_block );
+	}
+
+	/**
+	 * @covers ::block_core_image_add_figure_role
+	 */
+	public function test_should_add_role_none_to_figure_when_image_is_linked() {
+		$content       = '<figure class="wp-block-image"><a href="https://example.com"><img src="canola.jpg" alt="A field of canola"/></a></figure>';
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+		$parsed_block  = $parsed_blocks[0];
+		$block         = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image( array(), $content, $block );
+		$this->assertSame( '<figure role="none" class="wp-block-image"><a href="https://example.com"><img src="canola.jpg" alt="A field of canola"/></a></figure>', $rendered_block );
+	}
+
+	/**
+	 * @covers ::block_core_image_add_figure_role
+	 */
+	public function test_should_keep_existing_role_on_figure() {
+		$content       = '<figure class="wp-block-image" role="group"><img src="canola.jpg" alt="A field of canola"/></figure>';
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+		$parsed_block  = $parsed_blocks[0];
+		$block         = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image( array(), $content, $block );
+		$this->assertSame( '<figure class="wp-block-image" role="group"><img src="canola.jpg" alt="A field of canola"/></figure>', $rendered_block );
 	}
 
 	/**
