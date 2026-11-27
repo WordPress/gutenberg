@@ -1,7 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import type { Post } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
@@ -16,17 +18,28 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
+interface QuickEditModalProps {
+	postType: string;
+	postId: string[];
+	closeModal: () => void;
+	/** Called once the edits are saved, before the modal closes. */
+	onSave?: () => void;
+	quickEditForm: Form | undefined;
+}
+
 export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
 	onSave: onSaved,
 	quickEditForm,
-} ) {
+}: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
-	const [ modalElement, setModalElement ] = useState( null );
-	const [ localEdits, setLocalEdits ] = useState( {} );
+	const [ modalElement, setModalElement ] = useState< HTMLDivElement | null >(
+		null
+	);
+	const [ localEdits, setLocalEdits ] = useState< Partial< Post > >( {} );
 	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const {
@@ -41,7 +54,11 @@ export function QuickEditModal( {
 				};
 			}
 
-			const args = [ 'postType', postType, postId[ 0 ] ];
+			const args: [ string, string, string ] = [
+				'postType',
+				postType,
+				postId[ 0 ],
+			];
 
 			const { getHomePage, getPostsPageId } = unlock(
 				select( coreDataStore )
@@ -71,11 +88,11 @@ export function QuickEditModal( {
 	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
 		() =>
-			_fields?.map( ( field ) => {
+			_fields?.map( ( field: Field< Post > ) => {
 				if ( field.id === 'status' ) {
 					return {
 						...field,
-						elements: field.elements.filter(
+						elements: field.elements?.filter(
 							( element ) => element.value !== 'trash'
 						),
 					};
@@ -93,7 +110,7 @@ export function QuickEditModal( {
 		[ _fields, canSwitchTemplate ]
 	);
 
-	const form = useMemo( () => {
+	const form = useMemo( (): Form => {
 		if ( ! quickEditForm ) {
 			return { layout: { type: 'panel' }, fields: [] };
 		}
@@ -110,14 +127,14 @@ export function QuickEditModal( {
 		};
 	}, [ isBulk, quickEditForm ] );
 
-	const onChange = ( edits ) => {
+	const onChange = ( edits: Record< string, any > ) => {
 		const currentData = { ...record, ...localEdits };
 
 		if (
 			edits.status &&
 			edits.status !== 'future' &&
 			currentData?.status === 'future' &&
-			new Date( currentData.date ) > new Date()
+			new Date( currentData.date as string ) > new Date()
 		) {
 			edits.date = null;
 		}
