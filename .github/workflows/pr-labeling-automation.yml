@@ -18,8 +18,16 @@ jobs:
               with:
                   dot: true
                   sync-labels: true
-            - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+            # The base branch, never the pull request's code.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  configuration-path: .github/labeler-blocks.yml
-                  dot: true
-                  sync-labels: false
+                  sparse-checkout: |
+                      .github/scripts
+                      packages/block-library/src
+                  persist-credentials: false
+            - name: Add block labels
+              run: .github/scripts/label-blocks.sh
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  PR: ${{ github.event.pull_request.number }}
+                  REPO: ${{ github.repository }}
