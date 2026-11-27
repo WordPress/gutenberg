@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
 import { unlock } from '../lock-unlock';
@@ -6,9 +7,8 @@ import { syncSiteBase } from '../page/sync-site-base';
 
 // The resolvers of `core-data` request what isn't in the store: leave those
 // requests pending, so the store holds only what the tests receive.
-vi.mock( '@wordpress/api-fetch', () => ( {
-	default: vi.fn( () => new Promise( () => {} ) ),
-} ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
+vi.mocked( apiFetch ).mockImplementation( () => new Promise( () => {} ) );
 
 function createRegistryWithBase( base?: Record< string, unknown > ) {
 	const registry = createRegistry();
