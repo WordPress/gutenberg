@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Image: Stop screen readers from announcing "figure" before an image that has no caption, by adding `role="none"` to its `figure` element.
+-   Image: Stop screen readers from announcing "figure" before an image that has no caption, by adding `role="none"` to its `figure` element ([#87508](https://github.com/WordPress/gutenberg/pull/87508)).
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
 -   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
