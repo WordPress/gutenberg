@@ -8,11 +8,11 @@
 
 ### Bug Fixes
 
--   Update `moment-timezone` to `^0.5.48`, so builds ship IANA timezone data 2025b instead of 2023c ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
 -   Keep `translators:` comments next to their `__()`, `_x()`, `_n()` and `_nx()` calls in the transpiled and unminified output, so `wp i18n make-pot` extracts them from the built files ([#87189](https://github.com/WordPress/gutenberg/pull/87189)).
 
 ### Internal
 
+-   Remove the unused `moment-timezone` dependency. The `moment-timezone` alias resolves the pre-built bundle from the package that imports it, never from `wp-build` ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
 -   The generated registration PHP now picks the `SCRIPT_DEBUG` file extension with an `if` that also checks the new `has_debug_assets` key of `build/constants.php`, in every build. Tools that post-process the generated PHP may need updating; read `has_debug_assets` instead of matching the template code ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).

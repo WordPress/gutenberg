@@ -51,7 +51,6 @@
 		"chokidar": "^4.0.0",
 		"cssnano": "^6.0.1",
 		"fast-glob": "^3.2.7",
-		"moment-timezone": "^0.5.48",
 		"postcss": "^8.5.33",
 		"postcss-modules": "^6.0.1",
 		"rolldown": "^1.2.15",
