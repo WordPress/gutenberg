@@ -10,6 +10,7 @@
 
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 -   Keep the sidebar's Dashboard link readable when it has keyboard focus. Before, the admin color scheme's link focus color made the label hard to read on the dark sidebar ([#87419](https://github.com/WordPress/gutenberg/pull/87419)).
+-   Announce the route title to screen readers only when the route path and its title change. Do not announce on first load, when only the search params change, or with the previous route's title while the next route loads ([#84586](https://github.com/WordPress/gutenberg/pull/84586)).
 
 ## 0.27.0 (2026-11-18)
 

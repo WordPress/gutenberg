@@ -36,6 +36,7 @@ import useMovingAnimation from './animation';
 import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
+import { useScreenTitle } from '../routes/use-title';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
@@ -61,6 +62,7 @@ function Layout() {
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
+	useScreenTitle();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
 	const animationRef = useMovingAnimation( {
