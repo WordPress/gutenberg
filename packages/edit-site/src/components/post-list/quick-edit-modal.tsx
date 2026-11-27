@@ -3,7 +3,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type { Post } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { Field, Form, NormalizedField } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
@@ -16,7 +16,30 @@ import { unlock } from '../../lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
-const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
+const fieldsWithBulkEditSupport = [
+	'status',
+	'date',
+	'author',
+	'discussion',
+	'template',
+	'parent',
+];
+
+const EMPTY_ARRAY: string[] = [];
+
+/**
+ * Whether the field is disabled for the post.
+ *
+ * @param field The field.
+ * @param item  The post.
+ * @return Whether the field is disabled.
+ */
+function isFieldDisabled< Item >( field: Field< Item >, item: Item ) {
+	const { isDisabled } = field;
+	return typeof isDisabled === 'function'
+		? isDisabled( { item, field: field as NormalizedField< Item > } )
+		: !! isDisabled;
+}
 
 interface QuickEditModalProps {
 	postType: string;
@@ -40,7 +63,7 @@ export function QuickEditModal( {
 		null
 	);
 	const [ localEdits, setLocalEdits ] = useState< Partial< Post > >( {} );
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -60,35 +83,56 @@ export function QuickEditModal( {
 				postId[ 0 ],
 			];
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
+	);
+	// The posts being edited, which the list has already loaded.
+	const records = useSelect(
+		( select ) =>
+			postId.map(
+				( id ) =>
+					select( coreDataStore ).getEditedEntityRecord(
+						'postType',
+						postType,
+						id
+					) as Post | undefined
+			),
+		[ postType, postId ]
 	);
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
 	const _fields = usePostFields( { postType } );
+	// The form of several posts has no id to tell whether a field is
+	// disabled, so ask each post instead.
+	const fieldsDisabledForAll = useSelect(
+		() =>
+			isBulk
+				? ( _fields ?? [] )
+						.filter( ( field: Field< Post > ) =>
+							records.every(
+								( post ) =>
+									!! post && isFieldDisabled( field, post )
+							)
+						)
+						.map( ( field: Field< Post > ) => field.id )
+				: EMPTY_ARRAY,
+		[ _fields, records, isBulk ]
+	);
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: Field< Post > ) => {
+				if ( fieldsDisabledForAll.includes( field.id ) ) {
+					field = { ...field, readOnly: true };
+				}
+
 				if ( field.id === 'status' ) {
 					return {
 						...field,
@@ -98,16 +142,9 @@ export function QuickEditModal( {
 					};
 				}
 
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
-
 				return field;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields, fieldsDisabledForAll ]
 	);
 
 	const form = useMemo( (): Form => {
@@ -153,9 +190,17 @@ export function QuickEditModal( {
 	}, [ postId ] );
 
 	const onSave = async () => {
-		for ( const id of postId ) {
-			editEntityRecord( 'postType', postType, id, localEdits );
-		}
+		postId.forEach( ( id, index ) => {
+			const edits: Record< string, any > = { ...localEdits };
+			// Leave alone the fields disabled for this post once edited.
+			const post = { ...records[ index ], ...localEdits };
+			for ( const field of fields ?? [] ) {
+				if ( field.id in edits && isFieldDisabled( field, post ) ) {
+					delete edits[ field.id ];
+				}
+			}
+			editEntityRecord( 'postType', postType, id, edits );
+		} );
 
 		if ( isBulk ) {
 			await Promise.allSettled(
@@ -189,7 +234,9 @@ export function QuickEditModal( {
 			<div className="dataviews-action-modal__quick-edit-content">
 				{ hasFinishedResolution && (
 					<DataForm
-						data={ { ...record, ...localEdits } }
+						// Several posts have no record: the fields still need
+						// the post type.
+						data={ { type: postType, ...record, ...localEdits } }
 						fields={ fields }
 						form={ form }
 						onChange={ onChange }
