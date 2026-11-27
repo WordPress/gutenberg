@@ -5,12 +5,10 @@ const TableOfContentsItem = ( {
 	isValid,
 	isDisabled,
 	level,
-	href,
 	onSelect,
 } ) => {
-	function handleClick( event ) {
+	function handleClick() {
 		if ( isDisabled ) {
-			event.preventDefault();
 			return;
 		}
 		onSelect();
@@ -27,8 +25,8 @@ const TableOfContentsItem = ( {
 				}
 			) }
 		>
-			<a
-				href={ href }
+			<button
+				type="button"
 				className="document-outline__button"
 				aria-disabled={ isDisabled }
 				onClick={ handleClick }
@@ -41,7 +39,7 @@ const TableOfContentsItem = ( {
 				<span className="document-outline__item-content">
 					{ children }
 				</span>
-			</a>
+			</button>
 		</li>
 	);
 };

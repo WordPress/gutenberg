@@ -1,6 +1,6 @@
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	BaseControl,
 	Icon as WCIcon,
 } from '@wordpress/components';
@@ -22,7 +22,7 @@ function FieldItem( {
 	onToggleVisibility?: () => void;
 } ) {
 	return (
-		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
+		<WCItem onClick={ field.enableHiding ? onToggleVisibility : undefined }>
 			<Stack direction="row" gap="sm" justify="flex-start" align="center">
 				<div style={ { height: 24, width: 24 } }>
 					{ isVisible && <WCIcon icon={ check } /> }
@@ -31,7 +31,7 @@ function FieldItem( {
 					{ field.label }
 				</span>
 			</Stack>
-		</Item>
+		</WCItem>
 	);
 }
 

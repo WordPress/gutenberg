@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { Tabs } from '../..';
-import styles from '../style.module.css';
+import styles from '../style.module.scss';
 
 function OverflowTabs( { tabWidth }: { tabWidth: number } ) {
 	return (

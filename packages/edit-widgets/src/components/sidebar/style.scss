@@ -4,6 +4,12 @@
 	padding-left: 0;
 }
 
+// Overlap the header's bottom border, so the selected tab's indicator
+// covers it, as in the inserter.
+.edit-widgets-sidebar__panel-tablist {
+	margin-bottom: -$border-width;
+}
+
 
 .edit-widgets-widget-areas__top-container {
 	display: flex;

@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `coreDataStore`: Type the `core/data` store descriptor with its runtime selectors and actions, allowing selectors such as `hasFinishedResolution` to accept `storeName` without casts ([#87190](https://github.com/WordPress/gutenberg/pull/87190)).
 -   `plugins.persistence`: Allow calling `createPersistenceInterface` and registering the plugin without options ([#87060](https://github.com/WordPress/gutenberg/pull/87060)).
 
 ## 11.2.0 (2026-11-18)
