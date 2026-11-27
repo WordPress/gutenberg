@@ -14,6 +14,7 @@
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 -   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   `registerInserterMediaCategory`: Accept `file` as a `mediaType`, for documents and other non-media files. Its items are inserted as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+-   Block states: Add the Hover, Focus, Focus-visible and Active states to the Navigation Overlay Close block, so its close button can be styled when hovered or focused ([#87520](https://github.com/WordPress/gutenberg/pull/87520)).
 
 ### Bug Fixes
 
