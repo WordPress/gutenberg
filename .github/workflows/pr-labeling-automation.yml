@@ -18,22 +18,8 @@ jobs:
               with:
                   dot: true
                   sync-labels: true
-            # The base branch, never the pull request's code.
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-              with:
-                  sparse-checkout: |
-                      .github/scripts
-                      packages/block-library/src
-                  persist-credentials: false
-            - name: Write block label rules from block.json
-              id: blocks
-              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-              with:
-                  script: |
-                      const blockLabelerConfig = require( './.github/scripts/block-labeler-config.cjs' );
-                      await blockLabelerConfig( { github, context, core } );
             - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
               with:
-                  configuration-path: ${{ steps.blocks.outputs.path }}
+                  configuration-path: .github/labeler-blocks.yml
                   dot: true
                   sync-labels: false
