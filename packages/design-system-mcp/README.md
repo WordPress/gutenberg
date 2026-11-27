@@ -19,7 +19,7 @@ Without the MCP server, an AI agent may produce a functional and convincing resu
 
 Every setup below runs the server with `npx`, so [Node.js](https://nodejs.org/) 22.13.0 or newer must be installed.
 
-For an interactive setup guide, pick your AI tool in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai--docs#setup) to see only the instructions for it.
+For an interactive setup guide, pick your AI tool in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai-mcp--docs#setup) to see only the instructions for it.
 
 ### Shared configuration
 
