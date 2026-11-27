@@ -256,33 +256,24 @@ test.describe( 'Style Revisions', () => {
 				color: { background: 'blue' },
 			} );
 
+			// This flow starts from the browse-mode sidebar, not the edit
+			// mode the shared `beforeEach` opens.
+			await admin.visitSiteEditor();
 			if ( isSiteEditorV2 ) {
-				await admin.visitSiteEditor();
 				await page.getByRole( 'link', { name: 'Styles' } ).click();
-				await page
-					.getByRole( 'region', { name: 'Styles' } )
-					.getByRole( 'button', { name: 'Revisions' } )
-					.click();
 			} else {
-				// This flow starts from the browse-mode sidebar, not the edit
-				// mode the shared `beforeEach` opens.
-				await admin.visitSiteEditor();
-
-				const navigationContainer = page.getByRole( 'region', {
-					name: 'Navigation',
-				} );
-
-				await navigationContainer
+				await page
+					.getByRole( 'region', { name: 'Navigation' } )
 					.getByRole( 'button', { name: 'Styles' } )
 					.click();
 
 				// wait for the editor canvas to be ready (to contain a block)
 				await editor.canvas.locator( '.wp-block' ).first().waitFor();
-
-				await navigationContainer
-					.getByRole( 'button', { name: /\d+ Revisions?/ } )
-					.click();
 			}
+			await page
+				.getByRole( 'region', { name: 'Styles' } )
+				.getByRole( 'button', { name: 'Revisions', exact: true } )
+				.click();
 
 			await expect(
 				page.getByLabel( 'Global styles revisions list' )
@@ -401,19 +392,23 @@ test.describe( 'Style Revisions', () => {
 				color: { background: 'blue' },
 			} );
 
-			// The styles route (site-editor.php?p=%2Fstyles) is where the
-			// Revisions entry lives.
+			// Enter the editor from the styles route
+			// (site-editor.php?p=%2Fstyles) and open its revisions.
 			await admin.visitSiteEditor();
-			const navigationContainer = page.getByRole( 'region', {
-				name: 'Navigation',
-			} );
-			await navigationContainer
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
 			await expect( page ).toHaveURL( /p=%2Fstyles/ );
-
-			await navigationContainer
-				.getByRole( 'button', { name: /\d+ Revisions?/ } )
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await userGlobalStylesRevisions.openStylesPanel();
+			await page
+				.getByRole( 'button', { name: 'Revisions', exact: true } )
 				.click();
 
 			// The revisions sidebar is open in the editor.
