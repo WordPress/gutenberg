@@ -83,7 +83,7 @@ export function McpSetup( { children }: { children: ReactNode } ) {
 					</button>
 				) ) }
 			</div>
-			<div className={ styles.panel } role="group" aria-live="polite">
+			<div className={ styles.panel }>
 				<Subheading disableAnchor>{ tool.props.label }</Subheading>
 				{ tool.props.children }
 			</div>
