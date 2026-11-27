@@ -27,15 +27,16 @@ export function resolveCircularOptionPickerPresentation(
 /**
  * Returns a React key for each option group. A group with a unique slug keeps
  * its identity when groups are reordered or removed. Groups without a slug, or
- * with a slug that another group also uses, fall back to their index.
+ * with a slug that another group also uses, fall back to their index. A group
+ * whose slug becomes repeated, or stops being repeated, gets a new key.
  */
 export function getOptionGroupKeys( groups: Array< { slug?: string } > ) {
 	const slugCounts = new Map< string, number >();
-	for ( const { slug } of groups ) {
+	groups.forEach( ( { slug } ) => {
 		if ( typeof slug === 'string' ) {
 			slugCounts.set( slug, ( slugCounts.get( slug ) ?? 0 ) + 1 );
 		}
-	}
+	} );
 	return groups.map( ( { slug }, index ) =>
 		typeof slug === 'string' && slugCounts.get( slug ) === 1
 			? `slug-${ slug }`
