@@ -656,7 +656,7 @@ export function PaletteEdit( {
 	);
 	const [ isEditing, setIsEditing ] = useState( false );
 	// Remember the slug too, so the editor closes instead of switching presets
-	// when the palette changes from outside, for example on undo.
+	// when its preset is removed or moved from outside, for example on undo.
 	const [ editingTarget, setEditingTarget ] = useState< {
 		index: number;
 		slug: string;
@@ -666,11 +666,10 @@ export function PaletteEdit( {
 		elements[ editingTarget.index ]?.slug === editingTarget.slug
 			? editingTarget.index
 			: null;
-	const isAdding =
-		isEditing &&
-		!! editingElement &&
-		elements[ editingElement ] &&
-		! elements[ editingElement ].slug;
+	// Forget the preset once it is gone, so a redo does not reopen its editor.
+	if ( editingTarget && editingElement === null ) {
+		setEditingTarget( null );
+	}
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
 	const debounceOnChange = useDebounce( onChange, 100 );
@@ -758,7 +757,6 @@ export function PaletteEdit( {
 						<Button
 							ref={ addColorRef }
 							size="small"
-							isPressed={ isAdding }
 							icon={ plus }
 							label={ getAddLabel( variant ) }
 							onClick={ () => {
@@ -800,10 +798,6 @@ export function PaletteEdit( {
 									] );
 								}
 								setIsEditing( true );
-								setEditingTarget( {
-									index: elements.length,
-									slug,
-								} );
 							} }
 						/>
 					) }

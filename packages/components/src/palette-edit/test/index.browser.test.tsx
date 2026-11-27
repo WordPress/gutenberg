@@ -1034,6 +1034,12 @@ describe( 'PaletteEdit', () => {
 		await waitFor( () => {
 			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 		} );
+
+		// Restoring the color, for example on redo, does not reopen its editor.
+		await rerender( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		expect( screen.getByLabelText( 'Secondary' ) ).toBeVisible();
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'does not move the swatch editor to another color when colors move', async () => {
