@@ -59,7 +59,6 @@
 		"@wordpress/react-inert-value": "file:../react-inert-value",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/widget-primitives": "file:../widget-primitives",
 		"clsx": "^2.1.1",
 		"fast-deep-equal": "^3.1.3",

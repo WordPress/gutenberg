@@ -1,10 +1,10 @@
+import { useViewportMatch } from '@wordpress/compose';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as viewportStore } from '@wordpress/viewport';
 import {
 	WidgetDashboard,
 	type DashboardWidget,
@@ -39,10 +39,7 @@ function Dashboard() {
 
 	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
 	// https://github.com/WordPress/gutenberg/issues/77628
-	const isMobileViewport = useSelect(
-		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
-		[]
-	);
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 

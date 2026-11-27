@@ -1,8 +1,7 @@
-import { useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-import { store as viewportStore } from '@wordpress/viewport';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
@@ -73,10 +72,7 @@ export function Actions(): React.ReactNode {
 	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
 	// https://github.com/WordPress/gutenberg/issues/77628
-	const isMobileViewport = useSelect(
-		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
-		[]
-	);
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
