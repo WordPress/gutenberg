@@ -113,9 +113,7 @@ function TagCloudEdit( {
 				parseQuantityAndUnitFromRawValue( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
 			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
-				updateObj[
-					attribute as 'smallestFontSize' | 'largestFontSize'
-				] = `${ currentQuantity }${ newUnit }`;
+				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
 			}
 		} );
 		setAttributes( updateObj );
