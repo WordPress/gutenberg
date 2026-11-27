@@ -2672,24 +2672,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/loginout/edit.jsx": {
+	"packages/block-library/src/loginout/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/loginout/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/loginout/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
