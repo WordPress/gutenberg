@@ -42,7 +42,7 @@ Work down this list and stop at the first match:
 These conventions use the shared Agent Skills format:
 
 -   One directory per domain: `.agents/skills/<domain>/`, lowercase kebab-case.
--   `SKILL.md` starts with YAML frontmatter containing only `name` (matching the directory) and `description`. Phrase the description as a trigger: "Use when …".
+-   `SKILL.md` starts with YAML frontmatter containing only `name` (matching the directory) and `description`. Phrase the description as a trigger: "Use when …". Quote the description if it contains `: `, or the frontmatter is not valid YAML. `npm run lint:skills` checks these rules.
 -   Keep the body short and procedural. Link to depth rather than inlining it, and keep every linked file one hop from `SKILL.md`.
 -   Link a doc the agent **must** read as part of the procedure step that needs it ("read the [guide] before writing your first body"). In testing, if an agent finds a skill that matches its task, it will focus on that task rather than re-considering generalized "read the relevant docs" files from AGENTS.md.
 -   An optional `.agents/skills/<domain>/references/` directory holds agent-specific depth that has no home in the public docs.
@@ -81,4 +81,4 @@ Walking through how the live testing skill applies these conventions:
 
 1. Confirm the public docs can't cover it — improve them first if they can.
 2. Create `.agents/skills/<domain>/SKILL.md` following the conventions above.
-3. Run `npm run lint:md:docs`.
+3. Run `npm run lint:skills` and `npm run lint:md:docs`.
