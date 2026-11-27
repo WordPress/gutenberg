@@ -15,7 +15,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { readNpmPackResult } from './read-npm-pack-result.mjs';
+import { packWorkspacePackage } from './pack-workspace-package.ts';
 
 const { values } = parseArgs( {
 	options: {
@@ -83,56 +83,12 @@ function write( name, content ) {
 	writeFileSync( path.join( consumer, name ), content );
 }
 function pack( name ) {
-	const source = path.join( root, 'packages', name );
-	const staging = path.join( directory, name );
-	cpSync( source, staging, {
-		recursive: true,
-		filter: ( file ) => ! file.split( path.sep ).includes( 'node_modules' ),
-	} );
-	const manifest = JSON.parse(
-		readFileSync( path.join( staging, 'package.json' ) )
+	const tarball = packWorkspacePackage(
+		path.join( root, 'packages', name ),
+		directory,
+		{ exact: true, env }
 	);
-	// Apply the same file: -> version conversion as publication. Dependencies
-	// other than the changed packages below come from the public registry.
-	for ( const section of [
-		'dependencies',
-		'devDependencies',
-		'optionalDependencies',
-	] ) {
-		for ( const [ dependency, version ] of Object.entries(
-			manifest[ section ] ?? {}
-		) ) {
-			if ( version.startsWith( 'file:' ) ) {
-				manifest[ section ][ dependency ] = JSON.parse(
-					readFileSync(
-						path.resolve(
-							source,
-							version.slice( 5 ),
-							'package.json'
-						)
-					)
-				).version;
-			}
-		}
-	}
-	writeFileSync(
-		path.join( staging, 'package.json' ),
-		JSON.stringify( manifest )
-	);
-	const { stdout } = execute(
-		'npm',
-		[
-			'pack',
-			staging,
-			'--json',
-			'--ignore-scripts',
-			'--pack-destination',
-			directory,
-		],
-		directory
-	);
-	const packed = readNpmPackResult( stdout, manifest.name );
-	return `file:${ path.join( directory, packed.filename ) }`;
+	return `file:${ tarball }`;
 }
 const scripts = values.scripts ?? pack( 'scripts' );
 const eslintPlugin = values[ 'eslint-plugin' ] ?? pack( 'eslint-plugin' );

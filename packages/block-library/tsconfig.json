@@ -8,6 +8,7 @@
 			"style-imports"
 		]
 	},
+	"files": [ "src/cover/edit/resizable-cover-popover.jsx" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
