@@ -65,8 +65,6 @@ function getNavigationPath( location, postType, showStylebook ) {
 			'template-part-item',
 			'page-item',
 			'template-item',
-			'static-template-item',
-			'post-item',
 		].includes( name )
 	) {
 		return getListPathForPostType( postType );

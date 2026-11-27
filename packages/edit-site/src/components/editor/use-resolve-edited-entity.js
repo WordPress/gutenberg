@@ -38,8 +38,6 @@ function getPostType( name ) {
 		postType = TEMPLATE_POST_TYPE;
 	} else if ( name === 'page-item' || name === 'pages' ) {
 		postType = 'page';
-	} else if ( name === 'post-item' || name === 'posts' ) {
-		postType = 'post';
 	}
 
 	return postType;
