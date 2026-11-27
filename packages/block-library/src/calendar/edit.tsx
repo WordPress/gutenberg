@@ -19,18 +19,16 @@ import type { CalendarAttributes } from './types';
  * @param date Date in `ISO8601/RFC3339` format.
  * @return Year and date of the specified date.
  */
-const getYearMonth = memoize(
-	( date?: string ): { year?: number; month?: number } => {
-		if ( ! date ) {
-			return {};
-		}
-		const dateObj = new Date( date );
-		return {
-			year: dateObj.getFullYear(),
-			month: dateObj.getMonth() + 1,
-		};
+const getYearMonth = memoize( ( date?: string ) => {
+	if ( ! date ) {
+		return {};
 	}
-);
+	const dateObj = new Date( date );
+	return {
+		year: dateObj.getFullYear(),
+		month: dateObj.getMonth() + 1,
+	};
+} );
 
 export default function CalendarEdit( {
 	attributes,
