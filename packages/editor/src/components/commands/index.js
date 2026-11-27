@@ -23,6 +23,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { getPostViewTarget, openPostView } from '../../utils/post-view-target';
 import {
 	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -87,6 +88,7 @@ const getEditorCommandLoader = () =>
 			isViewable,
 			isPublished,
 			viewLink,
+			siteUrl,
 			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
@@ -103,8 +105,12 @@ const getEditorCommandLoader = () =>
 				isCurrentPostPublished,
 			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
-			const { getPostType } = select( coreStore );
+			const { getPostType, canUser, getEntityRecord } =
+				select( coreStore );
 			const postType = getPostType( getCurrentPostType() );
+			const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+				? getEntityRecord( 'root', 'site' )?.url
+				: undefined;
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -116,6 +122,7 @@ const getEditorCommandLoader = () =>
 				isViewable: postType?.viewable ?? false,
 				isPublished: isCurrentPostPublished(),
 				viewLink: getEditedPostAttribute( 'link' ),
+				siteUrl: _siteUrl,
 				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
@@ -358,7 +365,14 @@ const getEditorCommandLoader = () =>
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						window.open( viewLink, '_blank' );
+						openPostView(
+							viewLink,
+							getPostViewTarget(
+								getCurrentPostId(),
+								viewLink,
+								siteUrl
+							)
+						);
 					},
 				} );
 			}

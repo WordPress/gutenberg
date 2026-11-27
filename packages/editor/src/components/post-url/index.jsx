@@ -4,7 +4,6 @@ import { useRef, useState, createInterpolateElement } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
-	ExternalLink,
 	Button,
 	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
@@ -15,7 +14,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import { copy } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
+import { Link } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 /**
  * Renders the `PostURL` component.
@@ -33,6 +37,8 @@ import { store as editorStore } from '../../store';
 export default function PostURL( { onClose } ) {
 	const {
 		isEditable,
+		postId,
+		siteUrl,
 		postSlug,
 		postLink,
 		permalinkPrefix,
@@ -43,6 +49,10 @@ export default function PostURL( { onClose } ) {
 		const postTypeSlug = select( editorStore ).getCurrentPostType();
 		const postType = select( coreStore ).getPostType( postTypeSlug );
 		const permalinkParts = select( editorStore ).getPermalinkParts();
+		const { canUser, getEntityRecord } = select( coreStore );
+		const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+			? getEntityRecord( 'root', 'site' )?.url
+			: undefined;
 		const hasPublishAction = post?._links?.[ 'wp:action-publish' ] ?? false;
 
 		return {
@@ -52,6 +62,8 @@ export default function PostURL( { onClose } ) {
 				select( editorStore ).getEditedPostSlug()
 			),
 			viewPostLabel: postType?.labels?.view_item,
+			postId: post.id,
+			siteUrl: _siteUrl,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,
@@ -70,6 +82,7 @@ export default function PostURL( { onClose } ) {
 			type: 'snackbar',
 		} );
 	} );
+	const linkTarget = getPostViewTarget( postId, postLink, siteUrl );
 	const postUrlSlugDescriptionId =
 		'editor-post-url__slug-description-' + useInstanceId( PostURL );
 
@@ -89,10 +102,11 @@ export default function PostURL( { onClose } ) {
 							{
 								span: <span id={ postUrlSlugDescriptionId } />,
 								a: (
-									<ExternalLink
+									<Link
 										href={ __(
 											'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
 										) }
+										openInNewTab
 									/>
 								),
 							}
@@ -171,10 +185,12 @@ export default function PostURL( { onClose } ) {
 								<span className="editor-post-url__permalink-visual-label">
 									{ __( 'Permalink:' ) }
 								</span>
-								<ExternalLink
+								<Link
 									className="editor-post-url__link"
 									href={ postLink }
-									target="_blank"
+									target={ linkTarget }
+									onClick={ onPostViewLinkClick }
+									openInNewTab
 								>
 									{ postSlug ? (
 										<>
@@ -192,18 +208,20 @@ export default function PostURL( { onClose } ) {
 										// Without a slug the post only has its plain permalink.
 										permalink
 									) }
-								</ExternalLink>
+								</Link>
 							</p>
 						</>
 					) }
 					{ ! isEditable && (
-						<ExternalLink
+						<Link
 							className="editor-post-url__link"
 							href={ postLink }
-							target="_blank"
+							target={ linkTarget }
+							onClick={ onPostViewLinkClick }
+							openInNewTab
 						>
 							{ postLink }
-						</ExternalLink>
+						</Link>
 					) }
 				</div>
 			</VStack>

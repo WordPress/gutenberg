@@ -1,9 +1,4 @@
-import {
-	PanelBody,
-	Button,
-	TextControl,
-	ExternalLink,
-} from '@wordpress/components';
+import { PanelBody, Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -12,9 +7,13 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Link, VisuallyHidden } from '@wordpress/ui';
 import { usePostScheduleLabel } from '../post-schedule/label';
 import { store as editorStore } from '../../store';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 const POSTNAME = '%postname%';
 const PAGENAME = '%pagename%';
@@ -73,15 +72,19 @@ export default function PostPublishPanelPostpublish( {
 	focusOnMount,
 	children,
 } ) {
-	const { post, postType, isScheduled } = useSelect( ( select ) => {
+	const { post, postType, isScheduled, siteUrl } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPost,
 			isCurrentPostScheduled,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, canUser, getEntityRecord } = select( coreStore );
+		const _siteUrl = canUser( 'read', { kind: 'root', name: 'site' } )
+			? getEntityRecord( 'root', 'site' )?.url
+			: undefined;
 
 		return {
+			siteUrl: _siteUrl,
 			post: getCurrentPost(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			isScheduled: isCurrentPostScheduled(),
@@ -96,6 +99,7 @@ export default function PostPublishPanelPostpublish( {
 	const addLink = addQueryArgs( 'post-new.php', {
 		post_type: post.type,
 	} );
+	const linkTarget = getPostViewTarget( post.id, link, siteUrl );
 
 	const postLinkRef = useCallback(
 		( node ) => {
@@ -118,9 +122,15 @@ export default function PostPublishPanelPostpublish( {
 	return (
 		<div className="post-publish-panel__postpublish">
 			<PanelBody className="post-publish-panel__postpublish-header">
-				<ExternalLink ref={ postLinkRef } href={ link }>
+				<Link
+					ref={ postLinkRef }
+					href={ link }
+					target={ linkTarget }
+					onClick={ onPostViewLinkClick }
+					openInNewTab
+				>
 					{ decodeEntities( post.title ) || __( '(no title)' ) }
-				</ExternalLink>{ ' ' }
+				</Link>{ ' ' }
 				{ postPublishNonLinkHeader }
 			</PanelBody>
 			<PanelBody>
@@ -153,7 +163,8 @@ export default function PostPublishPanelPostpublish( {
 							__next40pxDefaultSize
 							icon={ external }
 							iconPosition="right"
-							target="_blank"
+							target={ linkTarget }
+							onClick={ onPostViewLinkClick }
 						>
 							{ viewPostLabel }
 							<VisuallyHidden render={ <span /> }>

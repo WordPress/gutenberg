@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+-   Reuse one browser tab per post when opening its front end from the view button, the permalink, the post-publish panel or the command palette, instead of opening another tab on every click ([#87394](https://github.com/WordPress/gutenberg/pull/87394)).
 
 ### Bug Fixes
 
@@ -31,6 +32,7 @@
 
 ### Internal
 
+-   PostURL and PostPublishPanel: Replace `ExternalLink` with `Link` from `@wordpress/ui`, which draws its new-tab indicator in CSS rather than as a `↗` character in the markup ([#87394](https://github.com/WordPress/gutenberg/pull/87394)).
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 

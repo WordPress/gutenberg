@@ -1,13 +1,18 @@
 import { Button } from '@wordpress/components';
 import { copy } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { cleanForSlug, safeDecodeURIComponent } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { hasActionLink } from '../../shared/has-action-link';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../shared/post-view-window';
 import type { PostWithSlug } from './types';
 import styles from './style.module.css';
 
@@ -54,6 +59,13 @@ const SlugEdit = ( {
 		isEditable && slug
 			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
 			: safeDecodeURIComponent( data.link || '' );
+	const siteUrl = useSelect( ( select ) => {
+		const { canUser, getEntityRecord } = select( coreStore );
+		return canUser( 'read', { kind: 'root', name: 'site' } )
+			? ( getEntityRecord( 'root', 'site' ) as { url?: string } )?.url
+			: undefined;
+	}, [] );
+	const permalinkTarget = getPostViewTarget( data.id, permalink, siteUrl );
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) => {
@@ -143,6 +155,8 @@ const SlugEdit = ( {
 						<Link
 							className={ styles[ 'help-link' ] }
 							href={ permalink }
+							target={ permalinkTarget }
+							onClick={ onPostViewLinkClick }
 							openInNewTab
 						>
 							{ slug ? (
@@ -164,6 +178,8 @@ const SlugEdit = ( {
 				<Link
 					className={ styles[ 'help-link' ] }
 					href={ permalink }
+					target={ permalinkTarget }
+					onClick={ onPostViewLinkClick }
 					openInNewTab
 				>
 					{ permalink }

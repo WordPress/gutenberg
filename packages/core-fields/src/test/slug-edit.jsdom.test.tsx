@@ -19,6 +19,12 @@ const post: PostWithSlug = {
 	_links: { 'wp:action-publish': [ { href: '' } ] },
 };
 
+const sameOriginPost: PostWithSlug = {
+	...post,
+	link: `${ window.location.origin }/?p=1`,
+	permalink_template: `${ window.location.origin }/%postname%/`,
+};
+
 // Holds the edits the way DataForm does, so the control gets them back.
 function EditedSlug( { initial }: { initial: PostWithSlug } ) {
 	const [ data, setData ] = useState( initial );
@@ -76,5 +82,43 @@ describe( 'SlugEdit', () => {
 		expect( input ).toHaveValue( '' );
 		fireEvent.blur( input );
 		expect( input ).toHaveValue( 'my-post-title' );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/28479.
+	it( 'targets the post-specific window from the editable permalink', () => {
+		render( <EditedSlug initial={ sameOriginPost } /> );
+		expect(
+			screen.getByRole( 'link', { name: /localhost\/テスト\// } )
+		).toHaveAttribute( 'target', 'wp-post-1' );
+	} );
+
+	it( 'targets the post-specific window from the read-only permalink', () => {
+		const { _links, ...readOnlyPost } = sameOriginPost;
+		render( <EditedSlug initial={ readOnlyPost } /> );
+		expect(
+			screen.getByRole( 'link', { name: /localhost/ } )
+		).toHaveAttribute( 'target', 'wp-post-1' );
+	} );
+
+	it( 'falls back to a plain new tab for an item with no ID', () => {
+		const { id, ...withoutId } = sameOriginPost;
+		render( <EditedSlug initial={ withoutId } /> );
+		expect(
+			screen.getByRole( 'link', { name: /localhost\/テスト\// } )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'opens a plain new tab when the permalink points elsewhere', () => {
+		render( <EditedSlug initial={ post } /> );
+		expect(
+			screen.getByRole( 'link', { name: /example\.com\/テスト\// } )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'still opens the documentation link in a plain new tab', () => {
+		render( <EditedSlug initial={ post } /> );
+		expect(
+			screen.getByRole( 'link', { name: /Learn more/ } )
+		).toHaveAttribute( 'target', '_blank' );
 	} );
 } );

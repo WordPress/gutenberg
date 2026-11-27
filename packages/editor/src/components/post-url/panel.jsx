@@ -9,6 +9,10 @@ import PostURLCheck from './check';
 import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
+import {
+	getPostViewTarget,
+	onPostViewLinkClick,
+} from '../../utils/post-view-target';
 
 /**
  * Renders the `PostURLPanel` component.
@@ -100,10 +104,16 @@ function PostURLToggle( { isOpen, onClick } ) {
 }
 
 function FrontPageLink() {
-	const { postLink } = useSelect( ( select ) => {
+	const { postId, postLink, siteUrl } = useSelect( ( select ) => {
 		const { getCurrentPost } = select( editorStore );
+		const { canUser, getEntityRecord } = select( coreStore );
+		const post = getCurrentPost();
 		return {
-			postLink: getCurrentPost()?.link,
+			postId: post?.id,
+			postLink: post?.link,
+			siteUrl: canUser( 'read', { kind: 'root', name: 'site' } )
+				? getEntityRecord( 'root', 'site' )?.url
+				: undefined,
 		};
 	}, [] );
 
@@ -111,6 +121,8 @@ function FrontPageLink() {
 		<Link
 			className="editor-post-url__front-page-link"
 			href={ postLink }
+			target={ getPostViewTarget( postId, postLink, siteUrl ) }
+			onClick={ onPostViewLinkClick }
 			openInNewTab
 		>
 			{ postLink }

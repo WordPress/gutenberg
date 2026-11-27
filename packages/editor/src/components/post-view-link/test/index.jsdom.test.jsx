@@ -11,8 +11,9 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 } ) );
 
 const DEFAULTS = {
+	postId: 123,
 	postType: { labels: { view_item: 'View Post' } },
-	permalink: 'https://example.com/sample/',
+	permalink: `${ window.location.origin }/sample/`,
 	isPublished: true,
 	showIconLabels: false,
 };
@@ -23,8 +24,11 @@ function setupUseSelectMock( overrides = {} ) {
 	const data = { ...DEFAULTS, ...overrides };
 	useSelect.mockImplementation( ( cb ) =>
 		cb( () => ( {
+			getCurrentPostId: () => data.postId,
 			getCurrentPostType: () => 'post',
 			getPostType: () => data.postType,
+			canUser: () => true,
+			getEntityRecord: () => ( { url: window.location.origin } ),
 			getPermalink: () => data.permalink,
 			isCurrentPostPublished: () => data.isPublished,
 			get: () => data.showIconLabels,
@@ -44,6 +48,26 @@ describe( 'PostViewLink', () => {
 		setupUseSelectMock( { postType: {} } );
 		render( <PostViewLink /> );
 		expect( screen.getByLabelText( 'View post' ) ).toBeInTheDocument();
+	} );
+
+	it( 'targets the post-specific window so repeat clicks reuse one tab', () => {
+		// See https://github.com/WordPress/gutenberg/issues/28479.
+		setupUseSelectMock();
+		render( <PostViewLink /> );
+		expect( screen.getByLabelText( 'View Post' ) ).toHaveAttribute(
+			'target',
+			'wp-post-123'
+		);
+	} );
+
+	it( 'opens a plain new tab when the permalink points elsewhere', () => {
+		// See https://github.com/WordPress/gutenberg/issues/28479.
+		setupUseSelectMock( { permalink: 'https://elsewhere.test/sample/' } );
+		render( <PostViewLink /> );
+		expect( screen.getByLabelText( 'View Post' ) ).toHaveAttribute(
+			'target',
+			'_blank'
+		);
 	} );
 
 	it( 'renders nothing if the post is not published', () => {
