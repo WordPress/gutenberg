@@ -29,7 +29,7 @@
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
-### Enahncements
+### Enhancements
 
 -   Post Title: Add text shadow support, so the title stays readable over an image background ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
 
