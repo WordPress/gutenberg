@@ -67,12 +67,15 @@ function Edit( {
 			// This causes the `editingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			const link = ( event.target as HTMLElement ).closest(
-				'[contenteditable] a'
-			);
+			const target = event.target as HTMLElement;
+			const link = target.closest( '[contenteditable] a' );
 			if (
 				! link || // other formats (e.g. bold) may be nested within the link.
-				! isActive
+				! isActive ||
+				// A click on an inline image selects it and opens its own
+				// popover. The link stays reachable from the toolbar and with
+				// the keyboard shortcut.
+				target.tagName === 'IMG'
 			) {
 				return;
 			}
