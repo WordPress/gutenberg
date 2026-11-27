@@ -24,6 +24,7 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -1351,31 +1352,47 @@ export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
 	const { snapRotate90, toggleFlip } = imageEditor;
-	return useMemo(
-		() => ( {
+	// A save reads the edit once and then waits, and a change made meanwhile
+	// is dropped when it succeeds. `inert` does not reach a panel's popover
+	// or a callback it kept from before the save, so the setters check the
+	// latest value when they run.
+	const isSavingRef = useRef( isSaving );
+	useLayoutEffect( () => {
+		isSavingRef.current = isSaving;
+	}, [ isSaving ] );
+	return useMemo( () => {
+		function unlessSaving< Args extends unknown[] >(
+			setter: ( ...args: Args ) => void
+		) {
+			return ( ...args: Args ) => {
+				if ( ! isSavingRef.current ) {
+					setter( ...args );
+				}
+			};
+		}
+		return {
 			mediaType,
 			isImage,
 			isSaving,
 			hasChanges,
 			aspectRatioValue,
 			aspectRatioOptions,
-			setAspectRatioValue,
-			rotate: snapRotate90,
-			flipHorizontal: () => toggleFlip( 'horizontal' ),
-			flipVertical: () => toggleFlip( 'vertical' ),
-		} ),
-		[
-			mediaType,
-			isImage,
-			isSaving,
-			hasChanges,
-			aspectRatioValue,
-			aspectRatioOptions,
-			setAspectRatioValue,
-			snapRotate90,
-			toggleFlip,
-		]
-	);
+			setAspectRatioValue: unlessSaving( setAspectRatioValue ),
+			rotate: unlessSaving( snapRotate90 ),
+			flipHorizontal: unlessSaving( () => toggleFlip( 'horizontal' ) ),
+			flipVertical: unlessSaving( () => toggleFlip( 'vertical' ) ),
+		};
+	}, [
+		mediaType,
+		isImage,
+		isSaving,
+		hasChanges,
+		aspectRatioValue,
+		aspectRatioOptions,
+		setAspectRatioValue,
+		snapRotate90,
+		toggleFlip,
+	] );
 }
 
 export default MediaEditor;

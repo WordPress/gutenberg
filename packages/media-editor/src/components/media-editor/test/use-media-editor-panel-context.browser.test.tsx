@@ -26,6 +26,9 @@ const image: Media = {
 	title: { raw: 'Black', rendered: 'Black' },
 };
 
+// A `rotate` the probe kept, as a panel keeps a callback for later.
+const kept: { rotate?: ( direction: 1 | -1 ) => void } = {};
+
 /* A panel's view of the editor, beside what the session itself holds. */
 function Probe() {
 	const {
@@ -49,6 +52,13 @@ function Probe() {
 			<button onClick={ () => rotate( 1 ) }>Rotate</button>
 			<button
 				onClick={ () => {
+					kept.rotate = rotate;
+				} }
+			>
+				Keep rotate
+			</button>
+			<button
+				onClick={ () => {
 					flipHorizontal();
 					flipVertical();
 				} }
@@ -70,15 +80,20 @@ function Frame( { children }: MediaEditorFrameProps ) {
 			} }
 		>
 			<Probe />
+			<MediaEditor.SaveActions />
 			{ children }
 		</div>
 	);
 }
 
-async function setup() {
+async function setup( {
+	onEdit,
+}: { onEdit?: () => Promise< Response > } = {} ) {
 	await page.viewport( 1000, 800 );
-	vi.spyOn( window, 'fetch' ).mockImplementation( async () =>
-		Response.json( image )
+	vi.spyOn( window, 'fetch' ).mockImplementation( async ( input ) =>
+		onEdit && String( input ).includes( '/edit' )
+			? onEdit()
+			: Response.json( image )
 	);
 	const registry = createRegistry();
 	registry.register( coreStore );
@@ -131,5 +146,30 @@ describe( 'useMediaEditorPanelContext', () => {
 		expect(
 			await screen.findByText( /flipped:true,true$/ )
 		).toBeInTheDocument();
+	} );
+
+	it( 'ignores changes while a save runs, from callbacks kept before it began', async () => {
+		let finishSave: ( response: Response ) => void = () => {};
+		await setup( {
+			onEdit: () =>
+				new Promise( ( resolve ) => {
+					finishSave = resolve;
+				} ),
+		} );
+		await userEvent.click(
+			await screen.findByRole( 'button', { name: 'Rotate' } )
+		);
+		expect( await screen.findByText( /rotation:90 / ) ).toBeInTheDocument();
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Keep rotate' } )
+		);
+
+		await userEvent.click( screen.getByRole( 'button', { name: 'Save' } ) );
+		expect( await screen.findByText( /saving:true/ ) ).toBeInTheDocument();
+		kept.rotate?.( 1 );
+		await new Promise( ( resolve ) => requestAnimationFrame( resolve ) );
+
+		expect( screen.getByText( /rotation:90 / ) ).toBeInTheDocument();
+		finishSave( Response.json( image ) );
 	} );
 } );
