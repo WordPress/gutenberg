@@ -7,28 +7,35 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDisabled } from '@wordpress/compose';
+import type { BlockEditProps } from '@wordpress/blocks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { CalendarAttributes } from './types';
 
 /**
  * Returns the year and month of a specified date.
  *
  * @see `WP_REST_Posts_Controller::prepare_date_response()`.
  *
- * @param {string} date Date in `ISO8601/RFC3339` format.
- * @return {Object} Year and date of the specified date.
+ * @param date Date in `ISO8601/RFC3339` format.
+ * @return Year and date of the specified date.
  */
-const getYearMonth = memoize( ( date ) => {
-	if ( ! date ) {
-		return {};
+const getYearMonth = memoize(
+	( date?: string ): { year?: number; month?: number } => {
+		if ( ! date ) {
+			return {};
+		}
+		const dateObj = new Date( date );
+		return {
+			year: dateObj.getFullYear(),
+			month: dateObj.getMonth() + 1,
+		};
 	}
-	const dateObj = new Date( date );
-	return {
-		year: dateObj.getFullYear(),
-		month: dateObj.getMonth() + 1,
-	};
-} );
+);
 
-export default function CalendarEdit( { attributes, name } ) {
+export default function CalendarEdit( {
+	attributes,
+	name,
+}: BlockEditProps< CalendarAttributes > ) {
 	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
 
@@ -47,12 +54,14 @@ export default function CalendarEdit( { attributes, name } ) {
 			singlePublishedPostQuery,
 		] );
 
-		let _date;
+		let _date: string | undefined;
 
 		// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
 		// Blocks can be loaded into a *non-post* block editor.
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const editorSelectors = select( 'core/editor' );
+		const editorSelectors = select( 'core/editor' ) as
+			| { getEditedPostAttribute: ( attr: string ) => string | undefined }
+			| undefined;
 		if ( editorSelectors ) {
 			const postType = editorSelectors.getEditedPostAttribute( 'type' );
 			// Dates are used to overwrite year and month used on the calendar.
@@ -108,7 +117,7 @@ export default function CalendarEdit( { attributes, name } ) {
 						{ sprintf(
 							/* translators: %s: error message returned when rendering the block. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>

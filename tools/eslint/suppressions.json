@@ -933,29 +933,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/calendar/edit.jsx": {
+	"packages/block-library/src/calendar/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/calendar/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/calendar/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/calendar/transforms.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
