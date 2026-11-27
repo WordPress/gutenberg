@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Background: Replace a text gradient with a gradient picked in the Background panel, instead of filling the text with it, unless the Clip control is shown ([#87553](https://github.com/WordPress/gutenberg/pull/87553)).
 -   List View: Use the theme's brand colors for selected labels, anchor badges and action focus rings. When design tokens are loaded, setting `--wp-admin-theme-color` alone no longer changes the selected row's fill ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
 -   Undo: Placing the caret in an empty post or container no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
@@ -38,14 +39,11 @@
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
-
-### Bug Fixes
-
--   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ## 20.1.0 (2026-11-18)
 

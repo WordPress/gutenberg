@@ -449,6 +449,19 @@ export default function BackgroundImagePanel( {
 				[ 'background', 'backgroundClip' ],
 				undefined
 			);
+		} else if (
+			newGradient &&
+			isTextGradient &&
+			! showBackgroundClipControl
+		) {
+			// Without the clip control, a gradient picked here is a
+			// background gradient, so it replaces the text gradient.
+			// Mirror of `clearedClip` in the Typography panel.
+			newValue = setImmutably(
+				newValue,
+				[ 'background', 'backgroundClip' ],
+				'text' === baseClip ? 'border-box' : undefined
+			);
 		}
 		onChange( newValue );
 	};
