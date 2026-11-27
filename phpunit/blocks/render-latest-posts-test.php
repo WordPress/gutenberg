@@ -504,4 +504,66 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'Block content should be rendered'
 		);
 	}
+
+	/**
+	 * Tests that the block's excerpt length setting is applied even when a theme
+	 * or plugin filters `excerpt_length` at a higher priority than the block.
+	 *
+	 * @ticket 33027
+	 *
+	 * @covers ::render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_excerpt_length_beats_theme_filter() {
+		$words = array();
+		for ( $i = 1; $i <= 60; $i++ ) {
+			$words[] = 'w' . $i;
+		}
+
+		self::factory()->post->create_and_get(
+			array(
+				'post_title'   => 'Long post',
+				'post_content' => implode( ' ', $words ),
+				// An empty excerpt, so that WordPress generates one and `excerpt_length` applies.
+				'post_excerpt' => '',
+				'post_status'  => 'publish',
+			)
+		);
+
+		// A theme filter of the kind the developer documentation recommends.
+		$theme_filter = static function () {
+			return 2;
+		};
+		add_filter( 'excerpt_length', $theme_filter, 999 );
+
+		$output = render_block(
+			array(
+				'blockName'    => 'core/latest-posts',
+				'attrs'        => array(
+					'postsToShow'             => 1,
+					'orderBy'                 => 'date',
+					'order'                   => 'DESC',
+					'excerptLength'           => 10,
+					'displayFeaturedImage'    => false,
+					'displayPostContent'      => true,
+					'displayPostContentRadio' => 'excerpt',
+				),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			)
+		);
+
+		remove_filter( 'excerpt_length', $theme_filter, 999 );
+
+		$this->assertStringContainsString(
+			'w10',
+			$output,
+			"The block's excerpt length setting should take precedence over the theme filter"
+		);
+		$this->assertStringNotContainsString(
+			'w11',
+			$output,
+			"The excerpt should not be longer than the block's excerpt length setting"
+		);
+	}
 }
