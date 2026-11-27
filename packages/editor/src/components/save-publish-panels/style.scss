@@ -8,7 +8,7 @@
 .editor-layout__toggle-entities-saved-states-panel {
 	z-index: z-index(".editor-layout__toggle-sidebar-panel");
 	position: fixed !important; // Necessary to override the default relative positioning.
-	top: -9999em;
+	top: 100%;
 	bottom: auto;
 	left: auto;
 	right: 0;

@@ -53,6 +53,10 @@
 		:global(.components-popover):first-of-type {
 			view-transition-name: boot--components-popover;
 		}
+
+		:global(#wpadminbar) {
+			view-transition-name: boot--admin-bar;
+		}
 	}
 
 	&::view-transition-group(boot--canvas-header),
@@ -60,6 +64,10 @@
 	&::view-transition-group(boot-safari--canvas),
 	&::view-transition-group(boot--canvas) {
 		z-index: 1;
+	}
+
+	&::view-transition-group(boot--admin-bar) {
+		z-index: 2;
 	}
 
 	&::view-transition-new(boot-safari--canvas),
