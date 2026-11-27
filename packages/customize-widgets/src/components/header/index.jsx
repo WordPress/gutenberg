@@ -85,8 +85,8 @@ function Header( {
 						} }
 						size="compact"
 					/>
-					<MoreMenu />
 				</NavigableToolbar>
+				<MoreMenu />
 			</div>
 
 			{ createPortal(

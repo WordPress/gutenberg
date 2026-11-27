@@ -1,8 +1,4 @@
-import {
-	MenuGroup,
-	MenuItem,
-	ToolbarDropdownMenu,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -33,7 +29,7 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<ToolbarDropdownMenu
+			<DropdownMenu
 				icon={ moreVertical }
 				label={ __( 'Options' ) }
 				popoverProps={ {
@@ -119,7 +115,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</ToolbarDropdownMenu>
+			</DropdownMenu>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }
