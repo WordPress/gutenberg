@@ -123,7 +123,7 @@ const TOOLS: Tool[] = [
 		logo: jetbrainsLogo,
 		config: JSON_CONFIG,
 		steps: [
-			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add.',
+			'In PhpStorm, WebStorm, or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add.',
 			'Paste the configuration above into the JSON configuration field, then click OK and Apply.',
 			'Check that `wordpress-design-system` shows as connected in the Status column.',
 		],
