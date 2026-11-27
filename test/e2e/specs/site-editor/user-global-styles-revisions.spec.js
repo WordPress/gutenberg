@@ -151,33 +151,24 @@ test.describe( 'Style Revisions', () => {
 			color: { background: 'blue' },
 		} );
 
+		// This flow starts from the browse-mode sidebar, not the edit mode
+		// the shared `beforeEach` opens.
+		await admin.visitSiteEditor();
 		if ( isSiteEditorV2 ) {
-			await admin.visitSiteEditor();
 			await page.getByRole( 'link', { name: 'Styles' } ).click();
-			await page
-				.getByRole( 'region', { name: 'Styles' } )
-				.getByRole( 'button', { name: 'Revisions' } )
-				.click();
 		} else {
-			// This flow starts from the browse-mode sidebar, not the edit
-			// mode the shared `beforeEach` opens.
-			await admin.visitSiteEditor();
-
-			const navigationContainer = page.getByRole( 'region', {
-				name: 'Navigation',
-			} );
-
-			await navigationContainer
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
 
 			// wait for the editor canvas to be ready (to contain a block)
 			await editor.canvas.locator( '.wp-block' ).first().waitFor();
-
-			await navigationContainer
-				.getByRole( 'button', { name: 'Revisions' } )
-				.click();
 		}
+		await page
+			.getByRole( 'region', { name: 'Styles' } )
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
