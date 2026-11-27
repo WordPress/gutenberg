@@ -33,12 +33,16 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	 */
 	public function mock_http_request( $response, $args, $url ) {
 		$feeds = array(
-			'https://example.com/testrss.xml'          => 'feed-with-gmt-offset.xml',
-			'https://example.com/testrss-dst.xml'      => 'feed-across-dst.xml',
-			'https://example.com/testrss-no-title.xml' => 'feed-without-item-title.xml',
+			'https://example.com/testrss.xml'     => 'feed-with-gmt-offset.xml',
+			'https://example.com/testrss-dst.xml' => 'feed-across-dst.xml',
 		);
 
-		if ( ! isset( $feeds[ $url ] ) ) {
+		if ( 'https://example.com/testrss-no-title.xml' === $url ) {
+			$body = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Test RSS Feed</title><link>https://www.example.com</link><description>An item without a title.</description><item><link>https://www.example.com/untitled</link><guid isPermaLink="true">https://www.example.com/untitled</guid><description>A post without a title.</description><pubDate>Wed, 19 Mar 2025 10:00:00 +0000</pubDate></item></channel></rss>';
+		} elseif ( isset( $feeds[ $url ] ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			$body = file_get_contents( GUTENBERG_DIR_TESTDATA . 'feed/' . $feeds[ $url ] );
+		} else {
 			return $response;
 		}
 
@@ -46,8 +50,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 			'headers'  => array(
 				'content-type' => 'application/rss+xml; charset=UTF-8',
 			),
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			'body'     => file_get_contents( GUTENBERG_DIR_TESTDATA . 'feed/' . $feeds[ $url ] ),
+			'body'     => $body,
 			'response' => array(
 				'code'    => 200,
 				'message' => 'OK',
