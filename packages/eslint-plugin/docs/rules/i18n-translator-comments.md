@@ -23,13 +23,18 @@ Examples of **correct** code for this rule:
 
 ```js
 var color = '';
-// translators: %s: Color
-sprintf( __( 'Color: %s' ), color );
+sprintf(
+	/* translators: %s: Color. */
+	__( 'Color: %s' ),
+	color
+);
 
 var address = '';
 sprintf(
-	// translators: %s: Address.
+	/* translators: %s: Address. */
 	__( 'Address: %s' ),
 	address
 );
 ```
+
+Where the comment goes matters as well as whether it is there: see [`i18n-translator-comments-position`](./i18n-translator-comments-position.md).

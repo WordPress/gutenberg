@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`i18n-translator-comments-position`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments-position.md) rule, enabled in the `i18n` ruleset, to enforce that a translator comment is immediately before the `__` call expression, the only position bundlers reliably keep it in. The rule is fixable.
+
 ### Enhancements
 
 -   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).

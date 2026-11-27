@@ -10,6 +10,7 @@ module.exports = [
 		rules: {
 			'@wordpress/valid-sprintf': 'error',
 			'@wordpress/i18n-translator-comments': 'error',
+			'@wordpress/i18n-translator-comments-position': 'error',
 			'@wordpress/i18n-text-domain': 'error',
 			'@wordpress/i18n-no-collapsible-whitespace': 'error',
 			'@wordpress/i18n-no-placeholders-only': 'error',
