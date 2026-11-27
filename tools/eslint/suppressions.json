@@ -7703,14 +7703,6 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/sidebar-navigation-screen-details-footer/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/sidebar-navigation-screen-global-styles/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
