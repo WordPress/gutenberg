@@ -228,6 +228,54 @@ test.describe( 'Style Revisions', () => {
 		await expect( page ).not.toHaveURL( /canvas=edit/ );
 	} );
 
+	test( 'should show the selected revision in the style book from the Styles panel', async ( {
+		admin,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+
+		await admin.visitSiteEditor();
+		if ( isSiteEditorV2 ) {
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+		} else {
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+		}
+		const stylesPanel = page.getByRole( 'region', { name: 'Styles' } );
+		await stylesPanel
+			.getByRole( 'button', { name: 'Style Book', exact: true } )
+			.click();
+		const styleBookBody = page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.locator( 'body' );
+		await expect( styleBookBody ).toHaveCSS(
+			'background-color',
+			'rgb(255, 0, 0)'
+		);
+
+		await stylesPanel
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await expect( styleBookBody ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 255)'
+		);
+	} );
+
 	test( 'should access from the site editor sidebar with a static front page', async ( {
 		admin,
 		editor,
