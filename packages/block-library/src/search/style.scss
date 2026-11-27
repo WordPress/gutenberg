@@ -125,6 +125,13 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	background-color: $white;
 	box-sizing: border-box;
 
+	// Provide a visible focus ring on the wrapper when the input receives keyboard focus,
+	// since the input's own outline is suppressed inside the shared border.
+	&:has(.wp-block-search__input:focus-visible) {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+
 	.wp-block-search__input {
 		border-radius: 0;
 		border: none;
