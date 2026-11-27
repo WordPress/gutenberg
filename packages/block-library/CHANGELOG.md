@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Social Icons: Revert a Logos Only style change with a single Undo, including the icon background it removed or restored ([#87528](https://github.com/WordPress/gutenberg/pull/87528)).
 -   Read More: Strip HTML from the post title in the link's screen-reader text, so a title with a link no longer nests a link inside the Read More link ([#87560](https://github.com/WordPress/gutenberg/pull/87560)).
 -   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
