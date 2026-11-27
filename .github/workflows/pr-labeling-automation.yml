@@ -15,6 +15,20 @@ jobs:
         runs-on: 'ubuntu-slim'
         steps:
             - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+              id: labeler
               with:
                   dot: true
                   sync-labels: true
+            # A PR changing many blocks at once (a refactor) gets no block labels.
+            - name: Remove block labels when more than 3 were added
+              if: steps.labeler.outputs.new-labels != ''
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  NEW_LABELS: ${{ steps.labeler.outputs.new-labels }}
+                  PR: ${{ github.event.pull_request.number }}
+                  REPO: ${{ github.repository }}
+              run: |
+                  blocks=$(echo "$NEW_LABELS" | tr ',' '\n' | grep '^\[Block\] ' || true)
+                  if [ "$(echo "$blocks" | grep -c .)" -gt 3 ]; then
+                      gh pr edit "$PR" --repo "$REPO" --remove-label "$(echo "$blocks" | paste -sd, -)"
+                  fi
