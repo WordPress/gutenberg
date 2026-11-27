@@ -16,34 +16,32 @@ import type { TemplatePartAttributes } from './types';
 const { name } = metadata;
 export { metadata, name };
 
-export const settings: Partial< BlockConfiguration< TemplatePartAttributes > > =
-	{
-		icon: symbolFilled,
-		__experimentalLabel: ( { slug, theme }: TemplatePartAttributes ) => {
-			// Attempt to find entity title if block is a template part.
-			// Require slug to request, otherwise entity is uncreated and will throw 404.
-			if ( ! slug ) {
-				return;
-			}
+export const settings: BlockModule< TemplatePartAttributes >[ 'settings' ] = {
+	icon: symbolFilled,
+	__experimentalLabel: ( { slug, theme }: TemplatePartAttributes ) => {
+		// Attempt to find entity title if block is a template part.
+		// Require slug to request, otherwise entity is uncreated and will throw 404.
+		if ( ! slug ) {
+			return;
+		}
 
-			const { getCurrentTheme, getEditedEntityRecord } =
-				select( coreDataStore );
-			const entity = getEditedEntityRecord(
-				'postType',
-				'wp_template_part',
-				( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
-			) as Updatable< WpTemplatePart > | false;
-			if ( ! entity ) {
-				return;
-			}
+		const { getCurrentTheme, getEditedEntityRecord } =
+			select( coreDataStore );
+		const entity = getEditedEntityRecord(
+			'postType',
+			'wp_template_part',
+			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
+		) as Updatable< WpTemplatePart > | false;
+		if ( ! entity ) {
+			return;
+		}
 
-			return (
-				decodeEntities( entity.title ) ||
-				capitalCase( entity.slug || '' )
-			);
-		},
-		edit,
-	};
+		return (
+			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
+		);
+	},
+	edit,
+};
 
 export const init = () => {
 	addFilter(
@@ -96,7 +94,8 @@ export const init = () => {
 
 	return initBlock( {
 		name,
-		metadata: metadata as BlockModule[ 'metadata' ],
-		settings: settings as BlockModule[ 'settings' ],
+		metadata:
+			metadata as BlockModule< TemplatePartAttributes >[ 'metadata' ],
+		settings,
 	} );
 };
