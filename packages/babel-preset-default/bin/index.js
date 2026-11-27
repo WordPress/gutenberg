@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { readFile, writeFile } = require( 'fs' ).promises;
+const { readFile, writeFile } = require( 'fs/promises' );
 const path = require( 'path' );
 const { version } = require( 'core-js/package.json' );
 const compat = require( 'core-js-compat' );
