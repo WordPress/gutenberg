@@ -47,6 +47,11 @@ type DataViewsContextType< Item > = {
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;
 	intersectionObserver?: IntersectionObserver | null;
+	/**
+	 * Asks to keep focus in the view once the action being run has removed
+	 * the control that had it.
+	 */
+	requestFocusAfterAction?: () => void;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {

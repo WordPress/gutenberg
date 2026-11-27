@@ -166,6 +166,8 @@ function ActionTrigger< Item >( {
 			size="compact"
 			disabled={ !! action.disabled || isBusy }
 			loading={ isBusy }
+			// Tells the focus handling after the action that it holds focus.
+			data-dataviews-busy={ isBusy || undefined }
 			onClick={ onClick }
 		>
 			{ label }
@@ -312,6 +314,9 @@ function renderBulkActionsContent< Item >(
 											tone="neutral"
 											size="compact"
 											loading={ !! actionInProgress }
+											data-dataviews-busy={
+												!! actionInProgress || undefined
+											}
 										>
 											{ __( 'Actions' ) }
 											<Button.Icon icon={ chevronDown } />
@@ -343,7 +348,8 @@ function BulkActionsContent< Item >( {
 	onActionInProgressChange,
 	onClearSelection,
 }: ToolbarContentProps< Item > ) {
-	const { paginationInfo } = useContext( DataViewsContext );
+	const { paginationInfo, requestFocusAfterAction } =
+		useContext( DataViewsContext );
 	const [ pendingContent, setPendingContent ] =
 		useState< React.JSX.Element >();
 	const registry = useRegistry();
@@ -352,6 +358,7 @@ function BulkActionsContent< Item >( {
 		items: Item[];
 	} | null >( null );
 	const onAction = async ( action: Action< Item >, items: Item[] ) => {
+		requestFocusAfterAction?.();
 		if ( 'RenderModal' in action ) {
 			setActiveModal( { action, items } );
 			return;

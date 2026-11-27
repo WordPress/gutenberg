@@ -650,6 +650,39 @@ test.describe( 'Page List', () => {
 		} );
 	} );
 
+	test.describe( 'Trash', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		test( 'keeps focus in the list after trashing a page', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+			const table = page.getByRole( 'table' );
+			const row = table
+				.getByRole( 'row' )
+				.filter( { hasText: 'Sample Page' } );
+			await row
+				.getByRole( 'button', { name: 'Trash', exact: true } )
+				.click();
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Trash', exact: true } )
+				.click();
+
+			await expect( row ).toBeHidden();
+			await expect(
+				table.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
+		} );
+	} );
+
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {
 		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
 		const PAGE_TITLE = 'Timezone Test Page';

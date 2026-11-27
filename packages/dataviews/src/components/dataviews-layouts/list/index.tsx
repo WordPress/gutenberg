@@ -72,6 +72,7 @@ function PrimaryActionGridCell< Item >( {
 	item: Item;
 } ) {
 	const registry = useRegistry();
+	const { requestFocusAfterAction } = useContext( DataViewsContext );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const compositeItemId = generatePrimaryActionCompositeId(
@@ -91,7 +92,10 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						text={ label }
 						size="small"
-						onClick={ () => setIsModalOpen( true ) }
+						onClick={ () => {
+							requestFocusAfterAction?.();
+							setIsModalOpen( true );
+						} }
 					/>
 				}
 			>
@@ -114,6 +118,7 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						size="small"
 						onClick={ () => {
+							requestFocusAfterAction?.();
 							primaryAction.callback( [ item ], { registry } );
 						} }
 					>
