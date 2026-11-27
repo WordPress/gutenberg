@@ -130,7 +130,7 @@ export default function BreadcrumbEdit( {
 	const { content, status, error } = useServerSideRender( {
 		attributes,
 		skipBlockSupportAttributes: true,
-		block: name!,
+		block: name,
 		urlQueryArgs: {
 			// The block-renderer endpoint requires `edit_post` permissions
 			// for the post referenced by `post_id`, and the `postId` block

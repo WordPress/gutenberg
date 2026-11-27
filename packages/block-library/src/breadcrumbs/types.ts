@@ -15,6 +15,5 @@ export interface BreadcrumbsContext {
 }
 
 export type BreadcrumbsEditProps = BlockEditProps< BreadcrumbsAttributes > & {
-	name?: string;
 	context: BreadcrumbsContext;
 };
