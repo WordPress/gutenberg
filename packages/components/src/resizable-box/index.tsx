@@ -11,7 +11,10 @@ import type { Resizable, ResizableProps } from 're-resizable';
 import type { ForwardedRef, RefObject } from 'react';
 import ResizeTooltip from './resize-tooltip';
 import { TransformAwareResizable } from './transform-aware-resizable';
-import { getScreenTransform, getTransformedHandleStyles } from './utils';
+import {
+	getViewportVectorTransform,
+	getTransformedHandleStyles,
+} from './utils';
 import type { LinearTransform } from './utils';
 
 const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
@@ -117,7 +120,7 @@ function useHandleStyles(
 		if ( ! element ) {
 			return;
 		}
-		const next = getScreenTransform( element );
+		const next = getViewportVectorTransform( element );
 		setMatrix( ( current ) =>
 			isSameTransform( current, next ) ? current : next
 		);

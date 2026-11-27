@@ -498,6 +498,40 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( options.nth( 2 ) ).toHaveAttribute( 'tabindex', '-1' );
 	} );
 
+	// A test for https://github.com/WordPress/gutenberg/issues/84044.
+	test( 'shows a focus ring on the scrolling tab panel', async ( {
+		admin,
+		page,
+		browserName,
+	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName !== 'firefox',
+			'Only Firefox makes a scrolling panel with focusable content a tab stop.'
+		);
+
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		await expect(
+			blockLibrary.getByRole( 'tab', { name: 'Blocks' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		const panel = blockLibrary.getByRole( 'tabpanel', { name: 'Blocks' } );
+		await expect( panel ).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			blockLibrary.getByRole( 'searchbox', { name: 'Search' } )
+		).toBeFocused();
+	} );
+
 	test( 'should insert block with the slash inserter when using multiple words', async ( {
 		admin,
 		editor,
