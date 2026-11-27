@@ -47,7 +47,7 @@ $badge-colors: (
 	max-width: 100%;
 	font-size: var(--wpds-typography-font-size-sm);
 	font-weight: 400;
-	line-height: $font-line-height-small;
+	line-height: var(--wpds-typography-line-height-sm);
 }
 
 .components-badge__icon {

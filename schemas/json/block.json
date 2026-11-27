@@ -681,6 +681,16 @@
 							"description": "Allow blocks to define a rotation.",
 							"type": "boolean",
 							"default": false
+						},
+						"translate": {
+							"description": "Allow blocks to define an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						},
+						"scale": {
+							"description": "Allow blocks to define a uniform scale.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},
@@ -867,7 +877,9 @@
 							"type": "object",
 							"properties": {
 								"root": { "type": "string" },
-								"rotate": { "type": "string" }
+								"rotate": { "type": "string" },
+								"translate": { "type": "string" },
+								"scale": { "type": "string" }
 							}
 						}
 					]
