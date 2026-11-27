@@ -286,8 +286,15 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			if ( 'settings' === $subtree && array_key_exists( 'viewport', $input[ $subtree ] ) ) {
 				$result['viewport'] = self::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
 
-				if ( null !== self::$diagnostics && $result['viewport'] !== $input[ $subtree ]['viewport'] ) {
-					static::add_diagnostic( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ) );
+				// A non-object and unknown breakpoint keys are already reported by the schema walk above.
+				if ( null !== self::$diagnostics && is_array( $input[ $subtree ]['viewport'] ) ) {
+					$given = array_intersect_key( $input[ $subtree ]['viewport'], WP_Theme_JSON_Gutenberg::DEFAULT_VIEWPORT_BREAKPOINTS );
+					$kept  = $result['viewport'];
+					ksort( $given );
+					ksort( $kept );
+					if ( $kept !== $given ) {
+						static::add_diagnostic( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ) );
+					}
 				}
 			}
 

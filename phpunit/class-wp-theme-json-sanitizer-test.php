@@ -193,6 +193,25 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				array( 'theme_json_invalid_viewport', array( 'settings', 'viewport' ) ),
 			),
+			'viewport that is not an object'           => array(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array( 'viewport' => '480px' ),
+				),
+				array( 'theme_json_expected_object', array( 'settings', 'viewport' ) ),
+			),
+			'viewport with an unknown breakpoint'      => array(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile'  => '480px',
+							'desktop' => '1200px',
+						),
+					),
+				),
+				array( 'theme_json_unknown_key', array( 'settings', 'viewport', 'desktop' ) ),
+			),
 		);
 	}
 
@@ -294,8 +313,8 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'lightbox' => array( 'enabled' => true ),
 					'viewport' => array(
-						'mobile' => '480px',
 						'tablet' => '782px',
+						'mobile' => '480px',
 					),
 					'blocks'   => array(
 						'core/paragraph' => array( 'color' => array( 'text' => false ) ),
