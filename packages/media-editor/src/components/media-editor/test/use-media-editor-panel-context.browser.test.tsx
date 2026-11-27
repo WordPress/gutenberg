@@ -36,7 +36,7 @@ function Probe() {
 		rotate,
 		flipHorizontal,
 	} = useMediaEditorPanelContext();
-	const { state } = useMediaEditor().cropper;
+	const { state } = useMediaEditor().imageEditor;
 	return (
 		<div>
 			<p>

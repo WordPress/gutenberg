@@ -1307,7 +1307,7 @@ MediaEditor.SaveActions = SaveActions;
 
 /**
  * What a sidebar panel may read and do. The session has far more, the
- * cropper controller with its state shape, gestures and image loading, and
+ * image editor controller with its state shape, gestures and image loading, and
  * public means frozen: adding to this later costs nothing, removing from
  * the session would need a deprecation cycle.
  */
@@ -1341,11 +1341,11 @@ export interface MediaEditorPanelContextValue {
 export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
 	const { mediaType, isImage, isSaving, hasChanges, aspectRatioPresets } =
 		useMediaEditorFrameContext();
-	const { cropper } = useMediaEditor();
+	const { imageEditor } = useMediaEditor();
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
-	const { snapRotate90, setFlip } = cropper;
-	const { flip } = cropper.state;
+	const { snapRotate90, setFlip } = imageEditor;
+	const { flip } = imageEditor.state;
 	return useMemo(
 		() => ( {
 			mediaType,

@@ -83,7 +83,7 @@ describe( 'useMediaEditorState', () => {
 				'test/vignette': { amount: 0.5 },
 			} );
 			expect( result.current.isDirty ).toBe( true );
-			expect( result.current.cropper.isDirty ).toBe( false );
+			expect( result.current.imageEditor.isDirty ).toBe( false );
 			expect( result.current.hasOutputEdits ).toBe( false );
 		} );
 	} );
