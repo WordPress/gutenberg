@@ -152,9 +152,18 @@ test.describe( 'Template resolution', () => {
 			await updateSiteSettings( { requestUtils, pageId: newPage.id } );
 			await page.reload();
 			await openPostSummary( { editor, page } );
+			// The reading settings assign the template of the posts page, so
+			// the field shows it without offering to edit it.
+			await expect(
+				summary
+					.locator( '.dataforms-layouts-panel__field-trigger' )
+					.filter( {
+						has: page.getByText( 'Template', { exact: true } ),
+					} )
+			).toContainText( 'Index' );
 			await expect(
 				summary.getByRole( 'button', { name: 'Edit Template' } )
-			).toHaveAccessibleDescription( 'Index' );
+			).toBeHidden();
 		} );
 
 		test( 'Site editor proper template resolution', async ( {
@@ -174,9 +183,18 @@ test.describe( 'Template resolution', () => {
 				canvas: 'edit',
 			} );
 			const summary = await openPostSummary( { editor, page } );
+			// The reading settings assign the template of the posts page, so
+			// the field shows it without offering to edit it.
+			await expect(
+				summary
+					.locator( '.dataforms-layouts-panel__field-trigger' )
+					.filter( {
+						has: page.getByText( 'Template', { exact: true } ),
+					} )
+			).toContainText( 'Index' );
 			await expect(
 				summary.getByRole( 'button', { name: 'Edit Template' } )
-			).toHaveAccessibleDescription( 'Index' );
+			).toBeHidden();
 		} );
 	} );
 } );

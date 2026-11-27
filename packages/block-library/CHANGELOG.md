@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
+
 ### Bug Fixes
 
 -   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
@@ -24,6 +28,7 @@
 -   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 -   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
+-   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
 
 ### Internal
 

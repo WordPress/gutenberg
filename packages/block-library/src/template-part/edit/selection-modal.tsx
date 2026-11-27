@@ -1,4 +1,6 @@
 import { useMemo, useState } from '@wordpress/element';
+import type { BlockEditProps } from '@wordpress/blocks';
+import type { WpTemplatePart } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
@@ -13,6 +15,15 @@ import {
 } from './utils/hooks';
 import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import { searchPatterns } from '../../utils/search-patterns';
+import type { TemplatePartAttributes } from '../types';
+
+interface TemplatePartSelectionModalProps {
+	setAttributes: BlockEditProps< TemplatePartAttributes >[ 'setAttributes' ];
+	onClose: () => void;
+	templatePartId?: string | null;
+	area?: string;
+	clientId: string;
+}
 
 export default function TemplatePartSelectionModal( {
 	setAttributes,
@@ -20,7 +31,7 @@ export default function TemplatePartSelectionModal( {
 	templatePartId = null,
 	area,
 	clientId,
-} ) {
+}: TemplatePartSelectionModalProps ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
@@ -42,7 +53,7 @@ export default function TemplatePartSelectionModal( {
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const onTemplatePartSelect = ( templatePart ) => {
+	const onTemplatePartSelect = ( templatePart: WpTemplatePart ) => {
 		setAttributes( {
 			slug: templatePart.slug,
 			theme: templatePart.theme,
