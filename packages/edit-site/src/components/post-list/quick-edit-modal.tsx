@@ -40,7 +40,7 @@ export function QuickEditModal( {
 		null
 	);
 	const [ localEdits, setLocalEdits ] = useState< Partial< Post > >( {} );
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -60,24 +60,12 @@ export function QuickEditModal( {
 				postId[ 0 ],
 			];
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -98,16 +86,9 @@ export function QuickEditModal( {
 					};
 				}
 
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
-
 				return field;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields ]
 	);
 
 	const form = useMemo( (): Form => {
