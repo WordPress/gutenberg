@@ -91,6 +91,7 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						text={ label }
 						size="small"
+						aria-haspopup="dialog"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
 				}

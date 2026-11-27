@@ -218,7 +218,6 @@ export default function DocumentOutline( {
 							}
 							onSelect?.();
 						} }
-						href="#"
 						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
@@ -247,7 +246,6 @@ export default function DocumentOutline( {
 								hasOutlineItemsDisabled ||
 								! isContentBlock( item.clientId )
 							}
-							href={ `#block-${ item.clientId }` }
 							onSelect={ () => {
 								selectBlock( item.clientId );
 								onSelect?.();

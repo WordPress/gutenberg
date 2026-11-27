@@ -1,14 +1,23 @@
 import { store as coreDataStore } from '@wordpress/core-data';
+import type { WpTemplatePart } from '@wordpress/core-data';
+import type { BlockConfiguration } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { getTemplatePartIcon } from './edit/utils/get-template-part-icon';
+import type { TemplatePartAttributes } from './types';
 
-export function enhanceTemplatePartVariations( settings, name ) {
+export function enhanceTemplatePartVariations(
+	settings: BlockConfiguration< TemplatePartAttributes >,
+	name: string
+) {
 	if ( name !== 'core/template-part' ) {
 		return settings;
 	}
 
 	if ( settings.variations ) {
-		const isActive = ( blockAttributes, variationAttributes ) => {
+		const isActive = (
+			blockAttributes: TemplatePartAttributes,
+			variationAttributes: TemplatePartAttributes
+		) => {
 			const { area, theme, slug } = blockAttributes;
 			// We first check the `area` block attribute which is set during insertion.
 			// This property is removed on the creation of a template part.
@@ -22,7 +31,7 @@ export function enhanceTemplatePartVariations( settings, name ) {
 			}
 			const { getCurrentTheme, getEntityRecord } =
 				select( coreDataStore );
-			const entity = getEntityRecord(
+			const entity = getEntityRecord< WpTemplatePart >(
 				'postType',
 				'wp_template_part',
 				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
