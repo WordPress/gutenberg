@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation Link: Show a help text in the Inspector when a custom (URL-only) link points at a page on this site, since it has no entity ID and will never receive `current-menu-item` highlighting ([#83109](https://github.com/WordPress/gutenberg/pull/83109)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
