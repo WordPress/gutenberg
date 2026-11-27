@@ -248,12 +248,23 @@ describe( 'MediaEditorPanel', () => {
 		).toThrow( 'scope "media-editor"' );
 	} );
 
-	it( 'warns when two panels share a name', () => {
+	it( 'keeps the first of two panels that share a name, and warns', () => {
+		function Toggle() {
+			const [ shown, setShown ] = useState( true );
+			return (
+				<>
+					<button onClick={ () => setShown( false ) }>hide</button>
+					{ shown && (
+						<MediaEditorPanel name="plugin/same" title="First">
+							first
+						</MediaEditorPanel>
+					) }
+				</>
+			);
+		}
 		render(
 			<Editor>
-				<MediaEditorPanel name="plugin/same" title="First">
-					first
-				</MediaEditorPanel>
+				<Toggle />
 				<MediaEditorPanel name="plugin/same" title="Second">
 					second
 				</MediaEditorPanel>
@@ -266,6 +277,15 @@ describe( 'MediaEditorPanel', () => {
 		expect( screen.getByTestId( 'tabs' ) ).toHaveTextContent(
 			/^plugin\/same$/
 		);
+		expect(
+			screen.getByRole( 'region', { name: 'First' } )
+		).toHaveTextContent( /^first$/ );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'hide' } ) );
+
+		expect(
+			screen.getByRole( 'region', { name: 'Second' } )
+		).toHaveTextContent( /^second$/ );
 	} );
 
 	it( 'warns about a media type the editor does not know', () => {

@@ -49,6 +49,8 @@ export interface MediaEditorPanelProps extends MediaEditorPanelRegistration {
 interface MediaEditorPanelsContextValue {
 	register: ( panel: MediaEditorPanelRegistration, instance: object ) => void;
 	unregister: ( name: string, instance: object ) => void;
+	/** The mounted panel that holds each name. */
+	owners: Record< string, object >;
 }
 
 const MediaEditorPanelsContext =
@@ -88,19 +90,23 @@ export function getPanelSlotName( name: string ) {
  */
 export function useMediaEditorPanels() {
 	const [ panels, setPanels ] = useState<
-		Record< string, MediaEditorPanelRegistration >
+		Record<
+			string,
+			{ registration: MediaEditorPanelRegistration; owner: object }
+		>
 	>( {} );
-	// Which mounted panel holds each name, so a second panel taking a name is
-	// told apart from the first re-announcing itself, and an unmount only
-	// withdraws a name it still holds.
+	// Which mounted panel holds each name. The first panel to announce a name
+	// keeps it; another one with the same name stays hidden until the first
+	// unmounts. A ref, so panels announcing in the same commit see each other.
 	const ownersRef = useRef( new Map< string, object >() );
 	const register = useCallback(
 		( panel: MediaEditorPanelRegistration, instance: object ) => {
 			const owner = ownersRef.current.get( panel.name );
 			if ( owner && owner !== instance ) {
 				warning(
-					`A media editor panel named "${ panel.name }" is already registered, so this one replaces its tab. Give each panel a unique name.`
+					`A media editor panel named "${ panel.name }" is already registered, so this one is not shown. Give each panel a unique name.`
 				);
+				return;
 			}
 			ownersRef.current.set( panel.name, instance );
 			setPanels( ( current ) => {
@@ -108,10 +114,17 @@ export function useMediaEditorPanels() {
 				// passes a fresh `mediaTypes` array on every render does not
 				// re-render the editor, which would re-render the panel, and
 				// so on.
-				if ( fastDeepEqual( current[ panel.name ], panel ) ) {
+				const entry = current[ panel.name ];
+				if (
+					entry?.owner === instance &&
+					fastDeepEqual( entry.registration, panel )
+				) {
 					return current;
 				}
-				return { ...current, [ panel.name ]: panel };
+				return {
+					...current,
+					[ panel.name ]: { registration: panel, owner: instance },
+				};
 			} );
 		},
 		[]
@@ -130,17 +143,32 @@ export function useMediaEditorPanels() {
 			return next;
 		} );
 	}, [] );
+	const owners = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( panels ).map( ( [ name, { owner } ] ) => [
+					name,
+					owner,
+				] )
+			),
+		[ panels ]
+	);
 	const contextValue = useMemo(
-		() => ( { register, unregister } ),
-		[ register, unregister ]
+		() => ( { register, unregister, owners } ),
+		[ register, unregister, owners ]
 	);
 	const sorted = useMemo(
 		() =>
-			Object.values( panels ).sort( ( a, b ) => {
-				const byOrder =
-					( a.order ?? DEFAULT_ORDER ) - ( b.order ?? DEFAULT_ORDER );
-				return byOrder !== 0 ? byOrder : a.name.localeCompare( b.name );
-			} ),
+			Object.values( panels )
+				.map( ( { registration } ) => registration )
+				.sort( ( a, b ) => {
+					const byOrder =
+						( a.order ?? DEFAULT_ORDER ) -
+						( b.order ?? DEFAULT_ORDER );
+					return byOrder !== 0
+						? byOrder
+						: a.name.localeCompare( b.name );
+				} ),
 		[ panels ]
 	);
 	return { panels: sorted, contextValue };
@@ -175,8 +203,10 @@ export default function MediaEditorPanel( {
 			`MediaEditorPanel is rendered outside the media editor. A plugin registers its panel with scope "${ MEDIA_EDITOR_PLUGIN_SCOPE }" so the editor mounts it: registerPlugin( name, { scope: "${ MEDIA_EDITOR_PLUGIN_SCOPE }", render } ).`
 		);
 	}
-	const { register, unregister } = context;
-	const instanceRef = useRef( {} );
+	const { register, unregister, owners } = context;
+	// A token for this mounted panel, stable for its lifetime.
+	const [ instance ] = useState( () => ( {} ) );
+	const owner = owners[ name ];
 	// Layout effects, so the tab exists before the sidebar paints; the
 	// editor's first render otherwise shows an empty sidebar for a frame.
 	// Announcing and withdrawing are separate effects: the details may
@@ -196,12 +226,17 @@ export default function MediaEditorPanel( {
 				);
 			}
 		} );
-		register( { name, title, order, mediaTypes }, instanceRef.current );
-	}, [ name, title, order, mediaTypes, register ] );
+		register( { name, title, order, mediaTypes }, instance );
+		// `owner` re-runs this when the panel holding the name unmounts, so a
+		// hidden panel with the same name takes the tab over.
+	}, [ name, title, order, mediaTypes, register, owner, instance ] );
 	useLayoutEffect( () => {
-		const instance = instanceRef.current;
 		return () => unregister( name, instance );
-	}, [ name, unregister ] );
+	}, [ name, unregister, instance ] );
+
+	if ( owner !== instance ) {
+		return null;
+	}
 
 	return (
 		<Fill name={ getPanelSlotName( name ) }>
