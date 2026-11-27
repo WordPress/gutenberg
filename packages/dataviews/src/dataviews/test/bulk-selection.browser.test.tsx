@@ -1,12 +1,18 @@
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
-import { afterEach, beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { speak } from '@wordpress/a11y';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
 import type { Action, Field, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import '../../style.scss';
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const initialViewport = {
 	width: window.innerWidth,
@@ -466,4 +472,44 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 			);
 		} )
 		.toBe( true );
+} );
+
+it( 'does not announce bulk actions in layouts that do not show them', async () => {
+	vi.mocked( speak ).mockClear();
+	function SelectableList() {
+		const [ view, setView ] = useState< View >( {
+			type: 'list',
+			titleField: 'title',
+			fields: [ 'author' ],
+			page: 1,
+			perPage: 10,
+		} );
+		const { data, paginationInfo } = filterSortAndPaginate(
+			posts,
+			view,
+			fields
+		);
+		return (
+			<DataViews
+				data={ data }
+				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
+				actions={ actions }
+				paginationInfo={ paginationInfo }
+				defaultLayouts={ { list: true } }
+			/>
+		);
+	}
+	const user = userEvent.setup();
+	await render( <SelectableList /> );
+	await user.click(
+		page.getByRole( 'button', { name: 'First post', exact: true } )
+	);
+	await expect
+		.element(
+			page.getByRole( 'button', { name: 'First post', exact: true } )
+		)
+		.toHaveAttribute( 'aria-pressed', 'true' );
+	expect( speak ).not.toHaveBeenCalled();
 } );

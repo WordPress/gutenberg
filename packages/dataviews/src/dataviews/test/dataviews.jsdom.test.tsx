@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import DataViews from '../index';
 import {
@@ -311,6 +311,101 @@ describe( 'DataViews component', () => {
 			name: 'Title',
 		} );
 		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+	} );
+
+	it( 'announces when selecting makes bulk actions available or unavailable', async () => {
+		vi.mocked( speak ).mockClear();
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, titleField: 'title' } }
+				actions={ actions }
+			/>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: /Hello World$/ } )
+		);
+		expect( speak ).toHaveBeenLastCalledWith( 'Bulk actions available.' );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: /Homepage$/ } )
+		);
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: /Hello World$/ } )
+		);
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		await user.click(
+			screen.getByRole( 'checkbox', { name: /Homepage$/ } )
+		);
+		expect( speak ).toHaveBeenLastCalledWith(
+			'Bulk actions no longer available.'
+		);
+		expect( speak ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'announces bulk actions after the focus moves to the toolbar', async () => {
+		vi.mocked( speak ).mockClear();
+		const focus = vi.spyOn( HTMLElement.prototype, 'focus' );
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, titleField: 'title' } }
+				actions={ actions }
+			/>
+		);
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		);
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Deselect all' } )
+		).toHaveFocus();
+		expect( speak ).toHaveBeenLastCalledWith( 'Bulk actions available.' );
+		// A focus move interrupts what the screen reader is saying.
+		expect(
+			vi.mocked( speak ).mock.invocationCallOrder.at( -1 )
+		).toBeGreaterThan( focus.mock.invocationCallOrder.at( -1 )! );
+		focus.mockRestore();
+	} );
+
+	it( 'announces bulk actions when the consumer takes the selection a render later', async () => {
+		vi.mocked( speak ).mockClear();
+		// Like a router keeping the selection in the URL: the new selection
+		// arrives after a render with a fresh copy of the old one.
+		function DelayedSelection() {
+			const [ selection, setSelection ] = useState< string[] >( [] );
+			const [ pending, setPending ] = useState< string[] | null >( null );
+			useEffect( () => {
+				if ( pending ) {
+					setSelection( pending );
+				}
+			}, [ pending ] );
+			return (
+				<DataViewWrapper
+					view={ { ...DEFAULT_VIEW, titleField: 'title' } }
+					actions={ actions }
+					selection={ [ ...selection ] }
+					onChangeSelection={ setPending }
+				/>
+			);
+		}
+		render( <DelayedSelection /> );
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: /Hello World$/ } )
+		);
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith( 'Bulk actions available.' )
+		);
+	} );
+
+	it( 'does not announce bulk actions when the consumer clears the selection', () => {
+		vi.mocked( speak ).mockClear();
+		const props = { onChangeSelection: vi.fn(), actions };
+		const { rerender } = render(
+			<DataViewWrapper { ...props } selection={ [ '1' ] } />
+		);
+		rerender( <DataViewWrapper { ...props } selection={ [] } /> );
+		expect( speak ).not.toHaveBeenCalled();
 	} );
 
 	it( 'disabled desktop bulk action cannot run', async () => {

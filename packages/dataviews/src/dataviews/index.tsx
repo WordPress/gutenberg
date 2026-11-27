@@ -8,8 +8,12 @@ import {
 } from '@wordpress/element';
 import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
+import { hasAPossibleBulkAction } from '../components/dataviews-bulk-actions';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 import {
 	Filters,
 	FiltersToggled,
@@ -139,9 +143,39 @@ function DataViews< Item >( {
 	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
+	// Like the footer, only the table and grid layouts show bulk actions.
+	const layoutHasBulkActions = [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+		view.type
+	);
+	function hasBulkActionsFor( ids: string[] ) {
+		if ( ! layoutHasBulkActions ) {
+			return false;
+		}
+		// The items the toolbar works on, which with infinite scroll keep the
+		// selected items of the pages loaded before.
+		return displayData.some(
+			( item ) =>
+				ids.includes( getItemId( item ) ) &&
+				hasAPossibleBulkAction( actions, item )
+		);
+	}
+	// The bulk actions only show once an item is selected, so screen reader
+	// users can't find them beforehand. Say when selecting makes them
+	// available and when clearing the selection removes them. Only changes
+	// made here, by the user, are announced: when the consumer clears the
+	// selection, e.g. after moving the items to the trash, announcing it would
+	// cut off the notice of that action. A change the consumer doesn't take
+	// stays pending, as it may take it later, so a consumer that refuses one
+	// can have its own later change of the same kind announced.
+	const bulkActionsAnnouncementRef = useRef< boolean | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
+		const hasBulkActions = hasBulkActionsFor( newValue );
+		bulkActionsAnnouncementRef.current =
+			hasBulkActionsFor( selection ) !== hasBulkActions
+				? hasBulkActions
+				: null;
 		if ( isUncontrolled ) {
 			setSelectionState( newValue );
 		}
@@ -149,6 +183,24 @@ function DataViews< Item >( {
 			onChangeSelection( newValue );
 		}
 	}
+	// Announce once the new selection renders, which can be later when the
+	// consumer keeps it, e.g. in the URL. That's also after any focus move it
+	// causes, which would otherwise cut the announcement off.
+	const showsBulkActions = hasBulkActionsFor( selection );
+	useEffect( () => {
+		const hasBulkActions = bulkActionsAnnouncementRef.current;
+		bulkActionsAnnouncementRef.current = null;
+		// Only for a change the user made, e.g. not when the consumer clears
+		// the selection after moving the items to the trash.
+		if ( hasBulkActions !== showsBulkActions ) {
+			return;
+		}
+		speak(
+			showsBulkActions
+				? __( 'Bulk actions available.' )
+				: __( 'Bulk actions no longer available.' )
+		);
+	}, [ showsBulkActions ] );
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 	// When infinite scroll is enabled, don't filter selection by current data
 	// because items may be scrolled out of view but still selected.
