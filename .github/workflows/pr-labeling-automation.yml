@@ -26,8 +26,8 @@ jobs:
                       packages/block-library/src
                   persist-credentials: false
             - name: Add block labels
-              run: .github/scripts/label-blocks.sh
-              env:
-                  GH_TOKEN: ${{ github.token }}
-                  PR: ${{ github.event.pull_request.number }}
-                  REPO: ${{ github.repository }}
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              with:
+                  script: |
+                      const labelBlocks = require( './.github/scripts/label-blocks.cjs' );
+                      await labelBlocks( { github, context, core } );
