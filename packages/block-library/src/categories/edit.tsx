@@ -364,8 +364,7 @@ export default function CategoriesEdit( {
 				<p>{ taxonomy!.labels.no_terms }</p>
 			) }
 			{ ! isResolving &&
-				categories &&
-				categories.length > 0 &&
+				categories?.length! > 0 &&
 				( displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() ) }
