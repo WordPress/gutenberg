@@ -107,6 +107,8 @@ function TableColumnField< Item >( {
 	const className = clsx( 'dataviews-view-table__cell-content-wrapper', {
 		'dataviews-view-table__cell-align-end': align === 'end',
 		'dataviews-view-table__cell-align-center': align === 'center',
+		'dataviews-view-table__cell-numeric':
+			field.type === 'integer' || field.type === 'number',
 	} );
 
 	return (
