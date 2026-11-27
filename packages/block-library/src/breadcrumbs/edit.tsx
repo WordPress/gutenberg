@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Post } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
@@ -18,6 +20,7 @@ import {
 	useToolsPanelDropdownMenuProps,
 } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { BreadcrumbsEditProps } from './types';
 
 const separatorDefaultValue = '/';
 
@@ -26,7 +29,7 @@ export default function BreadcrumbEdit( {
 	setAttributes,
 	name,
 	context: { postId, postType, templateSlug },
-} ) {
+}: BreadcrumbsEditProps ) {
 	const {
 		separator,
 		showHomeItem,
@@ -46,11 +49,9 @@ export default function BreadcrumbEdit( {
 			if ( ! postType ) {
 				return {};
 			}
-			const _post = select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
+			const _post = select( coreStore ).getEntityRecord<
+				Post & Record< string, unknown >
+			>( 'postType', postType, postId );
 			const _canReadPost = postId
 				? select( coreStore ).canUser( 'read', {
 						kind: 'postType',
@@ -85,7 +86,10 @@ export default function BreadcrumbEdit( {
 							( { visibility } ) => visibility?.publicly_queryable
 						)
 						.some( ( taxonomy ) => {
-							return !! _post[ taxonomy.rest_base ]?.length;
+							return !! (
+								_post[ taxonomy.rest_base ] as
+									unknown[] | undefined
+							 )?.length;
 						} ),
 				isLoading:
 					// Wait for the post record only while it can still be
@@ -143,7 +147,7 @@ export default function BreadcrumbEdit( {
 	const prevContentRef = useRef( '' );
 	useEffect( () => {
 		if ( status === 'success' ) {
-			prevContentRef.current = content;
+			prevContentRef.current = content!;
 		}
 	}, [ content, status ] );
 	const [ showLoader, setShowLoader ] = useState( false );
@@ -213,12 +217,14 @@ export default function BreadcrumbEdit( {
 		placeholder = (
 			<nav
 				{ ...blockProps }
-				style={ {
-					'--separator': `"${ separator
-						.replace( /\\/g, '\\\\' )
-						.replace( /"/g, '\\"' ) }"`,
-					...blockProps.style,
-				} }
+				style={
+					{
+						'--separator': `"${ separator
+							.replace( /\\/g, '\\\\' )
+							.replace( /"/g, '\\"' ) }"`,
+						...blockProps.style,
+					} as CSSProperties
+				}
 			>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
@@ -361,7 +367,7 @@ export default function BreadcrumbEdit( {
 						{ sprintf(
 							/* translators: %s: Error message. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>
