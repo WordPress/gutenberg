@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Title: Keep the title editable inside synced patterns ([#71981](https://github.com/WordPress/gutenberg/issues/71981)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
