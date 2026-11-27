@@ -90,11 +90,20 @@ export function SocialLinksEdit( props ) {
 		if ( logosOnly ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( ( prev ) => {
-				backgroundToRestoreRef.current = {
-					iconBackgroundColor: prev.iconBackgroundColor,
-					iconBackgroundColorValue: prev.iconBackgroundColorValue,
-					customIconBackgroundColor: prev.customIconBackgroundColor,
-				};
+				// Redo replays an already cleared background. Keep nothing to
+				// restore then, so a later Undo isn't overwritten.
+				if (
+					prev.iconBackgroundColor ||
+					prev.iconBackgroundColorValue ||
+					prev.customIconBackgroundColor
+				) {
+					backgroundToRestoreRef.current = {
+						iconBackgroundColor: prev.iconBackgroundColor,
+						iconBackgroundColorValue: prev.iconBackgroundColorValue,
+						customIconBackgroundColor:
+							prev.customIconBackgroundColor,
+					};
+				}
 				return {
 					iconBackgroundColor: undefined,
 					iconBackgroundColorValue: undefined,
