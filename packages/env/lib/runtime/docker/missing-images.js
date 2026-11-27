@@ -61,7 +61,7 @@ async function findMissingImages(
 	dockerComposeConfigPath,
 	isCached = isImageCached
 ) {
-	const dockerComposeConfig = yaml.safeLoad(
+	const dockerComposeConfig = yaml.load(
 		await readFile( dockerComposeConfigPath, 'utf8' )
 	);
 
