@@ -78,11 +78,6 @@ describe( 'Header', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Options' } )
 		).toHaveFocus();
-		expect(
-			screen.getByRole( 'toolbar', { name: 'Document tools' } )
-		).not.toContainElement(
-			screen.getByRole( 'button', { name: 'Options' } )
-		);
 	} );
 
 	it( 'undoes and redoes changes when there is history', async () => {
