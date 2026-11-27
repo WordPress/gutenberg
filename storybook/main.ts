@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
+import { markdownDoc } from './markdown-doc-plugin.js';
 import { statusIndexer } from './status-indexer.js';
 
 /**
@@ -157,6 +158,8 @@ const config: StorybookConfig = {
 			},
 			plugins: [
 				dsTokenFallbacksJs(),
+				// Render Markdown imported with `?doc` as it reads on GitHub.
+				markdownDoc(),
 				react() as PluginOption,
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
 				{
