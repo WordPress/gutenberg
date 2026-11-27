@@ -16,6 +16,6 @@ export const settings: BlockModule< LoginOutAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata: metadata as BlockModule< LoginOutAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );
