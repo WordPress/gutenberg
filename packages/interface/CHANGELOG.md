@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InterfaceSkeleton`: Keep the open save panel visible when the browser window loses focus, so it no longer disappears and then reappears over the toolbar Save button ([#55824](https://github.com/WordPress/gutenberg/issues/55824)).
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
