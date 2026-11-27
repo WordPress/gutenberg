@@ -21,27 +21,29 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 import { SelectControl } from '@wordpress/ui';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { TagCloudAttributes } from './types';
 
 /**
  * Minimum number of tags a user can show using this block.
- *
- * @type {number}
  */
 const MIN_TAGS = 1;
 
 /**
  * Maximum number of tags a user can show using this block.
- *
- * @type {number}
  */
 const MAX_TAGS = 100;
 
 const MIN_FONT_SIZE = 0.1;
 const MAX_FONT_SIZE = 100;
 
-function TagCloudEdit( { attributes, setAttributes, name } ) {
+function TagCloudEdit( {
+	attributes,
+	setAttributes,
+	name,
+}: BlockEditProps< TagCloudAttributes > ) {
 	const {
 		taxonomy,
 		showTagCounts,
@@ -50,7 +52,9 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 		largestFontSize,
 	} = attributes;
 
-	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const [ availableUnits ] = useSettings( 'spacing.units' ) as [
+		string[] | undefined,
+	];
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// The `pt` unit is used as the default value and is therefore
@@ -66,7 +70,11 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 		[]
 	);
 
-	const taxonomyItems = [
+	const taxonomyItems: Array< {
+		label: string;
+		value: string;
+		disabled?: boolean;
+	} > = [
 		{
 			label: __( '- Select -' ),
 			value: '',
@@ -82,14 +90,19 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 			} ),
 	];
 
-	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
+	const onFontSizeChange = (
+		fontSizeLabel: 'smallestFontSize' | 'largestFontSize',
+		newValue?: string
+	) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const [ quantity, newUnit ] =
 			parseQuantityAndUnitFromRawValue( newValue );
 		if ( ! Number.isFinite( quantity ) ) {
 			return;
 		}
-		const updateObj = { [ fontSizeLabel ]: newValue };
+		const updateObj: Partial< TagCloudAttributes > = {
+			[ fontSizeLabel ]: newValue,
+		};
 		// We need to keep in sync the `unit` changes to both `smallestFontSize`
 		// and `largestFontSize` attributes.
 		Object.entries( {
@@ -100,7 +113,9 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 				parseQuantityAndUnitFromRawValue( currentValue );
 			// Only add an update if the other font size attribute has a different unit.
 			if ( attribute !== fontSizeLabel && currentUnit !== newUnit ) {
-				updateObj[ attribute ] = `${ currentQuantity }${ newUnit }`;
+				updateObj[
+					attribute as 'smallestFontSize' | 'largestFontSize'
+				] = `${ currentQuantity }${ newUnit }`;
 			}
 		} );
 		setAttributes( updateObj );
@@ -144,7 +159,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 							null
 						}
 						onValueChange={ ( item ) =>
-							item && setAttributes( { taxonomy: item.value } )
+							item && setAttributes( { taxonomy: item.value! } )
 						}
 					/>
 				</ToolsPanelItem>
@@ -254,7 +269,7 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
 						{ sprintf(
 							/* translators: %s: error message returned when rendering the block. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>
