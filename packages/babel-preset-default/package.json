@@ -52,9 +52,9 @@
 	},
 	"devDependencies": {
 		"core-js-compat": "^3.39.0",
+		"rolldown": "^1.2.15",
 		"terser": "^5.37.0",
-		"vitest": "^5.1.1",
-		"webpack": "^5.111.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 const { readFile, writeFile } = require( 'fs' ).promises;
 const path = require( 'path' );
-const { promisify } = require( 'util' );
 const { version } = require( 'core-js/package.json' );
 const compat = require( 'core-js-compat' );
-const webpack = require( 'webpack' );
+const { build } = require( 'rolldown' );
 const { minify } = require( 'terser' );
 const exclusions = require( '../polyfill-exclusions' );
 const inclusions = require( '../polyfill-inclusions' );
 
 const BUILD_DIR = path.resolve( __dirname, '../build' );
+const ENTRY = '\0polyfill-entry';
 
 /**
  * Lists the `core-js` modules to bundle, in `core-js-compat` order.
@@ -60,41 +60,48 @@ async function getBanner( modules ) {
 }
 
 /**
- * Bundles the given `core-js` modules into `build/polyfill.js`, an ES5 script
- * wrapped the same way `core-js-builder` wraps its bundle.
+ * Bundles the given `core-js` modules into `build/polyfill.js`, a strict-mode
+ * IIFE script.
  *
  * @param {string[]} modules Module names.
  * @param {string}   banner  Banner comment.
  * @return {Promise<string>} Written script.
  */
 async function bundle( modules, banner ) {
-	const stats = await promisify( webpack )( {
-		mode: 'none',
-		target: [ 'web', 'es5' ],
-		entry: modules.map( ( name ) =>
-			require.resolve( `core-js/modules/${ name }` )
-		),
-		node: false,
-		output: { path: BUILD_DIR, filename: 'polyfill.js', iife: false },
+	const entry = modules
+		.map( ( name ) => {
+			const file = require.resolve( `core-js/modules/${ name }` );
+			return `import ${ JSON.stringify( file ) };`;
+		} )
+		.join( '\n' );
+	const {
+		output: [ chunk ],
+	} = await build( {
+		input: ENTRY,
+		platform: 'browser',
+		// Leave out the `// <module path>` comments, which contain local paths.
+		experimental: { attachDebugInfo: 'none' },
 		plugins: [
-			new webpack.BannerPlugin( {
-				banner: `${ banner }\n!function (undefined) { 'use strict';`,
-				raw: true,
-			} ),
-			new webpack.BannerPlugin( {
-				banner: '}();',
-				raw: true,
-				footer: true,
-			} ),
+			{
+				name: 'polyfill-entry',
+				resolveId: ( id ) => ( id === ENTRY ? id : null ),
+				load: ( id ) => ( id === ENTRY ? entry : null ),
+			},
 		],
+		output: {
+			file: path.join( BUILD_DIR, 'polyfill.js' ),
+			format: 'iife',
+			// The `;` keeps the IIFE from calling the end of a script that
+			// WordPress concatenates before this one.
+			postBanner: `${ banner }\n;`,
+			// Rolldown drops the `'use strict'` of each CommonJS module.
+			intro: "'use strict';",
+		},
 	} );
-	if ( stats.hasErrors() ) {
-		throw new Error( stats.toString( 'errors-only' ) );
-	}
-	return readFile( path.join( BUILD_DIR, 'polyfill.js' ), 'utf8' );
+	return chunk.code;
 }
 
-async function build() {
+async function buildPolyfill() {
 	const modules = getModules();
 	const script = await bundle( modules, await getBanner( modules ) );
 
@@ -113,7 +120,7 @@ async function build() {
 	await writeFile( path.join( BUILD_DIR, 'polyfill.min.js' ), minified.code );
 }
 
-build().catch( ( error ) => {
+buildPolyfill().catch( ( error ) => {
 	console.error( error );
 	process.exit( 1 );
 } );
