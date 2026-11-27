@@ -15,9 +15,7 @@ let lastScreen;
 
 const ITEM_ROUTES = [
 	'page-item',
-	'post-item',
 	'template-item',
-	'static-template-item',
 	'template-part-item',
 	'pattern-item',
 	'navigation-item',
