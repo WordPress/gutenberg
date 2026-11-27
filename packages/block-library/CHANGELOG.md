@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Audio: Pause the Audio block that is playing when another one starts, so two never play at once ([#86453](https://github.com/WordPress/gutenberg/issues/86453)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).

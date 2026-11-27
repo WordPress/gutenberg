@@ -68,7 +68,8 @@
 			}
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
 		}
 	},
 	"editorStyle": "wp-block-audio-editor",
