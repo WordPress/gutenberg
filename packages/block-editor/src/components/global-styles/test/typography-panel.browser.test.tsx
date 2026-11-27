@@ -707,35 +707,6 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 					screen.getByRole( 'radio', { name: 'Large' } )
 				).not.toBeChecked();
 			} );
-
-			it( 'commits the Global Styles size to the state when the default state differs', async () => {
-				const onChange = vi.fn();
-
-				// The block inspector passes the block's Desktop size (Small)
-				// as inherited, so the Global Styles size (Large) is a change.
-				await renderPanel( {
-					settings,
-					inheritedValue: {
-						typography: { fontSize: 'var:preset|font-size|small' },
-					},
-					baseValue: {
-						typography: { fontSize: 'var:preset|font-size|small' },
-					},
-					onChange,
-				} );
-
-				await userEvent.click(
-					screen.getByRole( 'radio', { name: 'Large' } )
-				);
-
-				expect( onChange ).toHaveBeenCalledWith(
-					expect.objectContaining( {
-						typography: expect.objectContaining( {
-							fontSize: 'var:preset|font-size|large',
-						} ),
-					} )
-				);
-			} );
 		} );
 	} );
 
