@@ -1,6 +1,6 @@
 # Block attribute types
 
-Block attribute types and the Field API types in `@wordpress/dataviews` are the same thing. A type that exists in both means the same in both, and the editor can build a control for an attribute from its type.
+Block attribute types and the Field API types in `@wordpress/dataviews` are the same thing. A type that exists in both means the same in both. The goal is for the editor to build a control for an attribute from its type.
 
 ## Why not JSON Schema
 
@@ -10,9 +10,9 @@ Block attributes were never strict JSON Schema anyway: `rich-text`, `source`, `s
 
 ## Where JSON Schema still applies
 
-The server checks attribute values with the REST API's JSON Schema code. Before that check, WordPress maps each type that isn't in JSON Schema:
+The server checks attribute values with the REST API's JSON Schema code. Before that check, WordPress maps each type that isn't in JSON Schema to a JSON Schema type and format:
 
-| Attribute type | Checked as |
+| Attribute type | Checked as (JSON Schema) |
 | --- | --- |
 | `datetime` | `string`, `format: date-time` |
 | `url` | `string`, `format: uri` |
@@ -20,6 +20,8 @@ The server checks attribute values with the REST API's JSON Schema code. Before 
 The REST API sanitizes `uri` but doesn't validate it, so a `url` attribute accepts any string, including relative paths and `#anchor`. The editor follows the same rules.
 
 The REST API and the Abilities API stay JSON Schema.
+
+The Field API also has a `format` property, but it means something else: the display format, such as how a date is shown. It is not a JSON Schema format.
 
 ## Adding a type
 
