@@ -1,6 +1,6 @@
 ---
 name: wp-theme-setup
-description: Use when setting up WordPress Design System tokens in a project: loading the tokens stylesheet, configuring the Stylelint and ESLint token rules from `@wordpress/theme-build-tools` and `@wordpress/eslint-plugin`, and adding token fallback values automatically at build time.
+description: "Use when setting up WordPress Design System tokens in a project: loading the tokens stylesheet, configuring the Stylelint and ESLint token rules from `@wordpress/theme-build-tools` and `@wordpress/eslint-plugin`, and adding token fallback values automatically at build time."
 ---
 
 # Set up design tokens in a project
