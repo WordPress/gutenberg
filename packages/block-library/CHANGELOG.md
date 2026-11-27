@@ -6,7 +6,7 @@
 
 -   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
 -   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
--   Date, Navigation Link, Navigation Submenu, Image, Button: Use the `datetime` and `url` attribute types. The Attributes panel offers only date fields for a date, and URL or text fields for a URL ([#87563](https://github.com/WordPress/gutenberg/pull/87563)).
+-   Date, Navigation Link, Navigation Submenu: Use the `datetime` and `url` attribute types, so the Attributes panel only offers date fields for a date and URL fields for a URL ([#87563](https://github.com/WordPress/gutenberg/pull/87563)).
 
 ### Bug Fixes
 
