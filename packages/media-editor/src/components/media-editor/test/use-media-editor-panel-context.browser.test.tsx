@@ -35,6 +35,7 @@ function Probe() {
 		setAspectRatioValue,
 		rotate,
 		flipHorizontal,
+		flipVertical,
 	} = useMediaEditorPanelContext();
 	const { state } = useMediaEditor().imageEditor;
 	return (
@@ -42,11 +43,18 @@ function Probe() {
 			<p>
 				{ `type:${ mediaType } saving:${ isSaving } ratio:${ aspectRatioValue } rotation:${ Math.abs(
 					state.rotation
-				) } flipped:${ state.flip.horizontal }` }
+				) } flipped:${ state.flip.horizontal },${ state.flip.vertical }` }
 			</p>
 			<button onClick={ () => setAspectRatioValue( '1' ) }>Square</button>
 			<button onClick={ () => rotate( 1 ) }>Rotate</button>
-			<button onClick={ flipHorizontal }>Flip</button>
+			<button
+				onClick={ () => {
+					flipHorizontal();
+					flipVertical();
+				} }
+			>
+				Flip both
+			</button>
 		</div>
 	);
 }
@@ -117,9 +125,11 @@ describe( 'useMediaEditorPanelContext', () => {
 		);
 		expect( await screen.findByText( /rotation:90 / ) ).toBeInTheDocument();
 
-		await userEvent.click( screen.getByRole( 'button', { name: 'Flip' } ) );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Flip both' } )
+		);
 		expect(
-			await screen.findByText( /flipped:true$/ )
+			await screen.findByText( /flipped:true,true$/ )
 		).toBeInTheDocument();
 	} );
 } );

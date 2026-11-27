@@ -1350,8 +1350,7 @@ export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
 	const { imageEditor } = useMediaEditor();
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
-	const { snapRotate90, setFlip } = imageEditor;
-	const { flip } = imageEditor.state;
+	const { snapRotate90, toggleFlip } = imageEditor;
 	return useMemo(
 		() => ( {
 			mediaType,
@@ -1362,16 +1361,8 @@ export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
 			aspectRatioOptions,
 			setAspectRatioValue,
 			rotate: snapRotate90,
-			flipHorizontal: () =>
-				setFlip( {
-					horizontal: ! flip.horizontal,
-					vertical: flip.vertical,
-				} ),
-			flipVertical: () =>
-				setFlip( {
-					horizontal: flip.horizontal,
-					vertical: ! flip.vertical,
-				} ),
+			flipHorizontal: () => toggleFlip( 'horizontal' ),
+			flipVertical: () => toggleFlip( 'vertical' ),
 		} ),
 		[
 			mediaType,
@@ -1382,8 +1373,7 @@ export function useMediaEditorPanelContext(): MediaEditorPanelContextValue {
 			aspectRatioOptions,
 			setAspectRatioValue,
 			snapRotate90,
-			setFlip,
-			flip,
+			toggleFlip,
 		]
 	);
 }
