@@ -38,6 +38,7 @@
 	flex: 1;
 	position: relative;
 	background-color: $components-color-background;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:where(.is-disabled) {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
