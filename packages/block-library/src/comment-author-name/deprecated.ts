@@ -50,10 +50,10 @@ const v2 = {
 		return null;
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
+	isEligible( attributes: Record< string, unknown > ) {
 		return (
 			!! attributes.textAlign ||
-			!! attributes.className?.match(
+			!! ( attributes.className as string )?.match(
 				/\bhas-text-align-(left|center|right)\b/
 			)
 		);
@@ -91,7 +91,7 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible( { style }: Record< string, any > ) {
 		return style?.typography?.fontFamily;
 	},
 };
