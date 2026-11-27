@@ -59,6 +59,10 @@
 			}
 		}
 	}
+
+	&.is-pressed .components-menu-item__info {
+		color: inherit;
+	}
 }
 
 .components-menu-item__info-wrapper {

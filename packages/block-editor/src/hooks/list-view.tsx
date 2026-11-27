@@ -38,7 +38,7 @@ export function ListViewPanel( {
 	clientId: string;
 	name: string;
 } ) {
-	const { isSelectionWithinCurrentSection } =
+	const { isSelectionWithinCurrentSection, isMultiSelected } =
 		useContext( PrivateBlockContext );
 
 	const { isOpened, expandRevision, handleToggle } =
@@ -78,7 +78,8 @@ export function ListViewPanel( {
 	const blockType = getBlockType( name );
 	const title = blockType?.title || name;
 
-	if ( ! isEnabled || isNestedListView ) {
+	// The List View only shows a single block's inner blocks.
+	if ( ! isEnabled || isNestedListView || isMultiSelected ) {
 		return null;
 	}
 

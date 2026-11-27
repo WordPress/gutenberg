@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `__experimentalUseFixedWindowList` has been deprecated ([#87454](https://github.com/WordPress/gutenberg/pull/87454)).
+
 ### Bug Fixes
 
 -   `useDialog`: Don't close the dialog when Escape is pressed to cancel an IME composition ([#87329](https://github.com/WordPress/gutenberg/pull/87329)).

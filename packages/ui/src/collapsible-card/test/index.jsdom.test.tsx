@@ -198,10 +198,10 @@ describe( 'CollapsibleCard', () => {
 			).toBeVisible();
 		} );
 
-		it( 'wraps the trigger in a heading via `render`', () => {
+		it( 'wraps the trigger in a heading via `role` and `aria-level`', () => {
 			render(
 				<CollapsibleCard.Root>
-					<CollapsibleCard.Header render={ <h2 /> }>
+					<CollapsibleCard.Header role="heading" aria-level={ 2 }>
 						<Card.Title>Title</Card.Title>
 					</CollapsibleCard.Header>
 				</CollapsibleCard.Root>
@@ -311,7 +311,8 @@ describe( 'CollapsibleCard', () => {
 					<p id={ existingDescriptionId }>Existing description</p>
 					<CollapsibleCard.Root>
 						<CollapsibleCard.Header
-							render={ <h2 /> }
+							role="heading"
+							aria-level={ 2 }
 							aria-describedby={ existingDescriptionId }
 						>
 							<Card.Title>Settings</Card.Title>
