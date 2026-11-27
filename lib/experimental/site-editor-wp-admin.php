@@ -166,3 +166,114 @@ function gutenberg_site_editor_wp_admin_prepare_screen() {
 }
 
 add_action( 'site-editor-v2-wp-admin_init', '_gutenberg_preload_route_entity_fields' );
+
+/**
+ * Returns the route path matching a site-editor.php URL.
+ *
+ * Handles the `p` paths of the site editor, and the older `postType`,
+ * `postId` and `path` args that Core still links to, such as the "Edit site"
+ * link in the admin bar. Unknown URLs map to the home route.
+ *
+ * @param array $args Query args of the site-editor.php URL.
+ * @return string The route path.
+ */
+function gutenberg_get_site_editor_wp_admin_path_for_site_editor_args( $args ) {
+	$list_paths = array(
+		'wp_template'      => '/templates',
+		'wp_template_part' => '/template-parts',
+		'wp_block'         => '/patterns',
+		'page'             => '/types/page',
+		'wp_navigation'    => '/navigation',
+	);
+
+	$post_type = isset( $args['postType'] ) ? (string) $args['postType'] : '';
+	$post_id   = isset( $args['postId'] ) ? (string) $args['postId'] : '';
+
+	if ( ! empty( $args['p'] ) ) {
+		$p = '/' . trim( (string) $args['p'], '/' );
+
+		// List paths, such as `/template` or `/pattern`. The template parts
+		// list is `/pattern` with a `postType` arg.
+		$v1_lists = array(
+			'/template'   => 'wp_template',
+			'/pattern'    => 'wp_template_part' === $post_type ? 'wp_template_part' : 'wp_block',
+			'/page'       => 'page',
+			'/navigation' => 'wp_navigation',
+		);
+		if ( isset( $v1_lists[ $p ] ) ) {
+			return $list_paths[ $v1_lists[ $p ] ];
+		}
+		if ( in_array( $p, array( '/styles', '/stylebook' ), true ) ) {
+			return '/styles';
+		}
+		if ( '/identity' === $p ) {
+			return '/identity';
+		}
+
+		// Item paths, such as `/wp_template/twentytwentyfive//home`.
+		$parts     = explode( '/', ltrim( $p, '/' ), 2 );
+		$post_type = $parts[0];
+		$post_id   = $parts[1] ?? '';
+		if ( '' === $post_id || ! isset( $list_paths[ $post_type ] ) ) {
+			return '/';
+		}
+	} elseif ( ! empty( $args['path'] ) ) {
+		$legacy_paths = array(
+			'/wp_global_styles'     => '/styles',
+			'/wp_template/all'      => '/templates',
+			'/wp_template_part/all' => '/template-parts',
+			'/patterns'             => '/patterns',
+			'/navigation'           => '/navigation',
+		);
+		return $legacy_paths[ (string) $args['path'] ] ?? '/';
+	}
+
+	if ( ! isset( $list_paths[ $post_type ] ) ) {
+		return '/';
+	}
+	if ( '' === $post_id ) {
+		return $list_paths[ $post_type ];
+	}
+	if ( 'wp_navigation' === $post_type ) {
+		return '/navigation/edit/' . rawurlencode( $post_id );
+	}
+	return '/types/' . $post_type . '/edit/' . rawurlencode( $post_id );
+}
+
+/**
+ * Redirects site-editor.php to the matching route of the site editor page.
+ *
+ * Core and plugins link to site-editor.php in several places, such as the
+ * "Edit site" link in the admin bar and the Themes screen.
+ */
+function gutenberg_redirect_site_editor_to_site_editor_wp_admin() {
+	// Theme previews are handled by site-editor.php or the theme preview page.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( isset( $_GET['wp_theme_preview'] ) ) {
+		return;
+	}
+
+	// The page is only registered when the theme supports the site editor.
+	if ( '' === menu_page_url( 'site-editor-v2-wp-admin', false ) ) {
+		return;
+	}
+
+	$args = array();
+	foreach ( array( 'p', 'path', 'postType', 'postId' ) as $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only picks the route to open.
+		if ( isset( $_GET[ $key ] ) && is_string( $_GET[ $key ] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args[ $key ] = sanitize_text_field( wp_unslash( $_GET[ $key ] ) );
+		}
+	}
+
+	$path = gutenberg_get_site_editor_wp_admin_path_for_site_editor_args( $args );
+	$url  = admin_url( 'themes.php?page=site-editor-v2-wp-admin' );
+	if ( '/' !== $path ) {
+		$url = add_query_arg( 'p', rawurlencode( $path ), $url );
+	}
+
+	wp_safe_redirect( $url );
+	exit;
+}
+add_action( 'load-site-editor.php', 'gutenberg_redirect_site_editor_to_site_editor_wp_admin' );
