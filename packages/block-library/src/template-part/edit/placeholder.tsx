@@ -1,4 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import {
 	Placeholder,
 	Button,
@@ -15,6 +16,15 @@ import {
 } from './utils/hooks';
 import TitleModal from './title-modal';
 import { getTemplatePartIcon } from './utils/get-template-part-icon';
+import type { TemplatePartAttributes } from '../types';
+
+interface TemplatePartPlaceholderProps {
+	area?: string;
+	clientId: string;
+	templatePartId: string | null;
+	onOpenSelectionModal: () => void;
+	setAttributes: BlockEditProps< TemplatePartAttributes >[ 'setAttributes' ];
+}
 
 export default function TemplatePartPlaceholder( {
 	area,
@@ -22,7 +32,7 @@ export default function TemplatePartPlaceholder( {
 	templatePartId,
 	onOpenSelectionModal,
 	setAttributes,
-} ) {
+}: TemplatePartPlaceholderProps ) {
 	const { templateParts, isResolving } = useAlternativeTemplateParts(
 		area,
 		templatePartId
