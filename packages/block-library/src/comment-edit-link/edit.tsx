@@ -1,14 +1,19 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import type { CommentEditLinkAttributes } from './types';
 
-export default function Edit( props ) {
+export default function Edit(
+	props: BlockEditProps< CommentEditLinkAttributes >
+) {
 	const { attributes, setAttributes } = props;
 	const { linkTarget } = attributes;
 	useDeprecatedTextAlign( props );

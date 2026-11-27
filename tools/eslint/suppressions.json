@@ -1208,32 +1208,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comment-edit-link/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-edit-link/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-edit-link/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-edit-link/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/comment-reply-link/deprecated.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
