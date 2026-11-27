@@ -21,8 +21,6 @@ For an interactive setup guide, pick your AI tool in [Storybook](https://wordpre
 
 ### Claude Code
 
-See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
-
 ```bash
 claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
 ```
