@@ -24,7 +24,7 @@ const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 function SidebarHeader( { selectedWidgetAreaBlock } ) {
 	return (
-		<WCTabs.TabList>
+		<WCTabs.TabList className="edit-widgets-sidebar__panel-tablist">
 			<WCTabs.Tab tabId={ WIDGET_AREAS_IDENTIFIER }>
 				{ selectedWidgetAreaBlock
 					? selectedWidgetAreaBlock.attributes.name
