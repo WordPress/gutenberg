@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import { hasAPossibleBulkAction } from '../components/dataviews-bulk-actions';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 import {
 	Filters,
 	FiltersToggled,
@@ -142,9 +143,10 @@ function DataViews< Item >( {
 	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, resizeObserverRef ] = useContainerWidth();
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
-	const layoutHasBulkActions = !! VIEW_LAYOUTS.find(
-		( layout ) => layout.type === view.type
-	)?.hasBulkActions;
+	// Like the footer, only the table and grid layouts show bulk actions.
+	const layoutHasBulkActions = [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
+		view.type
+	);
 	function hasBulkActionsFor( ids: string[] ) {
 		if ( ! layoutHasBulkActions ) {
 			return false;
@@ -162,7 +164,9 @@ function DataViews< Item >( {
 	// available and when clearing the selection removes them. Only changes
 	// made here, by the user, are announced: when the consumer clears the
 	// selection, e.g. after moving the items to the trash, announcing it would
-	// cut off the notice of that action.
+	// cut off the notice of that action. A change the consumer doesn't take
+	// stays pending, as it may take it later, so a consumer that refuses one
+	// can have its own later change of the same kind announced.
 	const bulkActionsAnnouncementRef = useRef< boolean | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
