@@ -1158,6 +1158,12 @@
 		"parent": "core-blocks-theme"
 	},
 	{
+		"title": "Template Slot",
+		"slug": "core-block-template-slot",
+		"markdown_source": "../packages/block-library/src/template-slot/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
 		"title": "Term Count",
 		"slug": "core-block-term-count",
 		"markdown_source": "../packages/block-library/src/term-count/README.md",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#86603](https://github.com/WordPress/gutenberg/pull/86603)).
+
 ### Bug Fixes
 
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).

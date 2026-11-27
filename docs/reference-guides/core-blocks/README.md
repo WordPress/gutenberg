@@ -1031,6 +1031,15 @@ Edit the different global regions of your site, like the header, footer, sidebar
 -	**Supports:** align, interactivity (clientNavigation), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
+## Template Slot
+
+Where the templates rendered inside this template go. What it holds is shown when the template is rendered on its own.
+
+-	**Name:** [core/template-slot](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-template-slot/)
+-	**Experimental:** true
+-	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
+-	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), ~~html~~
+
 ## Term Count
 
 Displays the post count of a taxonomy term.
