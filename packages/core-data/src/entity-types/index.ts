@@ -485,13 +485,13 @@ export type EntityRecordOfQuery<
 	Query,
 > = Query extends unknown
 	? '_fields' extends keyof Query
-		? ProjectedRecord<
+		? ProjectedFields<
 				EntityRecordInContexts<
 					Kind,
 					Name,
 					ContextOfQuery< Query, DefaultContextOf< Kind, Name > >
 				>,
-				FieldPathsOf< Query[ '_fields' & keyof Query ] >
+				Query[ '_fields' & keyof Query ]
 			>
 		: EntityRecordInContexts<
 				Kind,
@@ -521,22 +521,38 @@ type SplitFields< S extends string > =
 		: S;
 
 /**
- * The field paths a `_fields` value names, as a comma-separated string or an
- * array. Resolves to `never` when the names are not known at compile time.
+ * Projects the record once for each value `_fields` may hold, so
+ * `cond ? 'id,slug' : 'id,title'` gives one shape per branch rather than one
+ * that requires every field either branch names. An `undefined` value applies
+ * no projection, so it keeps the full record.
  */
-type FieldPathsOf< Fields > = 0 extends 1 & Fields
-	? never
-	: Fields extends string
-		? string extends Fields
+type ProjectedFields< RecordType, Fields > = 0 extends 1 & Fields
+	? DeepPartial< RecordType >
+	: Fields extends undefined
+		? RecordType
+		: Fields extends unknown
+			? ProjectedRecord< RecordType, FieldPathsOf< Fields > >
+			: never;
+
+/**
+ * The field paths a `_fields` value names, as a comma-separated string or a
+ * tuple. Resolves to `never` when the names are not known at compile time,
+ * which includes an array that is not a tuple: `( 'id' | 'title' )[]` may hold
+ * only `'id'`, so it does not promise that `title` is present.
+ */
+type FieldPathsOf< Fields > = Fields extends string
+	? string extends Fields
+		? never
+		: SplitFields< Fields >
+	: Fields extends readonly ( infer Field )[]
+		? number extends Fields[ 'length' ]
 			? never
-			: SplitFields< Fields >
-		: Fields extends readonly ( infer Field )[]
-			? Field extends string
+			: Field extends string
 				? string extends Field
 					? never
 					: Field
 				: never
-			: never;
+		: never;
 
 /**
  * The top-level field a path such as `_links.version-history.href` reads.

@@ -1021,6 +1021,58 @@ describe( 'Entity record types', () => {
 			// @ts-expect-error -- any field may be missing.
 			post?.title.raw;
 		};
+
+		// An array that is not a tuple may hold any subset of its element
+		// type, so none of the fields it could name is guaranteed.
+		( fields: ( 'id' | 'title' )[] ) => {
+			const { records } = useEntityRecords( 'postType', 'post', {
+				_fields: fields,
+			} );
+			records?.[ 0 ].title?.raw satisfies string | undefined;
+			// @ts-expect-error -- `title` may not have been requested.
+			records?.[ 0 ].title.raw;
+		};
+	} );
+
+	it( '`_fields` with alternatives keeps one record shape per alternative', () => {
+		( condition: boolean ) => {
+			const post = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: condition ? 'id,slug' : 'id,title' }
+			);
+			true satisfies Expect<
+				typeof post,
+				| { id: number; slug: string }
+				| { id: number; title: Post< 'edit' >[ 'title' ] }
+				| undefined
+			>;
+			post?.id satisfies number | undefined;
+			// @ts-expect-error -- the `'id,title'` request omits `slug`.
+			post?.slug;
+
+			// TypeScript widens alternative array literals to one array that
+			// is not a tuple, so any of the fields may be missing.
+			const listed = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: condition ? [ 'id', 'slug' ] : [ 'id', 'title' ] }
+			);
+			listed?.slug satisfies string | undefined;
+			// @ts-expect-error -- the `[ 'id', 'slug' ]` request omits `title`.
+			listed?.title.raw;
+
+			// Without `_fields`, the request returns the full record.
+			const maybe = select( coreStore ).getEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ _fields: condition ? 'id,slug' : undefined }
+			);
+			maybe?.slug satisfies string | undefined;
+		};
 	} );
 
 	it( 'an unknown pair falls back to the wider overload', () => {
