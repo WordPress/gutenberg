@@ -1,7 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { category as icon } from '@wordpress/icons';
+import type { BlockConfiguration } from '@wordpress/blocks';
+import type { CategoriesAttributes } from './types';
 
-const variations = [
+const variations: BlockConfiguration< CategoriesAttributes >[ 'variations' ] = [
 	{
 		name: 'terms',
 		title: __( 'Terms List' ),
@@ -13,8 +15,8 @@ const variations = [
 			// for backwards compatibility reasons.
 			// The logical fallback is thus the only other built-in and public taxonomy: Tags.
 			taxonomy: 'post_tag',
-		},
-		isActive: ( blockAttributes ) =>
+		} as CategoriesAttributes,
+		isActive: ( blockAttributes: CategoriesAttributes ) =>
 			// This variation is used for any taxonomy other than `category`.
 			blockAttributes.taxonomy !== 'category',
 	},
@@ -25,7 +27,7 @@ const variations = [
 		icon,
 		attributes: {
 			taxonomy: 'category',
-		},
+		} as CategoriesAttributes,
 		isActive: [ 'taxonomy' ],
 		// The following is needed to prevent "Terms List" from showing up twice in the inserter
 		// (once for the block, once for the variation). Fortunately, it does not collide with

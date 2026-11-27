@@ -959,30 +959,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/categories/edit.jsx": {
+	"packages/block-library/src/categories/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/categories/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/categories/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/categories/variations.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/code/edit.jsx": {
