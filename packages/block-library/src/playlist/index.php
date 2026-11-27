@@ -34,6 +34,10 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					continue;
 				}
 
+				if ( false === ( $track_attributes['metadata']['blockVisibility'] ?? null ) ) {
+					continue;
+				}
+
 				$track_id          = 'track-' . count( $playlist_tracks );
 				$playlist_tracks[] = $track_id;
 
