@@ -3,6 +3,11 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { load } from 'js-yaml';
 
+// The SKILL.md frontmatter rules follow the Agent Skills specification:
+// https://agentskills.io/specification
+// The repository's conventions are stricter in places. See
+// docs/contributors/code/agents-and-skills.md.
+
 // The repository's own skill catalog, and the skills that packages ship.
 const CATALOG_DIRECTORY = '.agents/skills';
 const PACKAGES_DIRECTORY = 'packages';
