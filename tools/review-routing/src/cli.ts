@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { ask, buildRequest } from './decision-api.ts';
 import { buildEvidence } from './evidence.ts';
@@ -15,6 +15,8 @@ Options:
   --repo <name>     Repository as owner/name. Default: WordPress/gutenberg.
   --dry-run         Print the evidence and questions. Does not call the model.
   --json            Print the decisions as JSON, not Markdown.
+  --json-file <path>
+                    Also write the decisions as JSON to a file.
   --help            Show this message.
 
 Credentials come from the environment, or from tools/review-routing/.env.
@@ -35,6 +37,7 @@ const { values } = parseArgs( {
 		repo: { type: 'string', default: 'WordPress/gutenberg' },
 		'dry-run': { type: 'boolean', default: false },
 		json: { type: 'boolean', default: false },
+		'json-file': { type: 'string' },
 		help: { type: 'boolean', default: false },
 	},
 } );
@@ -100,19 +103,25 @@ const probabilities = await ask( request, {
 	apiKey: DECISION_API_KEY,
 } );
 const decisions = decide( rules, probabilities );
+const toJSON = () =>
+	`${ JSON.stringify(
+		decisions.map( ( { rule, probability, requestReview } ) => ( {
+			rule: rule.id,
+			reviewers: rule.reviewers,
+			probability,
+			threshold: rule.threshold,
+			requestReview,
+		} ) ),
+		null,
+		'\t'
+	) }\n`;
+
+if ( values[ 'json-file' ] ) {
+	writeFileSync( values[ 'json-file' ], toJSON() );
+}
 
 process.stdout.write(
 	values.json
-		? `${ JSON.stringify(
-				decisions.map( ( { rule, probability, requestReview } ) => ( {
-					rule: rule.id,
-					reviewers: rule.reviewers,
-					probability,
-					threshold: rule.threshold,
-					requestReview,
-				} ) ),
-				null,
-				'\t'
-			) }\n`
+		? toJSON()
 		: `${ renderReport( decisions, stats, DECISION_MODEL ) }\n`
 );

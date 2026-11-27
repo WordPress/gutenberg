@@ -2,7 +2,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useMemo } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
-import { GridRect } from './utils';
+import {
+	getGridItemPlacement,
+	getRequiredGridRowCount,
+	GridRect,
+} from './utils';
 import { setImmutably } from '../../utils/object';
 import type { Layout } from '../../layouts/types';
 import type { GridItemAttributes } from './types';
@@ -62,24 +66,14 @@ export function useGridLayoutSync( {
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
-				const {
-					columnStart,
-					rowStart,
-					columnSpan = 1,
-					rowSpan = 1,
-				} = ( getBlockAttributes( clientId ) as GridItemAttributes )
-					.style?.layout ?? {};
-				if ( ! columnStart || ! rowStart ) {
+				const placement = getGridItemPlacement(
+					( getBlockAttributes( clientId ) as GridItemAttributes )
+						.style?.layout
+				);
+				if ( ! placement.columnStart || ! placement.rowStart ) {
 					continue;
 				}
-				occupiedRects.push(
-					new GridRect( {
-						columnStart,
-						rowStart,
-						columnSpan,
-						rowSpan,
-					} )
-				);
+				occupiedRects.push( new GridRect( placement ) );
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
@@ -88,29 +82,24 @@ export function useGridLayoutSync( {
 				const attributes = getBlockAttributes(
 					clientId
 				) as GridItemAttributes;
-				const {
-					columnStart,
-					rowStart,
-					columnSpan = 1,
-					rowSpan = 1,
-				} = attributes.style?.layout ?? {};
-				if ( columnStart && rowStart ) {
+				const itemLayout = attributes.style?.layout;
+				if ( itemLayout?.columnStart && itemLayout.rowStart ) {
 					continue;
 				}
+				const placement = getGridItemPlacement( itemLayout );
 				const [ newColumnStart, newRowStart ] = placeBlock(
 					occupiedRects,
 					columnCount,
-					columnSpan,
-					rowSpan,
+					placement.columnSpan,
+					placement.rowSpan,
 					previouslySelectedBlockRect?.columnEnd,
 					previouslySelectedBlockRect?.rowEnd
 				);
 				occupiedRects.push(
 					new GridRect( {
+						...placement,
 						columnStart: newColumnStart,
 						rowStart: newRowStart,
-						columnSpan,
-						rowSpan,
 					} )
 				);
 				updates[ clientId ] = {
@@ -126,10 +115,10 @@ export function useGridLayoutSync( {
 			}
 
 			// Ensure there's enough rows to fit all blocks.
-			const bottomMostRow = Math.max(
-				...occupiedRects.map( ( r ) => r.rowEnd )
+			const newRowCount = getRequiredGridRowCount(
+				occupiedRects,
+				rowCount
 			);
-			const newRowCount = Math.max( rowCount, bottomMostRow );
 			if (
 				gridLayout.columnCount !== columnCount ||
 				gridLayout.rowCount !== newRowCount

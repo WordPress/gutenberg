@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { getImageEdit } from '@wordpress/image-editor';
+import { getImageEdit, mapImageEdit } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
 
@@ -94,30 +94,20 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 		return [];
 	}
 
-	// Core applies modifiers in the order they arrive, so send them in the
-	// edit's order: flip, then rotate, then crop.
-	const modifiers: Modifier[] = [];
-	if ( edit.flip ) {
-		modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
-	}
-	if ( edit.rotation !== undefined ) {
-		modifiers.push( {
-			type: 'rotate',
-			args: { angle: edit.rotation },
-		} );
-	}
-	if ( edit.crop ) {
-		modifiers.push( {
+	// Core applies modifiers in the order they arrive.
+	return mapImageEdit< Modifier >( edit, {
+		flip: ( flip ) => ( { type: 'flip', args: { flip } } ),
+		rotation: ( angle ) => ( { type: 'rotate', args: { angle } } ),
+		crop: ( { x, y, width, height } ) => ( {
 			type: 'crop',
 			args: {
-				left: edit.crop.x * 100,
-				top: edit.crop.y * 100,
-				width: edit.crop.width * 100,
-				height: edit.crop.height * 100,
+				left: x * 100,
+				top: y * 100,
+				width: width * 100,
+				height: height * 100,
 			},
-		} );
-	}
-	return modifiers;
+		} ),
+	} );
 }
 
 function getMetadataEdits(

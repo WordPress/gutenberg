@@ -27,12 +27,12 @@
 	},
 	"devDependencies": {
 		"@testing-library/jest-dom": "^7.0.1",
-		"@types/node": "^24.13.3",
+		"@types/node": "^24.19.2",
 		"@types/react": "^19.3.0",
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/theme": "file:../../packages/theme",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

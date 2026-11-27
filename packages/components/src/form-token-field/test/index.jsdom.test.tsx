@@ -9,7 +9,11 @@ import {
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
+import { Dialog } from '@wordpress/ui';
 import FormTokenField from '../';
+import Modal from '../../modal';
+
+globalThis.wpVitest.mockCSSSupports();
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -1162,6 +1166,63 @@ describe( 'FormTokenField', () => {
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( onChangeSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should close the suggestion list first, and then a parent Modal, when the Escape key is pressed', async () => {
+			const user = userEvent.setup();
+			const onRequestClose = vi.fn();
+
+			render(
+				<Modal title="Modal" onRequestClose={ onRequestClose }>
+					<FormTokenFieldWithState
+						suggestions={ [ 'Black', 'Ash', 'Onyx', 'Ebony' ] }
+					/>
+				</Modal>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.type( input, 'ony' );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.keyboard( '[Escape]' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( onRequestClose ).not.toHaveBeenCalled();
+
+			await user.keyboard( '[Escape]' );
+			expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should close the suggestion list first, and then a parent `@wordpress/ui` Dialog, when the Escape key is pressed', async () => {
+			const user = userEvent.setup();
+			const onOpenChange = vi.fn();
+
+			render(
+				<Dialog.Root open onOpenChange={ onOpenChange }>
+					<Dialog.Popup>
+						<Dialog.Title>Dialog</Dialog.Title>
+						<FormTokenFieldWithState
+							suggestions={ [ 'Black', 'Ash', 'Onyx', 'Ebony' ] }
+						/>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			const input = await screen.findByRole( 'combobox' );
+
+			await user.type( input, 'ony' );
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			await user.keyboard( '[Escape]' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( onOpenChange ).not.toHaveBeenCalled();
+
+			await user.keyboard( '[Escape]' );
+			expect( onOpenChange ).toHaveBeenCalledTimes( 1 );
+			expect( onOpenChange ).toHaveBeenCalledWith(
+				false,
+				expect.anything()
+			);
 		} );
 
 		it( 'should hide the suggestion list on an empty input', async () => {
@@ -2491,8 +2552,6 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
-	// This section is definitely testing things in a non-user centric way,
-	// but I wasn't sure if there was a better way.
 	describe( 'aria attributes', () => {
 		it( 'should add the correct aria attributes to the input as the user interacts with it', async () => {
 			const user = userEvent.setup();
@@ -2513,6 +2572,7 @@ describe( 'FormTokenField', () => {
 			expect( input ).toHaveAttribute( 'aria-autocomplete', 'list' );
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Typing "Pi" will show the "Pistachio" and "Pine" suggestions.
@@ -2522,7 +2582,11 @@ describe( 'FormTokenField', () => {
 			expect( suggestionList ).toBeVisible();
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Select the "Pine" suggestion
@@ -2534,7 +2598,11 @@ describe( 'FormTokenField', () => {
 				{ name: 'Pine', selected: true }
 			);
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).toHaveAttribute(
 				'aria-activedescendant',
 				pineSuggestion.id
@@ -2563,6 +2631,7 @@ describe( 'FormTokenField', () => {
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 		} );
 	} );

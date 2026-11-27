@@ -2,8 +2,11 @@ import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import type { Block } from '@wordpress/blocks';
-import { PATTERN_SYNC_TYPES } from '../constants';
-import type { BlockMetadata } from '../types';
+import {
+	PATTERN_OVERRIDES_BINDING_SOURCE,
+	PATTERN_SYNC_TYPES,
+} from '../constants';
+import type { Binding, BlockMetadata } from '../types';
 import type {
 	PatternJSON,
 	PatternOverrides,
@@ -87,6 +90,35 @@ export const createPatternFromFile =
 	};
 
 /**
+ * Returns the bindings of a block that outlive detaching its pattern.
+ *
+ * Pattern overrides only apply while a block is part of a synced pattern, so
+ * detaching drops them. Bindings to other sources, such as post meta, are kept.
+ *
+ * @param bindings The `metadata.bindings` of a block, which is untyped.
+ *
+ * @return The remaining bindings, or `undefined` when none remain.
+ */
+function getBindingsToKeep( bindings: unknown ) {
+	if (
+		! bindings ||
+		typeof bindings !== 'object' ||
+		Array.isArray( bindings )
+	) {
+		return undefined;
+	}
+
+	const kept = Object.fromEntries(
+		Object.entries( bindings as Record< string, Binding | null > ).filter(
+			( [ , binding ] ) =>
+				binding?.source !== PATTERN_OVERRIDES_BINDING_SOURCE
+		)
+	);
+
+	return Object.keys( kept ).length > 0 ? kept : undefined;
+}
+
+/**
  * Returns a generator converting a synced pattern block into a static block.
  *
  * @param clientId The client ID of the block to attach.
@@ -102,7 +134,7 @@ export const convertSyncedPatternToStatic =
 		const existingOverrides = patternBlock.attributes?.content as
 			PatternOverrides | undefined;
 
-		function cloneBlocksAndRemoveBindings(
+		function cloneBlocksAndRemoveOverrideBindings(
 			blocks: Array< Block >
 		): Array< Block > {
 			return blocks.map( ( block ) => {
@@ -112,7 +144,13 @@ export const convertSyncedPatternToStatic =
 				if ( metadata ) {
 					metadata = { ...metadata };
 					delete metadata.id;
-					delete metadata.bindings;
+					const bindings = getBindingsToKeep( metadata.bindings );
+					if ( bindings ) {
+						metadata.bindings =
+							bindings as BlockMetadata[ 'bindings' ];
+					} else {
+						delete metadata.bindings;
+					}
 					// Use overridden values of the pattern block if they exist.
 					// A block without a name reads the `undefined` key.
 					if ( existingOverrides?.[ metadata.name as string ] ) {
@@ -142,7 +180,7 @@ export const convertSyncedPatternToStatic =
 								? metadata
 								: undefined,
 					},
-					cloneBlocksAndRemoveBindings( block.innerBlocks )
+					cloneBlocksAndRemoveOverrideBindings( block.innerBlocks )
 				);
 			} );
 		}
@@ -155,7 +193,7 @@ export const convertSyncedPatternToStatic =
 			.dispatch( blockEditorStore )
 			.replaceBlocks(
 				patternBlock.clientId,
-				cloneBlocksAndRemoveBindings( patternInnerBlocks )
+				cloneBlocksAndRemoveOverrideBindings( patternInnerBlocks )
 			);
 	};
 

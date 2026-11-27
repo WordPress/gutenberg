@@ -6,7 +6,7 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
-import { defaultColumnsNumber } from './shared';
+import { defaultColumnsNumber, isGalleryFlexLayout } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -115,6 +115,34 @@ addFilter(
 	updateThirdPartyTransformFromGallery
 );
 
+// Flex keeps the Grid settings so switching back to Grid restores them.
+const layoutVariationTransform = ( variationName, type, isActive ) => ( {
+	type: 'block',
+	blocks: [ 'core/gallery' ],
+	variationName,
+	// Hides the active variation from the block switcher's Transform list.
+	isMatch: ( { layout } ) => ! isActive( layout ),
+	transform: ( attributes, innerBlocks ) => {
+		const { columnCount, minimumColumnWidth } = attributes.layout ?? {};
+
+		return createBlock(
+			'core/gallery',
+			{
+				...attributes,
+				layout: {
+					type,
+					...( Number.isInteger( columnCount ) &&
+						columnCount > 0 && { columnCount } ),
+					...( typeof minimumColumnWidth === 'string' && {
+						minimumColumnWidth,
+					} ),
+				},
+			},
+			innerBlocks
+		);
+	},
+} );
+
 const transforms = {
 	from: [
 		{
@@ -218,6 +246,12 @@ const transforms = {
 				return createBlock( 'core/gallery', {}, innerBlocks );
 			},
 		},
+		layoutVariationTransform(
+			'gallery-grid',
+			'grid',
+			( layout ) => layout?.type === 'grid'
+		),
+		layoutVariationTransform( 'gallery-flex', 'flex', isGalleryFlexLayout ),
 	],
 	to: [
 		{

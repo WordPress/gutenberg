@@ -5,6 +5,12 @@
 ### Internal
 
 -   Remove `@wordpress/widget-dashboard` from the list of core modules allowed to use private APIs ([#86118](https://github.com/WordPress/gutenberg/pull/86118)).
+-   Add `@wordpress/dom` to the list of core modules allowed to use private APIs ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 3.2.0 (2026-11-18)
+
+### Internal
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 3.1.0 (2026-11-04)

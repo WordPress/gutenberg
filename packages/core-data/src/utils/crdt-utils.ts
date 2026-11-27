@@ -305,3 +305,39 @@ function findBlockByClientIdInBlocks(
 
 	return null;
 }
+
+/**
+ * Split an HTML string so that tags, comments, and character entities are
+ * each one token. All other text is split into single code points.
+ *
+ * @param html The HTML string to split.
+ * @return The list of tokens.
+ */
+export function tokenizeHtml( html: string ): string[] {
+	return (
+		html.match(
+			/<!--[\s\S]*?-->|<\/?[a-zA-Z][a-zA-Z0-9:-]*(?:"[^"]*"|'[^']*'|[^'">])*>|&[a-zA-Z0-9#]+;|[\s\S]/gu
+		) ?? []
+	);
+}
+
+/**
+ * Split an opening HTML tag into its name, each attribute, and the closing
+ * bracket. Anything that is not an opening tag is returned whole.
+ *
+ * `<a href="x" target="_blank">` becomes `<a`, ` href="x"`, ` target="_blank"`, `>`.
+ *
+ * @param token One token from `tokenizeHtml`.
+ * @return The parts of the token.
+ */
+export function splitHtmlTag( token: string ): string[] {
+	if ( ! /^<[a-zA-Z]/.test( token ) ) {
+		return [ token ];
+	}
+
+	return (
+		token.match(
+			/^<[a-zA-Z][a-zA-Z0-9:-]*|\s+[^\s"'>=/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+))?|[\s\S]/gu
+		) ?? [ token ]
+	);
+}

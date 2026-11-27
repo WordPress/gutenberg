@@ -22,7 +22,7 @@ $block-inserter-tabs-height: 44px;
 	border: none;
 	padding: 0;
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 0;
 
 	@include break-medium {

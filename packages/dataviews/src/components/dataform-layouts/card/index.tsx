@@ -102,6 +102,12 @@ function HeaderContent< Item >( {
 
 	const hasBadge = touched && layout.isCollapsible;
 	const hasSummary = visibleSummaryFields.length > 0 && layout.withHeader;
+	// A collapsible card's heading wraps its toggle, so only a static card
+	// renders its title as the heading.
+	const HeadingTag =
+		layout.withHeader && ! layout.isCollapsible && layout.headingLevel
+			? ( `h${ layout.headingLevel }` as const )
+			: undefined;
 
 	return (
 		<Stack
@@ -109,7 +115,9 @@ function HeaderContent< Item >( {
 			justify="space-between"
 			className="dataforms-layouts-card__field-header-content"
 		>
-			<Card.Title>{ label }</Card.Title>
+			<Card.Title render={ HeadingTag && <HeadingTag /> }>
+				{ label }
+			</Card.Title>
 			{ ( hasBadge || hasSummary ) && (
 				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
 					{ hasBadge && <ValidationBadge validity={ validity } /> }
@@ -234,10 +242,10 @@ export default function FormCardField< Item >( {
 		hasFocusedContentRef.current = true;
 	}, [] );
 
-	// Reveal the errors of every field in the card once focus leaves the card,
-	// replicating at the card level how validated controls show errors on
-	// their first blur. Moving focus between fields within the card doesn't
-	// count, so the natural tab sequence is preserved.
+	// Reveal the errors of every field in the card once focus leaves the card.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within the card doesn't count,
+	// so the natural tab sequence is preserved.
 	const handleFocusOutside = useCallback( () => {
 		// Leaving without ever entering the fields — for instance tabbing past
 		// the header of a collapsed card — isn't an interaction to report on.
@@ -294,6 +302,14 @@ export default function FormCardField< Item >( {
 		/>
 	);
 
+	const headingLevel = layout.withHeader ? layout.headingLevel : undefined;
+	// A native heading only allows phrasing content, so the collapsible
+	// header's wrapper, which contains the toggle, takes heading semantics
+	// through ARIA instead.
+	const collapsibleHeadingProps = headingLevel
+		? { role: 'heading', 'aria-level': headingLevel }
+		: {};
+
 	const headerContent = (
 		<HeaderContent
 			data={ data }
@@ -314,7 +330,7 @@ export default function FormCardField< Item >( {
 				onOpenChange={ handleOpenChange }
 				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header { ...collapsibleHeadingProps }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content

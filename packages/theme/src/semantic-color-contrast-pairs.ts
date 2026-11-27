@@ -6,7 +6,37 @@
  */
 export const MINIMUM_TEXT_CONTRAST = 4.5;
 
+// Shared by the ramp builder and the semantic warning checks.
+export const NEUTRAL_CONTRAST_SURFACES = {
+	'background.surface.neutral': 'surface2',
+	'background.surface.neutral-strong': 'surface3',
+	'background.surface.neutral-weak': 'surface1',
+} as const;
+
+const neutralSurfaces = Object.keys(
+	NEUTRAL_CONTRAST_SURFACES
+) as ( keyof typeof NEUTRAL_CONTRAST_SURFACES )[];
+
+const brandSurfaces = [
+	...neutralSurfaces,
+	'background.surface.brand',
+] as const;
+
+const brandFocusTokens = [
+	'stroke.focus',
+	'background.interactive.brand-strong',
+	'background.interactive.brand-strong-active',
+] as const;
+
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
+	...brandSurfaces.flatMap( ( background ) =>
+		(
+			[
+				'foreground.interactive.brand',
+				'foreground.interactive.brand-active',
+			] as const
+		 ).map( ( foreground ) => ( { background, foreground } ) )
+	),
 	{
 		background: 'background.interactive.neutral',
 		foreground: 'foreground.interactive.neutral',
@@ -41,6 +71,14 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	},
 	{
 		background: 'background.surface.neutral',
+		foreground: 'foreground.content.neutral-weak',
+	},
+	{
+		background: 'background.surface.neutral-weak',
+		foreground: 'foreground.content.neutral-weak',
+	},
+	{
+		background: 'background.surface.neutral-strong',
 		foreground: 'foreground.content.neutral-weak',
 	},
 	{
@@ -114,21 +152,12 @@ export const MINIMUM_NON_TEXT_CONTRAST = 3;
 // These colors identify focus through a ring or a solid item highlight. Check
 // every supported neutral surface and the public brand surface using the final
 // colors after seed adjustment.
-export const SEMANTIC_FOCUS_CONTRAST_PAIRS = (
-	[
-		'background.surface.neutral',
-		'background.surface.neutral-strong',
-		'background.surface.neutral-weak',
-		'background.surface.brand',
-	] as const
- ).flatMap( ( background ) =>
-	(
-		[
-			'stroke.focus',
-			'background.interactive.brand-strong',
-			'background.interactive.brand-strong-active',
-		] as const
-	 ).map( ( foreground ) => ( { background, foreground } ) )
+export const SEMANTIC_FOCUS_CONTRAST_PAIRS = brandSurfaces.flatMap(
+	( background ) =>
+		brandFocusTokens.map( ( foreground ) => ( {
+			background,
+			foreground,
+		} ) )
 );
 
 type SemanticColorContrastPair =
