@@ -153,7 +153,7 @@ export default function ArchivesEdit( {
 				</div>
 			) }
 			{ status === 'success' && (
-				<HtmlRenderer wrapperProps={ blockProps } html={ content! } />
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
 			) }
 		</>
 	);
