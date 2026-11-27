@@ -1607,12 +1607,10 @@ export function selection(
 				return state;
 			}
 
+			const resetClientIds = getFlattenedClientIds( action.blocks );
+
 			// If the start of the selection won't exist after reset, remove selection.
-			if (
-				! action.blocks.some(
-					( block ) => block.clientId === startClientId
-				)
-			) {
+			if ( ! startClientId || ! resetClientIds[ startClientId ] ) {
 				return {
 					selectionStart: {},
 					selectionEnd: {},
@@ -1620,11 +1618,7 @@ export function selection(
 			}
 
 			// If the end of the selection won't exist after reset, collapse selection.
-			if (
-				! action.blocks.some(
-					( block ) => block.clientId === endClientId
-				)
-			) {
+			if ( ! endClientId || ! resetClientIds[ endClientId ] ) {
 				return {
 					...state,
 					selectionEnd: state.selectionStart,

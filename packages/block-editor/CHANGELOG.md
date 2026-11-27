@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   `resetBlocks`: Keep the selection on an inner block that still exists in the new blocks, instead of clearing it.
 -   List View: Use the theme's brand colors for selected labels, anchor badges and action focus rings. When design tokens are loaded, setting `--wp-admin-theme-color` alone no longer changes the selected row's fill ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
 -   Undo: Placing the caret in an empty post or container no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
