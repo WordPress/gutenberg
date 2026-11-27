@@ -9,7 +9,7 @@ This skill ships with the `@wordpress/ui` package and matches the installed vers
 
 ## Start from the interaction
 
-Identify the behavior you are building and find a similar implementation in the project. Use the Design System MCP server when available: `get_patterns` for how to approach an interaction, such as confirming a destructive action, then `get_components` and `get_component_details` for the components, their props and their imports. Without MCP, read the `README.md` in the installed `@wordpress/ui` package for usage conventions such as component names, custom rendering, refs and controlled state, and the [Storybook](https://wordpress.github.io/gutenberg/). If the project also uses `@wordpress/admin-ui` or `@wordpress/dataviews`, read the `README.md` in their installed packages in the same way.
+Identify the behavior you are building and find a similar implementation in the project. Use the Design System MCP server when available: `get_patterns` for how to approach an interaction, such as confirming a destructive action, then `get_components` and `get_component_details` for the components, their props and their imports. Without MCP, read the `README.md` in the installed `@wordpress/ui` package for usage conventions such as component names, custom rendering, refs and controlled state. If the project also uses `@wordpress/admin-ui` or `@wordpress/dataviews`, read the `README.md` in their installed packages in the same way.
 
 ## Compose with components
 
@@ -40,7 +40,7 @@ When the product needs its own component, build it by composing existing compone
 
 ## When a component lacks something
 
-If a feature or design is missing from the existing components, do not override the component's styles to get it. First check whether the latest version of `@wordpress/ui` already has the feature or component, in the package changelog, the [Storybook](https://wordpress.github.io/gutenberg/) or the latest release on npm. If it does, suggest updating the package. Then search the [WordPress/gutenberg issues](https://github.com/WordPress/gutenberg/issues) for an existing request for the feature. If there is none, raise a feature request that describes the missing feature or design and what you tried. Use the component as it is in the meantime.
+If a feature or design is missing from the existing components, do not override the component's styles to get it. First check whether the latest version of `@wordpress/ui` already has the feature or component, in the package changelog or the latest release on npm. If it does, suggest updating the package. Then search the [WordPress/gutenberg issues](https://github.com/WordPress/gutenberg/issues) for an existing request for the feature. If there is none, raise a feature request that describes the missing feature or design and what you tried. Use the component as it is in the meantime.
 
 If a workaround for missing behavior or composition cannot wait, keep it temporary and add a code comment that links the issue, so it reads as deliberate and can be removed once the issue is fixed. Do not import from package-private paths.
 
