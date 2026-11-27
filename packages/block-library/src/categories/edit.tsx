@@ -42,8 +42,11 @@ export default function CategoriesEdit( {
 }: BlockEditProps< CategoriesAttributes > & { className?: string } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
-	const { records: allTaxonomies, isResolving: isResolvingTaxonomies } =
-		useEntityRecords< Taxonomy >( 'root', 'taxonomy', { per_page: -1 } );
+	const {
+		records: allTaxonomies,
+		// @ts-expect-error Bug: `useEntityRecords` returns `isResolving`, so this is always `undefined`.
+		isResolvingTaxonomies,
+	} = useEntityRecords< Taxonomy >( 'root', 'taxonomy', { per_page: -1 } );
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
 	const taxonomyItems = ( taxonomies ?? [] ).map( ( t ) => ( {
