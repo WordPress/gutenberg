@@ -422,6 +422,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		isResponsiveEditing,
+		isDragging,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -432,6 +433,7 @@ function GridTools( {
 				getSettings,
 				getSelectedBlockStyleState,
 				getDraggedBlockClientIds,
+				isDraggingBlocks,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
@@ -468,6 +470,7 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				isResponsiveEditing: getIsResponsiveEditing(),
+				isDragging: isDraggingBlocks(),
 			};
 		},
 		[ clientId, isManualGrid ]
@@ -525,7 +528,10 @@ function GridTools( {
 		return null;
 	}
 
-	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
+	// A dragged block is scaled down as its own drag preview. Unmount the
+	// resizer for the drag, so that its handles don't keep that scale.
+	const showResizer =
+		allowSizingOnChildren && ! isBlockItselfCurrentlyHidden && ! isDragging;
 
 	function updateLayout( layout: ChildLayout ) {
 		setAttributes( {
