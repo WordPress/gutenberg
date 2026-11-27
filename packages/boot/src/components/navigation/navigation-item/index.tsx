@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import {
 	FlexBlock,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import RouterLinkItem from '../router-link-item';
@@ -55,13 +55,13 @@ export default function NavigationItem( {
 	if ( isExternal ) {
 		// Render as a regular anchor tag for external URLs
 		return (
-			<Item
+			<WCItem
 				as="a"
 				href={ to }
 				className={ clsx( styles.item, className ) }
 			>
 				{ content }
-			</Item>
+			</WCItem>
 		);
 	}
 
