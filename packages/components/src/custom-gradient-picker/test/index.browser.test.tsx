@@ -106,6 +106,38 @@ describe( 'CustomGradientPicker', () => {
 		} );
 	} );
 
+	describe( 'control point keyboard movement', () => {
+		it( 'keeps focus on a control point moved past another one', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			await render(
+				<ControlledCustomGradientPicker
+					initialValue="linear-gradient(90deg,#ff0000 40%,#0000ff 50%)"
+					onChange={ onChange }
+				/>
+			);
+
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 40% with color code #ff0000/,
+				} )
+			).toHaveFocus();
+
+			// The second press ties the points; the third passes the other one.
+			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
+
+			expect( onChange ).toHaveBeenLastCalledWith(
+				'linear-gradient(90deg,rgb(0,0,255) 50%,rgb(255,0,0) 70%)'
+			);
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 70% with color code rgb\(255,0,0\)/,
+				} )
+			).toHaveFocus();
+		} );
+	} );
+
 	describe( 'GradientTypePicker selection', () => {
 		it( 'keeps an empty gradient unchanged when Linear is reselected', async () => {
 			const user = userEvent.setup();

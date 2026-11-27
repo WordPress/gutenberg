@@ -1,7 +1,14 @@
 import clsx from 'clsx';
 import { colord } from 'colord';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+} from '@wordpress/element';
+import type { ForwardedRef } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import Button from '../../button';
@@ -24,6 +31,7 @@ import {
 } from './constants';
 import type { WordPressComponentProps } from '../../context';
 import type {
+	ControlPoint,
 	ControlPointButtonProps,
 	ControlPointMoveState,
 	ControlPointsProps,
@@ -32,18 +40,22 @@ import type {
 import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-function ControlPointButton( {
-	isOpen,
-	position,
-	color,
-	disablePositioning,
-	...additionalProps
-}: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
-	const instanceId = useInstanceId( ControlPointButton );
+function UnforwardedControlPointButton(
+	{
+		isOpen,
+		position,
+		color,
+		disablePositioning,
+		...additionalProps
+	}: WordPressComponentProps< ControlPointButtonProps, 'button', true >,
+	ref: ForwardedRef< HTMLButtonElement >
+) {
+	const instanceId = useInstanceId( UnforwardedControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
 		<>
 			<Button
+				ref={ ref }
 				aria-label={ sprintf(
 					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
@@ -74,6 +86,8 @@ function ControlPointButton( {
 		</>
 	);
 }
+
+const ControlPointButton = forwardRef( UnforwardedControlPointButton );
 
 function GradientColorPickerDropdown( {
 	isRenderedInSidebar,
@@ -176,6 +190,48 @@ function ControlPoints( {
 		};
 	}, [] );
 
+	const buttonsRef = useRef< ( HTMLButtonElement | null )[] >( [] );
+	const keyboardMovedPointRef = useRef< ControlPoint >( undefined );
+
+	const moveControlPointWithKeyboard = (
+		index: number,
+		position: number
+	) => {
+		const newControlPoints = updateControlPointPosition(
+			controlPoints,
+			index,
+			position
+		);
+		keyboardMovedPointRef.current = newControlPoints[ index ];
+		onChange( newControlPoints );
+	};
+
+	// Sorting the new value can give the moved point another index. Its
+	// focused button keeps the old index, so move focus to the moved point.
+	useEffect( () => {
+		const movedPoint = keyboardMovedPointRef.current;
+		keyboardMovedPointRef.current = undefined;
+		if ( ! movedPoint ) {
+			return;
+		}
+		const buttons = buttonsRef.current;
+		const focusedIndex = buttons.findIndex(
+			( button ) =>
+				!! button && button === button.ownerDocument.activeElement
+		);
+		const isMovedPoint = ( point?: ControlPoint ) =>
+			point?.position === movedPoint.position &&
+			colord( point.color ).toRgbString() ===
+				colord( movedPoint.color ).toRgbString();
+		if (
+			focusedIndex === -1 ||
+			isMovedPoint( controlPoints[ focusedIndex ] )
+		) {
+			return;
+		}
+		buttons[ controlPoints.findIndex( isMovedPoint ) ]?.focus();
+	}, [ controlPoints ] );
+
 	return (
 		<>
 			{ controlPoints.map( ( point, index ) => {
@@ -191,6 +247,9 @@ function ControlPoints( {
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<ControlPointButton
 									key={ index }
+									ref={ ( button ) => {
+										buttonsRef.current[ index ] = button;
+									} }
 									onClick={ () => {
 										if (
 											controlPointMoveStateRef.current &&
@@ -252,14 +311,11 @@ function ControlPoints( {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
 											event.stopPropagation();
-											onChange(
-												updateControlPointPosition(
-													controlPoints,
-													index,
-													clampPercent(
-														point.position -
-															KEYBOARD_CONTROL_POINT_VARIATION
-													)
+											moveControlPointWithKeyboard(
+												index,
+												clampPercent(
+													point.position -
+														KEYBOARD_CONTROL_POINT_VARIATION
 												)
 											);
 										} else if (
@@ -268,14 +324,11 @@ function ControlPoints( {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
 											event.stopPropagation();
-											onChange(
-												updateControlPointPosition(
-													controlPoints,
-													index,
-													clampPercent(
-														point.position +
-															KEYBOARD_CONTROL_POINT_VARIATION
-													)
+											moveControlPointWithKeyboard(
+												index,
+												clampPercent(
+													point.position +
+														KEYBOARD_CONTROL_POINT_VARIATION
 												)
 											);
 										}

@@ -35,6 +35,7 @@
 -   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
 -   `Panel`: Keep `PanelHeader` 48px tall, including its bottom border, inside containers that apply the `reset` mixin, such as the editor sidebar ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 -   `SandBox`: Restore current content and metadata when a same-origin iframe reloads after being moved ([#86770](https://github.com/WordPress/gutenberg/pull/86770)).
+-   `GradientPicker`, `CustomGradientPicker`: Keep focus on a control point that the arrow keys move past another control point ([#86780](https://github.com/WordPress/gutenberg/pull/86780)).
 
 ### Internal
 
