@@ -5,10 +5,10 @@ import {
 	createBlock,
 	getBlockType,
 	getBlockVariations,
+	type Block,
 } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
 import { kebabCase } from '@wordpress/kebab-case';
-import type { Block } from '@wordpress/blocks';
 import metadata from './block.json';
 import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
 import type {

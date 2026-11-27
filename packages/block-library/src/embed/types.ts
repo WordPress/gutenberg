@@ -9,7 +9,7 @@ import type {
 /**
  * Attributes of the embed block.
  */
-export type EmbedAttributes = {
+export interface EmbedAttributes extends Record< string, unknown > {
 	url?: string;
 	caption?: string;
 	type?: string;
@@ -18,7 +18,7 @@ export type EmbedAttributes = {
 	responsive?: boolean;
 	previewable?: boolean;
 	className?: string;
-};
+}
 
 /**
  * An embed provider variation, which also declares the URL patterns it
@@ -57,7 +57,6 @@ export interface EmbedPreviewData {
 export interface UpgradeableEmbedProps extends Partial<
 	BlockEditProps< EmbedAttributes >
 > {
-	name?: string;
 	preview?: EmbedPreviewData;
 }
 
