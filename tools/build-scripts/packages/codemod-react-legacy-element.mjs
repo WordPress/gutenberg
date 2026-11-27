@@ -122,8 +122,9 @@ function resolveMemoHelperSource() {
 
 /**
  * Extracts the immediately-invoked function expression (IIFE) from a top-level
- * statement, if it is one. Handles esbuild's `var Global = (() => { … })();`
- * output as well as bare `(function () { … })();` expression statements.
+ * statement, if it is one. Handles bundler output like
+ * `var Global = (function () { … })();` as well as bare
+ * `(function () { … })();` expression statements.
  *
  * @param {Object} statement AST statement node.
  * @return {Object|undefined} The IIFE function node (arrow/function expression).
@@ -186,6 +187,29 @@ function injectHelpers( ast, ms, source ) {
 }
 
 /**
+ * Whether a node is the string `value`. Some minifiers emit plain strings as
+ * template literals, so those count as string literals here too.
+ *
+ * @param {Object} node  AST node.
+ * @param {string} value Expected string value.
+ * @return {boolean} True when the node matches.
+ */
+function isStringLiteral( node, value ) {
+	if ( ! node ) {
+		return false;
+	}
+	if ( node.type === 'StringLiteral' ) {
+		return node.value === value;
+	}
+	return (
+		node.type === 'TemplateLiteral' &&
+		node.expressions.length === 0 &&
+		node.quasis.length === 1 &&
+		node.quasis[ 0 ].value.cooked === value
+	);
+}
+
+/**
  * Whether a node is a `Symbol.for( '<value>' )` call.
  *
  * @param {Object} node  AST node.
@@ -203,8 +227,7 @@ function isSymbolForCall( node, value ) {
 		node.callee.property.type === 'Identifier' &&
 		node.callee.property.name === 'for' &&
 		node.arguments.length === 1 &&
-		node.arguments[ 0 ].type === 'StringLiteral' &&
-		node.arguments[ 0 ].value === value
+		isStringLiteral( node.arguments[ 0 ], value )
 	);
 }
 
@@ -272,8 +295,7 @@ function patchReference( refPath, legacyName, ms, filename ) {
 		! parent.computed &&
 		( ( parent.key.type === 'Identifier' &&
 			parent.key.name === '$$typeof' ) ||
-			( parent.key.type === 'StringLiteral' &&
-				parent.key.value === '$$typeof' ) )
+			isStringLiteral( parent.key, '$$typeof' ) )
 	) {
 		return;
 	}
@@ -501,8 +523,7 @@ function getBooleanAttributeValueId( statement ) {
 	const setsEmptyAttribute =
 		isCallTo( consequent, 'setAttribute' ) &&
 		consequent.arguments.length === 2 &&
-		consequent.arguments[ 1 ].type === 'StringLiteral' &&
-		consequent.arguments[ 1 ].value === '';
+		isStringLiteral( consequent.arguments[ 1 ], '' );
 	if ( ! setsEmptyAttribute || ! isCallTo( alternate, 'removeAttribute' ) ) {
 		return undefined;
 	}
@@ -538,11 +559,8 @@ function patchInertAttribute( ast, ms, filename ) {
 	traverse( ast, {
 		SwitchStatement( path ) {
 			const cases = path.node.cases;
-			const inertIndex = cases.findIndex(
-				( switchCase ) =>
-					switchCase.test &&
-					switchCase.test.type === 'StringLiteral' &&
-					switchCase.test.value === 'inert'
+			const inertIndex = cases.findIndex( ( switchCase ) =>
+				isStringLiteral( switchCase.test, 'inert' )
 			);
 			if ( inertIndex === -1 ) {
 				return;
