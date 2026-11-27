@@ -1053,6 +1053,9 @@ describe( 'PaletteEdit', () => {
 		);
 
 		await userEvent.click( screen.getByLabelText( 'Secondary' ) );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Edit: Secondary' } )
+		).toBeVisible();
 
 		await rerender(
 			<PaletteEdit
@@ -1062,9 +1065,7 @@ describe( 'PaletteEdit', () => {
 		);
 
 		await waitFor( () => {
-			expect(
-				screen.queryByRole( 'dialog', { name: 'Edit: Tertiary' } )
-			).not.toBeInTheDocument();
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 		} );
 	} );
 
