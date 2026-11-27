@@ -1,6 +1,10 @@
 # Enforce valid sprintf usage (valid-sprintf)
 
-[`sprintf`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/i18n/README.md#api) must be called with a valid format string with at least one placeholder, and with a valid set of placeholder substitute values.
+[`sprintf`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/i18n/README.md#api) must be called with a valid format string with at least one placeholder, and with a valid set of placeholder substitute values: one for each argument the placeholders read.
+
+A single array literal is read as the list of values, as in `sprintf( format, [ a, b ] )`. Any other single value, such as a variable, counts as one value. The number of values is not checked when the format string uses named placeholders, such as `%(name)s`, or when values are spread, as in `sprintf( format, ...values )`.
+
+In format strings that are not translated, mixing ordered placeholders such as `%1$s` with unordered ones such as `%s` is reported. Unordered placeholders in translatable format strings are reported by [`i18n-ordered-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ordered-placeholders.md).
 
 ## Rule details
 
@@ -15,6 +19,8 @@ sprintf( '%%', 'substitute' );
 sprintf( __( '%%' ), 'substitute' );
 sprintf( _n( '%s', '' ), 'substitute' );
 sprintf( _n( '%s', '%s %s' ), 'substitute' );
+sprintf( __( '%1$s and %2$s' ), 'substitute' );
+sprintf( __( '%s' ), 'substitute', 'extra' );
 ```
 
 Examples of **correct** code for this rule:
@@ -25,4 +31,6 @@ sprintf( __( '%s' ), 'substitute' );
 sprintf( _x( '%s' ), 'substitute' );
 sprintf( _n( '%s', '%s' ), 'substitute' );
 sprintf( _nx( '%s', '%s' ), 'substitute' );
+sprintf( __( '%1$s and %2$s' ), 'first', 'second' );
+sprintf( __( '%1$s and %2$s' ), [ 'first', 'second' ] );
 ```

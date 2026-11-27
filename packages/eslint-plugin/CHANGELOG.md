@@ -5,6 +5,14 @@
 ### Breaking Changes
 
 -   Add [`@wordpress/i18n-plural-placeholder`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-plural-placeholder.md) to the recommended i18n ruleset. It reports `_n()` and `_nx()` calls where neither string contains a placeholder for the number ([#87264](https://github.com/WordPress/gutenberg/pull/87264)).
+-   Add [`@wordpress/i18n-ordered-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-ordered-placeholders.md) to the recommended i18n ruleset. It reports translatable strings with more than one placeholder where any of them is unordered, such as `'%s of %s'`, and suggests numbering them. `valid-sprintf` no longer reports unordered placeholders in translatable format strings, and reports them in other format strings only when mixed with ordered ones ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
+-   Add [`@wordpress/i18n-no-mismatched-placeholders`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-mismatched-placeholders.md) to the recommended i18n ruleset. It reports `_n()` and `_nx()` calls where the singular and plural strings use different placeholders ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
+-   Add [`@wordpress/i18n-no-html-wrapped-strings`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-html-wrapped-strings.md) to the recommended i18n ruleset. It reports translatable strings wrapped in a single HTML element ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
+-   `valid-sprintf`: Report calls with more or fewer placeholder values than the format string reads. Treat `%%` and `%` with flags, such as `% %`, as escaped percent signs, as `sprintf` does, and stop failing on a translation function call with a variable argument ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
+
+### New Features
+
+-   Add [`@wordpress/i18n-no-concatenation`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-concatenation.md), which reports translatable strings combined with other text. It is not part of the recommended configuration ([#87487](https://github.com/WordPress/gutenberg/pull/87487)).
 
 ### Enhancements
 

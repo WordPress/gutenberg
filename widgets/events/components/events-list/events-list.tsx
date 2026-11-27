@@ -291,12 +291,9 @@ export function EventsList( {
 				<EmptyState.Icon icon={ calendar } />
 				<EmptyState.Title>{ emptyTitle() }</EmptyState.Title>
 				<EmptyState.Description>
-					{ createInterpolateElement(
-						__( '<a>Help organize the next one!</a>' ),
-						{
-							a: <Link href={ organizeUrl } openInNewTab />,
-						}
-					) }
+					<Link href={ organizeUrl } openInNewTab>
+						{ __( 'Help organize the next one!' ) }
+					</Link>
 				</EmptyState.Description>
 			</EmptyState.Root>
 		</Stack>

@@ -46,7 +46,7 @@ function ListedTermCount() {
 	return (
 		<VisuallyHidden>
 			{ sprintf(
-				/* translators: %d: number of terms found. */
+				/* translators: %d: number of results. */
 				_n( '%d result found.', '%d results found.', count ),
 				count
 			) }

@@ -62,7 +62,7 @@ const TimeZone = () => {
 					styles[ 'time-zone-trigger' ]
 				) }
 				aria-label={ sprintf(
-					/* translators: %s: timezone abbreviation, e.g. "CEST" or "UTC+3". */
+					/* translators: %s: timezone detail, e.g. "CEST", "(CEST) Europe/Madrid" or "UTC+3". */
 					__( 'Timezone: %s' ),
 					zoneAbbr
 				) }

@@ -157,7 +157,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 				<div { ...blockProps }>
 					<p>
 						{ sprintf(
-							/* translators: %s: error message returned when rendering the block. */
+							/* translators: %s: Error message. */
 							__( 'Error: %s' ),
 							error
 						) }

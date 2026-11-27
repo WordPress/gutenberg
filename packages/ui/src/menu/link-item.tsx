@@ -37,7 +37,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			className={ styles[ 'external-link-indicator' ] }
 			role="img"
 			aria-label={
-				/* translators: accessibility text appended to link text */
+				/* translators: accessibility text */
 				__( '(opens in a new tab)' )
 			}
 		/>

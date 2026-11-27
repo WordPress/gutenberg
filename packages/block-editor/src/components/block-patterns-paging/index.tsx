@@ -17,7 +17,7 @@ export default function Pagination( {
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<WCText variant="muted">
 				{ sprintf(
-					// translators: %s: Total number of patterns.
+					// translators: %s: formatted number of items.
 					_n( '%s item', '%s items', totalItems ),
 					// `sprintf` formats numbers with `%s`.
 					totalItems as unknown as string

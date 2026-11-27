@@ -18,6 +18,9 @@ module.exports = [
 			'@wordpress/i18n-no-flanking-whitespace': 'error',
 			'@wordpress/i18n-hyphenated-range': 'error',
 			'@wordpress/i18n-plural-placeholder': 'error',
+			'@wordpress/i18n-ordered-placeholders': 'error',
+			'@wordpress/i18n-no-mismatched-placeholders': 'error',
+			'@wordpress/i18n-no-html-wrapped-strings': 'error',
 		},
 	},
 ];
