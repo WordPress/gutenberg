@@ -31,7 +31,7 @@
 
 ### Enhancements
 
--   Post Title: Add text shadow support, so the title stays readable over an image background ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
+-   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
 
 ## 12.2.0 (2026-11-18)
 
