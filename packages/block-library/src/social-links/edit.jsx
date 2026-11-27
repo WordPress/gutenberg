@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	useInnerBlocksProps,
 	useBlockProps,
@@ -75,19 +75,12 @@ export function SocialLinksEdit( props ) {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const wasLogosOnlyRef = useRef( logosOnly );
-	const backgroundToRestoreRef = useRef();
 
 	// Remove icon background color when logos only style is selected or
-	// restore it when any other style is selected. Only react to a style
-	// change, so that mounting or unmounting the block doesn't edit it.
+	// restore it when any other style is selected.
 	useEffect( () => {
-		if ( wasLogosOnlyRef.current === logosOnly ) {
-			return;
-		}
-		wasLogosOnlyRef.current = logosOnly;
-
 		if ( logosOnly ) {
+			let restore;
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( ( prev ) => {
 				// Redo replays an already cleared background. Keep nothing to
@@ -97,7 +90,7 @@ export function SocialLinksEdit( props ) {
 					prev.iconBackgroundColorValue ||
 					prev.customIconBackgroundColor
 				) {
-					backgroundToRestoreRef.current = {
+					restore = {
 						iconBackgroundColor: prev.iconBackgroundColor,
 						iconBackgroundColorValue: prev.iconBackgroundColorValue,
 						customIconBackgroundColor:
@@ -110,10 +103,13 @@ export function SocialLinksEdit( props ) {
 					customIconBackgroundColor: undefined,
 				};
 			} );
-		} else if ( backgroundToRestoreRef.current ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( backgroundToRestoreRef.current );
-			backgroundToRestoreRef.current = undefined;
+
+			return () => {
+				if ( restore ) {
+					__unstableMarkNextChangeAsNotPersistent();
+					setAttributes( restore );
+				}
+			};
 		}
 	}, [ logosOnly, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
