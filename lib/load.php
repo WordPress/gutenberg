@@ -175,10 +175,7 @@ require __DIR__ . '/experimental/experiments/react-19.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/extensible-site-editor.php';
 	require __DIR__ . '/experimental/theme-preview/load.php';
-
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-site-editor-wp-admin' ) ) {
-		require __DIR__ . '/experimental/site-editor-wp-admin.php';
-	}
+	require __DIR__ . '/experimental/site-editor-wp-admin.php';
 }
 
 if (

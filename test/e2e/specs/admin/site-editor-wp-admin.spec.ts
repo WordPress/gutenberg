@@ -49,7 +49,6 @@ test.describe( 'Site editor in wp-admin', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-extensible-site-editor',
-			'gutenberg-site-editor-wp-admin',
 		] );
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
@@ -165,27 +164,21 @@ test.describe( 'Site editor in wp-admin', () => {
 		).toBe( true );
 	} );
 
-	test( 'redirects site-editor.php links to the matching route', async ( {
-		admin,
+	test( 'opens the current template from the admin bar', async ( {
 		page,
 	} ) => {
-		// The shape of the "Edit site" link in the admin bar.
-		await admin.visitAdminPage(
-			'site-editor.php',
-			'postType=wp_template&postId=emptytheme//index&canvas=edit'
-		);
+		await page.goto( '/' );
+
+		await page.locator( '#wp-admin-bar-site-editor > a' ).click();
 
 		await expect( page ).toHaveURL( new RegExp( `page=${ PAGE }` ) );
 		expect( getRoutePath( page ) ).toBe(
 			'/types/wp_template/edit/emptytheme%2F%2Findex'
 		);
+		await expect(
+			page.getByRole( 'region', { name: 'Editor top bar' } )
+		).toBeVisible();
 		await expect( getCurrentMenuItem( page ) ).toHaveText( 'Templates' );
-
-		await admin.visitAdminPage( 'site-editor.php' );
-
-		await expect( page ).toHaveURL( new RegExp( `page=${ PAGE }` ) );
-		expect( getRoutePath( page ) ).toBeNull();
-		await expect( getCurrentMenuItem( page ) ).toHaveText( 'Editor' );
 	} );
 
 	test( 'toggles fullscreen mode while editing', async ( {
