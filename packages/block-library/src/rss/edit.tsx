@@ -301,9 +301,8 @@ export default function RSSEdit( {
 						),
 						{
 							a: (
-								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel">
-									{ null }
-								</ExternalLink>
+								// @ts-expect-error `createInterpolateElement` fills in the children.
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
 							),
 						}
 					) }
