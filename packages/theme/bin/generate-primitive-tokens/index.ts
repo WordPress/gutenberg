@@ -50,7 +50,7 @@ function generatePrimitiveColorTokens() {
 			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
-				ramp: buildAccentRamp( seed, bgRamp ),
+				ramp: buildAccentRamp( scaleName, seed, bgRamp ),
 			} ) );
 
 		// Convert the ramp values in a DTCG compatible format.

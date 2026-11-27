@@ -1,0 +1,220 @@
+import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+import type { Post } from '@wordpress/core-data';
+import { DataForm } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
+import {
+	Button,
+	Modal,
+	Popover as WCPopover,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
+import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { unlock } from '../../lock-unlock';
+
+const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+
+const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
+
+interface QuickEditModalProps {
+	postType: string;
+	postId: string[];
+	closeModal: () => void;
+	/** Called once the edits are saved, before the modal closes. */
+	onSave?: () => void;
+	quickEditForm: Form | undefined;
+}
+
+export function QuickEditModal( {
+	postType,
+	postId,
+	closeModal,
+	onSave: onSaved,
+	quickEditForm,
+}: QuickEditModalProps ) {
+	const isBulk = postId.length > 1;
+
+	const [ modalElement, setModalElement ] = useState< HTMLDivElement | null >(
+		null
+	);
+	const [ localEdits, setLocalEdits ] = useState< Partial< Post > >( {} );
+	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+		( select ) => {
+			const {
+				getEditedEntityRecord,
+				hasFinishedResolution: hasFinished,
+			} = select( coreDataStore );
+
+			if ( isBulk ) {
+				return {
+					record: null,
+					hasFinishedResolution: true,
+				};
+			}
+
+			const args: [ string, string, string ] = [
+				'postType',
+				postType,
+				postId[ 0 ],
+			];
+
+			const { getHomePage, getPostsPageId } = unlock(
+				select( coreDataStore )
+			);
+			const singlePostId = String( postId[ 0 ] );
+			const isPostsPage =
+				singlePostId !== undefined && getPostsPageId() === singlePostId;
+			const isFrontPage =
+				singlePostId !== undefined &&
+				postType === 'page' &&
+				getHomePage()?.postId === singlePostId;
+
+			return {
+				record: getEditedEntityRecord( ...args ),
+				hasFinishedResolution: hasFinished(
+					'getEditedEntityRecord',
+					args
+				),
+				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
+			};
+		},
+		[ postType, postId, isBulk ]
+	);
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreDataStore );
+
+	const _fields = usePostFields( { postType } );
+	const fields = useMemo(
+		() =>
+			_fields?.map( ( field: Field< Post > ) => {
+				if ( field.id === 'status' ) {
+					return {
+						...field,
+						elements: field.elements?.filter(
+							( element ) => element.value !== 'trash'
+						),
+					};
+				}
+
+				if ( field.id === 'template' ) {
+					return {
+						...field,
+						readOnly: ! canSwitchTemplate,
+					};
+				}
+
+				return field;
+			} ),
+		[ _fields, canSwitchTemplate ]
+	);
+
+	const form = useMemo( (): Form => {
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
+		return {
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
+		};
+	}, [ isBulk, quickEditForm ] );
+
+	const onChange = ( edits: Record< string, any > ) => {
+		const currentData = { ...record, ...localEdits };
+
+		if (
+			edits.status &&
+			edits.status !== 'future' &&
+			currentData?.status === 'future' &&
+			new Date( currentData.date as string ) > new Date()
+		) {
+			edits.date = null;
+		}
+		if (
+			edits.status &&
+			edits.status === 'private' &&
+			currentData?.password
+		) {
+			edits.password = '';
+		}
+
+		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
+	};
+	useEffect( () => {
+		setLocalEdits( {} );
+	}, [ postId ] );
+
+	const onSave = async () => {
+		for ( const id of postId ) {
+			editEntityRecord( 'postType', postType, id, localEdits );
+		}
+
+		if ( isBulk ) {
+			await Promise.allSettled(
+				postId.map( ( id ) =>
+					saveEditedEntityRecord( 'postType', postType, id )
+				)
+			);
+		} else {
+			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
+		}
+		onSaved?.();
+		closeModal?.();
+	};
+
+	return (
+		<Modal
+			ref={ setModalElement }
+			size="small"
+			overlayClassName="dataviews-action-modal__quick-edit"
+			__experimentalHideHeader
+			onRequestClose={ closeModal }
+			focusOnMount="firstElement"
+		>
+			<div className="dataviews-action-modal__quick-edit-header">
+				<PostCardPanel
+					postType={ postType }
+					postId={ postId }
+					hideActions
+				/>
+			</div>
+			<div className="dataviews-action-modal__quick-edit-content">
+				{ hasFinishedResolution && (
+					<DataForm
+						data={ { ...record, ...localEdits } }
+						fields={ fields }
+						form={ form }
+						onChange={ onChange }
+					/>
+				) }
+			</div>
+			<HStack className="dataviews-action-modal__quick-edit-footer">
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ closeModal }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={ onSave }
+				>
+					{ __( 'Done' ) }
+				</Button>
+			</HStack>
+			{ modalElement &&
+				// Keep popovers inside modal isolation but outside the clipped frame.
+				createPortal( <WCPopover.Slot />, modalElement ) }
+		</Modal>
+	);
+}
