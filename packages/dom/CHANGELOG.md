@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Add private helpers that read CSS transforms, and a dependency on `@wordpress/private-apis` ([#87406](https://github.com/WordPress/gutenberg/pull/87406)).
+
 ## 5.2.0 (2026-11-18)
 
 ### Bug Fixes

@@ -395,11 +395,13 @@ export function HierarchicalTermSelector( { slug } ) {
 				taxonomy?.labels?.singular_name ?? defaultName
 			);
 			speak( termAddedMessage, 'assertive' );
-			setAdding( false );
 			setFormName( '' );
 			setFormParent( '' );
 			onUpdateTerms( [ ...terms, newTerm.id ] );
 		} finally {
+			// Clear the flag whether or not the term was created, otherwise a
+			// failed request would block every later attempt.
+			setAdding( false );
 			unlockPostSaving( lockName );
 		}
 	};

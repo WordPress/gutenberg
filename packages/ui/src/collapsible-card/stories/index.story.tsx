@@ -137,35 +137,36 @@ export const Stacked: Story = {
 };
 
 /**
- * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
- * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
- * a heading and contribute to the document outline. The right level
- * depends on the surrounding outline, so the consumer is expected to opt
- * in.
+ * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass
+ * `role="heading"` and `aria-level` to expose the wrapper as a heading
+ * around the trigger and contribute to the document outline. The right
+ * level depends on the surrounding outline, so the consumer is expected to
+ * opt in. Don't render the wrapper as a native `<h1>`–`<h6>` element: the
+ * trigger is a `<div>`, which a native heading can't contain.
  */
-export const WithHeadingElement: Story = {
+export const WithHeading: Story = {
 	parameters: { controls: { disable: true } },
 	render: () => (
 		<Stack direction="column" gap="lg">
 			<CollapsibleCard.Root>
-				<CollapsibleCard.Header render={ <h2 /> }>
+				<CollapsibleCard.Header role="heading" aria-level={ 2 }>
 					<Card.Title>Heading level 2</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text render={ <p /> }>
-						The wrapper renders as an h2 element when the consumer
-						passes an h2 React element to the render prop.
+						The wrapper is exposed as a level 2 heading that
+						contains the toggle button.
 					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root>
-				<CollapsibleCard.Header render={ <h3 /> }>
+				<CollapsibleCard.Header role="heading" aria-level={ 3 }>
 					<Card.Title>Heading level 3</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text render={ <p /> }>
-						Pass any of h1–h6 to choose the level that fits the
-						surrounding document outline.
+						Pass any aria-level from 1 to 6 to choose the level that
+						fits the surrounding document outline.
 					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
@@ -175,8 +176,8 @@ export const WithHeadingElement: Story = {
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
 					<Text render={ <p /> }>
-						Without a render prop, the header wraps the trigger in a
-						plain div and does not contribute to the document
+						Without a heading role, the header wraps the trigger in
+						a plain div and does not contribute to the document
 						outline.
 					</Text>
 				</CollapsibleCard.Content>
