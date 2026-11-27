@@ -221,6 +221,23 @@ describe( 'MediaEditorPanel', () => {
 		).toHaveTextContent( 'Fine content' );
 	} );
 
+	it( 'keeps a panel whose function child throws inside its tab', () => {
+		render(
+			<Editor>
+				<MediaEditorPanel name="plugin/broken" title="Broken">
+					{ (): never => {
+						throw new Error( 'Broken panel' );
+					} }
+				</MediaEditorPanel>
+			</Editor>
+		);
+
+		expect( console ).toHaveErrored();
+		expect(
+			screen.getByRole( 'region', { name: 'Broken' } )
+		).toHaveTextContent( 'The "Broken" panel could not be shown' );
+	} );
+
 	it( 'names the plugin scope when rendered outside the editor', () => {
 		expect( () =>
 			render(

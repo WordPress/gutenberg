@@ -207,12 +207,32 @@ export default function MediaEditorPanel( {
 		<Fill name={ getPanelSlotName( name ) }>
 			{ ( fillProps ) => (
 				<MediaEditorPanelErrorBoundary title={ title }>
-					{ typeof children === 'function'
-						? // The slot passes exactly these props; `Fill` types them loosely.
-							children( fillProps as MediaEditorPanelFillProps )
-						: children }
+					<MediaEditorPanelContent
+						// The slot passes exactly these props; `Fill` types them loosely.
+						fillProps={ fillProps as MediaEditorPanelFillProps }
+					>
+						{ children }
+					</MediaEditorPanelContent>
 				</MediaEditorPanelErrorBoundary>
 			) }
 		</Fill>
 	);
+}
+
+/**
+ * Calls a function child while rendering, inside the error boundary, so a
+ * function that throws is caught there like any other content.
+ *
+ * @param props
+ * @param props.fillProps
+ * @param props.children
+ */
+function MediaEditorPanelContent( {
+	fillProps,
+	children,
+}: {
+	fillProps: MediaEditorPanelFillProps;
+	children: MediaEditorPanelProps[ 'children' ];
+} ) {
+	return typeof children === 'function' ? children( fillProps ) : children;
 }
