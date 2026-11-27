@@ -20,6 +20,6 @@ export const settings: BlockModule< CategoriesAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata: metadata as BlockModule< CategoriesAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );
