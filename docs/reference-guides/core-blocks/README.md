@@ -962,7 +962,7 @@ Display the tab buttons for a tabbed interface.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs
 -	**Supports:** ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, text), layout (default, ~~allowOrientation~~, ~~allowVerticalAlignment~~, ~~allowWrap~~), shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~, ~~lock~~, ~~visibility~~
--	**Attributes:** tabs
+-	**Attributes:** activeTabUnderlineColor, tabs
 
 ## Tab Panel
 

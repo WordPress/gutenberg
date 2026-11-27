@@ -21,6 +21,9 @@
 				}
 			},
 			"default": []
+		},
+		"activeTabUnderlineColor": {
+			"type": "string"
 		}
 	},
 	"supports": {

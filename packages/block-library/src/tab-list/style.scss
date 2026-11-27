@@ -30,7 +30,7 @@
 	&[aria-selected="true"]::before {
 		content: "";
 		position: absolute;
-		border-bottom: 2px solid currentColor;
+		border-bottom: 2px solid var(--wp--style--tab-list-active-underline-color, currentColor);
 		pointer-events: none;
 		left: 0;
 		width: 100%;

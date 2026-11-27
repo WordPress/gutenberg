@@ -33,6 +33,7 @@
 
 ### Enhancements
 
+-   Tab List: Add an Active tab underline color control, so the active tab stays easy to spot on any background ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).

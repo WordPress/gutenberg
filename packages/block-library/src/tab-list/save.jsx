@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { tabs } = attributes;
+	const { tabs, activeTabUnderlineColor } = attributes;
 	const blockProps = useBlockProps.save( {
 		role: 'tablist',
 	} );
@@ -33,6 +33,10 @@ export default function save( { attributes } ) {
 		...borderProps.style,
 		...spacingProps.style,
 		...shadowProps.style,
+		...( activeTabUnderlineColor && {
+			'--wp--style--tab-list-active-underline-color':
+				activeTabUnderlineColor,
+		} ),
 	};
 
 	return (

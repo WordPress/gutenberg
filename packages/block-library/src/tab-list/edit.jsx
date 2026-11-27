@@ -3,6 +3,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	useBlockProps,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	store as blockEditorStore,
 	RichText,
 	useBackgroundProps,
@@ -31,7 +33,7 @@ function Edit( {
 	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { ariaLabel } = attributes;
+	const { ariaLabel, activeTabUnderlineColor } = attributes;
 
 	const backgroundProps = useBackgroundProps( attributes );
 	const colorProps = useColorProps( attributes );
@@ -39,6 +41,7 @@ function Edit( {
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
 		useSelect(
@@ -166,6 +169,10 @@ function Edit( {
 		...borderProps.style,
 		...spacingProps.style,
 		...shadowProps.style,
+		...( activeTabUnderlineColor && {
+			'--wp--style--tab-list-active-underline-color':
+				activeTabUnderlineColor,
+		} ),
 	};
 
 	return (
@@ -203,6 +210,31 @@ function Edit( {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					<ColorGradientSettingsDropdown
+						__experimentalIsRenderedInSidebar
+						settings={ [
+							{
+								label: __( 'Active tab underline' ),
+								colorValue: activeTabUnderlineColor,
+								onColorChange: ( value ) =>
+									setAttributes( {
+										activeTabUnderlineColor:
+											value || undefined,
+									} ),
+								isShownByDefault: true,
+								resetAllFilter: () => ( {
+									activeTabUnderlineColor: undefined,
+								} ),
+								clearable: true,
+							},
+						] }
+						panelId={ clientId }
+						{ ...colorGradientSettings }
+					/>
+				</InspectorControls>
+			) }
 			<TabMovers tabsClientId={ tabsClientId } />
 			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<div { ...blockProps }>
