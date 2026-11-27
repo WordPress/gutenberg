@@ -1133,7 +1133,7 @@ function MediaEditorContent( {
 							initial={ false }
 							custom={ sidebarTransition }
 						>
-							{ !! activePanel && tabs.length > 0 && (
+							{ !! activePanel && (
 								<motion.div
 									className="media-editor__sidebar-container"
 									variants={ sidebarVariants }
@@ -1142,25 +1142,31 @@ function MediaEditorContent( {
 									exit="closed"
 									transition={ sidebarTransition }
 								>
-									<MediaEditorSidebar
-										tabs={ tabs }
-										// Swapping the edited media can drop the
-										// Crop tab out from under an open panel —
-										// saving a crop moves the editor to a new
-										// id, which may resolve as non-image.
-										// Fall back rather than hand `Tabs.Root`
-										// a value no tab matches.
-										activeTab={
-											tabs.some(
-												( tab ) =>
-													tab.id === activePanel
-											)
-												? activePanel
-												: DETAILS_PANEL
-										}
-										onSelectTab={ selectPanel }
-										disabled={ isSaving }
-									/>
+									{ /* Panels announce their tabs after the
+									     first render. Waiting for them outside
+									     this container would slide it in on
+									     every open. */ }
+									{ tabs.length > 0 && (
+										<MediaEditorSidebar
+											tabs={ tabs }
+											// Swapping the edited media can drop the
+											// Crop tab out from under an open panel —
+											// saving a crop moves the editor to a new
+											// id, which may resolve as non-image.
+											// Fall back rather than hand `Tabs.Root`
+											// a value no tab matches.
+											activeTab={
+												tabs.some(
+													( tab ) =>
+														tab.id === activePanel
+												)
+													? activePanel
+													: DETAILS_PANEL
+											}
+											onSelectTab={ selectPanel }
+											disabled={ isSaving }
+										/>
+									) }
 								</motion.div>
 							) }
 						</AnimatePresence>
