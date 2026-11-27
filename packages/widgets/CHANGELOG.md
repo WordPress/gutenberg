@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Include TypeScript type declarations ([#87197](https://github.com/WordPress/gutenberg/pull/87197)).
+
+## 5.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Legacy widget: Render nothing for an `instance` attribute whose `encoded` value is an array, rather than throwing a `TypeError` on PHP 8, and render nothing when `encoded` contains characters outside the base64 alphabet, which were previously skipped ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).

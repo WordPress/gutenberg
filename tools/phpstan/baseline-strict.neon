@@ -1,0 +1,49 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Function register_core_entity_actions\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: ../../packages/core-actions/src/index.php
+
+		-
+			message: '#^Parameter \#1 \$capability of function current_user_can expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/core-actions/src/index.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$args of function array_merge expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/core-actions/src/index.php
+
+		-
+			message: '#^Function wp_register_core_field_collections\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: ../../packages/core-fields/src/index.php
+
+		-
+			message: '#^Function wp_register_core_post_type_supports_fields\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: ../../packages/core-fields/src/index.php
+
+		-
+			message: '#^Parameter \#1 \$arr1 of function array_intersect expects an array of values castable to string, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/core-fields/src/post_type_supports/format/field.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_unique expects an array of values castable to string, array\<mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../packages/core-fields/src/post_type_supports/format/field.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 1
+			path: ../../packages/core-fields/src/post_type_supports/format/field.php

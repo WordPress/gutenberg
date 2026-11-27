@@ -92,6 +92,41 @@ function getInnerBlocksTemplate( attributes ) {
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
+/**
+ * Gets the pixel size of a CSS length unit in the element's document.
+ *
+ * @param {HTMLElement|null|undefined} element Element used to resolve the unit.
+ * @param {string}                     unit    CSS length unit.
+ * @return {number|undefined} Pixels per unit, if it can be resolved.
+ */
+function getPixelsPerUnit( element, unit ) {
+	if ( ! element ) {
+		return undefined;
+	}
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return undefined;
+	}
+
+	switch ( unit ) {
+		case 'px':
+			return 1;
+		case 'em':
+			return parseFloat( view.getComputedStyle( element ).fontSize );
+		case 'rem':
+			return parseFloat(
+				view.getComputedStyle( element.ownerDocument.documentElement )
+					.fontSize
+			);
+		case 'vw':
+			return view.innerWidth / 100;
+		case 'vh':
+			return view.innerHeight / 100;
+		default:
+			return undefined;
+	}
+}
+
 function CoverEdit( {
 	attributes,
 	clientId,
@@ -523,6 +558,7 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
+	const resizeUnitRef = useRef( { unit: 'px', pixelsPerUnit: 1 } );
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
@@ -747,13 +783,19 @@ function CoverEdit( {
 		/>
 	);
 
-	const setMinHeight = ( value ) => {
+	const setMinHeight = ( pixelHeight ) => {
+		const { unit, pixelsPerUnit } = resizeUnitRef.current;
+		const value =
+			pixelHeight === undefined
+				? undefined
+				: Number( ( pixelHeight / pixelsPerUnit ).toFixed( 2 ) );
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
 				dimensions: {
 					...style?.dimensions,
-					minHeight: value === undefined ? undefined : `${ value }px`,
+					minHeight:
+						value === undefined ? undefined : `${ value }${ unit }`,
 				},
 			} ),
 		} );
@@ -765,6 +807,20 @@ function CoverEdit( {
 		height,
 		minHeight,
 		onResizeStart: () => {
+			const [ , minHeightUnit = 'px' ] =
+				parseQuantityAndUnitFromRawValue( minHeight );
+			// The resize handle can be outside the canvas iframe. Resolve units
+			// against the Cover itself, independently of its content's height.
+			const pixelsPerUnit = getPixelsPerUnit(
+				ref.current,
+				minHeightUnit
+			);
+			// Keep the existing pixel fallback for custom units that cannot be
+			// resolved here, or when their reference dimension is zero.
+			resizeUnitRef.current =
+				Number.isFinite( pixelsPerUnit ) && pixelsPerUnit > 0
+					? { unit: minHeightUnit, pixelsPerUnit }
+					: { unit: 'px', pixelsPerUnit: 1 };
 			toggleSelection( false );
 		},
 		onResize: setMinHeight,

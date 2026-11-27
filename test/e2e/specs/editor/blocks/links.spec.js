@@ -154,6 +154,34 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `will automatically create a tel link that keeps the plus if selected text is a phone number`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with a phone number.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( '+44 20 7946 0958' );
+
+		// Select the phone number.
+		await pageUtils.pressKeys( 'shift+Home' );
+
+		// Click on the Link button.
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		// A tel link that keeps the plus should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="tel:+442079460958">+44 20 7946 0958</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `does not create link when link ui is closed without submission`, async ( {
 		page,
 		editor,
@@ -532,7 +560,7 @@ test.describe( 'Links', () => {
 		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
 		await expect(
-			page.getByRole( 'link', { name: 'The new Gutenberg editing' } )
+			linkPopover.locator( `a[href="${ URL }"]` )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		await pageUtils.pressKeys( 'Enter' );

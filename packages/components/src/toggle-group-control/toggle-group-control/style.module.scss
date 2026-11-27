@@ -12,7 +12,7 @@
 
 	@media not ( prefers-reduced-motion ) {
 		&[data-indicator-animated]::before {
-			transition-property: transform, border-radius;
+			transition-property: transform, width, border-radius;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}

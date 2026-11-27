@@ -16,7 +16,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -30,7 +30,7 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import { getImageAttributes, isGalleryFlexLayout, isObject } from './shared';
+import { getImageAttributes, isGalleryFlexLayout } from './shared';
 import { getHrefAndDestination } from './utils';
 import { getDefaultLinkDestination } from '../image/utils';
 import Gallery from './gallery';
@@ -91,9 +91,7 @@ export default function GalleryEdit( props ) {
 		className,
 		clientId,
 		insertBlocksAfter,
-		isContentLocked,
 		context,
-		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const postId = context?.postId;
@@ -114,7 +112,7 @@ export default function GalleryEdit( props ) {
 			)
 		: LINK_OPTIONS;
 
-	const { align, columns, imageCrop, layout } = attributes;
+	const { layout } = attributes;
 	const isDynamic = !! attributes.dynamicContent;
 	// The site default only applies to images being added, which a dynamic
 	// gallery never has, so match the server render.
@@ -123,58 +121,12 @@ export default function GalleryEdit( props ) {
 		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkDestination() );
 	const galleryAttributes = { ...attributes, linkTo };
 	const isFlexLayout = isGalleryFlexLayout( layout );
-	const previousLayoutRef = useRef( layout );
 
 	const { getBlocks } = useSelect( blockEditorStore );
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceInnerBlocks,
-		updateBlockAttributes,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, updateBlockAttributes, selectBlock } =
+		useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-
-	useEffect( () => {
-		// Variations replace the whole layout object. Carry Grid-only settings
-		// across a layout type change so switching back restores them.
-		const previousLayout = previousLayoutRef.current;
-		previousLayoutRef.current = layout;
-
-		if (
-			! isObject( previousLayout ) ||
-			! isObject( layout ) ||
-			previousLayout.type === layout.type
-		) {
-			return;
-		}
-
-		const nextLayout = { ...layout };
-		let hasPreservedGridSetting = false;
-
-		if (
-			! Object.hasOwn( layout, 'columnCount' ) &&
-			Number.isInteger( previousLayout.columnCount ) &&
-			previousLayout.columnCount > 0
-		) {
-			nextLayout.columnCount = previousLayout.columnCount;
-			hasPreservedGridSetting = true;
-		}
-
-		if (
-			! Object.hasOwn( layout, 'minimumColumnWidth' ) &&
-			typeof previousLayout.minimumColumnWidth === 'string'
-		) {
-			nextLayout.minimumColumnWidth = previousLayout.minimumColumnWidth;
-			hasPreservedGridSetting = true;
-		}
-
-		if ( hasPreservedGridSetting ) {
-			previousLayoutRef.current = nextLayout;
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: nextLayout } );
-		}
-	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const { innerBlockImages, multiGallerySelection, selectedStyleState } =
 		useSelect(
@@ -395,23 +347,7 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
-			`wp-block-gallery-${ clientId }`,
-			// In dynamic mode there are no inner blocks and the gallery isn't
-			// rendered through the `Gallery` component, so the classes that
-			// component normally composes onto the `<figure>` (see `gallery.jsx`)
-			// must be added here to keep the preview's flex/crop layout matching
-			// the static gallery and the frontend.
-			isDynamic && [
-				layoutClassNames,
-				'blocks-gallery-grid',
-				{
-					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]:
-						isFlexLayout && columns !== undefined,
-					'columns-default': isFlexLayout && columns === undefined,
-					'is-cropped': isFlexLayout && imageCrop,
-				},
-			]
+			`wp-block-gallery-${ clientId }`
 		),
 	} );
 
@@ -479,7 +415,7 @@ export default function GalleryEdit( props ) {
 			<InspectorControls
 				group={ isViewportStyleState ? 'style-state' : 'default' }
 			>
-				{ ! isViewportStyleState && (
+				{ ! isViewportStyleState && ! multiGallerySelection && (
 					<GallerySourcePanel
 						dynamic={ dynamic }
 						hasImages={ hasImages }
@@ -500,42 +436,49 @@ export default function GalleryEdit( props ) {
 					updateInnerImages={ updateInnerImages }
 					appliedSort={ appliedSort }
 					setAppliedSort={ setAppliedSort }
+					multiGallerySelection={ multiGallerySelection }
 				/>
 			</InspectorControls>
-			<BlockControls group="block">
-				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ linkOptions.map( ( linkItem ) => {
-								const isOptionSelected =
-									linkTo === linkItem.value;
-								return (
-									<MenuItem
-										key={ linkItem.value }
-										isSelected={ isOptionSelected }
-										className={ clsx(
-											'components-dropdown-menu__menu-item',
-											{
-												'is-active': isOptionSelected,
-											}
-										) }
-										iconPosition="left"
-										icon={ linkItem.icon }
-										onClick={ () => {
-											setLinkTo( linkItem.value );
-											onClose();
-										} }
-										role="menuitemradio"
-										info={ linkItem.infoText }
-									>
-										{ linkItem.label }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</ToolbarDropdownMenu>
-			</BlockControls>
+			{ ! multiGallerySelection && (
+				<BlockControls group="block">
+					<ToolbarDropdownMenu
+						icon={ linkIcon }
+						label={ __( 'Link' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ linkOptions.map( ( linkItem ) => {
+									const isOptionSelected =
+										linkTo === linkItem.value;
+									return (
+										<MenuItem
+											key={ linkItem.value }
+											isSelected={ isOptionSelected }
+											className={ clsx(
+												'components-dropdown-menu__menu-item',
+												{
+													'is-active':
+														isOptionSelected,
+												}
+											) }
+											iconPosition="left"
+											icon={ linkItem.icon }
+											onClick={ () => {
+												setLinkTo( linkItem.value );
+												onClose();
+											} }
+											role="menuitemradio"
+											info={ linkItem.infoText }
+										>
+											{ linkItem.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				</BlockControls>
+			) }
 			{ ! multiGallerySelection && ! isDynamic && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
@@ -568,11 +511,12 @@ export default function GalleryEdit( props ) {
 			) : (
 				<Gallery
 					{ ...props }
-					isContentLocked={ isContentLocked }
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
-				/>
+				>
+					{ innerBlocksProps.children }
+				</Gallery>
 			) }
 		</>
 	);

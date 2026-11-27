@@ -313,6 +313,22 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
+		it( 'card: keeps headingLevel when withHeader=true', () => {
+			const form: Form = {
+				layout: { type: 'card', headingLevel: 3 },
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'card',
+				isCollapsible: true,
+				isOpened: true,
+				summary: [],
+				withHeader: true,
+				headingLevel: 3,
+			} );
+		} );
+
 		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
 			const form = {
 				layout: {

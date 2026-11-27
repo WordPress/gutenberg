@@ -291,3 +291,17 @@ html :where(.is-position-sticky) {
 	}
 }
 /*!rtl:end:ignore*/
+
+// Translate axes are set separately by each style layer. They must not pass to
+// nested blocks, which would otherwise inherit an ancestor's offset.
+@property --wp--style--translate-x {
+	syntax: "<length-percentage>";
+	inherits: false;
+	initial-value: 0;
+}
+
+@property --wp--style--translate-y {
+	syntax: "<length-percentage>";
+	inherits: false;
+	initial-value: 0;
+}

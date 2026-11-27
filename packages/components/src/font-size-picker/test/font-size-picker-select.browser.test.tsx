@@ -59,9 +59,14 @@ describe( 'FontSizePickerSelect', () => {
 		);
 		const trigger = screen.getByRole( 'combobox', { name: 'Font size' } );
 		await userEvent.click( trigger );
-		expect(
-			screen.getByRole( 'option', { name: 'Small', description: '12px' } )
-		).toBeVisible();
+		await expect
+			.element(
+				screen.getByRole( 'option', {
+					name: 'Small',
+					description: '12px',
+				} )
+			)
+			.toBeVisible();
 		await userEvent.keyboard( '{Home}{ArrowDown}{Enter}' );
 		expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		await expect.element( trigger ).toHaveFocus();

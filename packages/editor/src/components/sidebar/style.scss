@@ -15,6 +15,12 @@
 	}
 }
 
+// Overlap the header's bottom border, so the selected tab's indicator
+// covers it, as in the inserter.
+.editor-sidebar__panel-tablist {
+	margin-bottom: -$border-width;
+}
+
 .editor-post-summary .components-v-stack:empty {
 	display: none;
 }
@@ -25,7 +31,7 @@
 	&__revisions-block-message {
 		padding: $grid-unit-20;
 		color: $gray-700;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
 

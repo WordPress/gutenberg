@@ -297,3 +297,102 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			] );
 	} );
 } );
+
+test.describe( 'Deleting in host mode (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'keeps the browser from deleting into the previous block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'Heading' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>Bold</strong> text' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph', exact: true } )
+			.click();
+		await page.keyboard.press( 'Home' );
+		// Enters the bold format without moving the caret. Rich text leaves
+		// Backspace to the browser there.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect( editor.canvas.locator( 'strong' ) ).toHaveAttribute(
+			'data-rich-text-format-boundary',
+			'true'
+		);
+
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading', attributes: { content: 'Heading' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>Bold</strong> text' },
+			},
+		] );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading 2',
+				exact: true,
+			} )
+		).toHaveText( 'Heading' );
+	} );
+} );
+
+test.describe( 'Selecting a block without a caret (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'removes the caret from the previously selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		const [ , second, spacer ] = await editor.getBlocks( { full: true } );
+		const getSelectedBlockClientId = () =>
+			page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId()
+			);
+		const getCaretBlockClientId = () =>
+			editor.canvas.locator( ':root' ).evaluate( ( root ) => {
+				const { anchorNode } = root.ownerDocument.getSelection();
+				if ( ! anchorNode ) {
+					return null;
+				}
+				const element =
+					anchorNode.nodeType === anchorNode.TEXT_NODE
+						? anchorNode.parentElement
+						: anchorNode;
+				return element.closest( '[data-block]' )?.dataset.block ?? null;
+			} );
+
+		await editor.canvas.getByText( 'Second', { exact: true } ).click();
+		await expect.poll( getSelectedBlockClientId ).toBe( second.clientId );
+		await expect.poll( getCaretBlockClientId ).toBe( second.clientId );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Spacer', exact: true } )
+			.click();
+
+		await expect.poll( getSelectedBlockClientId ).toBe( spacer.clientId );
+		// WebKit moves the caret to the spacer, the others remove it.
+		await expect.poll( getCaretBlockClientId ).not.toBe( second.clientId );
+	} );
+} );

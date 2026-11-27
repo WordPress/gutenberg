@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `shortcutAriaLabel`: Add translated names for the Forward-slash, Backslash, Plus and Minus keys ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
+## 5.2.0 (2026-11-18)
+
 ## 5.1.0 (2026-11-04)
 
 ## 5.0.0 (2026-10-20)
