@@ -446,14 +446,33 @@ export type NormalizedBlockTransform<
 > = Transform & { blockName: string };
 
 /**
- * Internal type for the innerBlocks property inside of the example.
+ * Structured data for a block preview.
+ */
+export type BlockExample<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> = {
+	attributes?: Partial< Attributes >;
+	innerBlocks?: BlockExampleInnerBlock[];
+	/**
+	 * Static HTML fragments interleaved with inner blocks, where `null`
+	 * entries mark inner block positions. Only applies to the Custom HTML
+	 * block.
+	 */
+	innerContent?: Array< string | null >;
+	/**
+	 * The width of the preview container in pixels.
+	 */
+	viewportWidth?: number;
+};
+
+/**
+ * An inner block in a block example.
  *
  * @see BlockType.example
  */
-export type BlockExampleInnerBlock = Partial< BlockType > &
-	Pick< BlockType, 'name' | 'attributes' > & {
-		innerBlocks?: BlockExampleInnerBlock[];
-	};
+export type BlockExampleInnerBlock = BlockExample & {
+	name: string;
+};
 
 export interface BlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
@@ -512,19 +531,7 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#example
 	 */
-	example?: Partial< BlockType > & {
-		innerBlocks?: BlockExampleInnerBlock[];
-		/**
-		 * Static HTML fragments interleaved with inner blocks, where `null`
-		 * entries mark inner block positions. Only applies to the Custom HTML
-		 * block.
-		 */
-		innerContent?: Array< string | null >;
-		/**
-		 * The width of the preview container in pixels.
-		 */
-		viewportWidth?: number;
-	};
+	example?: BlockExample< Attributes >;
 	/**
 	 * Block type icon.
 	 */
