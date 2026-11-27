@@ -131,7 +131,6 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Cache the resolved color palette to avoid repeated lookups.
 	 *
-	 * @since 6.9.0
 	 * @var array|null
 	 */
 	private static $color_palette_cache = null;
@@ -461,7 +460,7 @@ class WP_Duotone_Gutenberg {
 	 * This retrieves all color presets from default, theme, and custom origins
 	 * and flattens them into a single array indexed by slug.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @return array Associative array of color slugs to color values.
 	 */
@@ -503,7 +502,7 @@ class WP_Duotone_Gutenberg {
 	 * This should be called when global settings might have changed,
 	 * such as when switching style variations.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 */
 	public static function clear_color_palette_cache() {
 		self::$color_palette_cache = null;
@@ -516,7 +515,7 @@ class WP_Duotone_Gutenberg {
 	 * - var(--wp--preset--color--slug)
 	 * - var:preset|color|slug
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @param string $color The color value to check.
 	 * @return bool True if the color is a CSS custom property.
@@ -547,7 +546,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Extract the color slug from a CSS custom property.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @param string $color The CSS custom property string.
 	 * @return string|null The color slug, or null if not found.
@@ -569,7 +568,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Resolve a CSS custom property to its actual color value.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @param string $color The color value, possibly a CSS custom property.
 	 * @return string|null The resolved color value, or null if it couldn't be resolved.
@@ -599,7 +598,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Resolve all CSS custom properties in an array of colors.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @param array $colors Array of color values.
 	 * @return array Array of resolved color values.
@@ -638,7 +637,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Check if any colors in the array are CSS custom properties.
 	 *
-	 * @since 6.9.0
+	 * @since 7.3.0
 	 *
 	 * @param array $colors Array of color values.
 	 * @return bool True if any color is a CSS custom property.
