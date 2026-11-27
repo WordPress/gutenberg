@@ -9,8 +9,10 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 import { SelectControl } from '@wordpress/ui';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { ArchivesAttributes } from './types';
 
 const ARCHIVE_TYPE_ITEMS = [
 	{ label: __( 'Year' ), value: 'yearly' },
@@ -19,7 +21,11 @@ const ARCHIVE_TYPE_ITEMS = [
 	{ label: __( 'Day' ), value: 'daily' },
 ];
 
-export default function ArchivesEdit( { attributes, setAttributes, name } ) {
+export default function ArchivesEdit( {
+	attributes,
+	setAttributes,
+	name,
+}: BlockEditProps< ArchivesAttributes > ) {
 	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -124,7 +130,7 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 								) ?? ARCHIVE_TYPE_ITEMS[ 0 ]
 							}
 							onValueChange={ ( item ) =>
-								item && setAttributes( { type: item.value } )
+								item && setAttributes( { type: item.value! } )
 							}
 						/>
 					</ToolsPanelItem>
@@ -141,13 +147,13 @@ export default function ArchivesEdit( { attributes, setAttributes, name } ) {
 						{ sprintf(
 							/* translators: %s: error message returned when rendering the block. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>
 			) }
 			{ status === 'success' && (
-				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+				<HtmlRenderer wrapperProps={ blockProps } html={ content! } />
 			) }
 		</>
 	);
