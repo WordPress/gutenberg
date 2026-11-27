@@ -132,12 +132,19 @@ export default function EditSiteEditor( {
 	// Routes render their own element for this area, so navigating between
 	// them remounts this component. The check therefore runs on every render
 	// rather than on a transition, which a remount would never observe.
-	const isStylesEditing = isEditMode && location.name === 'styles';
+	//
+	// The Styles panel also previews revisions outside edit mode. It sets the
+	// styles path itself, so resetting it would hide the preview.
+	const isStylesRoute = location.name === 'styles';
+	const isPreviewingRevisions =
+		!! location.query.section?.startsWith( '/revisions' );
+	const keepStylesNavigation =
+		isStylesRoute && ( isEditMode || isPreviewingRevisions );
 	useEffect( () => {
-		if ( ! isStylesEditing ) {
+		if ( ! keepStylesNavigation ) {
 			resetStylesNavigation();
 		}
-	}, [ isStylesEditing, resetStylesNavigation ] );
+	}, [ keepStylesNavigation, resetStylesNavigation ] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onActionPerformed = useCallback(
