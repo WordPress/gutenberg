@@ -62,10 +62,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	};
 
 	const isWideViewport = useViewportMatch( 'wide' );
-	// Undo and redo are not displayed below this breakpoint. They are omitted
-	// rather than hidden with CSS so that they are not registered as toolbar
-	// items, which would leave the roving tabindex stepping onto a button that
-	// cannot receive focus. See https://github.com/WordPress/gutenberg/issues/49479.
+	// Undo and redo aren't rendered below this, so they stay out of the roving tabindex.
 	const isMediumViewport = useViewportMatch( 'medium' );
 
 	/* translators: accessibility text for the editor toolbar */
