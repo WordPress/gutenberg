@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Swap the values of `--wpds-color-background-interactive-neutral-strong` and `--wpds-color-background-interactive-neutral-strong-active`, so solid neutral controls have a stronger resting fill and a softer fill wherever the active token is used ([#87429](https://github.com/WordPress/gutenberg/pull/87429)).
 -   Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Preserve saturated background colors in neighboring surfaces and neutral strokes, including page and menu dividers ([#87175](https://github.com/WordPress/gutenberg/pull/87175)).
 

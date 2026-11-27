@@ -207,9 +207,20 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					preventDefault = true;
 					break;
 				case 'Escape':
+					// Only consume Escape while the control is expanded (the
+					// suggestions list is shown, or results are loading), so
+					// that a parent dialog (e.g. `Modal`, `Popover`) can close
+					// when the control is already collapsed. The first Escape
+					// always ends the search and restores the selected label,
+					// whether or not the results have arrived. Also stop
+					// propagation then, because some dialogs (e.g. the
+					// `@wordpress/ui` `Dialog`) do not check `defaultPrevented`.
+					if ( isExpanded ) {
+						preventDefault = true;
+						event.stopPropagation();
+					}
 					setIsExpanded( false );
 					setSelectedSuggestion( null );
-					preventDefault = true;
 					break;
 				default:
 					break;
@@ -258,10 +269,14 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	// Stop propagation of the keydown event when pressing Enter on the Reset
 	// button to prevent calling the onKeydown callback on the container div
-	// element which actually sets the selected suggestion.
+	// element which actually sets the selected suggestion. Let Escape
+	// propagate, so that a parent dialog (e.g. `Modal`) can close.
 	const handleResetStopPropagation: React.KeyboardEventHandler<
 		HTMLButtonElement
 	> = ( event ) => {
+		if ( event.code === 'Escape' ) {
+			return;
+		}
 		event.stopPropagation();
 	};
 

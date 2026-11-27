@@ -1521,6 +1521,10 @@ export interface BlockEditProps<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 > extends BlockSaveProps< Attributes > {
 	/**
+	 * The block's name.
+	 */
+	name: string;
+	/**
 	 * The block's client ID.
 	 */
 	clientId: string;
