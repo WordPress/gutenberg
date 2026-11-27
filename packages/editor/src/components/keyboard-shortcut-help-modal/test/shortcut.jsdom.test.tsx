@@ -5,6 +5,22 @@ import { textFormattingShortcuts } from '../config';
 import Shortcut from '../shortcut';
 
 describe( 'Shortcut production entries', () => {
+	it( 'uses the shared readable name for forward slash without an override', () => {
+		render(
+			<Shortcut
+				description="Change the block"
+				keyCombination={ { character: '/' } }
+			/>
+		);
+
+		expect( isInaccessible( screen.getByText( 'Forward-slash' ) ) ).toBe(
+			false
+		);
+		expect(
+			isInaccessible( screen.getByText( '/', { selector: 'kbd kbd' } ) )
+		).toBe( true );
+	} );
+
 	it( 'keeps null modifiers readable for the primary shortcut and aliases', () => {
 		render(
 			<Shortcut

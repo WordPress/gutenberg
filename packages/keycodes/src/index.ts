@@ -399,6 +399,8 @@ export const shortcutAriaLabel: WPModifierHandler< WPKeyHandler< string > > =
 				'`': __( 'Backtick' ),
 				/* translators: tilde as in the character '~' */
 				'~': __( 'Tilde' ),
+				/* translators: forward slash as in the character '/' */
+				'/': __( 'Forward-slash' ),
 				/* translators: backslash as in the character '\' */
 				'\\': __( 'Backslash' ),
 				/* translators: plus as in the character '+' */

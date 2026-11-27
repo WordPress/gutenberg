@@ -168,6 +168,7 @@ describe( 'displayShortcut', () => {
 describe( 'shortcutAriaLabel', () => {
 	it.each( [
 		[ '\\', 'Backslash' ],
+		[ '/', 'Forward-slash' ],
 		[ '+', 'Plus' ],
 		[ '-', 'Minus' ],
 	] )(
@@ -192,6 +193,7 @@ describe( 'shortcutAriaLabel', () => {
 		const previousLocale = getLocaleData();
 		setLocaleData( {
 			Backslash: [ 'Barra inversa' ],
+			'Forward-slash': [ 'Barra obliqua' ],
 			Plus: [ 'Più' ],
 			Minus: [ 'Meno' ],
 		} );
@@ -199,6 +201,9 @@ describe( 'shortcutAriaLabel', () => {
 		try {
 			expect( shortcutAriaLabel.undefined( '\\' ) ).toBe(
 				'Barra inversa'
+			);
+			expect( shortcutAriaLabel.undefined( '/' ) ).toBe(
+				'Barra obliqua'
 			);
 			expect( shortcutAriaLabel.undefined( '+' ) ).toBe( 'Più' );
 			expect( shortcutAriaLabel.undefined( '-' ) ).toBe( 'Meno' );
