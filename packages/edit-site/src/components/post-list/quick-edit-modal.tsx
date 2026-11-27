@@ -3,7 +3,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type { Post } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
@@ -73,23 +73,7 @@ export function QuickEditModal( {
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
-	const _fields = usePostFields( { postType } );
-	const fields = useMemo(
-		() =>
-			_fields?.map( ( field: Field< Post > ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements?.filter(
-							( element ) => element.value !== 'trash'
-						),
-					};
-				}
-
-				return field;
-			} ),
-		[ _fields ]
-	);
+	const fields = usePostFields( { postType } );
 
 	const form = useMemo( (): Form => {
 		if ( ! quickEditForm ) {
@@ -109,24 +93,6 @@ export function QuickEditModal( {
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData = { ...record, ...localEdits };
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date as string ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
