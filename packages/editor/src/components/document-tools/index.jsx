@@ -62,6 +62,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	};
 
 	const isWideViewport = useViewportMatch( 'wide' );
+	// Undo and redo aren't rendered below this, so they stay out of the roving tabindex.
+	const isMediumViewport = useViewportMatch( 'medium' );
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -115,18 +117,26 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
+						{ isMediumViewport && (
+							<>
+								<ToolbarItem
+									as={ EditorHistoryUndo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									size="compact"
+								/>
+								<ToolbarItem
+									as={ EditorHistoryRedo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									size="compact"
+								/>
+							</>
+						) }
 						{ ! isDistractionFree && (
 							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"

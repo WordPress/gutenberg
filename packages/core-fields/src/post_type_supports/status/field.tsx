@@ -1,6 +1,7 @@
 import { isInTheFuture } from '@wordpress/date';
 import type { FieldsScriptParts } from '../../types';
 import { hasActionLink } from '../../shared/has-action-link';
+import StatusEdit from './edit';
 import type { PostWithStatus } from './types';
 import StatusView from './view';
 
@@ -31,6 +32,7 @@ export const fieldExtensions: FieldsScriptParts< PostWithStatus >[ string ] = {
 		return edits;
 	},
 	render: StatusView,
+	Edit: StatusEdit,
 	// A user who can't publish can't change the status either.
 	isDisabled: ( { item } ) => ! hasActionLink( item, 'wp:action-publish' ),
 };

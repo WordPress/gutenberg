@@ -1,3 +1,4 @@
+import type { FormEvent } from 'react';
 import {
 	BlockControls,
 	InspectorControls,
@@ -22,13 +23,19 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { prependHTTPS } from '@wordpress/url';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { RSSAttributes } from './types';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 20;
 
-export default function RSSEdit( { attributes, setAttributes, name } ) {
+export default function RSSEdit( {
+	attributes,
+	setAttributes,
+	name,
+}: BlockEditProps< RSSAttributes > ) {
 	const [ isEditing, setIsEditing ] = useState( ! attributes.feedURL );
 
 	const {
@@ -46,7 +53,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 
 	// The typed URL is written to `feedURL` only on Apply. Reset it when
 	// `feedURL` changes outside the form, such as on undo.
-	const [ url, setURL ] = useState( feedURL );
+	const [ url, setURL ] = useState< string | undefined >( feedURL );
 	const [ prevFeedURL, setPrevFeedURL ] = useState( feedURL );
 	if ( feedURL !== prevFeedURL ) {
 		setPrevFeedURL( feedURL );
@@ -55,7 +62,9 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	function toggleAttribute( propName ) {
+	function toggleAttribute(
+		propName: 'displayAuthor' | 'displayDate' | 'displayExcerpt'
+	) {
 		return () => {
 			const value = attributes[ propName ];
 
@@ -63,7 +72,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		};
 	}
 
-	function onSubmitURL( event ) {
+	function onSubmitURL( event: FormEvent ) {
 		event.preventDefault();
 
 		if ( url ) {
@@ -292,6 +301,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						),
 						{
 							a: (
+								// @ts-expect-error `createInterpolateElement` fills in the children.
 								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
 							),
 						}
@@ -311,7 +321,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						{ sprintf(
 							/* translators: %s: error message returned when rendering the block. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>

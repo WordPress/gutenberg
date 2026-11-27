@@ -18,6 +18,6 @@ export const settings: BlockModule< ArchivesAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata: metadata as BlockModule< ArchivesAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );

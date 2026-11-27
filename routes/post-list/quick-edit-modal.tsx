@@ -111,15 +111,6 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements.filter(
-							( element: { value: string } ) =>
-								element.value !== 'trash'
-						),
-					};
-				}
 				if ( field.id === 'featured_media' && field.Edit ) {
 					return {
 						...field,
@@ -150,27 +141,6 @@ export function QuickEditModal( {
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData: Record< string, any > = {
-			...record,
-			...localEdits,
-		};
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
