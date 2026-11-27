@@ -3,10 +3,10 @@ import { Children, isValidElement, useState } from '@wordpress/element';
 import { Subheading } from '@storybook/addon-docs/blocks';
 import { SelectControl } from '@wordpress/ui';
 import styles from './style.module.css';
-import { Tool, type ToolProps } from './tool';
+import { McpSetupTool, type McpSetupToolProps } from './mcp-setup-tool';
 import { ToolIcon } from './tool-icon';
 
-function ToolOption( { tool }: { tool?: ReactElement< ToolProps > } ) {
+function ToolOption( { tool }: { tool?: ReactElement< McpSetupToolProps > } ) {
 	if ( ! tool ) {
 		return null;
 	}
@@ -18,11 +18,11 @@ function ToolOption( { tool }: { tool?: ReactElement< ToolProps > } ) {
 	);
 }
 
-export function InstallGrid( { children }: { children: ReactNode } ) {
+export function McpSetup( { children }: { children: ReactNode } ) {
 	const [ selected, setSelected ] = useState( 0 );
 	const tools = Children.toArray( children ).filter(
-		( child ) => isValidElement( child ) && child.type === Tool
-	) as ReactElement< ToolProps >[];
+		( child ) => isValidElement( child ) && child.type === McpSetupTool
+	) as ReactElement< McpSetupToolProps >[];
 	const tool = tools[ selected ] ?? tools[ 0 ];
 
 	if ( ! tool ) {

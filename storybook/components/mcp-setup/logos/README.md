@@ -1,6 +1,6 @@
 # Tool logos
 
-Logos for the AI tools in the install grid. Logos are trademarks of their owners and are used here only to identify each tool.
+Logos for the AI tools in the MCP setup guide. Logos are trademarks of their owners and are used here only to identify each tool.
 
 | File | Source |
 | --- | --- |

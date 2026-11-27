@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type ToolProps = {
+export type McpSetupToolProps = {
 	label: string;
 	/** Logo (an SVG file). A generic `{}` badge is shown when omitted. */
 	logo?: string;
@@ -9,10 +9,10 @@ export type ToolProps = {
 };
 
 /**
- * One tool in the grid. `InstallGrid` reads its props to draw the tile and
+ * One AI tool in `McpSetup`. `McpSetup` reads its props to draw the tile and
  * renders its children as the panel when the tile is selected.
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function Tool( _props: ToolProps ) {
+export function McpSetupTool( _props: McpSetupToolProps ) {
 	return null;
 }

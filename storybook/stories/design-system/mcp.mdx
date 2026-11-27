@@ -1,19 +1,19 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import {
-	InstallGrid,
+	McpSetup,
+	McpSetupTool,
 	InstallButton,
-	Tool,
-} from '../../components/install-grid';
-import anthropicLogo from '../../components/install-grid/logos/anthropic.svg';
-import antigravityLogo from '../../components/install-grid/logos/antigravity.svg';
-import claudeCodeLogo from '../../components/install-grid/logos/claude-code.svg';
-import cursorLogo from '../../components/install-grid/logos/cursor.svg';
-import jetbrainsLogo from '../../components/install-grid/logos/jetbrains.svg';
-import openaiLogo from '../../components/install-grid/logos/openai.svg';
-import opencodeLogo from '../../components/install-grid/logos/opencode.svg';
-import raycastLogo from '../../components/install-grid/logos/raycast.svg';
-import vscodeLogo from '../../components/install-grid/logos/vscode.svg';
-import zedLogo from '../../components/install-grid/logos/zed.svg';
+} from '../../components/mcp-setup';
+import anthropicLogo from '../../components/mcp-setup/logos/anthropic.svg';
+import antigravityLogo from '../../components/mcp-setup/logos/antigravity.svg';
+import claudeCodeLogo from '../../components/mcp-setup/logos/claude-code.svg';
+import cursorLogo from '../../components/mcp-setup/logos/cursor.svg';
+import jetbrainsLogo from '../../components/mcp-setup/logos/jetbrains.svg';
+import openaiLogo from '../../components/mcp-setup/logos/openai.svg';
+import opencodeLogo from '../../components/mcp-setup/logos/opencode.svg';
+import raycastLogo from '../../components/mcp-setup/logos/raycast.svg';
+import vscodeLogo from '../../components/mcp-setup/logos/vscode.svg';
+import zedLogo from '../../components/mcp-setup/logos/zed.svg';
 
 <Meta title="Design System/Using with AI" />
 
@@ -39,9 +39,9 @@ Without the MCP server, an AI agent may produce a functional and convincing resu
 
 ## Setup
 
-<InstallGrid>
+<McpSetup>
 
-<Tool label="Claude Code" logo={ claudeCodeLogo }>
+<McpSetupTool label="Claude Code" logo={ claudeCodeLogo }>
 
 ```bash
 claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
@@ -50,9 +50,9 @@ claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-
 1. Open a terminal and run the command above. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) for more options.
 2. Start Claude Code and run `/mcp` to confirm `wordpress-design-system` is connected.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="OpenAI Codex" logo={ openaiLogo }>
+<McpSetupTool label="OpenAI Codex" logo={ openaiLogo }>
 
 ```bash
 codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
@@ -62,9 +62,9 @@ codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-a
 2. Open a terminal and run the command above.
 3. Start Codex and run `/mcp` to confirm `wordpress-design-system` is connected.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Cursor" logo={ cursorLogo }>
+<McpSetupTool label="Cursor" logo={ cursorLogo }>
 
 In `~/.cursor/mcp.json`:
 
@@ -89,9 +89,9 @@ In `~/.cursor/mcp.json`:
 1. Click “Add to Cursor”, or add the configuration above to your Cursor [MCP settings](https://cursor.com/docs/mcp).
 2. Open Cursor Settings, go to MCP, and confirm `wordpress-design-system` is enabled.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="VS Code" logo={ vscodeLogo }>
+<McpSetupTool label="VS Code" logo={ vscodeLogo }>
 
 In `.vscode/mcp.json`:
 
@@ -116,9 +116,9 @@ In `.vscode/mcp.json`:
 1. Click “Install in VS Code”, or add the configuration above to your [`mcp.json` file](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file).
 2. Start the server from the MCP view, or from the `MCP: List Servers` command.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="JetBrains" logo={ jetbrainsLogo }>
+<McpSetupTool label="JetBrains" logo={ jetbrainsLogo }>
 
 ```json
 {
@@ -140,9 +140,9 @@ In `.vscode/mcp.json`:
 2. Paste the configuration above into the JSON configuration field, then click OK and Apply.
 3. Check that `wordpress-design-system` shows as connected in the Status column.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Claude Desktop" logo={ anthropicLogo }>
+<McpSetupTool label="Claude Desktop" logo={ anthropicLogo }>
 
 In `claude_desktop_config.json`:
 
@@ -166,9 +166,9 @@ In `claude_desktop_config.json`:
 2. Add the configuration above to the file that opens.
 3. Quit and reopen Claude Desktop.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Antigravity" logo={ antigravityLogo }>
+<McpSetupTool label="Antigravity" logo={ antigravityLogo }>
 
 In `~/.gemini/config/mcp_config.json`:
 
@@ -190,9 +190,9 @@ In `~/.gemini/config/mcp_config.json`:
 
 1. See the [MCP installation instructions](https://antigravity.google/docs/mcp#getting-started-by-surface) for the Antigravity App, CLI, and IDE, or prompt your agent to add the MCP configuration above.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="OpenCode" logo={ opencodeLogo }>
+<McpSetupTool label="OpenCode" logo={ opencodeLogo }>
 
 In `opencode.json`:
 
@@ -218,9 +218,9 @@ In `opencode.json`:
 1. Add the configuration above to the file, as described in the [OpenCode MCP documentation](https://opencode.ai/docs/mcp-servers/).
 2. Restart OpenCode and run `opencode mcp list` to confirm the server is connected.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Zed" logo={ zedLogo }>
+<McpSetupTool label="Zed" logo={ zedLogo }>
 
 In `settings.json`:
 
@@ -243,9 +243,9 @@ In `settings.json`:
 1. Open the Zed settings file and add the configuration above, as described in the [Zed MCP documentation](https://zed.dev/docs/ai/mcp#as-custom-servers).
 2. Open the Agent Panel settings and confirm `wordpress-design-system` shows as active.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Raycast" logo={ raycastLogo }>
+<McpSetupTool label="Raycast" logo={ raycastLogo }>
 
 ```json
 {
@@ -264,9 +264,9 @@ In `settings.json`:
 1. Click “Install in Raycast”, or run the [“Install MCP Server” command](https://manual.raycast.com/ai/model-context-protocol) in Raycast and choose Standard Input/Output as the transport.
 2. If you filled in the form yourself, enter `command` from the configuration above as the Command and `args` as the Arguments, then press Install MCP Server.
 
-</Tool>
+</McpSetupTool>
 
-<Tool label="Other">
+<McpSetupTool label="Other">
 
 In `mcp.json`:
 
@@ -289,6 +289,6 @@ In `mcp.json`:
 1. Add the configuration above to your MCP client’s configuration (`mcp.json` or equivalent), as described in the [MCP documentation](https://modelcontextprotocol.io/docs/develop/connect-local-servers).
 2. Restart the tool so it picks up the new server.
 
-</Tool>
+</McpSetupTool>
 
-</InstallGrid>
+</McpSetup>
