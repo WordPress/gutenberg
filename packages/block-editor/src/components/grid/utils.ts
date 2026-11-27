@@ -123,13 +123,6 @@ export function getRequiredGridRowCount(
 	return Math.max( minimumRowCount, bottomMostRow );
 }
 
-export function getComputedCSS( element: Element, property: string ) {
-	// The element is rendered in a window.
-	return element.ownerDocument
-		.defaultView!.getComputedStyle( element )
-		.getPropertyValue( property );
-}
-
 interface GridMeasurement {
 	columns: GridTrack[];
 	rows: GridTrack[];
@@ -405,43 +398,36 @@ export function getGridItemRect( gridItemElement: HTMLElement ) {
 }
 
 export function getGridInfo( gridElement: Element ): GridInfo {
-	const gridTemplateColumns = getComputedCSS(
-		gridElement,
-		'grid-template-columns'
-	);
-	const gridTemplateRows = getComputedCSS(
-		gridElement,
-		'grid-template-rows'
-	);
-	const borderTopWidth = getComputedCSS( gridElement, 'border-top-width' );
-	const borderRightWidth = getComputedCSS(
-		gridElement,
-		'border-right-width'
-	);
-	const borderBottomWidth = getComputedCSS(
-		gridElement,
-		'border-bottom-width'
-	);
-	const borderLeftWidth = getComputedCSS( gridElement, 'border-left-width' );
-	const paddingTop = getComputedCSS( gridElement, 'padding-top' );
-	const paddingRight = getComputedCSS( gridElement, 'padding-right' );
-	const paddingBottom = getComputedCSS( gridElement, 'padding-bottom' );
-	const paddingLeft = getComputedCSS( gridElement, 'padding-left' );
+	const {
+		gridTemplateColumns,
+		gridTemplateRows,
+		borderTopWidth,
+		borderRightWidth,
+		borderBottomWidth,
+		borderLeftWidth,
+		paddingTop,
+		paddingRight,
+		paddingBottom,
+		paddingLeft,
+		color,
+		gap,
+	} = gridElement.ownerDocument.defaultView!.getComputedStyle( gridElement );
 
 	const numColumns = gridTemplateColumns.split( ' ' ).length;
-	const numRows = gridTemplateRows.split( ' ' ).length;
+	const rows = gridTemplateRows.split( ' ' );
+	const numRows = rows.length;
 	const numItems = numColumns * numRows;
 	return {
 		numColumns,
 		numRows,
 		numItems,
-		currentColor: getComputedCSS( gridElement, 'color' ),
+		currentColor: color,
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,
 			// Preview rows beyond a manual grid retain its square cell height.
-			gridAutoRows: gridTemplateRows.split( ' ' )[ 0 ],
-			gap: getComputedCSS( gridElement, 'gap' ),
+			gridAutoRows: rows[ 0 ],
+			gap,
 			inset: `
 				calc(${ paddingTop } + ${ borderTopWidth })
 				calc(${ paddingRight } + ${ borderRightWidth })
