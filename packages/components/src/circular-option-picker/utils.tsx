@@ -25,6 +25,23 @@ export function resolveCircularOptionPickerPresentation(
 }
 
 /**
+ * Returns a React key for each option group. A group with a slug keeps its
+ * identity when groups are reordered or removed. Repeated slugs get an
+ * occurrence suffix, and groups without a slug fall back to their index.
+ */
+export function getOptionGroupKeys( groups: Array< { slug?: string } > ) {
+	const occurrences = new Map< string, number >();
+	return groups.map( ( { slug }, index ) => {
+		if ( typeof slug !== 'string' ) {
+			return `index-${ index }`;
+		}
+		const occurrence = occurrences.get( slug ) ?? 0;
+		occurrences.set( slug, occurrence + 1 );
+		return `slug-${ slug }-${ occurrence }`;
+	} );
+}
+
+/**
  * Computes the common props for the CircularOptionPicker.
  */
 export function getComputeCircularOptionPickerCommonProps(

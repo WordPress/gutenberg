@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `ColorPalette`, `GradientPicker`: Keep focus on a palette or origin with a `slug` when the groups are reordered or removed ([#86782](https://github.com/WordPress/gutenberg/pull/86782)).
 -   `MenuItem`: Give the `info` text of pressed items the same color as the label, so it stays readable on the pressed fill, including in forced colors mode ([#87153](https://github.com/WordPress/gutenberg/pull/87153)).
 -   `ConfirmDialog`: Ignore Enter key presses during IME composition ([#87378](https://github.com/WordPress/gutenberg/pull/87378)).
 -   `BoxControl`: Show the side input tooltip above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86805](https://github.com/WordPress/gutenberg/pull/86805)).

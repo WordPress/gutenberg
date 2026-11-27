@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
@@ -414,6 +414,77 @@ describe( 'ColorPalette', () => {
 				name: /^Custom color picker$/,
 			} )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'multiple origins', () => {
+		const red = { slug: 'red', name: 'Red', color: '#f00' };
+		const blue = { slug: 'blue', name: 'Blue', color: '#00f' };
+		const theme = { slug: 'theme', name: 'Theme', colors: [ red ] };
+		const custom = { slug: 'custom', name: 'Custom', colors: [ blue ] };
+
+		it.each( [
+			[ 'moved', 'Red', [ custom, theme ], 1 ],
+			[ 'shifted by a removal', 'Blue', [ custom ], 0 ],
+		] as const )(
+			'keeps focus on a swatch whose origin is %s',
+			async ( _case, swatch, nextOrigins, nextIndex ) => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				const view = await render(
+					<ColorPalette
+						colors={ [ theme, custom ] }
+						onChange={ onChange }
+						disableCustomColors
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: swatch } )
+				);
+				onChange.mockClear();
+
+				await view.rerender(
+					<ColorPalette
+						colors={ [ ...nextOrigins ] }
+						onChange={ onChange }
+						disableCustomColors
+					/>
+				);
+
+				expect(
+					screen.getByRole( 'option', { name: swatch } )
+				).toHaveFocus();
+				await user.keyboard( '{Enter}' );
+				expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+					expect.any( String ),
+					nextIndex,
+					swatch.toLowerCase()
+				);
+			}
+		);
+
+		it( 'renders origins that share a slug', async () => {
+			const consoleError = vi.spyOn( console, 'error' );
+			await render(
+				<ColorPalette
+					colors={ [ theme, { ...custom, slug: 'theme' } ] }
+					onChange={ vi.fn() }
+					disableCustomColors
+				/>
+			);
+
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Theme' } )
+				).getByRole( 'option', { name: 'Red' } )
+			).toBeVisible();
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Custom' } )
+				).getByRole( 'option', { name: 'Blue' } )
+			).toBeVisible();
+			expect( consoleError ).not.toHaveBeenCalled();
+			consoleError.mockRestore();
+		} );
 	} );
 
 	describe( 'duplicate colors in palette', () => {
