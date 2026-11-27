@@ -8,7 +8,7 @@ const EMPTY_ARRAY: WpTemplatePart[] = [];
 export function useExistingTemplateParts(): WpTemplatePart[] {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords< WpTemplatePart >(
+			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part',
 				{ per_page: -1 }

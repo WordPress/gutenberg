@@ -37,12 +37,7 @@ import {
 	chevronRight,
 } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
-import type {
-	FontCollection as FontCollectionType,
-	FontFace,
-	FontFamily,
-	CollectionFontFamily,
-} from '@wordpress/core-data';
+import type { FontFace, FontFamily } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import filterFonts from './utils/filter-fonts';
@@ -98,7 +93,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const { installFonts, isInstalling, baseCustomFonts } =
 		useContext( FontLibraryContext );
 	const { record: selectedCollection, isResolving: isLoading } =
-		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
+		useEntityRecord( 'root', 'fontCollection', slug );
 
 	useEffect( () => {
 		const handleStorage = () => {
@@ -126,9 +121,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	}, [ selectedFont ] );
 
 	const collectionFonts = useMemo(
-		() =>
-			( selectedCollection?.font_families as
-				CollectionFontFamily[] | undefined ) ?? [],
+		() => selectedCollection?.font_families ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];

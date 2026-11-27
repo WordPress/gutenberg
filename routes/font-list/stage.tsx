@@ -6,7 +6,6 @@ import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { FontLibrary } from '@wordpress/global-styles-ui';
-import type { FontCollection as FontCollectionType } from '@wordpress/core-data';
 import { unlock } from './lock-unlock';
 import './style.scss';
 
@@ -14,10 +13,13 @@ const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 function FontLibraryPage() {
-	const { records: collections = [] } =
-		useEntityRecords< FontCollectionType >( 'root', 'fontCollection', {
+	const { records: collections = [] } = useEntityRecords(
+		'root',
+		'fontCollection',
+		{
 			_fields: 'slug,name,description',
-		} );
+		}
+	);
 	const [ activeTab, setActiveTab ] = useState( 'installed-fonts' );
 
 	// Use the useGlobalStyles hook from @wordpress/editor

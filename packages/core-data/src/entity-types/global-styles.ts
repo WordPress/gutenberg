@@ -1,3 +1,7 @@
+import type {
+	GlobalStylesSettings,
+	GlobalStylesStyles,
+} from '@wordpress/global-styles-engine';
 import type { Context, ContextualField, OmitNevers } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
@@ -22,16 +26,12 @@ declare module './base-entity-records' {
 			/**
 			 * The styles the variation applies.
 			 */
-			styles: ContextualField<
-				Record< string, Object >,
-				'view' | 'edit',
-				C
-			>;
+			styles: ContextualField< GlobalStylesStyles, 'view' | 'edit', C >;
 			/**
 			 * The settings the variation applies.
 			 */
 			settings: ContextualField<
-				Record< string, Object >,
+				GlobalStylesSettings,
 				'view' | 'edit',
 				C
 			>;
