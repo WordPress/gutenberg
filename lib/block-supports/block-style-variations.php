@@ -122,7 +122,12 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	// theme_json data.
 	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
 
-	$variation_instance = wp_unique_id( $variation . '--' );
+	/*
+	 * Hash the block instead of using a per-request counter, so the class name
+	 * doesn't change with the number of blocks rendered before it. Client-side
+	 * navigation keeps blocks outside the router region, with their old classes.
+	 */
+	$variation_instance = wp_unique_id_from_values( $parsed_block, $variation . '--' );
 	$class_name         = "is-style-$variation_instance";
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
@@ -244,9 +249,9 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 
 	/*
 	 * Matches a class prefixed by `is-style`, followed by the
-	 * variation slug, then `--`, and finally an instance number.
+	 * variation slug, then `--`, and finally a hash.
 	 */
-	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block_class_name, $matches );
+	preg_match( '/\bis-style-(\S+?--[0-9a-f]{8})\b/', $block_class_name, $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;
