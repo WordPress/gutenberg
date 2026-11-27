@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Remove private API usage and `@wordpress/private-apis` dependency ([#86118](https://github.com/WordPress/gutenberg/pull/86118)).
 -   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
@@ -21,7 +22,6 @@
 
 ### Internal
 
--   Remove private API usage and `@wordpress/private-apis` dependency ([#86118](https://github.com/WordPress/gutenberg/pull/86118)).
 -   Widget footer: stop setting `rel="noopener noreferrer"` on actions that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86486](https://github.com/WordPress/gutenberg/pull/86486)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
