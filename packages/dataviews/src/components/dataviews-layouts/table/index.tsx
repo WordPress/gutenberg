@@ -204,6 +204,14 @@ function TableRow< Item >( {
 						titleField={ showTitle ? titleField : undefined }
 						mediaField={ showMedia ? mediaField : undefined }
 						mediaAspectRatio={ mediaAspectRatio }
+						mediaLabel={
+							showTitle || ! showMedia || ! mediaField
+								? undefined
+								: titleField?.getValueFormatted( {
+										item,
+										field: titleField,
+									} )
+						}
 						descriptionField={
 							showDescription ? descriptionField : undefined
 						}

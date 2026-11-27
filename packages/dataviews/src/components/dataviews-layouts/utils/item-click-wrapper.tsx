@@ -60,7 +60,6 @@ export function ItemClickWrapper< Item >( {
 	) => ReactElement;
 	className?: string;
 	title?: string;
-	tabIndex?: number;
 	children: ReactNode;
 } ) {
 	// Always render a wrapper element so layout and styling relying on the wrapper

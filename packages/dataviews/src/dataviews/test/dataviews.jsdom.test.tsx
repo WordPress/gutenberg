@@ -743,7 +743,7 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
-		it( 'keeps clickable media next to a clickable title out of the tab order', () => {
+		it( 'names clickable media after the item when the title is hidden', () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -751,23 +751,33 @@ describe( 'DataViews component', () => {
 						fields: [],
 						titleField: 'title',
 						mediaField: 'image',
+						showTitle: false,
 					} }
 					isItemClickable={ () => true }
 					onClickItem={ () => {} }
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: data[ 0 ].title } )
-			).toHaveLength( 1 );
-			const media = screen
-				.getAllByRole( 'button', { hidden: true } )
-				.find( ( button ) =>
-					button.classList.contains(
-						'dataviews-column-primary__media'
-					)
-				);
-			expect( media ).toHaveAttribute( 'tabindex', '-1' );
-			expect( media ).toHaveAttribute( 'aria-hidden', 'true' );
+				screen.getByRole( 'button', { name: data[ 0 ].title } )
+			).toHaveClass( 'dataviews-column-primary__media' );
+		} );
+
+		it( 'names clickable media "Navigate to item" when there is no title field', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: undefined,
+						mediaField: 'image',
+					} }
+					isItemClickable={ () => true }
+					onClickItem={ () => {} }
+				/>
+			);
+			expect(
+				screen.getAllByRole( 'button', { name: 'Navigate to item' } )
+			).toHaveLength( data.length );
 		} );
 
 		it( 'should render actions column if actions are supported and passed in', () => {
