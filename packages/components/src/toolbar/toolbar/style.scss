@@ -5,7 +5,7 @@
 .components-accessible-toolbar {
 	display: inline-flex;
 	border: $border-width solid var(--wpds-color-stroke-surface-neutral-strong);
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	flex-shrink: 0;
 
 	& > .components-toolbar-group:last-child {
@@ -49,7 +49,7 @@
 			content: "";
 			position: absolute;
 			display: block;
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			height: $grid-unit-40;
 
 			// Position the focus rectangle. Offsets are measured from the

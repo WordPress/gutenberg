@@ -49,7 +49,7 @@
 
 	&:hover {
 		background-color: $gray-100;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 }
 

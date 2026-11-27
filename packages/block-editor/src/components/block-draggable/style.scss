@@ -10,7 +10,7 @@
 
 .block-editor-block-draggable-chip {
 	background-color: $gray-900;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	box-shadow: $elevation-small;
 	color: $white;
 	cursor: grabbing;

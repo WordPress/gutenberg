@@ -17,7 +17,7 @@
 		height: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$grid-unit-20 * 2});
 		max-width: 400px;
-		border-radius: $radius-large;
+		border-radius: var(--wpds-border-radius-lg);
 		position: relative;
 		animation-name: none;
 

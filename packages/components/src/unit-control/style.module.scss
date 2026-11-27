@@ -61,7 +61,7 @@
 .unit-select.unit-select.unit-select {
 	appearance: none;
 	background: transparent;
-	border-radius: $radius-x-small;
+	border-radius: var(--wpds-border-radius-xs);
 	border: none;
 	display: block;
 	outline: none;

@@ -123,7 +123,7 @@
 			content: "";
 			position: absolute;
 			display: block;
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			height: $grid-unit-40;
 
 			// Position the focus rectangle.

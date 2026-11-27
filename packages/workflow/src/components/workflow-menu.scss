@@ -94,7 +94,7 @@
 		margin: 0;
 		padding: $grid-unit-15;
 		background: $gray-100;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		font-size: 12px;
 		line-height: 1.5;
 		white-space: pre-wrap;
@@ -107,7 +107,7 @@
 	padding: $grid-unit-15;
 	background: $gray-200;
 	border: 1px solid #{color.adjust( $alert-red, $lightness: -10% )};
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	color: $alert-red;
 
 	p {

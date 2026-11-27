@@ -9,7 +9,7 @@
 	font-size: var(--wpds-typography-font-size-md);
 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
 	backdrop-filter: blur($grid-unit-20) saturate(180%);
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	box-shadow: $elevation-small;
 	color: $white;
 	padding: $grid-unit-15 ($grid-unit-05 * 5);

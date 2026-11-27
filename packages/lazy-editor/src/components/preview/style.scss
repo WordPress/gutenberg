@@ -6,7 +6,7 @@
 	align-items: center;
 	flex-direction: column;
 	height: 100%;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 
 	.dataviews-view-grid & {
 		.block-editor-block-preview__container {

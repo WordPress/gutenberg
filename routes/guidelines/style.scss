@@ -5,7 +5,7 @@
 .guidelines__content {
 	margin-top: 0;
 	padding: $grid-unit-30;
-	border-radius: $radius-large;
+	border-radius: var(--wpds-border-radius-lg);
 }
 
 .guidelines__list {

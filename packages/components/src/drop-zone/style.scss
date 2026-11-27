@@ -12,7 +12,7 @@
 	z-index: z-index(".components-drop-zone");
 	visibility: hidden;
 	opacity: 0;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 
 	&.is-active {
 		opacity: 1;

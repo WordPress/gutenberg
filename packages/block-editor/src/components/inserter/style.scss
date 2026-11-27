@@ -65,12 +65,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
-				border-radius: $radius-medium $radius-medium 0 0;
+				border-radius: var(--wpds-border-radius-md) var(--wpds-border-radius-md) 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
-				border-radius: 0 0 $radius-medium $radius-medium;
+				border-radius: 0 0 var(--wpds-border-radius-md) var(--wpds-border-radius-md);
 			}
 
 			&.components-button {
@@ -319,7 +319,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 }
 
 .block-editor-inserter__tips {

@@ -3,7 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 @mixin preview-overlay {
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	background: $white;
 }
 
@@ -40,10 +40,10 @@ fieldset.media-edit {
 
 	.media-edit__compact-group {
 		border: $border-width dashed $gray-600;
-		border-radius: $radius-medium;
+		border-radius: var(--wpds-border-radius-md);
 
 		&.is-single {
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 		}
 
 		.media-edit__picker-button {
@@ -101,7 +101,7 @@ fieldset.media-edit {
 		align-items: center;
 		gap: $grid-unit-10;
 		border: $border-width dashed $gray-600;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		padding: $grid-unit-05 $grid-unit-10;
 		min-height: $grid-unit-50;
 		cursor: var(--wpds-cursor-control);
@@ -155,7 +155,7 @@ fieldset.media-edit {
 		width: $grid-unit-30;
 		aspect-ratio: 1 / 1;
 		flex-shrink: 0;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 		@include checkerboard-background( 4px );
 	}
 
@@ -172,7 +172,7 @@ fieldset.media-edit {
 			position: relative;
 			width: 100%;
 			aspect-ratio: var(--media-edit-expanded-multiple-aspect-ratio, 3/2);
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 			padding: $grid-unit-05;
 			overflow: hidden;
 			display: flex;
@@ -209,7 +209,7 @@ fieldset.media-edit {
 		.media-edit__expanded-item {
 			position: relative;
 			min-width: 0;
-			border-radius: $radius-medium;
+			border-radius: var(--wpds-border-radius-md);
 
 			&:hover,
 			&:focus-within {
@@ -254,12 +254,12 @@ fieldset.media-edit {
 
 		// Picker button in expanded context gets medium radius by default
 		.media-edit__picker-button {
-			border-radius: $radius-medium;
+			border-radius: var(--wpds-border-radius-md);
 		}
 
 		// In empty state, use small radius
 		&.is-empty .media-edit__picker-button {
-			border-radius: $radius-small;
+			border-radius: var(--wpds-border-radius-sm);
 		}
 
 		&.is-multiple:not(.is-empty) {

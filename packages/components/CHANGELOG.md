@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `AlignmentMatrixControl`, `Badge`, `BorderControl`, `Button`, `ButtonGroup`, `ColorPalette`, `CustomGradientPicker`, `CustomSelectControl`, `DropZone`, `FocalPointPicker`, `FormTokenField`, `InputControl`, `PaletteEdit`, `Placeholder`, `Popover`, `RangeControl`, `ResizableBox`, `Snackbar`, `Toolbar`, and `UnitControl`: Use the `--wpds-border-radius-*` tokens for their corner radii, so they follow the `cornerRadius` setting of `ThemeProvider` ([#87492](https://github.com/WordPress/gutenberg/pull/87492)).
 -   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
 -   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height ([#87154](https://github.com/WordPress/gutenberg/pull/87154)).
 -   `TimePicker`: Use the WordPress UI select for choosing a month ([#87079](https://github.com/WordPress/gutenberg/pull/87079)).

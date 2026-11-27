@@ -214,7 +214,7 @@
 
 .tooltip {
 	background: rgba(0, 0, 0, 0.8);
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	color: #fff;
 	font-size: 12px;
 	min-width: 32px;

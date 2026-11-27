@@ -61,7 +61,7 @@
 		justify-content: center;
 		min-width: 0;
 		border: 0;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	// Long filenames often have no spaces to break on.

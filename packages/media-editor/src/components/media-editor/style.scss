@@ -92,7 +92,7 @@
 			justify-content: center;
 			align-self: stretch;
 			background: $gray-200;
-			border-radius: 0 0 $radius-large $radius-large;
+			border-radius: 0 0 var(--wpds-border-radius-lg) var(--wpds-border-radius-lg);
 			padding: $grid-unit-10 $grid-unit-20;
 
 			// Trunk's measure for the ruler itself (`flex: 0 1 360px` there,
@@ -111,7 +111,7 @@
 		align-items: center;
 		justify-content: center;
 		background: $gray-200;
-		border-radius: $radius-large;
+		border-radius: var(--wpds-border-radius-lg);
 		overflow: auto;
 		flex: 1;
 		min-height: 0;

@@ -28,7 +28,7 @@
 	overflow: auto;
 
 	background-color: $components-color-background;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	box-shadow: 0 0 0 $border-width $components-color-gray-300, $elevation-medium;
 
 	&:where(.is-toolbar) {
@@ -110,7 +110,7 @@
 	line-height: 20px;
 
 	color: var(--wpds-color-foreground-interactive-neutral);
-	border-radius: $radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 
 	padding-block: $grid-unit-05;
 	padding-inline: $grid-unit-15;

@@ -3,7 +3,7 @@
 
 .wp-block-post-author__transform {
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: var(--wpds-border-radius-sm);
 	margin: $grid-unit-20;
 	padding: $grid-unit-20;
 }

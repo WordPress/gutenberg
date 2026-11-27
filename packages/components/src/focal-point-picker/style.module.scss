@@ -26,7 +26,7 @@
 
 .media-container {
 	align-items: center;
-	border-radius: variables.$radius-small;
+	border-radius: var(--wpds-border-radius-sm);
 	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
 	cursor: pointer;
 	display: inline-flex;

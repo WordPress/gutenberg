@@ -106,15 +106,15 @@ $swatch-gap: 12px;
 
 	// Identify the first visible instance as placeholder items will not have this class.
 	&:nth-child(1 of &) {
-		border-top-left-radius: $radius-small;
-		border-top-right-radius: $radius-small;
+		border-top-left-radius: var(--wpds-border-radius-sm);
+		border-top-right-radius: var(--wpds-border-radius-sm);
 		border-top: 1px solid $gray-300;
 	}
 
 	// Identify the last visible instance as placeholder items will not have this class.
 	&:nth-last-child(1 of &) {
-		border-bottom-left-radius: $radius-small;
-		border-bottom-right-radius: $radius-small;
+		border-bottom-left-radius: var(--wpds-border-radius-sm);
+		border-bottom-right-radius: var(--wpds-border-radius-sm);
 	}
 
 	> div,
@@ -187,7 +187,7 @@ $swatch-gap: 12px;
 	}
 
 	&.block-editor-panel-color-gradient-settings__reset {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	.block-editor-panel-color-gradient-settings__dropdown:hover + &,
@@ -221,6 +221,6 @@ $swatch-gap: 12px;
 	margin: auto $grid-unit auto;
 
 	&.block-editor-panel-color-gradient-settings__contrast-warning {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 }

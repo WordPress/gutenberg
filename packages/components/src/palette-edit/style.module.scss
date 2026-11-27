@@ -11,7 +11,7 @@
 .name-input {
 	:global(.components-input-control__container) {
 		background: $gray-100;
-		border-radius: $radius-x-small;
+		border-radius: var(--wpds-border-radius-xs);
 
 		// Preserve the established specificity for InputControl overrides.
 		:global(
