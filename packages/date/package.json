@@ -42,7 +42,7 @@
 	"dependencies": {
 		"@wordpress/deprecated": "file:../deprecated",
 		"moment": "^2.31.0",
-		"moment-timezone": "^0.5.40"
+		"moment-timezone": "^0.5.48"
 	},
 	"devDependencies": {
 		"vitest": "^5.1.1"
