@@ -3,7 +3,11 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
-import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
+import {
+	getPasteBlocks,
+	preparePasteBlocks,
+	setClipboardBlocks,
+} from '../writing-flow/utils';
 import type { TreeBlock } from '../../store/types';
 import type { ListViewSelectBlock } from './types';
 
@@ -108,6 +112,15 @@ export default function useClipboardHandler( {
 
 			event.preventDefault();
 
+			// Bail early if any selected block cannot be removed, so cut
+			// neither flashes, shows a moved notice, nor alters the clipboard.
+			if (
+				event.type === 'cut' &&
+				! canRemoveBlocks( selectedBlockClientIds )
+			) {
+				return;
+			}
+
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
@@ -122,11 +135,6 @@ export default function useClipboardHandler( {
 			}
 
 			if ( event.type === 'cut' ) {
-				// Don't update the selection if the blocks cannot be deleted.
-				if ( ! canRemoveBlocks( selectedBlockClientIds ) ) {
-					return;
-				}
-
 				let blockToFocus =
 					getPreviousBlockClientId( firstBlockClientId ) ??
 					// If the previous block is not found (when the first block is deleted),
@@ -175,23 +183,44 @@ export default function useClipboardHandler( {
 							)
 						)
 					) {
-						insertBlocks(
+						const insertableBlocks = preparePasteBlocks(
 							blocks,
+							registry
+						);
+						if ( ! insertableBlocks ) {
+							return;
+						}
+						insertBlocks(
+							insertableBlocks,
 							undefined,
 							selectedBlockClientId
 						);
-						updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
+						updateFocusAndSelection(
+							insertableBlocks[ 0 ]?.clientId,
+							false
+						);
 						return;
 					}
 				}
 
+				const replacementBlocks = preparePasteBlocks(
+					blocks,
+					registry,
+					selectedBlockClientIds
+				);
+				if ( ! replacementBlocks ) {
+					return;
+				}
 				replaceBlocks(
 					selectedBlockClientIds,
-					blocks,
-					blocks.length - 1,
+					replacementBlocks,
+					replacementBlocks.length - 1,
 					-1
 				);
-				updateFocusAndSelection( blocks[ 0 ]?.clientId, false );
+				updateFocusAndSelection(
+					replacementBlocks[ 0 ]?.clientId,
+					false
+				);
 			}
 		}
 
