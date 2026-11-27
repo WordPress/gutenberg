@@ -13,7 +13,6 @@ export const settings: BlockModule< RSSAttributes >[ 'settings' ] = {
 	icon,
 	example: {
 		attributes: {
-			// @ts-expect-error `BlockConfiguration['example']['attributes']` is typed as `BlockType['attributes']` schema instead of attribute values.
 			feedURL: 'https://wordpress.org',
 		},
 	},
