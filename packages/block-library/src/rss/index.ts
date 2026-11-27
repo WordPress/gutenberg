@@ -22,6 +22,6 @@ export const settings: BlockModule< RSSAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata: metadata as BlockModule< RSSAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );
