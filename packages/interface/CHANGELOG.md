@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `InterfaceSkeleton`: Keep the open save panel visible when the browser window loses focus, so it no longer disappears and then reappears over the toolbar Save button ([#55824](https://github.com/WordPress/gutenberg/issues/55824)).
+-   `InterfaceSkeleton`: Keep the open save panel visible when the browser window loses focus, so it no longer disappears and then reappears over the toolbar Save button ([#87519](https://github.com/WordPress/gutenberg/pull/87519)).
 
 ### Internal
 
