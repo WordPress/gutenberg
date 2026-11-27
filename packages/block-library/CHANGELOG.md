@@ -33,6 +33,7 @@
 
 ### Enhancements
 
+-   Navigation Submenu: Add a "Label only" choice for a submenu without a link, render such a submenu as a button that opens its dropdown, and mark it in List View ([#86936](https://github.com/WordPress/gutenberg/issues/86936)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).

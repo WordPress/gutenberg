@@ -367,7 +367,13 @@ export default function NavigationSubmenuEdit( {
 								placeholder={ itemLabelPlaceholder }
 								withoutInteractiveFormatting
 								onClick={ () => {
-									if ( ! openSubmenusOnClick && ! url ) {
+									// A submenu with items and no link is
+									// label only: clicking edits the text.
+									if (
+										! openSubmenusOnClick &&
+										! url &&
+										! hasChildren
+									) {
 										setIsLinkOpen( true );
 									}
 								} }
@@ -403,6 +409,21 @@ export default function NavigationSubmenuEdit( {
 							onRemove={ () => {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );
+							} }
+							onUseLabelOnly={ () => {
+								setAttributes( {
+									url: undefined,
+									id: undefined,
+									kind: undefined,
+									type: undefined,
+								} );
+								setIsLinkOpen( false );
+								selectLabelText( ref );
+								speak(
+									__(
+										'The submenu has no link. It only opens its dropdown.'
+									)
+								);
 							} }
 							onChange={ handleLinkChange }
 						/>
