@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
 -   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
 -   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
@@ -23,6 +24,7 @@
 -   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 -   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
+-   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
 -   Query Pagination: Exclude skipped posts when calculating page links for custom queries with an offset ([#86081](https://github.com/WordPress/gutenberg/pull/86081)).
 
 ### Internal

@@ -9,11 +9,11 @@ import {
 /**
  * Helper function to retrieve the corresponding icon by area name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
+ * @param areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
  *
- * @return {Object} The corresponding icon.
+ * @return The corresponding icon.
  */
-export const getTemplatePartIcon = ( areaOrIconName ) => {
+export const getTemplatePartIcon = ( areaOrIconName?: string ) => {
 	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
 	} else if ( 'footer' === areaOrIconName ) {
