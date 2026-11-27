@@ -94,6 +94,7 @@ export function updateSelectedCell( state, selection, updateCell ) {
 					}
 
 					return {
+						...row,
 						cells: row.cells.map(
 							( cellAttributes, columnIndex ) => {
 								const cellLocation = {
@@ -461,6 +462,7 @@ export function insertColumn( state, { columnIndex } ) {
 					}
 
 					return {
+						...row,
 						cells: [
 							...row.cells.slice( 0, columnIndex ),
 							{
@@ -503,6 +505,7 @@ export function deleteColumn( state, { columnIndex } ) {
 				sectionName,
 				section
 					.map( ( row ) => ( {
+						...row,
 						cells:
 							row.cells.length >= columnIndex
 								? row.cells.filter(
