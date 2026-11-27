@@ -169,27 +169,6 @@ export function QuickEditModal( {
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData: Record< string, any > = {
-			...record,
-			...localEdits,
-		};
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
