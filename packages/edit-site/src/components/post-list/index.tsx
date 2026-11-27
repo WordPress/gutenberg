@@ -264,8 +264,6 @@ export default function PostList( { postType }: { postType: string } ) {
 	// user's view lives in preferences, which this does not touch.
 	const { invalidateResolution } = useDispatch( coreStore );
 	const refreshViewCounts = useCallback( () => {
-		// @ts-expect-error `getViewConfig` is private, so it is missing from the
-		// selector names `invalidateResolution` accepts.
 		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
 	}, [ invalidateResolution, postType ] );
 
