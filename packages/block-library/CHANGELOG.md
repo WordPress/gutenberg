@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Social Icon: Update the Dribbble icon to the current logo ([#59090](https://github.com/WordPress/gutenberg/issues/59090)).
+-   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
 
 ### Bug Fixes
 
