@@ -19,7 +19,7 @@
 			"default": "button"
 		},
 		"url": {
-			"type": "string",
+			"type": "url",
 			"source": "attribute",
 			"selector": "a",
 			"attribute": "href",

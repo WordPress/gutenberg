@@ -630,5 +630,63 @@ test.describe( 'Post Meta source', () => {
 				} )
 			).toBeHidden();
 		} );
+
+		test( 'should list string fields for the image url', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: { url: 'https://example.org/image.jpg' },
+			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
+			await connectUrlToUrlCustomField( page );
+			const [ image ] = await editor.getBlocks();
+			expect( image.attributes.metadata.bindings.url ).toEqual( {
+				source: 'core/post-meta',
+				args: { key: 'url_custom_field' },
+			} );
+
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '.wp-block-image img' )
+			).toHaveAttribute( 'src', '#url-custom-field' );
+		} );
+
+		test( 'should list string fields for the button url', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{ name: 'core/button', attributes: { text: 'Read more' } },
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Button text' } )
+				.click();
+			await connectUrlToUrlCustomField( page );
+			const [ buttons ] = await editor.getBlocks();
+			expect(
+				buttons.innerBlocks[ 0 ].attributes.metadata.bindings.url
+			).toEqual( {
+				source: 'core/post-meta',
+				args: { key: 'url_custom_field' },
+			} );
+		} );
 	} );
 } );
+
+async function connectUrlToUrlCustomField( page ) {
+	await page.getByLabel( 'Attributes options' ).click();
+	await page.getByRole( 'menuitemcheckbox', { name: 'url, show' } ).click();
+	await page.keyboard.press( 'Escape' );
+	await page.getByRole( 'button', { name: 'url' } ).click();
+	await page.getByRole( 'menuitem', { name: 'Post Meta' } ).click();
+	await page
+		.getByRole( 'menuitemcheckbox', { name: 'url_custom_field' } )
+		.click();
+	await page.keyboard.press( 'Escape' );
+	await page.keyboard.press( 'Escape' );
+}

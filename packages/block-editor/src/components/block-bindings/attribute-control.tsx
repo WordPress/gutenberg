@@ -76,7 +76,9 @@ export default function BlockBindingsAttributeControl( {
 					}
 					const compatibleFieldsList = fieldsList.filter(
 						( field: BlockBindingsField ) =>
-							field.type === attributeType
+							field.type === attributeType ||
+							( attributeType === 'url' &&
+								field.type === 'string' )
 					);
 					if ( compatibleFieldsList.length ) {
 						sourceFields[ sourceName ] = compatibleFieldsList;
