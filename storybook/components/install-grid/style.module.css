@@ -70,16 +70,18 @@
 }
 
 .root .panel ol li {
-	display: flex;
-	align-items: flex-start;
-	gap: 12px;
+	position: relative;
+	min-height: 24px;
 	margin: 0 0 10px;
+	padding-inline-start: 36px;
 	counter-increment: step;
 }
 
 .root .panel ol li::before {
-	display: inline-flex;
-	flex: none;
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: 24px;
