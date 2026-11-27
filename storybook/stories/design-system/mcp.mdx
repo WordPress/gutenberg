@@ -1,5 +1,4 @@
-import { Meta, Markdown } from '@storybook/addon-docs/blocks';
-import Readme from '../../../packages/design-system-mcp/README.md?raw';
+import { Meta } from '@storybook/addon-docs/blocks';
 import {
 	InstallGrid,
 	InstallButton,
@@ -18,8 +17,6 @@ import zedLogo from '../../components/install-grid/logos/zed.svg';
 
 <Meta title="Design System/Using with AI" />
 
-export const [ beforeSetup, afterSetup ] = Readme.split( /^## Setup[\s\S]*?(?=^## Importing the package)/m );
-
 export const SERVER_NAME = 'wordpress-design-system';
 export const PACKAGE_ARGS = [ '-y', '--ignore-scripts', '--min-release-age=2', '@wordpress/design-system-mcp@latest' ];
 export const SERVER_ENTRY = { command: 'npx', args: PACKAGE_ARGS };
@@ -27,9 +24,22 @@ export const VSCODE_URL = `vscode:mcp/install?${ encodeURIComponent( JSON.string
 export const RAYCAST_URL = `raycast://mcp/install?${ encodeURIComponent( JSON.stringify( { name: SERVER_NAME, type: 'stdio', ...SERVER_ENTRY } ) ) }`;
 export const CURSOR_URL = `https://cursor.com/en-US/install-mcp?name=${ SERVER_NAME }&config=${ btoa( JSON.stringify( { command: [ 'npx', ...PACKAGE_ARGS ].join( ' ' ) } ) ) }`;
 
-<Markdown>{ beforeSetup }</Markdown>
+# WordPress Design System MCP Server
+
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. It gives AI agents component documentation, usage examples, and design tokens.
+
+By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
+
+- Which components should be used for a given interaction or user interface, like a button or a dropdown
+- How to implement those components in code, following sample code from the design system documentation
+- How to implement new components following the design system styling standards with design tokens
+- How to compose those components into an interaction, following the design system patterns, like confirming a destructive action or wording an error message
+
+Without the MCP server, an AI agent may produce a functional and convincing result, but there's a higher risk that its resources are out-of-date or inaccurate, and it may try to use components which are no longer recommended for use.
 
 ## Setup
+
+Pick your AI tool to see only the instructions for it.
 
 <InstallGrid>
 
@@ -285,4 +295,5 @@ In `mcp.json`:
 
 </InstallGrid>
 
-<Markdown>{ afterSetup }</Markdown>
+
+To embed the server in your own tooling, or to contribute to it, see the [`@wordpress/design-system-mcp` package](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp).
