@@ -1,5 +1,6 @@
 import { Resizable } from 're-resizable';
 import type { MouseEvent, TouchEvent } from 'react';
+import { flushSync } from '@wordpress/element';
 import {
 	getHandleVector,
 	getResizeStep,
@@ -74,6 +75,7 @@ export class TransformAwareResizable extends Resizable {
 	}
 
 	onMouseUp( event: globalThis.MouseEvent | globalThis.TouchEvent ) {
+		this.finishSettling();
 		this.stopTransformedDrag();
 		super.onMouseUp( event );
 	}
@@ -185,19 +187,38 @@ export class TransformAwareResizable extends Resizable {
 		drag.frame = view.requestAnimationFrame( () => {
 			drag.frame = view.requestAnimationFrame( () => {
 				drag.frame = undefined;
-				if ( this.transformedDrag !== drag || ! drag.pointer ) {
-					return;
+				if ( this.transformedDrag === drag ) {
+					this.settle( drag, view );
 				}
-				drag.settles++;
-				drag.isSettling = true;
-				this.onMouseMove(
-					new view.MouseEvent( 'mousemove', {
-						clientX: drag.pointer.x,
-						clientY: drag.pointer.y,
-					} )
-				);
-				drag.isSettling = false;
 			} );
 		} );
+	}
+
+	// A release can come before the handle has caught up, and the size at
+	// release is the one kept. So settle now instead of on later frames,
+	// flushing the consumer's render each time like the two-frame wait does.
+	finishSettling() {
+		const drag = this.transformedDrag;
+		const view = this.window;
+		while ( drag?.frame && view ) {
+			view.cancelAnimationFrame( drag.frame );
+			drag.frame = undefined;
+			flushSync( () => this.settle( drag, view ) );
+		}
+	}
+
+	settle( drag: TransformedDrag, view: Window ) {
+		if ( ! drag.pointer ) {
+			return;
+		}
+		drag.settles++;
+		drag.isSettling = true;
+		this.onMouseMove(
+			new view.MouseEvent( 'mousemove', {
+				clientX: drag.pointer.x,
+				clientY: drag.pointer.y,
+			} )
+		);
+		drag.isSettling = false;
 	}
 }
