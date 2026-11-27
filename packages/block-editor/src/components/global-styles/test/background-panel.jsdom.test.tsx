@@ -542,6 +542,60 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		).toHaveAttribute( 'aria-selected', 'false' );
 	} );
 
+	const pickGradient = async (
+		user: UserEvent,
+		settings: StyleSettings,
+		baseValue?: PanelStyle
+	) => {
+		const onChange = vi.fn();
+		render(
+			<BackgroundPanel
+				value={ {
+					background: {
+						gradient: TEXT_GRADIENT,
+						backgroundClip: 'text',
+					},
+				} }
+				baseValue={ baseValue }
+				settings={ settings }
+				onChange={ onChange }
+				defaultControls={ { gradient: true } }
+				panelId="test-panel"
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Gradient' } ) );
+		await user.click( screen.getByRole( 'option', { name: /purple/i } ) );
+
+		return onChange.mock.calls.at( -1 )![ 0 ];
+	};
+
+	it( 'replaces a text gradient with a background gradient picked here', async () => {
+		const result = await pickGradient( userEvent.setup(), baseSettings );
+
+		expect( result.background.gradient ).toBe( TEXT_GRADIENT );
+		expect( result.background.backgroundClip ).toBeUndefined();
+	} );
+
+	it( 'escapes the Default state text clip when replacing a text gradient', async () => {
+		const result = await pickGradient( userEvent.setup(), baseSettings, {
+			background: { gradient: TEXT_GRADIENT, backgroundClip: 'text' },
+		} );
+
+		expect( result.background.gradient ).toBe( TEXT_GRADIENT );
+		expect( result.background.backgroundClip ).toBe( 'border-box' );
+	} );
+
+	it( 'keeps the text clip for a gradient picked here once the clip control is shown', async () => {
+		const result = await pickGradient( userEvent.setup(), {
+			...baseSettings,
+			background: { ...baseSettings.background, backgroundClip: true },
+		} );
+
+		expect( result.background.gradient ).toBe( TEXT_GRADIENT );
+		expect( result.background.backgroundClip ).toBe( 'text' );
+	} );
+
 	it( 'says the background clips to the text, leaving every control usable', () => {
 		const { container } = render(
 			<BackgroundPanel
