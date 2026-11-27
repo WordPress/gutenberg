@@ -44,12 +44,20 @@ export function usePaddingAppender( enabled ) {
 				const lastBlock = registry
 					.select( blockEditorStore )
 					.getBlock( lastBlockClientId );
-				const { selectBlock, insertDefaultBlock } =
-					registry.dispatch( blockEditorStore );
+				const {
+					selectBlock,
+					insertDefaultBlock,
+					__unstableMarkNextChangeAsNotPersistent,
+				} = registry.dispatch( blockEditorStore );
 
 				if ( lastBlock && isUnmodifiedDefaultBlock( lastBlock ) ) {
 					selectBlock( lastBlockClientId );
 				} else {
+					if ( ! blockOrder.length ) {
+						__unstableMarkNextChangeAsNotPersistent( {
+							history: 'ignore',
+						} );
+					}
 					insertDefaultBlock();
 				}
 			}
