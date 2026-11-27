@@ -110,7 +110,7 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const isDroppingAllowed = useSelect(
+		const isDragging = useSelect(
 			( select ) => select( blockEditorStore ).isDraggingBlocks(),
 			[]
 		);
@@ -152,7 +152,7 @@ const GridVisualizerGrid = forwardRef(
 		return (
 			<BlockPopoverCover
 				className={ clsx( 'block-editor-grid-visualizer', {
-					'is-dropping-allowed': isDroppingAllowed,
+					'is-dropping-allowed': isDragging,
 					'is-manual-grid': isManualGrid,
 				} ) }
 				clientId={ gridClientId }
@@ -173,6 +173,7 @@ const GridVisualizerGrid = forwardRef(
 							gridElement={ gridElement }
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
+							isDragging={ isDragging }
 						/>
 					) : (
 						<AutoGridVisualizer
@@ -214,14 +215,11 @@ function ManualGridVisualizer( {
 	gridElement,
 	gridInfo,
 	childGridRect,
+	isDragging,
 }: ManualGridVisualizerProps ) {
 	const [ highlightedItems, setHighlightedItems ] = useState<
 		GridDropPlacement[] | null
 	>( null );
-	const isDragging = useSelect(
-		( select ) => select( blockEditorStore ).isDraggingBlocks(),
-		[]
-	);
 	const dropZoneRef = useGridVisualizerDropZone(
 		gridClientId,
 		gridElement,
@@ -232,15 +230,22 @@ function ManualGridVisualizer( {
 
 	const gridItemStyles = useSelect(
 		( select ) => {
+			// Only the inserters need to know which cells are occupied.
+			if ( isDragging ) {
+				return null;
+			}
 			const { getBlockOrder, getBlockStyles } = unlock(
 				select( blockEditorStore )
 			);
 			const blockOrder = getBlockOrder( gridClientId );
 			return getBlockStyles( blockOrder );
 		},
-		[ gridClientId ]
+		[ gridClientId, isDragging ]
 	);
 	const occupiedRects = useMemo( () => {
+		if ( ! gridItemStyles ) {
+			return null;
+		}
 		const rects: GridRect[] = [];
 		for ( const style of Object.values( gridItemStyles ) ) {
 			const {
@@ -275,15 +280,12 @@ function ManualGridVisualizer( {
 						column,
 						row
 					);
-					const isCellOccupied = occupiedRects.some( ( rect ) =>
-						rect.contains( column, row )
-					);
-					const cellProps = {
-						column,
-						row,
-						gridClientId,
-						gridInfo,
-					};
+					const showAppender =
+						occupiedRects !== null &&
+						( isChildGridCell ||
+							! occupiedRects.some( ( rect ) =>
+								rect.contains( column, row )
+							) );
 					return (
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
@@ -295,8 +297,13 @@ function ManualGridVisualizer( {
 									: gridInfo.currentColor
 							}
 						>
-							{ ( ! isCellOccupied || isChildGridCell ) && (
-								<GridVisualizerAppender { ...cellProps } />
+							{ showAppender && (
+								<GridVisualizerAppender
+									column={ column }
+									row={ row }
+									gridClientId={ gridClientId }
+									gridInfo={ gridInfo }
+								/>
 							) }
 						</GridVisualizerCell>
 					);

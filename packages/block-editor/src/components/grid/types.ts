@@ -175,4 +175,5 @@ export interface AutoGridVisualizerProps {
 export interface ManualGridVisualizerProps extends AutoGridVisualizerProps {
 	gridClientId: string;
 	gridElement: Element;
+	isDragging: boolean;
 }
