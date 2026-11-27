@@ -23,7 +23,7 @@
 			"role": "local"
 		},
 		"url": {
-			"type": "string",
+			"type": "url",
 			"source": "attribute",
 			"selector": "img",
 			"attribute": "src",
