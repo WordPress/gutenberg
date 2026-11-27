@@ -10,6 +10,7 @@ import {
 	getValidTextAlignments,
 	addAssignedTextAlign,
 	getTextAlignControlGroup,
+	getTextAlignmentControls,
 } from '../text-align';
 
 const noop = () => {};
@@ -45,8 +46,13 @@ describe( 'textAlign', () => {
 
 		it( 'should return all text aligns sorted when provided in the random order', () => {
 			expect(
-				getValidTextAlignments( [ 'right', 'center', 'left' ] )
-			).toEqual( [ 'left', 'center', 'right' ] );
+				getValidTextAlignments( [
+					'right',
+					'justify',
+					'center',
+					'left',
+				] )
+			).toEqual( [ 'left', 'center', 'right', 'justify' ] );
 		} );
 
 		it( 'should return all text aligns if block defines text align support as true', () => {
@@ -54,13 +60,31 @@ describe( 'textAlign', () => {
 				'left',
 				'center',
 				'right',
+				'justify',
 			] );
+		} );
+
+		it( 'should keep justify when listed by the block', () => {
+			expect(
+				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
+			).toEqual( [ 'left', 'right', 'justify' ] );
 		} );
 
 		it( 'should remove incorrect text aligns', () => {
 			expect(
-				getValidTextAlignments( [ 'left', 'right', 'justify' ] )
+				getValidTextAlignments( [ 'left', 'right', 'foo' ] )
 			).toEqual( [ 'left', 'right' ] );
+		} );
+	} );
+
+	describe( 'getTextAlignmentControls()', () => {
+		it( 'should not offer a toolbar control for justify', () => {
+			expect(
+				getTextAlignmentControls( getValidTextAlignments( true ) ).map(
+					( { align } ) => align
+				)
+			).toEqual( [ 'left', 'center', 'right' ] );
+			expect( getTextAlignmentControls( [ 'justify' ] ) ).toEqual( [] );
 		} );
 	} );
 
@@ -146,6 +170,35 @@ describe( 'textAlign', () => {
 
 			expect( props ).toEqual( {
 				className: 'has-text-align-center foo',
+			} );
+		} );
+
+		it( 'should add the justify classname when text align is justify', () => {
+			registerBlockType( 'core/foo', {
+				...blockSettings,
+				supports: {
+					typography: {
+						textAlign: true,
+					},
+				},
+			} as unknown as BlockConfiguration );
+
+			const props = addAssignedTextAlign(
+				{
+					className: 'foo',
+				},
+				'core/foo',
+				{
+					style: {
+						typography: {
+							textAlign: 'justify',
+						},
+					},
+				}
+			);
+
+			expect( props ).toEqual( {
+				className: 'has-text-align-justify foo',
 			} );
 		} );
 	} );

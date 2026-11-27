@@ -43,7 +43,7 @@ const TEXT_ALIGNMENT_OPTIONS = [
 	},
 ];
 
-const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
+const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right', 'justify' ];
 const NO_TEXT_ALIGNMENTS: string[] = [];
 
 /**
@@ -65,6 +65,21 @@ export function getValidTextAlignments(
 	}
 
 	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
+}
+
+/**
+ * Returns the toolbar controls for the given text alignments.
+ * Justify is a valid value but has no toolbar control, as justified text can
+ * reduce readability. Exported just for testing purposes.
+ *
+ * @param validTextAlignments Text aligns supported by the block.
+ *
+ * @return Toolbar controls.
+ */
+export function getTextAlignmentControls( validTextAlignments: string[] ) {
+	return TEXT_ALIGNMENT_OPTIONS.filter( ( control ) =>
+		validTextAlignments.includes( control.align )
+	);
 }
 
 export function getTextAlignControlGroup(
@@ -103,18 +118,17 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 		return null;
 	}
 
-	const validTextAlignments = getValidTextAlignments(
-		// The support is a boolean or a list of alignments.
-		getBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY ) as
-			boolean | string[] | undefined
+	const textAlignmentControls = getTextAlignmentControls(
+		getValidTextAlignments(
+			// The support is a boolean or a list of alignments.
+			getBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY ) as
+				boolean | string[] | undefined
+		)
 	);
-	if ( ! validTextAlignments.length ) {
+	if ( ! textAlignmentControls.length ) {
 		return null;
 	}
 
-	const textAlignmentControls = TEXT_ALIGNMENT_OPTIONS.filter( ( control ) =>
-		validTextAlignments.includes( control.align )
-	);
 	// The style attribute holds the text alignment.
 	const stateStyle = getStyleForState( style, selectedState ) as
 		TextAlignStyle | undefined;

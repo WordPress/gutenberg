@@ -1107,7 +1107,7 @@ export interface TypographyProps {
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign
 	 */
-	textAlign: boolean | Array< 'left' | 'center' | 'right' >;
+	textAlign: boolean | Array< 'left' | 'center' | 'right' | 'justify' >;
 }
 
 /**

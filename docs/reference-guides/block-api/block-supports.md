@@ -1246,7 +1246,8 @@ supports: {
     typography: {
         // Declare support for block's text alignment.
         // This adds support for all the options:
-        // left, center, right.
+        // left, center, right, justify.
+        // Justify has no toolbar button.
         textAlign: true
     }
 }

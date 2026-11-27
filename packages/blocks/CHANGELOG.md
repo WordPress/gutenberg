@@ -9,6 +9,10 @@
 -   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 -   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
 
+### Bug Fixes
+
+-   Types: Allow `justify` in the `typography.textAlign` support array ([#80264](https://github.com/WordPress/gutenberg/pull/80264)).
+
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).

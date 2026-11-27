@@ -79,7 +79,8 @@ const transforms = {
 				if (
 					textAlign === 'left' ||
 					textAlign === 'center' ||
-					textAlign === 'right'
+					textAlign === 'right' ||
+					textAlign === 'justify'
 				) {
 					attributes.style = {
 						...attributes.style,

@@ -49,6 +49,9 @@
 	/*rtl:ignore*/
 	text-align: right;
 }
+:root .has-text-align-justify {
+	text-align: justify;
+}
 
 // A text gradient makes the letters transparent. A block instance's text or
 // link color, or a color applied to selected text, fills them again. The
