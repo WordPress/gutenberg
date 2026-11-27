@@ -1225,9 +1225,9 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components package and root Storybook stories — disable use-recommended-components.
+	// Override: Components package and Storybook — disable use-recommended-components.
 	{
-		files: [ 'packages/components/**', 'storybook/stories/**' ],
+		files: [ 'packages/components/**', 'storybook/**' ],
 		rules: {
 			'@wordpress/use-recommended-components': 'off',
 		},
