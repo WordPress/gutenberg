@@ -655,9 +655,17 @@ export function PaletteEdit( {
 		[ colorPalette ]
 	);
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState<
-		number | null | undefined
-	>( null );
+	// Remember the slug too, so the editor closes instead of switching presets
+	// when the palette changes from outside, for example on undo.
+	const [ editingTarget, setEditingTarget ] = useState< {
+		index: number;
+		slug: string;
+	} | null >( null );
+	const editingElement =
+		editingTarget &&
+		elements[ editingTarget.index ]?.slug === editingTarget.slug
+			? editingTarget.index
+			: null;
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
@@ -677,8 +685,15 @@ export function PaletteEdit( {
 					: elements[ newEditingElementIndex ];
 			const key = variant === 'gradient' ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
-			if ( !! selectedElement && selectedElement[ key ] === value ) {
-				setEditingElement( newEditingElementIndex );
+			if (
+				newEditingElementIndex !== undefined &&
+				!! selectedElement &&
+				selectedElement[ key ] === value
+			) {
+				setEditingTarget( {
+					index: newEditingElementIndex,
+					slug: selectedElement.slug,
+				} );
 			} else {
 				setIsEditing( true );
 			}
@@ -691,11 +706,15 @@ export function PaletteEdit( {
 	// instead would edit whichever duotone happened to come first.
 	const onSelectDuotoneItem = useCallback(
 		( value?: string[] | 'unset', newEditingElementIndex?: number ) => {
-			if (
-				newEditingElementIndex !== undefined &&
-				( duotones ?? [] )[ newEditingElementIndex ]
-			) {
-				setEditingElement( newEditingElementIndex );
+			const selectedDuotone =
+				newEditingElementIndex === undefined
+					? undefined
+					: duotones?.[ newEditingElementIndex ];
+			if ( newEditingElementIndex !== undefined && selectedDuotone ) {
+				setEditingTarget( {
+					index: newEditingElementIndex,
+					slug: selectedDuotone.slug,
+				} );
 			} else {
 				setIsEditing( true );
 			}
@@ -729,7 +748,7 @@ export function PaletteEdit( {
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
-								setEditingElement( null );
+								setEditingTarget( null );
 							} }
 						>
 							{ __( 'Done' ) }
@@ -781,7 +800,10 @@ export function PaletteEdit( {
 									] );
 								}
 								setIsEditing( true );
-								setEditingElement( elements.length );
+								setEditingTarget( {
+									index: elements.length,
+									slug,
+								} );
 							} }
 						/>
 					) }
@@ -820,7 +842,7 @@ export function PaletteEdit( {
 									{ ! canOnlyChangeValues && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingTarget( null );
 												setIsEditing( false );
 												onChange();
 											} }
@@ -833,7 +855,7 @@ export function PaletteEdit( {
 									{ canReset && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingTarget( null );
 												onChange();
 											} }
 										>
@@ -865,7 +887,7 @@ export function PaletteEdit( {
 						<ColorPickerPopover
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
-							onClose={ () => setEditingElement( null ) }
+							onClose={ () => setEditingTarget( null ) }
 							onChange={ (
 								newElement: ( typeof elements )[ number ]
 							) => {
@@ -886,7 +908,7 @@ export function PaletteEdit( {
 									)
 								);
 							} }
-							element={ elements[ editingElement ?? -1 ] }
+							element={ elements[ editingElement ] }
 							popoverProps={ popoverProps }
 						/>
 					) }

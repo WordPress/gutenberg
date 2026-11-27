@@ -35,6 +35,7 @@
 -   `TabPanel`: Show the selection indicator as a solid line in forced colors mode at every pixel density ([#87347](https://github.com/WordPress/gutenberg/pull/87347)).
 -   `Panel`: Keep `PanelHeader` 48px tall, including its bottom border, inside containers that apply the `reset` mixin, such as the editor sidebar ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
 -   `SandBox`: Restore current content and metadata when a same-origin iframe reloads after being moved ([#86770](https://github.com/WordPress/gutenberg/pull/86770)).
+-   `PaletteEdit`: Close the swatch editor when the palette changes from outside, so an undo no longer crashes it or moves it to another preset ([#86765](https://github.com/WordPress/gutenberg/pull/86765)).
 
 ### Internal
 
