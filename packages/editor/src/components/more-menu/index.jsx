@@ -5,6 +5,7 @@ import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { keyboardShortcut } from '@wordpress/keycodes';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Menu,
@@ -23,9 +24,18 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+	const { showIconLabels, distractionFreeShortcut } = useSelect(
+		( select ) => ( {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+			distractionFreeShortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation(
+				'core/editor/toggle-distraction-free'
+			),
+		} ),
 		[]
 	);
 
@@ -101,7 +111,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 							messageDeactivated={ __(
 								'Distraction free mode deactivated.'
 							) }
-							shortcut={ keyboardShortcut.primaryShift( '\\' ) }
+							shortcut={ distractionFreeShortcut }
 						/>
 						<MoreMenuPreferenceItem
 							scope="core"

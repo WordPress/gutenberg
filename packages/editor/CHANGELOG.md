@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Distraction free: Use `Cmd+Shift+Option+\` in Safari, which reserves `Cmd+Shift+\`.
 -   `PostTaxonomiesHierarchicalTermSelector`: Keep the form to add a term usable after creating a term fails, instead of ignoring every later attempt ([#87498](https://github.com/WordPress/gutenberg/pull/87498)).
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
 -   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
