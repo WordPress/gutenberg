@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import type { Form } from '@wordpress/dataviews';
@@ -9,7 +9,13 @@ import {
 	Popover as WCPopover,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createPortal,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { inertValue } from '@wordpress/react-inert-value';
@@ -55,6 +61,79 @@ function withEditorAssets( FieldEdit: any ) {
 }
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
+
+type FieldSetValue = ( args: {
+	item: any;
+	value: any;
+} ) => Record< string, any >;
+
+/**
+ * The values picked in a bulk edit form, by field id, in the order they were
+ * last picked, with the `setValue` of their field.
+ */
+type PickedValues = Map< string, { value: unknown; setValue: FieldSetValue } >;
+
+/*
+ * DataForm's default `setValue`, for a field without its own: the value under
+ * the field id, nested for a dotted id.
+ */
+const setValueFromId =
+	( id: string ): FieldSetValue =>
+	( { value } ) => {
+		const path = id.split( '.' );
+		const edits: Record< string, any > = {};
+		let current = edits;
+		for ( const segment of path.slice( 0, -1 ) ) {
+			current[ segment ] = {};
+			current = current[ segment ];
+		}
+		current[ path[ path.length - 1 ] ] = value;
+		return edits;
+	};
+
+/*
+ * A bulk edit shows no post, so each field picks its value against the form's
+ * own edits, and a field whose `setValue` depends on the post can't apply what
+ * the value means for each one (the status field drops the date in the future
+ * of a scheduled post and the password of a private one). Note every value
+ * the form picks, so the save can run its field's `setValue` again against
+ * each post.
+ */
+function withPickedValue< F extends { id: string; setValue?: FieldSetValue } >(
+	field: F,
+	pickedValues: PickedValues
+): F {
+	const setValue = field.setValue ?? setValueFromId( field.id );
+	return {
+		...field,
+		setValue: ( args: { item: any; value: any } ) => {
+			// A field picked again moves last, so the picks replay in the
+			// order they were last made.
+			pickedValues.delete( field.id );
+			pickedValues.set( field.id, { value: args.value, setValue } );
+			return setValue( args );
+		},
+	};
+}
+
+/*
+ * The edits a bulk edit makes to one post: the values picked in the form, in
+ * order, each turned into edits by its field against the post as the earlier
+ * picks leave it, as if the post had been edited alone.
+ */
+function replayPickedValues(
+	pickedValues: PickedValues,
+	post: Record< string, any >
+) {
+	let edits: Record< string, any > = {};
+	for ( const { value, setValue } of pickedValues.values() ) {
+		edits = {
+			...edits,
+			...setValue( { item: { ...post, ...edits }, value } ),
+		};
+	}
+	return edits;
+}
 
 interface QuickEditModalProps {
 	postType: string;
@@ -106,6 +185,8 @@ export function QuickEditModal( {
 	);
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
+	const registry = useRegistry();
+	const pickedValues = useRef< PickedValues >( new Map() );
 
 	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
@@ -121,6 +202,17 @@ export function QuickEditModal( {
 				return field;
 			} ),
 		[ _fields ]
+	);
+
+	// In a bulk edit, note the values the form picks: see `withPickedValue`.
+	const formFields = useMemo(
+		() =>
+			isBulk
+				? fields?.map( ( field: any ) =>
+						withPickedValue( field, pickedValues.current )
+					)
+				: fields,
+		[ fields, isBulk ]
 	);
 
 	const form = useMemo( (): Form => {
@@ -145,12 +237,30 @@ export function QuickEditModal( {
 	};
 	useEffect( () => {
 		setLocalEdits( {} );
+		pickedValues.current.clear();
 	}, [ postId ] );
 
-	const onSave = async () => {
-		for ( const id of postId ) {
-			editEntityRecord( 'postType', postType, id, localEdits );
+	const getEditsFor = async ( id: string ) => {
+		if ( ! isBulk ) {
+			return localEdits;
 		}
+		const post = await registry
+			.resolveSelect( coreDataStore )
+			.getEditedEntityRecord( 'postType', postType, id )
+			// Without the post there's nothing to replay the picks against,
+			// and its save reports the error.
+			.catch( () => undefined );
+		if ( ! post ) {
+			return localEdits;
+		}
+		return replayPickedValues( pickedValues.current, post );
+	};
+
+	const onSave = async () => {
+		const edits = await Promise.all( postId.map( getEditsFor ) );
+		postId.forEach( ( id, index ) => {
+			editEntityRecord( 'postType', postType, id, edits[ index ] );
+		} );
 
 		if ( isBulk ) {
 			await Promise.allSettled(
@@ -185,7 +295,7 @@ export function QuickEditModal( {
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
-						fields={ fields }
+						fields={ formFields }
 						form={ form }
 						onChange={ onChange }
 					/>
