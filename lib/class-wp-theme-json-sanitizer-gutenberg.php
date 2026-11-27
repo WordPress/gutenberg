@@ -536,16 +536,17 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		foreach ( $diagnostics as $diagnostic ) {
 			$path = $diagnostic['path'];
 			if ( isset( $path[4] ) && 'styles' === $path[0] && 'blocks' === $path[1] && 'variations' === $path[3] && array_key_exists( $path[4], $theme_json['styles']['variations'] ) ) {
-				$own_value = $theme_json;
+				$has_own_value = true;
+				$node          = $theme_json;
 				foreach ( $path as $key ) {
-					if ( ! is_array( $own_value ) || ! array_key_exists( $key, $own_value ) ) {
-						$own_value = null;
+					if ( ! is_array( $node ) || ! array_key_exists( $key, $node ) ) {
+						$has_own_value = false;
 						break;
 					}
-					$own_value = $own_value[ $key ];
+					$node = $node[ $key ];
 				}
 
-				if ( null === $own_value ) {
+				if ( ! $has_own_value ) {
 					$diagnostic['path']    = array_merge( array( 'styles', 'variations' ), array_slice( $path, 4 ) );
 					$diagnostic['message'] = self::get_diagnostic_message( $diagnostic['code'], $diagnostic['path'] );
 				}
