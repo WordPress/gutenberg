@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/mixins" as *;
 @use "../utils/grid-items.scss" as *;
 
 .dataviews-view-picker-grid {
@@ -55,8 +56,15 @@
 			outline: none;
 		}
 
-		[data-active-item="true"] {
-			outline: 2px solid var(--wpds-color-stroke-focus);
+		[data-active-item="true"]::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			border-radius: var(--wpds-border-radius-md);
+			pointer-events: none;
+			@include outset-ring__focus();
+			// Keep the focus ring inside the card so scrolling cannot clip it.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 	}
 
