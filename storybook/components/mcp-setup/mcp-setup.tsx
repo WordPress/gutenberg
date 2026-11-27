@@ -23,7 +23,7 @@ export function McpSetup( { children }: { children: ReactNode } ) {
 	const tools = Children.toArray( children ).filter(
 		( child ) => isValidElement( child ) && child.type === McpSetupTool
 	) as ReactElement< McpSetupToolProps >[];
-	const tool = tools[ selected ] ?? tools[ 0 ];
+	const tool = tools[ selected ];
 
 	if ( ! tool ) {
 		return null;
@@ -40,7 +40,7 @@ export function McpSetup( { children }: { children: ReactNode } ) {
 				<SelectControl
 					label="AI tool"
 					items={ items }
-					value={ items[ tools.indexOf( tool ) ] }
+					value={ items[ selected ] }
 					onValueChange={ ( item ) => {
 						if ( item?.value ) {
 							setSelected( Number( item.value ) );
