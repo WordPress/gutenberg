@@ -11,7 +11,7 @@
 -   `NavMenu` no longer has `object_id`, which belongs to menu items and is not returned for menus ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `WpFontFamily` now matches the REST schema: `id` is a `number`, `theme_json_version` and `font_faces` are added, and the top-level `slug` and `name` are removed. Read them from `font_family_settings` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   `Taxonomy.visibility` is only available in the edit context ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
--   `useEntityRecord` types `editedRecord`, `edits` and the `edit()` argument with `Updatable`, so fields edited as raw markup, such as a post's `title` and `content`, are strings. Read `editedRecord.title` instead of `editedRecord.title.raw` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
+-   `useEntityRecord` types `edits` and the `edit()` argument with `Updatable`, so rendered fields are edited as strings. In `editedRecord`, the fields an entity edits as raw markup, such as a post's `title` and `content`, are strings: read `editedRecord.title` instead of `editedRecord.title.raw`. Other rendered fields, such as a comment's `content`, keep their object until they are edited ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 -   Every taxonomy name resolves to `Term`, so a taxonomy merged into `TaxonomyEntityRecordTypes` must use a record that extends `Term` ([#86224](https://github.com/WordPress/gutenberg/pull/86224)).
 
 ### Enhancements

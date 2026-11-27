@@ -6,15 +6,20 @@ import type * as ET from '../entity-types';
 import type { Status } from './constants';
 import { getResolutionStatus } from './utils';
 
-export interface EntityRecordResolution< RecordType > {
+export interface EntityRecordResolution<
+	RecordType,
+	RawFields extends PropertyKey = keyof RecordType,
+> {
 	/** The requested entity record */
 	record: RecordType | null;
 
 	/**
-	 * The edited entity record. Fields edited as raw markup, such as a post's
-	 * `title` and `content`, hold that markup as a string.
+	 * The edited entity record. Fields the entity edits as raw markup, such as
+	 * a post's `title` and `content`, hold that markup as a string. Other
+	 * rendered fields, such as a comment's `content`, keep their object until
+	 * they are edited.
 	 */
-	editedRecord: Partial< ET.Updatable< RecordType > >;
+	editedRecord: Partial< ET.EditedRecord< RecordType, RawFields > >;
 
 	/** The edits to the edited entity record */
 	edits: Partial< ET.Updatable< RecordType > >;
@@ -156,7 +161,10 @@ export default function useEntityRecord<
 	name: Name,
 	recordId: string | number,
 	options?: Options
-): EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >;
+): EntityRecordResolution<
+	ET.EntityRecordOfQuery< Kind, Name, undefined >,
+	ET.RawAttributesOf< Kind, Name >
+>;
 
 /*
  * The site settings have no key, so they are the one record read without an
@@ -169,7 +177,8 @@ export default function useEntityRecord(
 	recordId?: undefined,
 	options?: Options
 ): EntityRecordResolution<
-	ET.EntityRecordOfQuery< 'root', 'site', undefined >
+	ET.EntityRecordOfQuery< 'root', 'site', undefined >,
+	ET.RawAttributesOf< 'root', 'site' >
 >;
 
 /*

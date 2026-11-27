@@ -469,6 +469,36 @@ type EntityRecordInContexts<
 > = C extends Context ? EntityRecordOf< Kind, Name, C > : never;
 
 /**
+ * The fields an entity lists in its `rawAttributes` config in `entities.ts`.
+ * `getRawEntityRecord`, and so `getEditedEntityRecord`, replaces only these
+ * fields with their `raw` string; every other field keeps the shape the REST
+ * API returned. Keep this in sync with `entities.ts`.
+ */
+export type RawAttributesOf< Kind, Name > = Kind extends 'postType'
+	? 'title' | 'excerpt' | 'content'
+	: Kind extends 'root'
+		? Name extends 'media'
+			? 'caption' | 'title' | 'description'
+			: Name extends 'menuItem'
+				? 'title'
+				: never
+		: never;
+
+/**
+ * A record merged with its edits, as `getEditedEntityRecord` returns it. A
+ * rendered field listed in `RawFields` holds its raw string. Any other
+ * rendered field keeps its object until it is edited, and edits pass a
+ * string, so it may hold either.
+ */
+export type EditedRecord< RecordType, RawFields extends PropertyKey > = {
+	[ K in keyof RecordType ]: RecordType[ K ] extends RenderedText< any >
+		? K extends RawFields
+			? string
+			: RecordType[ K ] | string
+		: RecordType[ K ];
+};
+
+/**
  * Resolves a `kind`/`name` pair against the query it was requested with.
  *
  * `context` selects which fields the REST API serialises, so a `'view'`

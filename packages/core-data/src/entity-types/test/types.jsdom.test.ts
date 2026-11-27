@@ -800,6 +800,27 @@ describe( 'Entity record types', () => {
 			// @ts-expect-error -- the edited title is the raw string, not an object.
 			editedRecord.title?.raw;
 
+			// Only fields the entity lists in `rawAttributes` are flattened.
+			// A comment lists none, so its unedited `content` is still the
+			// object the REST API returned, and an edit makes it a string.
+			const { editedRecord: comment, edit: editComment } =
+				useEntityRecord( 'root', 'comment', 1 );
+			true satisfies Expect<
+				typeof comment.content,
+				Comment< 'edit' >[ 'content' ] | string | undefined
+			>;
+			editComment( { content: 'Edited' } );
+
+			const { editedRecord: styles } = useEntityRecord(
+				'root',
+				'globalStyles',
+				1
+			);
+			true satisfies Expect<
+				typeof styles.title,
+				GlobalStyles< 'edit' >[ 'title' ] | string | undefined
+			>;
+
 			const { records } = useEntityRecords( 'postType', 'post' );
 			true satisfies Expect< typeof records, Post< 'edit' >[] | null >;
 

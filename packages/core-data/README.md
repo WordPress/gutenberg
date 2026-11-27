@@ -1171,7 +1171,7 @@ _Parameters_
 
 _Returns_
 
-- `EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined > >`: Entity record data.
+- `EntityRecordResolution< ET.EntityRecordOfQuery< Kind, Name, undefined >, ET.RawAttributesOf< Kind, Name > >`: Entity record data.
 
 _Changelog_
 
