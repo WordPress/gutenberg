@@ -15,8 +15,8 @@ const variations: BlockConfiguration< CategoriesAttributes >[ 'variations' ] = [
 			// for backwards compatibility reasons.
 			// The logical fallback is thus the only other built-in and public taxonomy: Tags.
 			taxonomy: 'post_tag',
-		} as CategoriesAttributes,
-		isActive: ( blockAttributes: CategoriesAttributes ) =>
+		},
+		isActive: ( blockAttributes ) =>
 			// This variation is used for any taxonomy other than `category`.
 			blockAttributes.taxonomy !== 'category',
 	},
