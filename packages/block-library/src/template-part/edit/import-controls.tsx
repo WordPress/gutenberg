@@ -14,7 +14,10 @@ import { SelectControl } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
-import { transformWidgetToBlock } from './utils/transformers';
+import {
+	transformWidgetToBlock,
+	type WidgetEntity,
+} from './utils/transformers';
 import type { TemplatePartAttributes } from '../types';
 
 const SIDEBARS_QUERY = {
@@ -108,11 +111,7 @@ export function TemplatePartImportControls( {
 
 		const skippedWidgets = new Set< string >();
 		const blocks = widgets.flatMap( ( widget ) => {
-			const block = transformWidgetToBlock(
-				widget as unknown as Parameters<
-					typeof transformWidgetToBlock
-				>[ 0 ]
-			);
+			const block = transformWidgetToBlock( widget as WidgetEntity );
 
 			// Skip the block if we have no matching transformations.
 			if ( ! block ) {

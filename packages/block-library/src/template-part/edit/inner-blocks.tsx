@@ -12,14 +12,13 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
+import type { TemplatePartAttributes } from '../types';
 
 type EditorLayout = NonNullable<
 	Parameters< typeof useInnerBlocksProps >[ 1 ]
 >[ 'layout' ];
 
-interface LayoutConfig extends Record< string, unknown > {
-	inherit?: boolean;
-}
+type LayoutConfig = TemplatePartAttributes[ 'layout' ];
 
 interface InnerBlocksProps {
 	postId: string;
@@ -72,11 +71,14 @@ function NonEditableTemplatePartPreview( {
 				return {};
 			}
 			const { getEditedEntityRecord } = select( coreStore );
-			const editedRecord = (
-				getEditedEntityRecord as ( ...args: unknown[] ) => unknown
-			 )( 'postType', 'wp_template_part', id, {
-				context: 'view',
-			} ) as ( WpTemplatePart & { blocks?: Block[] } ) | undefined;
+			const editedRecord = getEditedEntityRecord(
+				'postType',
+				'wp_template_part',
+				id,
+				// @ts-expect-error Bug: the selector ignores the query, so `context` has no effect.
+				{ context: 'view' }
+			) as unknown as
+				( WpTemplatePart & { blocks?: Block[] } ) | undefined;
 			return {
 				editedBlocks: editedRecord!.blocks,
 				content: editedRecord!.content,

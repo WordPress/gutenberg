@@ -1,6 +1,6 @@
 import { capitalCase } from 'change-case';
 import { store as coreDataStore } from '@wordpress/core-data';
-import type { WpTemplatePart } from '@wordpress/core-data';
+import type { Updatable, WpTemplatePart } from '@wordpress/core-data';
 import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
@@ -32,13 +32,13 @@ export const settings: Partial< BlockConfiguration< TemplatePartAttributes > > =
 				'postType',
 				'wp_template_part',
 				( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
-			) as unknown as WpTemplatePart | undefined;
+			) as Updatable< WpTemplatePart > | false;
 			if ( ! entity ) {
 				return;
 			}
 
 			return (
-				decodeEntities( entity.title as unknown as string ) ||
+				decodeEntities( entity.title ) ||
 				capitalCase( entity.slug || '' )
 			);
 		},

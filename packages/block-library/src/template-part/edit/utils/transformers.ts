@@ -7,21 +7,11 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
+import type { Widget } from '@wordpress/core-data';
 
-interface WidgetEntity {
-	id: string;
-	id_base: string;
-	instance: {
-		raw: {
-			content: string;
-		};
-	};
-	_embedded: {
-		about: Array< {
-			is_multi?: boolean;
-		} >;
-	};
-}
+export type WidgetEntity = Widget< 'edit' > & {
+	_embedded: { about: Array< { is_multi?: boolean } > };
+};
 
 /**
  * Converts a widget entity record into a block.

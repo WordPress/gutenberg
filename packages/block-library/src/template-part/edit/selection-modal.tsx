@@ -91,13 +91,7 @@ export default function TemplatePartSelectionModal( {
 					<BlockPatternsList
 						blockPatterns={ filteredTemplateParts }
 						onClickPattern={ ( pattern ) => {
-							onTemplatePartSelect(
-								(
-									pattern as unknown as {
-										templatePart: WpTemplatePart;
-									}
-								 ).templatePart
-							);
+							onTemplatePartSelect( pattern.templatePart );
 						} }
 					/>
 				</div>

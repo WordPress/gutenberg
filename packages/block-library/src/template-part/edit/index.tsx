@@ -1,4 +1,4 @@
-import type { ComponentProps, ElementType } from 'react';
+import type { ElementType } from 'react';
 import { serialize } from '@wordpress/blocks';
 import type { Block, BlockEditProps } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -22,7 +22,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import type { WpTemplatePart } from '@wordpress/core-data';
+import type { Updatable, WpTemplatePart } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import TemplatePartPlaceholder from './placeholder';
@@ -65,8 +65,7 @@ function ReplaceButton( {
 	const canReplace =
 		isEntityAvailable &&
 		hasReplacements &&
-		!! area &&
-		SUPPORTED_AREAS.includes( area );
+		SUPPORTED_AREAS.includes( area! );
 
 	if ( ! canReplace ) {
 		return null;
@@ -104,8 +103,7 @@ function TemplatesList( {
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		!! area &&
-		SUPPORTED_AREAS.includes( area );
+		SUPPORTED_AREAS.includes( area! );
 
 	if ( ! canReplace ) {
 		return null;
@@ -115,14 +113,8 @@ function TemplatesList( {
 		<PanelBody title={ __( 'Design' ) }>
 			<BlockPatternsList
 				label={ __( 'Templates' ) }
-				blockPatterns={
-					blockPatterns as unknown as ComponentProps<
-						typeof BlockPatternsList
-					>[ 'blockPatterns' ]
-				}
-				onClickPattern={ ( pattern ) =>
-					onSelect( pattern as unknown as { blocks: Block[] } )
-				}
+				blockPatterns={ blockPatterns }
+				onClickPattern={ onSelect }
 				showTitlesAsTooltip
 			/>
 		</PanelBody>
@@ -133,7 +125,7 @@ export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
-}: BlockEditProps< TemplatePartAttributes > & { clientId: string } ) {
+}: BlockEditProps< TemplatePartAttributes > ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const currentTheme = useSelect(
@@ -168,8 +160,8 @@ export default function TemplatePartEdit( {
 				templatePartId!,
 			];
 			const entityRecord = templatePartId
-				? ( getEditedEntityRecord( ...getEntityArgs ) as unknown as
-						WpTemplatePart | undefined )
+				? ( getEditedEntityRecord( ...getEntityArgs ) as
+						Updatable< WpTemplatePart > | undefined )
 				: null;
 			const _area = entityRecord?.area || attributes.area;
 			const hasResolvedEntity = templatePartId
@@ -225,7 +217,7 @@ export default function TemplatePartEdit( {
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" updated.' ),
-				( title as unknown as string ) || slug!
+				title || slug!
 			),
 			{
 				type: 'snackbar',

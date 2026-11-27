@@ -38,14 +38,14 @@ export function TemplatePartAdvancedControls( {
 		'postType',
 		'wp_template_part',
 		'area',
-		templatePartId ?? undefined
+		templatePartId!
 	);
 
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'title',
-		templatePartId ?? undefined
+		templatePartId!
 	);
 
 	const defaultTemplatePartAreas = useSelect(

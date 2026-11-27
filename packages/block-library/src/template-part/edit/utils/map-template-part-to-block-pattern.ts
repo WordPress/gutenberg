@@ -11,10 +11,7 @@ import { createTemplatePartId } from './create-template-part-id';
 export function mapTemplatePartToBlockPattern( templatePart: WpTemplatePart ) {
 	return {
 		name: createTemplatePartId( templatePart.theme, templatePart.slug )!,
-		title:
-			typeof templatePart.title === 'string'
-				? templatePart.title
-				: templatePart.title.rendered,
+		title: templatePart.title.rendered,
 		blocks: parse( templatePart.content.raw ),
 		templatePart,
 	};
