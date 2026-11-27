@@ -19,6 +19,7 @@
 
 -   List View: Use the theme's brand colors for selected labels, anchor badges and action focus rings. When design tokens are loaded, setting `--wp-admin-theme-color` alone no longer changes the selected row's fill ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
+-   Undo: Placing the caret in an empty post or container no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View, Block Styles: Use `Highlight` and `HighlightText` for the selected row and the active style in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
