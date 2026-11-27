@@ -1,18 +1,29 @@
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useContext } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useResizeObserver,
+	useViewportMatch,
+} from '@wordpress/compose';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button, pending WordPress/gutenberg#76135.
 	Button,
 	Checkbox,
 	Field,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton, pending WordPress/gutenberg#76135.
-	IconButton,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
 	Menu,
 	Stack,
+	Tooltip,
 } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
@@ -228,24 +239,43 @@ function renderBulkActionsContent< Item >(
 	onChangeSelection: SetSelection,
 	totalItems: number,
 	isMobile: boolean,
+	toolbarRef: React.Ref< HTMLDivElement >,
+	isClearSelectionIconOnly: boolean,
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >,
 	onClearSelection?: () => void
 ) {
+	// Named for what it does, so it can't be read as closing the whole view.
+	// Text next to the actions also keeps it in sight for screen magnifier
+	// users. When the text doesn't fit, it's an icon with a tooltip instead,
+	// on the same button, so it keeps focus when the view resizes.
 	const clearSelection = selectedItems.length > 0 && (
-		<IconButton
-			className="dataviews-bulk-actions__clear"
-			variant="minimal"
-			tone="neutral"
-			size="compact"
-			icon={ closeSmall }
-			label={ __( 'Cancel' ) }
-			disabled={ !! actionInProgress }
-			focusableWhenDisabled={ false }
-			onClick={ () => {
-				onClearSelection?.();
-				onChangeSelection( EMPTY_ARRAY );
-			} }
-		/>
+		<Tooltip.Root disabled={ ! isClearSelectionIconOnly }>
+			<Tooltip.Trigger
+				render={
+					<Button
+						className="dataviews-bulk-actions__clear"
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+						disabled={ !! actionInProgress }
+						focusableWhenDisabled={ false }
+						onClick={ () => {
+							onClearSelection?.();
+							onChangeSelection( EMPTY_ARRAY );
+						} }
+					/>
+				}
+			>
+				<Button.Icon
+					className="dataviews-bulk-actions__clear-icon"
+					icon={ closeSmall }
+				/>
+				<span className="dataviews-bulk-actions__clear-text">
+					{ __( 'Clear selection' ) }
+				</span>
+			</Tooltip.Trigger>
+			<Tooltip.Popup>{ __( 'Clear selection' ) }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 	const renderActions = ( isMenuItem = false ) =>
 		actionsToShow.map( ( action ) => (
@@ -260,8 +290,11 @@ function renderBulkActionsContent< Item >(
 		) );
 	return (
 		<Stack
+			ref={ toolbarRef }
 			direction="row"
-			className="dataviews-bulk-actions"
+			className={ clsx( 'dataviews-bulk-actions', {
+				'is-clear-selection-icon-only': isClearSelectionIconOnly,
+			} ) }
 			gap="md"
 			align="center"
 			justify="start"
@@ -400,6 +433,37 @@ function BulkActionsContent< Item >( {
 			} ),
 		[ actions, selectedItems ]
 	);
+	// Whether "Clear selection" only fits as an icon. Measured with the text,
+	// as it doesn't depend on the viewport but on the room the view and the
+	// actions leave, which changes with their labels and translations.
+	const toolbarRef = useRef< HTMLDivElement >( null );
+	const [ isClearSelectionIconOnly, setIsClearSelectionIconOnly ] =
+		useState( false );
+	const updateClearSelectionFit = useCallback( () => {
+		const toolbar = toolbarRef.current;
+		if ( ! toolbar ) {
+			return;
+		}
+		const wasIconOnly = toolbar.classList.contains(
+			'is-clear-selection-icon-only'
+		);
+		toolbar.classList.remove( 'is-clear-selection-icon-only' );
+		// Only a scroll container counts its end padding in `scrollWidth`.
+		const { overflow } = toolbar.style;
+		toolbar.style.overflow = 'hidden';
+		const isOverflowing = toolbar.scrollWidth > toolbar.clientWidth;
+		toolbar.style.overflow = overflow;
+		// Leave the class to the next render.
+		toolbar.classList.toggle( 'is-clear-selection-icon-only', wasIconOnly );
+		setIsClearSelectionIconOnly( isOverflowing );
+	}, [] );
+	// Whenever the content may have changed, e.g. the actions or the count,
+	// and when the toolbar resizes.
+	useLayoutEffect( updateClearSelectionFit );
+	const resizeToolbarRef = useResizeObserver< HTMLDivElement >(
+		updateClearSelectionFit
+	);
+	const toolbarRefs = useMergeRefs( [ toolbarRef, resizeToolbarRef ] );
 	const renderContent = ( actionInProgress: string | null ) =>
 		renderBulkActionsContent(
 			data,
@@ -414,6 +478,8 @@ function BulkActionsContent< Item >( {
 			onChangeSelection,
 			paginationInfo.totalItems,
 			isMobile,
+			toolbarRefs,
+			isClearSelectionIconOnly,
 			selectionCheckboxRef,
 			onClearSelection
 		);
