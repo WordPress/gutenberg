@@ -218,6 +218,44 @@ description: |
 		] );
 	} );
 
+	test( 'accepts an optional compatibility field', () => {
+		const source = VALID_SOURCE.replace(
+			'description: Use when writing tests.',
+			'description: Use when writing tests.\ncompatibility: Requires Node.js 22 or later.'
+		);
+		expect( messagesFor( source ) ).toEqual( [] );
+	} );
+
+	test( 'rejects a compatibility field that is empty or not a string', () => {
+		for ( const value of [ "''", '[ node ]', '42' ] ) {
+			const source = VALID_SOURCE.replace(
+				'description: Use when writing tests.',
+				`description: Use when writing tests.\ncompatibility: ${ value }`
+			);
+			expect( messagesFor( source ) ).toEqual( [
+				{
+					line: 4,
+					message: expect.stringContaining( '"compatibility" field' ),
+				},
+			] );
+		}
+	} );
+
+	test( 'rejects a compatibility field longer than 500 characters', () => {
+		const source = VALID_SOURCE.replace(
+			'description: Use when writing tests.',
+			`description: Use when writing tests.\ncompatibility: ${ 'a'.repeat(
+				501
+			) }`
+		);
+		expect( messagesFor( source ) ).toEqual( [
+			{
+				line: 4,
+				message: expect.stringContaining( '500 characters or fewer' ),
+			},
+		] );
+	} );
+
 	test( 'rejects unknown fields', () => {
 		const source = VALID_SOURCE.replace(
 			'description:',

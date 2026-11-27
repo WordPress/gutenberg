@@ -8,10 +8,11 @@ const SKILL_FILE = 'SKILL.md';
 const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const NAME_MAX_LENGTH = 64;
 const DESCRIPTION_MAX_LENGTH = 1024;
+const COMPATIBILITY_MAX_LENGTH = 500;
 
 // The repository's skill conventions allow only these fields. See
 // docs/contributors/code/agents-and-skills.md.
-const ALLOWED_FIELDS = new Set( [ 'name', 'description' ] );
+const ALLOWED_FIELDS = new Set( [ 'name', 'description', 'compatibility' ] );
 
 /**
  * @typedef {Object} SkillError
@@ -152,7 +153,7 @@ export function validateSkill( { directoryName, source } ) {
 		}
 	}
 
-	const { name, description } = frontmatter;
+	const { name, description, compatibility } = frontmatter;
 
 	if ( typeof name !== 'string' || name === '' ) {
 		errors.push( {
@@ -198,6 +199,24 @@ export function validateSkill( { directoryName, source } ) {
 			errors.push( {
 				line: lineOf( 'description' ),
 				message: `"description" must be ${ DESCRIPTION_MAX_LENGTH } characters or fewer. Found ${ description.length }.`,
+			} );
+		}
+	}
+
+	if ( compatibility !== undefined ) {
+		if (
+			typeof compatibility !== 'string' ||
+			compatibility.trim() === ''
+		) {
+			errors.push( {
+				line: lineOf( 'compatibility' ),
+				message:
+					'The "compatibility" field must be a non-empty string that describes the environment the skill needs.',
+			} );
+		} else if ( compatibility.length > COMPATIBILITY_MAX_LENGTH ) {
+			errors.push( {
+				line: lineOf( 'compatibility' ),
+				message: `"compatibility" must be ${ COMPATIBILITY_MAX_LENGTH } characters or fewer. Found ${ compatibility.length }.`,
 			} );
 		}
 	}
