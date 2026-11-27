@@ -2,6 +2,7 @@ import * as interfaceApis from '@wordpress/interface';
 import { lock } from './lock-unlock';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
+import { ExperimentalEditorProvider } from './components/provider';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
@@ -25,6 +26,7 @@ export const privateApis = {};
 lock( privateApis, {
 	BackButton,
 	Editor,
+	ExperimentalEditorProvider,
 	PluginPostExcerpt,
 	PostCardPanel,
 	PreferencesModal,
