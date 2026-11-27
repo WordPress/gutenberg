@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
+
 ### Bug Fixes
 
 -   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
