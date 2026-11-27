@@ -26,6 +26,7 @@ import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
@@ -256,17 +257,17 @@ export function ImageEdit( {
 		const linkDestination =
 			attributes.linkDestination || getDefaultLinkDestination();
 
-		// Check if the image is linked to it's media.
-		let href;
 		switch ( linkDestination ) {
 			case LINK_DESTINATION_MEDIA:
-				href = media.url;
+				mediaAttributes.href = media.url;
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
-				href = media.link;
+				mediaAttributes.href = media.link;
+				break;
+			case LINK_DESTINATION_NONE:
+				mediaAttributes.href = undefined;
 				break;
 		}
-		mediaAttributes.href = href;
 
 		setAttributes( {
 			blob: undefined,

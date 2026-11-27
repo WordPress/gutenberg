@@ -512,7 +512,11 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#example
 	 */
-	example?: Partial< BlockType > & {
+	example?: Partial< Omit< BlockType, 'attributes' > > & {
+		/**
+		 * Attribute values for the block preview.
+		 */
+		attributes?: Partial< Attributes >;
 		innerBlocks?: BlockExampleInnerBlock[];
 		/**
 		 * Static HTML fragments interleaved with inner blocks, where `null`
@@ -1513,6 +1517,10 @@ export interface BlockEditProps<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 > extends BlockSaveProps< Attributes > {
 	/**
+	 * The block's name.
+	 */
+	name: string;
+	/**
 	 * The block's client ID.
 	 */
 	clientId: string;
@@ -1534,6 +1542,29 @@ export interface BlockEditProps<
 	 * Context values inherited from ancestor blocks.
 	 */
 	context: Record< string, unknown >;
+	/**
+	 * Inserts blocks after this block. Undefined when the block is locked
+	 * against insertion.
+	 */
+	insertBlocksAfter?: ( blocks: Block | Block[] ) => void;
+	/**
+	 * Merges this block with the previous block, or the next block if
+	 * `forward` is true. Undefined when the block cannot be removed.
+	 */
+	mergeBlocks?: ( forward: boolean ) => void;
+	/**
+	 * Replaces this block, selecting the block at `indexToSelect`.
+	 * Undefined when the block cannot be removed.
+	 */
+	onReplace?: (
+		blocks: Block | Block[],
+		indexToSelect?: number | null,
+		initialPosition?: 0 | -1 | null
+	) => void;
+	/**
+	 * Removes this block. Undefined when the block cannot be removed.
+	 */
+	onRemove?: () => void;
 }
 
 /**

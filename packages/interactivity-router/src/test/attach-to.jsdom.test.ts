@@ -303,6 +303,54 @@ afterEach( () => {
 } );
 
 describe( 'attachment targets', () => {
+	test( 'attaches new regions within ignored HTML content', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', false );
+		const readHtml = vi.fn();
+		store( namespace, {
+			state: {
+				/** Records any forbidden evaluation of an ignored HTML reference. */
+				get ignored() {
+					readHtml();
+					return asDangerousHTML( '<b>ignored</b>' );
+				},
+			},
+		} );
+		const variants = [ '---id', '--suffix', '--suffix---id' ];
+		const root = hydrateHtml(
+			`<main data-wp-interactive="${ namespace }">${ variants
+				.map(
+					( variant, index ) =>
+						`<section data-wp-html${ variant }="state.ignored"><div data-target="${ index }"></div></section>`
+				)
+				.join( '' ) }</main>`
+		);
+		await actions.navigate( pageUrl( 'B' ), {
+			...quiet,
+			html: pageHtml(
+				regionHtml( 's', '<p>B</p>' ) +
+					variants
+						.map( ( _, index ) =>
+							regionHtml(
+								`ignored-${ index }`,
+								`<p data-attached>attached ${ index }</p>`,
+								`[data-target="${ index }"]`
+							)
+						)
+						.join( '' )
+			).replace( '<title>t</title>', '<title>B</title>' ),
+		} );
+		await nextFrames();
+
+		expectPage( 'B' );
+		expect(
+			[ ...root.querySelectorAll( '[data-target]' ) ].map(
+				( target ) =>
+					target.querySelector( '[data-attached]' )?.textContent
+			)
+		).toEqual( variants.map( ( _, index ) => `attached ${ index }` ) );
+		expect( readHtml ).not.toHaveBeenCalled();
+	} );
+
 	for ( const selector of [ '.target', '.owner' ] ) {
 		test( `attaches to the first usable match after inert ${ selector } matches`, async () => {
 			const outside = document.createElement( 'div' );

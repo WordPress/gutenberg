@@ -31,3 +31,12 @@ export type { Schema } from './dom/types';
  * The rules for a single tag in a `Schema`.
  */
 export type { SchemaItem } from './dom/types';
+
+export { privateApis } from './private-apis';
+
+/**
+ * Types for core consumers of the locked DOM helpers.
+ *
+ * @ignore
+ */
+export type { DOMPrivateApis } from './private-apis';

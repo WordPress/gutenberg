@@ -4,9 +4,25 @@
 
 ### Bug Fixes
 
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
+-   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
+-   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
+-   Refetch a post type's registered meta when its `getPostType` or `getEntityRecord( 'root', 'postType', … )` resolution is invalidated, so meta registered after the editor loads shows up in block bindings ([#87263](https://github.com/WordPress/gutenberg/pull/87263)).
+-   Add a `getEntityConfig` resolver, so reading a `root` entity other than `site`, such as `__unstableBase` or `status`, no longer waits for the `OPTIONS /wp/v2/settings` request ([#87446](https://github.com/WordPress/gutenberg/pull/87446)).
+
+### Internal
+
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 9.2.0 (2026-11-18)
+
+### Bug Fixes
+
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
+-   Real-time collaboration: Re-parse blocks of persisted CRDT documents that hold missing or invalid blocks, so a block does not stay missing after its plugin is reactivated or stay invalid after its block type accepts its markup again ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
+-   Core Data: Reject unsafe entity record keys.
 
 ## 9.1.0 (2026-11-04)
 
@@ -191,6 +207,12 @@
 
 ## 7.34.0 (2025-10-29)
 
+## 7.33.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 7.33.0 (2025-10-17)
 
 ## 7.32.0 (2025-10-01)
@@ -221,6 +243,12 @@
 
 ## 7.20.0 (2025-03-13)
 
+## 7.19.7 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 7.19.0 (2025-02-28)
 
 ## 7.18.0 (2025-02-12)
@@ -243,6 +271,12 @@
 
 ## 7.9.0 (2024-10-03)
 
+## 7.8.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 7.8.0 (2024-09-19)
 
 ## 7.7.0 (2024-09-05)
@@ -258,6 +292,12 @@
 ## 7.2.0 (2024-06-26)
 
 ## 7.1.0 (2024-06-15)
+
+## 7.0.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 7.0.0 (2024-05-31)
 
@@ -279,6 +319,12 @@
 ## 6.30.0 (2024-03-06)
 
 ## 6.29.0 (2024-02-21)
+
+## 6.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 6.28.0 (2024-02-09)
 
@@ -303,6 +349,12 @@
 
 ## 6.20.0 (2023-10-05)
 
+## 6.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 6.19.0 (2023-09-20)
 
 ## 6.18.0 (2023-08-31)
@@ -316,6 +368,12 @@
 ## 6.14.0 (2023-07-05)
 
 ## 6.13.0 (2023-06-23)
+
+## 6.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 6.12.0 (2023-06-07)
 
@@ -334,6 +392,12 @@
 ## 6.5.0 (2023-03-01)
 
 ## 6.4.0 (2023-02-15)
+
+## 6.3.5 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 6.3.0 (2023-02-01)
 
@@ -356,6 +420,12 @@
 ## 5.2.0 (2022-10-05)
 
 ## 5.1.0 (2022-09-21)
+
+## 5.0.5 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 5.0.0 (2022-09-13)
 
@@ -391,6 +461,12 @@
 
 ## 4.5.0 (2022-04-21)
 
+## 4.4.7 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 4.4.0 (2022-04-08)
 
 ## 4.3.0 (2022-03-23)
@@ -413,6 +489,12 @@
 ### Bug Fixes
 
 -   `getEntityRecords` no longer returns an empty array for unknown entities but returns `null` instead. `hasEntityRecords` now also returns `false` when the entity configuration is unknown. ([#36984](https://github.com/WordPress/gutenberg/pull/36984))
+
+## 4.0.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
 
 ## 4.0.0 (2021-07-29)
 

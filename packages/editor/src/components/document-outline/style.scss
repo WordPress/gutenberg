@@ -13,10 +13,6 @@
 	display: flex;
 	margin: 4px 0;
 
-	a {
-		text-decoration: none;
-	}
-
 	.document-outline__emdash::before {
 		color: $gray-300;
 		margin-right: 4px;
@@ -52,6 +48,7 @@
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
 	color: $gray-900;
+	font: inherit;
 	text-align: left;
 	border-radius: $radius-small;
 
@@ -75,7 +72,7 @@
 	background: $gray-300;
 	color: $gray-900;
 	border-radius: 3px;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	padding: 1px 6px;
 	margin-right: 4px;
 

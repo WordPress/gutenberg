@@ -1,5 +1,5 @@
 import { Checkbox } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
 
@@ -29,9 +29,12 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	const isInSelectionArray = selection.includes( id );
 	const checked = ! disabled && isInSelectionArray;
 
-	// Fallback label to ensure accessibility
-	const selectionLabel =
-		titleField?.getValue?.( { item } ) || __( '(no title)' );
+	// Name the action as well as the item, as the list tables do.
+	const selectionLabel = sprintf(
+		/* translators: %s: The title of the item. */
+		__( 'Select %s' ),
+		titleField?.getValue?.( { item } ) || __( '(no title)' )
+	);
 
 	return (
 		<Checkbox

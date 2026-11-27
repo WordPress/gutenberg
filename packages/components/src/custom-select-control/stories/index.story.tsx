@@ -4,8 +4,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
-	tags: [ 'manifest' ],
-	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl',
+	title: 'Components/@wordpress-components/Deprecated/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
 	argTypes: {
@@ -21,9 +20,9 @@ const meta: Meta< typeof CustomSelectControl > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) in `@wordpress/ui`, but continue using for now. See the [migration guide](?path=/docs/components-customselectcontrol--migration-guide).',
+			notes: 'Deprecated. Use [`SelectControl`](?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-customselectcontrol--migration-guide).',
 		},
 	},
 	decorators: [

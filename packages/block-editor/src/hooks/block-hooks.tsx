@@ -202,8 +202,7 @@ function BlockHooksControlPure( {
 											if ( ! checked ) {
 												// Create and insert block.
 												const relativePosition =
-													// @ts-expect-error Bug: a block hooked by a filter has no `blockHooks`.
-													block.blockHooks[ name ];
+													block.blockHooks?.[ name ];
 												insertBlockIntoDesignatedLocation(
 													createBlock( block.name ),
 													relativePosition

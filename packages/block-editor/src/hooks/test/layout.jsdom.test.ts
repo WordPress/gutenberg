@@ -1,5 +1,17 @@
-import { describe, expect, it, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { act, renderHook, screen } from '@testing-library/react';
+import {
+	createBlock,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
+import { BlockEditorProvider, BlockInspector, BlockList } from '../../';
+import { useSettings } from '../../components/use-settings';
+import { getLayoutType } from '../../layouts';
+import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 import {
 	getLayoutStateOverrides,
 	getResetLayout,
@@ -7,16 +19,16 @@ import {
 	hasLayoutPanelControls,
 	useLayoutStyles,
 } from '../layout';
-import { getLayoutType } from '../../layouts';
-import { useSettings } from '../../components/use-settings';
 
 vi.mock(
 	import( '../../components/use-settings' ),
-	async ( importOriginal ) => ( {
-		...( await importOriginal() ),
-		useSettings: vi.fn(),
-	} )
+	async ( importOriginal ) => {
+		const original = await importOriginal();
+		return { ...original, useSettings: vi.fn( original.useSettings ) };
+	}
 );
+
+globalThis.wpVitest.mockMatchMedia();
 
 describe( 'layout', () => {
 	describe( 'useLayoutStyles()', () => {
@@ -73,6 +85,60 @@ describe( 'layout', () => {
 					displayControlsForLegacyLayouts: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'Layout inspector', () => {
+		const blockName = 'test/layout-inspector';
+
+		beforeAll( () => {
+			registerBlockType( blockName, {
+				apiVersion: 3,
+				title: 'Layout test block',
+				category: 'design',
+				attributes: {},
+				supports: { layout: { default: { type: 'constrained' } } },
+				edit: () => null,
+				save: () => null,
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockName );
+		} );
+
+		it( 'hides the content width toggle when editing a viewport style state', async () => {
+			const block = createBlock( blockName );
+			const { result } = renderHook(
+				() => unlock( useDispatch( blockEditorStore ) ),
+				{
+					wrapper: ( { children } ) =>
+						createElement(
+							BlockEditorProvider,
+							{ value: [ block ] },
+							createElement( BlockInspector ),
+							createElement( BlockList ),
+							children
+						),
+				}
+			);
+
+			await act( async () =>
+				result.current.selectBlock( block.clientId )
+			);
+			const toggle = { name: 'Inner blocks use content width' };
+			expect(
+				await screen.findByRole( 'checkbox', toggle )
+			).toBeInTheDocument();
+
+			await act( async () => {
+				await result.current.setResponsiveEditing( true );
+				await result.current.setStyleStateViewport( '@mobile' );
+			} );
+
+			expect(
+				screen.queryByRole( 'checkbox', toggle )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
