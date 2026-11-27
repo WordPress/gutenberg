@@ -81,7 +81,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-extensible-site-editor',
 					'label'       => __( 'Extensible Site Editor', 'gutenberg' ),
-					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+					'description' => __( 'Replaces the site editor with the extensible site editor, shown inside wp-admin with its sections listed under Appearance.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-guidelines',

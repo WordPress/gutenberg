@@ -3,6 +3,7 @@ import { Stack, Text } from '@wordpress/ui';
 import Navigation from '../navigation';
 import type { NavigationConfig } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
+import { HeaderActionsSlot } from './header-actions-slot';
 import type { PageComponents } from './types';
 import styles from './style.module.css';
 
@@ -79,16 +80,18 @@ export default function Header( {
 					{ breadcrumbs }
 					{ badges }
 				</Stack>
-				{ actions && (
-					<Stack
-						align="center"
-						className={ styles[ 'header-actions' ] }
-						direction="row"
-						gap="sm"
-					>
-						{ actions }
-					</Stack>
-				) }
+				<Stack
+					align="center"
+					className={ styles[ 'header-actions' ] }
+					direction="row"
+					gap="sm"
+				>
+					{ actions }
+					<HeaderActionsSlot
+						bubblesVirtually
+						className={ styles[ 'header-actions-slot' ] }
+					/>
+				</Stack>
 			</Stack>
 			{ subTitle && (
 				<Text

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   In single-page mode, wp-admin menu links that point at the current page navigate between its routes without reloading, and the current menu item follows the route.
+-   In single-page mode, pages that register entity links show the button to review and save changes in the page header.
+-   In single-page mode, the editor has a fullscreen mode that hides the admin menu. It is on by default, and can be toggled from the editor's options menu or with a keyboard shortcut.
+
 ### Enhancements
 
 -   Color the current sidebar item with the resting brand color, and keep the active brand color for hover and focus ([#87453](https://github.com/WordPress/gutenberg/pull/87453)).

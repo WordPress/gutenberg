@@ -1,7 +1,12 @@
 import { createRoot, StrictMode, type ComponentType } from '@wordpress/element';
 import { dispatch, useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import Router from './router';
 import RootSinglePage from '../root/single-page';
+import {
+	PREFERENCE_SCOPE as FULLSCREEN_PREFERENCE_SCOPE,
+	PREFERENCE_NAME as FULLSCREEN_PREFERENCE_NAME,
+} from '../editor-fullscreen-mode';
 import { store } from '../../store';
 import type { MenuItem, Route } from '../../store/types';
 
@@ -81,6 +86,11 @@ export async function initSinglePage( {
 }: InitSinglePageProps ) {
 	( routes ?? [] ).forEach( ( route ) => {
 		dispatch( store ).registerRoute( route );
+	} );
+
+	// The editor opens in fullscreen mode by default, as in the post editor.
+	dispatch( preferencesStore ).setDefaults( FULLSCREEN_PREFERENCE_SCOPE, {
+		[ FULLSCREEN_PREFERENCE_NAME ]: true,
 	} );
 
 	await runInitModules( initModules );

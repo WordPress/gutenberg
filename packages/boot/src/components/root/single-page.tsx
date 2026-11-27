@@ -3,15 +3,23 @@ import { privateApis as routePrivateApis } from '@wordpress/route';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { getAdminThemeColors } from '@wordpress/admin-ui';
+import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
+import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import SavePanel from '../save-panel';
+import SaveButton from '../save-button';
 import CanvasRenderer from '../canvas-renderer';
 import PluginArea from '../plugin-area';
+import EditorFullscreenMode, {
+	useIsEditorFullscreenMode,
+} from '../editor-fullscreen-mode';
 import { unlock } from '../../lock-unlock';
+import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
+import useAdminMenuSync from './use-admin-menu-sync';
 import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
 import useRouteFocus from '../app/use-route-focus';
@@ -30,9 +38,17 @@ export default function RootSinglePage() {
 		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
-	const isFullScreen = canvas && ! canvas.isPreview;
+	const isEditorCanvas = canvas && ! canvas.isPreview;
+	const isFullscreenMode = useIsEditorFullscreenMode();
+	// Other single-page screens, such as Fonts or Connectors, have their own
+	// save flows. Only pages that edit entities in the canvas get the button.
+	const showSaveButton = useSelect(
+		( select ) => select( bootStore ).hasEntityLinks(),
+		[]
+	);
 
 	useRouteTitle();
+	useAdminMenuSync( isEditorCanvas ? canvas.postType : undefined );
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
@@ -41,54 +57,68 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
-			<PluginArea />
-			<ThemeProvider
-				isRoot
-				color={ { ...themeColors, background: '#f8f8f8' } }
-			>
-				<ThemeProvider color={ themeColors }>
-					<div
-						ref={ layoutRef }
-						className={ clsx(
-							styles.layout,
-							styles[ 'layout-single-page' ],
-							{
-								[ styles[ 'has-canvas' ] ]:
-									!! canvas || canvas === null,
-								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
-							}
-						) }
-					>
-						<UnsavedChangesWarning />
-						<SavePanel />
-						<SnackbarNotices
-							className={ styles[ 'notices-snackbar' ] }
-						/>
-						<div className={ styles.surfaces }>
-							<ThemeProvider
-								color={ {
-									...themeColors,
-									// Reset to the default background color.
-									background: '#fcfcfc',
-								} }
-							>
-								<Outlet />
-								{ /* Render Canvas in Root to prevent remounting on route changes */ }
-								{ ( canvas || canvas === null ) && (
-									<div className={ styles.canvas }>
-										<CanvasRenderer
-											canvas={ canvas }
-											routeContentModule={
-												routeContentModule
-											}
-										/>
-									</div>
-								) }
-							</ThemeProvider>
+			<Tooltip.Provider>
+				<PluginArea />
+				{ isEditorCanvas && (
+					<EditorFullscreenMode isActive={ isFullscreenMode } />
+				) }
+				<ThemeProvider
+					isRoot
+					color={ { ...themeColors, background: '#f8f8f8' } }
+				>
+					<ThemeProvider color={ themeColors }>
+						<div
+							ref={ layoutRef }
+							className={ clsx(
+								styles.layout,
+								styles[ 'layout-single-page' ],
+								{
+									[ styles[ 'has-canvas' ] ]:
+										!! canvas || canvas === null,
+									[ styles[ 'has-full-canvas' ] ]:
+										isEditorCanvas,
+								}
+							) }
+						>
+							<UnsavedChangesWarning />
+							<SavePanel />
+							{ showSaveButton && (
+								<Page.HeaderActionsFill>
+									<SaveButton isFullWidth={ false } />
+								</Page.HeaderActionsFill>
+							) }
+							<SnackbarNotices
+								className={ styles[ 'notices-snackbar' ] }
+							/>
+							<div className={ styles.surfaces }>
+								<ThemeProvider
+									color={ {
+										...themeColors,
+										// Reset to the default background color.
+										background: '#fcfcfc',
+									} }
+								>
+									<Outlet />
+									{ /* Render Canvas in Root to prevent remounting on route changes */ }
+									{ ( canvas || canvas === null ) && (
+										<div className={ styles.canvas }>
+											<CanvasRenderer
+												canvas={ canvas }
+												showBackButton={
+													isFullscreenMode
+												}
+												routeContentModule={
+													routeContentModule
+												}
+											/>
+										</div>
+									) }
+								</ThemeProvider>
+							</div>
 						</div>
-					</div>
+					</ThemeProvider>
 				</ThemeProvider>
-			</ThemeProvider>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

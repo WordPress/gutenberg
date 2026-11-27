@@ -13,6 +13,17 @@ export function getDashboardLink( state: State ) {
 }
 
 /**
+ * Returns whether the page registered any entity links, meaning it edits
+ * entities in the canvas.
+ *
+ * @param state Store state.
+ * @return Whether any entity links are registered.
+ */
+export function hasEntityLinks( state: State ) {
+	return Object.keys( state.entityLinks ).length > 0;
+}
+
+/**
  * Returns the path an entity is edited or listed at.
  *
  * Falls back to the links registered for `default`, so a post type with no

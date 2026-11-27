@@ -4,6 +4,7 @@ import Header from './header';
 import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
+import { HeaderActionsFill } from './header-actions-slot';
 import styles from './style.module.css';
 
 /**
@@ -150,5 +151,6 @@ function Page( {
 }
 
 Page.SidebarToggleFill = SidebarToggleFill;
+Page.HeaderActionsFill = HeaderActionsFill;
 
 export default Page;
