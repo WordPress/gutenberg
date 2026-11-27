@@ -1246,11 +1246,11 @@ function MediaEditorContent( {
 								     way: components that announce a tab and fill it.
 								     `PluginArea` mounts `registerPlugin` callbacks for
 								     this scope here, inside the session provider, so
-								     plugin panels get the session from
-								     `useMediaEditor()`. A panel's content renders in
-								     the panel's own React tree and is portaled into
-								     its tab, so a plugin's providers and error
-								     boundary reach it. `MediaEditorProvider` sits
+								     plugin panels can call
+								     `useMediaEditorPanelContext()`. A panel's content
+								     renders in the panel's own React tree and is
+								     portaled into its tab, so a plugin's providers and
+								     error boundary reach it. `MediaEditorProvider` sits
 								     above the panels so Core's Details form finds
 								     its context there too. */ }
 								<MediaEditorPanel

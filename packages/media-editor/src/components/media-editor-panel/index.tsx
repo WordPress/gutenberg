@@ -151,9 +151,9 @@ export function useMediaEditorPanels() {
  * while mounted, so the sidebar shows a tab for it, and fills that tab
  * with its children. Core's Crop and Details panels are rendered with
  * this component; a plugin renders it from a `registerPlugin` callback
- * in the `media-editor` scope, where `useMediaEditor()` gives it the
- * session. Content that throws stays inside its tab, which names the
- * failed panel; the rest of the editor keeps working.
+ * in the `media-editor` scope, where `useMediaEditorPanelContext()` gives
+ * it what a panel may read and do. Content that throws stays inside its
+ * tab, which names the failed panel; the rest of the editor keeps working.
  *
  * @param props
  * @param props.name
