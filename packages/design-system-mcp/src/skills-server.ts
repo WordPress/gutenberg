@@ -38,7 +38,7 @@ export function registerSkills( server: McpServer ): void {
 		{
 			title: 'Design system agent skills',
 			description:
-				'Agent skills for building with `@wordpress/ui` and `@wordpress/theme`.',
+				'Agent skills for building, setting up and migrating to the design system.',
 			mimeType: 'text/markdown',
 		},
 		async ( uri ) => {
