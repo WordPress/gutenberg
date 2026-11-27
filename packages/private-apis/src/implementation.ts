@@ -57,6 +57,8 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
+	// Compatibility only: older bundled engine versions opt in at module load.
+	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
 	'@wordpress/views',
