@@ -351,7 +351,9 @@ export function sanitizeBlockAttributes(
 							RichTextData.fromHTMLString( value );
 					}
 				} else if (
-					schema.type === 'string' &&
+					( schema.type === 'string' ||
+						schema.type === 'datetime' ||
+						schema.type === 'url' ) &&
 					value instanceof RichTextData
 				) {
 					accumulator[ key ] = value.toHTMLString();

@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { RichTextData } from '@wordpress/rich-text';
 import type { BlockType } from '../../types';
 import { partial } from '../../store/test/fixtures/types';
 import '../../store';
@@ -334,6 +335,34 @@ describe( 'sanitizeBlockAttributes', () => {
 			nodeContent: [ 'test-1', 'test-2' ],
 			childrenContent: [],
 			withDefault: [ 'test' ],
+		} );
+	} );
+
+	it( 'converts rich text to HTML for datetime and url attributes', () => {
+		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
+			category: 'text',
+			attributes: {
+				date: {
+					type: 'datetime',
+				},
+				link: {
+					type: 'url',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = sanitizeBlockAttributes( 'core/test-block', {
+			date: RichTextData.fromHTMLString( '2025-12-03T10:20:30' ),
+			link: RichTextData.fromHTMLString(
+				'https://example.org/a?b=1&amp;c=2'
+			),
+		} );
+
+		expect( attributes ).toEqual( {
+			date: '2025-12-03T10:20:30',
+			link: 'https://example.org/a?b=1&amp;c=2',
 		} );
 	} );
 
