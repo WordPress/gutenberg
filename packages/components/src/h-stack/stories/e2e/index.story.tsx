@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { StoryFn, Meta } from '@storybook/react-webpack5';
-
-/**
- * Internal dependencies
- */
+import type { StoryFn, Meta } from '@storybook/react-vite';
 import { View } from '../../../view';
 import { HStack } from '../..';
 

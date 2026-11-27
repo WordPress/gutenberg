@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/video",
+		"isValid": true,
+		"attributes": {
+			"autoplay": true,
+			"caption": "",
+			"controls": false,
+			"loop": true,
+			"muted": true,
+			"preload": "metadata",
+			"src": "https://example.com/converted.mp4",
+			"width": 640,
+			"height": 360,
+			"playsInline": true,
+			"tracks": []
+		},
+		"innerBlocks": []
+	}
+]

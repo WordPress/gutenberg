@@ -1,0 +1,113 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+	PackageCard,
+	PackageCards,
+	PrincipleCard,
+	PrincipleCards,
+} from './intro-cards';
+
+<Meta title="Design System/Introduction" />
+
+# WordPress Design System
+
+The WordPress Design System is a collection of reusable components, design tokens, and guidelines for building consistent, accessible user interfaces in the WordPress administrative dashboard.
+
+It is what WordPress itself is built with, and it is available to plugin developers too. Interfaces made from the same components and tokens look and behave like the rest of WordPress, so your plugin's screens feel native to the dashboard instead of bolted on.
+
+## Build with the Design System
+
+Foundational packages provide the primitives for building any interface: [components](?path=/docs/design-system-components-introduction--docs), [icons](?path=/docs/icons-icon--docs) and [design tokens](?path=/docs/design-system-theme-introduction--docs).
+
+Compositional packages combine those primitives into complete experiences. Use [Admin UI](?path=/docs/admin-ui-page--docs), [DataViews](?path=/docs/dataviews-dataviews--docs) and [DataForm](?path=/docs/dataviews-dataform--docs) to build table and form based interfaces quickly and consistently.
+
+When building your own components, use [design tokens](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) in your component styles to stay aligned with the design system's own components. The [theming system](?path=/docs/design-system-theme-introduction--docs) exposes these tokens as custom CSS properties you can use in your own stylesheet.
+
+When working with AI agents, use the [WordPress Design System MCP Server](?path=/docs/design-system-using-with-ai--docs). It gives agents the latest component documentation, usage examples, and design tokens.
+
+Designers can find the matching design resources in the [WordPress Design System on Figma](https://www.figma.com/@wordpressds).
+
+## Parts of the Design System
+
+### Foundational Packages
+
+Foundational packages establish the fundamental components and theming behaviors.
+
+<PackageCards>
+  <PackageCard
+    illustration="theming"
+    title="Theming"
+    packageName="@wordpress/theme"
+    storybookId="design-system-theme-introduction--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/"
+  >
+    Design tokens for colors, spacing, typography and more, plus a ThemeProvider that generates accessible color ramps from seed values.
+  </PackageCard>
+  <PackageCard
+    illustration="components"
+    title="Components"
+    packageName="@wordpress/ui"
+    storybookId="design-system-components-introduction--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-ui/"
+  >
+    Themeable, accessible React components with consistent patterns, styled entirely with design tokens.
+  </PackageCard>
+  <PackageCard
+    illustration="icons"
+    title="Icons"
+    packageName="@wordpress/icons"
+    storybookId="icons-icon--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-icons/"
+  >
+    A curated library of SVG icons covering common editor and admin actions, drawn in one shared visual language.
+  </PackageCard>
+</PackageCards>
+
+### Compositional Packages
+
+Higher-level compositional packages use the design system to provide solutions for common UI patterns:
+
+<PackageCards>
+  <PackageCard
+    illustration="dataviews"
+    title="DataViews"
+    packageName="@wordpress/dataviews"
+    storybookId="dataviews-dataviews--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/"
+  >
+    Display, filter and edit lists of data as a table, grid or list, with [DataForm](?path=/docs/dataviews-dataform--docs) for editing individual records.
+  </PackageCard>
+  <PackageCard
+    illustration="adminui"
+    title="Admin UI"
+    packageName="@wordpress/admin-ui"
+    storybookId="admin-ui-page--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-admin-ui/"
+  >
+    Building blocks for consistent admin page layouts and headers.
+  </PackageCard>
+</PackageCards>
+
+## Principles of the Design System
+
+The design system is guided by a few principles that distinguish it from the existing [@wordpress/components](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package:
+
+<PrincipleCards>
+  <PrincipleCard title="Cohesive by design">
+    Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+  </PrincipleCard>
+  <PrincipleCard title="Flexible theming">
+    Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+  </PrincipleCard>
+  <PrincipleCard title="Modern distribution">
+    Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+  </PrincipleCard>
+  <PrincipleCard title="Composable architecture">
+    Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+  </PrincipleCard>
+</PrincipleCards>
+
+For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
+
+## Contributing
+
+If a component, token, or guideline falls short of what you need, report it rather than working around it quietly. [Contributing to the Design System](?path=/docs/design-system-contributing--docs) covers how to report a shortcoming and how to fix it at the source. It applies to AI agents as much as to people.

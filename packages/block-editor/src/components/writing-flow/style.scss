@@ -1,0 +1,48 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+/* The stop element is invisible, so its focus indication is drawn around the
+   canvas it stands for. For the iframed canvas it is an overlay instead of
+   an outline, because Safari paints an outline on an iframe element
+   underneath the iframe's content. */
+.block-editor-iframe__scale-container > .block-editor-writing-flow__canvas-stop:focus::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	border: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+}
+
+.block-editor-writing-flow__canvas-stop:focus + .block-editor-writing-flow {
+	outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+}
+
+/* Looks like a tooltip. Shown at the top of the canvas while the stop is
+   focused. Sticky, because on the widgets screen the stop spans scrolling
+   content and the hint must stay in view; anywhere else there is nothing
+   to scroll and it stays at the top of the canvas. */
+.block-editor-writing-flow__canvas-stop-hint {
+	display: none;
+	position: sticky;
+	top: $grid-unit-20;
+	margin-inline: auto;
+	width: fit-content;
+	z-index: 2;
+	background: $black;
+	font-family: $default-font;
+	border-radius: $radius-medium;
+	color: $gray-100;
+	text-align: center;
+	line-height: 1.4;
+	font-size: 12px;
+	padding: $grid-unit-05 $grid-unit-10;
+	box-shadow: $elevation-small;
+	white-space: nowrap;
+	pointer-events: none;
+}
+
+.block-editor-writing-flow__canvas-stop:focus > .block-editor-writing-flow__canvas-stop-hint {
+	display: block;
+}

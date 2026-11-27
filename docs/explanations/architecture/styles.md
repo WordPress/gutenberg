@@ -4,7 +4,7 @@ This document introduces the main concepts related to styles that affect the use
 
 ## HTML and CSS
 
-By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
+By creating a post in the block editor, the user is creating a number of artifacts: an HTML document plus a number of CSS stylesheets, either embedded in the document or external.
 
 The final HTML document is the result of a few things:
 
@@ -53,7 +53,7 @@ To build an experience like the one described above a block author needs a few p
 
 1. **A UI control**. It presents the user some choices, for example, to be able to change the font size of the block. The control takes care of reading the data from the block (does this block already have a font size assigned?) and other data it needs (what are the font sizes a user can use in this block?). See available [component library](https://developer.wordpress.org/block-editor/reference-guides/components/).
 2. **A block attribute**. The block needs to hold data to know which modifications were applied to it: whether it has been given a font size already for example. See how blocks can define [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/).
-3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSetting](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesetting).
+3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSettings](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesettings).
 4. **Serialize the user style into HTML markup**. Upon a user action, the block HTML markup needs to be updated accordingly (apply the proper class or inline style). This process is called serialization and it is the [edit, save](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), and [render_callback](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/) functions' responsibility: these functions take block data and convert it into HTML.
 
 In essence, these are the essential mechanics a block author needs to care about for their block to be able to be styled by the user. While this can be done completely manually, there's an API that automates this process for common style needs: block supports.
@@ -168,7 +168,7 @@ This mechanism was [introduced in WordPress 5.8](https://make.wordpress.org/core
 
 This is the general data flow:
 
-![Data flow of Global Styles](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/global-styles-input-output.png)
+![Data flow of Global Styles](https://developer.wordpress.org/files/2026/06/global-styles-input-output.png)
 
 The process of generating the stylesheet has, in essence, three steps:
 

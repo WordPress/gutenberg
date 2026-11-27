@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { __experimentalItem as Item } from '@wordpress/components';
 import { privateApis as routePrivateApis } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { createLink } = unlock( routePrivateApis );

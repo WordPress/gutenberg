@@ -2,6 +2,101 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add `transform.translate`, which outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each `x` or `y` length or percentage, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. Any other value outputs nothing ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add `transform.scale`, which outputs the individual `scale` property for a single non-negative number or percentage, and nothing for any other value ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+
+## 3.2.0 (2026-11-18)
+
+### New Features
+
+-   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
+
+### Bug Fixes
+
+-   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).
+-   Add the `background.backgroundAttachment`, `outline`, `shadow` and `typography.textIndent` styles the engine already generates to the `Style` type ([#85097](https://github.com/WordPress/gutenberg/pull/85097)).
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85205](https://github.com/WordPress/gutenberg/pull/85205)).
+
+## 3.1.0 (2026-11-04)
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+
+## 2.57.0 (2026-10-07)
+
+### New Features
+
+-   Add a `background.backgroundClip` style rule that generates `background-clip`, along with the `-webkit-background-clip` and `-webkit-text-fill-color` declarations needed for the text clipping case ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+## 2.56.0 (2026-09-23)
+
+### New Features
+
+-   Add text shadow preset support ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 2.50.0 (2026-07-01)
+
+## 2.49.0 (2026-06-24)
+
+### Enhancements
+
+-   Export the `Style`, `StyleOptions`, and `GeneratedCSSRule` TypeScript types so that consumers of the public API can type their usage of `compileCSS` and `getCSSRules`.
+
+## 2.48.1 (2026-06-16)
+
+## 2.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 2.47.0 (2026-05-27)
+
+## 2.46.0 (2026-05-14)
+
+## 2.45.0 (2026-04-29)
+
+## 2.44.0 (2026-04-15)
+
+## 2.43.0 (2026-04-01)
+
+## 2.42.0 (2026-03-18)
+
+## 2.41.0 (2026-03-04)
+
+## 2.40.0 (2026-02-18)
+
+## 2.39.0 (2026-01-29)
+
+## 2.38.0 (2026-01-16)
+
 ## 2.36.0 (2025-11-26)
 
 ## 2.35.0 (2025-11-12)

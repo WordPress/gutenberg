@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -42,7 +39,8 @@ export function GlobalStylesBlockLink( { path, onPathChange } ) {
 		}
 		if (
 			! path ||
-			( path !== '/blocks' && ! path.startsWith( '/blocks/' ) )
+			( path !== '/blocks' && ! path.startsWith( '/blocks/' ) ) ||
+			path.startsWith( '/blocks/elements/' )
 		) {
 			return;
 		}

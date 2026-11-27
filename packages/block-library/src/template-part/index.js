@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
@@ -57,8 +46,11 @@ export const init = () => {
 		enhanceTemplatePartVariations
 	);
 
-	// Prevent adding template parts inside post templates.
-	const DISALLOWED_PARENTS = [ 'core/post-template', 'core/post-content' ];
+	// Prevent adding template parts inside post content.
+	// Note: this code previously restricted 'core/post-template', which is why the filter
+	// is called `removeTemplatePartsFromPostTemplates`. The filter name is unchanged
+	// for backwards compatibility. See https://github.com/WordPress/gutenberg/pull/86377.
+	const DISALLOWED_PARENTS = [ 'core/post-content' ];
 	addFilter(
 		'blockEditor.__unstableCanInsertBlockType',
 		'core/block-library/removeTemplatePartsFromPostTemplates',
@@ -83,7 +75,7 @@ export const init = () => {
 					return false;
 				}
 			}
-			return true;
+			return canInsert;
 		}
 	);
 

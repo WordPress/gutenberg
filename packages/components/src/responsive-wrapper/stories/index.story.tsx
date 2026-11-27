@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
-	title: 'Components/Layout/ResponsiveWrapper',
+	title: 'Components/@wordpress-components/Deprecated/ResponsiveWrapper',
 	id: 'components-responsivewrapper',
 	argTypes: {
 		children: { control: false },
@@ -18,6 +11,11 @@ const meta: Meta< typeof ResponsiveWrapper > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Deprecated. Use the CSS `aspect-ratio` property instead.',
+		},
 	},
 };
 export default meta;
@@ -28,14 +26,10 @@ const Template: StoryFn< typeof ResponsiveWrapper > = ( args ) => (
 
 export const Default = Template.bind( {} );
 Default.args = {
-	naturalWidth: 2000,
-	naturalHeight: 680,
-	children: (
-		<img
-			src="https://s.w.org/style/images/about/WordPress-logotype-standard.png"
-			alt="WordPress"
-		/>
-	),
+	naturalWidth: 600,
+	naturalHeight: 124,
+	// Served from `storybook/static`.
+	children: <img src="wp-logo@2x.png" alt="WordPress" />,
 };
 
 /**

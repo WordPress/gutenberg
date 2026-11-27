@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath } from '../utils/object';
 import { getValueFromVariable } from '../utils/common';
 import type { GlobalStylesConfig, UnresolvedValue } from '../types';
@@ -20,8 +17,7 @@ export function getStyle< T = any >(
 	}
 
 	const rawResult = getValueFromObjectPath( globalStyles, finalPath ) as
-		| string
-		| UnresolvedValue;
+		string | UnresolvedValue;
 	const result = shouldDecodeEncode
 		? getValueFromVariable( globalStyles, blockName, rawResult )
 		: rawResult;

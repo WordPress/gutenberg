@@ -6,16 +6,19 @@ import {
 	Subtitle,
 	Title,
 } from '@storybook/addon-docs/blocks';
-
-/**
- * Internal dependencies
- */
 import { WithGlobalCSS } from './decorators/with-global-css';
-import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
-import { WithTheme } from './decorators/with-theme';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+import { ComponentStatusIndicator } from './components/component-status-indicator';
+import { handlePreloadError } from './load-error-recovery';
+import theme from './theme';
+
+if ( typeof window !== 'undefined' ) {
+	window.addEventListener( 'vite:preloadError', handlePreloadError, {
+		once: true,
+	} );
+}
 
 export const globalTypes = {
 	direction: {
@@ -27,20 +30,6 @@ export const globalTypes = {
 			items: [
 				{ value: 'ltr', title: 'LTR' },
 				{ value: 'rtl', title: 'RTL' },
-			],
-		},
-	},
-	componentsTheme: {
-		name: 'Theme',
-		description: 'Change the components theme. (Work in progress)',
-		defaultValue: 'default',
-		toolbar: {
-			icon: 'paintbrush',
-			items: [
-				{ value: 'default', title: 'Default' },
-				{ value: 'darkBg', title: 'Dark (background)' },
-				{ value: 'lightGrayBg', title: 'Light gray (background)' },
-				{ value: 'classic', title: 'Classic (accent)' },
 			],
 		},
 	},
@@ -61,19 +50,6 @@ export const globalTypes = {
 			],
 		},
 	},
-	marginChecker: {
-		name: 'Margin Checker',
-		description:
-			'Show a div before and after the component to check for unwanted margins.',
-		defaultValue: 'hide',
-		toolbar: {
-			icon: 'collapse',
-			items: [
-				{ value: 'hide', title: 'Hide' },
-				{ value: 'show', title: 'Show' },
-			],
-		},
-	},
 	maxWidthWrapper: {
 		name: 'Max-Width Wrapper',
 		description: 'Wrap the component in a div with a max-width.',
@@ -89,23 +65,32 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
-	dsDensity: {},
+	dsPrimaryColor: {},
+	dsBackgroundColor: {},
+	dsCursorControl: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
 	WithGlobalCSS,
-	WithMarginChecker,
 	WithRTL,
 	WithMaxWidthWrapper,
-	WithTheme,
 	WithDesignSystemTheme,
 ];
 
 export const parameters = {
+	a11y: {
+		test: 'error',
+	},
 	controls: {
+		expanded: true,
 		sort: 'requiredFirst',
 	},
+	backgrounds: {
+		disable: true,
+	},
 	docs: {
+		theme,
 		controls: {
 			sort: 'requiredFirst',
 		},
@@ -115,6 +100,7 @@ export const parameters = {
 			<>
 				<Title />
 				<Subtitle />
+				<ComponentStatusIndicator />
 				<Primary />
 				<Description />
 				<Controls />
@@ -123,70 +109,203 @@ export const parameters = {
 		),
 	},
 	options: {
-		storySort: {
-			order: [
-				'Docs',
-				'Playground',
-				'BlockEditor',
+		storySort: ( a, b ) => {
+			// Top-level folders in sidebar order. Every root is listed so the
+			// order is deliberate; a nested array orders the folder before it.
+			const SECTION_ORDER = [
+				'Introduction',
+				'Design System',
+				[
+					'Introduction',
+					'Contributing',
+					'Using with AI',
+					'Foundations',
+					'Tokens',
+					'Theme',
+					'Patterns',
+					'DataViews',
+					'Admin UI',
+					'Icons',
+				],
 				'Components',
 				[
 					'Introduction',
-					'Contributing Guidelines',
-					'Actions',
-					'Containers',
-					'Feedback',
-					'Layout',
-					'Navigation',
-					'Overlays',
-					'Selection & Input',
+					'@wordpress-ui',
+					[ 'Introduction' ],
+					'@wordpress-components',
 					[
-						'Color',
-						'Common',
-						'File Upload',
-						'Time & Date',
-						'Validated Form Controls',
-						[ 'Overview' ],
+						'Introduction',
+						'Contributing Guidelines',
+						'Actions',
+						'Containers',
+						'Feedback',
+						'Layout',
+						'Navigation',
+						'Overlays',
+						'Selection & Input',
+						'Typography',
+						'Utilities',
+						'Deprecated',
 					],
-					'Typography',
-					'Utilities',
 				],
+				'Editor',
 				[
-					'Actions',
-					'Layout',
-					'Navigation',
-					'Overlays',
-					'Selection & Input',
-					'Typography',
+					'Block Editor',
+					'Global Styles',
+					'Image Cropper',
+					'Media Editor',
+					'Upload Progress Snackbar',
 				],
-				'Icons',
-			],
-		},
-	},
-	sourceLink: {
-		links: {
-			// Disable default links
-			'component-vscode': () => undefined,
-			'story-vscode': () => undefined,
-			'addon-powered-by': () => undefined,
-			// Custom GitHub link
-			'story-github': ( { importPath } ) => {
-				if ( ! importPath ) {
-					return undefined;
+				'Widgets',
+				[
+					'Primitives',
+					[ 'Introduction', 'Anatomy', 'System Architecture' ],
+					'Dashboard',
+					[
+						'Introduction',
+						'Anatomy',
+						'Widget Chrome',
+						'Playground',
+					],
+					'Grid',
+				],
+				'Playground',
+			];
+			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
+
+			// Get order index for a name in an order array (skipping nested arrays)
+			const getOrderIndex = ( orderArray, name ) => {
+				let index = 0;
+				for ( const item of orderArray ) {
+					if ( item === name ) {
+						return index;
+					}
+					if ( ! Array.isArray( item ) ) {
+						index++;
+					}
 				}
-				// importPath is like "../packages/components/src/button/stories/index.story.tsx"
-				// Convert to component directory path: "packages/components/src/button"
-				const componentPath = importPath
-					.replace( /^\.\.\//, '' ) // Remove leading "../"
-					.replace( /^\.\//, '' ) // Remove leading "./" (for stories in storybook folder)
-					.replace( /\/stories\/.*$/, '' ); // Remove "/stories/..." suffix
-				return {
-					label: 'View source',
-					href: `https://github.com/WordPress/gutenberg/blob/trunk/${ componentPath }`,
-					icon: 'GithubIcon',
-				};
-			},
+				return index; // Not found, put at end
+			};
+
+			// Get the nested order array that follows a name
+			const getNestedOrder = ( orderArray, name ) => {
+				for ( let i = 0; i < orderArray.length; i++ ) {
+					if (
+						orderArray[ i ] === name &&
+						Array.isArray( orderArray[ i + 1 ] )
+					) {
+						return orderArray[ i + 1 ];
+					}
+				}
+				return [];
+			};
+
+			// Check if an entry is an MDX doc page ending at a specific path depth
+			// Named attached MDX pages share their component's title. Giving them
+			// standalone MDX priority can move them ahead of that component's Docs.
+			const isMdxAtDepth = ( entry, path, depth ) =>
+				entry.type === 'docs' &&
+				( entry.name === 'Docs' ||
+					! entry.tags?.includes( 'attached-mdx' ) ) &&
+				path.length === depth + 1 &&
+				entry.importPath?.endsWith( '.mdx' );
+
+			const aPath = a.title.split( '/' );
+			const bPath = b.title.split( '/' );
+			const maxDepth = Math.max( aPath.length, bPath.length );
+
+			let currentOrder = SECTION_ORDER;
+
+			for ( let depth = 0; depth < maxDepth; depth++ ) {
+				const aSegment = aPath[ depth ];
+				const bSegment = bPath[ depth ];
+
+				// If one path is shorter, check if the longer one is an MDX doc
+				// that should appear before stories at the parent level
+				if ( aSegment === undefined && bSegment !== undefined ) {
+					// MDX subfolder comes before parent's stories
+					if (
+						a.type === 'story' &&
+						isMdxAtDepth( b, bPath, depth )
+					) {
+						return 1;
+					}
+					return -1;
+				}
+				if ( aSegment !== undefined && bSegment === undefined ) {
+					// MDX subfolder comes before parent's stories
+					if (
+						b.type === 'story' &&
+						isMdxAtDepth( a, aPath, depth )
+					) {
+						return -1;
+					}
+					return 1;
+				}
+
+				if ( aSegment !== bSegment ) {
+					// MDX pages (importPath ends in .mdx) come before components
+					// (whose autodocs are generated from .story.tsx files)
+					const aIsMdx = isMdxAtDepth( a, aPath, depth );
+					const bIsMdx = isMdxAtDepth( b, bPath, depth );
+
+					if ( aIsMdx !== bIsMdx ) {
+						return aIsMdx ? -1 : 1;
+					}
+
+					// Among MDX pages, prioritize those in PRIORITIZED_MDX_DOCS
+					if ( aIsMdx && bIsMdx ) {
+						const aIsPrioritized =
+							PRIORITIZED_MDX_DOCS.includes( aSegment );
+						const bIsPrioritized =
+							PRIORITIZED_MDX_DOCS.includes( bSegment );
+						if ( aIsPrioritized !== bIsPrioritized ) {
+							return aIsPrioritized ? -1 : 1;
+						}
+					}
+
+					const aIndex = getOrderIndex( currentOrder, aSegment );
+					const bIndex = getOrderIndex( currentOrder, bSegment );
+					if ( aIndex !== bIndex ) {
+						return aIndex - bIndex;
+					}
+					return aSegment.localeCompare( bSegment );
+				}
+
+				// Same segment, descend into nested order
+				currentOrder = getNestedOrder( currentOrder, aSegment );
+			}
+
+			// Same title - sort by type:
+			// 0: autodocs "Docs"
+			// 1: prioritized MDX pages (Introduction, Overview, etc.)
+			// 2: other MDX docs
+			// 3: stories (which appear before subfolders due to shorter paths)
+			const getPriority = ( entry ) => {
+				if ( entry.type === 'docs' && entry.name === 'Docs' ) {
+					return 0;
+				}
+				if (
+					entry.type === 'docs' &&
+					PRIORITIZED_MDX_DOCS.includes( entry.name )
+				) {
+					return 1;
+				}
+				if ( entry.type === 'docs' ) {
+					return 2;
+				}
+				return 3;
+			};
+			const aPriority = getPriority( a );
+			const bPriority = getPriority( b );
+			if ( aPriority !== bPriority ) {
+				return aPriority - bPriority;
+			}
+
+			// Same priority, preserve export order
+			return 0;
 		},
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

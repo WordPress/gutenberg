@@ -1,11 +1,8 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 const ALIGNMENTS = {
 	bottom: { alignItems: 'flex-end', justifyContent: 'center' },
-	bottomLeft: { alignItems: 'flex-start', justifyContent: 'flex-end' },
+	bottomLeft: { alignItems: 'flex-end', justifyContent: 'flex-start' },
 	bottomRight: { alignItems: 'flex-end', justifyContent: 'flex-end' },
 	center: { alignItems: 'center', justifyContent: 'center' },
 	spaced: { alignItems: 'center', justifyContent: 'space-between' },
@@ -21,7 +18,7 @@ export function getAlignmentProps( alignment?: keyof typeof ALIGNMENTS ): {
 	alignItems?: CSSProperties[ 'alignItems' ];
 	justifyContent?: CSSProperties[ 'justifyContent' ];
 } {
-	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] : {};
+	const alignmentProps = alignment ? ( ALIGNMENTS[ alignment ] ?? {} ) : {};
 
 	return alignmentProps;
 }

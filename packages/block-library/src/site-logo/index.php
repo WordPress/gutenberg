@@ -50,6 +50,25 @@ function render_block_core_site_logo( $attributes ) {
 		$custom_logo = $processor->get_updated_html();
 	}
 
+	// Border and shadow skip serialization on the wrapper so they can frame the image.
+	$image_attributes = wp_get_block_supports_classes_and_styles( $attributes, array( 'border', 'shadow' ) );
+	if ( ! empty( $image_attributes ) ) {
+		$processor = new WP_HTML_Tag_Processor( $custom_logo );
+		if ( $processor->next_tag( 'img' ) ) {
+			if ( ! empty( $image_attributes['class'] ) ) {
+				foreach ( explode( ' ', $image_attributes['class'] ) as $image_class ) {
+					$processor->add_class( $image_class );
+				}
+			}
+			if ( ! empty( $image_attributes['style'] ) ) {
+				$image_style = $processor->get_attribute( 'style' );
+				$image_style = is_string( $image_style ) && '' !== trim( $image_style ) ? rtrim( trim( $image_style ), ';' ) . ';' : '';
+				$processor->set_attribute( 'style', $image_style . $image_attributes['style'] );
+			}
+			$custom_logo = $processor->get_updated_html();
+		}
+	}
+
 	$classnames = array();
 	if ( empty( $attributes['width'] ) ) {
 		$classnames[] = 'is-default-size';
@@ -139,7 +158,7 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
  *
  * @since 5.8.0
  *
- * @param  mixed $value Attachment ID of the custom logo or an empty value.
+ * @param mixed $value Attachment ID of the custom logo or an empty value.
  * @return mixed
  */
 function _sync_custom_logo_to_site_logo( $value ) {

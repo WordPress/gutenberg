@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { WordPressComponentProps } from '../context';
 
@@ -60,8 +57,7 @@ export type PanelBodyProps = {
 	 * this prop, it will receive an object with the `opened` prop as an argument.
 	 */
 	children?:
-		| React.ReactNode
-		| ( ( props: { opened: boolean } ) => React.ReactNode );
+		React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode );
 
 	/**
 	 * The CSS class to apply to the wrapper element.
@@ -70,7 +66,7 @@ export type PanelBodyProps = {
 	/**
 	 * An icon to be shown next to the title.
 	 */
-	icon?: JSX.Element;
+	icon?: React.JSX.Element;
 	/**
 	 * Whether or not the panel will start open.
 	 */
@@ -104,7 +100,7 @@ export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
 	/**
 	 * An icon to be shown next to the title.
 	 */
-	icon?: JSX.Element;
+	icon?: React.JSX.Element;
 	/**
 	 * Whether or not the `PanelBody` is currently opened or not.
 	 */

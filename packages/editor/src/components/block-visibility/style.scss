@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 
 .editor-block-visibility__disabled-blocks-count {
 	border: $border-width solid $gray-300;
@@ -13,7 +12,8 @@
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
 	top: ($grid-unit-05 + 1) * -1;
-	z-index: z-index(".block-editor-block-manager__disabled-blocks-count");
+	// Keep the sticky disabled block count above the category items.
+	z-index: 1;
 
 	// Stick the category titles to the bottom
 	~ .block-editor-block-manager__content .block-editor-block-manager__category-title {

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { Popover } from '..';
 import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
@@ -33,7 +22,8 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
-	title: 'Components/Overlays/Popover',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
 	subcomponents: {
@@ -55,6 +45,10 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -89,7 +83,7 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
+			const buttonRef = useRef< HTMLButtonElement >( undefined );
 			const toggleVisible = ( event: React.MouseEvent ) => {
 				if ( buttonRef.current && event.target !== buttonRef.current ) {
 					return;
@@ -114,6 +108,7 @@ export const Default: StoryObj< typeof Popover > = {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ toggleVisible }
 						ref={ buttonRef }
@@ -179,6 +174,9 @@ export const AllPlacements: StoryObj< typeof Popover > = {
 	// Excluding placement and position since they all possible values
 	// are passed directly in code.
 	parameters: {
+		// FIXME: All Placements: scrollable demo region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: {
 			exclude: [ 'placement', 'position' ],
 		},
@@ -209,6 +207,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 				<div style={ { padding: '20px' } }>
 					<div>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							onClick={ increase }
 							style={ {
@@ -218,7 +217,11 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 							Increase Size
 						</Button>
 
-						<Button variant="primary" onClick={ decrease }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ decrease }
+						>
 							Decrease Size
 						</Button>
 					</div>
@@ -239,6 +242,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 	],
 	args: {
 		...Default.args,
+		animate: false,
 		children: (
 			<div
 				style={ {
@@ -302,6 +306,7 @@ export const WithCloseHandlers: StoryObj< typeof Popover > = {
 				} }
 			>
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ toggleVisible }
 					ref={ buttonRef }

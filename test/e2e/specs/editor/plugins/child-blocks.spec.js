@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Child Blocks', () => {
@@ -36,11 +33,11 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-unrestricted-parent',
 		} );
 
-		await page
+		await editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Child Blocks Unrestricted Parent',
 			} )
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();
@@ -74,11 +71,11 @@ test.describe( 'Child Blocks', () => {
 			name: 'test/child-blocks-restricted-parent',
 		} );
 
-		await page
+		await editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Child Blocks Restricted Parent',
 			} )
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();

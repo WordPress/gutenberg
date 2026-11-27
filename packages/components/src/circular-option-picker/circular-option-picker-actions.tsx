@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import Dropdown from '../dropdown';
 import type { DropdownLinkActionProps } from './types';

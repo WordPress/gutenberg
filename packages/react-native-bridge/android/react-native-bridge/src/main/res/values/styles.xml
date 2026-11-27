@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-
-    <!-- Base application theme. -->
-    <style name="Base.GutenbergWebView" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
-        <item name="android:statusBarColor">@color/status_bar_color</item>
-    </style>
-
-</resources>

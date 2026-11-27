@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	Card,
 	CardHeader,
@@ -21,7 +14,7 @@ import Button from '../../button';
 const meta: Meta< typeof Card > = {
 	component: Card,
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
-	title: 'Components/Containers/Card',
+	title: 'Components/@wordpress-components/Containers/Card',
 	id: 'components-card',
 	argTypes: {
 		as: {
@@ -36,6 +29,11 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Card`](?path=/docs/design-system-components-card--docs) or [`CollapsibleCard`](?path=/docs/design-system-components-collapsiblecard--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 
@@ -59,14 +57,14 @@ export const Default: StoryObj< typeof Card > = {
 					<Text>CardBody (after CardDivider)</Text>
 				</CardBody>
 				<CardMedia>
-					<img
-						alt="Card Media"
-						src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
-					/>
+					{ /* Served from `storybook/static`. */ }
+					<img alt="Sun above green hills" src="landscape.svg" />
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
+					<Button __next40pxDefaultSize variant="secondary">
+						Action Button
+					</Button>
 				</CardFooter>
 			</>
 		),

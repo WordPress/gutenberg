@@ -1,23 +1,20 @@
-/**
- * External dependencies
- */
-import { get, OKLCH, parse } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './lib/register-color-spaces';
-import { buildRamp } from './lib/index';
-import { clampAccentScaleReferenceLightness } from './lib/utils';
-import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
+import { ColorSpace, get, OKLCH, sRGB } from 'colorjs.io/fn';
+import { buildRamp } from './lib/index.ts';
+import { clampAccentScaleReferenceLightness } from './lib/utils.ts';
+import {
+	BG_RAMP_CONFIG,
+	ACCENT_RAMP_CONFIG,
+	PRIMARY_RAMP_CONFIGS,
+} from './lib/ramp-configs.ts';
 import type {
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
-} from './lib/types';
-import { getContrast } from './lib/color-utils';
-import { CONTRAST_COMBINATIONS } from './lib/constants';
-export { DEFAULT_SEED_COLORS } from './lib/constants';
+} from './lib/types.ts';
+import { getContrast } from './lib/color-utils.ts';
+import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
+import { NEUTRAL_CONTRAST_SURFACES } from '../semantic-color-contrast-pairs.ts';
+export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
 /**
  * Creates a background ramp.
@@ -39,12 +36,16 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 		value: number;
 	};
 } {
+	// The ramp holds colors as strings, and may be prebuilt rather than built
+	// from a seed, which registers the color space parsing them needs.
+	ColorSpace.register( sRGB );
+
 	return {
 		mainDirection: ramp.direction,
 		pinLightness: {
 			stepName: STEP_TO_PIN,
 			value: clampAccentScaleReferenceLightness(
-				get( parse( ramp.ramp[ STEP_TO_PIN ] ), [ OKLCH, 'l' ] ),
+				get( ramp.ramp[ STEP_TO_PIN ], [ OKLCH, 'l' ] ),
 				ramp.direction
 			),
 		},
@@ -54,10 +55,12 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 /**
  * Creates an accent ramp (ie used by primary, success, info, warning and error
  * ramps).
+ * @param name   The accent ramp name.
  * @param seed   The seed color for the accent ramp.
  * @param bgRamp The ramp of the background on which the accent is shown.
  */
 export function buildAccentRamp(
+	name: string,
 	seed: string,
 	bgRamp?: InternalRampResult
 ): InternalRampResult {
@@ -66,7 +69,21 @@ export function buildAccentRamp(
 	}
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+	if ( name !== 'primary' || ! bgRamp ) {
+		return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+	}
+	const endpoint = bgRamp.direction === 'lighter' ? '#fff' : '#000';
+	const neutralSurface = Object.values( NEUTRAL_CONTRAST_SURFACES )
+		.map( ( step ) => bgRamp.ramp[ step ] )
+		.reduce( ( worst, next ) =>
+			getContrast( next, endpoint ) < getContrast( worst, endpoint )
+				? next
+				: worst
+		);
+	return buildRamp( seed, PRIMARY_RAMP_CONFIGS[ bgRamp.direction ], {
+		...bgRampInfo,
+		neutralSurface,
+	} );
 }
 
 /**

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -21,7 +18,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'before pause' );
 		await editor.page.waitForTimeout( 1000 );
@@ -53,6 +50,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -91,7 +90,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'before keyboard ' );
@@ -128,6 +127,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -163,9 +164,161 @@ test.describe( 'undo', () => {
 		} );
 	} );
 
+	test( 'should undo formatting separately from typing', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'one two' );
+		await editor.page.waitForTimeout( 1000 );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ' three' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong> three</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one two</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
+
+		// Undo inserting the paragraph.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+	} );
+
+	test( 'should not end the undo level when leaving a format with the arrow key', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a<strong>b</strong>' },
+		} );
+		await page.keyboard.press( 'End' );
+		// At the end of a format, the arrow keys enter and leave it without
+		// moving the caret.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'y' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong>y</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
+	test( 'should undo each format change across blocks separately', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// The same text on both lines, so the caret lands between the same
+		// letters one line up.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toHaveLength( 2 );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+i' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong><em>b</em></strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>a</em></strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>a</strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.saveDraft();
@@ -173,6 +326,19 @@ test.describe( 'undo', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
+
+		// Real-time collaboration causes block CRDT content to be updated
+		// asynchronously, and the RTC undo manager relies on up-to-date CRDT
+		// content. Ensure the bold has been applied before trying to undo.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<strong>test</strong>',
+				},
+			},
+		] );
+
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -191,7 +357,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		const firstBlock = await editor.getEditedPostContent();
@@ -221,6 +387,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 2,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd block.
@@ -237,6 +405,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd block.
@@ -253,6 +423,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
@@ -336,7 +508,7 @@ test.describe( 'undo', () => {
 
 		// Issue is demonstrated from an edited post: create, save, and reload.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'original' );
 		await editor.saveDraft();
@@ -371,7 +543,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.saveDraft();
@@ -386,7 +558,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
@@ -401,7 +573,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '1' );
@@ -443,7 +615,7 @@ test.describe( 'undo', () => {
 		// and skipping `undo` history steps.
 		const text = 'tonis';
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( text );
 		await editor.publishPost();
@@ -452,7 +624,7 @@ test.describe( 'undo', () => {
 		await expect(
 			page.locator( 'role=button[name="Redo"]' )
 		).toBeEnabled();
-		await page.click( 'role=button[name="Redo"]' );
+		await page.getByRole( 'button', { name: 'Redo', exact: true } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -475,7 +647,7 @@ test.describe( 'undo', () => {
 			.type( 'a' ); // First step.
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click(); // third step.
 
 		// Title should be empty
@@ -496,6 +668,250 @@ test.describe( 'undo', () => {
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/24679.
+	test( 'should not be dirty after undoing all changes', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.publishPost();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Howdy!' );
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeEnabled();
+
+		// Undo new block and content addition.
+		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+
+		// This cleanup runs through `withMultiEntityRecordEdits`, which
+		// real-time collaboration bypasses in favor of its own undo manager.
+		const isCollaborationEnabled = await page.evaluate(
+			() => window.__experimentalEnableRealTimeCollaboration === true
+		);
+
+		// The entity is no longer dirty, so the "Save" button is disabled.
+		// Under real-time collaboration the undo runs through the RTC undo
+		// manager, which doesn't yet clear the dirty state, so the button
+		// stays enabled for now. That path is fixed separately.
+		// See: https://github.com/WordPress/gutenberg/pull/77100.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toHaveAttribute(
+			'aria-disabled',
+			isCollaborationEnabled ? 'false' : 'true'
+		);
+	} );
+
+	test( 'should leave undo to the browser inside the link dialog', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'some linked text here' );
+		// Select the word "linked".
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 10 } );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+		await expect( urlInput ).toBeFocused();
+
+		await page.keyboard.type( 'exampl' );
+		await expect( urlInput ).toHaveValue( 'exampl' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// The browser undoes the typing within the field. The dialog stays
+		// open and the canvas content is untouched.
+		await expect( urlInput ).toHaveValue( '' );
+		await expect( urlInput ).toBeFocused();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'some linked text here' },
+			},
+		] );
+	} );
+
+	test( 'should leave undo to the browser when editing a block as HTML', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'third' );
+
+		await editor.canvas.getByText( 'second', { exact: true } ).click();
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+
+		const textarea = editor.canvas.locator(
+			'textarea.block-editor-block-list__block-html-textarea'
+		);
+		await textarea.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'EDIT' );
+		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
+
+		// Undo granularity within the field is the browser's own; press
+		// once per typed character. Excess presses are harmless no-ops in
+		// browsers that group the typing into a single undo unit, since the
+		// editor history must not act while the field is focused.
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The other blocks
+		// are untouched, and redo restores the typing.
+		await expect( textarea ).toHaveValue( '<p>second</p>' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+			{ name: 'core/paragraph', attributes: { content: 'third' } },
+		] );
+
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
+	} );
+
+	test( 'should leave undo to the browser inside the Custom HTML dialog', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'a paragraph' );
+		await editor.insertBlock( {
+			name: 'core/html',
+			attributes: { content: '<p>markup</p>' },
+		} );
+		await editor.clickBlockToolbarButton( 'Edit code' );
+
+		const field = page.getByRole( 'dialog' ).getByRole( 'textbox' );
+		await field.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'EDIT' );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The dialog stays
+		// open and the content behind it is untouched.
+		await expect( field ).toHaveValue( '<p>markup</p>' );
+		await expect.poll( editor.getEditedPostContent )
+			.toBe( `<!-- wp:paragraph -->
+<p>a paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<p>markup</p>
+<!-- /wp:html -->` );
+
+		// Redo restores the typing. This distinguishes the browser's own
+		// undo from the editor history remounting the dialog: a remount
+		// resets the field to the same committed value, but destroys the
+		// browser's redo stack with it.
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+	} );
+} );
+
+test.describe( 'Media Library modal undo', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'does not remove block on undo while media modal is open', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		await expect( modal ).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( modal ).toBeVisible();
+		await expect( modal.locator( '.media-frame-content' ) ).toBeVisible();
+
+		const closeButton = page.locator( '.media-modal-close' );
+		await expect( closeButton ).toBeVisible();
+		await closeButton.focus();
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( modal ).toBeVisible();
+
+		await closeButton.click();
+		await expect( modal ).toBeHidden();
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/image"]' )
+		).toHaveCount( 1 );
+	} );
+
+	test( 'cleans up modal and backdrop when component unmounts', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		const backdrop = page.locator( '.media-modal-backdrop' );
+
+		await expect( modal ).toBeVisible();
+		await expect( backdrop ).toBeVisible();
+
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const blocks = select( 'core/block-editor' ).getBlocks();
+			const imageBlock = blocks.find(
+				( block ) => block.name === 'core/image'
+			);
+
+			if ( imageBlock ) {
+				dispatch( 'core/block-editor' ).removeBlock(
+					imageBlock.clientId
+				);
+			}
+		} );
+
+		await expect( modal ).toHaveCount( 0 );
+		await expect( backdrop ).toHaveCount( 0 );
 	} );
 } );
 

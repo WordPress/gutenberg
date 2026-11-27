@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

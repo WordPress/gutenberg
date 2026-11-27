@@ -1,16 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
-import type { Field, View } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
+import type { Field, View, Form } from '@wordpress/dataviews';
+import { DataForm, DataViews } from '@wordpress/dataviews';
 import {
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -21,9 +18,13 @@ import {
 } from '../index';
 
 export default {
-	title: 'Fields/Media Fields',
+	id: 'fields-media-fields',
+	title: 'Design System/DataViews/Fields/Media Fields',
 	component: DataForm,
 };
+
+// Served from `storybook/static`.
+const IMAGE_URL = 'landscape.svg';
 
 // Sample data for media fields
 const sampleMediaItem: MediaItem = {
@@ -31,8 +32,8 @@ const sampleMediaItem: MediaItem = {
 	date: '2024-01-15T10:30:00',
 	date_gmt: '2024-01-15T10:30:00',
 	guid: {
-		raw: 'https://cldup.com/cXyG__fTLN.jpg',
-		rendered: 'https://cldup.com/cXyG__fTLN.jpg',
+		raw: IMAGE_URL,
+		rendered: IMAGE_URL,
 	},
 	modified: '2024-01-15T10:30:00',
 	modified_gmt: '2024-01-15T10:30:00',
@@ -46,6 +47,7 @@ const sampleMediaItem: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -53,7 +55,7 @@ const sampleMediaItem: MediaItem = {
 	permalink_template: 'https://example.com/?attachment_id=123',
 	generated_slug: 'sample-image',
 	class_list: [ 'post-123', 'attachment' ],
-	alt_text: 'A beautiful sample image',
+	alt_text: 'Sun above green hills',
 	caption: {
 		raw: 'A caption for the image',
 		rendered: '<p>A caption for the image</p>\n',
@@ -63,15 +65,15 @@ const sampleMediaItem: MediaItem = {
 		rendered:
 			'<p>This is a detailed description of the sample image. It contains useful information about what the image depicts and its context.</p>',
 	},
-	mime_type: 'image/jpeg',
+	mime_type: 'image/svg+xml',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+	source_url: IMAGE_URL,
 	media_details: {
-		file: 'sample-image.jpg',
-		width: 1920,
-		height: 1080,
-		filesize: 524288,
+		file: 'landscape.svg',
+		width: 1200,
+		height: 600,
+		filesize: 273,
 		image_meta: {
 			aperture: '2.8',
 			credit: '',
@@ -86,26 +88,22 @@ const sampleMediaItem: MediaItem = {
 			orientation: '1',
 			keywords: [],
 		},
-		sizes: {
-			thumbnail: {
-				file: 'sample-image-150x150.jpg',
-				width: 150,
-				height: 150,
-				filesize: 8192,
-				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
-			medium: {
-				file: 'sample-image-300x169.jpg',
-				width: 300,
-				height: 169,
-				filesize: 24576,
-				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
-			},
-		},
+		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'John Doe',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Sample data for a non-image file (ZIP)
@@ -130,6 +128,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -148,7 +147,7 @@ const sampleMediaItemZip: MediaItem = {
 	},
 	mime_type: 'application/zip',
 	media_type: 'file',
-	post: 1,
+	post: 123,
 	source_url:
 		'http://localhost:8888/wp-content/uploads/2025/11/gutenberg-v22-0-0.zip',
 	media_details: {
@@ -173,6 +172,39 @@ const sampleMediaItemZip: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		'wp:attached-to': [
+			{
+				id: 123,
+				date: '2025-12-19T00:21:52',
+				slug: '',
+				type: 'post',
+				link: 'http://localhost:8888/?p=123',
+				title: {
+					raw: 'A post title',
+					rendered: 'A post title',
+				},
+				excerpt: {
+					raw: '',
+					rendered: '',
+					protected: false,
+				},
+				author: 1,
+				featured_media: 0,
+			},
+		],
+		author: [
+			{
+				id: 1,
+				name: 'Jane Smith',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Sample data for a broken image (demonstrates error fallback)
@@ -196,6 +228,7 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	},
 	author: 1,
 	featured_media: 0,
+	edit_root: 0,
 	comment_status: 'open',
 	ping_status: 'closed',
 	template: '',
@@ -215,7 +248,9 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	mime_type: 'image/jpeg',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://example.com/this-image-does-not-exist.jpg',
+	// Data that is not an image fails to load without a request. The data ends
+	// with a file name for the file name field.
+	source_url: 'data:image/jpeg,/this-image-does-not-exist.jpg',
 	media_details: {
 		file: 'broken-image.jpg',
 		width: 1920,
@@ -224,6 +259,19 @@ const sampleMediaItemBrokenImage: MediaItem = {
 		sizes: {},
 	},
 	missing_image_sizes: [],
+	_embedded: {
+		author: [
+			{
+				id: 1,
+				name: 'Admin User',
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
+			},
+		],
+	},
 };
 
 // Create a showcase of all media fields.
@@ -231,7 +279,11 @@ const showcaseFields = [
 	mediaThumbnailField,
 	filenameField,
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	mimeTypeField,
 	mediaDimensionsField,
@@ -259,6 +311,10 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 			'mime_type',
 			'media_dimensions',
 			'filesize',
+			'author',
+			'date',
+			'modified',
+			'attached_to',
 		],
 	};
 
@@ -315,12 +371,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Media Fields DataViews Preview</h2>
@@ -335,8 +385,13 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);
+};
+
+DataViewsPreview.parameters = {
+	// FIXME: Preview table has an empty column header (empty-table-header).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
 };

@@ -24,29 +24,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-/**
- * External dependencies
- */
 import { isPlainObject } from 'is-plain-object';
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import {
 	escapeHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
-import { createContext, Fragment, StrictMode, forwardRef } from './react';
+import {
+	createContext,
+	createElement,
+	Fragment,
+	StrictMode,
+	forwardRef,
+	memo,
+} from './react';
 import RawHTML from './raw-html';
 
-/** @typedef {import('react').ReactElement} ReactElement */
+/** @typedef {React.ReactElement} ReactElement */
 
 const Context = createContext( undefined );
 Context.displayName = 'ElementContext';
@@ -80,6 +75,10 @@ interface HTMLProps {
 const { Provider, Consumer } = Context;
 
 const ForwardRef = forwardRef( () => {
+	return null;
+} );
+
+const Memo = memo( () => {
 	return null;
 } );
 
@@ -625,8 +624,14 @@ export function renderElement(
 			return renderChildren( props.children, props.value, legacyContext );
 
 		case Consumer.$$typeof:
+			// In React 18 the `Consumer` is the `_context` itself and `Provider`
+			// has `_context` as a property. In React 19 it's the other way around.
+			const contextValue =
+				context !== undefined
+					? context
+					: ( type._context || type )._currentValue;
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children( contextValue ),
 				context,
 				legacyContext
 			);
@@ -634,6 +639,15 @@ export function renderElement(
 		case ForwardRef.$$typeof:
 			return renderElement(
 				type.render( props ),
+				context,
+				legacyContext
+			);
+
+		case Memo.$$typeof:
+			// Memoization is meaningless for a static, one-off serialization,
+			// so the wrapped type is rendered directly.
+			return renderElement(
+				createElement( type.type, props ),
 				context,
 				legacyContext
 			);

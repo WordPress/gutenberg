@@ -1,98 +1,67 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { Box } from '../box';
-import { type BoxProps } from '../box/types';
+import { help } from '@wordpress/icons';
 import { type BadgeProps } from './types';
-
-/**
- * Default render function that renders a span element with the given props.
- *
- * @param props The props to apply to the HTML element.
- */
-const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
-	<span { ...props } />
-);
-
-/**
- * Maps intent values to Box backgroundColor and color props.
- * Uses strong emphasis styles (as emphasis prop has been removed).
- * @param intent
- */
-const getIntentStyles = (
-	intent: BadgeProps[ 'intent' ]
-): Partial< BoxProps > => {
-	switch ( intent ) {
-		case 'high':
-			return {
-				backgroundColor: 'error',
-				color: 'error',
-			};
-		case 'medium':
-			return {
-				backgroundColor: 'warning',
-				color: 'warning',
-			};
-		case 'low':
-			return {
-				backgroundColor: 'caution',
-				color: 'caution',
-			};
-		case 'stable':
-			return {
-				backgroundColor: 'success',
-				color: 'success',
-			};
-		case 'informational':
-			return {
-				backgroundColor: 'info',
-				color: 'info',
-			};
-		case 'draft':
-			return {
-				backgroundColor: 'neutral-weak',
-				color: 'neutral',
-			};
-		case 'none':
-		default:
-			return {
-				backgroundColor: 'neutral',
-				color: 'neutral-weak',
-			};
-	}
-};
+import styles from './style.module.scss';
+import { Text } from '../text';
+import { Icon } from '../icon';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
  * A badge component for displaying labels with semantic intent.
- * Built on the Box primitive for consistent theming and accessibility.
+ * Add an infotip to explain a status in a popover.
  */
-export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
-	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
-	ref
-) {
-	const intentStyles = getIntentStyles( intent );
+export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
+	function UnforwardedBadge(
+		{ intent = 'none', className, children, infotip, render, ...props },
+		ref
+	) {
+		const badge = (
+			<Text
+				ref={ ref }
+				className={ clsx(
+					styles.badge,
+					styles[ `is-${ intent }-intent` ],
+					className
+				) }
+				{ ...props }
+				render={
+					infotip ? (
+						<infotip.popover.Trigger
+							className={ clsx(
+								styles[ 'infotip-trigger' ],
+								defenseStyles.button
+							) }
+							openOnHover
+							delay={ 200 }
+							closeDelay={ 200 }
+							render={ render }
+						/>
+					) : (
+						render
+					)
+				}
+				variant="body-sm"
+			>
+				<span className={ styles.label }>{ children }</span>
+				{ infotip && (
+					<Icon
+						icon={ help }
+						size={ 16 }
+						aria-hidden="true"
+						className={ styles[ 'infotip-icon' ] }
+					/>
+				) }
+			</Text>
+		);
 
-	return (
-		<Box
-			{ ...intentStyles }
-			padding={ { inline: 'xs', block: '2xs' } }
-			borderRadius="lg"
-			render={ render }
-			style={ {
-				fontFamily: 'var(--wpds-font-family-body)',
-				fontSize: 'var(--wpds-font-size-sm)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-xs)',
-				...props.style,
-			} }
-			ref={ ref }
-		>
-			{ children }
-		</Box>
-	);
-} );
+		return infotip ? (
+			<infotip.popover.Root>
+				{ badge }
+				{ infotip.popup }
+			</infotip.popover.Root>
+		) : (
+			badge
+		);
+	}
+);

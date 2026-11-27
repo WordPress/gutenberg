@@ -1,22 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { mediaAndText as icon } from '@wordpress/icons';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
+import { TEMPLATE } from './constants';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-import { unlock } from '../lock-unlock';
-
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -49,42 +39,10 @@ export const settings = {
 		],
 	},
 	transforms,
+	template: TEMPLATE,
 	edit,
 	save,
 	deprecated,
 };
-
-if ( window.__experimentalContentOnlyInspectorFields ) {
-	settings[ fieldsKey ] = [
-		{
-			id: 'media',
-			label: __( 'Media' ),
-			type: 'media',
-			mapping: {
-				id: 'mediaId',
-				type: 'mediaType',
-				url: 'mediaUrl',
-				link: 'mediaLink',
-			},
-			args: {
-				allowedTypes: [ 'image', 'video' ],
-				multiple: false,
-			},
-		},
-		{
-			id: 'link',
-			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-			},
-		},
-	];
-	settings[ formKey ] = {
-		fields: [ 'media' ],
-	};
-}
 
 export const init = () => initBlock( { name, metadata, settings } );

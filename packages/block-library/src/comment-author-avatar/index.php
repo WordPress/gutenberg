@@ -26,45 +26,33 @@ function render_block_core_comment_author_avatar( $attributes, $content, $block 
 	// This is the only way to retrieve style and classes on different instances.
 	$wrapper_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
 
-	/**
-	 * We get the spacing attributes and transform the array provided into a string formatted for being applied as a style html tag.
-	 * Good candidate to be moved to a separate function in core.
-	*/
-	$spacing_attributes = isset( $attributes['style']['spacing'] ) ? $attributes['style']['spacing'] : null;
-	if ( isset( $spacing_attributes ) && ! empty( $spacing_attributes ) ) {
-		$spacing_array = array();
-		foreach ( $spacing_attributes as $spacing_attribute_key => $spacing_attribute_value ) {
-			foreach ( $spacing_attribute_value as $position_key => $position_value ) {
-				$spacing_array[] = $spacing_attribute_key . '-' . $position_key . ': ' . $position_value;
-			}
-		}
-		$spacing_string = implode( ';', $spacing_array );
-	}
-
-	$width   = isset( $attributes['width'] ) ? $attributes['width'] : 96;
-	$height  = isset( $attributes['height'] ) ? $attributes['height'] : 96;
-	$styles  = isset( $wrapper_attributes['style'] ) ? $wrapper_attributes['style'] : '';
-	$classes = isset( $wrapper_attributes['class'] ) ? $wrapper_attributes['class'] : '';
+	$width   = $attributes['width'] ?? 96;
+	$height  = $attributes['height'] ?? 96;
+	$styles  = $wrapper_attributes['style'] ?? '';
+	$classes = $wrapper_attributes['class'] ?? '';
 
 	/* translators: %s: Author name. */
 	$alt = sprintf( __( '%s Avatar' ), $comment->comment_author );
 
 	$avatar_block = get_avatar(
 		$comment,
-		null,
+		max( (int) $width, (int) $height ),
 		'',
 		$alt,
 		array(
 			'height'     => $height,
 			'width'      => $width,
-			'extra_attr' => sprintf( 'style="%1s"', $styles ),
+			'extra_attr' => sprintf( 'style="%s"', $styles ),
 			'class'      => $classes,
 		)
 	);
-	if ( isset( $spacing_attributes ) ) {
-		return sprintf( '<div style="%1s">%2s</div>', esc_attr( $spacing_string ), $avatar_block );
+
+	// Spacing skips serialization, so it goes on the outer div, not the image.
+	$spacing_styles = wp_get_spacing_classes_and_styles( $attributes );
+	if ( ! empty( $spacing_styles['style'] ) ) {
+		return sprintf( '<div style="%1$s">%2$s</div>', esc_attr( $spacing_styles['style'] ), $avatar_block );
 	}
-	return sprintf( '<div>%1s</div>', $avatar_block );
+	return sprintf( '<div>%s</div>', $avatar_block );
 }
 
 /**

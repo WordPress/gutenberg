@@ -1,41 +1,64 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import {
-	parse,
+	ColorSpace,
+	clone,
+	set,
 	to,
-	get,
-	serialize,
 	sRGB,
 	HSL,
-	type ColorTypes,
+	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import './color-ramps/lib/register-color-spaces';
-import { ThemeContext } from './context';
-import colorTokens from './prebuilt/ts/color-tokens';
+import { ThemeContext } from './context.ts';
+import colorTokens from './prebuilt/ts/color-tokens.ts';
 import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
 	type RampResult,
-} from './color-ramps';
-import type { ThemeProviderProps } from './types';
+} from './color-ramps/index.ts';
+import { getColorString, getContrast } from './color-ramps/lib/color-utils.ts';
+import { MINIMUM_TEXT_CONTRAST } from './semantic-color-contrast-pairs.ts';
+import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
+import type { ThemeProviderProps } from './types.ts';
+import {
+	collectThemeProviderColorWarnings,
+	type ThemeProviderColorRampName,
+	type ThemeProviderColorWarning,
+} from './theme-provider-color-warnings.ts';
 
 type Entry = [ string, string ];
 
+// `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
+// Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+
+/*
+ * Building a ramp is costly, and the ramps of the default seeds are prebuilt,
+ * so use them when a seed is the default: with the default background, and
+ * the default admin color scheme, no ramp is built at all.
+ */
+function getBgRamp( seed: string ): RampResult {
+	return seed === DEFAULT_SEED_COLORS.background
+		? DEFAULT_RAMPS.background
+		: getCachedBgRamp( seed );
+}
+
+function getAccentRamp(
+	rampName: Exclude< ThemeProviderColorRampName, 'background' >,
+	seed: string,
+	bgRamp: RampResult
+): RampResult {
+	if (
+		bgRamp === DEFAULT_RAMPS.background &&
+		seed === DEFAULT_SEED_COLORS[ rampName ]
+	) {
+		return DEFAULT_RAMPS[ rampName ];
+	}
+	return getCachedAccentRamp( rampName, seed, bgRamp );
+}
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
@@ -49,23 +72,23 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-fg-interactive-brand-strong)',
+		'var(--wpds-color-foreground-interactive-brand-strong)',
 	],
 	[
 		'--wp-components-color-background',
-		'var(--wpds-color-bg-surface-neutral-strong)',
+		'var(--wpds-color-background-surface-neutral-strong)',
 	],
 	[
 		'--wp-components-color-foreground',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 	[
 		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-100',
-		'var(--wpds-color-bg-surface-neutral)',
+		'var(--wpds-color-background-surface-neutral)',
 	],
 	[
 		'--wp-components-color-gray-200',
@@ -85,66 +108,47 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 	],
 	[
 		'--wp-components-color-gray-700',
-		'var(--wpds-color-fg-content-neutral-weak)',
+		'var(--wpds-color-foreground-content-neutral-weak)',
 	],
 	[
 		'--wp-components-color-gray-800',
-		'var(--wpds-color-fg-content-neutral)',
+		'var(--wpds-color-foreground-content-neutral)',
 	],
 ];
 
-function customRgbFormat( color: ColorTypes ) {
+function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
-	return [ get( rgb, 'srgb.r' ), get( rgb, 'srgb.g' ), get( rgb, 'srgb.b' ) ]
-		.map( ( n ) => Math.round( n * 255 ) )
+	return rgb.coords
+		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
 		.join( ', ' );
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
-	const parsedAccent = to( parse( accent ), HSL );
+	ColorSpace.register( sRGB );
+	const parsedAccent = to( accent, HSL );
+	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
-	const coords = parsedAccent.coords;
-	const darker10 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
-			],
-		},
-		sRGB
+	// Create darker version of accent —
+	const darker10 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 5 ) // L reduced by 5%
 	);
-	const darker20 = to(
-		{
-			space: HSL,
-			coords: [
-				coords[ 0 ], // h
-				coords[ 1 ], // s
-				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
-			],
-		},
-		sRGB
+	const darker20 = set(
+		clone( parsedAccent ),
+		[ HSL, 'l' ],
+		Math.max( 0, parsedL - 10 ) // L reduced by 10%
 	);
 
 	return [
-		[
-			'--wp-admin-theme-color',
-			serialize( to( parsedAccent, sRGB ), { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color', getColorString( parsedAccent ) ],
 		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
-		[
-			'--wp-admin-theme-color-darker-10',
-			serialize( darker10, { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color-darker-10', getColorString( darker10 ) ],
 		[
 			'--wp-admin-theme-color-darker-10--rgb',
 			customRgbFormat( darker10 ),
 		],
-		[
-			'--wp-admin-theme-color-darker-20',
-			serialize( darker20, { format: 'hex' } ),
-		],
+		[ '--wp-admin-theme-color-darker-20', getColorString( darker20 ) ],
 		[
 			'--wp-admin-theme-color-darker-20--rgb',
 			customRgbFormat( darker20 ),
@@ -153,13 +157,15 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
 }
 
 function colorTokensCSS(
-	computedColorRamps: Map< string, RampResult >
+	computedColorRamps: Map< ThemeProviderColorRampName, RampResult >
 ): Entry[] {
 	const entries: Entry[] = [];
 
 	for ( const [ rampName, { ramp } ] of computedColorRamps ) {
 		for ( const [ tokenName, tokenValue ] of Object.entries( ramp ) ) {
-			const key = `${ rampName }-${ tokenName }`;
+			const primitiveRampName =
+				rampName === 'background' ? 'bg' : rampName;
+			const key = `${ primitiveRampName }-${ tokenName }`;
 			const aliasedBy = colorTokens[ key ] ?? [];
 			for ( const aliasedId of aliasedBy ) {
 				entries.push( [ `--wpds-color-${ aliasedId }`, tokenValue ] );
@@ -172,80 +178,150 @@ function colorTokensCSS(
 
 function generateStyles( {
 	primary,
-	computedColorRamps,
+	colorEntries,
 }: {
 	primary: string;
-	computedColorRamps: Map< string, RampResult >;
+	colorEntries: Entry[];
 } ): CSSProperties {
-	return Object.fromEntries(
+	const styles = Object.fromEntries(
 		[
 			// Semantic color tokens
-			colorTokensCSS( computedColorRamps ),
+			colorEntries,
 			// Legacy overrides
 			legacyWpAdminThemeOverridesCSS( primary ),
 			legacyWpComponentsOverridesCSS,
 		].flat()
 	);
+	// The legacy accent keeps the seed even when the semantic brand fill moves.
+	// Prefer white: the darker legacy accent states only increase its contrast.
+	const accent = styles[ '--wp-admin-theme-color' ];
+	const onFill = styles[ '--wpds-color-foreground-interactive-brand-strong' ];
+	if ( getContrast( accent, onFill ) < MINIMUM_TEXT_CONTRAST ) {
+		styles[ '--wp-components-color-accent-inverted' ] =
+			getContrast( accent, '#fff' ) >= MINIMUM_TEXT_CONTRAST
+				? '#fff'
+				: '#000';
+	}
+	return styles;
+}
+
+function generateThemeProviderColors(
+	primary: string,
+	background: string
+): {
+	styles: CSSProperties;
+	warnings: ThemeProviderColorWarning[];
+} {
+	const seeds = {
+		...DEFAULT_SEED_COLORS,
+		background,
+		primary,
+	};
+	const computedColorRamps = new Map<
+		ThemeProviderColorRampName,
+		RampResult
+	>();
+	const bgRamp = getBgRamp( seeds.background );
+
+	for ( const [ rawRampName, seed ] of Object.entries( seeds ) ) {
+		const rampName = rawRampName as ThemeProviderColorRampName;
+		computedColorRamps.set(
+			rampName,
+			rampName === 'background'
+				? bgRamp
+				: getAccentRamp( rampName, seed, bgRamp )
+		);
+	}
+	const colorEntries = colorTokensCSS( computedColorRamps );
+
+	return {
+		styles: generateStyles( {
+			primary: seeds.primary,
+			colorEntries,
+		} ),
+		warnings: collectThemeProviderColorWarnings(
+			computedColorRamps,
+			new Map( colorEntries )
+		),
+	};
 }
 
 export function useThemeProviderStyles( {
 	color = {},
+	cursor,
+	cornerRadius,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
+	cursor?: ThemeProviderProps[ 'cursor' ];
+	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
+	// Color styles are only emitted when seeds are either applied locally or
+	// inherited from an ancestor. Otherwise, the expectation is that static CSS
+	// stylesheet, build fallbacks, or CSS properties defined elsewhere apply
+	// (e.g. `@wordpress/base-styles`). Inherited seed values must always be
+	// reapplied so portaled subtrees retain the values.
+	const hasColor =
+		color.primary !== undefined ||
+		color.background !== undefined ||
+		inheritedSettings.color?.primary !== undefined ||
+		inheritedSettings.color?.background !== undefined;
+
 	// Compute settings:
 	// - used provided prop value;
-	// - otherwise, use inherited value from parent instance;
-	// - otherwise, use fallback value (where applicable).
-	const primary =
-		color.primary ??
-		inheritedSettings.color?.primary ??
-		DEFAULT_SEED_COLORS.primary;
-	const bg =
-		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	// - otherwise, if a parent instance exists, use its inherited value or default;
+	// - otherwise, omit.
+	const primary = hasColor
+		? ( color.primary ??
+			inheritedSettings.color?.primary ??
+			DEFAULT_SEED_COLORS.primary )
+		: undefined;
+	const background = hasColor
+		? ( color.background ??
+			inheritedSettings.color?.background ??
+			DEFAULT_SEED_COLORS.background )
+		: undefined;
+	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	const cornerRadiusPreset =
+		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 
 	const resolvedSettings = useMemo(
 		() => ( {
 			color: {
 				primary,
-				bg,
+				background,
 			},
+			cursor: cursorControl ? { control: cursorControl } : undefined,
+			cornerRadius: cornerRadiusPreset,
 		} ),
-		[ primary, bg ]
+		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
-	const themeProviderStyles = useMemo( () => {
-		// Determine which seeds are needed for generating ramps.
-		const seeds = {
-			...DEFAULT_SEED_COLORS,
-			bg,
-			primary,
-		};
+	const generatedColors = useMemo( () => {
+		if ( primary === undefined || background === undefined ) {
+			return {
+				styles: {},
+				warnings: undefined,
+			};
+		}
 
-		// Generate ramps.
-		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = getCachedBgRamp( seeds.bg );
-		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
-			if ( rampName === 'bg' ) {
-				computedColorRamps.set( rampName, bgRamp );
-			} else {
-				computedColorRamps.set(
-					rampName,
-					getCachedAccentRamp( seed, bgRamp )
-				);
-			}
-		} );
+		return generateThemeProviderColors( primary, background );
+	}, [ primary, background ] );
 
-		return generateStyles( {
-			primary: seeds.primary,
-			computedColorRamps,
-		} );
-	}, [ primary, bg ] );
+	const themeProviderStyles: CSSProperties = useMemo(
+		() => ( {
+			...generatedColors.styles,
+			...( cursorControl && {
+				'--wpds-cursor-control': cursorControl,
+			} ),
+		} ),
+		[ generatedColors.styles, cursorControl ]
+	);
 
 	return {
 		resolvedSettings,
 		themeProviderStyles,
+		colorWarnings: generatedColors.warnings,
 	};
 }

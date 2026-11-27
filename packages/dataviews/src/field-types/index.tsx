@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	Field,
 	FieldTypeName,
@@ -19,6 +16,7 @@ import { default as number } from './number';
 import { default as text } from './text';
 import { default as datetime } from './datetime';
 import { default as date } from './date';
+import { default as time } from './time';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
 import { default as array } from './array';
@@ -28,6 +26,7 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
+import getFilter from './utils/get-filter';
 import getFormat from './utils/get-format';
 
 /**
@@ -44,6 +43,7 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 		text,
 		datetime,
 		date,
+		time,
 		boolean,
 		media,
 		array,
@@ -95,6 +95,10 @@ export default function normalizeFields< Item >(
 			getElements: field.getElements,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
+			isDisabled:
+				typeof field.isDisabled === 'function'
+					? field.isDisabled
+					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
 			// The type provides defaults for the following props
@@ -111,6 +115,7 @@ export default function normalizeFields< Item >(
 				fieldType.defaultOperators,
 				fieldType.validOperators
 			),
+			filter: getFilter( fieldType ),
 			format: getFormat( field, fieldType ),
 			getValueFormatted:
 				field.getValueFormatted ?? fieldType.getValueFormatted,

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -26,14 +23,14 @@ const { state } = store( 'router-regions', {
 		router: {
 			navigate: withSyncEvent( function* ( e ) {
 				e.preventDefault();
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
+				const { actions } =
+					yield import( '@wordpress/interactivity-router' );
 				yield actions.navigate( e.target.href );
 			} ),
-			back() {
+			back: withSyncEvent( function* ( e ) {
+				e.preventDefault();
 				history.back();
-			},
+			} ),
 		},
 		counter: {
 			increment() {
@@ -63,6 +60,9 @@ const { state } = store( 'router-regions', {
 	callbacks: {
 		init() {
 			state.initCount += 1;
+		},
+		nope() {
+			// This function does nothing.
 		},
 	},
 } );

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ShortcutProps } from '../shortcut/types';
 import type { ButtonAsButtonProps } from '../button/types';
 
@@ -28,7 +25,7 @@ export type MenuItemsChoiceProps = {
 	 *
 	 * @default noop
 	 */
-	onHover: ( value: string | null ) => void;
+	onHover?: ( value: string | null ) => void;
 };
 
 export type MenuItemChoice = {

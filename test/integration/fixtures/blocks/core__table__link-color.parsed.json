@@ -1,0 +1,26 @@
+[
+	{
+		"blockName": "core/table",
+		"attrs": {
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "var:preset|color|vivid-red"
+						}
+					}
+				},
+				"typography": {
+					"fontSize": "20px"
+				}
+			},
+			"backgroundColor": "pale-cyan-blue",
+			"textColor": "black"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-table has-link-color\" style=\"font-size:20px\"><table class=\"has-black-color has-pale-cyan-blue-background-color has-text-color has-background has-fixed-layout\"><tbody><tr><td><a href=\"https://wordpress.org/\">WordPress</a></td><td>Cell</td></tr></tbody></table><figcaption class=\"wp-element-caption\">A <a href=\"https://wordpress.org/\">linked</a> caption</figcaption></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-table has-link-color\" style=\"font-size:20px\"><table class=\"has-black-color has-pale-cyan-blue-background-color has-text-color has-background has-fixed-layout\"><tbody><tr><td><a href=\"https://wordpress.org/\">WordPress</a></td><td>Cell</td></tr></tbody></table><figcaption class=\"wp-element-caption\">A <a href=\"https://wordpress.org/\">linked</a> caption</figcaption></figure>\n"
+		]
+	}
+]

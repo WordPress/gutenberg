@@ -1,35 +1,25 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockCanvas,
 	BlockEditorProvider,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
+import styles from './style.lazy.scss?inline';
+import { contentStyles } from '../editor-styles';
 
-/**
- * Internal dependencies
- */
-import styles from './style.lazy.scss';
-import { editorStyles } from '../editor-styles';
-
-export default function EditorFullPage() {
+export default function EditorFullPage( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	// Ensures that the CSS intended for the playground (especially the style resets)
 	// are only loaded for the playground and don't leak into other stories.
 	useEffect( () => {
-		styles.use();
+		const style = document.createElement( 'style' );
+		style.textContent = styles;
+		document.head.appendChild( style );
 
-		return styles.unuse;
-	} );
+		return () => document.head.removeChild( style );
+	}, [] );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -46,7 +36,10 @@ export default function EditorFullPage() {
 					<BlockInspector />
 				</div>
 				<div className="playground__content">
-					<BlockCanvas height="100%" styles={ editorStyles } />
+					<BlockCanvas
+						height="100%"
+						styles={ contentStyles[ direction ] }
+					/>
 				</div>
 			</BlockEditorProvider>
 		</div>

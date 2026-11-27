@@ -23,6 +23,10 @@ function render_block_core_categories( $attributes, $content, $block ) {
 
 	$taxonomy = get_taxonomy( $attributes['taxonomy'] );
 
+	if ( ! $taxonomy ) {
+		return '';
+	}
+
 	$args = array(
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
@@ -32,7 +36,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
-	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
+	if ( ! empty( $attributes['showOnlyTopLevel'] ) ) {
 		$args['parent'] = 0;
 	}
 
@@ -47,10 +51,13 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			$taxonomy->labels->singular_name
 		);
 
+		// Pre-select the current term using query var.
+		$args['selected'] = get_query_var( $taxonomy->query_var );
+
 		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 		$default_label  = $taxonomy->label;
 		$label_text     = ! empty( $attributes['label'] ) ? wp_kses_post( $attributes['label'] ) : $default_label;
-		$wrapper_markup = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">' . $label_text . '</label>%2$s</div>';
+		$wrapper_markup = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">%3$s</label>%2$s</div>';
 		$items_markup   = wp_dropdown_categories( $args );
 		$type           = 'dropdown';
 
@@ -66,6 +73,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 	} else {
 		$args['show_option_none'] = $taxonomy->labels->no_terms;
 
+		$label_text     = '';
 		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
@@ -84,7 +92,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 	return sprintf(
 		$wrapper_markup,
 		$wrapper_attributes,
-		$items_markup
+		$items_markup,
+		$label_text
 	);
 }
 
@@ -110,7 +119,8 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 				if ( 'escape' === dropdown.dataset.lastkey ) {
 					return;
 				}
-				if ( dropdown.value && dropdown instanceof HTMLSelectElement ) {
+				// Only navigate if a valid term is selected (not the default "Select [taxonomy]" option)
+				if ( dropdown.value && dropdown.value !== '-1' && dropdown instanceof HTMLSelectElement ) {
 					const url = new URL( homeUrl );
 					url.searchParams.set( dropdown.name, dropdown.value );
 					location.href = url.href;

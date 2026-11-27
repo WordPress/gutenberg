@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { ESCAPE } from '@wordpress/keycodes';
+import { ESCAPE, withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
 import { dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as customizeWidgetsStore } from '../store';
 
 export default function getInserterOuterSection() {
@@ -56,7 +49,7 @@ export default function getInserterOuterSection() {
 			// Handle closing the inserter when pressing the Escape key.
 			ownerWindow.addEventListener(
 				'keydown',
-				( event ) => {
+				withIgnoreIMEEvents( ( event ) => {
 					if (
 						this.expanded() &&
 						( event.keyCode === ESCAPE ||
@@ -69,7 +62,7 @@ export default function getInserterOuterSection() {
 							false
 						);
 					}
-				},
+				} ),
 				// Use capture mode to make this run before other event listeners.
 				true
 			);

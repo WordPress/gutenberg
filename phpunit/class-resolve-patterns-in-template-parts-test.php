@@ -289,8 +289,8 @@ class Tests_Resolve_Patterns_In_Template_Parts extends WP_Test_REST_Controller_T
 		$template_part_1 = null;
 		$template_part_2 = null;
 		foreach ( $data as $template_part ) {
-			$id   = isset( $template_part['id'] ) ? $template_part['id'] : '';
-			$slug = isset( $template_part['slug'] ) ? $template_part['slug'] : '';
+			$id   = $template_part['id'] ?? '';
+			$slug = $template_part['slug'] ?? '';
 			if ( $template_part_name_1 === $id || 'test-template-part-1' === $slug ) {
 				$template_part_1 = $template_part;
 			}

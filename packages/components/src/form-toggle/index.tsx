@@ -1,21 +1,36 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Circle, Path, SVG } from '@wordpress/primitives';
 import type { FormToggleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 export const noop = () => {};
+
+const onLabel = (
+	<SVG
+		className="components-form-toggle__label components-form-toggle__on-label"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 8 8"
+	>
+		<Path
+			d="M4 1.5v5"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+		/>
+	</SVG>
+);
+
+const offLabel = (
+	<SVG
+		className="components-form-toggle__label components-form-toggle__off-label"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 8 8"
+	>
+		<Circle cx={ 4 } cy={ 4 } r={ 2.5 } fill="none" stroke="currentColor" />
+	</SVG>
+);
 
 function UnforwardedFormToggle(
 	props: WordPressComponentProps< FormToggleProps, 'input', false >,
@@ -54,6 +69,10 @@ function UnforwardedFormToggle(
 				ref={ ref }
 			/>
 			<span className="components-form-toggle__track"></span>
+			<span className="components-form-toggle__labels">
+				{ onLabel }
+				{ offLabel }
+			</span>
 			<span className="components-form-toggle__thumb"></span>
 		</span>
 	);
@@ -79,5 +98,6 @@ function UnforwardedFormToggle(
  * ```
  */
 export const FormToggle = forwardRef( UnforwardedFormToggle );
+FormToggle.displayName = 'FormToggle';
 
 export default FormToggle;

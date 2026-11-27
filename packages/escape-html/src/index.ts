@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import __unstableEscapeGreaterThan from './escape-greater';
 
 /**
@@ -69,6 +66,9 @@ export function escapeLessThan( value: string ): string {
  * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
  * necessary for `__unstableEscapeGreaterThan` to be used.
  *
+ * Note we also escape the less-than symbol to prevent HTML injection vulnerabilities
+ * and parsing issues, particularly for users without the unfiltered_html capability.
+ *
  * See: https://core.trac.wordpress.org/ticket/45387
  *
  * @param value Attribute value.
@@ -77,7 +77,7 @@ export function escapeLessThan( value: string ): string {
  */
 export function escapeAttribute( value: string ): string {
 	return __unstableEscapeGreaterThan(
-		escapeQuotationMark( escapeAmpersand( value ) )
+		escapeLessThan( escapeQuotationMark( escapeAmpersand( value ) ) )
 	);
 }
 

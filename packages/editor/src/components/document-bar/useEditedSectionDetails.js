@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -19,11 +12,6 @@ import { unlock } from '../../lock-unlock';
  */
 export default function useEditedSectionDetails() {
 	return useSelect( ( select ) => {
-		// Only run when the content only pattern insertion experiment is enabled
-		if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
-			return null;
-		}
-
 		const {
 			getBlockAttributes,
 			getBlockName,

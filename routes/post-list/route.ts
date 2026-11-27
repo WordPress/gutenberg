@@ -1,18 +1,25 @@
-/**
- * WordPress dependencies
- */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { notFound } from '@wordpress/route';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
  * Route configuration for post list.
  */
 export const route = {
+	beforeLoad: async ( { params }: { params: { type: string } } ) => {
+		try {
+			const postType = await resolveSelect( coreStore ).getPostType(
+				params.type
+			);
+
+			if ( ! postType ) {
+				throw notFound();
+			}
+		} catch {
+			throw notFound();
+		}
+	},
 	title: async ( { params }: { params: { type: string } } ) => {
 		const postType = await resolveSelect( coreStore ).getPostType(
 			params.type
@@ -50,12 +57,19 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 
 		// Otherwise, fetch the first post from the filtered query
-		const query = viewToQuery( view, params.type );
+		const postType = await resolveSelect( coreStore ).getPostType(
+			params.type
+		);
+		const taxonomies = postType?.taxonomies?.length
+			? await resolveSelect( coreStore ).getTaxonomies( {
+					type: params.type,
+				} )
+			: [];
+		const query = viewToQuery( view, params.type, taxonomies ?? [] );
 		const posts = await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			params.type,
@@ -69,7 +83,6 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 

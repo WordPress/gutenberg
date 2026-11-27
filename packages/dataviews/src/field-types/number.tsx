@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { FormatNumber, NormalizedField } from '../types';
 import type { FieldType } from '../types/private';
 import {
@@ -17,7 +10,6 @@ import {
 	OPERATOR_GREATER_THAN_OR_EQUAL,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
-	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
@@ -111,7 +103,6 @@ export default {
 		// Multiple-selection
 		OPERATOR_IS_ANY,
 		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
 	format,

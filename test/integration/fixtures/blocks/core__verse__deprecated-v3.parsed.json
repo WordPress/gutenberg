@@ -1,0 +1,49 @@
+[
+	{
+		"blockName": "core/verse",
+		"attrs": {
+			"textAlign": "left"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<pre class=\"wp-block-verse has-text-align-left\">A <em>verse</em>…<br>And more!</pre>\n",
+		"innerContent": [
+			"\n<pre class=\"wp-block-verse has-text-align-left\">A <em>verse</em>…<br>And more!</pre>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/verse",
+		"attrs": {
+			"textAlign": "center"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<pre class=\"wp-block-verse has-text-align-center\">A <em>verse</em>…<br>And more!</pre>\n",
+		"innerContent": [
+			"\n<pre class=\"wp-block-verse has-text-align-center\">A <em>verse</em>…<br>And more!</pre>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/verse",
+		"attrs": {
+			"textAlign": "right"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<pre class=\"wp-block-verse has-text-align-right\">A <em>verse</em>…<br>And more!</pre>\n",
+		"innerContent": [
+			"\n<pre class=\"wp-block-verse has-text-align-right\">A <em>verse</em>…<br>And more!</pre>\n"
+		]
+	}
+]

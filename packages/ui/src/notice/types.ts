@@ -1,0 +1,134 @@
+import type { ReactNode } from 'react';
+import type { ComponentProps } from '../utils/types';
+import type { IconProps } from '../icon/types';
+import type { ButtonProps } from '../button/types';
+import type { ButtonLinkProps } from '../button-link/types';
+import type { IconButtonProps } from '../icon-button/types';
+import type { LinkProps } from '../link/types';
+
+export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
+
+export interface ListProps extends ComponentProps< 'div' > {
+	/**
+	 * Where to render the live regions. Defaults to the list itself. Use a
+	 * container outside the app, such as its document body, for notifications
+	 * that should still be announced when a modal hides the app. An explicit
+	 * spokenMessage can announce through aria-hidden ancestors. Notices inside
+	 * an HTML hidden subtree and notices with politeness="off" stay silent.
+	 */
+	liveRegionContainer?: HTMLElement | null;
+	/**
+	 * Notices to display. Keep the list mounted when there are no notices.
+	 */
+	children?: ReactNode;
+}
+
+export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
+	/**
+	 * Announcement urgency inside `Notice.List`, independent of visual intent.
+	 * Use `assertive` for time-sensitive updates or `off` to skip announcements.
+	 * Has no effect outside a list.
+	 *
+	 * @default 'polite'
+	 */
+	politeness?: 'polite' | 'assertive' | 'off';
+
+	/**
+	 * Message announced inside `Notice.List`. Set it whenever the title or
+	 * description contains more than plain text. Without it, the list derives a
+	 * best-effort message from the plain text of the title and description,
+	 * excluding `Notice.Actions` and the dismiss button. Use `politeness="off"`
+	 * to skip announcements. Has no effect outside a list.
+	 */
+	spokenMessage?: string;
+
+	/**
+	 * The semantic intent of the notice, communicating its meaning through color.
+	 * Available intents: neutral, info, warning, success, and error.
+	 *
+	 * @default 'neutral'
+	 */
+	intent?: NoticeIntent;
+
+	/**
+	 * Custom icon to override the default intent icon. Pass `null` to hide the icon.
+	 * Default icons by intent: neutral (none), info (info), warning (caution),
+	 * success (published), error (error).
+	 */
+	icon?: IconProps[ 'icon' ] | null;
+
+	/**
+	 * The content to be rendered inside the notice.
+	 */
+	children?: ReactNode;
+}
+
+export interface TitleProps extends ComponentProps< 'span' > {
+	/**
+	 * The title text of the notice.
+	 */
+	children?: ReactNode;
+}
+
+export interface DescriptionProps extends ComponentProps< 'span' > {
+	/**
+	 * The description text of the notice.
+	 */
+	children?: ReactNode;
+}
+
+export interface ActionsProps extends ComponentProps< 'div' > {
+	/**
+	 * The action buttons for the notice.
+	 */
+	children?: ReactNode;
+}
+
+export interface CloseIconButtonProps extends Omit<
+	IconButtonProps,
+	| 'loading'
+	| 'loadingAnnouncement'
+	| 'variant'
+	| 'size'
+	| 'tone'
+	| 'label'
+	| 'icon'
+> {
+	/**
+	 * A label describing the button's action, shown as a tooltip and to
+	 * assistive technology.
+	 */
+	label?: IconButtonProps[ 'label' ];
+
+	/**
+	 * The icon to display in the button.
+	 */
+	icon?: IconButtonProps[ 'icon' ];
+}
+
+export interface ActionButtonProps extends Omit<
+	ButtonProps,
+	'size' | 'tone'
+> {
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}
+
+export interface ActionLinkProps extends Omit< LinkProps, 'variant' | 'tone' > {
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}
+
+export interface ActionButtonLinkProps extends Omit<
+	ButtonLinkProps,
+	'size' | 'tone'
+> {
+	/**
+	 * The content to be rendered inside the component.
+	 */
+	children?: ReactNode;
+}

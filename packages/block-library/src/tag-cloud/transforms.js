@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -8,14 +5,22 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/categories' ],
-			transform: () => createBlock( 'core/tag-cloud' ),
+			transform: ( { taxonomy, showPostCounts } ) =>
+				createBlock( 'core/tag-cloud', {
+					taxonomy,
+					showTagCounts: showPostCounts,
+				} ),
 		},
 	],
 	to: [
 		{
 			type: 'block',
 			blocks: [ 'core/categories' ],
-			transform: () => createBlock( 'core/categories' ),
+			transform: ( { taxonomy, showTagCounts } ) =>
+				createBlock( 'core/categories', {
+					taxonomy,
+					showPostCounts: showTagCounts,
+				} ),
 		},
 	],
 };

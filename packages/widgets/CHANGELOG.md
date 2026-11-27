@@ -2,6 +2,84 @@
 
 ## Unreleased
 
+### New Features
+
+-   Include TypeScript type declarations ([#87197](https://github.com/WordPress/gutenberg/pull/87197)).
+
+## 5.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   Legacy widget: Render nothing for an `instance` attribute whose `encoded` value is an array, rather than throwing a `TypeError` on PHP 8, and render nothing when `encoded` contains characters outside the base64 alphabet, which were previously skipped ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).
+
+## 5.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   Legacy widget: Show "Select widget" in the widget type select instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Legacy widget: Migrate widget type selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 4.50.0 (2026-07-01)
+
+## 4.49.0 (2026-06-24)
+
+## 4.48.1 (2026-06-16)
+
+## 4.48.0 (2026-06-10)
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
+## 4.44.0 (2026-04-15)
+
+## 4.43.0 (2026-04-01)
+
+## 4.42.0 (2026-03-18)
+
+## 4.41.0 (2026-03-04)
+
+## 4.40.0 (2026-02-18)
+
+## 4.39.0 (2026-01-29)
+
+## 4.38.0 (2026-01-16)
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)
