@@ -23,6 +23,7 @@
 -   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 -   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
+-   Image: Keep the lightbox image on whole pixels, so the enlarged image is no longer blurry ([#85271](https://github.com/WordPress/gutenberg/pull/85271)).
 
 ### Internal
 

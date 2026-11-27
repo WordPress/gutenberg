@@ -853,6 +853,12 @@ const { state, actions, callbacks } = store(
 					containerWidth = containerHeight * fullSizeRatio;
 				}
 
+				// Keep the container on whole pixels, so that centering it with
+				// `translate(-50%, -50%)` doesn't land on sub-pixel positions,
+				// which makes the image blurry.
+				containerWidth = Math.round( containerWidth );
+				containerHeight = Math.round( containerHeight );
+
 				const hasCroppedSource =
 					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
 				const sourceRatio = hasCroppedSource
@@ -873,17 +879,11 @@ const { state, actions, callbacks } = store(
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
 
-				// As of this writing, using the calculations above will render the
-				// lightbox with a small, erroneous whitespace on the left side of the
-				// image in iOS Safari, perhaps due to an inconsistency in how browsers
-				// handle absolute positioning and CSS transformation. In any case,
-				// adding 1 pixel to the container width and height solves the problem,
-				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
-					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
-					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
+					--wp--lightbox-container-width: ${ containerWidth }px;
+					--wp--lightbox-container-height: ${ containerHeight }px;
 					--wp--lightbox-image-width: ${ containerWidth }px;
 					--wp--lightbox-image-height: ${ containerHeight }px;
 					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);

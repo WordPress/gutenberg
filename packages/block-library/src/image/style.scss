@@ -396,7 +396,11 @@
 					}
 				}
 				.scrim {
-					animation: turn-on-visibility 0.4s forwards;
+					// Don't use `forwards`: an animation that stays in effect keeps
+					// the scrim, and the image above it, on compositor layers that
+					// aren't snapped to the pixel grid, so the image looks blurry.
+					opacity: 1;
+					animation: turn-on-visibility 0.4s;
 				}
 			}
 			&.show-closing-animation {
