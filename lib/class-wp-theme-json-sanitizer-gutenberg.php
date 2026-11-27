@@ -505,6 +505,52 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	}
 
 	/**
+	 * Moves diagnostics for copies of a shared block style variation back to `styles.variations`.
+	 *
+	 * Before sanitizing, `WP_Theme_JSON_Gutenberg` copies each `styles.variations.<name>` into
+	 * `styles.blocks.<block>.variations.<name>` for every block that registers the variation, and
+	 * removes the original. A dropped value in a shared variation is therefore reported once per
+	 * block, at a path the input never had. When the input has no value of its own at the reported
+	 * path, the dropped value can only have come from the shared variation, so the diagnostic is
+	 * moved there and the copies collapse into one.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array[] $diagnostics Diagnostics from `collect()`.
+	 * @param array   $theme_json  The structure they were collected for, before migration.
+	 * @return array[] The diagnostics, re-indexed.
+	 */
+	public static function restore_shared_variation_paths( $diagnostics, $theme_json ) {
+		if ( empty( $theme_json['styles']['variations'] ) || ! is_array( $theme_json['styles']['variations'] ) ) {
+			return $diagnostics;
+		}
+
+		$restored = array();
+		foreach ( $diagnostics as $diagnostic ) {
+			$path = $diagnostic['path'];
+			if ( isset( $path[4] ) && 'styles' === $path[0] && 'blocks' === $path[1] && 'variations' === $path[3] && array_key_exists( $path[4], $theme_json['styles']['variations'] ) ) {
+				$own_value = $theme_json;
+				foreach ( $path as $key ) {
+					if ( ! is_array( $own_value ) || ! array_key_exists( $key, $own_value ) ) {
+						$own_value = null;
+						break;
+					}
+					$own_value = $own_value[ $key ];
+				}
+
+				if ( null === $own_value ) {
+					$diagnostic['path']    = array_merge( array( 'styles', 'variations' ), array_slice( $path, 4 ) );
+					$diagnostic['message'] = self::get_diagnostic_message( $diagnostic['code'], $diagnostic['path'] );
+				}
+			}
+
+			$restored[ wp_json_encode( array( $diagnostic['code'], $diagnostic['path'] ) ) ] = $diagnostic;
+		}
+
+		return array_values( $restored );
+	}
+
+	/**
 	 * Whether a `collect()` callback is running.
 	 *
 	 * Lets a caller skip work that only exists to build a diagnostic, such as a list to check a name against.

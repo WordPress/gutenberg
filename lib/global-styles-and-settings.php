@@ -450,9 +450,11 @@ function gutenberg_get_theme_directory_pattern_slugs() {
 function gutenberg_validate_theme_json( $theme_json, $args = array() ) {
 	$args = wp_parse_args( $args, array( 'origin' => 'theme' ) );
 
-	return WP_Theme_JSON_Sanitizer_Gutenberg::collect(
+	$diagnostics = WP_Theme_JSON_Sanitizer_Gutenberg::collect(
 		static function () use ( $theme_json, $args ) {
 			new WP_Theme_JSON_Gutenberg( $theme_json, $args['origin'] );
 		}
 	);
+
+	return WP_Theme_JSON_Sanitizer_Gutenberg::restore_shared_variation_paths( $diagnostics, $theme_json );
 }

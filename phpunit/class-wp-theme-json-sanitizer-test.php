@@ -111,6 +111,25 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				array( 'theme_json_expected_object', array( 'styles', 'variations', 'outline' ) ),
 			),
+			'shared style variation value, copied to every block that registers outline' => array(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array( 'variations' => array( 'outline' => array( 'color' => 'red' ) ) ),
+				),
+				array( 'theme_json_expected_object', array( 'styles', 'variations', 'outline', 'color' ) ),
+			),
+			'block style variation value that overrides a shared one' => array(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'variations' => array( 'outline' => array( 'color' => array( 'text' => 'red' ) ) ),
+						'blocks'     => array(
+							'core/button' => array( 'variations' => array( 'outline' => array( 'color' => 'red' ) ) ),
+						),
+					),
+				),
+				array( 'theme_json_expected_object', array( 'styles', 'blocks', 'core/button', 'variations', 'outline', 'color' ) ),
+			),
 			'scalar where an object is expected'       => array(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
