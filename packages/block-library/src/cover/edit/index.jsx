@@ -165,11 +165,13 @@ function CoverEdit( {
 		postId
 	);
 	const { getSettings } = useSelect( blockEditorStore );
-	const openMediaEditorModal = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
-		[]
-	);
+	const { openMediaEditorModal, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			openMediaEditorModal: settings[ openMediaEditorModalKey ],
+			isPreviewMode: settings.isPreviewMode,
+		};
+	}, [] );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
@@ -207,7 +209,7 @@ function CoverEdit( {
 	// handled in their respective callbacks.
 	useEffect( () => {
 		( async () => {
-			if ( ! useFeaturedImage ) {
+			if ( ! useFeaturedImage || isPreviewMode ) {
 				return;
 			}
 
@@ -244,6 +246,7 @@ function CoverEdit( {
 		setOverlayColor,
 		useFeaturedImage,
 		getLatestProps,
+		isPreviewMode,
 	] );
 
 	// instead of destructuring the attributes
