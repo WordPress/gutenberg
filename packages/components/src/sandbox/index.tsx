@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+import { useEvent, useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
@@ -408,7 +408,7 @@ function SameOriginSandBox( {
 		}
 	}
 
-	function trySandBox( forceRerender = false ) {
+	const trySandBox = useEvent( ( forceRerender = false ) => {
 		if ( ! isFrameAccessible() ) {
 			return;
 		}
@@ -459,7 +459,7 @@ function SameOriginSandBox( {
 			} )
 		);
 		contentDocument.close();
-	}
+	} );
 
 	useEffect( () => {
 		trySandBox();
@@ -512,21 +512,15 @@ function SameOriginSandBox( {
 				checkMessageForResize
 			);
 		};
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [] );
+	}, [ trySandBox ] );
 
 	useEffect( () => {
 		trySandBox();
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ title, styles, scripts ] );
+	}, [ title, styles, scripts, trySandBox ] );
 
 	useEffect( () => {
 		trySandBox( true );
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ html, type ] );
+	}, [ html, type, trySandBox ] );
 
 	return (
 		<iframe

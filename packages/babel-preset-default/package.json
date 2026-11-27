@@ -51,10 +51,10 @@
 		"react": "^19.3.0"
 	},
 	"devDependencies": {
-		"core-js-builder": "^3.39.0",
 		"core-js-compat": "^3.39.0",
+		"rolldown": "^1.2.15",
 		"terser": "^5.37.0",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,7 +1,7 @@
 import { _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	FlexItem,
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
@@ -27,7 +27,7 @@ function FontFamilyItem( { font }: FontFamilyItemProps ) {
 	const previewStyle = getFamilyPreviewStyle( font );
 
 	return (
-		<Item onClick={ handleClick }>
+		<WCItem onClick={ handleClick }>
 			<HStack justify="space-between">
 				<FlexItem style={ previewStyle }>{ font.name }</FlexItem>
 				<FlexItem className="global-styles-ui-screen-typography__font-variants-count">
@@ -38,7 +38,7 @@ function FontFamilyItem( { font }: FontFamilyItemProps ) {
 					) }
 				</FlexItem>
 			</HStack>
-		</Item>
+		</WCItem>
 	);
 }
 

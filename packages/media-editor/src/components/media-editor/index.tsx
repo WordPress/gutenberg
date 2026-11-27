@@ -39,6 +39,7 @@ import {
 	displayShortcut,
 	isAppleOS,
 	isKeyboardEvent,
+	withIgnoreIMEEvents,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Action, ActionModal, Field, Form } from '@wordpress/dataviews';
@@ -938,45 +939,47 @@ function MediaEditorContent( {
 		discardAndClose();
 	};
 
-	const handleKeyDown = ( event: ReactKeyboardEvent< HTMLElement > ) => {
-		const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
-		const isRedoShortcut =
-			isKeyboardEvent.primaryShift( event, 'z' ) ||
-			( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
-		if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
-			const target = event.target as HTMLElement;
-			const isMetadataField =
-				( target.tagName === 'INPUT' ||
-					target.tagName === 'TEXTAREA' ||
-					target.isContentEditable ) &&
-				! target.closest( `[${ CROP_CONTROL_ATTR }]` );
-			if ( ! isMetadataField ) {
-				event.preventDefault();
-				if ( isCropInteractionActive || isSaving ) {
+	const handleKeyDown = withIgnoreIMEEvents(
+		( event: ReactKeyboardEvent< HTMLElement > ) => {
+			const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
+			const isRedoShortcut =
+				isKeyboardEvent.primaryShift( event, 'z' ) ||
+				( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
+			if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
+				const target = event.target as HTMLElement;
+				const isMetadataField =
+					( target.tagName === 'INPUT' ||
+						target.tagName === 'TEXTAREA' ||
+						target.isContentEditable ) &&
+					! target.closest( `[${ CROP_CONTROL_ATTR }]` );
+				if ( ! isMetadataField ) {
+					event.preventDefault();
+					if ( isCropInteractionActive || isSaving ) {
+						return;
+					}
+					if ( isRedoShortcut ) {
+						session.redo();
+					} else {
+						session.undo();
+					}
+				}
+			}
+
+			if ( shouldCloseOnEsc ) {
+				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
 					return;
 				}
-				if ( isRedoShortcut ) {
-					session.redo();
-				} else {
-					session.undo();
+				if ( isSaving ) {
+					event.preventDefault();
+					return;
+				}
+				if ( hasChanges ) {
+					event.preventDefault();
+					setIsDiscardDialogOpen( true );
 				}
 			}
 		}
-
-		if ( shouldCloseOnEsc ) {
-			if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
-				return;
-			}
-			if ( isSaving ) {
-				event.preventDefault();
-				return;
-			}
-			if ( hasChanges ) {
-				event.preventDefault();
-				setIsDiscardDialogOpen( true );
-			}
-		}
-	};
+	);
 
 	const snackbar = (
 		<SnackbarNotices

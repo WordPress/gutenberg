@@ -5,16 +5,6 @@
 	display: inline-flex;
 	align-items: center;
 
-	// Hide all action buttons except the inserter on mobile.
-	.editor-document-tools__left > .editor-history__redo,
-	.editor-document-tools__left > .editor-history__undo {
-		display: none;
-
-		@include break-medium() {
-			display: inline-flex;
-		}
-	}
-
 	.editor-document-tools__left > .editor-document-tools__inserter-toggle {
 		display: inline-flex;
 
@@ -59,7 +49,7 @@
 			}
 
 			@media (forced-colors: active) {
-				background: SelectedItem !important;
+				background: Highlight !important;
 
 				&:disabled,
 				&[aria-disabled="true"] {

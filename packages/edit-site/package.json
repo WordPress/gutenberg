@@ -70,6 +70,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",
@@ -84,11 +85,21 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

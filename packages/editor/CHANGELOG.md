@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### New Features
+
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
+
+### Enhancements
+
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep the form to add a term usable after creating a term fails, instead of ignoring every later attempt ([#87498](https://github.com/WordPress/gutenberg/pull/87498)).
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep categories checked while a new one is being created, and match category names containing HTML entities when searching or adding ([#87517](https://github.com/WordPress/gutenberg/pull/87517)).
+-   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
+-   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
+-   Undo: Clicking below the content of an empty post no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+-   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `PostTaxonomiesFlatTermSelector`, `PostTaxonomiesHierarchicalTermSelector`: Prevent saving the post while a new term is being created, so the term isn't left out of the saved post ([#87321](https://github.com/WordPress/gutenberg/pull/87321)).
+-   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
+-   Show `auto` as the canvas height in the viewport status in the editor footer for patterns, template parts and navigation menus ([#87375](https://github.com/WordPress/gutenberg/pull/87375)).
+-   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
+-   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
+-   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
+-   `DocumentTools`: Fix arrow key navigation in the toolbar below the medium breakpoint ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
+-   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
 ### Documentation
 
 -   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).

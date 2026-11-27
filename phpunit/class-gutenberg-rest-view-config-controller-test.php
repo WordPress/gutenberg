@@ -294,7 +294,16 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertSame( $config['default_view'], $data['default_view'] );
 		$this->assertSame( $config['default_layouts'], $data['default_layouts'] );
-		$this->assertSame( $config['view_list'], $data['view_list'] );
+		// The 7.3 controller adds item counts to the `page` view list; they are
+		// covered by its own tests, so leave them out of this comparison.
+		$view_list = array_map(
+			static function ( $entry ) {
+				unset( $entry['count'] );
+				return $entry;
+			},
+			$data['view_list']
+		);
+		$this->assertSame( $config['view_list'], $view_list );
 		$this->assertSame( $config['form'], $data['form'] );
 	}
 

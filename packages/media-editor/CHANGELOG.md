@@ -2,12 +2,18 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEditor`: Ignore keyboard shortcuts and Escape-to-close handling during IME composition ([#87354](https://github.com/WordPress/gutenberg/pull/87354)).
+-   Expose readable text for shortcut keycaps, including arrow groups and the Plus and Minus zoom keys ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
 ## 0.23.0 (2026-11-18)
 
 ### Enhancements
 
 -   `MediaEditor.MoreMenu` takes `actions` and `item` props, and lists the actions eligible for the item, such as "Permanently delete". It now also shows for media other than images when it has actions ([#86349](https://github.com/WordPress/gutenberg/pull/86349)).
 -   Show the shape of each aspect ratio in the aspect ratio dropdown of the crop panel and in the aspect ratio menu used on narrow screens ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+-   `MediaPreview` shows media without a preview, such as a zip file, with its filename, file type and size, and Download and Copy URL buttons. Its empty and error states also use `EmptyState` from `@wordpress/ui` ([#86490](https://github.com/WordPress/gutenberg/pull/86490)).
 
 ### Bug Fixes
 

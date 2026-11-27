@@ -492,6 +492,16 @@
 							"description": "Allow users to set a rotation.",
 							"type": "boolean",
 							"default": false
+						},
+						"translate": {
+							"description": "Allow users to set an X and Y offset.",
+							"type": "boolean",
+							"default": false
+						},
+						"scale": {
+							"description": "Allow users to set a uniform scale.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -1950,6 +1960,34 @@
 						"rotate": {
 							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
 							"type": "string"
+						},
+						"translate": {
+							"description": "Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`.",
+							"type": "object",
+							"properties": {
+								"x": {
+									"description": "The horizontal offset.",
+									"type": "string"
+								},
+								"y": {
+									"description": "The vertical offset.",
+									"type": "string"
+								}
+							},
+							"additionalProperties": false
+						},
+						"scale": {
+							"description": "Sets the `scale` CSS property. Accepts a single non-negative number, such as `1.2`, or percentage, such as `120%`. One value scales both axes.",
+							"oneOf": [
+								{
+									"type": "number",
+									"minimum": 0
+								},
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+(?:\\.\\d+)?|\\.\\d+)%?$"
+								}
+							]
 						}
 					},
 					"additionalProperties": false

@@ -4,8 +4,15 @@
 
 ### Bug Fixes
 
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
+-   Refetch a post type's registered meta when its `getPostType` or `getEntityRecord( 'root', 'postType', … )` resolution is invalidated, so meta registered after the editor loads shows up in block bindings ([#87263](https://github.com/WordPress/gutenberg/pull/87263)).
+-   Add a `getEntityConfig` resolver, so reading a `root` entity other than `site`, such as `__unstableBase` or `status`, no longer waits for the `OPTIONS /wp/v2/settings` request ([#87446](https://github.com/WordPress/gutenberg/pull/87446)).
+
+### Internal
+
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 9.2.0 (2026-11-18)
 
