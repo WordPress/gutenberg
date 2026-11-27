@@ -663,7 +663,8 @@ export function PaletteEdit( {
 	} | null >( null );
 	const editingElement =
 		editingTarget &&
-		elements[ editingTarget.index ]?.slug === editingTarget.slug
+		editingTarget.index < elements.length &&
+		elements[ editingTarget.index ].slug === editingTarget.slug
 			? editingTarget.index
 			: null;
 	// Forget the preset once it is gone, so a redo does not reopen its editor.
