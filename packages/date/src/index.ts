@@ -217,7 +217,7 @@ function setupWPTimezone() {
 		packed = momentLib.tz.pack( {
 			name: WP_ZONE,
 			abbrs: [ WP_ZONE ],
-			untils: [ null ],
+			untils: [ Infinity ],
 			offsets: [ -settings.timezone.offset * 60 || 0 ],
 		} );
 	}

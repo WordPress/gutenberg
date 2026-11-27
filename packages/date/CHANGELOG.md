@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Update `moment-timezone` to `^0.5.48` for IANA timezone data 2025b, so sites in zones whose rules changed since 2023, such as Paraguay and Kazakhstan, show dates in the right local time ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
+-   Update `moment-timezone` to `^0.6.6` for IANA timezone data 2026f, so sites in zones whose rules changed since 2023, such as Paraguay and Kazakhstan, show dates in the right local time. Scripts that use the shared `moment.tz` also get its 0.6 fixes: adding days across a daylight saving gap now skips the nonexistent hour, and a time-only parse such as `moment.tz( '09:00', 'HH:mm', zone )` uses the date in that zone. TypeScript projects that import `@wordpress/date` get the stricter `moment-timezone` 0.6 type definitions ([#87538](https://github.com/WordPress/gutenberg/pull/87538)).
 
 ## 6.2.0 (2026-11-18)
 
