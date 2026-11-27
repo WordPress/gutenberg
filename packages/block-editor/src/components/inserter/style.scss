@@ -321,6 +321,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter {
+	color: var(--wpds-color-foreground-content-neutral);
 	width: 100%;
 
 	// Constrain to container. Avoids overflow bug on FF 79
