@@ -2,14 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
-import {
-	EditorProvider,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { useStyle } = unlock( editorPrivateApis );
+const { ExperimentalEditorProvider, useStyle } = unlock( editorPrivateApis );
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
@@ -27,7 +24,7 @@ function PreviewField( { item } ) {
 	// the block editor settings are needed in context where we don't have the block editor.
 	// Explore how we can solve this in a better way.
 	return (
-		<EditorProvider post={ item } settings={ settings }>
+		<ExperimentalEditorProvider post={ item } settings={ settings }>
 			<div
 				className="page-templates-preview-field"
 				style={ { backgroundColor } }
@@ -39,7 +36,7 @@ function PreviewField( { item } ) {
 					</BlockPreview.Async>
 				) }
 			</div>
-		</EditorProvider>
+		</ExperimentalEditorProvider>
 	);
 }
 
