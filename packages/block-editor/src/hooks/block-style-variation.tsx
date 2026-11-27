@@ -20,7 +20,7 @@ import type {
 
 const VARIATION_PREFIX = 'is-style-';
 
-function getVariationMatches( className?: string ): string[] {
+export function getVariationMatches( className?: string ): string[] {
 	if ( ! className ) {
 		return [];
 	}

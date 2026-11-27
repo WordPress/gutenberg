@@ -12,7 +12,7 @@ on:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
-# Only the newest commit needs scores.
+# Only the newest commit needs scores and review requests.
 concurrency:
     group: ${{ github.workflow }}-${{ github.event.number }}
     cancel-in-progress: true
@@ -30,7 +30,8 @@ jobs:
             contents: read
             pull-requests: read
         timeout-minutes: 5
-
+        outputs:
+            reviewers: ${{ steps.score.outputs.reviewers }}
         steps:
             # On `pull_request_target`, this checks out the base branch. The
             # tool has no runtime dependencies, so `npm run` needs no install.
@@ -51,11 +52,8 @@ jobs:
                   check-latest: true
                   package-manager-cache: false
 
-            # The scores do not request reviews yet, and CODEOWNERS still does.
-            # So a failure, such as a model that does not respond, only logs an
-            # error.
             - name: Score the rules
-              continue-on-error: true
+              id: score
               env:
                   DECISION_API_URL: ${{ vars.REVIEW_ROUTING_DECISION_API_URL }}
                   DECISION_API_KEY: ${{ secrets.REVIEW_ROUTING_DECISION_API_KEY }}
@@ -65,6 +63,77 @@ jobs:
                   REPO: ${{ github.repository }}
               run: |
                   # `--silent` keeps npm's own header out of the report.
-                  report="$(npm run --silent --workspace @wordpress/review-routing-tools route -- --pr "$PR_NUMBER" --repo "$REPO")"
+                  # The tool runs in its workspace directory, so the path is
+                  # absolute.
+                  report="$(npm run --silent --workspace @wordpress/review-routing-tools route -- --pr "$PR_NUMBER" --repo "$REPO" --json-file "$RUNNER_TEMP/decisions.json")"
                   printf '%s\n' "$report"
                   printf '%s\n' "$report" >> "$GITHUB_STEP_SUMMARY"
+
+                  # Several rules can name the same reviewer, who gets one request.
+                  reviewers="$(jq -c '[ .[] | select( .requestReview ) | .reviewers[] ] | unique' "$RUNNER_TEMP/decisions.json")"
+                  printf 'reviewers=%s\n' "$reviewers" >> "$GITHUB_OUTPUT"
+
+    request:
+        name: Request reviews
+        needs: route
+        if: ${{ needs.route.outputs.reviewers != '[]' }}
+        runs-on: 'ubuntu-slim'
+        permissions:
+            pull-requests: write
+        timeout-minutes: 5
+        steps:
+            # A reviewer is requested at most once for each pull request. GitHub
+            # removes a reviewer from the requested reviewers after they review,
+            # so the timeline is used instead.
+            - name: Request reviews
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  REVIEWERS: ${{ needs.route.outputs.reviewers }}
+              with:
+                  script: |
+                      const { owner, repo } = context.repo;
+                      const pull = context.payload.pull_request;
+                      const events = await github.paginate(
+                          github.rest.issues.listEventsForTimeline,
+                          { owner, repo, issue_number: pull.number, per_page: 100 }
+                      );
+
+                      const skip = new Set(
+                          [
+                              // Exclude the author, who cannot review their own pull request.
+                              pull.user.login,
+                              // Exclude earlier requests using the timeline.
+                              ...events
+                                  .filter( ( event ) => event.event === 'review_requested' )
+                                  .map( ( event ) =>
+                                      event.requested_team
+                                          ? `${ owner }/${ event.requested_team.slug }`
+                                          : event.requested_reviewer?.login
+                                  ),
+                          ]
+                              .filter( Boolean )
+                              .map( ( name ) => name.toLowerCase() )
+                      );
+
+                      const wanted = JSON.parse( process.env.REVIEWERS );
+                      const requested = wanted.filter( ( name ) => ! skip.has( name.toLowerCase() ) );
+                      const skipped = wanted.filter( ( name ) => skip.has( name.toLowerCase() ) );
+
+                      if ( requested.length ) {
+                          await github.rest.pulls.requestReviewers( {
+                              owner,
+                              repo,
+                              pull_number: pull.number,
+                              reviewers: requested.filter( ( name ) => ! name.includes( '/' ) ),
+                              team_reviewers: requested
+                                  .filter( ( name ) => name.includes( '/' ) )
+                                  .map( ( name ) => name.split( '/' )[ 1 ] ),
+                          } );
+                      }
+
+                      const names = ( list ) => list.join( ', ' ) || '(none)';
+                      await core.summary
+                          .addRaw(
+                              `Requested review: ${ names( requested ) }. Skipped, requested before or the author: ${ names( skipped ) }.`
+                          )
+                          .write();

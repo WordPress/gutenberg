@@ -24,9 +24,12 @@ import type { HeaderProps } from './types';
  *
  * Defaults to a `<div>` wrapper around the trigger. Since the right heading
  * level depends on the surrounding document outline, the consumer is
- * expected to opt in to heading semantics. Pass `render` to wrap the
- * trigger in a heading (e.g. `render={ <h2 /> }`), following the W3C APG
- * accordion pattern (heading wraps button).
+ * expected to opt in to heading semantics. Pass `role="heading"` and
+ * `aria-level` (e.g. `role="heading" aria-level={ 2 }`) to expose the
+ * wrapper as a heading around the trigger, following the W3C APG accordion
+ * pattern (heading wraps button). Avoid rendering the wrapper as a native
+ * `<h1>`–`<h6>` element: the trigger is a `<div>`, which a native heading
+ * can't contain.
  *
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "5.1.0",
+	"version": "5.2.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,8 +28,10 @@
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
+	"types": "build-types",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -77,8 +79,14 @@
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",
 		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

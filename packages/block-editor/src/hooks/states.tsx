@@ -3,7 +3,6 @@ import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
-import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
 import type { StyleStateOption } from '../components/global-styles/types';
 import type { BlockStatesControlProps, BlockStateBadgesProps } from './types';
@@ -86,7 +85,6 @@ export function BlockStatesControl( {
 		() => getPseudoStateOptions( name ),
 		[ name ]
 	);
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! pseudoStateOptions.length ) {
 		return null;
@@ -97,7 +95,6 @@ export function BlockStatesControl( {
 			pseudoStates={ pseudoStateOptions }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
-			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
 		>
 			{ children }

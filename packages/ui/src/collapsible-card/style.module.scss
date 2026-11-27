@@ -6,9 +6,9 @@
 	@layer components {
 		/*
 		 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
-		 * (defaults to `<div>`, but consumers can opt into a heading level via
-		 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
-		 * when the wrapper renders as an h1–h6, the unlayered defense class beats
+		 * (a `<div>`, which consumers expose as a heading with `role="heading"`
+		 * and `aria-level`). Combined with `defenseStyles.heading` so that, if a
+		 * consumer still renders the wrapper as an h1–h6, the unlayered defense class beats
 		 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
 		 * transparent so UA and host stylesheets don't bleed into the inner
 		 * trigger.

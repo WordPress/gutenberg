@@ -30,6 +30,7 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
+import { TRANSFORM_SUPPORT_KEY, TransformPanel } from './transform';
 import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
@@ -50,6 +51,7 @@ import {
 	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
 } from './block-style-state';
+import { getVariationMatches } from './block-style-variation';
 import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -86,6 +88,7 @@ const styleSupportKeys = [
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	SHADOW_SUPPORT_KEY,
+	TRANSFORM_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType: string | BlockType ) =>
@@ -612,19 +615,98 @@ function getRootStateStyles(
 }
 
 /**
+ * Returns the Global Styles a block instance state layers over, given the
+ * state's path, such as `[ '@mobile' ]`.
+ */
+type GlobalBaseStyleGetter = ( statePath: string[] ) => PanelStyle | undefined;
+
+/**
+ * Returns the Global Styles a block instance state layers over: its block
+ * type's, then those of the block style variation applied to it.
+ *
+ * Each includes the Global Styles for the same state, so a state only
+ * escapes a text clip that applies there. A breakpoint pseudo state layers
+ * over the root, the breakpoint, the pseudo state, then both, as output.
+ *
+ * Mirror of `gutenberg_get_block_state_global_base_style` in
+ * lib/block-supports/states.php.
+ *
+ * @param globalBlockStyles Global Styles for the block type.
+ * @param className         Block class name, which names any applied variation.
+ * @param stateKeys         Pseudo-state and breakpoint keys to leave out.
+ * @param statePath         State the styles are for, e.g. `[ '@mobile', ':hover' ]`.
+ * @return Root-only style object.
+ */
+export function getGlobalBlockBaseStyle(
+	globalBlockStyles: PanelStyle | undefined,
+	className: string | undefined,
+	stateKeys: string[],
+	statePath: string[] = []
+): PanelStyle | undefined {
+	if ( ! globalBlockStyles ) {
+		return undefined;
+	}
+
+	const nestedKeys = [ 'elements', 'blocks', 'variations', ...stateKeys ];
+	const layerPaths = [
+		[],
+		...statePath.map( ( state ) => [ state ] ),
+		...( statePath.length > 1 ? [ statePath ] : [] ),
+	];
+	const getLayers = ( styles: PanelStyle ) =>
+		layerPaths.reduce< PanelStyle | undefined >( ( merged, layerPath ) => {
+			const layer = layerPath.reduce< unknown >(
+				( value, key ) =>
+					( value as Record< string, unknown > | undefined )?.[ key ],
+				styles
+			) as PanelStyle | undefined;
+			return layer
+				? ( mergeStyleObjects(
+						merged,
+						getRootStateStyles( layer, nestedKeys )
+					) as PanelStyle )
+				: merged;
+		}, undefined );
+	const baseStyle = getLayers( globalBlockStyles );
+	const variations = (
+		globalBlockStyles as { variations?: Record< string, PanelStyle > }
+	 ).variations;
+
+	// Only the first block style variation with data applies, as in the
+	// variation support.
+	const variationStyles = getVariationMatches( className )
+		.map( ( variation ) => variations?.[ variation ] )
+		.find( ( styles ) => styles && Object.keys( styles ).length );
+
+	return variationStyles
+		? ( mergeStyleObjects(
+				baseStyle,
+				getLayers( variationStyles )
+			) as PanelStyle )
+		: baseStyle;
+}
+
+/**
  * Generates CSS rules for supported pseudo-state styles.
  *
- * @param style        Block style object containing pseudo-state styles.
- * @param name         Block name.
- * @param baseSelector Base selector used to scope generated CSS.
- * @param baseStyle    Styles these pseudo states layer over.
+ * @param style              Block style object containing pseudo-state styles.
+ * @param name               Block name.
+ * @param baseSelector       Base selector used to scope generated CSS.
+ * @param baseStyle          Block instance styles these pseudo states layer over.
+ * @param defaultStyles      For breakpoint pseudo states, the block style object
+ *                           whose default pseudo states they also layer over.
+ * @param getGlobalBaseStyle Returns the Global Styles a state layers over.
+ * @param viewport           For breakpoint pseudo states, the breakpoint.
  * @return Generated CSS rule strings.
  */
 function getPseudoStateCSSRules(
 	style: PanelStyle | undefined,
 	name: string,
 	baseSelector: string,
-	baseStyle?: PanelStyle
+	baseStyle?: PanelStyle,
+	defaultStyles?: PanelStyle,
+	getGlobalBaseStyle?: GlobalBaseStyleGetter,
+	viewport?: string
 ) {
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ];
 	if ( ! validPseudoStates ) {
@@ -636,11 +718,24 @@ function getPseudoStateCSSRules(
 		// The valid pseudo states start with a colon.
 		const stateStyles = style?.[ pseudoState as `:${ string }` ];
 		if ( stateStyles ) {
+			const defaultPseudoStyles =
+				defaultStyles?.[ pseudoState as `:${ string }` ];
+			// Cascade order: Global Styles, the block, its breakpoint, then
+			// the default pseudo state.
+			const stateBaseStyle = mergeStyleObjects(
+				mergeStyleObjects(
+					getGlobalBaseStyle?.(
+						viewport ? [ viewport, pseudoState ] : [ pseudoState ]
+					),
+					baseStyle
+				),
+				defaultPseudoStyles
+			) as PanelStyle | undefined;
 			const css = getBlockStateStylesCSS( stateStyles, {
 				name,
 				baseSelector,
 				state: pseudoState,
-				baseStyle,
+				baseStyle: stateBaseStyle,
 			} );
 			if ( css ) {
 				cssRules.push( css );
@@ -657,17 +752,19 @@ function getPseudoStateCSSRules(
  * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
  * media query.
  *
- * @param style            Block style object containing responsive states.
- * @param name             Block name.
- * @param baseSelector     Base selector used to scope generated CSS.
- * @param viewportSettings Viewport breakpoint settings.
+ * @param style              Block style object containing responsive states.
+ * @param name               Block name.
+ * @param baseSelector       Base selector used to scope generated CSS.
+ * @param viewportSettings   Viewport breakpoint settings.
+ * @param getGlobalBaseStyle Returns the Global Styles a state layers over.
  * @return Generated CSS rule strings.
  */
 export function getResponsiveStateCSSRules(
 	style: PanelStyle | undefined,
 	name: string,
 	baseSelector: string,
-	viewportSettings?: unknown
+	viewportSettings?: unknown,
+	getGlobalBaseStyle?: GlobalBaseStyleGetter
 ) {
 	const cssRules: string[] = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
@@ -695,7 +792,10 @@ export function getResponsiveStateCSSRules(
 			const rootCSS = getBlockStateStylesCSS( viewportRootStyles, {
 				name,
 				baseSelector,
-				baseStyle: defaultRootStyles,
+				baseStyle: mergeStyleObjects(
+					getGlobalBaseStyle?.( [ viewport ] ),
+					defaultRootStyles
+				) as PanelStyle | undefined,
 			} );
 			if ( rootCSS ) {
 				viewportCSSRules.push( rootCSS );
@@ -719,7 +819,10 @@ export function getResponsiveStateCSSRules(
 					mergeStyleObjects(
 						defaultRootStyles,
 						viewportRootStyles
-					) as PanelStyle
+					) as PanelStyle,
+					style,
+					getGlobalBaseStyle,
+					viewport
 				)
 			);
 
@@ -828,6 +931,9 @@ const skipSerializationPathsEdit: Record< string, string[] > = {
 	],
 	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		BACKGROUND_SUPPORT_KEY,
+	],
+	[ `${ TRANSFORM_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TRANSFORM_SUPPORT_KEY,
 	],
 };
 
@@ -1054,30 +1160,34 @@ function BlockStyleControls( {
 }: BlockStyleControlsProps ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
-		( select ) => {
-			const blockEditorSelect = select( blockEditorStore );
-			const {
-				getSelectedBlockStyleState,
-				isSelectedBlockStyleStateShownOnCanvas,
-			} = unlock( blockEditorSelect );
-			const editorSettings = blockEditorSelect.getSettings();
-			return {
-				// The global styles data holds the styles of each block type.
-				globalBlockStyles: (
-					editorSettings as {
-						[ globalStylesDataKey ]?: {
-							blocks?: Record< string, PanelStyle >;
-						};
-					}
-				 )?.[ globalStylesDataKey ]?.blocks?.[ name ],
-				selectedState: getSelectedBlockStyleState( clientId ),
-				showStateOnCanvas:
-					isSelectedBlockStyleStateShownOnCanvas( clientId ),
-			};
-		},
-		[ clientId, name ]
-	);
+	const [ viewportSettings ] = useSettings( 'viewport' );
+	const { globalBlockStyles, className, selectedState, showStateOnCanvas } =
+		useSelect(
+			( select ) => {
+				const blockEditorSelect = select( blockEditorStore );
+				const {
+					getSelectedBlockStyleState,
+					isSelectedBlockStyleStateShownOnCanvas,
+				} = unlock( blockEditorSelect );
+				const editorSettings = blockEditorSelect.getSettings();
+				return {
+					// The global styles data holds the styles of each block type.
+					globalBlockStyles: (
+						editorSettings as {
+							[ globalStylesDataKey ]?: {
+								blocks?: Record< string, PanelStyle >;
+							};
+						}
+					 )?.[ globalStylesDataKey ]?.blocks?.[ name ],
+					className: blockEditorSelect.getBlockAttributes( clientId )
+						?.className as string | undefined,
+					selectedState: getSelectedBlockStyleState( clientId ),
+					showStateOnCanvas:
+						isSelectedBlockStyleStateShownOnCanvas( clientId ),
+				};
+			},
+			[ clientId, name ]
+		);
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
@@ -1113,18 +1223,27 @@ function BlockStyleControls( {
 			return undefined;
 		}
 
+		const pseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
+
 		return getBlockStateStylesCSS( stateValue, {
 			name,
 			baseSelector: `[data-block="${ clientId }"]`,
-			baseStyle: getRootStateStyles( style, [
-				'elements',
-				...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
-			] ),
+			baseStyle: mergeStyleObjects(
+				getGlobalBlockBaseStyle( globalBlockStyles, className, [
+					...pseudoStates,
+					...Object.keys(
+						getResponsiveMediaQueries( viewportSettings )
+					),
+				] ),
+				getRootStateStyles( style, [ 'elements', ...pseudoStates ] )
+			) as PanelStyle,
 		} );
 	}, [
 		showStateOnCanvas,
 		isPseudoSelectorState,
 		globalBlockStyles,
+		className,
+		viewportSettings,
 		style,
 		selectedState,
 		clientId,
@@ -1160,6 +1279,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<TransformPanel { ...passedProps } />
 		</BlockStyleStateProvider>
 	);
 }
@@ -1188,6 +1308,23 @@ const elementTypes = [
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
 /**
+ * Removes transform styles from an element style object and its pseudo
+ * selector styles, as transforms are for blocks only. Mirror of
+ * `gutenberg_remove_element_transform_styles()` in PHP.
+ *
+ * @param style Element style object.
+ * @return Element style object without transform styles.
+ */
+function omitElementTransformStyles( style: PanelStyle ): PanelStyle {
+	return omitStyle( style as BlockStyle, [
+		TRANSFORM_SUPPORT_KEY,
+		...Object.keys( style )
+			.filter( ( key ) => key.startsWith( ':' ) )
+			.map( ( key ) => [ key, TRANSFORM_SUPPORT_KEY ] ),
+	] ) as PanelStyle;
+}
+
+/**
  * Generates CSS rules for block element styles (buttons, links, headings, etc.).
  *
  * Iterates over supported element types and compiles their styles, including
@@ -1207,6 +1344,13 @@ function getElementCSSRules(
 	if ( ! blockElementStyles ) {
 		return;
 	}
+
+	blockElementStyles = Object.fromEntries(
+		Object.entries( blockElementStyles ).map( ( [ element, style ] ) => [
+			element,
+			omitElementTransformStyles( style ),
+		] )
+	);
 
 	const rules: string[] = [];
 
@@ -1292,9 +1436,40 @@ function useBlockProps( {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 	const [ viewportSettings ] = useSettings( 'viewport' );
+	const { globalBlockStyles, className } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			return {
+				// The global styles data holds the styles of each block type.
+				globalBlockStyles: (
+					getSettings() as {
+						[ globalStylesDataKey ]?: {
+							blocks?: Record< string, PanelStyle >;
+						};
+					}
+				 )?.[ globalStylesDataKey ]?.blocks?.[ name ],
+				className: getBlockAttributes( clientId )?.className as
+					string | undefined,
+			};
+		},
+		[ clientId, name ]
+	);
 
 	const styles = useMemo( () => {
 		const cssRules: string[] = [];
+		const pseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
+		const stateKeys = [
+			...pseudoStates,
+			...Object.keys( getResponsiveMediaQueries( viewportSettings ) ),
+		];
+		const getGlobalBaseStyle: GlobalBaseStyleGetter = ( statePath ) =>
+			getGlobalBlockBaseStyle(
+				globalBlockStyles,
+				className,
+				stateKeys,
+				statePath
+			);
 
 		const elementCSS = getElementCSSRules(
 			blockElementStyles,
@@ -1310,10 +1485,9 @@ function useBlockProps( {
 				style,
 				name,
 				baseElementSelector,
-				getRootStateStyles( style, [
-					'elements',
-					...( VALID_BLOCK_PSEUDO_STATES[ name ] ?? [] ),
-				] )
+				getRootStateStyles( style, [ 'elements', ...pseudoStates ] ),
+				undefined,
+				getGlobalBaseStyle
 			)
 		);
 
@@ -1322,7 +1496,8 @@ function useBlockProps( {
 				style,
 				name,
 				baseElementSelector,
-				viewportSettings
+				viewportSettings,
+				getGlobalBaseStyle
 			)
 		);
 
@@ -1330,6 +1505,8 @@ function useBlockProps( {
 	}, [
 		baseElementSelector,
 		blockElementStyles,
+		className,
+		globalBlockStyles,
 		name,
 		style,
 		viewportSettings,

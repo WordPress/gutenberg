@@ -572,8 +572,16 @@ export const getInserterMediaCategories = createSelector(
 			) {
 				return false;
 			}
+			// Files are not a MIME type of their own: they cover documents
+			// (`application/*`) and plain text files (`text/*`).
+			const mimeTypePrefixes =
+				category.mediaType === 'file'
+					? [ 'application/', 'text/' ]
+					: [ `${ category.mediaType }/` ];
 			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
+				mimeTypePrefixes.some( ( prefix ) =>
+					mimeType.startsWith( prefix )
+				)
 			);
 		} );
 	},
@@ -655,6 +663,33 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
 	}, getAllPatternsDependants( select ) )
+);
+
+/**
+ * Returns whether the patterns are being resolved.
+ * This is used to determine if the patterns are still being fetched
+ * from the server or if they are already available in the store.
+ *
+ * @param state Block editor state.
+ *
+ * @return Whether the patterns are being resolved.
+ */
+export const isResolvingPatterns = createRegistrySelector(
+	( select ) =>
+		( state: State ): boolean => {
+			const blockPatternsSelect =
+				state.settings[ selectBlockPatternsKey ];
+			const reusableBlocksSelect =
+				state.settings[ reusableBlocksSelectKey ];
+			return (
+				( blockPatternsSelect
+					? blockPatternsSelect( select ) === undefined
+					: false ) ||
+				( reusableBlocksSelect
+					? reusableBlocksSelect( select ) === undefined
+					: false )
+			);
+		}
 );
 
 const EMPTY_ARRAY: never[] = [];
@@ -1162,18 +1197,6 @@ export const isBlockParentHiddenAtViewport = (
 		isBlockHiddenAtViewport( state, parentId, viewport )
 	);
 };
-
-/**
- * Returns true if there is a spotlighted block, which is the case while a
- * contentOnly section is being edited.
- *
- * @param state Global application state.
- *
- * @return Whether the block is currently spotlighted.
- */
-export function hasBlockSpotlight( state: State ) {
-	return !! state.editedContentOnlySection;
-}
 
 /**
  * Returns whether a block is locked to prevent editing.
