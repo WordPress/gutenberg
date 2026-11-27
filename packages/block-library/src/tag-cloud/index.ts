@@ -20,6 +20,6 @@ export const settings: BlockModule< TagCloudAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata: metadata as BlockModule< TagCloudAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );
