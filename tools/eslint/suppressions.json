@@ -832,26 +832,15 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/breadcrumbs/edit.jsx": {
+	"packages/block-library/src/breadcrumbs/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
 		},
 		"no-restricted-syntax": {
 			"count": 3
 		},
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/breadcrumbs/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/button/constants.js": {
@@ -7668,27 +7657,8 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/post-list/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/post-list/quick-edit-modal.jsx": {
+	"packages/edit-site/src/components/post-list/quick-edit-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/post-list/use-notes-count.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

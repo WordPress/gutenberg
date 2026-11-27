@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
 -   Validate registered direct-parent relationships for structural block wrapping ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
 
 ### Internal

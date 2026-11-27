@@ -112,7 +112,7 @@ function PostListView( {
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
-	const { invalidateResolution } = unlock( useDispatch( coreStore ) );
+	const { invalidateResolution } = useDispatch( coreStore );
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
@@ -246,6 +246,8 @@ function PostListView( {
 	// Fetching it again after a change updates the counts only: the user's
 	// view lives in preferences, which this does not touch.
 	const refreshViewCounts = useCallback( () => {
+		// @ts-expect-error `getViewConfig` is private, so it is missing from the
+		// selector names `invalidateResolution` accepts.
 		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
 	}, [ invalidateResolution, postType ] );
 
