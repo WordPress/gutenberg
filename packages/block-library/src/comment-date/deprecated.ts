@@ -30,7 +30,7 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
+	isEligible( { style }: Record< string, any > ) {
 		return style?.typography?.fontFamily;
 	},
 };
