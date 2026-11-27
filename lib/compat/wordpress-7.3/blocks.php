@@ -10,19 +10,22 @@
  *
  * WordPress versions before 7.3 can't validate these types.
  *
- * @param array $args Block type arguments.
- * @return array Block type arguments.
+ * @param array<string, mixed> $args Block type arguments.
+ * @return array<string, mixed> Block type arguments.
  */
 function gutenberg_register_field_api_attribute_types_as_string( $args ) {
 	if ( empty( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
 		return $args;
 	}
 
-	foreach ( $args['attributes'] as $name => $attribute ) {
-		if ( isset( $attribute['type'] ) && in_array( $attribute['type'], array( 'datetime', 'url' ), true ) ) {
-			$args['attributes'][ $name ]['type'] = 'string';
+	$attributes = $args['attributes'];
+	foreach ( $attributes as $name => $attribute ) {
+		if ( is_array( $attribute ) && isset( $attribute['type'] ) && in_array( $attribute['type'], array( 'datetime', 'url' ), true ) ) {
+			$attribute['type']   = 'string';
+			$attributes[ $name ] = $attribute;
 		}
 	}
+	$args['attributes'] = $attributes;
 
 	return $args;
 }
