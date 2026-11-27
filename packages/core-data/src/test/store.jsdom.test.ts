@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
+import { additionalEntityConfigLoaders } from '../entities';
 import { store as coreDataStore } from '../index';
 import type * as ET from '../entity-types';
 import { unlock } from '../lock-unlock';
@@ -177,6 +178,31 @@ describe( 'getEntityConfig', () => {
 				.resolveSelect( coreDataStore )
 				.getEntityConfig( 'root', 'site' )
 		).resolves.toMatchObject( { meta: { labels: { title: 'Title' } } } );
+	} );
+
+	it( 'loads each named loader of a kind', async () => {
+		const userConfig = { kind: 'root', name: 'testUser', baseURL: '/' };
+		const loader = {
+			kind: 'root',
+			name: 'testUser',
+			loadEntities: async () => [ userConfig ],
+		};
+		additionalEntityConfigLoaders.push( loader );
+		apiFetchMock.mockResolvedValue( {} );
+
+		try {
+			const { getEntityConfig } = registry.resolveSelect( coreDataStore );
+			await getEntityConfig( 'root', 'site' );
+
+			await expect(
+				getEntityConfig( 'root', 'testUser' )
+			).resolves.toEqual( userConfig );
+		} finally {
+			additionalEntityConfigLoaders.splice(
+				additionalEntityConfigLoaders.indexOf( loader ),
+				1
+			);
+		}
 	} );
 } );
 

@@ -4,7 +4,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import type { Block } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
-import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import {
+	additionalEntityConfigLoaders,
+	DEFAULT_ENTITY_KEY,
+	findEntityConfigLoader,
+} from './entities';
 import { getEntitySyncManager } from './entity-sync';
 import type { EntitySyncRecord } from './entity-sync';
 import {
@@ -969,7 +973,7 @@ export const getDefaultTemplateId =
 		} );
 		// Wait for the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
-		await resolveSelect.getEntitiesConfig( 'postType' );
+		await resolveSelect.getEntityConfig( 'postType', 'wp_template' );
 		const id = template?.id;
 
 		registry.batch( () => {
@@ -1286,17 +1290,16 @@ getRegisteredPostMeta.shouldInvalidate = (
 };
 
 /**
- * Requests entity configs for the given kind from the REST API.
+ * Requests the entity config for the given kind and name from the REST API,
+ * if a loader provides it.
  *
  * @param kind Entity kind.
+ * @param name Entity name.
  */
-export const getEntitiesConfig =
-	( kind: string ) =>
+export const getEntityConfig =
+	( kind: string, name: string ) =>
 	async ( { dispatch }: CoreDataThunkArgs ) => {
-		const loader = additionalEntityConfigLoaders.find(
-			( l ) => l.kind === kind
-		);
-
+		const loader = findEntityConfigLoader( kind, name );
 		if ( ! loader ) {
 			return;
 		}
@@ -1314,30 +1317,47 @@ export const getEntitiesConfig =
 	};
 
 /**
- * Waits for the loader that provides the entity config for the given kind and
- * name, if there is one.
+ * Resolves each loader once. A loader without a name loads every config of
+ * its kind, so all names of that kind share one resolution, keyed by an
+ * empty name.
  *
  * @param kind Entity kind.
  * @param name Entity name.
+ *
+ * @return The resolution args.
  */
-export const getEntityConfig =
-	( kind: string, name: string ) =>
-	async ( { resolveSelect }: CoreDataThunkArgs ) => {
-		const hasLoader = additionalEntityConfigLoaders.some(
-			( loader ) =>
-				loader.kind === kind &&
-				( ! loader.name || loader.name === name )
-		);
-		if ( hasLoader ) {
-			// Loaders request every config of a kind at once.
-			await resolveSelect.getEntitiesConfig( kind );
-		}
-	};
+getEntityConfig.getResolutionArgs = (
+	kind: string,
+	name: string
+): [ string, string ] => {
+	const loader = findEntityConfigLoader( kind, name );
+	return [ kind, loader && ! loader.name ? '' : name ];
+};
 
+// Receives the resolution args, so it only skips names that have their own
+// resolution, such as statically configured `root` entities.
 getEntityConfig.isFulfilled = ( state: State, kind: string, name: string ) =>
 	state.entities.config.some(
 		( config ) => config.kind === kind && config.name === name
 	);
+
+/**
+ * Requests the entity configs for the given kind from the REST API.
+ *
+ * @param kind Entity kind.
+ */
+export const getEntitiesConfig =
+	( kind: string ) =>
+	async ( { resolveSelect }: CoreDataThunkArgs ) => {
+		// A kind can have several loaders, so resolve each of them.
+		await Promise.all(
+			additionalEntityConfigLoaders
+				.filter( ( loader ) => loader.kind === kind )
+				.map( ( loader ) =>
+					resolveSelect.getEntityConfig( kind, loader.name ?? '' )
+				)
+		);
+	};
 
 /**
  * Requests editor settings from the REST API.
