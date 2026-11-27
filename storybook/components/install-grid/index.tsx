@@ -36,8 +36,9 @@ const RAYCAST_URL = `raycast://mcp/install?${ encodeURIComponent(
 	JSON.stringify( { name: SERVER_NAME, type: 'stdio', ...SERVER_ENTRY } )
 ) }`;
 
-const CURSOR_URL =
-	'https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9';
+const CURSOR_URL = `https://cursor.com/en-US/install-mcp?name=${ SERVER_NAME }&config=${ btoa(
+        JSON.stringify( { command: [ 'npx', ...PACKAGE_ARGS ].join( ' ' ) } )
+) }`;
 
 type Link = {
 	href: string;
