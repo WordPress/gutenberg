@@ -27,7 +27,7 @@ const variations: BlockConfiguration< CategoriesAttributes >[ 'variations' ] = [
 		icon,
 		attributes: {
 			taxonomy: 'category',
-		} as CategoriesAttributes,
+		},
 		isActive: [ 'taxonomy' ],
 		// The following is needed to prevent "Terms List" from showing up twice in the inserter
 		// (once for the block, once for the variation). Fortunately, it does not collide with
