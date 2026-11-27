@@ -9,13 +9,14 @@ import type {
 	Block,
 	BlockConfiguration,
 	BlockEditProps,
-	registerBlockType,
 } from '@wordpress/blocks';
 
 /**
  * A block as each block directory exports it, ready to register.
  */
-export interface BlockModule {
+export interface BlockModule<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> {
 	/**
 	 * Block name.
 	 */
@@ -23,11 +24,11 @@ export interface BlockModule {
 	/**
 	 * Parsed block.json metadata.
 	 */
-	metadata: Omit< BlockConfiguration, 'name' >;
+	metadata: Omit< BlockConfiguration< Attributes >, 'name' >;
 	/**
 	 * Block settings.
 	 */
-	settings?: Parameters< typeof registerBlockType >[ 1 ];
+	settings?: Partial< Omit< BlockConfiguration< Attributes >, 'name' > >;
 }
 
 /**
