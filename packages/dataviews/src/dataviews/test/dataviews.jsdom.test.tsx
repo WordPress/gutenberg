@@ -209,16 +209,15 @@ describe( 'DataViews component', () => {
 		}
 	);
 
-	it( 'marks the triggers of actions that open a dialog', async () => {
+	it( 'marks the triggers of modal actions as opening a dialog', async () => {
 		render(
 			<DataViewWrapper
 				actions={ [
 					{ ...actions[ 0 ], isPrimary: true },
 					{
-						id: 'quick-edit',
-						label: 'Quick edit',
+						id: 'duplicate',
+						label: 'Duplicate',
 						isPrimary: true,
-						opensDialog: true,
 						callback: vi.fn(),
 					},
 					{ id: 'view', label: 'View', callback: vi.fn() },
@@ -230,8 +229,8 @@ describe( 'DataViews component', () => {
 			screen.getByRole( 'button', { name: 'Delete' } )
 		).toHaveAttribute( 'aria-haspopup', 'dialog' );
 		expect(
-			screen.getByRole( 'button', { name: 'Quick edit' } )
-		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+			screen.getByRole( 'button', { name: 'Duplicate' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
 		const user = userEvent.setup();
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 		expect(
@@ -240,6 +239,32 @@ describe( 'DataViews component', () => {
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Delete…' } )
 		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+	} );
+
+	it( 'marks the bulk triggers of modal actions as opening a dialog', () => {
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, type: LAYOUT_TABLE } }
+				actions={ [
+					...actions,
+					{
+						id: 'archive',
+						label: 'Archive',
+						supportsBulk: true,
+						callback: vi.fn(),
+					},
+				] }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			/>
+		);
+		// Neither is primary, so their only buttons are in the toolbar.
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Archive' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
 	} );
 
 	it( 'renders header bulk actions once in a custom table composition', () => {

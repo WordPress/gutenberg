@@ -13,7 +13,6 @@ import {
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import getActionLabel from '../../utils/get-action-label';
-import getActionPopup from '../../utils/get-action-popup';
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -70,7 +69,7 @@ function ButtonTrigger< Item >( {
 			size="compact"
 			variant={ variant }
 			onClick={ onClick }
-			aria-haspopup={ getActionPopup( action ) }
+			aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
 		>
 			{ label }
 		</Button>
@@ -87,7 +86,7 @@ function MenuItemTrigger< Item >( {
 		<Menu.Item
 			disabled={ action.disabled }
 			onClick={ onClick }
-			aria-haspopup={ getActionPopup( action ) }
+			aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
 		>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>

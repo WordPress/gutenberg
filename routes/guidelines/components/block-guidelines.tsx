@@ -130,7 +130,6 @@ export default function BlockGuidelines( {
 			{
 				id: 'edit',
 				label: __( 'Edit' ),
-				opensDialog: true,
 				callback: ( items: DataRow[] ) => {
 					handleRowClick( items[ 0 ].id );
 				},
@@ -138,7 +137,6 @@ export default function BlockGuidelines( {
 			{
 				id: 'remove',
 				label: __( 'Remove' ),
-				opensDialog: true,
 				callback: ( items: DataRow[] ) => {
 					setItemToDelete( items[ 0 ] );
 				},

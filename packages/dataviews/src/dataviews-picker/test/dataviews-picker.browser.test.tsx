@@ -441,33 +441,6 @@ describe( 'DataViews Picker', () => {
 				).toEqual( [ 2 ] );
 			} );
 
-			it( 'marks the footer actions that open a dialog', async () => {
-				const actions: ActionButton< Data >[] = [
-					{
-						id: 'insert',
-						label: 'Insert',
-						supportsBulk: true,
-						isPrimary: true,
-						callback: vi.fn(),
-					},
-					{
-						id: 'details',
-						label: 'Details',
-						supportsBulk: true,
-						opensDialog: true,
-						callback: vi.fn(),
-					},
-				];
-				await render( <Picker actions={ actions } /> );
-
-				expect(
-					screen.getByRole( 'button', { name: 'Details' } )
-				).toHaveAttribute( 'aria-haspopup', 'dialog' );
-				expect(
-					screen.getByRole( 'button', { name: 'Insert' } )
-				).not.toHaveAttribute( 'aria-haspopup' );
-			} );
-
 			it( 'calls the action callback when the action button is clicked', async () => {
 				await render( <Picker actions={ multiSelectActions } /> );
 

@@ -14,7 +14,6 @@ import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
 import getActionLabel from '../../utils/get-action-label';
-import getActionPopup from '../../utils/get-action-popup';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -146,7 +145,6 @@ function ActionButtons< Item >( {
 						} }
 						size="compact"
 						variant={ variant }
-						aria-haspopup={ getActionPopup( action ) }
 					>
 						{ label }
 					</Button>

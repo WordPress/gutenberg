@@ -33,7 +33,6 @@ import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import type { SelectionProps } from '../utils/use-selection-props';
 import getActionLabel from '../../../utils/get-action-label';
-import getActionPopup from '../../../utils/get-action-popup';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -92,7 +91,7 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						text={ label }
 						size="small"
-						aria-haspopup={ getActionPopup( primaryAction ) }
+						aria-haspopup="dialog"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
 				}
@@ -115,7 +114,6 @@ function PrimaryActionGridCell< Item >( {
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
 						size="small"
-						aria-haspopup={ getActionPopup( primaryAction ) }
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );
 						} }
