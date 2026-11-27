@@ -14,7 +14,6 @@ export const settings: BlockModule< ReadMoreAttributes >[ 'settings' ] = {
 	edit,
 	example: {
 		attributes: {
-			// @ts-expect-error Fixed in #87543 (`BlockConfiguration['example']['attributes']`).
 			content: __( 'Read more' ),
 		},
 	},
