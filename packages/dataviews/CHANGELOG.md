@@ -7,7 +7,7 @@
 -   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   Name the selection checkboxes "Select [title]" instead of the item title alone ([#87220](https://github.com/WordPress/gutenberg/pull/87220)).
 -   DataForm: Add a `headingLevel` option to the `card` layout, which renders the card's title as a heading of that level ([#87390](https://github.com/WordPress/gutenberg/pull/87390)).
--   Rename the "Cancel" button of the bulk actions toolbar to "Clear selection" and move it from the far end of the toolbar to right after the actions. From the `large` breakpoint up it shows as text; below that it stays an icon. Tests that find it by "Cancel" need updating ([#87232](https://github.com/WordPress/gutenberg/pull/87232)).
+-   Replace the "Cancel" icon button of the bulk actions toolbar with a "Clear selection" text button, right after the actions instead of at the far end of the toolbar. When the text doesn't fit, it's an icon with a tooltip instead. Tests that find it by "Cancel" need updating ([#87232](https://github.com/WordPress/gutenberg/pull/87232)).
 
 ### Bug Fixes
 

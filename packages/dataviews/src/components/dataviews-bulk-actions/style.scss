@@ -20,3 +20,31 @@
 	flex-shrink: 0;
 	white-space: nowrap;
 }
+
+.dataviews-bulk-actions__clear-icon {
+	display: none;
+}
+
+// When the text doesn't fit, show the icon instead, and keep the text as the
+// name of the button.
+.dataviews-bulk-actions.is-clear-selection-icon-only {
+	// Square, like an icon button.
+	.dataviews-bulk-actions__clear {
+		--wp-ui-button-aspect-ratio: 1;
+		--wp-ui-button-padding-inline: 0px;
+		--wp-ui-button-min-width: unset;
+	}
+
+	.dataviews-bulk-actions__clear-icon {
+		display: revert;
+	}
+
+	.dataviews-bulk-actions__clear-text {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+}

@@ -60,7 +60,7 @@ function SelectableTable( { isLoading = false } = {} ) {
 	);
 }
 
-it( 'shows "Clear selection" as text on large screens and as an icon below', async () => {
+it( 'shows "Clear selection" as text, or as an icon when the text does not fit, keeping focus', async () => {
 	const user = userEvent.setup();
 	await render( <SelectableTable /> );
 	await user.click(
@@ -70,11 +70,18 @@ it( 'shows "Clear selection" as text on large screens and as an icon below', asy
 		name: 'Clear selection',
 		exact: true,
 	} );
-	await expect.element( clear ).toHaveTextContent( 'Clear selection' );
+	clear.element().focus();
+	await expect.element( clear ).toHaveFocus();
+	expect( clear.element().getBoundingClientRect().width ).toBeGreaterThan(
+		32
+	);
 
-	await page.viewport( 800, 900 );
-	await expect.element( clear ).toHaveTextContent( '' );
-	await expect.element( clear ).toBeVisible();
+	await page.viewport( 320, 900 );
+	await expect
+		.poll( () => clear.element().getBoundingClientRect().width )
+		.toBe( 32 );
+	await expect.element( clear ).toHaveAccessibleName( 'Clear selection' );
+	await expect.element( clear ).toHaveFocus();
 } );
 
 it( 'keeps column names and sorting accessible during selection, skips covered controls, and restores sorting after deselection', async () => {
