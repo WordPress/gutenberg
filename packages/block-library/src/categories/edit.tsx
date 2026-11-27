@@ -59,12 +59,11 @@ export default function CategoriesEdit( {
 	const isHierarchicalTaxonomy =
 		! isResolvingTaxonomies && taxonomy?.hierarchical;
 
-	const query: {
-		per_page: number;
-		hide_empty: boolean;
-		context: string;
-		parent?: number;
-	} = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
+	const query: Record< string, unknown > = {
+		per_page: -1,
+		hide_empty: ! showEmpty,
+		context: 'view',
+	};
 	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
 		query.parent = 0;
 	}
