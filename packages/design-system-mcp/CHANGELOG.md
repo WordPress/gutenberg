@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Serve the `@wordpress/ui` and `@wordpress/theme` agent skills (`wp-ui`, `wp-ui-migration`, `wp-ui-setup`, `wp-theme`, `wp-theme-setup`) as MCP resources with `skill://<name>/<path>` URIs, read from the trunk branch like the design tokens.
+
 ## 0.17.0 (2026-11-18)
 
 ### Enhancements

@@ -4,12 +4,14 @@ import {
 	parseComponentDetail,
 } from './parse-components.ts';
 import { parsePatterns } from './parse-patterns.ts';
+import { parseFrontmatter } from './skills.ts';
 import type {
 	Component,
 	ComponentDetail,
 	ManifestComponent,
 	ManifestDoc,
 	Pattern,
+	Skill,
 } from './types.ts';
 
 const COMPONENTS_MANIFEST_URL =
@@ -24,6 +26,15 @@ const DOCS_MANIFEST_URL =
 	process.env.DOCS_MANIFEST_URL ||
 	'https://wordpress.github.io/gutenberg/manifests/docs.json';
 
+const SKILLS_TREE_URL =
+	process.env.SKILLS_TREE_URL ||
+	'https://api.github.com/repos/WordPress/gutenberg/git/trees/trunk?recursive=1';
+
+const SKILLS_RAW_BASE_URL =
+	process.env.SKILLS_RAW_BASE_URL ||
+	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/';
+
+let cachedSkills: Skill[] | null = null;
 let cachedComponents: Record< string, ManifestComponent > | null = null;
 let cachedTokens: string | null = null;
 let cachedPatterns: Pattern[] | null = null;
@@ -35,6 +46,7 @@ export function resetCache(): void {
 	cachedComponents = null;
 	cachedTokens = null;
 	cachedPatterns = null;
+	cachedSkills = null;
 }
 
 /**
@@ -156,4 +168,70 @@ export async function getPatternDetail(
 	return (
 		patterns.find( ( pattern ) => pattern.slug === normalizedSlug ) ?? null
 	);
+}
+
+/**
+ * Get the agent skills that the design system packages ship, such as the
+ * `wp-ui` and `wp-theme` skills, with every file of each skill.
+ *
+ * The skills live in `packages/<package>/skills/<name>/`, so they are read
+ * from the same trunk branch as the design tokens.
+ *
+ * @return The skills.
+ */
+export async function getSkills(): Promise< Skill[] > {
+	if ( cachedSkills ) {
+		return cachedSkills;
+	}
+
+	const treeResponse = await fetch( SKILLS_TREE_URL );
+	if ( ! treeResponse.ok ) {
+		throw new Error(
+			`Failed to fetch skills tree: ${ treeResponse.status } ${ treeResponse.statusText }`
+		);
+	}
+
+	const tree: { tree: { path: string; type: string }[] } =
+		await treeResponse.json();
+
+	const paths = new Map< string, { path: string; repoPath: string }[] >();
+	for ( const entry of tree.tree ) {
+		const match = entry.path.match(
+			/^packages\/[^/]+\/skills\/([^/]+)\/(.+)$/
+		);
+		if ( entry.type !== 'blob' || ! match ) {
+			continue;
+		}
+		const files = paths.get( match[ 1 ] ) ?? [];
+		files.push( { path: match[ 2 ], repoPath: entry.path } );
+		paths.set( match[ 1 ], files );
+	}
+
+	const skills: Skill[] = [];
+	for ( const [ name, entries ] of paths ) {
+		if ( ! entries.some( ( { path } ) => path === 'SKILL.md' ) ) {
+			continue;
+		}
+		const files = await Promise.all(
+			entries.map( async ( { path, repoPath } ) => {
+				const response = await fetch( SKILLS_RAW_BASE_URL + repoPath );
+				if ( ! response.ok ) {
+					throw new Error(
+						`Failed to fetch skill file ${ repoPath }: ${ response.status } ${ response.statusText }`
+					);
+				}
+				return { path, content: await response.text() };
+			} )
+		);
+		const frontmatter = parseFrontmatter(
+			files.find( ( { path } ) => path === 'SKILL.md' )!.content
+		);
+		if ( frontmatter?.name !== name || ! frontmatter.description ) {
+			continue;
+		}
+		skills.push( { name, frontmatter, files } );
+	}
+
+	cachedSkills = skills.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+	return cachedSkills;
 }

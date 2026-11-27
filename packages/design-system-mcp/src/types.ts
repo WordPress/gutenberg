@@ -63,3 +63,17 @@ export interface Pattern {
 	description: string;
 	content: string;
 }
+
+export interface SkillFile {
+	/** Path relative to the skill directory, such as `SKILL.md`. */
+	path: string;
+	content: string;
+}
+
+export interface Skill {
+	/** The skill name, which is also its directory name. */
+	name: string;
+	/** The `SKILL.md` frontmatter. */
+	frontmatter: Record< string, string >;
+	files: SkillFile[];
+}

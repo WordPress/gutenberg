@@ -15,6 +15,10 @@ By using the MCP server, you can be confident that your AI agents are correctly 
 
 Without the MCP server, an AI agent may produce a functional and convincing result, but there's a higher risk that its resources are out-of-date or inaccurate, and it may try to use components which are no longer recommended for use. Since AI agents are unable to read [the WordPress Gutenberg Storybook documentation](https://wordpress.github.io/gutenberg/), the MCP server provides an alternative, machine-readable interface to that same information.
 
+## Agent skills
+
+The server also publishes the agent skills that `@wordpress/ui` and `@wordpress/theme` ship, as MCP resources. Each file of a skill is a resource with a `skill://<name>/<path>` URI, such as `skill://wp-ui/SKILL.md`, so a client that loads skills by URI can read them with `resources/read`. The server does not serve the `skills/list` and `skills/get` methods of the [Skills extension](https://modelcontextprotocol.io/extensions/skills/overview) yet.
+
 ## Setup
 
 ### Claude Code

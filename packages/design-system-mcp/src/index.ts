@@ -1,4 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/server';
+import { registerSkills } from './skills-server.ts';
 import { registerTools } from './tools/index.ts';
 
 export { parseComponents, parseComponentDetail } from './parse-components.ts';
@@ -29,6 +30,7 @@ export function createServer() {
 	);
 
 	registerTools( server );
+	registerSkills( server );
 
 	return server;
 }
