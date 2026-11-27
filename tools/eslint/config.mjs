@@ -1225,11 +1225,22 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components package and Storybook — disable use-recommended-components.
+	// Override: Components package — disable use-recommended-components.
 	{
-		files: [ 'packages/components/**', 'storybook/**' ],
+		files: [ 'packages/components/**' ],
 		rules: {
 			'@wordpress/use-recommended-components': 'off',
+		},
+	},
+
+	// Override: Storybook — allow "Use with caution" UI components, but keep flagging deprecated ones.
+	{
+		files: [ 'storybook/**' ],
+		rules: {
+			'@wordpress/use-recommended-components': [
+				'error',
+				{ allowUseWithCaution: true },
+			],
 		},
 	},
 
