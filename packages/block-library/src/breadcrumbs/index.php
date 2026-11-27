@@ -115,21 +115,19 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$show_terms = $attributes['prefersTaxonomy'];
 		}
 
-		// Add post type archive link if applicable.
-		$post_type_object = get_post_type_object( $post_type );
-		$archive_link     = get_post_type_archive_link( $post_type );
-		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
-			$label      = $post_type_object->labels->archives;
-			$allow_html = false;
-			if ( 'post' === $post_type && $page_for_posts ) {
-				$label      = block_core_breadcrumbs_get_post_title( $page_for_posts );
-				$allow_html = true;
+		// Add the posts page or the post type archive link if applicable.
+		$posts_page_item = 'post' === $post_type ? block_core_breadcrumbs_get_posts_page_item() : null;
+		if ( $posts_page_item ) {
+			$breadcrumb_items[] = $posts_page_item;
+		} else {
+			$post_type_object = get_post_type_object( $post_type );
+			$archive_link     = get_post_type_archive_link( $post_type );
+			if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
+				$breadcrumb_items[] = array(
+					'label' => $post_type_object->labels->archives,
+					'url'   => $archive_link,
+				);
 			}
-			$breadcrumb_items[] = array(
-				'label'      => $label,
-				'url'        => $archive_link,
-				'allow_html' => $allow_html,
-			);
 		}
 		// Build breadcrumb trail based on hierarchical structure or taxonomy terms.
 		if ( ! $show_terms ) {
@@ -367,20 +365,60 @@ function block_core_breadcrumbs_get_term_ancestors_items( $term_id, $taxonomy ) 
 }
 
 /**
+ * Creates the breadcrumb item for the posts page.
+ *
+ * The item is only created when the front page displays a static page and a
+ * different page is set as the posts page in the Reading settings.
+ *
+ * @since 7.3.0
+ *
+ * @return array|null The posts page breadcrumb item data, or null if there is no posts page.
+ */
+function block_core_breadcrumbs_get_posts_page_item() {
+	$page_for_posts = (int) get_option( 'page_for_posts' );
+
+	if (
+		'page' !== get_option( 'show_on_front' ) ||
+		! $page_for_posts ||
+		(int) get_option( 'page_on_front' ) === $page_for_posts
+	) {
+		return null;
+	}
+
+	$url = get_post_type_archive_link( 'post' );
+	if ( ! $url || untrailingslashit( home_url() ) === untrailingslashit( $url ) ) {
+		return null;
+	}
+
+	return array(
+		'label'      => block_core_breadcrumbs_get_post_title( $page_for_posts ),
+		'url'        => $url,
+		'allow_html' => true,
+	);
+}
+
+/**
  * Generates breadcrumb items for archive pages.
  *
  * Handles taxonomy archives, post type archives, date archives, and author archives.
  * For hierarchical taxonomies, includes ancestor terms in the breadcrumb trail.
  *
  * @since 7.0.0
+ * @since 7.3.0 Starts the trail with the posts page on date and author archives,
+ *              and on archives of taxonomies registered for posts.
  *
  * @return array Array of breadcrumb item data.
  */
 function block_core_breadcrumbs_get_archive_breadcrumbs() {
 	$breadcrumb_items = array();
+	$posts_page_item  = block_core_breadcrumbs_get_posts_page_item();
 
 	// Date archive (check first since it doesn't have a queried object).
 	if ( is_date() ) {
+		if ( $posts_page_item ) {
+			$breadcrumb_items[] = $posts_page_item;
+		}
+
 		$year  = get_query_var( 'year' );
 		$month = get_query_var( 'monthnum' );
 		$day   = get_query_var( 'day' );
@@ -455,6 +493,12 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 		$term     = $queried_object;
 		$taxonomy = $term->taxonomy;
 
+		// Add the posts page for taxonomies registered for posts.
+		$taxonomy_object = get_taxonomy( $taxonomy );
+		if ( $posts_page_item && $taxonomy_object && in_array( 'post', (array) $taxonomy_object->object_type, true ) ) {
+			$breadcrumb_items[] = $posts_page_item;
+		}
+
 		// Add hierarchical term ancestors if applicable.
 		$breadcrumb_items = array_merge(
 			$breadcrumb_items,
@@ -487,6 +531,9 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 	} elseif ( is_author() ) {
 		// Author archive.
 		$author = $queried_object;
+		if ( $posts_page_item ) {
+			$breadcrumb_items[] = $posts_page_item;
+		}
 		// Add author (current if not paginated, link if paginated).
 		$breadcrumb_items[] = block_core_breadcrumbs_create_item(
 			$author->display_name,
