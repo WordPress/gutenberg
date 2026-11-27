@@ -20,6 +20,48 @@ const ALLOWED_FIELDS = new Set( [ 'name', 'description' ] );
  */
 
 /**
+ * Finds comments that silently cut off a plain (unquoted) field value.
+ *
+ * In a plain scalar, a "#" after a space or tab starts a comment, so
+ * `description: Use for #tags` loads as "Use for" and still parses.
+ * Quoted values and `|` or `>` block scalars keep "#" as text.
+ *
+ * @param {string[]} frontmatterLines Lines between the "---" delimiters.
+ * @return {Array<{field: string, index: number}>} Each field cut off, with the frontmatter line index of the comment.
+ */
+function findTrailingComments( frontmatterLines ) {
+	const found = [];
+	let plainField = null;
+
+	frontmatterLines.forEach( ( line, index ) => {
+		const fieldMatch = line.match( /^([^\s#][^:]*):(?:[ \t]+(.*))?$/ );
+
+		if ( fieldMatch ) {
+			const [ , field, value = '' ] = fieldMatch;
+			plainField = value === '' || /^['"|>]/.test( value ) ? null : field;
+			if ( plainField && /[ \t]#/.test( value ) ) {
+				found.push( { field, index } );
+				plainField = null;
+			}
+			return;
+		}
+
+		// A continuation line of a plain value, such as a folded description.
+		if ( plainField && /^[ \t]/.test( line ) ) {
+			if ( /(?:^|[ \t])#/.test( line.trim() ) ) {
+				found.push( { field: plainField, index } );
+				plainField = null;
+			}
+			return;
+		}
+
+		plainField = null;
+	} );
+
+	return found;
+}
+
+/**
  * Validates the frontmatter of one SKILL.md file.
  *
  * @param {Object} options               Validation options.
@@ -92,7 +134,12 @@ export function validateSkill( { directoryName, source } ) {
 		];
 	}
 
-	const errors = [];
+	const errors = findTrailingComments( frontmatterLines ).map(
+		( { field, index } ) => ( {
+			line: toFileLine( index ),
+			message: `The "${ field }" value is cut off at " #", which starts a YAML comment. Wrap the whole value in quotes to keep the text after it.`,
+		} )
+	);
 
 	for ( const field of Object.keys( frontmatter ) ) {
 		if ( ! ALLOWED_FIELDS.has( field ) ) {

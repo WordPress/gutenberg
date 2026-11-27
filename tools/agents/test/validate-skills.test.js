@@ -69,6 +69,64 @@ description: Use when testing: unit or e2e.
 		] );
 	} );
 
+	test( 'reports a " #" that cuts off a plain value', () => {
+		const source = `---
+name: testing
+description: Use when tagging tests #slow or #flaky.
+---
+`;
+		expect( messagesFor( source ) ).toEqual( [
+			{
+				line: 3,
+				message: expect.stringContaining(
+					'"description" value is cut off at " #"'
+				),
+			},
+		] );
+	} );
+
+	test( 'reports a " #" on a continuation line of a plain value', () => {
+		const source = `---
+name: testing
+description: Use when tagging
+  tests #slow.
+---
+`;
+		expect( messagesFor( source ) ).toEqual( [
+			{
+				line: 4,
+				message: expect.stringContaining(
+					'"description" value is cut off'
+				),
+			},
+		] );
+	} );
+
+	test( 'accepts "#" inside quoted values, block scalars, and words', () => {
+		const source = `---
+name: testing
+description: 'Use when tagging tests #slow, or for C# and issue#1.'
+---
+`;
+		expect( messagesFor( source ) ).toEqual( [] );
+		expect(
+			messagesFor( `---
+name: testing
+description: >-
+  Use when tagging
+  tests #slow.
+---
+` )
+		).toEqual( [] );
+		expect(
+			messagesFor( `---
+name: testing
+description: Use for C# tests and issue#1.
+---
+` )
+		).toEqual( [] );
+	} );
+
 	test( 'rejects duplicate fields', () => {
 		const source = `---
 name: testing

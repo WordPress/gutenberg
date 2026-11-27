@@ -8,4 +8,4 @@ Run `npm run agents:setup` from the repository root to generate compatibility vi
 
 ## Validation
 
-Run `npm run lint:skills` from the repository root to check the YAML frontmatter of every `.agents/skills/*/SKILL.md` file. It reports invalid YAML, a missing or malformed `name` or `description`, a `name` that does not match the skill's directory, and any field other than `name` and `description`, following the [skill conventions](../../docs/contributors/code/agents-and-skills.md#skill-conventions). It runs in CI and on commit when skill files change.
+Run `npm run lint:skills` from the repository root to check the YAML frontmatter of every `.agents/skills/*/SKILL.md` file. It reports invalid YAML, an unquoted ` #` that turns the rest of a value into a comment, a missing or malformed `name` or `description`, a `name` that does not match the skill's directory, and any field other than `name` and `description`, following the [skill conventions](../../docs/contributors/code/agents-and-skills.md#skill-conventions). It runs in CI and on commit when skill files change.
