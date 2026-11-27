@@ -140,7 +140,7 @@ const transforms = {
 					return converted !== null;
 				} );
 			},
-			transform: ( {}, innerBlocks ) => {
+			transform: ( { citation }, innerBlocks ) => {
 				const paragraphs = innerBlocks.flatMap( ( innerBlock ) => {
 					// If already a paragraph, use it directly
 					if ( innerBlock.name === 'core/paragraph' ) {
@@ -151,8 +151,14 @@ const transforms = {
 						switchToBlockType( innerBlock, 'core/paragraph' ) || []
 					);
 				} );
-				const content = paragraphs
-					.map( ( { attributes } ) => attributes.content || '' )
+				const lines = paragraphs.map(
+					( { attributes } ) => attributes.content || ''
+				);
+				const content = (
+					RichText.isEmpty( citation )
+						? lines
+						: [ ...lines, citation ]
+				)
 					.filter( Boolean )
 					.join( '<br>' );
 				return createBlock( 'core/verse', { content } );
