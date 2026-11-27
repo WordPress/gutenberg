@@ -4,8 +4,8 @@ Logos for the AI tools in the MCP setup guide. Logos are trademarks of their own
 
 | File | Source |
 | --- | --- |
-| `claude-code.svg` | Claude favicon, https://claude.ai/favicon.svg |
-| `anthropic.svg` | Anthropic mark from [Simple Icons](https://simpleicons.org/) (CC0), since Anthropic publishes no downloadable vector kit |
+| `claude-code.svg` | The spark from the Claude Code logo in the [Anthropic press kit](https://www.anthropic.com/press-kit), cropped from the wordmark so it fits a square tile |
+| `anthropic.svg` | Anthropic symbol (Slate) from the [Anthropic press kit](https://www.anthropic.com/press-kit) |
 | `openai.svg` | OpenAI favicon, https://openai.com/favicon.svg, with its light and dark theme variables fixed to the light variant |
 | `cursor.svg` | Cursor favicon, https://cursor.com/marketing-static/favicon.svg |
 | `vscode.svg` | [Visual Studio Code brand kit](https://code.visualstudio.com/brand) |
