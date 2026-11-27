@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87506](https://github.com/WordPress/gutenberg/issues/87506)).
 -   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
 -   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
