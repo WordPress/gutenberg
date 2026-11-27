@@ -39,6 +39,24 @@ describe( 'transforms', () => {
 				sizeSlug: {
 					type: 'string',
 				},
+				align: {
+					type: 'string',
+				},
+				lightbox: {
+					type: 'object',
+				},
+				aspectRatio: {
+					type: 'string',
+				},
+				scale: {
+					type: 'string',
+				},
+				metadata: {
+					type: 'object',
+				},
+				style: {
+					type: 'object',
+				},
 			},
 			save: () => {},
 			category: 'media',
@@ -160,6 +178,31 @@ describe( 'transforms', () => {
 		expect( transformedBlocks[ 0 ] ).toMatchObject( {
 			name: 'core/group',
 			attributes: { layout: { type: 'grid' } },
+		} );
+	} );
+
+	it( 'keeps every image attribute when transforming Gallery to Image', () => {
+		const imageAttributes = {
+			url: 'https://example.com/one.jpg',
+			alt: 'One',
+			id: 1,
+			sizeSlug: 'large',
+			lightbox: { enabled: true },
+			aspectRatio: '16/9',
+			scale: 'cover',
+			metadata: { name: 'Hero shot' },
+			style: { border: { radius: '12px' } },
+		};
+		const block = createBlock( 'core/gallery', { align: 'wide' }, [
+			createBlock( 'core/image', imageAttributes ),
+		] );
+
+		const transformedBlocks = switchToBlockType( block, 'core/image' );
+
+		expect( transformedBlocks ).toHaveLength( 1 );
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/image',
+			attributes: { ...imageAttributes, align: 'wide' },
 		} );
 	} );
 

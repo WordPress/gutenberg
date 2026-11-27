@@ -263,40 +263,8 @@ const transforms = {
 			isMatch: ( { dynamicContent } ) => ! dynamicContent,
 			transform: ( { align }, innerBlocks ) => {
 				if ( innerBlocks.length > 0 ) {
-					return innerBlocks.map(
-						( {
-							attributes: {
-								url,
-								alt,
-								caption,
-								title,
-								href,
-								rel,
-								linkClass,
-								id,
-								sizeSlug: imageSizeSlug,
-								linkDestination,
-								linkTarget,
-								anchor,
-								className,
-							},
-						} ) =>
-							createBlock( 'core/image', {
-								align,
-								url,
-								alt,
-								caption,
-								title,
-								href,
-								rel,
-								linkClass,
-								id,
-								sizeSlug: imageSizeSlug,
-								linkDestination,
-								linkTarget,
-								anchor,
-								className,
-							} )
+					return innerBlocks.map( ( { attributes } ) =>
+						createBlock( 'core/image', { ...attributes, align } )
 					);
 				}
 				return createBlock( 'core/image', { align } );
