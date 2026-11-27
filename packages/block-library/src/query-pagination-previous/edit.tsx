@@ -1,7 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, PlainText } from '@wordpress/block-editor';
+import type { BlockEditProps } from '@wordpress/blocks';
+import type {
+	QueryPaginationPreviousAttributes,
+	QueryPaginationPreviousBlockContext,
+} from './types';
 
-const arrowMap = {
+const arrowMap: Record< string, string > = {
 	none: '',
 	arrow: '←',
 	chevron: '«',
@@ -11,8 +16,10 @@ export default function QueryPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
 	context: { paginationArrow, showLabel },
+}: BlockEditProps< QueryPaginationPreviousAttributes > & {
+	context: QueryPaginationPreviousBlockContext;
 } ) {
-	const displayArrow = arrowMap[ paginationArrow ];
+	const displayArrow = arrowMap[ paginationArrow! ];
 	return (
 		<a
 			href="#pagination-previous-pseudo-link"
