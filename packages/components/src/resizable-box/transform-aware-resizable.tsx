@@ -1,6 +1,7 @@
 import { Resizable } from 're-resizable';
 import type { MouseEvent, TouchEvent } from 'react';
 import {
+	getAxisScale,
 	getHandleVector,
 	getResizeStep,
 	getViewportVectorTransform,
@@ -17,6 +18,7 @@ type TransformedDrag = {
 	matrix: LinearTransform;
 	handleElement: Element;
 	gain: number;
+	maxGain: number;
 	grab?: Point;
 	last?: { size: Size; handle: Point };
 	pointer?: Point;
@@ -31,6 +33,13 @@ type TransformedDrag = {
 const MIN_GAIN = 0.2;
 const MAX_GAIN = 2;
 const MAX_SETTLES = 10;
+
+// An ancestor that grows with a scaled-down box moves the handle by up to the
+// unscaled growth, so the gain can reach 1 / scale.
+function getMaxGain( matrix: LinearTransform ) {
+	const scale = getAxisScale( matrix );
+	return MAX_GAIN / Math.min( 1, scale.x, scale.y );
+}
 
 /**
  * Keeps the dragged handle under the pointer when the box or an ancestor is
@@ -67,6 +76,7 @@ export class TransformAwareResizable extends Resizable {
 				matrix,
 				handleElement: event.currentTarget,
 				gain: 1,
+				maxGain: getMaxGain( matrix ),
 				settles: 0,
 				isSettling: false,
 			};
@@ -128,7 +138,7 @@ export class TransformAwareResizable extends Resizable {
 			);
 			if ( gain !== undefined && gain < MIN_GAIN ) {
 				drag.cannotFollow = true;
-			} else if ( gain !== undefined && gain <= MAX_GAIN ) {
+			} else if ( gain !== undefined && gain <= drag.maxGain ) {
 				drag.gain = gain;
 			}
 		}
