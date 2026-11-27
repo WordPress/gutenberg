@@ -4,6 +4,10 @@
 
 ### Bug Fixes
 
+-   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
+-   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
+-   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
+-   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
 -   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
 -   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
 -   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
@@ -19,6 +23,7 @@
 -   Gallery: In a multiselection, hide the settings that only apply to the first gallery, such as Link, Detach, Source, Order by, Resolution, Open images in new tab, and Aspect ratio ([#87374](https://github.com/WordPress/gutenberg/pull/87374)).
 -   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
 -   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
+-   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
 
 ### Internal
 

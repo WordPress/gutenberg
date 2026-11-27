@@ -1,12 +1,16 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from 'react';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	privateApis as domPrivateApis,
+	type DOMPrivateApis,
+} from '@wordpress/dom';
 import { useEffect, useState, useMemo, forwardRef } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { PrivateBlockPopover } from '.';
 import { unlock } from '../../lock-unlock';
 import type { BlockPopoverCoverProps } from './types';
 
-const { getScreenTransform } = unlock( componentsPrivateApis );
+const { getViewportVectorTransform } =
+	unlock< DOMPrivateApis >( domPrivateApis );
 
 function BlockPopoverCover(
 	{
@@ -58,14 +62,14 @@ function CoverContainer( {
 	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
 	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
 	const [ matrix, setMatrix ] = useState( () =>
-		getScreenTransform( selectedElement )
+		getViewportVectorTransform( selectedElement )
 	);
 
 	useEffect( () => {
 		const update = () => {
 			setWidth( selectedElement.offsetWidth );
 			setHeight( selectedElement.offsetHeight );
-			setMatrix( getScreenTransform( selectedElement ) );
+			setMatrix( getViewportVectorTransform( selectedElement ) );
 		};
 		const resizeObserver = new window.ResizeObserver( update );
 		resizeObserver.observe( selectedElement, { box: 'border-box' } );

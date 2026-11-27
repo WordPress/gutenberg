@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
 -   Preserve explicitly saved registered custom attributes when migrating deprecated block content ([#85723](https://github.com/WordPress/gutenberg/pull/85723)).
 
 ### Internal

@@ -832,26 +832,15 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/breadcrumbs/edit.jsx": {
+	"packages/block-library/src/breadcrumbs/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
 		},
 		"no-restricted-syntax": {
 			"count": 3
 		},
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/breadcrumbs/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/button/constants.js": {
@@ -6293,14 +6282,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/caption.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/utils/deprecated-text-align-attributes.ts": {
 		"no-restricted-syntax": {
 			"count": 1
@@ -6311,73 +6292,19 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/html-renderer.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/media-control.jsx": {
+	"packages/block-library/src/utils/media-control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/poster-image.jsx": {
+	"packages/block-library/src/utils/poster-image.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/test/waveform-player-auto-init.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/waveform-player-dependency.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/waveform-player.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/waveform-utils.browser.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/waveform-player.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/utils/waveform-player.tsx": {
 		"no-restricted-syntax": {
 			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/waveform-utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/verse/deprecated.jsx": {
@@ -7730,27 +7657,8 @@
 			"count": 1
 		}
 	},
-	"packages/edit-site/src/components/post-list/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/post-list/quick-edit-modal.jsx": {
+	"packages/edit-site/src/components/post-list/quick-edit-modal.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/edit-site/src/components/post-list/use-notes-count.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -11789,11 +11697,6 @@
 	},
 	"packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/widgets/src/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
