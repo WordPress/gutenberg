@@ -5,6 +5,14 @@
 ### New Features
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+-   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 17.2.0 (2026-11-18)
 

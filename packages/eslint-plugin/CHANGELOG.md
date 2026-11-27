@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Add [`@wordpress/i18n-plural-placeholder`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-plural-placeholder.md) to the recommended i18n ruleset. It reports `_n()` and `_nx()` calls where neither string contains a placeholder for the number ([#87264](https://github.com/WordPress/gutenberg/pull/87264)).
+
 ### Enhancements
 
 -   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 
 ## 28.2.0 (2026-11-18)
 

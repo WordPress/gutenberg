@@ -110,7 +110,9 @@
 			"__experimentalSkipSerialization": true
 		},
 		"transform": {
-			"rotate": true
+			"rotate": true,
+			"translate": true,
+			"scale": true
 		},
 		"dimensions": {
 			"minWidth": true,

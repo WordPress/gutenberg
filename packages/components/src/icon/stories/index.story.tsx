@@ -37,7 +37,7 @@ WithAFunction.args = {
 		<img
 			width={ size }
 			height={ size }
-			src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+			src="wordpress-wmark.svg"
 			alt="WordPress"
 		/>
 	),
@@ -51,7 +51,7 @@ WithAFunction.parameters = {
     <img
       width={ size }
       height={ size }
-      src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+      src="wordpress-wmark.svg"
       alt="WordPress"
     />
   ) }

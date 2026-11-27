@@ -498,6 +498,40 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( options.nth( 2 ) ).toHaveAttribute( 'tabindex', '-1' );
 	} );
 
+	// A test for https://github.com/WordPress/gutenberg/issues/84044.
+	test( 'shows a focus ring on the scrolling tab panel', async ( {
+		admin,
+		page,
+		browserName,
+	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName !== 'firefox',
+			'Only Firefox makes a scrolling panel with focusable content a tab stop.'
+		);
+
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		await expect(
+			blockLibrary.getByRole( 'tab', { name: 'Blocks' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		const panel = blockLibrary.getByRole( 'tabpanel', { name: 'Blocks' } );
+		await expect( panel ).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			blockLibrary.getByRole( 'searchbox', { name: 'Search' } )
+		).toBeFocused();
+	} );
+
 	test( 'should insert block with the slash inserter when using multiple words', async ( {
 		admin,
 		editor,
@@ -1074,6 +1108,63 @@ test.describe( 'insert media from inserter', () => {
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
 <!-- /wp:image -->`
 		);
+	} );
+} );
+
+test.describe( 'insert a file from inserter', () => {
+	let uploadedFile;
+	let uploadedImage;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedFile = await requestUtils.uploadMedia(
+			'./assets/e2e-test-document.pdf'
+		);
+		uploadedImage = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test( 'lists only documents and inserts them as File blocks', async ( {
+		admin,
+		page,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+
+		await page.getByLabel( 'Block Inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Files' } ).click();
+		const fileItem = page.getByRole( 'button', {
+			name: uploadedFile.title.raw,
+		} );
+		await expect( fileItem ).toBeVisible();
+		// Images have their own category, so they are left out of Files.
+		await expect(
+			page.getByRole( 'button', { name: uploadedImage.title.raw } )
+		).toBeHidden();
+		await fileItem.click();
+		// Inserted from the library as is, so it keeps the attachment's id,
+		// is named after its title and, being a PDF, shows a preview.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/file',
+				attributes: {
+					id: uploadedFile.id,
+					href: uploadedFile.source_url,
+					fileName: uploadedFile.title.raw,
+					fileId: expect.stringMatching( /^wp-block-file--media-/ ),
+					displayPreview: true,
+				},
+			},
+		] );
 	} );
 } );
 
