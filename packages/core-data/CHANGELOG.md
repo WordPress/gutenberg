@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   `useResourcePermissions`: Deprecate the `status`, `isResolving` and `hasResolved` return values; check the permission values instead ([#87457](https://github.com/WordPress/gutenberg/pull/87457)).
+-   `useResourcePermissions`: Deprecate the `status`, `isResolving` and `hasResolved` return values; use the `canUser` selector with `useSelect` instead ([#87457](https://github.com/WordPress/gutenberg/pull/87457)).
 
 ### Bug Fixes
 

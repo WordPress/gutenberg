@@ -19,19 +19,19 @@ interface ResolutionDetails {
 	/**
 	 * Resolution status
 	 *
-	 * @deprecated Check the permission values instead.
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
 	 */
 	status: Status;
 	/**
 	 * Is the data still being resolved?
 	 *
-	 * @deprecated Check the permission values instead.
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
 	 */
 	isResolving: boolean;
 	/**
 	 * Is the data resolved by now?
 	 *
-	 * @deprecated Check the permission values instead.
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
 	 */
 	hasResolved: boolean;
 }
