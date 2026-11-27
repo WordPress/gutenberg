@@ -1319,24 +1319,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comments-pagination-numbers/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comments-pagination-numbers/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comments-pagination-numbers/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/comments-pagination-previous/edit.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1

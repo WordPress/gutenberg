@@ -1,11 +1,19 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import type { MouseEvent } from 'react';
+import type { PaginationItemProps } from './types';
 
-const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) =>
+const PaginationItem = ( {
+	content,
+	tag: Tag = 'a',
+	extraClass = '',
+}: PaginationItemProps ) =>
 	Tag === 'a' ? (
 		<Tag
 			className={ `page-numbers ${ extraClass }` }
 			href="#comments-pagination-numbers-pseudo-link"
-			onClick={ ( event ) => event.preventDefault() }
+			onClick={ ( event: MouseEvent< HTMLAnchorElement > ) =>
+				event.preventDefault()
+			}
 		>
 			{ content }
 		</Tag>
