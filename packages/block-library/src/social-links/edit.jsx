@@ -79,38 +79,41 @@ export function SocialLinksEdit( props ) {
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
 	useEffect( () => {
-		if ( logosOnly ) {
-			let restore;
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( ( prev ) => {
-				// Redo replays an already cleared background. Keep nothing to
-				// restore then, so a later Undo isn't overwritten.
-				if (
-					prev.iconBackgroundColor ||
-					prev.iconBackgroundColorValue ||
-					prev.customIconBackgroundColor
-				) {
-					restore = {
-						iconBackgroundColor: prev.iconBackgroundColor,
-						iconBackgroundColorValue: prev.iconBackgroundColorValue,
-						customIconBackgroundColor:
-							prev.customIconBackgroundColor,
-					};
-				}
-				return {
-					iconBackgroundColor: undefined,
-					iconBackgroundColorValue: undefined,
-					customIconBackgroundColor: undefined,
-				};
-			} );
-
-			return () => {
-				if ( restore ) {
-					__unstableMarkNextChangeAsNotPersistent();
-					setAttributes( restore );
-				}
-			};
+		if ( ! logosOnly ) {
+			return;
 		}
+
+		let restore;
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( ( prev ) => {
+			// Redo replays an already cleared background. Keep nothing to
+			// restore then, so a later Undo isn't overwritten.
+			const {
+				iconBackgroundColor: bg,
+				iconBackgroundColorValue: bgValue,
+				customIconBackgroundColor: customBg,
+			} = prev;
+			if ( bg || bgValue || customBg ) {
+				restore = {
+					iconBackgroundColor: bg,
+					iconBackgroundColorValue: bgValue,
+					customIconBackgroundColor: customBg,
+				};
+			}
+			return {
+				iconBackgroundColor: undefined,
+				iconBackgroundColorValue: undefined,
+				customIconBackgroundColor: undefined,
+			};
+		} );
+
+		return () => {
+			if ( ! restore ) {
+				return;
+			}
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( restore );
+		};
 	}, [ logosOnly, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	// Fallback color values are used maintain selections in case switching
