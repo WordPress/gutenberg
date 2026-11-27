@@ -31,6 +31,7 @@
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
+-   Paste: Keep the nested lists of both list items when pasting a copied list item into another list item, and paste into an empty list item instead of doing nothing ([#84115](https://github.com/WordPress/gutenberg/pull/84115)).
 -   Block popover: Turn the resize handles and spacing visualizers with a rotated or scaled block ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 -   Block toolbar: Show the toolbar of a block inside a tilted container above the container, lined up with the selected block. A quarter turn in the plane of the page keeps the toolbar in place ([#86885](https://github.com/WordPress/gutenberg/pull/86885)).
 -   In-between inserter: Insert in the gap under the pointer between the children of a rotated, moved or scaled container ([#86892](https://github.com/WordPress/gutenberg/pull/86892)).
@@ -38,14 +39,11 @@
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
-
-### Bug Fixes
-
--   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 
 ## 20.1.0 (2026-11-18)
 
