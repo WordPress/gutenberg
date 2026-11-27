@@ -61,14 +61,6 @@
 	padding-top: 24px;
 }
 
-/* Storybook's docs link color would otherwise win over the button's text color. */
-.root .install,
-.root .install:visited,
-.root .install:hover {
-	color: var(--wp-ui-button-foreground-color);
-	text-decoration: none;
-}
-
 .root .steps {
 	margin: 16px 0 40px;
 	padding: 0;

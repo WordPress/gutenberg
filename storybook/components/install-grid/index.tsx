@@ -37,7 +37,7 @@ const RAYCAST_URL = `raycast://mcp/install?${ encodeURIComponent(
 ) }`;
 
 const CURSOR_URL = `https://cursor.com/en-US/install-mcp?name=${ SERVER_NAME }&config=${ btoa(
-        JSON.stringify( { command: [ 'npx', ...PACKAGE_ARGS ].join( ' ' ) } )
+	JSON.stringify( { command: [ 'npx', ...PACKAGE_ARGS ].join( ' ' ) } )
 ) }`;
 
 type Link = {
@@ -66,8 +66,6 @@ type Tool = ToolBase &
 	);
 
 const CLI_ARGS = `wordpress-design-system -- npx ${ PACKAGE_ARGS.join( ' ' ) }`;
-
-const RESTART = 'Restart the tool so it picks up the new server.';
 
 const TOOLS: Tool[] = [
 	{
@@ -205,7 +203,7 @@ const TOOLS: Tool[] = [
 		config: JSON_CONFIG,
 		steps: [
 			'Add the configuration above to your MCP client’s configuration (`mcp.json` or equivalent), as described in the [MCP documentation](https://modelcontextprotocol.io/docs/develop/connect-local-servers).',
-			RESTART,
+			'Restart the tool so it picks up the new server.',
 		],
 	},
 ];
@@ -300,7 +298,8 @@ export function InstallGrid() {
 							</a>
 						) : (
 							<ButtonLink
-								className={ styles.install }
+								// Storybook leaves `.sb-unstyled` links alone.
+								className="sb-unstyled"
 								href={ tool.install.href }
 								variant="solid"
 								tone="brand"
