@@ -1,4 +1,4 @@
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PluginPrePublishPanel } from '@wordpress/editor';
 import CompactList from '../../components/compact-list';
@@ -28,11 +28,11 @@ export default function InstalledBlocksPrePublishPanel() {
 			initialOpen
 		>
 			<p className="installed-blocks-pre-publish-panel__copy">
-				{ _n(
-					'The following block has been added to your site.',
-					'The following blocks have been added to your site.',
-					newBlockTypes.length
-				) }
+				{ newBlockTypes.length === 1
+					? __( 'The following block has been added to your site.' )
+					: __(
+							'The following blocks have been added to your site.'
+						) }
 			</p>
 			<CompactList items={ newBlockTypes } />
 		</PluginPrePublishPanel>
