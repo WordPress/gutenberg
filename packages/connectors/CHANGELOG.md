@@ -8,5 +8,6 @@
 
 ### Internal
 
+-   Replace `@wordpress/components` usage with `@wordpress/ui` components. ([#85193](https://github.com/WordPress/gutenberg/pull/85193))
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

@@ -26,7 +26,7 @@ const TEST_PROVIDER_DESCRIPTION = 'A test AI provider for E2E testing.';
 
 const getConnectorCardByName = ( page, name ) =>
 	page
-		.locator( '.components-item' )
+		.locator( '.connector-item' )
 		.filter( {
 			has: page.getByRole( 'heading', { name, level: 2 } ),
 		} )
