@@ -124,7 +124,7 @@ describe( 'CustomGradientPicker', () => {
 				} )
 			).toHaveFocus();
 
-			// The second press ties the points; the third passes the other one.
+			// The first press ties the points; the second passes the other one.
 			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
 
 			expect( onChange ).toHaveBeenLastCalledWith(
@@ -133,6 +133,32 @@ describe( 'CustomGradientPicker', () => {
 			expect(
 				screen.getByRole( 'button', {
 					name: /position 70% with color code rgb\(255,0,0\)/,
+				} )
+			).toHaveFocus();
+		} );
+
+		it( 'keeps focus on a moved control point that ties an identical one', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ControlledCustomGradientPicker initialValue="linear-gradient(90deg,#ff0000 40%,#0000ff 50%,#ff0000 50%)" />
+			);
+			const points = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+			points[ 2 ].focus();
+
+			await user.keyboard( '[ArrowLeft]' );
+
+			// The stable sort keeps the moved point after the identical one.
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /Gradient control point/,
+				} )[ 1 ]
+			).toHaveFocus();
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code rgb\(0,0,255\)/,
 				} )
 			).toHaveFocus();
 		} );
@@ -495,6 +521,39 @@ describe( 'CustomGradientBar', () => {
 			{ position: KEYBOARD_CONTROL_POINT_VARIATION, color: 'rgb(0,0,0)' },
 			POINTS[ 1 ],
 		] );
+	} );
+
+	it( 'does not move focus back to a moved control point after focus leaves it', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const points = [
+			{ position: 30, color: 'rgb(255,0,0)' },
+			{ position: 70, color: 'rgb(0,0,255)' },
+		];
+		const props = {
+			background: 'linear-gradient(90deg, red, blue)',
+			hasGradient: true,
+			onChange,
+		};
+		const view = await render(
+			<CustomGradientBar { ...props } value={ points } />
+		);
+		const [ red, blue ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		red.focus();
+		await user.keyboard( '[ArrowRight]' );
+		blue.focus();
+
+		// The parent applies the move after focus has left the moved point.
+		await view.rerender(
+			<CustomGradientBar
+				{ ...props }
+				value={ [ { ...points[ 0 ], position: 40 }, points[ 1 ] ] }
+			/>
+		);
+
+		expect( blue ).toHaveFocus();
 	} );
 
 	it( 'moves a control point when dragged from above its handle', async () => {

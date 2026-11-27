@@ -4,6 +4,7 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	forwardRef,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 	useState,
 	useMemo,
@@ -123,6 +124,20 @@ function GradientColorPickerDropdown( {
 	);
 }
 
+type KeyboardMove = {
+	button: HTMLButtonElement;
+	point: ControlPoint;
+	rank: number;
+};
+
+function isSamePoint( first: ControlPoint, second: ControlPoint ) {
+	return (
+		first.position === second.position &&
+		colord( first.color ).toRgbString() ===
+			colord( second.color ).toRgbString()
+	);
+}
+
 function ControlPoints( {
 	disableRemove,
 	disableAlpha,
@@ -191,9 +206,10 @@ function ControlPoints( {
 	}, [] );
 
 	const buttonsRef = useRef< ( HTMLButtonElement | null )[] >( [] );
-	const keyboardMovedPointRef = useRef< ControlPoint >( undefined );
+	const keyboardMoveRef = useRef< KeyboardMove >( undefined );
 
 	const moveControlPointWithKeyboard = (
+		button: HTMLButtonElement,
 		index: number,
 		position: number
 	) => {
@@ -202,34 +218,37 @@ function ControlPoints( {
 			index,
 			position
 		);
-		keyboardMovedPointRef.current = newControlPoints[ index ];
+		const point = newControlPoints[ index ];
+		keyboardMoveRef.current = {
+			button,
+			point,
+			// A stable sort keeps identical points in this order.
+			rank: newControlPoints
+				.slice( 0, index )
+				.filter( ( other ) => isSamePoint( other, point ) ).length,
+		};
 		onChange( newControlPoints );
 	};
 
-	// Sorting the new value can give the moved point another index. Its
-	// focused button keeps the old index, so move focus to the moved point.
-	useEffect( () => {
-		const movedPoint = keyboardMovedPointRef.current;
-		keyboardMovedPointRef.current = undefined;
-		if ( ! movedPoint ) {
-			return;
-		}
-		const buttons = buttonsRef.current;
-		const focusedIndex = buttons.findIndex(
-			( button ) =>
-				!! button && button === button.ownerDocument.activeElement
-		);
-		const isMovedPoint = ( point?: ControlPoint ) =>
-			point?.position === movedPoint.position &&
-			colord( point.color ).toRgbString() ===
-				colord( movedPoint.color ).toRgbString();
+	// Sorting the new value can give the moved point another index, but the
+	// focused button keeps the old index. Move focus to the moved point.
+	useLayoutEffect( () => {
+		const move = keyboardMoveRef.current;
+		keyboardMoveRef.current = undefined;
 		if (
-			focusedIndex === -1 ||
-			isMovedPoint( controlPoints[ focusedIndex ] )
+			! move ||
+			move.button !== move.button.ownerDocument.activeElement
 		) {
 			return;
 		}
-		buttons[ controlPoints.findIndex( isMovedPoint ) ]?.focus();
+		const targetIndex = controlPoints
+			.map( ( point, index ) =>
+				isSamePoint( point, move.point ) ? index : -1
+			)
+			.filter( ( index ) => index !== -1 )[ move.rank ];
+		if ( targetIndex !== undefined ) {
+			buttonsRef.current[ targetIndex ]?.focus();
+		}
 	}, [ controlPoints ] );
 
 	return (
@@ -312,6 +331,7 @@ function ControlPoints( {
 											// to another editor area.
 											event.stopPropagation();
 											moveControlPointWithKeyboard(
+												event.currentTarget,
 												index,
 												clampPercent(
 													point.position -
@@ -325,6 +345,7 @@ function ControlPoints( {
 											// to another editor area.
 											event.stopPropagation();
 											moveControlPointWithKeyboard(
+												event.currentTarget,
 												index,
 												clampPercent(
 													point.position +
