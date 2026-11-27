@@ -257,3 +257,88 @@
 	inline-size: 100%;
 	justify-content: space-between;
 }
+
+/*
+ * Temporary: two layouts to compare with the one above, where each row
+ * decides on its own whether its details fit next to its name. See
+ * `file-row-layouts.story.tsx`.
+ *
+ * In both, the thumbnail and the remove button align with the first line of
+ * the name, as the media and actions do in a DataViews table.
+ */
+.layout-stacked .name,
+.layout-inline .name {
+	padding-block-start: calc((var(--wpds-dimension-size-sm) - var(--wpds-typography-line-height-xs)) / 2);
+}
+
+/*
+ * In the single-file drop area, the remove button sits outside the picker
+ * button, so it moves down by the picker button's padding.
+ */
+.surface:has(.layout-stacked, .layout-inline) > .remove {
+	margin-block-start: var(--file-picker-padding-block);
+}
+
+/* Option A: the details are always below the name. */
+.layout-stacked .text {
+	flex-direction: column;
+	flex-wrap: nowrap;
+	align-items: flex-start;
+}
+
+.layout-stacked .name {
+	flex: none;
+}
+
+/* Keep the second line's height while a progress bar takes its place. */
+.layout-stacked .trailing {
+	min-block-size: var(--wpds-typography-line-height-xs);
+}
+
+/*
+ * Option B: the details always share the name's first line, and only the name
+ * wraps. The name's line keeps the height of the thumbnail, so a row with a
+ * short name is as tall as an input.
+ */
+.layout-inline {
+	container-type: inline-size;
+}
+
+.layout-inline .text {
+	flex-wrap: nowrap;
+	align-items: flex-start;
+}
+
+.layout-inline .name {
+	flex: 1 1 0;
+	min-inline-size: 0;
+	padding-block-end: calc((var(--wpds-dimension-size-sm) - var(--wpds-typography-line-height-xs)) / 2);
+}
+
+.layout-inline .trailing {
+	flex: none;
+	flex-wrap: nowrap;
+	min-block-size: var(--wpds-dimension-size-sm);
+}
+
+/*
+ * In a narrow field, the details would leave the name too little room, so
+ * every row puts them below the name, as in option A. The field's width
+ * decides this, not the name, so all rows in a list change together.
+ */
+@container (inline-size < 400px) {
+	.layout-inline .text {
+		flex-direction: column;
+	}
+
+	.layout-inline .name {
+		flex: none;
+		inline-size: 100%;
+		padding-block-end: 0;
+	}
+
+	.layout-inline .trailing {
+		flex-wrap: wrap;
+		min-block-size: var(--wpds-typography-line-height-xs);
+	}
+}

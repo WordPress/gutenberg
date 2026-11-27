@@ -53,6 +53,22 @@ export function getExtension( name: string ) {
 }
 
 /**
+ * How a row lays out its name and details. Temporary, to compare layouts for
+ * long names. See `file-row-layouts.story.tsx`.
+ *
+ * - `wrap`: the details share the name's line while both fit, and move below
+ *   it otherwise. Each row decides on its own.
+ * - `stacked`: the details are always below the name.
+ * - `inline`: the details always share the name's first line, and only the
+ *   name wraps. In a narrow field, every row switches to `stacked`.
+ */
+export type FileRowLayout = 'wrap' | 'stacked' | 'inline';
+
+function getLayoutClassName( layout: FileRowLayout ) {
+	return layout === 'wrap' ? '' : styles[ `layout-${ layout }` ];
+}
+
+/**
  * Shows a thumbnail for an image, or a file icon for any other file. The
  * preview URL is revoked when the file changes.
  *
@@ -122,19 +138,27 @@ function FileDetails( {
  *
  * It renders only phrasing content, so it can be the content of a button.
  */
-export function FileSummary( { file }: { file: File } ) {
+export function FileSummary( {
+	file,
+	layout = 'wrap',
+}: {
+	file: File;
+	layout?: FileRowLayout;
+} ) {
 	return (
 		<Stack
 			render={ <span /> }
 			direction="row"
-			align="center"
+			align={ layout === 'wrap' ? 'center' : 'flex-start' }
 			gap="sm"
-			className={ styles.summary }
+			className={ `${ styles.summary } ${ getLayoutClassName( layout ) }` }
 		>
 			<FileThumbnail file={ file } />
 			<span className={ styles.text }>
 				<Text className={ styles.name }>{ file.name }</Text>
-				<FileDetails file={ file } />
+				<span className={ styles.trailing }>
+					<FileDetails file={ file } />
+				</span>
 			</span>
 		</Stack>
 	);
@@ -172,6 +196,8 @@ export const SelectedFile = forwardRef<
 		actions?: React.ReactNode;
 		/** Whether the remove button is disabled. */
 		disabled?: boolean;
+		/** How the name and details are laid out. Defaults to `wrap`. */
+		layout?: FileRowLayout;
 	}
 >( function UnforwardedSelectedFile(
 	{
@@ -183,15 +209,18 @@ export const SelectedFile = forwardRef<
 		progress,
 		actions,
 		disabled,
+		layout = 'wrap',
 	},
 	ref
 ) {
 	return (
 		<Stack
 			direction="row"
-			align="center"
+			align={ layout === 'wrap' ? 'center' : 'flex-start' }
 			gap="sm"
-			className={ `${ styles.surface } ${ styles.row }` }
+			className={ `${ styles.surface } ${
+				styles.row
+			} ${ getLayoutClassName( layout ) }` }
 		>
 			<FileThumbnail file={ file } />
 			<div className={ styles.text }>
