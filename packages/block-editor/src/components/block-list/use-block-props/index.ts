@@ -46,7 +46,8 @@ function useGhostMaterialize(
 	rootClientId: string | null | undefined,
 	ghostBlock: Block | undefined
 ) {
-	const { insertBlocks } = useDispatch( blockEditorStore );
+	const { insertBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect< HTMLElement >(
 		( element ) => {
@@ -60,8 +61,11 @@ function useGhostMaterialize(
 			function materialize() {
 				// One gesture fires both events; insert once.
 				remove();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				// Update the selection: the ghost is empty, so the caret
-				// can only be at its start, and the undo level records it.
+				// can only be at its start.
 				insertBlocks(
 					// The listeners are only added for a ghost block.
 					[ ghostBlock! ],
@@ -75,7 +79,12 @@ function useGhostMaterialize(
 			element.addEventListener( 'focusin', materialize, true );
 			return remove;
 		},
-		[ ghostBlock, rootClientId, insertBlocks ]
+		[
+			ghostBlock,
+			rootClientId,
+			insertBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
 	);
 }
 

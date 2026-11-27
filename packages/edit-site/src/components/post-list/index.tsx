@@ -4,10 +4,12 @@ import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
+import type { Post } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import type { View } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
@@ -31,19 +33,31 @@ import { QuickEditModal } from './quick-edit-modal';
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
-const EMPTY_ARRAY = [];
+/**
+ * A post as listed, with the hierarchy level the REST API adds when ordering
+ * by hierarchy and the number of notes left on it, unset until that arrives.
+ */
+type PostListItem = Post & {
+	level?: number;
+	notesCount?: number;
+};
+
+const EMPTY_ARRAY: PostListItem[] = [];
+const EMPTY_IDS: number[] = [];
+
+const NOTES_COUNT_FIELD = 'notesCount';
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
-function getItemId( item ) {
+function getItemId( item: Post ) {
 	return item.id.toString();
 }
 
-function getItemLevel( item ) {
-	return item.level;
+function getItemLevel( item: PostListItem ) {
+	return item.level as number;
 }
 
-export default function PostList( { postType } ) {
+export default function PostList( { postType }: { postType: string } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
@@ -64,14 +78,18 @@ export default function PostList( { postType } ) {
 		kind: 'postType',
 		name: postType,
 		slug: 'default',
-		defaultView,
+		// The route resolves the view config before the list renders.
+		defaultView: defaultView as View,
 		defaultLayouts,
 		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
 		},
-		onChangeQueryParams: ( newQueryParams ) => {
+		onChangeQueryParams: ( newQueryParams: {
+			page?: number;
+			search?: string;
+		} ) => {
 			history.navigate(
 				addQueryArgs( path, {
 					...query,
@@ -82,7 +100,7 @@ export default function PostList( { postType } ) {
 		},
 	} );
 
-	const onChangeView = useEvent( ( newView ) => {
+	const onChangeView = useEvent( ( newView: View ) => {
 		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
@@ -90,9 +108,11 @@ export default function PostList( { postType } ) {
 		}
 	} );
 
-	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
+	const [ selection, setSelection ] = useState< string[] >(
+		postId?.split( ',' ) ?? []
+	);
 	const onChangeSelection = useCallback(
-		( items ) => {
+		( items: string[] ) => {
 			setSelection( items );
 			history.navigate(
 				addQueryArgs( path, {
@@ -112,7 +132,7 @@ export default function PostList( { postType } ) {
 	} );
 
 	const queryArgs = useMemo( () => {
-		const filters = {};
+		const filters: Record< string, any > = {};
 		view.filters?.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
@@ -170,17 +190,34 @@ export default function PostList( { postType } ) {
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
 	const postIds = useMemo(
-		() => records?.map( ( record ) => record.id ) ?? [],
+		() => records?.map( ( record: Post ) => record.id ) ?? [],
 		[ records ]
 	);
-	const { notesCount, isLoading: isLoadingNotesCount } =
-		useNotesCount( postIds );
+	// The notes field exists only for post types that support notes.
+	const hasNotesField = fields.some(
+		( field: { id: string } ) => field.id === NOTES_COUNT_FIELD
+	);
+	// Fetch the counts even when the field is hidden, since actions get them
+	// with the posts, but only wait for them when the field is shown.
+	const { notesCount, isLoading: isLoadingNotesCount } = useNotesCount(
+		hasNotesField ? postIds : EMPTY_IDS
+	);
+	const showsNotesCount =
+		hasNotesField &&
+		( !! view.fields?.includes( NOTES_COUNT_FIELD ) ||
+			( view.titleField === NOTES_COUNT_FIELD &&
+				view.showTitle !== false ) ||
+			( view.mediaField === NOTES_COUNT_FIELD &&
+				view.showMedia !== false ) ||
+			( view.descriptionField === NOTES_COUNT_FIELD &&
+				view.showDescription !== false ) ||
+			view.groupBy?.field === NOTES_COUNT_FIELD );
 
 	const data = useMemo(
-		() =>
-			records?.map( ( record ) => ( {
+		(): PostListItem[] | undefined =>
+			records?.map( ( record: Post ) => ( {
 				...record,
-				notesCount: notesCount[ record.id ] ?? 0,
+				notesCount: notesCount[ record.id ],
 			} ) ),
 		[ records, notesCount ]
 	);
@@ -227,6 +264,8 @@ export default function PostList( { postType } ) {
 	// user's view lives in preferences, which this does not touch.
 	const { invalidateResolution } = useDispatch( coreStore );
 	const refreshViewCounts = useCallback( () => {
+		// @ts-expect-error `getViewConfig` is private, so it is missing from the
+		// selector names `invalidateResolution` accepts.
 		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
 	}, [ invalidateResolution, postType ] );
 
@@ -257,7 +296,7 @@ export default function PostList( { postType } ) {
 
 	const openModal = () => setShowAddPostModal( true );
 	const closeModal = () => setShowAddPostModal( false );
-	const handleNewPage = ( { type, id } ) => {
+	const handleNewPage = ( { type, id }: { type: string; id: number } ) => {
 		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
 	};
@@ -305,7 +344,9 @@ export default function PostList( { postType } ) {
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
 				isLoading={
-					isLoadingData || isLoadingNotesCount || ! hasResolved
+					isLoadingData ||
+					! hasResolved ||
+					( showsNotesCount && isLoadingNotesCount )
 				}
 				view={ view }
 				onChangeView={ onChangeView }
