@@ -397,6 +397,19 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * The top-level keys whose value is a list of objects identified by a `name`.
+	 *
+	 * These are merged by that name rather than by their position in the list.
+	 *
+	 * @since 7.3.0
+	 * @var string[]
+	 */
+	const TOP_LEVEL_KEYS_MERGED_BY_NAME = array(
+		'customTemplates',
+		'templateParts',
+	);
+
+	/**
 	 * The valid properties under the settings key.
 	 *
 	 * @since 5.8.0 As `ALLOWED_SETTINGS`.
@@ -4814,7 +4827,22 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
-		$incoming_data    = $incoming->get_raw_data();
+		$incoming_data = $incoming->get_raw_data();
+
+		/*
+		 * `array_replace_recursive` merges sequential arrays by numeric index, so
+		 * a list of objects is merged by position: an incoming list that is shorter
+		 * than, or ordered differently from, the existing one overwrites unrelated
+		 * entries and drops the ones it does not reach. Merge the lists whose entries
+		 * carry a `name` by that name, and take them out of the positional merge.
+		 */
+		foreach ( static::TOP_LEVEL_KEYS_MERGED_BY_NAME as $key ) {
+			if ( isset( $this->theme_json[ $key ], $incoming_data[ $key ] ) ) {
+				$this->theme_json[ $key ] = self::merge_lists_by_name( $this->theme_json[ $key ], $incoming_data[ $key ] );
+				unset( $incoming_data[ $key ] );
+			}
+		}
+
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		/*
@@ -5876,6 +5904,41 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
+	}
+
+	/**
+	 * Merges two lists of objects identified by a `name`.
+	 *
+	 * Entries sharing a name are merged, with the incoming entry taking precedence
+	 * over the existing one. Entries that only one of the lists declares are kept,
+	 * in the order in which they first appear. Entries without a name are appended
+	 * unchanged, since there is nothing to match them on.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array $existing The existing list.
+	 * @param array $incoming The incoming list.
+	 * @return array The merged list.
+	 */
+	private static function merge_lists_by_name( $existing, $incoming ) {
+		// Without two lists there is nothing to match on, so the incoming value wins.
+		if ( ! is_array( $existing ) || ! is_array( $incoming ) ) {
+			return $incoming;
+		}
+
+		$named   = array();
+		$unnamed = array();
+		foreach ( array_merge( array_values( $existing ), array_values( $incoming ) ) as $item ) {
+			if ( ! is_array( $item ) || ! isset( $item['name'] ) || ! is_string( $item['name'] ) ) {
+				$unnamed[] = $item;
+				continue;
+			}
+
+			$name           = $item['name'];
+			$named[ $name ] = isset( $named[ $name ] ) ? array_merge( $named[ $name ], $item ) : $item;
+		}
+
+		return array_merge( array_values( $named ), $unnamed );
 	}
 
 	/**

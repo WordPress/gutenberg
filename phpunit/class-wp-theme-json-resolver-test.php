@@ -651,6 +651,32 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the template parts a child theme adds do not displace the ones
+	 * its parent declares.
+	 *
+	 * @ticket 66778
+	 *
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_theme_data
+	 */
+	public function test_child_theme_template_parts_do_not_replace_parent_template_parts() {
+		switch_theme( 'block-theme-child' );
+
+		$this->assertSame(
+			array(
+				'small-header' => array(
+					'title' => 'Small Header',
+					'area'  => 'header',
+				),
+				'small-footer' => array(
+					'title' => 'Small Footer',
+					'area'  => 'footer',
+				),
+			),
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_template_parts()
+		);
+	}
+
+	/**
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
 	 */
 	public function test_get_user_data_from_wp_global_styles_does_not_use_uncached_queries() {

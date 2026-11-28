@@ -4190,6 +4190,236 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	/**
+	 * Tests that template parts declared by the incoming data are matched to the
+	 * existing ones by name, instead of by their position in the list.
+	 *
+	 * @ticket 66778
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::merge
+	 */
+	public function test_merge_preserves_template_parts_missing_from_incoming_data() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'templateParts' => array(
+					array(
+						'name'  => 'header',
+						'title' => 'Header',
+						'area'  => 'header',
+					),
+					array(
+						'name'  => 'footer',
+						'title' => 'Footer',
+						'area'  => 'footer',
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'templateParts' => array(
+						array(
+							'name'  => 'footer-landing',
+							'title' => 'Footer (Landing Page)',
+							'area'  => 'footer',
+						),
+					),
+				)
+			)
+		);
+
+		$expected = array(
+			'header'         => array(
+				'title' => 'Header',
+				'area'  => 'header',
+			),
+			'footer'         => array(
+				'title' => 'Footer',
+				'area'  => 'footer',
+			),
+			'footer-landing' => array(
+				'title' => 'Footer (Landing Page)',
+				'area'  => 'footer',
+			),
+		);
+
+		$this->assertSameSetsWithIndex( $expected, $theme_json->get_template_parts() );
+	}
+
+	/**
+	 * Tests that a template part declared by the incoming data overrides the
+	 * existing one that shares its name, wherever either of them is listed.
+	 *
+	 * @ticket 66778
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::merge
+	 */
+	public function test_merge_overrides_template_parts_sharing_a_name_with_incoming_data() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'templateParts' => array(
+					array(
+						'name'  => 'header',
+						'title' => 'Header',
+						'area'  => 'header',
+					),
+					array(
+						'name'  => 'footer',
+						'title' => 'Footer',
+						'area'  => 'footer',
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'templateParts' => array(
+						array(
+							'name'  => 'footer',
+							'title' => 'Site Footer',
+							'area'  => 'footer',
+						),
+					),
+				)
+			)
+		);
+
+		$expected = array(
+			'header' => array(
+				'title' => 'Header',
+				'area'  => 'header',
+			),
+			'footer' => array(
+				'title' => 'Site Footer',
+				'area'  => 'footer',
+			),
+		);
+
+		$this->assertSameSetsWithIndex( $expected, $theme_json->get_template_parts() );
+	}
+
+	/**
+	 * Tests that entries which declare no name, and so cannot be matched to
+	 * anything, survive the merge instead of being dropped.
+	 *
+	 * @ticket 66778
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::merge
+	 */
+	public function test_merge_keeps_template_parts_that_declare_no_name() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'templateParts' => array(
+					array(
+						'title' => 'Nameless',
+						'area'  => 'footer',
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'       => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'templateParts' => array(
+						array(
+							'name'  => 'header',
+							'title' => 'Header',
+							'area'  => 'header',
+						),
+					),
+				)
+			)
+		);
+
+		$raw_data = $theme_json->get_raw_data();
+
+		$this->assertSame(
+			array(
+				array(
+					'name'  => 'header',
+					'title' => 'Header',
+					'area'  => 'header',
+				),
+				array(
+					'title' => 'Nameless',
+					'area'  => 'footer',
+				),
+			),
+			$raw_data['templateParts']
+		);
+	}
+
+	/**
+	 * Tests that custom templates declared by the incoming data are matched to
+	 * the existing ones by name, instead of by their position in the list.
+	 *
+	 * @ticket 66778
+	 *
+	 * @covers WP_Theme_JSON_Gutenberg::merge
+	 */
+	public function test_merge_preserves_custom_templates_missing_from_incoming_data() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'         => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'customTemplates' => array(
+					array(
+						'name'      => 'page-home',
+						'title'     => 'Homepage',
+						'postTypes' => array( 'page' ),
+					),
+					array(
+						'name'      => 'single-review',
+						'title'     => 'Review',
+						'postTypes' => array( 'post' ),
+					),
+				),
+			)
+		);
+
+		$theme_json->merge(
+			new WP_Theme_JSON_Gutenberg(
+				array(
+					'version'         => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'customTemplates' => array(
+						array(
+							'name'      => 'page-contact',
+							'title'     => 'Contact',
+							'postTypes' => array( 'page' ),
+						),
+					),
+				)
+			)
+		);
+
+		$expected = array(
+			'page-home'     => array(
+				'title'     => 'Homepage',
+				'postTypes' => array( 'page' ),
+			),
+			'single-review' => array(
+				'title'     => 'Review',
+				'postTypes' => array( 'post' ),
+			),
+			'page-contact'  => array(
+				'title'     => 'Contact',
+				'postTypes' => array( 'page' ),
+			),
+		);
+
+		$this->assertSameSetsWithIndex( $expected, $theme_json->get_custom_templates() );
+	}
+
 	public function test_merge_incoming_data_empty_presets() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
