@@ -20,7 +20,7 @@ export default function Edit(
 	} = props;
 	useDeprecatedTextAlign( props );
 	const blockProps = useBlockProps();
-	const [ content ] = useEntityProp< { rendered: string } >(
+	const [ content ] = useEntityProp< Comment[ 'content' ] >(
 		'root',
 		'comment',
 		'content',
