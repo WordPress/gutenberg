@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { compileInlineStyle } from '../compile-inline-style.mjs';
+import { compileStyleFile } from '../compile-style-file.mjs';
 
 async function compileStyleModule() {
 	return compileInlineStyle( { minify: false } )(
@@ -153,5 +154,45 @@ describe( 'compileInlineStyle', () => {
 				'var(--wpds-dimension-gap-md, 12px)'
 			);
 		} );
+	} );
+} );
+
+describe( 'compileStyleFile', () => {
+	let dir;
+
+	beforeEach( async () => {
+		dir = await mkdtemp( path.join( tmpdir(), 'wp-build-css-' ) );
+	} );
+
+	afterEach( async () => {
+		await rm( dir, { recursive: true, force: true } );
+	} );
+
+	test( 'names classes relative to the root, as the JavaScript build does', async () => {
+		const cssText = '.card { color: red; }';
+		const filePath = path.join( dir, 'style.module.css' );
+		await writeFile( filePath, cssText );
+
+		const source = await compileInlineStyle( {
+			cssModules: true,
+			minify: false,
+		} )( cssText, dir, filePath );
+		const fromBuildRoot = await compileStyleFile( filePath, {
+			workingDir: dir,
+			rootDir: process.cwd(),
+			minify: false,
+		} );
+		const fromOtherRoot = await compileStyleFile( filePath, {
+			workingDir: dir,
+			rootDir: dir,
+			minify: false,
+		} );
+
+		expect( source ).toContain(
+			`export default ${ JSON.stringify( fromBuildRoot.classNames ) };`
+		);
+		expect( fromOtherRoot.classNames.card ).not.toBe(
+			fromBuildRoot.classNames.card
+		);
 	} );
 } );
