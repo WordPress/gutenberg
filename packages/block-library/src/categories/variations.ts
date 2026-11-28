@@ -1,7 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { category as icon } from '@wordpress/icons';
+import type { BlockConfiguration } from '@wordpress/blocks';
+import type { CategoriesAttributes } from './types';
 
-const variations = [
+const variations: BlockConfiguration< CategoriesAttributes >[ 'variations' ] = [
 	{
 		name: 'terms',
 		title: __( 'Terms List' ),
