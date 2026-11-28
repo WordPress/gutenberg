@@ -18,7 +18,7 @@ import {
 	media as mediaIcon,
 } from '@wordpress/icons';
 import { compose } from '@wordpress/compose';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import MediaUpload from '../media-upload';
@@ -34,6 +34,24 @@ import type {
 
 const noop = () => {};
 let uniqueId = 0;
+
+// Tracks a flow remounted while the media modal is open (e.g. on viewport
+// resize), so focus can return to its toggle when the modal closes.
+let openModal: { container?: HTMLDivElement } | null = null;
+
+function trackRemountedFlow( container: HTMLDivElement | null ) {
+	if ( container && openModal ) {
+		openModal.container = container;
+	}
+}
+
+function focusRemountedFlow() {
+	const container = openModal?.container;
+	openModal = null;
+	if ( container?.isConnected ) {
+		focus.focusable.find( container )[ 0 ]?.focus();
+	}
+}
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -168,6 +186,7 @@ const MediaReplaceFlow = ( {
 
 	return (
 		<Dropdown
+			ref={ trackRemountedFlow }
 			popoverProps={ mergedPopoverProps }
 			className={ className }
 			contentClassName={ clsx(
@@ -207,11 +226,15 @@ const MediaReplaceFlow = ( {
 								onSelect={ ( media ) =>
 									selectMedia( media, onClose )
 								}
+								onClose={ focusRemountedFlow }
 								allowedTypes={ allowedTypes }
 								render={ ( { open } ) => (
 									<MenuItem
 										icon={ mediaIcon }
-										onClick={ open }
+										onClick={ () => {
+											openModal = {};
+											open();
+										} }
 									>
 										{ __( 'Open Media Library' ) }
 									</MenuItem>

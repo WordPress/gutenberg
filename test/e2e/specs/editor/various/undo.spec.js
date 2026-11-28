@@ -927,7 +927,7 @@ test.describe( 'Media Library modal undo', () => {
 		).toHaveCount( 1 );
 	} );
 
-	test( 'cleans up modal and backdrop when component unmounts', async ( {
+	test( 'keeps the modal open when the component unmounts and cleans it up on close', async ( {
 		editor,
 		page,
 	} ) => {
@@ -955,6 +955,12 @@ test.describe( 'Media Library modal undo', () => {
 				);
 			}
 		} );
+
+		// The modal outlives its component, e.g. when the block toolbar
+		// remounts, and is removed once it closes.
+		await expect( modal ).toBeVisible();
+
+		await page.locator( '.media-modal-close' ).click();
 
 		await expect( modal ).toHaveCount( 0 );
 		await expect( backdrop ).toHaveCount( 0 );
