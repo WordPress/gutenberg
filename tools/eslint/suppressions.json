@@ -1078,29 +1078,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comment-content/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-content/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-content/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-content/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/comment-date/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
