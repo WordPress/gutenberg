@@ -411,16 +411,30 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			 * registers them, so that both site editors offer the same blocks.
 			 * The function is only defined in the Gutenberg plugin.
 			 */
-			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.blockLibrary.__experimentalRegisterExperimentalCoreBlocks?.( { enableFSEBlocks: true } ); wp.editor.registerCoreBlockBindingsSources();';
+			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.blockLibrary.__experimentalRegisterExperimentalCoreBlocks?.( { enableFSEBlocks: true } );';
 			wp_add_inline_script(
 				'wp-block-library',
 				$load_blocks_scripts,
 				'after'
 			);
 
+			/*
+			 * The editor's bindings sources need both `wp-editor` and the blocks,
+			 * so they are registered by a script that depends on both. A page
+			 * doesn't load `wp-editor` up front: it comes with these assets.
+			 */
+			wp_register_script( 'gutenberg-core-block-bindings-sources', false, array( 'wp-editor', 'wp-block-library' ), false, true );
+			wp_add_inline_script(
+				'gutenberg-core-block-bindings-sources',
+				'wp.editor.registerCoreBlockBindingsSources();',
+				'after'
+			);
+
 			// Enqueue editor assets.
+			wp_enqueue_script( 'wp-editor' );
 			wp_enqueue_script( 'wp-format-library' );
 			wp_enqueue_script( 'wp-block-library' );
+			wp_enqueue_script( 'gutenberg-core-block-bindings-sources' );
 			wp_enqueue_style( 'wp-editor' );
 			wp_enqueue_style( 'wp-block-library' );
 			// Block editor UI outside the canvas, such as inspector controls.

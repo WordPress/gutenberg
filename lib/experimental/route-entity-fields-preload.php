@@ -1,6 +1,7 @@
 <?php
 /**
- * Preload paths for the entity fields of the routes of the experimental pages:
+ * Preload paths for the entity fields of the routes of the experimental pages,
+ * and the import map entries of their entity modules:
  * the extensible site editor and the media editor.
  *
  * @package gutenberg
@@ -136,3 +137,40 @@ function _gutenberg_preload_route_entity_fields() {
 }
 add_action( 'site-editor-v2_init', '_gutenberg_preload_route_entity_fields' );
 add_action( 'media-editor-wp-admin_init', '_gutenberg_preload_route_entity_fields' );
+
+/**
+ * Adds the script modules of the entity fields and actions to the import map
+ * of the experimental pages.
+ *
+ * The editor imports these modules on demand, through the import map of the
+ * page. `_wp_add_entity_modules_to_editor_script()` lists them on the
+ * `wp-editor` script, but these pages load `wp-editor` with the editor assets,
+ * after their import map is printed, and not every browser merges an import
+ * map added later (Firefox doesn't). Listing them as dynamic dependencies of
+ * the page only adds them to its import map: a module is fetched when it is
+ * imported.
+ *
+ * @param array $boot_dependencies Boot dependencies for the page.
+ * @return array Boot dependencies, with the entity modules added.
+ */
+function _gutenberg_add_entity_modules_to_boot_dependencies( $boot_dependencies ) {
+	foreach ( array( 'wp_get_all_registered_entity_field_modules', 'wp_get_all_registered_entity_action_modules' ) as $get_modules ) {
+		if ( ! function_exists( $get_modules ) ) {
+			continue;
+		}
+		foreach ( call_user_func( $get_modules ) as $entities ) {
+			foreach ( $entities as $modules ) {
+				foreach ( $modules as $module ) {
+					$boot_dependencies[] = array(
+						'import' => 'dynamic',
+						'id'     => $module,
+					);
+				}
+			}
+		}
+	}
+
+	return $boot_dependencies;
+}
+add_filter( 'site-editor-v2_boot_dependencies', '_gutenberg_add_entity_modules_to_boot_dependencies' );
+add_filter( 'media-editor-wp-admin_boot_dependencies', '_gutenberg_add_entity_modules_to_boot_dependencies' );

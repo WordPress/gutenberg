@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add the script modules of the loaded assets to the page as an import map of their own. Changing the text of the page's existing import map had no effect, so those modules could not be imported.
+
 ## 2.2.0 (2026-11-18)
 
 ## 2.1.0 (2026-11-04)

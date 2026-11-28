@@ -15,7 +15,13 @@ type InlineScript = string | string[];
 type ScriptModules = Record< string, string >;
 
 /**
- * Injects or extends the import map with new module entries.
+ * Adds module entries to the import map of the page.
+ *
+ * A browser reads an import map once, when it is added to the page, so
+ * changing the text of an existing map has no effect. The new entries are
+ * added as an import map of their own instead, which the browser merges into
+ * the page's. Entries the page already maps are left out: a later map can't
+ * change them.
  *
  * @param scriptModules - Object mapping module specifiers to URLs
  */
@@ -24,47 +30,33 @@ function injectImportMap( scriptModules: Record< string, string > ): void {
 		return;
 	}
 
-	// Find the existing import map script element
-	const existingMapElement = document.querySelector< HTMLScriptElement >(
-		'script#wp-importmap[type=importmap]'
-	);
-
-	if ( existingMapElement ) {
-		try {
-			// Parse the existing import map
-			const existingMap = JSON.parse( existingMapElement.text );
-
-			// Ensure the imports object exists
-			if ( ! existingMap.imports ) {
-				existingMap.imports = {};
+	const mapped = new Set< string >();
+	document
+		.querySelectorAll< HTMLScriptElement >( 'script[type=importmap]' )
+		.forEach( ( element ) => {
+			try {
+				Object.keys( JSON.parse( element.text ).imports ?? {} ).forEach(
+					( specifier ) => mapped.add( specifier )
+				);
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to parse import map:', error );
 			}
+		} );
 
-			// Merge new imports with existing ones (new entries take precedence)
-			existingMap.imports = {
-				...existingMap.imports,
-				...scriptModules,
-			};
-
-			// Update the script element's content
-			existingMapElement.text = JSON.stringify( existingMap, null, 2 );
-		} catch ( error ) {
-			// eslint-disable-next-line no-console
-			console.error( 'Failed to parse or update import map:', error );
-		}
-	} else {
-		// If no import map exists, create a new one
-		const script = document.createElement( 'script' );
-		script.type = 'importmap';
-		script.id = 'wp-importmap';
-		script.text = JSON.stringify(
-			{
-				imports: scriptModules,
-			},
-			null,
-			2
-		);
-		document.head.appendChild( script );
+	const imports = Object.fromEntries(
+		Object.entries( scriptModules ).filter(
+			( [ specifier ] ) => ! mapped.has( specifier )
+		)
+	);
+	if ( Object.keys( imports ).length === 0 ) {
+		return;
 	}
+
+	const script = document.createElement( 'script' );
+	script.type = 'importmap';
+	script.text = JSON.stringify( { imports }, null, 2 );
+	document.head.appendChild( script );
 }
 
 function loadStylesheet( handle: string, styleData: Style ): Promise< void > {

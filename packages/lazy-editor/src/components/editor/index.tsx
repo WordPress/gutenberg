@@ -4,9 +4,9 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { useEditorAssets } from '@wordpress/lazy-editor/assets';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
-import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
 const {

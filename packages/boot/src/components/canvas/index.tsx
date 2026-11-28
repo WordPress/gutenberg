@@ -111,8 +111,13 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	);
 
 	useEffect( () => {
-		// Dynamically import the lazy-editor module
-		import( '@wordpress/lazy-editor' )
+		/*
+		 * Load the editor assets first: they include `wp-editor`, whose global
+		 * the lazy-editor module reads as soon as it is imported.
+		 */
+		import( '@wordpress/lazy-editor/assets' )
+			.then( ( { loadEditorAssets } ) => loadEditorAssets() )
+			.then( () => import( '@wordpress/lazy-editor' ) )
 			.then( ( module ) => {
 				setEditor( () => module.Editor );
 			} )
