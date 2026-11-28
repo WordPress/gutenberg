@@ -262,6 +262,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						showHandle={ isSelected }
 					>
 						<object
+							key={ href }
 							className="wp-block-file__preview"
 							data={ href }
 							type="application/pdf"
