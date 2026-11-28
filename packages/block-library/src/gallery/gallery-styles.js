@@ -6,11 +6,10 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
 import { unlock } from '../lock-unlock';
 import { getGalleryResponsiveCSS } from './responsive-styles';
 
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 const { globalStylesDataKey } = unlock( blockEditorPrivateApis );
 const GALLERY_BLOCK_NAME = 'core/gallery';
 

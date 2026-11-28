@@ -15,6 +15,7 @@
 
 ### Internal
 
+-   Remove '@wordpress/private-apis' dependency and export internal utilities directly as regular package exports ([#86115](https://github.com/WordPress/gutenberg/pull/86115)).
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 
 ## 2.2.0 (2026-11-18)

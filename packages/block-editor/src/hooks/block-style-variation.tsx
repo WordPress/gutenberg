@@ -3,8 +3,10 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	getBlockSelectors,
-	privateApis as globalStylesEnginePrivateApis,
+	getVariationStyle,
+	transformToStylesWithTextClipBase,
 } from '@wordpress/global-styles-engine';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -15,10 +17,6 @@ import type {
 	OverrideStylesProps,
 	StyleOverrideOptions,
 } from './types';
-
-const { getVariationStyle, transformToStylesWithTextClipBase } = unlock(
-	globalStylesEnginePrivateApis
-);
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -258,7 +256,7 @@ function useBlockProps( {
 			return;
 		}
 
-		const variationConfig = { settings, styles };
+		const variationConfig = { settings, styles } as GlobalStylesConfig;
 		const blockSelectors = getBlockSelectors( getBlockTypes(), clientId );
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;

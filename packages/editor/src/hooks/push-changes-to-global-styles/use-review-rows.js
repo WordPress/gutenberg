@@ -1,9 +1,8 @@
 import { useMemo } from '@wordpress/element';
 import {
 	getValueFromVariable,
-	privateApis as globalStylesEnginePrivateApis,
+	resolveStyle,
 } from '@wordpress/global-styles-engine';
-import { unlock } from '../../lock-unlock';
 import { getStyleLabel } from './style-labels';
 import {
 	formatStyleValue,
@@ -12,8 +11,6 @@ import {
 	formatSpacingShorthand,
 	formatBlockGap,
 } from './format-style-value';
-
-const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Turns a raw style value into readable text, using the row's `format` hint so

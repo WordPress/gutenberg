@@ -1,7 +1,6 @@
 import { useMediaQuery } from '@wordpress/compose';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getViewportBreakpoints } from '@wordpress/global-styles-engine';
 import type { BlockVisibilityViewport } from './constants';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Viewport breakpoints keyed by viewport. Desktop has no breakpoint: it
@@ -20,12 +19,6 @@ export type BlockVisibility =
 	| {
 			viewport?: Partial< Record< BlockVisibilityViewport, boolean > >;
 	  };
-
-const { getViewportBreakpoints } = unlock< {
-	getViewportBreakpoints: (
-		viewportSettings?: ViewportBreakpoints
-	) => ViewportBreakpoints;
-} >( globalStylesEnginePrivateApis );
 
 type UseBlockVisibilityOptions = {
 	blockVisibility?: BlockVisibility;

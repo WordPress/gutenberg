@@ -5,7 +5,7 @@ import type { BlockType } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
 import { SelectControl } from '@wordpress/ui';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
@@ -30,8 +30,6 @@ import type {
 	ResetPositionProps,
 	ResponsivePositionCSSOptions,
 } from './types';
-
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 const POSITION_SUPPORT_KEY = 'position';
 

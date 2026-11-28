@@ -3,25 +3,25 @@ import { getValueFromObjectPath } from './utils/object';
 import { getVariationStyle } from './variation';
 import type { GlobalStylesConfig } from './types';
 
-type StyleTree = Record< string, any >;
+export type StyleTree = Record< string, any >;
 
-interface SelectedState {
+export interface SelectedState {
 	viewport?: string | null;
 	pseudoState?: string | null;
 }
 
-interface SourceDescriptor {
+export interface SourceDescriptor {
 	layer: string;
 }
 
-interface ResolvedStyle {
+export interface ResolvedStyle {
 	value: StyleTree;
 	sources: Record< string, SourceDescriptor >;
 }
 
 // Query describing which slice of `globalStyles` to resolve. Kept separate from
 // the styles data itself, which is the first argument to `resolveStyle`.
-interface ResolveStyleContext {
+export interface ResolveStyleContext {
 	blockName?: string | null;
 	// Slug of the active block style variation, if any. Its styles are resolved
 	// against `globalStyles` internally and folded in as the highest layer.
