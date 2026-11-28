@@ -9,6 +9,7 @@
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+-   Update `js-yaml` dependency from 3.15.2 to 5.5.0. The generated `docker-compose.yml` now quotes every string value; Docker Compose reads it the same way ([#87533](https://github.com/WordPress/gutenberg/pull/87533)).
 
 ## 12.2.0 (2026-11-18)
 
