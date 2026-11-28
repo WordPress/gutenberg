@@ -5,10 +5,6 @@
 			"package": "equivalent-key-map"
 		},
 		{
-			"comment": "moment-timezone's deep import (moment-timezone/moment-timezone.js) has no resolvable declarations and there is no @types/moment-timezone for it. Referenced in @wordpress/date's emitted .d.ts.",
-			"package": "moment-timezone"
-		},
-		{
 			"comment": "@wordpress/edit-site-init's build/index.cjs require()s @wordpress/boot, which exposes only an ESM `import` condition (no CJS entry). A real packaging mismatch to resolve separately.",
 			"specifier": "@wordpress/boot",
 			"surface": "runtime",
