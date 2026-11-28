@@ -58,6 +58,112 @@ test.describe( 'Post title', () => {
 		} );
 	} );
 
+	test.describe( 'Markdown handling', () => {
+		for ( const text of [
+			'# 3 reason why',
+			'## 見出しタイトル',
+			'**bold title** and _italic_',
+			'- list item',
+			'[link text](https://example.com)',
+			'> quoted title',
+		] ) {
+			test( `preserves pasted title text: ${ text }`, async ( {
+				editor,
+				admin,
+				pageUtils,
+			} ) => {
+				await admin.createNewPost();
+				const title = editor.canvas.getByRole( 'textbox', {
+					name: 'Add title',
+				} );
+
+				await title.focus();
+				pageUtils.setClipboardData( { plainText: text } );
+				await pageUtils.pressKeys( 'primary+v' );
+
+				await expect( title ).toHaveText( text );
+				await expect.poll( editor.getBlocks ).toEqual( [] );
+			} );
+		}
+
+		test( 'preserves title Markdown copied with decorative HTML', async ( {
+			editor,
+			admin,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await title.focus();
+			pageUtils.setClipboardData( {
+				plainText: '# Title',
+				html: '<span style="font-family: monospace"># Title</span>',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( title ).toHaveText( '# Title' );
+			await expect( title.locator( 'span' ) ).toBeHidden();
+		} );
+
+		test( 'keeps multiline title pastes split into title and body blocks', async ( {
+			editor,
+			admin,
+			page,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await title.focus();
+			pageUtils.setClipboardData( {
+				plainText: '# First title\n\n**Second paragraph**',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect( title ).toHaveText( '# First title' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '**Second paragraph**' },
+				},
+			] );
+
+			await editor.saveDraft();
+			await page.reload();
+			await expect( title ).toHaveText( '# First title' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '**Second paragraph**' },
+				},
+			] );
+		} );
+
+		test( 'inserts literal Markdown at the current title selection', async ( {
+			editor,
+			admin,
+			page,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await title.fill( 'ab' );
+			await page.keyboard.press( 'ArrowLeft' );
+			pageUtils.setClipboardData( { plainText: '**x**' } );
+			await pageUtils.pressKeys( 'primary+v' );
+			await page.keyboard.type( 'y' );
+
+			await expect( title ).toHaveText( 'a**x**yb' );
+		} );
+	} );
+
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
 			editor,

@@ -28,6 +28,7 @@
 -   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
 -   `DocumentTools`: Fix arrow key navigation in the toolbar below the medium breakpoint ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
 -   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+-   `PostTitle`: Preserve literal Markdown characters when pasting text into the post title ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
 
 ### Internal
 
