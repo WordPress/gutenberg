@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
@@ -208,6 +208,64 @@ describe( 'DataViews component', () => {
 			).toBeInTheDocument();
 		}
 	);
+
+	it( 'marks the triggers of modal actions as opening a dialog', async () => {
+		render(
+			<DataViewWrapper
+				actions={ [
+					{ ...actions[ 0 ], isPrimary: true },
+					{
+						id: 'duplicate',
+						label: 'Duplicate',
+						isPrimary: true,
+						callback: vi.fn(),
+					},
+					{ id: 'view', label: 'View', callback: vi.fn() },
+				] }
+				data={ [ data[ 0 ] ] }
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Duplicate' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+		const user = userEvent.setup();
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'View' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Delete…' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+	} );
+
+	it( 'marks the bulk triggers of modal actions as opening a dialog', () => {
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, type: LAYOUT_TABLE } }
+				actions={ [
+					...actions,
+					{
+						id: 'archive',
+						label: 'Archive',
+						supportsBulk: true,
+						callback: vi.fn(),
+					},
+				] }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			/>
+		);
+		// Neither is primary, so their only buttons are in the toolbar.
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Archive' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+	} );
 
 	it( 'renders header bulk actions once in a custom table composition', () => {
 		render(
@@ -1627,6 +1685,33 @@ describe( 'DataViews component', () => {
 					} )
 				).length
 			).toEqual( 3 );
+		} );
+
+		it( 'should move focus to the adjacent row when an item id is a prefix of another item id', async () => {
+			const user = userEvent.setup();
+			const items: Data[] = [
+				{ id: 1, title: 'One' },
+				{ id: 12, title: 'Twelve' },
+				{ id: 13, title: 'Thirteen' },
+			];
+			render(
+				<DataViewWrapper
+					view={ { type: 'list' } }
+					data={ items }
+					paginationInfo={ { totalItems: 3, totalPages: 1 } }
+					actions={ actions }
+				/>
+			);
+			const triggers = await screen.findAllByRole( 'button', {
+				name: 'Actions',
+			} );
+
+			act( () => triggers[ 2 ].focus() );
+			await user.keyboard( '{ArrowUp}' );
+			expect( triggers[ 1 ] ).toHaveFocus();
+
+			await user.keyboard( '{ArrowDown}' );
+			expect( triggers[ 2 ] ).toHaveFocus();
 		} );
 
 		describe.each( [

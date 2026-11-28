@@ -100,7 +100,10 @@ async function placeUserBCaret( editor2: Editor, page2: Page, index: number ) {
 }
 
 test.describe( 'Collaboration - Awareness Avatar Visibility While Typing', () => {
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterEach( async ( { page, requestUtils } ) => {
+		// Close the page first: a preference save it still has queued would
+		// otherwise land after the reset.
+		await page.close();
 		await requestUtils.resetPreferences();
 	} );
 

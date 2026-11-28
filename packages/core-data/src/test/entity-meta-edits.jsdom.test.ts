@@ -996,6 +996,7 @@ describe( 'saving edited post metadata', () => {
 			},
 		] );
 		actions.finishResolution( 'getEntitiesConfig', [ 'postType' ] );
+		actions.finishResolution( 'getEntityConfig', [ 'postType', '' ] );
 		receive( post );
 		let resolveSave!: ( value: TestPost ) => void;
 		mockedApiFetch.mockImplementationOnce(
@@ -1007,6 +1008,27 @@ describe( 'saving edited post metadata', () => {
 		editMeta( { first: 'submitted first' } );
 		const saving = save();
 		await vi.waitFor( () => expect( apiFetch ).toHaveBeenCalledOnce() );
+		expect( {
+			request: mockedApiFetch.mock.calls[ 0 ]?.[ 0 ],
+			saving: selectors.isSavingEntityRecord(
+				'postType',
+				'post',
+				post.id
+			),
+		} ).toEqual( {
+			request: {
+				path: '/wp/v2/posts/1',
+				method: 'PUT',
+				data: {
+					id: post.id,
+					meta: {
+						first: 'submitted first',
+						second: 'saved second',
+					},
+				},
+			},
+			saving: true,
+		} );
 
 		editMeta( { second: 'edited second' } );
 		editMeta( { first: post.meta.first } );

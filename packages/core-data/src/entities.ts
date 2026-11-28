@@ -279,6 +279,21 @@ export const additionalEntityConfigLoaders: Array< EntityConfigLoader > = [
 ];
 
 /**
+ * Returns the loader that provides the entity config for the given kind and
+ * name. A loader without a name provides every config of its kind.
+ *
+ * @param kind Entity kind.
+ * @param name Entity name.
+ *
+ * @return The loader, if there is one.
+ */
+export const findEntityConfigLoader = ( kind: string, name: string ) =>
+	additionalEntityConfigLoaders.find(
+		( loader ) =>
+			loader.kind === kind && ( ! loader.name || loader.name === name )
+	);
+
+/**
  * Apply extra edits before persisting a post type.
  *
  * @param persistedRecord Already persisted Post

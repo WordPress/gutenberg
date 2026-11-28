@@ -39,6 +39,8 @@
 /packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/nux                                   @peterwilsoncc
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
+/packages/core-fields							@oandregal
+/packages/core-actions							@oandregal
 /packages/theme                                 @WordPress/gutenberg-components
 /packages/theme-build-tools                     @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
