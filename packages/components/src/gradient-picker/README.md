@@ -110,6 +110,8 @@ An array of objects as predefined gradients displayed above the gradient
 selector. Alternatively, if there are multiple sets (or 'origins') of
 gradients, you can pass an array of objects each with a `name` and a
 `gradients` array which will in turn contain the predefined gradient objects.
+Give each origin a stable, unique `slug` to keep focus on it when origins
+are reordered or removed.
 
 ### `headingLevel`
 

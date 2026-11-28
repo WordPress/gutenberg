@@ -35,6 +35,12 @@ const FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS = {
 	'2x-large': 'var(--wpds-typography-line-height-2xl)',
 };
 
+// System colors that Chromium does not map to the forced colors palette.
+// Matches the keyword only: the prefix skips over quoted strings and whole
+// `url()` arguments, and the lookarounds reject longer identifiers.
+const SELECTED_ITEM_SYSTEM_COLOR =
+	/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|url\([^)]*\)|(?!url\()[^"'])*?(?<=^|[\s,(])(SelectedItem(?:Text)?)(?=$|[\s,)!;])/i;
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -55,6 +61,7 @@ module.exports = {
 					`/${ FONT_FAMILY_VARIABLE.source }/`,
 					`/${ FONT_SIZE_VARIABLE.source }/`,
 					`/${ FONT_LINE_HEIGHT_VARIABLE.source }/`,
+					`/${ SELECTED_ITEM_SYSTEM_COLOR.source }/i`,
 				],
 				cursor: [ 'pointer' ],
 				'flex-direction': [ '/^(row|column)-reverse/' ],
@@ -78,6 +85,14 @@ module.exports = {
 							? '$font-weight-regular'
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
+					const [ , selectedItem ] =
+						value.match( SELECTED_ITEM_SYSTEM_COLOR ) ?? [];
+					if ( selectedItem ) {
+						const replacement = /text$/i.test( selectedItem )
+							? 'HighlightText'
+							: 'Highlight';
+						return `Avoid the \`${ selectedItem }\` system color. Chromium does not map it to the forced colors palette (https://issues.chromium.org/issues/40857613). Use \`${ replacement }\` instead.`;
 					}
 					const [ , fontFamily ] =
 						value.match( FONT_FAMILY_VARIABLE ) ?? [];

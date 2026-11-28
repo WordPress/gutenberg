@@ -146,8 +146,8 @@ export default {
 		'stroke-surface-neutral-weak',
 	],
 	'bg-fgFillDark': [ 'background-thumb-neutral' ],
-	'bg-bgFillInverted2': [ 'background-interactive-neutral-strong-active' ],
-	'bg-bgFillInverted1': [ 'background-interactive-neutral-strong' ],
+	'bg-bgFillInverted2': [ 'background-interactive-neutral-strong' ],
+	'bg-bgFillInverted1': [ 'background-interactive-neutral-strong-active' ],
 	'bg-fgFillInverted': [
 		'foreground-interactive-neutral-strong',
 		'foreground-interactive-neutral-strong-active',
