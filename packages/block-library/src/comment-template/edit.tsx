@@ -10,7 +10,18 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useCommentQueryArgs, useCommentTree } from './hooks';
+import type {
+	CommentNode,
+	CommentTemplateBlockContext,
+	CommentTemplateInnerBlocksProps,
+	CommentTemplatePreviewProps,
+	CommentsListProps,
+	CommentsPlaceholderSettings,
+	DiscussionSettings,
+	EmbeddedComment,
+} from './types';
 
 /**
  * Function that returns a comment structure that will be rendered with default placeholders.
@@ -19,27 +30,26 @@ import { useCommentQueryArgs, useCommentTree } from './hooks';
  * case of the placeholders. This is to ensure that the comment does not
  * conflict with the actual (real) comments.
  *
- * @param {Object}  settings                       Discussion Settings.
- * @param {number}  [settings.perPage]             - Comments per page setting or block attribute.
- * @param {boolean} [settings.pageComments]        - Enable break comments into pages setting.
- * @param {boolean} [settings.threadComments]      - Enable threaded (nested) comments setting.
- * @param {number}  [settings.threadCommentsDepth] - Level deep of threaded comments.
+ * @param settings                     Discussion Settings.
+ * @param settings.perPage             - Comments per page setting or block attribute.
+ * @param settings.pageComments        - Enable break comments into pages setting.
+ * @param settings.threadComments      - Enable threaded (nested) comments setting.
+ * @param settings.threadCommentsDepth - Level deep of threaded comments.
  *
- * @typedef {{id: null, children: EmptyComment[]}} EmptyComment
- * @return {EmptyComment[]}                 		Inner blocks of the Comment Template
+ * @return Inner blocks of the Comment Template
  */
 const getCommentsPlaceholder = ( {
 	perPage,
 	pageComments,
 	threadComments,
 	threadCommentsDepth,
-} ) => {
+}: CommentsPlaceholderSettings ): CommentNode[] => {
 	// Limit commentsDepth to 3
 	const commentsDepth = ! threadComments
 		? 1
-		: Math.min( threadCommentsDepth, 3 );
+		: Math.min( threadCommentsDepth!, 3 );
 
-	const buildChildrenComment = ( commentsLevel ) => {
+	const buildChildrenComment = ( commentsLevel: number ): CommentNode[] => {
 		// Render children comments until commentsDepth is reached
 		if ( commentsLevel < commentsDepth ) {
 			const nextLevel = commentsLevel + 1;
@@ -60,7 +70,7 @@ const getCommentsPlaceholder = ( {
 	];
 
 	// Add a second comment unless the break comments setting is active and set to less than 2, and there is one nested comment max
-	if ( ( ! pageComments || perPage >= 2 ) && commentsDepth < 3 ) {
+	if ( ( ! pageComments || perPage! >= 2 ) && commentsDepth < 3 ) {
 		placeholderComments.push( {
 			commentId: -2,
 			children: [],
@@ -68,7 +78,7 @@ const getCommentsPlaceholder = ( {
 	}
 
 	// Add a third comment unless the break comments setting is active and set to less than 3, and there aren't nested comments
-	if ( ( ! pageComments || perPage >= 3 ) && commentsDepth < 2 ) {
+	if ( ( ! pageComments || perPage! >= 3 ) && commentsDepth < 2 ) {
 		placeholderComments.push( {
 			commentId: -3,
 			children: [],
@@ -82,14 +92,14 @@ const getCommentsPlaceholder = ( {
 /**
  * Component which renders the inner blocks of the Comment Template.
  *
- * @param {Object} props                      Component props.
- * @param {Array}  [props.comment]            - A comment object.
- * @param {Array}  [props.activeCommentId]    - The ID of the comment that is currently active.
- * @param {Array}  [props.setActiveCommentId] - The setter for activeCommentId.
- * @param {Array}  [props.firstCommentId]     - ID of the first comment in the array.
- * @param {Array}  [props.blocks]             - Array of blocks returned from
- *                                            getBlocks() in parent .
- * @return {Element}                 		Inner blocks of the Comment Template
+ * @param props                    Component props.
+ * @param props.comment            - A comment object.
+ * @param props.activeCommentId    - The ID of the comment that is currently active.
+ * @param props.setActiveCommentId - The setter for activeCommentId.
+ * @param props.firstCommentId     - ID of the first comment in the array.
+ * @param props.blocks             - Array of blocks returned from
+ *                                 getBlocks() in parent .
+ * @return Inner blocks of the Comment Template
  */
 function CommentTemplateInnerBlocks( {
 	comment,
@@ -97,7 +107,7 @@ function CommentTemplateInnerBlocks( {
 	setActiveCommentId,
 	firstCommentId,
 	blocks,
-} ) {
+}: CommentTemplateInnerBlocksProps ) {
 	const { children, ...innerBlocksProps } = useInnerBlocksProps( {} );
 
 	return (
@@ -121,9 +131,9 @@ function CommentTemplateInnerBlocks( {
 				}
 			/>
 
-			{ comment?.children?.length > 0 ? (
+			{ comment?.children?.length! > 0 ? (
 				<CommentsList
-					comments={ comment.children }
+					comments={ comment.children! }
 					activeCommentId={ activeCommentId }
 					setActiveCommentId={ setActiveCommentId }
 					blocks={ blocks }
@@ -139,7 +149,7 @@ const CommentTemplatePreview = ( {
 	commentId,
 	setActiveCommentId,
 	isHidden,
-} ) => {
+}: CommentTemplatePreviewProps ) => {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 	} );
@@ -174,15 +184,15 @@ const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
 /**
  * Component that renders a list of (nested) comments. It is called recursively.
  *
- * @param {Object} props                      Component props.
- * @param {Array}  [props.comments]           - Array of comment objects.
- * @param {Array}  [props.blockProps]         - Props from parent's `useBlockProps()`.
- * @param {Array}  [props.activeCommentId]    - The ID of the comment that is currently active.
- * @param {Array}  [props.setActiveCommentId] - The setter for activeCommentId.
- * @param {Array}  [props.blocks]             - Array of blocks returned from getBlocks() in parent.
- * @param {Object} [props.firstCommentId]     - The ID of the first comment in the array of
- *                                            comment objects.
- * @return {Element}                 		List of comments.
+ * @param props                    Component props.
+ * @param props.comments           - Array of comment objects.
+ * @param props.blockProps         - Props from parent's `useBlockProps()`.
+ * @param props.activeCommentId    - The ID of the comment that is currently active.
+ * @param props.setActiveCommentId - The setter for activeCommentId.
+ * @param props.blocks             - Array of blocks returned from getBlocks() in parent.
+ * @param props.firstCommentId     - The ID of the first comment in the array of
+ *                                 comment objects.
+ * @return List of comments.
  */
 const CommentsList = ( {
 	comments,
@@ -191,12 +201,12 @@ const CommentsList = ( {
 	setActiveCommentId,
 	blocks,
 	firstCommentId,
-} ) => (
+}: CommentsListProps ) => (
 	<ol { ...blockProps }>
 		{ comments &&
 			comments.map( ( { commentId, ...comment }, index ) => (
 				<BlockContextProvider
-					key={ comment.commentId || index }
+					key={ ( comment as CommentNode ).commentId || index }
 					value={ {
 						// If the commentId is negative it means that this comment is a
 						// "placeholder" and that the block is most likely being used in the
@@ -221,10 +231,14 @@ const CommentsList = ( {
 export default function CommentTemplateEdit( {
 	clientId,
 	context: { postId },
+}: BlockEditProps< Record< string, unknown > > & {
+	context: CommentTemplateBlockContext;
 } ) {
 	const blockProps = useBlockProps();
 
-	const [ activeCommentId, setActiveCommentId ] = useState();
+	const [ activeCommentId, setActiveCommentId ] = useState<
+		number | undefined
+	>();
 	const {
 		commentOrder,
 		threadCommentsDepth,
@@ -233,7 +247,10 @@ export default function CommentTemplateEdit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings ?? {};
+		return (
+			( getSettings().__experimentalDiscussionSettings as
+				DiscussionSettings | undefined ) ?? {}
+		);
 	}, [] );
 
 	const commentQuery = useCommentQueryArgs( {
@@ -247,7 +264,11 @@ export default function CommentTemplateEdit( {
 			return {
 				// Request only top-level comments. Replies are embedded.
 				topLevelComments: commentQuery
-					? getEntityRecords( 'root', 'comment', commentQuery )
+					? getEntityRecords< EmbeddedComment >(
+							'root',
+							'comment',
+							commentQuery
+						)
 					: null,
 				blocks: getBlocks( clientId ),
 			};
@@ -280,18 +301,18 @@ export default function CommentTemplateEdit( {
 		} );
 	}
 
-	if ( ! commentTree.length ) {
+	if ( ! commentTree!.length ) {
 		return <p { ...blockProps }>{ __( 'No results found.' ) }</p>;
 	}
 
 	return (
 		<CommentsList
-			comments={ commentTree }
+			comments={ commentTree! }
 			blockProps={ blockProps }
 			blocks={ blocks }
 			activeCommentId={ activeCommentId }
 			setActiveCommentId={ setActiveCommentId }
-			firstCommentId={ commentTree[ 0 ]?.commentId }
+			firstCommentId={ commentTree![ 0 ]?.commentId }
 		/>
 	);
 }

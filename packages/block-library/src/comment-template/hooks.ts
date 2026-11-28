@@ -2,6 +2,13 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
+import type {
+	CommentNode,
+	CommentQueryArgsProps,
+	DefaultPageIndexProps,
+	DiscussionSettings,
+	EmbeddedComment,
+} from './types';
 
 // This is limited by WP REST API
 const MAX_COMMENTS_PER_PAGE = 100;
@@ -10,13 +17,13 @@ const MAX_COMMENTS_PER_PAGE = 100;
  * Return an object with the query args needed to fetch the default page of
  * comments.
  *
- * @param {Object} props        Hook props.
- * @param {number} props.postId ID of the post that contains the comments.
- *                              discussion settings.
+ * @param props        Hook props.
+ * @param props.postId ID of the post that contains the comments.
+ *                     discussion settings.
  *
- * @return {Object} Query args to retrieve the comments.
+ * @return Query args to retrieve the comments.
  */
-export const useCommentQueryArgs = ( { postId } ) => {
+export const useCommentQueryArgs = ( { postId }: CommentQueryArgsProps ) => {
 	// Initialize the query args that are not going to change.
 	const queryArgs = {
 		status: 'approve',
@@ -33,7 +40,9 @@ export const useCommentQueryArgs = ( { postId } ) => {
 		defaultCommentsPage: defaultPage,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
+		const { __experimentalDiscussionSettings } = getSettings() as {
+			__experimentalDiscussionSettings?: DiscussionSettings;
+		};
 		return __experimentalDiscussionSettings ?? {};
 	}, [] );
 
@@ -42,7 +51,7 @@ export const useCommentQueryArgs = ( { postId } ) => {
 	// max allowed for single page should be enough for the purpose of design and laying out the page.
 	// Fetching over the limit would return an error here but would work with backend query.
 	const perPage = pageComments
-		? Math.min( commentsPerPage, MAX_COMMENTS_PER_PAGE )
+		? Math.min( commentsPerPage!, MAX_COMMENTS_PER_PAGE )
 		: MAX_COMMENTS_PER_PAGE;
 
 	// Get the number of the default page.
@@ -73,15 +82,20 @@ export const useCommentQueryArgs = ( { postId } ) => {
  * index is by using the `X-WP-Total` header, which forces to make an
  * additional request.
  *
- * @param {Object} props             Hook props.
- * @param {string} props.defaultPage Page shown by default (newest/oldest).
- * @param {number} props.postId      ID of the post that contains the comments.
- * @param {number} props.perPage     The number of comments included per page.
- * @param {Object} props.queryArgs   Other query args.
+ * @param props             Hook props.
+ * @param props.defaultPage Page shown by default (newest/oldest).
+ * @param props.postId      ID of the post that contains the comments.
+ * @param props.perPage     The number of comments included per page.
+ * @param props.queryArgs   Other query args.
  *
- * @return {number} Index of the default comments page.
+ * @return Index of the default comments page.
  */
-const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
+const useDefaultPageIndex = ( {
+	defaultPage,
+	postId,
+	perPage,
+	queryArgs,
+}: DefaultPageIndexProps ) => {
 	const isNewest = defaultPage === 'newest';
 	// We need to fetch comments to know the index. Fetch a single ID, to make
 	// this call as light as possible.
@@ -109,12 +123,12 @@ const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
  * Generate a tree structure of comment IDs from a list of comment entities. The
  * children of each comment are obtained from `_embedded`.
  *
- * @typedef {{ commentId: number, children: CommentNode }} CommentNode
- *
- * @param {Object[]} topLevelComments List of comment entities.
- * @return {{ commentTree: CommentNode[]}} Tree of comment IDs.
+ * @param topLevelComments List of comment entities.
+ * @return Tree of comment IDs.
  */
-export const useCommentTree = ( topLevelComments ) => {
+export const useCommentTree = (
+	topLevelComments: EmbeddedComment[] | null | undefined
+): CommentNode[] | undefined => {
 	const commentTree = useMemo(
 		() =>
 			topLevelComments?.map( ( { id, _embedded } ) => {
