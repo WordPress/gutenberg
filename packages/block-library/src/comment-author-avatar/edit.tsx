@@ -85,14 +85,8 @@ export default function Edit( {
 			showHandle={ isSelected }
 			onResizeStop={ ( event, direction, elt, delta ) => {
 				setAttributes( {
-					height: parseInt(
-						( height + delta.height ) as unknown as string,
-						10
-					),
-					width: parseInt(
-						( width + delta.width ) as unknown as string,
-						10
-					),
+					height: parseInt( String( height + delta.height ), 10 ),
+					width: parseInt( String( width + delta.width ), 10 ),
 				} );
 			} }
 			lockAspectRatio
