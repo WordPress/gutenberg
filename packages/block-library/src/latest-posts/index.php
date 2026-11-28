@@ -237,7 +237,11 @@ function render_block_core_latest_posts( $attributes ) {
 		'grid' === $attributes['postLayout']
 	) ? 'grid' : 'default';
 	$layout_type        = $layout['type'] ?? $legacy_layout_type;
-	$column_count       = $layout['columnCount'] ?? ( $attributes['columns'] ?? null );
+
+	// Legacy content did not serialize the `columns` attribute because it
+	// defaulted to 3. Restore that default when no layout attribute exists.
+	$default_column_count = empty( $layout ) ? 3 : null;
+	$column_count         = $layout['columnCount'] ?? ( $attributes['columns'] ?? $default_column_count );
 
 	$classes = array( 'wp-block-latest-posts__list' );
 	if ( 'grid' === $layout_type ) {
