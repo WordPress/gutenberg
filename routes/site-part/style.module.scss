@@ -1,0 +1,86 @@
+@use "sass:meta";
+
+.content {
+	flex-grow: 1;
+	min-height: 0;
+	overflow: auto;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+}
+
+// Pull the rows out by their padding so their icons and text line up with
+// the text above them.
+.list {
+	list-style: none;
+	margin: 0 calc(-1 * var(--wpds-dimension-padding-md));
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+// A navigation row: the whole row is the link to the screen it names.
+.row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wpds-dimension-gap-md);
+	padding: var(--wpds-dimension-padding-md);
+	border-radius: var(--wpds-border-radius-md);
+	color: var(--wpds-color-foreground-content-neutral);
+	text-decoration: none;
+
+	&:hover {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+	}
+
+	&:focus-visible {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+
+	svg {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+}
+
+.text {
+	min-width: 0;
+}
+
+.label {
+	flex-grow: 1;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.description {
+	margin: 0;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.loading {
+	display: flex;
+	justify-content: center;
+	padding: var(--wpds-dimension-padding-2xl);
+}
+
+// Separates what the part holds from the links to other parts.
+.divider {
+	margin: 0;
+	border: 0;
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+// The identity panel renders `MediaEdit` of `@wordpress/fields`, whose
+// stylesheet WordPress doesn't register, so load it here with its class names
+// kept, as the Identity screen does.
+:global {
+	@include meta.load-css("@wordpress/fields/build-style/style.css");
+}
+
+// Site parts are synced: changing one changes it wherever it shows. Their
+// icons take the color the editor uses for synced content.
+.row .synced-icon {
+	color: var(--wp-block-synced-color);
+}

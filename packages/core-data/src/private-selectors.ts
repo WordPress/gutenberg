@@ -4,6 +4,13 @@ import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import {
+	getSitePartsUsageFromRecords,
+	needsPatterns,
+	type SitePartsBlock,
+	type SitePartsPatternInput,
+	type SitePartsUsage,
+} from './utils/site-parts-usage';
 
 type EntityRecordKey = string | number;
 
@@ -271,6 +278,126 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+const SITE_PARTS_QUERY = { per_page: -1 };
+
+/**
+ * Returns which template parts the site uses, and the primary part in each
+ * area: the part visitors see on the homepage. Unsaved edits to templates and
+ * parts are taken into account.
+ *
+ * A part is in use when a template reaches it through a Template Part block,
+ * a part that nests it, a Pattern block, or, for a navigation overlay, a
+ * Navigation block's `overlay` attribute. The primary part comes from the
+ * homepage template, falling back to the `index` template; the first header
+ * and last footer win, and the primary overlay is the one the primary header
+ * opens.
+ *
+ * @return The usage of every part, keyed by part id, and the primary part id
+ *         for each area. `null` while the records it needs are loading.
+ */
+export const getSitePartsUsage = createRegistrySelector( ( select ) => {
+	let lastInputs: unknown[] | undefined;
+	let lastResult: SitePartsUsage | null = null;
+
+	return function selectSitePartsUsage(): SitePartsUsage | null {
+		const store = select( STORE_NAME );
+		const theme: string | undefined = store.getCurrentTheme()?.stylesheet;
+		const templates = store.getEntityRecords(
+			'postType',
+			'wp_template',
+			SITE_PARTS_QUERY
+		) as any[] | null;
+		const parts = store.getEntityRecords(
+			'postType',
+			'wp_template_part',
+			SITE_PARTS_QUERY
+		) as any[] | null;
+		const homePage = unlock( store ).getHomePage();
+		if ( ! theme || ! templates || ! parts || ! homePage ) {
+			return null;
+		}
+
+		let homeTemplateId: string | null = null;
+		if ( homePage.postType === 'wp_template' ) {
+			homeTemplateId = homePage.postId;
+		} else if ( homePage.postType === 'page' ) {
+			const templateId = unlock( store ).getTemplateId(
+				'page',
+				homePage.postId
+			);
+			// Still resolving.
+			if ( templateId === undefined ) {
+				return null;
+			}
+			homeTemplateId = templateId || null;
+		}
+
+		// Prefer unsaved blocks, so the result follows edits as they happen.
+		const getSource = ( postType: string, record: any ) =>
+			(
+				store.getEntityRecordEdits(
+					'postType',
+					postType,
+					record.id
+				) as { blocks?: SitePartsBlock[] } | undefined
+			 )?.blocks ??
+			( typeof record.content === 'string'
+				? record.content
+				: record.content?.raw );
+
+		const templateSources = templates.map( ( record ) =>
+			getSource( 'wp_template', record )
+		);
+		const partSources = parts.map( ( record ) =>
+			getSource( 'wp_template_part', record )
+		);
+
+		// Only load patterns when something references one.
+		let patterns: SitePartsPatternInput[] | undefined;
+		if ( needsPatterns( [ ...templateSources, ...partSources ] ) ) {
+			patterns = store.getBlockPatterns();
+			if ( ! store.hasFinishedResolution( 'getBlockPatterns', [] ) ) {
+				return null;
+			}
+		}
+
+		const inputs = [
+			theme,
+			homeTemplateId,
+			templates,
+			parts,
+			patterns,
+			...templateSources,
+			...partSources,
+		];
+		if (
+			lastInputs &&
+			lastInputs.length === inputs.length &&
+			lastInputs.every( ( value, index ) => value === inputs[ index ] )
+		) {
+			return lastResult;
+		}
+
+		lastInputs = inputs;
+		lastResult = getSitePartsUsageFromRecords( {
+			theme,
+			homeTemplateId,
+			patterns,
+			templates: templates.map( ( record, index ) => ( {
+				id: record.id,
+				slug: record.slug,
+				source: templateSources[ index ],
+			} ) ),
+			parts: parts.map( ( record, index ) => ( {
+				id: record.id,
+				area: record.area || 'uncategorized',
+				source: partSources[ index ],
+			} ) ),
+		} );
+		return lastResult;
+	};
+} );
 
 /**
  * Returns the editor settings.

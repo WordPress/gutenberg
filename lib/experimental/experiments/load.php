@@ -84,6 +84,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-site-parts',
+					'label'       => __( 'Site parts', 'gutenberg' ),
+					'description' => __( 'Adds a Site parts screen to both site editors that opens the header, footer and navigation overlay your homepage uses, with panels for their site name, logo, menu and social icons.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),

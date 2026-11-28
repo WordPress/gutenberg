@@ -1,0 +1,7 @@
+// The notice takes the color the editor uses for synced content, such as
+// template parts and synced patterns, kept faint so it reads as a hint.
+.editor-site-part-synced-notice {
+	--wp-ui-notice-background-color: color-mix(in srgb, var(--wp-block-synced-color) 4%, var(--wpds-color-background-surface-neutral-strong));
+	--wp-ui-notice-border-color: color-mix(in srgb, var(--wp-block-synced-color) 30%, transparent);
+	--wp-ui-notice-decorative-icon-color: var(--wp-block-synced-color);
+}
