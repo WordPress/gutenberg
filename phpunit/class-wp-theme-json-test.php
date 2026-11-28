@@ -3805,6 +3805,34 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'transform', $stylesheet );
 	}
 
+	/**
+	 * Tests that the Image block outputs its transform on the block wrapper,
+	 * so the caption turns with the image.
+	 */
+	public function test_get_stylesheet_outputs_image_transform_on_wrapper() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image' => array(
+							'transform' => array(
+								'rotate'    => '5deg',
+								'translate' => array( 'y' => '1rem' ),
+								'scale'     => 0.9,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 5deg;--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);scale: 0.9;}', $stylesheet );
+		$this->assertStringNotContainsString( ':root :where(.wp-block-image img', $stylesheet );
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

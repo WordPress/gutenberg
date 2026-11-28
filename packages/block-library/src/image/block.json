@@ -139,6 +139,11 @@
 		},
 		"shadow": {
 			"__experimentalSkipSerialization": true
+		},
+		"transform": {
+			"rotate": true,
+			"translate": true,
+			"scale": true
 		}
 	},
 	"selectors": {

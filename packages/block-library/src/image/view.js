@@ -753,14 +753,19 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				const { imageRef } = state.selectedImage;
 				let {
 					naturalWidth,
 					naturalHeight,
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
-				} = state.selectedImage.imageRef;
-				let { x: screenPosX, y: screenPosY } =
-					state.selectedImage.imageRef.getBoundingClientRect();
+				} = imageRef;
+				// A transform keeps the image's on-screen centre, so place it from there.
+				const imageRect = imageRef.getBoundingClientRect();
+				const imageCenterX = imageRect.x + imageRect.width / 2;
+				const imageCenterY = imageRect.y + imageRect.height / 2;
+				let screenPosX = imageCenterX - originalWidth / 2;
+				let screenPosY = imageCenterY - originalHeight / 2;
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
@@ -873,6 +878,16 @@ const { state, actions, callbacks } = store(
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
 
+				// A scale grows the figure around its centre, so the zoom starts
+				// from the scaled image.
+				const figure = imageRef.offsetParent ?? imageRef;
+				const figureScale =
+					parseFloat( window.getComputedStyle( figure ).scale ) || 1;
+				screenPosX =
+					imageCenterX + ( screenPosX - imageCenterX ) * figureScale;
+				screenPosY =
+					imageCenterY + ( screenPosY - imageCenterY ) * figureScale;
+
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
 				// image in iOS Safari, perhaps due to an inconsistency in how browsers
@@ -893,7 +908,7 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-thumbnail-height: ${
 						hasCroppedSource ? thumbnailHeight : containerHeight
 					}px;
-					--wp--lightbox-scale: ${ containerScale };
+					--wp--lightbox-scale: ${ containerScale * figureScale };
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
