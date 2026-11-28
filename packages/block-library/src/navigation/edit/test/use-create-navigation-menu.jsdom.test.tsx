@@ -122,6 +122,10 @@ describe( 'creating Navigation menus', () => {
 			.finishResolution( 'getEntitiesConfig', [ 'postType' ] );
 		registry
 			.dispatch( coreStore )
+			.finishResolution( 'getEntityConfig', [ 'postType', '' ] );
+
+		registry
+			.dispatch( coreStore )
 			.finishResolution( 'getEntitiesConfig', [ 'root' ] );
 		vi.mocked( apiFetch ).mockReset();
 		vi.mocked( apiFetch ).mockImplementation(

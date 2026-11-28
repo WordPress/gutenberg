@@ -3,7 +3,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type { Post } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import type { Field, Form } from '@wordpress/dataviews';
+import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
@@ -40,7 +40,7 @@ export function QuickEditModal( {
 		null
 	);
 	const [ localEdits, setLocalEdits ] = useState< Partial< Post > >( {} );
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -60,24 +60,12 @@ export function QuickEditModal( {
 				postId[ 0 ],
 			];
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -85,30 +73,7 @@ export function QuickEditModal( {
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
-	const _fields = usePostFields( { postType } );
-	const fields = useMemo(
-		() =>
-			_fields?.map( ( field: Field< Post > ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements?.filter(
-							( element ) => element.value !== 'trash'
-						),
-					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
-
-				return field;
-			} ),
-		[ _fields, canSwitchTemplate ]
-	);
+	const fields = usePostFields( { postType } );
 
 	const form = useMemo( (): Form => {
 		if ( ! quickEditForm ) {
@@ -128,24 +93,6 @@ export function QuickEditModal( {
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData = { ...record, ...localEdits };
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date as string ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
