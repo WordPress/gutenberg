@@ -1,3 +1,5 @@
+import type { CommentTreeInputItem, CommentTreeNode } from './types';
+
 /**
  *
  * This function converts a flat list of comment objects with a `parent` property
@@ -22,13 +24,12 @@
  * 	},
  * ] );
  * ```
- * @typedef {{id: number, parent: number}} Comment
- * @param {Comment[]} data - List of comment objects.
+ * @param data - List of comment objects.
  *
- * @return {Object[]} Nested list of comment objects with a `children` property.
+ * @return Nested list of comment objects with a `children` property.
  */
-export const convertToTree = ( data ) => {
-	const table = {};
+export const convertToTree = ( data?: CommentTreeInputItem[] ) => {
+	const table: Record< number, CommentTreeNode > = {};
 
 	if ( ! data ) {
 		return [];
@@ -39,7 +40,7 @@ export const convertToTree = ( data ) => {
 		table[ item.id ] = { commentId: item.id, children: [] };
 	} );
 
-	const tree = [];
+	const tree: CommentTreeNode[] = [];
 
 	// Iterate over the original comments again
 	data.forEach( ( item ) => {
