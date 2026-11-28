@@ -20,3 +20,4 @@ require_once __DIR__ . '/notes-preview/class-gutenberg-rest-comments-controller-
 require_once __DIR__ . '/notes-preview/rest-api.php';
 require_once __DIR__ . '/notes-preview/preview-access.php';
 require_once __DIR__ . '/notes-preview/render.php';
+require_once __DIR__ . '/notes-preview/panel.php';
