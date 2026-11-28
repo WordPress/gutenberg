@@ -3,8 +3,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { keyboardShortcut } from '@wordpress/keycodes';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Menu,
@@ -15,19 +17,35 @@ import ModeSwitcher from '../mode-switcher';
 import MoreMenuPreferenceItem from './more-menu-preference-item';
 import MoreMenuSubmenu, { toMenuItems } from './more-menu-submenu';
 import NotesMoreMenuGroup from './notes-more-menu-group';
+import { PostPreviewMenuItem } from '../post-preview-button';
+import { PostViewLinkMenuItem } from '../post-view-link';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
 
-export default function MoreMenu( { isRevisionMode = false } ) {
+export default function MoreMenu( {
+	isRevisionMode = false,
+	forceIsAutosaveable,
+} ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+	const { showIconLabels, isViewable } = useSelect(
+		( select ) => ( {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+			isViewable:
+				select( coreStore ).getPostType(
+					select( editorStore ).getCurrentPostType()
+				)?.viewable ?? false,
+		} ),
 		[]
 	);
+
+	// On phones, the header has room for undo and redo instead.
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -70,6 +88,17 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 				className="editor-more-menu__popup"
 				positioner={ positioner }
 			>
+				{ ! isLargeViewport && isViewable && (
+					<>
+						<Menu.Group>
+							<PostPreviewMenuItem
+								forceIsAutosaveable={ forceIsAutosaveable }
+							/>
+							<PostViewLinkMenuItem />
+						</Menu.Group>
+						<Menu.Separator />
+					</>
+				) }
 				<Menu.Group>
 					<Menu.GroupLabel>{ _x( 'View', 'noun' ) }</Menu.GroupLabel>
 					<MoreMenuSubmenu label={ __( 'Appearance' ) }>

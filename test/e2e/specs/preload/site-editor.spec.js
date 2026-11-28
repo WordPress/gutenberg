@@ -82,7 +82,6 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
-				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/templates?context=edit&per_page=100&post_type=page',

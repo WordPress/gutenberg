@@ -9,7 +9,6 @@ import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import HeaderSkeleton from './header-skeleton';
 import MoreMenu from '../more-menu';
-import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
@@ -127,16 +126,11 @@ function Header( {
 						<PostSavedState forceIsDirty={ forceIsDirty } />
 					) }
 
-					<PostViewLink />
+					{ isLargeViewport && <PostViewLink /> }
 
 					<PreviewDropdown
 						forceIsAutosaveable={ forceIsDirty }
 						disabled={ isStylesCanvasActive }
-					/>
-
-					<PostPreviewButton
-						className="editor-header__post-preview-button"
-						forceIsAutosaveable={ forceIsDirty }
 					/>
 
 					{ isWideViewport && canBeZoomedOut && (
@@ -156,7 +150,7 @@ function Header( {
 						/>
 					) }
 					{ customSaveButton }
-					<MoreMenu />
+					<MoreMenu forceIsAutosaveable={ forceIsDirty } />
 				</>
 			}
 		/>

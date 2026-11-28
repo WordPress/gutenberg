@@ -592,7 +592,14 @@ export const autosave =
  */
 export const __unstableSaveForPreview =
 	( { forceIsAutosaveable } = {} ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
+		// A post isn't autosaveable until its autosaves have loaded.
+		await registry
+			.resolveSelect( coreStore )
+			.getAutosaves(
+				select.getCurrentPostType(),
+				select.getCurrentPostId()
+			);
 		if (
 			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
 			! select.isPostLocked()

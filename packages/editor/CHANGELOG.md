@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+-   Show undo and redo in the header on phones, and move Preview and View post to the Options menu there ([#87368](https://github.com/WordPress/gutenberg/pull/87368)).
 
 ### Bug Fixes
 
