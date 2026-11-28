@@ -1101,57 +1101,13 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comment-date/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-date/edit.jsx": {
+	"packages/block-library/src/comment-date/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-date/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-date/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/comment-edit-link/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

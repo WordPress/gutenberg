@@ -15,35 +15,31 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { CommentDateAttributes, CommentDateBlockContext } from './types';
 
 /**
  * Renders the `core/comment-date` block on the editor.
- *
- * @param {Object} props                   React props.
- * @param {Object} props.setAttributes     Callback for updating block attributes.
- * @param {Object} props.attributes        Block attributes.
- * @param {string} props.attributes.format Format of the date.
- * @param {string} props.attributes.isLink Whether the author name should be linked.
- * @param {Object} props.context           Inherited context.
- * @param {string} props.context.commentId The comment ID.
- *
- * @return {React.JSX.Element} React element.
  */
 export default function Edit( {
 	attributes: { format, isLink },
 	context: { commentId },
 	setAttributes,
+}: BlockEditProps< CommentDateAttributes > & {
+	context: CommentDateBlockContext;
 } ) {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
-	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
+	let [ date ] = useEntityProp< string >(
 		'root',
-		'site',
-		'date_format'
+		'comment',
+		'date',
+		commentId
 	);
+	const [ siteFormat = getDateSettings().formats.date ] =
+		useEntityProp< string >( 'root', 'site', 'date_format' );
 
 	const inspectorControls = (
 		<InspectorControls>
@@ -93,6 +89,7 @@ export default function Edit( {
 	}
 
 	let commentDate =
+		// @ts-expect-error Bug: the comment date is a string, so it is never a `Date`.
 		date instanceof Date ? (
 			<time dateTime={ dateI18n( 'c', date ) }>
 				{ format === 'human-diff'

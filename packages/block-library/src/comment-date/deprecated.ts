@@ -1,4 +1,5 @@
 import migrateFontFamily from '../utils/migrate-font-family';
+import type { StyledBlockAttributes } from '../utils/types';
 
 const v1 = {
 	attributes: {
@@ -30,8 +31,8 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
-		return style?.typography?.fontFamily;
+	isEligible( { style }: StyledBlockAttributes ) {
+		return !! style?.typography?.fontFamily;
 	},
 };
 
