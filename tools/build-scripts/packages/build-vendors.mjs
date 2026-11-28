@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import { readFile, writeFile, mkdir } from 'fs/promises';
-import esbuild from 'esbuild';
+import { build } from 'rolldown';
 import {
 	createPatcher,
 	patchTransitionalSymbols,
@@ -163,50 +163,55 @@ async function bundleVendorScript( config ) {
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
 		name: 'react-external',
-		setup( build ) {
-			build.onResolve( { filter: /^react$/ }, ( args ) => {
-				if ( args.kind === 'entry-point' ) {
-					return null;
-				}
+		resolveId( source, importer, { isEntry } ) {
+			if ( source === 'react' && ! isEntry ) {
+				return '\0react-external';
+			}
+			return null;
+		},
+		load( id ) {
+			if ( id === '\0react-external' ) {
 				return {
-					path: 'react',
-					namespace: 'react-external',
+					code: 'module.exports = globalThis.React;',
+					moduleType: 'js',
 				};
-			} );
-
-			build.onLoad(
-				{ filter: /.*/, namespace: 'react-external' },
-				() => ( {
-					contents: `module.exports = globalThis.React`,
-					loader: 'js',
-				} )
-			);
+			}
+			return null;
 		},
 	};
 
-	const esbuildOptions = {
-		bundle: true,
-		format: 'iife',
-		globalName: global,
-		target: 'esnext',
-		platform: 'browser',
-		entryPoints: [ name ],
-		// Resolve imports from this workspace's dependencies.
-		absWorkingDir: WORKSPACE_DIR,
-		plugins: dependencies?.includes( 'react' )
-			? [ reactExternalPlugin ]
-			: [],
-	};
+	const bundleFile = ( { file, minify } ) =>
+		build( {
+			input: name,
+			// Resolve imports from this workspace's dependencies.
+			cwd: WORKSPACE_DIR,
+			platform: 'browser',
+			transform: {
+				define: {
+					'process.env.NODE_ENV': minify
+						? '"production"'
+						: '"development"',
+				},
+			},
+			plugins: dependencies?.includes( 'react' )
+				? [ reactExternalPlugin ]
+				: [],
+			output: {
+				file,
+				format: 'iife',
+				name: global,
+				exports: 'default',
+				minify,
+			},
+		} );
 
 	await Promise.all( [
-		esbuild.build( {
-			...esbuildOptions,
-			outfile: path.join( VENDORS_DIR, handle + '.js' ),
+		bundleFile( {
+			file: path.join( VENDORS_DIR, handle + '.js' ),
 			minify: false,
 		} ),
-		esbuild.build( {
-			...esbuildOptions,
-			outfile: path.join( VENDORS_DIR, handle + '.min.js' ),
+		bundleFile( {
+			file: path.join( VENDORS_DIR, handle + '.min.js' ),
 			minify: true,
 		} ),
 		generateAssetFile( config ),
