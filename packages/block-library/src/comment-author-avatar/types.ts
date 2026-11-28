@@ -6,9 +6,6 @@ export interface CommentAuthorAvatarAttributes extends Record<
 	height: number;
 }
 
-export interface CommentAuthorAvatarBlockContext extends Record<
-	string,
-	unknown
-> {
+export interface CommentAuthorAvatarBlockContext {
 	commentId?: string | number;
 }
