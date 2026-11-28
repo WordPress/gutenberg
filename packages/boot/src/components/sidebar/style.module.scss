@@ -21,6 +21,10 @@
 	padding-inline-start: variables.$grid-unit-20;
 }
 
+[data-admin-navigation-rail] .footer {
+	padding-inline: var(--wpds-dimension-padding-sm);
+}
+
 .back-button {
 	margin-block-start: variables.$grid-unit-20;
 	margin-inline-end: variables.$grid-unit-15;

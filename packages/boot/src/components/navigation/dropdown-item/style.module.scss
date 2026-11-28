@@ -20,6 +20,11 @@
 		variables.$grid-unit-40 -
 		$padding-to-avoid-cutting-focus-ring;
 	overflow: hidden;
+
+	// Without icons, there is no icon column to line up with.
+	[data-admin-navigation-rail] & {
+		margin-inline-start: calc(var(--wpds-dimension-padding-md) - #{$padding-to-avoid-cutting-focus-ring});
+	}
 }
 
 .chevron.is-up {

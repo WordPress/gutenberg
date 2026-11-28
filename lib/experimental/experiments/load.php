@@ -84,6 +84,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-admin-navigation-rail',
+					'label'       => __( 'Admin navigation rail', 'gutenberg' ),
+					'description' => __( 'Collapses the admin menu into a rail of icons, shows the submenu of the current section in a column next to it, and keeps the rail visible in the post editor and the extensible site editor. Moves the site editor out of Appearance into its own menu item. Requires the Extensible Site Editor experiment.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
