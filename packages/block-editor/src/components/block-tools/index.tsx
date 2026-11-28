@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover as WCPopover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef, useState } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
@@ -27,6 +27,7 @@ import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
 import MultiBlockFormatEdit from '../rich-text/multi-block-format-edit';
+import { SlashInserterContext } from './slash-inserter-context';
 import type { BlockToolsProps } from './types';
 
 function selector( select: SelectFunction ) {
@@ -97,6 +98,17 @@ export default function BlockTools( {
 	const pasteStyles = usePasteStyles();
 	const [ renamingBlockClientId, setRenamingBlockClientId ] =
 		useState( null );
+	const [ slashInserters, setSlashInserters ] = useState<
+		{ clientId: string }[]
+	>( [] );
+	const registerSlashInserter = useCallback( ( blockClientId: string ) => {
+		const instance = { clientId: blockClientId };
+		setSlashInserters( ( current ) => [ ...current, instance ] );
+		return () =>
+			setSlashInserters( ( current ) =>
+				current.filter( ( inserter ) => inserter !== instance )
+			);
+	}, [] );
 
 	const { canRename } = useBlockRename(
 		getBlockName( getSelectedBlockClientIds()[ 0 ] )
@@ -327,6 +339,9 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
+						isSlashInserterVisible={ slashInserters.some(
+							( inserter ) => inserter.clientId === clientId
+						) }
 					/>
 				) }
 
@@ -337,9 +352,11 @@ export default function BlockTools( {
 						ref={ blockToolbarRef }
 					/>
 				) }
-				<MultiBlockFormatEdit contentRef={ __unstableContentRef }>
-					{ children }
-				</MultiBlockFormatEdit>
+				<SlashInserterContext.Provider value={ registerSlashInserter }>
+					<MultiBlockFormatEdit contentRef={ __unstableContentRef }>
+						{ children }
+					</MultiBlockFormatEdit>
+				</SlashInserterContext.Provider>
 				{ /* Used for inline rich text popovers. */ }
 				<WCPopover.Slot
 					name="__unstable-block-tools-after"

@@ -24,6 +24,7 @@ export interface BlockToolsProps extends Omit<
 export interface BlockToolbarPopoverProps {
 	clientId: string;
 	isTyping?: boolean;
+	isSlashInserterVisible?: boolean;
 	__unstableContentRef?: ContentRef;
 }
 
