@@ -16,6 +16,7 @@ import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import type { FontEvent } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
+import getUnclampedWeight from './utils/get-unclamped-weight';
 import { loadFontFaceInBrowser } from './utils';
 
 function UploadFonts() {
@@ -180,8 +181,13 @@ function UploadFonts() {
 		}
 		const subfamily = name?.get( 2 ) || '';
 		const isItalic = subfamily.toLowerCase().includes( 'italic' );
+		// The typographic subfamily (name ID 17) holds the full style name,
+		// where the subfamily (name ID 2) is limited to the four RIBBI styles.
+		const styleName = name?.get( 17 ) || subfamily;
+		const usWeightClass = font.opentype.tables[ 'OS/2' ]?.usWeightClass;
 		const fontWeight =
-			font.opentype.tables[ 'OS/2' ]?.usWeightClass || 'normal';
+			getUnclampedWeight( styleName, usWeightClass ) ??
+			( usWeightClass || 'normal' );
 		const weightAxis = font.opentype.tables.fvar?.axes.find(
 			( { tag } ) => tag === 'wght'
 		);
