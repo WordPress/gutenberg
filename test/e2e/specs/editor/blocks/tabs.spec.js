@@ -38,7 +38,9 @@ test.describe( 'Tabs', () => {
 	test.describe( 'Editor functionality', () => {
 		// Makes a tab the default tab with its Tab Panel's "Default tab" setting.
 		async function makeDefaultTab( { editor, page }, label ) {
-			await editor.canvas.getByRole( 'tab', { name: label } ).click();
+			const tab = editor.canvas.getByRole( 'tab', { name: label } );
+			await tab.click();
+			await expect( tab ).toHaveAttribute( 'aria-selected', 'true' );
 
 			// Only the active Tab Panel is visible, so this selects the one for
 			// the clicked tab.
@@ -738,6 +740,64 @@ test.describe( 'Tabs', () => {
 			// Undo restores the order and the default tab.
 			await pageUtils.pressKeys( 'primary+z' );
 			await expect( tabs ).toHaveText( [ 'Tab 1', 'Tab 2' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+		} );
+
+		test( 'keeps the default tab when its tab panel is moved with the block mover', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
+			await makeDefaultTab( { editor, page }, 'Tab 3' );
+
+			// The Tab Panel of the default tab is still selected.
+			await editor.clickBlockToolbarButton( 'Move up' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveText( [ 'Tab 1', 'Tab 3', 'Tab 2' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
+			await expect(
+				page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Default tab' } )
+			).toBeChecked();
+
+			// Undo restores the order and the default tab.
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( tabs ).toHaveText( [ 'Tab 1', 'Tab 2', 'Tab 3' ] );
+			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 2 );
+		} );
+
+		test( 'keeps the default tab when a tab panel before it is deleted', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock(
+				createTabs(
+					[ 'Tab 1', 'Tab 2', 'Tab 3' ],
+					[ 'Panel 1', 'Panel 2', 'Panel 3' ]
+				)
+			);
+			await makeDefaultTab( { editor, page }, 'Tab 3' );
+
+			// Delete the first Tab Panel from the block options menu.
+			await editor.canvas.getByRole( 'tab', { name: 'Tab 1' } ).click();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Tab Panel',
+					exact: true,
+				} )
+			);
+			await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+			const tabs = editor.canvas.getByRole( 'tab' );
+			await expect( tabs ).toHaveText( [ 'Tab 2', 'Tab 3' ] );
 			await expect.poll( () => getDefaultTabIndex( editor ) ).toBe( 1 );
 		} );
 	} );
