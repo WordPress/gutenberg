@@ -9,6 +9,7 @@
  * the trash are restored with it, so a child note the user trashed on its own
  * beforehand stays in the trash.
  *
+ * @package gutenberg
  * @see https://github.com/WordPress/gutenberg/issues/84099
  */
 

@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * Icons registry support.
+ *
+ * @package gutenberg
+ */
+
+/**
  * Returns the SVG elements and attributes allowed for registered icons.
  *
  * @return array[] Allowed SVG elements and attributes.

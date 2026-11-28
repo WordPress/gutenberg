@@ -12,6 +12,8 @@
  * follows edits, so no separate selection metadata is stored. The marker is
  * kept in the raw `post_content` (and REST `raw` view) and only stripped from
  * rendered front-end output by the filter below.
+ *
+ * @package gutenberg
  */
 
 /**

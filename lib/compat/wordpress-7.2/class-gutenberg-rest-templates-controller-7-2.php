@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * REST templates controller compatibility for WordPress 7.2.
+ *
+ * @package gutenberg
+ */
+
+/**
  * Core class used to access templates via the REST API before WordPress 7.2.
  *
  * This class extension exists to prevent a fatal error when a `null` template
