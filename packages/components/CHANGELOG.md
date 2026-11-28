@@ -48,6 +48,7 @@
 -   Update `timezone-mock` development dependency to 1.4.3 ([#87250](https://github.com/WordPress/gutenberg/pull/87250)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 -   Update `@types/highlight-words-core` dependency to 1.2.3 ([#87249](https://github.com/WordPress/gutenberg/pull/87249)).
+-   `ItemGroup`: Mark the deprecated `marquee` selector, which only raises specificity, as intentional for the `selector-no-deprecated` rule in Stylelint 18 ([#87149](https://github.com/WordPress/gutenberg/pull/87149)).
 
 ## 45.0.0 (2026-11-18)
 

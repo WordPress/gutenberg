@@ -31,9 +31,9 @@
 
 	// For FormTokenField
 	&:has(input:invalid[data-validity-visible])
-		.components-form-token-field__input-container:not(
-			:has([aria-expanded="true"])
-		) {
+	.components-form-token-field__input-container:not(
+		:has([aria-expanded="true"])
+	) {
 		@extend %red-error-border;
 	}
 

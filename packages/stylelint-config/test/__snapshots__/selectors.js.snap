@@ -3,6 +3,24 @@
 exports[`flags warnings with invalid selectors css > snapshot matches warnings 1`] = `
 [
   {
+    "column": 47,
+    "endColumn": 48,
+    "endLine": 18,
+    "line": 18,
+    "rule": "@stylistic/block-closing-brace-newline-before",
+    "severity": "error",
+    "text": "Expected newline before "}" (@stylistic/block-closing-brace-newline-before)",
+  },
+  {
+    "column": 18,
+    "endColumn": 19,
+    "endLine": 18,
+    "line": 18,
+    "rule": "@stylistic/declaration-block-trailing-semicolon",
+    "severity": "error",
+    "text": "Expected a trailing semicolon (@stylistic/declaration-block-trailing-semicolon)",
+  },
+  {
     "column": 12,
     "endColumn": 13,
     "endLine": 17,

@@ -1,4 +1,4 @@
 .example {
 	--my-token: 1rem;
-	color: var(--my-token);
+	margin: var(--my-token);
 }

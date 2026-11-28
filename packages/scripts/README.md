@@ -324,13 +324,15 @@ This is how you execute the script with presented setup:
 - `npm run lint:style` - lints CSS, PCSS, and SCSS files in the entire project’s directories.
 - `npm run lint:css:src` - lints only CSS files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
+When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that Stylelint expands the globs (like the `**` globstar) the same way regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
 It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](https://www.npmjs.com/package/@wordpress/stylelint-config) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+This script uses Stylelint 18. If you are upgrading from Stylelint 17, follow [Upgrading to Stylelint 18](https://github.com/WordPress/gutenberg/tree/HEAD/packages/stylelint-config/README.md#upgrading-to-stylelint-18) in the `@wordpress/stylelint-config` documentation, and check any Stylelint flags you pass to `lint-style` against the stricter parsing in the [Stylelint 18 migration guide](https://stylelint.io/migration-guide/to-18).
 
 ### `packages-update`
 

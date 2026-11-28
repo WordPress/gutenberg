@@ -25,6 +25,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	}
 
 	&.is-separated {
+		// stylelint-disable-next-line selector-no-deprecated -- `:not(marquee)` only raises specificity; no element is meant to match it.
 		> *:not(marquee) > * {
 			border-block-end: 1px solid $surface-border-color;
 		}

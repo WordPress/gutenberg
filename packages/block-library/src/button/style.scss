@@ -145,7 +145,7 @@ $blocks-block__margin: 0.5em;
 		.wp-block-button.is-style-outline
 		> .wp-block-button__link:not(.has-text-color)
 	),
-		:where(
+	:where(
 		.wp-block-button
 		.wp-block-button__link.is-style-outline:not(.has-text-color)
 	) {
@@ -156,7 +156,7 @@ $blocks-block__margin: 0.5em;
 		.wp-block-button.is-style-outline
 		> .wp-block-button__link:not(.has-background)
 	),
-		:where(
+	:where(
 		.wp-block-button
 		.wp-block-button__link.is-style-outline:not(.has-background)
 	) {

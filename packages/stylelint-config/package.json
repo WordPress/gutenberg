@@ -20,7 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=22.13.0"
+		"node": "^22.22.2 || ^24.15.0 || >=26.0.0"
 	},
 	"files": [
 		"CHANGELOG.md",
@@ -41,22 +41,22 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@stylistic/stylelint-plugin": "^5.2.1",
+		"@stylistic/stylelint-plugin": "^6.0.1",
 		"@wordpress/theme-build-tools": "file:../theme-build-tools",
-		"stylelint-config-recommended": "^18.0.0",
-		"stylelint-config-recommended-scss": "^17.0.1"
+		"stylelint-config-recommended": "^19.1.0",
+		"stylelint-config-recommended-scss": "^18.0.0"
 	},
 	"devDependencies": {
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
 		"@wordpress/theme": "file:../theme",
-		"stylelint": "^17.14.1",
-		"stylelint-scss": "^7.2.0",
+		"stylelint": "^18.1.0",
+		"stylelint-scss": "^7.5.0",
 		"vitest": "^5.1.1"
 	},
 	"peerDependencies": {
 		"@wordpress/theme": "^3.0.0 || ^4.0.0 || ^5.0.0",
-		"stylelint": "^17.14.1",
-		"stylelint-scss": "^7.2.0"
+		"stylelint": "^18.0.0",
+		"stylelint-scss": "^7.5.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/theme": {

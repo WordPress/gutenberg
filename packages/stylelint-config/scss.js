@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 
 /** @type {import('stylelint').Config} */
 export default {
-	extends: [ './', 'stylelint-config-recommended-scss' ].map( ( m ) =>
+	extends: [ './index.js', 'stylelint-config-recommended-scss' ].map( ( m ) =>
 		fileURLToPath( import.meta.resolve( m ) )
 	),
 
