@@ -3,6 +3,7 @@ import {
 	DEFAULT_THRESHOLD,
 	loadRoutingRules,
 	parseRoutingRule,
+	readContext,
 } from '../routing-rules.ts';
 
 describe( 'parseRoutingRule', () => {
@@ -72,6 +73,29 @@ describe( 'parseRoutingRule', () => {
 	} );
 } );
 
+describe( 'readContext', () => {
+	it( 'reads the object that the default export returns', async () => {
+		expect(
+			await readContext( 'data', {
+				default: async () => ( { stores: [ 'core' ] } ),
+			} )
+		).toEqual( { stores: [ 'core' ] } );
+	} );
+
+	it.each( [
+		[ 'a default export that is not a function', { default: {} } ],
+		[ 'a function that returns an array', { default: () => [] } ],
+		[
+			'an object with a question',
+			{ default: () => ( { question: 'Ask.' } ) },
+		],
+	] )( 'rejects a module with %s', async ( _, module ) => {
+		await expect( readContext( 'data', module ) ).rejects.toThrow(
+			/^data\.mts: /
+		);
+	} );
+} );
+
 describe( 'loadRoutingRules', () => {
 	it( 'reads the routing files in the repository', async () => {
 		const rules = await loadRoutingRules();
@@ -79,5 +103,14 @@ describe( 'loadRoutingRules', () => {
 		expect( rules.map( ( rule ) => rule.id ) ).toContain(
 			'design-system-api'
 		);
+	} );
+
+	it( 'reads the context of a rule from its .mts file', async () => {
+		const [ withContext, withoutContext ] = await loadRoutingRules(
+			new URL( './fixtures/routing-rules/', import.meta.url )
+		);
+
+		expect( withContext.context ).toEqual( { stores: [ 'core' ] } );
+		expect( withoutContext.context ).toBeUndefined();
 	} );
 } );

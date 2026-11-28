@@ -14,7 +14,10 @@ export type DecisionApi = {
 export type DecisionRequest = {
 	model: string;
 	state: string;
-	questions: Record< string, { type: 'noul'; instructions: string } >;
+	questions: Record<
+		string,
+		{ type: 'noul'; instructions: string | Record< string, unknown > }
+	>;
 };
 
 type DecisionResponse = {
@@ -32,7 +35,9 @@ type CloudflareEnvelope = {
 const TIMEOUT_MS = 120_000;
 
 /**
- * Builds a request with one yes or no question for each routing rule.
+ * Builds a request with one yes or no question for each routing rule. A rule
+ * with reference data sends an object, with the question in its own field, as
+ * the System One documentation recommends.
  *
  * @param state Evidence for the model to read.
  * @param rules Routing rules.
@@ -50,7 +55,12 @@ export function buildRequest(
 		questions: Object.fromEntries(
 			rules.map( ( rule ) => [
 				rule.id,
-				{ type: 'noul', instructions: rule.instructions },
+				{
+					type: 'noul',
+					instructions: rule.context
+						? { question: rule.instructions, ...rule.context }
+						: rule.instructions,
+				},
 			] )
 		),
 	};

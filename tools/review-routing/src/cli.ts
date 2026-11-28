@@ -82,8 +82,13 @@ const { state, stats } = buildEvidence( pull, generated );
 const request = buildRequest( state, rules, DECISION_MODEL ?? '' );
 
 if ( values[ 'dry-run' ] ) {
-	const questions = rules.map(
-		( rule ) => `### ${ rule.id }\n\n${ rule.instructions }`
+	const questions = Object.entries( request.questions ).map(
+		( [ id, { instructions } ] ) =>
+			`### ${ id }\n\n${
+				typeof instructions === 'string'
+					? instructions
+					: `\`\`\`json\n${ JSON.stringify( instructions, null, '\t' ) }\n\`\`\``
+			}`
 	);
 	process.stdout.write(
 		`${ state }\n\n---\n\n# Questions\n\n${ questions.join( '\n\n' ) }\n`

@@ -21,6 +21,20 @@ Does this change add or change a public API of the design system packages? ...
 
 Ask about one kind of change in each file. A question that combines several conditions gives a less useful probability, and the model can let one condition hide another. To route several kinds of change to the same reviewer, add a file for each kind with the same `reviewer`. The tool decides each rule on its own and does not combine the rules of a reviewer, so the report shows the probability of each rule. To ask a new reviewer, or to opt yourself in to a kind of change, add a file.
 
+### Reference data
+
+The model knows only what the question and the pull request tell it. To give it reference data, such as a list of names that changes as the project grows, add a TypeScript script file with the same name and the `.mts` extension next to the routing file. Its default export takes no arguments and returns a JSON-serializable object:
+
+```ts
+export default async function () {
+	return { stores: [ 'core', 'core/editor' ] };
+}
+```
+
+The model then reads the question and the data as one object, `{ "question": "...", "stores": [ ... ] }`, so the question can name the field: "Does this change add an action to one of the stores in `stores`?" `--dry-run` prints this object.
+
+The tool runs this file each time that it loads the rules, also with `--dry-run`, so treat it like any other code that you run from a checkout. It runs with Node.js, from the base branch in CI, and can use only Node.js built-in modules. To read a file of the repository, make its path from `import.meta.url`, and add its directory to the sparse checkout in `.github/workflows/review-routing.yml`.
+
 ## What the model reads
 
 Every rule reads the same evidence:
