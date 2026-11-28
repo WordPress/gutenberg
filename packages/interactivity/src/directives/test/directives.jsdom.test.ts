@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { hydrate } from 'preact';
+import { hydrate, render } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives.
 import { toVdom } from '../../vdom';
@@ -283,5 +283,151 @@ describe( 'negation operator', () => {
 		expect( valueElement ).not.toHaveAttribute( 'hidden' );
 		expect( getterElement ).not.toHaveAttribute( 'hidden' );
 		expect( console ).not.toHaveWarned();
+	} );
+} );
+
+describe( 'input value and checked attributes', () => {
+	it( 'does not overwrite the value or checked state when the element re-renders', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, { state: { invalid: false } } );
+
+		const region = createRegion(
+			namespace,
+			'<input id="text" value="from server" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="plain" value="from server">' +
+				'<input id="empty" value="" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="box" type="checkbox" checked data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="one" type="radio" name="r" value="1" checked data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="two" type="radio" name="r" value="2" data-wp-bind--aria-invalid="state.invalid">'
+		);
+		await hydrateRegion( region );
+
+		const text = region.querySelector( '#text' ) as HTMLInputElement;
+		const plain = region.querySelector( '#plain' ) as HTMLInputElement;
+		const empty = region.querySelector( '#empty' ) as HTMLInputElement;
+		const box = region.querySelector( '#box' ) as HTMLInputElement;
+		const one = region.querySelector( '#one' ) as HTMLInputElement;
+		const two = region.querySelector( '#two' ) as HTMLInputElement;
+
+		// The visitor edits every control.
+		text.value = 'typed';
+		plain.value = 'typed';
+		empty.value = 'typed';
+		box.checked = false;
+		one.checked = false;
+		two.checked = true;
+
+		// The `aria-invalid` binding on the same elements re-renders them.
+		await act( () => {
+			state.invalid = true;
+		} );
+
+		expect( text ).toHaveAttribute( 'aria-invalid', 'true' );
+		expect( text.value ).toBe( 'typed' );
+		expect( plain.value ).toBe( 'typed' );
+		expect( empty.value ).toBe( 'typed' );
+		expect( box.checked ).toBe( false );
+		expect( two.checked ).toBe( true );
+
+		// The edit also survives the next re-render, when invalid returns to false.
+		await act( () => {
+			state.invalid = false;
+		} );
+
+		expect( text ).toHaveAttribute( 'aria-invalid', 'false' );
+		expect( text.value ).toBe( 'typed' );
+		expect( plain.value ).toBe( 'typed' );
+		expect( empty.value ).toBe( 'typed' );
+		expect( box.checked ).toBe( false );
+		expect( two.checked ).toBe( true );
+	} );
+
+	it( 'treats a server-rendered value and checked as defaults, not as the current values', async () => {
+		const namespace = uniqueNamespace();
+		store( namespace, { state: { invalid: false } } );
+
+		const region = createRegion(
+			namespace,
+			'<input id="text" value="from server" data-wp-bind--aria-invalid="state.invalid">' +
+				'<input id="box" type="checkbox" checked data-wp-bind--aria-invalid="state.invalid">'
+		);
+		await hydrateRegion( region );
+
+		const text = region.querySelector( '#text' ) as HTMLInputElement;
+		const box = region.querySelector( '#box' ) as HTMLInputElement;
+
+		expect( text.value ).toBe( 'from server' );
+		expect( text.defaultValue ).toBe( 'from server' );
+		expect( box.checked ).toBe( true );
+	} );
+
+	it( 'lets data-wp-bind--value control the live value', async () => {
+		const namespace = uniqueNamespace();
+		const { state } = store( namespace, { state: { shown: 'bound' } } );
+
+		const region = createRegion(
+			namespace,
+			'<input value="from server" data-wp-bind--value="state.shown">'
+		);
+		await hydrateRegion( region );
+
+		const input = region.querySelector( 'input' ) as HTMLInputElement;
+		expect( input.value ).toBe( 'bound' );
+
+		await act( () => {
+			state.shown = 'updated';
+		} );
+
+		expect( input.value ).toBe( 'updated' );
+		// The server-rendered value stays the default.
+		expect( input.defaultValue ).toBe( 'from server' );
+	} );
+
+	it( 'applies the destination value and checked state to a reused input on navigation', async () => {
+		const namespace = uniqueNamespace();
+		store( namespace, { state: { invalid: false } } );
+		const markup = ( value: string, checked: boolean ) =>
+			`<div data-wp-interactive='{ "namespace": "${ namespace }" }'>` +
+			`<input id="text" value="${ value }" data-wp-bind--aria-invalid="state.invalid">` +
+			`<input id="plain" value="${ value }">` +
+			`<input id="box" type="checkbox"${
+				checked ? ' checked' : ''
+			} data-wp-bind--aria-invalid="state.invalid">` +
+			'</div>';
+
+		const container = document.createElement( 'div' );
+		container.innerHTML = markup( 'from server', true );
+		document.body.appendChild( container );
+		await act( () =>
+			hydrate( toVdom( container.firstElementChild! ), container )
+		);
+
+		const text = container.querySelector( '#text' ) as HTMLInputElement;
+		const plain = container.querySelector( '#plain' ) as HTMLInputElement;
+		const box = container.querySelector( '#box' ) as HTMLInputElement;
+		text.value = 'typed';
+		plain.value = 'typed';
+		box.checked = false;
+
+		// The destination page's HTML is parsed separately and rendered onto
+		// the same root, so Preact reuses the existing input nodes.
+		const destination = document.createElement( 'div' );
+		destination.innerHTML = markup( 'destination', true );
+		// `render` is Preact's, not a Testing Library util; the rule matches the name.
+		// eslint-disable-next-line testing-library/no-unnecessary-act
+		await act( () =>
+			render( toVdom( destination.firstElementChild! ), container )
+		);
+
+		const navigatedText = container.querySelector( '#text' )!;
+		const navigatedPlain = container.querySelector( '#plain' )!;
+		const navigatedBox = container.querySelector( '#box' )!;
+		expect( navigatedText ).toBe( text );
+		expect( navigatedPlain ).toBe( plain );
+		expect( navigatedBox ).toBe( box );
+		expect( text.value ).toBe( 'destination' );
+		expect( text.defaultValue ).toBe( 'destination' );
+		expect( plain.value ).toBe( 'destination' );
+		expect( box.checked ).toBe( true );
 	} );
 } );
