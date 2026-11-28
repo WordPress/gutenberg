@@ -11,14 +11,16 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { CommentsPaginationArrowControls } from './comments-pagination-arrow-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { CommentsPaginationAttributes } from './types';
 
 export default function QueryPaginationEdit( {
 	attributes: { paginationArrow },
 	setAttributes,
 	clientId,
-} ) {
+}: BlockEditProps< CommentsPaginationAttributes > ) {
 	const hasNextPreviousBlocks = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
@@ -42,7 +44,9 @@ export default function QueryPaginationEdit( {
 	// Get the Discussion settings
 	const pageComments = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
+		const { __experimentalDiscussionSettings } = getSettings() as {
+			__experimentalDiscussionSettings?: { pageComments?: boolean };
+		};
 		return __experimentalDiscussionSettings?.pageComments;
 	}, [] );
 
@@ -81,7 +85,10 @@ export default function QueryPaginationEdit( {
 							<CommentsPaginationArrowControls
 								value={ paginationArrow }
 								onChange={ ( value ) => {
-									setAttributes( { paginationArrow: value } );
+									setAttributes( {
+										paginationArrow: value as
+											string | undefined,
+									} );
 								} }
 							/>
 						</ToolsPanelItem>
