@@ -1,6 +1,6 @@
 ---
 name: browse
-description: Use when checking a change by hand in the real editor or admin, from the command line: open a logged-in browser on the local site, set up content, use the keyboard, call the REST API, and read back the blocks or the page.
+description: 'Use when checking a change by hand in the real editor or admin, from the command line: open a logged-in browser on the local site, set up content, use the keyboard, call the REST API, and read back the blocks or the page.'
 ---
 
 # Browse
