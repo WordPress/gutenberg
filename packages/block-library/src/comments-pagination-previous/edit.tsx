@@ -6,7 +6,7 @@ import type {
 	CommentsPaginationPreviousBlockContext,
 } from './types';
 
-const arrowMap: Record< string, string > = {
+const arrowMap = {
 	none: '',
 	arrow: '←',
 	chevron: '«',
