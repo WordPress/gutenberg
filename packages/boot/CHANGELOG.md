@@ -10,6 +10,7 @@
 
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 -   Keep the sidebar's Dashboard link readable when it has keyboard focus. Before, the admin color scheme's link focus color made the label hard to read on the dark sidebar ([#87419](https://github.com/WordPress/gutenberg/pull/87419)).
+-   Keep the selected block in the parent URL when opening a nested entity in the extensible site editor ([#87253](https://github.com/WordPress/gutenberg/pull/87253)).
 
 ## 0.27.0 (2026-11-18)
 

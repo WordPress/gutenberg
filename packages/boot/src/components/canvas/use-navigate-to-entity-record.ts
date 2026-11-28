@@ -26,7 +26,7 @@ type Navigate = ( options: {
 	search?: (
 		previous: Record< string, unknown >
 	) => Record< string, unknown >;
-} ) => void;
+} ) => Promise< void >;
 
 interface NavigateParams {
 	postType: string;
@@ -62,7 +62,7 @@ export default function useNavigateToEntityRecord(
 	const canGoBack = useCanGoBack();
 
 	const onNavigateToEntityRecord = useCallback(
-		( params: NavigateParams ) => {
+		async ( params: NavigateParams ) => {
 			/*
 			 * Stash the block selected in the entity being left, so returning to
 			 * it can restore the user's place. The edits hold the external
@@ -97,7 +97,8 @@ export default function useNavigateToEntityRecord(
 			const selectedBlock = edits?.selection?.selectionStart?.clientId;
 
 			if ( selectedBlock ) {
-				navigate( {
+				// Commit the current history entry before navigating to the next one.
+				await navigate( {
 					search: ( previous: Record< string, unknown > ) => ( {
 						...previous,
 						selectedBlock,
