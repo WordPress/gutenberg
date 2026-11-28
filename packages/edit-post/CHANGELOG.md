@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Post editor: Return to the previous entity after deleting the one being edited, instead of staying on the deleted record ([#87123](https://github.com/WordPress/gutenberg/pull/87123)).
 ## 9.2.0 (2026-11-18)
 
 ## 9.1.0 (2026-11-04)

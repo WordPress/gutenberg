@@ -16,6 +16,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -359,6 +360,18 @@ function Layout( {
 		initialPostType,
 		'post-only'
 	);
+
+	// Keep the latest navigation state in a ref so that `onActionPerformed`
+	// doesn't change identity every time the entity history changes.
+	const navigationStateRef = useRef( {} );
+	useEffect( () => {
+		navigationStateRef.current = {
+			currentPostId,
+			currentPostType,
+			onNavigateToPreviousEntityRecord,
+		};
+	}, [ currentPostId, currentPostType, onNavigateToPreviousEntityRecord ] );
+
 	const isEditingTemplate = currentPostType === 'wp_template';
 	const {
 		mode,
@@ -501,6 +514,34 @@ function Layout( {
 							deleted: 1,
 							post_type: items[ 0 ].type,
 						} );
+					}
+					break;
+				case 'delete-post':
+					{
+						const navigationState = navigationStateRef.current;
+						const deletedItem = items[ 0 ];
+
+						// Only react if the deleted entity is the one being edited.
+						if (
+							String( deletedItem.id ) !==
+								String( navigationState.currentPostId ) ||
+							deletedItem.type !== navigationState.currentPostType
+						) {
+							break;
+						}
+
+						// If the deleted entity was reached by navigating from
+						// another one (e.g. a post), go back to it. Otherwise
+						// (e.g. it was opened directly), go to the list.
+						if (
+							navigationState.onNavigateToPreviousEntityRecord
+						) {
+							navigationState.onNavigateToPreviousEntityRecord();
+						} else {
+							document.location.href = addQueryArgs( 'edit.php', {
+								post_type: deletedItem.type,
+							} );
+						}
 					}
 					break;
 				case 'duplicate-post':
