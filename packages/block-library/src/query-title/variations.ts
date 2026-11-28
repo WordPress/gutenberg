@@ -1,6 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { title } from '@wordpress/icons';
-const variations = [
+import type { BlockVariation } from '@wordpress/blocks';
+import type { QueryTitleAttributes } from './types';
+
+const variations: BlockVariation< QueryTitleAttributes >[] = [
 	{
 		isDefault: true,
 		name: 'archive-title',

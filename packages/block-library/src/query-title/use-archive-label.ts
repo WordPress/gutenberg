@@ -8,29 +8,36 @@ export function useArchiveLabel() {
 		// declaring @wordpress/editor as a dependency, we must access its
 		// store by string.
 		// The solution here is to split WP specific blocks from generic blocks.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+
 		const { getCurrentPostId, getCurrentPostType, getCurrentTemplateId } =
-			select( 'core/editor' );
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/editor' ) as {
+				getCurrentPostId: () => number | undefined;
+				getCurrentPostType: () => string | null;
+				getCurrentTemplateId: () => string | null;
+			};
 		const currentPostType = getCurrentPostType();
 		const templateId =
 			getCurrentTemplateId() ||
 			( currentPostType === 'wp_template' ? getCurrentPostId() : null );
 
 		return templateId
-			? select( coreStore ).getEditedEntityRecord(
-					'postType',
-					'wp_template',
-					templateId
-				)?.slug
+			? (
+					select( coreStore ).getEditedEntityRecord(
+						'postType',
+						'wp_template',
+						templateId
+					) as { slug?: string } | undefined
+				 )?.slug
 			: null;
 	}, [] );
 	const taxonomyMatches = templateSlug?.match(
 		/^(category|tag|taxonomy-([^-]+))$|^(((category|tag)|taxonomy-([^-]+))-(.+))$/
 	);
-	let taxonomy;
-	let term;
+	let taxonomy: string | undefined;
+	let term: string | undefined;
 	let isAuthor = false;
-	let authorSlug;
+	let authorSlug: string | undefined;
 	if ( taxonomyMatches ) {
 		// If is for a all taxonomies of a type
 		if ( taxonomyMatches[ 1 ] ) {
@@ -62,17 +69,23 @@ export function useArchiveLabel() {
 		( select ) => {
 			const { getEntityRecords, getTaxonomy, getAuthors } =
 				select( coreStore );
-			let archiveTypeLabel;
-			let archiveNameLabel;
+			let archiveTypeLabel: string | undefined;
+			let archiveNameLabel: string | undefined;
 			if ( taxonomy ) {
-				archiveTypeLabel =
-					getTaxonomy( taxonomy )?.labels?.singular_name;
+				archiveTypeLabel = (
+					getTaxonomy( taxonomy ) as
+						{ labels?: { singular_name?: string } } | undefined
+				 )?.labels?.singular_name;
 			}
 			if ( term ) {
-				const records = getEntityRecords( 'taxonomy', taxonomy, {
-					slug: term,
-					per_page: 1,
-				} );
+				const records = getEntityRecords< { name: string } >(
+					'taxonomy',
+					taxonomy!,
+					{
+						slug: term,
+						per_page: 1,
+					}
+				);
 				if ( records && records[ 0 ] ) {
 					archiveNameLabel = records[ 0 ].name;
 				}
