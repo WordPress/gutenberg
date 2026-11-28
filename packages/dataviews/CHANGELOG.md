@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+-   Keep grid and table picker focus outlines inside items so scroll containers do not clip them ([#87537](https://github.com/WordPress/gutenberg/pull/87537)).
 -   Hide the disabled filters "Reset" button right after it is clicked with a mouse; it is now only revealed for keyboard focus ([#87351](https://github.com/WordPress/gutenberg/pull/87351)).
 -   DataForm: Fix a `card` layout that can't be collapsed crashing when its header shows a summary, and make that summary readable by screen readers ([#87395](https://github.com/WordPress/gutenberg/pull/87395)).
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).

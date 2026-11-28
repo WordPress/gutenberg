@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/mixins" as *;
+
 // Picker-specific table styles
 // The table picker mainly reuses the regular table styles from ../table/style.scss
 // Add any picker-specific overrides here if needed in the future.
@@ -20,7 +22,16 @@
 		}
 
 		[data-active-item="true"] {
-			outline: 2px solid var(--wpds-color-stroke-focus);
+			@include outset-ring__focus();
+			// Keep the focus ring inside the row so scrolling cannot clip it.
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
+
+			// Prevent sticky scroll-fade cells from painting the 1px row
+			// divider over the inset focus outline.
+			&::before,
+			&::after {
+				background-image: none;
+			}
 		}
 	}
 
