@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { screen, waitFor, within } from '@testing-library/react';
-import type { ReactElement, ReactNode } from 'react';
+import type { MouseEventHandler, ReactElement, ReactNode } from 'react';
 import { dispatch } from '@wordpress/data';
 import Iframe from '../';
 import { store as blockEditorStore } from '../../../store';
@@ -90,5 +90,67 @@ describe( 'Iframe', () => {
 		// redispatched on the iframe. Only the copy reaches the handler.
 		expect( onClick ).toHaveBeenCalledTimes( 1 );
 		expect( onClick.mock.calls[ 0 ][ 0 ].target ).toBe( frame );
+	} );
+
+	it( 'forwards mouse movement before the canvas handles it', async () => {
+		const order: string[] = [];
+		const onMouseMove = vi.fn< MouseEventHandler< HTMLDivElement > >(
+			( event ) => {
+				order.push( 'outer' );
+				event.preventDefault();
+			}
+		);
+		const { frame, button } = await renderCanvas( ( canvas ) => (
+			<div onMouseMove={ onMouseMove }>{ canvas }</div>
+		) );
+		const onCanvasMouseMove = vi.fn( ( event: Event ) => {
+			order.push( 'canvas' );
+			return event.defaultPrevented;
+		} );
+		button.addEventListener( 'mousemove', onCanvasMouseMove );
+		const canvasWindow = frame.contentWindow! as typeof window;
+		button.dispatchEvent(
+			new canvasWindow.MouseEvent( 'mousemove', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 10,
+				clientY: 20,
+			} )
+		);
+
+		expect( order ).toEqual( [ 'outer', 'canvas' ] );
+		expect( onMouseMove ).toHaveBeenCalledTimes( 1 );
+		expect( onCanvasMouseMove ).toHaveReturnedWith( true );
+		const [ event ] = onMouseMove.mock.calls[ 0 ];
+		const { left, top } = frame.getBoundingClientRect();
+		expect( event.target ).toBe( frame );
+		expect( event.clientX ).toBe( left + 10 );
+		expect( event.clientY ).toBe( top + 20 );
+	} );
+
+	it( 'keeps dragover canvas-first even when the outer iframe prevents it', async () => {
+		const { frame, button } = await renderCanvas();
+		const onCanvasDragOver = vi.fn(
+			( event: Event ) => event.defaultPrevented
+		);
+		frame.contentDocument!.documentElement.addEventListener(
+			'dragover',
+			onCanvasDragOver
+		);
+		const onOuterDragOver = vi.fn( ( event: Event ) =>
+			event.preventDefault()
+		);
+		frame.addEventListener( 'dragover', onOuterDragOver );
+		const canvasWindow = frame.contentWindow! as typeof window;
+		const event = new canvasWindow.DragEvent( 'dragover', {
+			bubbles: true,
+			cancelable: true,
+		} );
+		button.dispatchEvent( event );
+
+		expect( onCanvasDragOver ).toHaveBeenCalledTimes( 1 );
+		expect( onCanvasDragOver ).toHaveReturnedWith( false );
+		expect( onOuterDragOver ).toHaveBeenCalledTimes( 1 );
+		expect( event.defaultPrevented ).toBe( true );
 	} );
 } );
