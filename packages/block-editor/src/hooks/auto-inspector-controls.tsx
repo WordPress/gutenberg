@@ -1,7 +1,7 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import { useContext, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
@@ -90,6 +90,8 @@ function AutoRegisterControls( {
 		return generateFieldsFromAttributes( blockType.attributes );
 	}, [ blockType?.attributes ] );
 
+	const { validity } = useFormValidity( attributes!, fields, form );
+
 	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}
@@ -107,6 +109,7 @@ function AutoRegisterControls( {
 					fields={ fields }
 					form={ form }
 					onChange={ setAttributes }
+					validity={ validity }
 				/>
 			</PanelBody>
 		</InspectorControls>
