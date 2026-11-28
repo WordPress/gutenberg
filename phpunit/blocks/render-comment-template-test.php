@@ -32,6 +32,7 @@ class Tests_Blocks_RenderCommentTemplateBlock extends WP_UnitTestCase {
 			'default_comments_page',
 			'page_comments',
 			'previous_default_page',
+			'thread_comments',
 			'thread_comments_depth',
 		);
 		foreach ( $options as $option ) {
@@ -159,7 +160,8 @@ END;
 
 		$args = $render_block_callback->get_args();
 		$this->assertSame( 'core/comment-content', $args[0][2]->name );
-		$this->assertSame( 'core/comment-template', $args[1][2]->name );
+		// Each comment renders from a copy named `core/null`, so block supports only apply to the outer list.
+		$this->assertSame( 'core/null', $args[1][2]->name );
 		$this->assertCount( 2, $args[1][2]->inner_blocks, "Inner block inserted by render_block_data filter wasn't retained." );
 		$this->assertInstanceOf(
 			'WP_Block',
@@ -170,6 +172,87 @@ END;
 			'core/social-links',
 			$args[1][2]->inner_blocks[1]->name,
 			"Inner block inserted by render_block_data isn't named as expected."
+		);
+	}
+
+	public function test_block_gap_layout_applies_to_outer_list_only() {
+		// The container class that carries the gap is only added when the theme supports block gap.
+		add_filter( 'wp_theme_json_data_theme', array( $this, 'filter_enable_block_gap' ) );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template {"style":{"spacing":{"blockGap":"48px"}}} --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$markup        = $block->render();
+
+		remove_filter( 'wp_theme_json_data_theme', array( $this, 'filter_enable_block_gap' ) );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'ol' ) );
+		$this->assertTrue( $processor->has_class( 'is-layout-flow' ), 'Outer list is missing the layout class.' );
+		$this->assertTrue( $processor->has_class( 'wp-block-comment-template-is-layout-flow' ) );
+		$this->assertMatchesRegularExpression(
+			'/\bwp-container-core-comment-template-is-layout-[a-z0-9]+\b/',
+			$processor->get_attribute( 'class' ),
+			'Outer list is missing the container class that carries the block gap.'
+		);
+		$this->assertSame( 1, preg_match_all( '/(?<![\w-])is-layout-flow(?![\w-])/', $markup ), 'Layout classes should only be added once.' );
+	}
+
+	public function test_block_gap_layout_is_not_added_to_nested_replies() {
+		update_option( 'thread_comments', true );
+		update_option( 'thread_comments_depth', 5 );
+
+		self::factory()->comment->create(
+			array(
+				'comment_post_ID'      => self::$custom_post->ID,
+				'comment_parent'       => self::$comment_ids[0],
+				'comment_author'       => 'Test',
+				'comment_author_email' => 'test@example.org',
+				'comment_content'      => 'Reply',
+				'comment_approved'     => '1',
+			)
+		);
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:comment-template {"style":{"spacing":{"blockGap":"48px"}}} --><!-- wp:comment-content /--><!-- /wp:comment-template -->'
+		);
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId' => self::$custom_post->ID,
+			)
+		);
+		$markup        = $block->render();
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'ol' ) );
+		$this->assertTrue( $processor->has_class( 'is-layout-flow' ), 'Outer list is missing the layout class.' );
+
+		$this->assertTrue( $processor->next_tag( 'ol' ), 'Nested reply list was not rendered.' );
+		$this->assertNull( $processor->get_attribute( 'class' ), 'Nested reply list should not have layout classes.' );
+
+		$this->assertSame( 1, preg_match_all( '/(?<![\w-])is-layout-flow(?![\w-])/', $markup ), 'Layout classes should only be added once.' );
+		$this->assertStringContainsString( 'Reply', $markup );
+	}
+
+	public function filter_enable_block_gap( $theme_json ) {
+		return $theme_json->update_with(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+			)
 		);
 	}
 }

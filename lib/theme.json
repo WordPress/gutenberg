@@ -413,6 +413,11 @@
 					}
 				}
 			},
+			"core/comment-template": {
+				"spacing": {
+					"blockGap": "0"
+				}
+			},
 			"core/icon": {
 				"dimensions": {
 					"width": "24px"

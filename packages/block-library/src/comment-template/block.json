@@ -13,9 +13,11 @@
 		"align": true,
 		"html": false,
 		"reusable": false,
+		"layout": true,
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"blockGap": true
 		},
 		"typography": {
 			"fontSize": true,
