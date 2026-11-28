@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   `Page`: Describe that `breadcrumbs` needs a `@wordpress/route` router and an `ariaLabel`, and set `ariaLabel` in the examples that have no title.
+
 ### Internal
 
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).

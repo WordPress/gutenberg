@@ -35,7 +35,7 @@ type Story = StoryObj< typeof meta >;
 
 export const Default: Story = {
 	args: {
-		title: 'Page title',
+		title: 'Settings',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -44,8 +44,8 @@ export const Default: Story = {
 
 export const WithSubtitle: Story = {
 	args: {
-		title: 'Page title',
-		subTitle: 'All of the subtitle text you need goes here.',
+		title: 'Settings',
+		subTitle: 'Manage how your site looks and works.',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -56,11 +56,12 @@ export const WithBreadcrumbs: Story = {
 	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
+		ariaLabel: 'Privacy',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
+					{ label: 'Settings', to: '/settings' },
+					{ label: 'Privacy' },
 				] }
 			/>
 		),
@@ -71,7 +72,7 @@ export const WithBreadcrumbs: Story = {
 
 export const WithVisual: Story = {
 	args: {
-		title: 'Page title',
+		title: 'Settings',
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -84,11 +85,12 @@ export const WithVisualAndBreadcrumbs: Story = {
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
+		ariaLabel: 'Privacy',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
+					{ label: 'Settings', to: '/settings' },
+					{ label: 'Privacy' },
 				] }
 			/>
 		),
@@ -105,7 +107,7 @@ export const WithVisualAndBreadcrumbs: Story = {
  */
 export const WithImageVisual: Story = {
 	args: {
-		title: 'Page title',
+		title: 'Profile',
 		visual: (
 			<img
 				src="https://secure.gravatar.com/avatar/c0ccdd53794779bcc07fcae7b79c4d80?s=48&r=g&d=mm"
@@ -122,12 +124,13 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
-		subTitle: 'All of the subtitle text you need goes here.',
+		subTitle: 'Choose how your site collects and shares visitor data.',
+		ariaLabel: 'Privacy',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
+					{ label: 'Settings', to: '/settings' },
+					{ label: 'Privacy' },
 				] }
 			/>
 		),
@@ -138,6 +141,7 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 
 export const WithoutHeader: Story = {
 	args: {
+		ariaLabel: 'Settings',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -146,8 +150,8 @@ export const WithoutHeader: Story = {
 
 export const WithTitleAndBadges: Story = {
 	args: {
-		title: 'Page title',
-		badges: <Badge intent="informational">Status</Badge>,
+		title: 'Discussion',
+		badges: <Badge intent="informational">New</Badge>,
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -158,11 +162,12 @@ export const WithBreadcrumbsAndBadges: Story = {
 	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
+		ariaLabel: 'Privacy Policy',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
+					{ label: 'Pages', to: '/pages' },
+					{ label: 'Privacy Policy' },
 				] }
 			/>
 		),
@@ -174,16 +179,11 @@ export const WithBreadcrumbsAndBadges: Story = {
 
 export const WithActions: Story = {
 	args: {
-		title: 'Page title',
+		title: 'Settings',
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Cancel
-				</Button>
-				<Button size="compact" variant="solid">
-					Save
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -198,7 +198,7 @@ export const WithActions: Story = {
  */
 export const WithInteractiveNavigation: Story = {
 	render: function Render( args ) {
-		const [ currentHref, setCurrentHref ] = useState( '/overview' );
+		const [ currentHref, setCurrentHref ] = useState( '/settings/general' );
 		const link = useCallback(
 			( {
 				href,
@@ -219,24 +219,27 @@ export const WithInteractiveNavigation: Story = {
 			[]
 		);
 
+		const pages = [
+			{ label: 'General', href: '/settings/general' },
+			{ label: 'Writing', href: '/settings/writing' },
+			{ label: 'Reading', href: '/settings/reading' },
+			{ label: 'Discussion', href: '/settings/discussion' },
+		];
+		const currentPage = pages.find( ( page ) => page.href === currentHref );
+
 		return (
 			<Page
 				{ ...args }
+				// Adjacent pages share the "Settings" title, so name each page
+				// region after its page.
+				ariaLabel={ `${ currentPage?.label } settings` }
 				components={ { link } }
-				navigation={ {
-					items: [
-						{ label: 'Overview', href: '/overview' },
-						{ label: 'Products', href: '/products' },
-						{ label: 'Orders', href: '/orders' },
-						{ label: 'Customers', href: '/customers' },
-					],
-					currentHref,
-				} }
+				navigation={ { items: pages, currentHref } }
 			/>
 		);
 	},
 	args: {
-		title: 'Analytics',
+		title: 'Settings',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -250,17 +253,12 @@ export const WithNavigation: Story = {
 export const WithNavigationAndActions: Story = {
 	...WithInteractiveNavigation,
 	args: {
-		title: 'Analytics',
-		subTitle: 'Review key metrics to understand performance.',
+		title: 'Settings',
+		subTitle: 'Manage how your site looks and works.',
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Export
-				</Button>
-				<Button size="compact" variant="solid">
-					Add widget
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
@@ -268,38 +266,28 @@ export const WithNavigationAndActions: Story = {
 	},
 };
 
-export const FullHeader: Story = {
+/**
+ * The header of a settings subpage. The breadcrumbs lead back to the parent
+ * page, the badge shows the status of the page, and "Save changes" saves it.
+ */
+export const WithBreadcrumbsAndActions: Story = {
 	decorators: [ withRouter ],
 	args: {
-		visual: <Icon icon={ wordpress } size={ 24 } />,
-		subTitle: 'All of the subtitle text you need goes here.',
+		subTitle: 'Choose how your site collects and shares visitor data.',
+		ariaLabel: 'Privacy',
 		breadcrumbs: (
 			<Breadcrumbs
 				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
+					{ label: 'Settings', to: '/settings' },
+					{ label: 'Privacy' },
 				] }
 			/>
 		),
-		badges: <Badge intent="informational">Status</Badge>,
-		navigation: {
-			items: [
-				{ label: 'Overview', href: '/overview' },
-				{ label: 'Products', href: '/products' },
-				{ label: 'Orders', href: '/orders' },
-				{ label: 'Customers', href: '/customers' },
-			],
-			currentHref: '/overview',
-		},
+		badges: <Badge intent="informational">Policy published</Badge>,
 		actions: (
-			<>
-				<Button size="compact" variant="outline">
-					Cancel
-				</Button>
-				<Button size="compact" variant="solid">
-					Save
-				</Button>
-			</>
+			<Button size="compact" variant="solid">
+				Save changes
+			</Button>
 		),
 		showSidebarToggle: false,
 		hasPadding: true,
