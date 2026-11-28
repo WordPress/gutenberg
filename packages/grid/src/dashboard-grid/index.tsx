@@ -26,6 +26,7 @@ import {
 import { GridItem } from './grid-item';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { measureContainer } from '../shared/measure-container';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -166,6 +167,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
 		const [ containerHeight, setContainerHeight ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
+		// Tiles wait for the first measurement; see the effect below.
+		const [ hasMeasured, setHasMeasured ] = useState( false );
+		const measureRef = useRef< HTMLDivElement | null >( null );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
@@ -173,6 +177,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			}
 		);
 		const mergedGridRef = useMergeRefs( [
+			measureRef,
 			setGridRoot,
 			resizeObserverRef,
 			ref,
@@ -182,22 +187,29 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// responsive mode; `useResizeObserver` delivers async. The
 		// computed `column-gap` is read from the resolved CSS so the
 		// math tracks the design-system token under any density.
+		//
+		// Tiles mount only after this runs. Children run their layout
+		// effects before this one, so a tile mounted in the same commit
+		// would read the unmeasured one-column span and size. The update
+		// renders synchronously before paint, so no empty frame shows.
+		//
+		// It runs again once `gridRoot` is set, after the parent's mount
+		// effects, so a gap or size the parent sets on mount still counts.
 		useLayoutEffect( () => {
-			if ( ! gridRoot ) {
+			const node = measureRef.current;
+			if ( ! node ) {
 				return;
 			}
-			const { width, height } = gridRoot.getBoundingClientRect();
+			setHasMeasured( true );
+			const { width, height, columnGap } = measureContainer( node );
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
 			if ( height > 0 ) {
 				setContainerHeight( height );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( gridRoot ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
+			if ( columnGap !== null ) {
+				setGapPx( columnGap );
 			}
 		}, [ gridRoot ] );
 		const effectiveColumns = useMemo(
@@ -726,7 +738,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						} }
 					>
 						{ gridOverlay }
-						{ items.map( ( id ) => {
+						{ ( hasMeasured ? items : [] ).map( ( id ) => {
 							const limitsPx = resizeLimitsByKey.get( id );
 							return (
 								<GridItem
@@ -779,7 +791,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								</GridItem>
 							);
 						} ) }
-						{ remaining }
+						{ hasMeasured && remaining }
 						{ exitingItems.map( ( { key, rect, child } ) => (
 							<ItemExitOverlay
 								key={ `exiting-${ key }` }

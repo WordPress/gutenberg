@@ -27,6 +27,7 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { measureContainer } from '../shared/measure-container';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -149,12 +150,16 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		);
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
+		// Tiles wait for the first measurement; see the effect below.
+		const [ hasMeasured, setHasMeasured ] = useState( false );
+		const measureRef = useRef< HTMLDivElement | null >( null );
 		const resizeObserverRef = useResizeObserver(
 			( [ { contentRect } ] ) => {
 				setContainerWidth( contentRect.width );
 			}
 		);
 		const mergedRootRef = useMergeRefs( [
+			measureRef,
 			setContainer,
 			resizeObserverRef,
 			ref,
@@ -163,19 +168,26 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		// Measure synchronously before paint and snapshot the computed
 		// `column-gap` so the placement math tracks the design-system
 		// token under any density.
+		//
+		// Tiles mount only after this runs. Children run their layout
+		// effects before this one, so a tile mounted in the same commit
+		// would read the unmeasured one-column span and size. The update
+		// renders synchronously before paint, so no empty frame shows.
+		//
+		// It runs again once `container` is set, after the parent's mount
+		// effects, so a gap or size the parent sets on mount still counts.
 		useLayoutEffect( () => {
-			if ( ! container ) {
+			const node = measureRef.current;
+			if ( ! node ) {
 				return;
 			}
-			const { width } = container.getBoundingClientRect();
+			setHasMeasured( true );
+			const { width, columnGap } = measureContainer( node );
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( container ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
+			if ( columnGap !== null ) {
+				setGapPx( columnGap );
 			}
 		}, [ container ] );
 		const effectiveColumns = useMemo(
@@ -616,7 +628,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						}
 					>
 						{ gridOverlay }
-						{ items.map( ( id ) => {
+						{ ( hasMeasured ? items : [] ).map( ( id ) => {
 							const child = childrenMap.get( id );
 							if ( ! child ) {
 								return null;
@@ -658,7 +670,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								</LanesItem>
 							);
 						} ) }
-						{ remaining }
+						{ hasMeasured && remaining }
 						{ exitingItems.map( ( { key, rect, child } ) => (
 							<ItemExitOverlay
 								key={ `exiting-${ key }` }
