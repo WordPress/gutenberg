@@ -29,6 +29,7 @@
 -   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
 -   Inserter, Document Overview: Show a focus ring when the scrolling tab panel receives keyboard focus, so its tab stop is no longer invisible ([#85738](https://github.com/WordPress/gutenberg/pull/85738)).
 -   List View: Arrow Left moves to the parent row when the parent is outside the render window ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+-   Paste styles: Don't paste a block style class, such as `is-style-asterisk`, onto a block that doesn't have that style. Other custom classes are still pasted ([#87401](https://github.com/WordPress/gutenberg/pull/87401)).
 -   Block Bindings: Restore selection, connection, and labels for legacy key-only fields ([#86492](https://github.com/WordPress/gutenberg/pull/86492)).
 -   `updateBlockAttributes`: Skip unknown client IDs, and client IDs without updates when `uniqueByBlock` is set, instead of throwing ([#87337](https://github.com/WordPress/gutenberg/pull/87337)).
 -   Block popover: Turn the resize handles and spacing visualizers with a rotated or scaled block ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
