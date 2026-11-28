@@ -26,6 +26,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { normalizeLegacyLayout } from '../../layouts/utils';
 import { unlock } from '../../lock-unlock';
+import type { BlockTemplate } from '../../store/types';
 import type { Layout } from '../../layouts/types';
 import type {
 	InnerBlocksOptions,
@@ -102,7 +103,12 @@ function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout
+		layout,
+		// A block type template has the same nested shape as a local template.
+		template === undefined
+			? ( blockType?.template as BlockTemplate | undefined )
+			: template,
+		name
 	);
 
 	useInnerBlockTemplateSync(

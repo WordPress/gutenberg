@@ -40,6 +40,7 @@
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
 -   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
 -   Block toolbar: Return focus to the block with Tab or Escape after a toolbar action replaces the block's element, such as changing a heading's level ([#87360](https://github.com/WordPress/gutenberg/pull/87360)).
+-   Template validation: Respect nested InnerBlocks ownership and preserve matching unlocked or locally templated descendants when resetting the root template ([#84805](https://github.com/WordPress/gutenberg/pull/84805)).
 
 ### Internal
 

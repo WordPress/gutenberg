@@ -38,7 +38,9 @@ async function getSettings( {
 				undefined,
 				captureToolbars,
 				undefined,
-				layout
+				layout,
+				undefined,
+				undefined
 			),
 		{
 			wrapper: ( { children }: { children: ReactNode } ) =>
