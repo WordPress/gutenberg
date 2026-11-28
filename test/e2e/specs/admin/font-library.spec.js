@@ -117,4 +117,86 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'When the font list is longer than the window', () => {
+		const FONT_COUNT = 22;
+		let fontFamilyIds = [];
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			fontFamilyIds = [];
+			for ( let i = 1; i <= FONT_COUNT; i++ ) {
+				const name = `Scroll Test Font ${ i }`;
+				const family = await requestUtils.rest( {
+					method: 'POST',
+					path: '/wp/v2/font-families',
+					params: {
+						theme_json_version: 3,
+						font_family_settings: JSON.stringify( {
+							name,
+							slug: `scroll-test-font-${ i }`,
+							fontFamily: `"${ name }", sans-serif`,
+						} ),
+					},
+				} );
+				fontFamilyIds.push( family.id );
+			}
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			for ( const id of fontFamilyIds ) {
+				await requestUtils.rest( {
+					method: 'DELETE',
+					path: `/wp/v2/font-families/${ id }`,
+					params: { force: true },
+				} );
+			}
+		} );
+
+		// Covers the font list needing several scrolls in the same direction when
+		// both the list and the page can scroll.
+		test( 'should scroll only the list, not the page, when the list reaches its end', async ( {
+			page,
+			admin,
+		} ) => {
+			// A short window, so the page can overflow as well as the list.
+			await page.setViewportSize( { width: 1024, height: 450 } );
+			await admin.visitAdminPage(
+				'admin.php',
+				'page=font-library-wp-admin'
+			);
+
+			const tabPanel = page.locator(
+				'.font-library-page__tab-panel:visible'
+			);
+			await expect(
+				tabPanel.getByRole( 'button', {
+					name: /^Scroll Test Font 1 /,
+				} )
+			).toBeVisible();
+
+			const listBox = await tabPanel.boundingBox();
+			await page.mouse.move(
+				listBox.x + listBox.width / 2,
+				listBox.y + listBox.height / 2
+			);
+
+			// Scroll well past the end of the list.
+			for ( let i = 0; i < 12; i++ ) {
+				await page.mouse.wheel( 0, 500 );
+			}
+
+			await expect
+				.poll( () =>
+					tabPanel.evaluate(
+						( el ) =>
+							Math.ceil( el.scrollTop + el.clientHeight ) >=
+							el.scrollHeight
+					)
+				)
+				.toBe( true );
+
+			// Scrolling at the end of the list must not scroll the page.
+			expect( await page.evaluate( () => window.scrollY ) ).toBe( 0 );
+		} );
+	} );
 } );
