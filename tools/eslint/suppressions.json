@@ -4180,59 +4180,13 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/query-pagination/deprecated.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/query-pagination/edit.tsx": {
 		"no-restricted-syntax": {
 			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-library/src/query-pagination/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination/query-pagination-arrow-controls.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination/query-pagination-label-control.jsx": {
+	"packages/block-library/src/query-pagination/query-pagination-label-control.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination/save.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

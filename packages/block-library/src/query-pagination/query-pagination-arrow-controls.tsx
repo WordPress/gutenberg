@@ -3,8 +3,12 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
+import type { QueryPaginationArrowControlsProps } from './types';
 
-export function QueryPaginationArrowControls( { value, onChange } ) {
+export function QueryPaginationArrowControls( {
+	value,
+	onChange,
+}: QueryPaginationArrowControlsProps ) {
 	return (
 		<ToggleGroupControl
 			label={ __( 'Arrow' ) }
