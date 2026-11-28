@@ -17,6 +17,7 @@
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Use semantic colors for the header background and toolbar dividers ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 -   Show the Settings button as text instead of a check icon when "Show button text labels" is on ([#86827](https://github.com/WordPress/gutenberg/pull/86827)).
+-   Load sidebar widgets when an empty block-widget instance has no content, preserving its editable paragraph and widget ID ([#85044](https://github.com/WordPress/gutenberg/pull/85044)).
 
 ## 7.1.0 (2026-11-04)
 
