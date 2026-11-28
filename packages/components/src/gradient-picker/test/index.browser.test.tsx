@@ -232,6 +232,54 @@ describe( 'GradientPicker', () => {
 		} );
 	} );
 
+	it( 'keeps focus on a gradient whose origin is shifted by a removal', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const theme = {
+			slug: 'theme',
+			name: 'Theme',
+			gradients: [
+				{ name: 'Ocean', slug: 'ocean', gradient: GRADIENT_A },
+			],
+		};
+		const custom = {
+			slug: 'custom',
+			name: 'Custom',
+			gradients: [
+				{ name: 'Blush', slug: 'blush', gradient: GRADIENT_B },
+			],
+		};
+		const view = await render(
+			<GradientPicker
+				gradients={ [ theme, custom ] }
+				onChange={ onChange }
+				disableCustomGradients
+			/>
+		);
+		await user.click(
+			screen.getByRole( 'option', { name: 'Gradient: Blush' } )
+		);
+		onChange.mockClear();
+
+		await view.rerender(
+			<GradientPicker
+				gradients={ [ custom ] }
+				onChange={ onChange }
+				disableCustomGradients
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'option', { name: 'Gradient: Blush' } )
+		).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+			GRADIENT_B,
+			0,
+			'blush'
+		);
+	} );
+
 	it( 'should render only the custom gradient editor without presets or a Clear button', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
