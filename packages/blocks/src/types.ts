@@ -450,8 +450,11 @@ export type NormalizedBlockTransform<
  *
  * @see BlockType.example
  */
-export type BlockExampleInnerBlock = Partial< BlockType > &
-	Pick< BlockType, 'name' | 'attributes' > & {
+export type BlockExampleInnerBlock = Partial<
+	Omit< BlockType, 'attributes' >
+> &
+	Pick< BlockType, 'name' > & {
+		attributes: Record< string, unknown >;
 		innerBlocks?: BlockExampleInnerBlock[];
 	};
 
