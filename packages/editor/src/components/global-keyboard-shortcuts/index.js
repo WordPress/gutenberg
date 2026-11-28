@@ -1,4 +1,5 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import {
@@ -6,6 +7,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
+import { getNextDeviceType } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 const { usesNativeUndo } = unlock( blockEditorPrivateApis );
@@ -23,7 +25,19 @@ export default function EditorKeyboardShortcuts() {
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	// Mirrors when the header's device preview dropdown is hidden or disabled.
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isStylesCanvasActive = useSelect( ( select ) => {
+		const { getStylesPath, getShowStylebook } = unlock(
+			select( editorStore )
+		);
+		return (
+			!! getStylesPath()?.startsWith( '/revisions' ) || getShowStylebook()
+		);
+	}, [] );
+	const { getBlockSelectionStart, getSettings } =
+		useSelect( blockEditorStore );
+	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
@@ -31,6 +45,7 @@ export default function EditorKeyboardShortcuts() {
 		redo,
 		undo,
 		savePost,
+		setDeviceType,
 		setIsListViewOpened,
 		switchEditorMode,
 		toggleDistractionFree,
@@ -39,6 +54,7 @@ export default function EditorKeyboardShortcuts() {
 		isEditedPostDirty,
 		isPostSavingLocked,
 		isListViewOpened,
+		getDeviceType,
 		getEditorMode,
 		isSavingNonPostEntityChanges,
 	} = useSelect( editorStore );
@@ -52,6 +68,23 @@ export default function EditorKeyboardShortcuts() {
 		},
 		{
 			isDisabled: isModeToggleDisabled,
+		}
+	);
+
+	useShortcut(
+		'core/editor/cycle-device-type',
+		( event ) => {
+			event.preventDefault();
+			setDeviceType(
+				getNextDeviceType(
+					getDeviceType(),
+					getSettings().__experimentalFeatures?.viewport
+				)
+			);
+			resetZoomLevel();
+		},
+		{
+			isDisabled: isMobileViewport || isStylesCanvasActive,
 		}
 	);
 
