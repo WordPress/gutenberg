@@ -6,7 +6,7 @@
 	"category": "theme",
 	"description": "Displays the contents of a post or page.",
 	"textdomain": "default",
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType", "queryId", "templateSlug" ],
 	"attributes": {
 		"tagName": {
 			"type": "string",

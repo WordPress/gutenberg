@@ -28,6 +28,7 @@ function ReadOnlyContent( {
 	userCanEdit,
 	postType,
 	postId,
+	showTeaser,
 	tagName: TagName = 'div',
 } ) {
 	const [ , , content ] = useEntityProp(
@@ -38,8 +39,18 @@ function ReadOnlyContent( {
 	);
 	const blockProps = useBlockProps( { className: layoutClassNames } );
 	const blocks = useMemo( () => {
-		return content?.raw ? parse( content.raw ) : [];
-	}, [ content?.raw ] );
+		const postBlocks = content?.raw ? parse( content.raw ) : [];
+		if ( ! showTeaser ) {
+			return postBlocks;
+		}
+		// Keep the More divider visible while previewing the post teaser.
+		const moreIndex = postBlocks.findIndex(
+			( block ) => block.name === 'core/more'
+		);
+		return moreIndex === -1
+			? postBlocks
+			: postBlocks.slice( 0, moreIndex + 1 );
+	}, [ content?.raw, showTeaser ] );
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: blockProps,
@@ -131,7 +142,7 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 
 function Content( props ) {
 	const {
-		context: { queryId, postType, postId } = {},
+		context: { queryId, postType, postId, templateSlug } = {},
 		layoutClassNames,
 		tagName,
 	} = props;
@@ -152,6 +163,10 @@ function Content( props ) {
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
+			showTeaser={
+				isDescendentOfQueryLoop &&
+				( templateSlug === 'index' || templateSlug === 'home' )
+			}
 			tagName={ tagName }
 		/>
 	);
