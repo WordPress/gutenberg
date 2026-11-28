@@ -6,6 +6,7 @@
 
 ### Bug Fixes
 
+-   `prependHTTP`, `prependHTTPS`: Don't prepend a protocol to a URL whose scheme contains digits, `+` or `-`, such as `chrome-extension://` or `web+demo://` ([#85515](https://github.com/WordPress/gutenberg/pull/85515)).
 -   `getFilename`: Decode the filename so non-ASCII names read as written ([#86422](https://github.com/WordPress/gutenberg/pull/86422)).
 
 ## 5.1.0 (2026-11-04)
