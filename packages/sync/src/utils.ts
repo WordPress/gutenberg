@@ -1,20 +1,12 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-
-/**
- * Internal dependencies
- */
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
-	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_VERSION_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
+	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
 } from './config';
 import type { CRDTDoc } from './types';
 
@@ -22,7 +14,13 @@ import type { CRDTDoc } from './types';
 type DocumentMeta = Record< string, DocumentMetaValue >;
 type DocumentMetaValue = boolean | number | string;
 
-export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
+/**
+ * Creates a new Y.Doc instance with the given document metadata.
+ *
+ * @param {DocumentMeta} documentMeta Optional metadata to associate with the
+ *                                    document. Metadata is not persisted.
+ */
+export function createYjsDoc( documentMeta: DocumentMeta = {} ): CRDTDoc {
 	// Convert the object representation of CRDT document metadata to a map.
 	// Document metadata is passed to the Y.Doc constructor and stored in its
 	// `meta` property. It is not synced to peers or persisted with the document.
@@ -31,29 +29,54 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 		Object.entries( documentMeta )
 	);
 
-	const ydoc = new Y.Doc( { meta: metaMap } );
-	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-
-	stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION );
-
-	return ydoc;
+	// IMPORTANT: Do not add update the document itself to avoid generating updates
+	// before observers are attached. Add initial updates in `initializeYjsDoc`.
+	return new Y.Doc( { meta: metaMap } );
 }
 
 /**
- * Record that the entity was saved (persisted to the database) in the CRDT
- * document record metadata.
+ * Initializes a Y.Doc instance with the necessary CRDT state for our use case.
+ *
+ * @param {Y.Doc} ydoc Y.Doc instance to initialize.
+ */
+export function initializeYjsDoc( ydoc: CRDTDoc ): void {
+	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+	stateMap.set( VERSION_KEY, CRDT_DOC_VERSION );
+}
+
+/**
+ * Record that the entity was saved by a user-facing entity save in the CRDT
+ * document metadata. Background CRDT snapshots should not update this marker.
  *
  * @param {CRDTDoc} ydoc CRDT document.
  */
 export function markEntityAsSaved( ydoc: CRDTDoc ): void {
-	const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
+	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
 	recordMeta.set( SAVED_AT_KEY, Date.now() );
 	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
 }
 
+function pseudoRandomID(): number {
+	return Math.floor( Math.random() * 1000000000 );
+}
+
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
+	// Encode a compacted copy of the doc rather than the doc itself. The live
+	// doc can be much larger than its current content: Y.UndoManager flags
+	// items deleted by tracked transactions with `keep`, which blocks garbage
+	// collection while they sit on the undo stack, so the encoded state would
+	// include the full content of everything deleted during the session. The
+	// `keep` flag is not serialized, so applying the state to a temporary doc
+	// garbage-collects that content. Struct identities are preserved, meaning
+	// peers merge the compacted state exactly as they would the original.
+	const tempDoc = createYjsDoc();
+	Y.applyUpdateV2( tempDoc, Y.encodeStateAsUpdateV2( crdtDoc ) );
+	const compactedUpdate = Y.encodeStateAsUpdateV2( tempDoc );
+	tempDoc.destroy();
+
 	return JSON.stringify( {
-		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		document: buffer.toBase64( compactedUpdate ),
+		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }
 
@@ -76,47 +99,10 @@ export function deserializeCrdtDoc(
 		// Overwrite the client ID (which is from a previous session) with a random
 		// client ID. Deserialized documents should not be used directly. Instead,
 		// their state should be applied to another in-use document.
-		ydoc.clientID = Math.floor( Math.random() * 1000000000 );
+		ydoc.clientID = pseudoRandomID();
 
 		return ydoc;
-	} catch ( e ) {
+	} catch {
 		return null;
 	}
-}
-
-export function getRecordValue< RecordType, Key extends keyof RecordType >(
-	obj: unknown,
-	key: Key
-): RecordType[ Key ] | null {
-	if ( 'object' === typeof obj && null !== obj && key in obj ) {
-		return ( obj as RecordType )[ key ];
-	}
-
-	return null;
-}
-
-export function getTypedKeys< T extends object >( obj: T ): Array< keyof T > {
-	return Object.keys( obj ) as Array< keyof T >;
-}
-
-export function areMapsEqual< Key, Value >(
-	map1: Map< Key, Value >,
-	map2: Map< Key, Value >,
-	comparatorFn: ( value1: Value, value2: Value ) => boolean
-): boolean {
-	if ( map1.size !== map2.size ) {
-		return false;
-	}
-
-	for ( const [ key, value1 ] of map1.entries() ) {
-		if ( ! map2.has( key ) ) {
-			return false;
-		}
-
-		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
-			return false;
-		}
-	}
-
-	return true;
 }

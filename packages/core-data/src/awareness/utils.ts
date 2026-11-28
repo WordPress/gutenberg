@@ -1,84 +1,4 @@
-/**
- * Internal dependencies
- */
-import type { User } from '../entity-types';
-import type { UserInfo } from './types';
-
-/**
- * The color palette for the user highlight.
- */
-const COLOR_PALETTE = [
-	'#3858E9', // blueberry
-	'#B42AED', // purple
-	'#E33184', // pink
-	'#F3661D', // orange
-	'#ECBD3A', // yellow
-	'#97FE17', // green
-	'#00FDD9', // teal
-	'#37C5F0', // cyan
-];
-
-/**
- * Generate a random integer between min and max, inclusive.
- *
- * @param min - The minimum value.
- * @param max - The maximum value.
- * @return A random integer between min and max.
- */
-function generateRandomInt( min: number, max: number ): number {
-	return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
-}
-
-/**
- * Get a unique user color from the palette, or generate a variation if none are available.
- * If the previously used color is available from localStorage, use it.
- *
- * @param existingColors - Colors that are already in use.
- * @return The new user color, in hex format.
- */
-function getNewUserColor( existingColors: string[] ): string {
-	const availableColors = COLOR_PALETTE.filter(
-		( color ) => ! existingColors.includes( color )
-	);
-
-	let hexColor: string;
-
-	if ( availableColors.length > 0 ) {
-		const randomIndex = generateRandomInt( 0, availableColors.length - 1 );
-		hexColor = availableColors[ randomIndex ];
-	} else {
-		// All colors are used, generate a variation of a random palette color
-		const randomIndex = generateRandomInt( 0, COLOR_PALETTE.length - 1 );
-		const baseColor = COLOR_PALETTE[ randomIndex ];
-		hexColor = generateColorVariation( baseColor );
-	}
-
-	return hexColor;
-}
-
-/**
- * Generate a variation of a hex color by adjusting its lightness.
- *
- * @param hexColor - The base hex color (e.g., '#3858E9').
- * @return A varied hex color.
- */
-function generateColorVariation( hexColor: string ): string {
-	// Parse hex to RGB
-	const r = parseInt( hexColor.slice( 1, 3 ), 16 );
-	const g = parseInt( hexColor.slice( 3, 5 ), 16 );
-	const b = parseInt( hexColor.slice( 5, 7 ), 16 );
-
-	// Apply a random lightness shift (-30 to +30)
-	const shift = generateRandomInt( -30, 30 );
-	const newR = Math.min( 255, Math.max( 0, r + shift ) );
-	const newG = Math.min( 255, Math.max( 0, g + shift ) );
-	const newB = Math.min( 255, Math.max( 0, b + shift ) );
-
-	// Convert back to hex
-	const toHex = ( n: number ) =>
-		n.toString( 16 ).padStart( 2, '0' ).toUpperCase();
-	return `#${ toHex( newR ) }${ toHex( newG ) }${ toHex( newB ) }`;
-}
+import type { CollaboratorInfo } from './types';
 
 /**
  * Get the browser name from the user agent.
@@ -114,46 +34,173 @@ function getBrowserName(): string {
 	return browserName;
 }
 
-/**
- * Check if two user infos are equal.
- *
- * @param userInfo1 - The first user info.
- * @param userInfo2 - The second user info.
- * @return True if the user infos are equal, false otherwise.
- */
-export function areUserInfosEqual(
-	userInfo1?: UserInfo,
-	userInfo2?: UserInfo
+export function areMapsEqual< Key, Value >(
+	map1: Map< Key, Value >,
+	map2: Map< Key, Value >,
+	comparatorFn: ( value1: Value, value2: Value ) => boolean
 ): boolean {
-	if ( ! userInfo1 || ! userInfo2 ) {
-		return userInfo1 === userInfo2;
-	}
-
-	if ( Object.keys( userInfo1 ).length !== Object.keys( userInfo2 ).length ) {
+	if ( map1.size !== map2.size ) {
 		return false;
 	}
 
-	return Object.entries( userInfo1 ).every( ( [ key, value ] ) => {
-		// Update this function with any non-primitive fields added to UserInfo.
-		return value === userInfo2[ key as keyof UserInfo ];
-	} );
+	for ( const [ key, value1 ] of map1.entries() ) {
+		if ( ! map2.has( key ) ) {
+			return false;
+		}
+
+		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
- * Generate a user info object from a current user and a list of existing colors.
+ * Check if two collaborator infos are equal.
  *
- * @param currentUser    - The current user.
- * @param existingColors - The existing colors.
- * @return The user info object.
+ * @param collaboratorInfo1 - The first collaborator info.
+ * @param collaboratorInfo2 - The second collaborator info.
+ * @return True if the collaborator infos are equal, false otherwise.
  */
-export function generateUserInfo(
-	currentUser: User< 'view' >,
-	existingColors: string[]
-): UserInfo {
-	return {
-		...currentUser,
+export function areCollaboratorInfosEqual(
+	collaboratorInfo1?: CollaboratorInfo,
+	collaboratorInfo2?: CollaboratorInfo
+): boolean {
+	if ( ! collaboratorInfo1 || ! collaboratorInfo2 ) {
+		return collaboratorInfo1 === collaboratorInfo2;
+	}
+
+	if (
+		Object.keys( collaboratorInfo1 ).length !==
+		Object.keys( collaboratorInfo2 ).length
+	) {
+		return false;
+	}
+
+	return Object.entries( collaboratorInfo1 ).every( ( [ key, value ] ) => {
+		// Update this function with any non-primitive fields added to CollaboratorInfo.
+		return value === collaboratorInfo2[ key as keyof CollaboratorInfo ];
+	} );
+}
+
+function hasValidAvatarUrls(
+	value: unknown
+): value is NonNullable< CollaboratorInfo[ 'avatar_urls' ] > {
+	if (
+		'object' !== typeof value ||
+		null === value ||
+		Array.isArray( value )
+	) {
+		return false;
+	}
+
+	return [ '24', '48', '96' ].every(
+		( size ) => ! ( size in value ) || 'string' === typeof value[ size ]
+	);
+}
+
+/**
+ * Check that awareness information contains the fields required to present a
+ * collaborator. Awareness is supplied by peers, so its runtime shape cannot be
+ * guaranteed by the local TypeScript type.
+ *
+ * @param value - The collaborator information to check.
+ * @return Whether the collaborator can be presented safely.
+ */
+export function isCollaboratorInfo(
+	value: unknown
+): value is CollaboratorInfo {
+	if ( 'object' !== typeof value || null === value ) {
+		return false;
+	}
+
+	return (
+		'id' in value &&
+		'name' in value &&
+		'slug' in value &&
+		'browserType' in value &&
+		'enteredAt' in value &&
+		( null === value.id ||
+			( 'number' === typeof value.id &&
+				Number.isInteger( value.id ) &&
+				value.id > 0 ) ) &&
+		'string' === typeof value.name &&
+		'' !== value.name.trim() &&
+		'string' === typeof value.slug &&
+		( ! ( 'avatar_urls' in value ) ||
+			hasValidAvatarUrls( value.avatar_urls ) ) &&
+		'string' === typeof value.browserType &&
+		'number' === typeof value.enteredAt &&
+		Number.isFinite( value.enteredAt )
+	);
+}
+
+/**
+ * Generate a collaborator info object from a current collaborator.
+ *
+ * @param currentCollaborator - The current collaborator, when available.
+ * @param clientId            - The Yjs client ID used for fallback identity.
+ * @return The collaborator info object.
+ */
+export function generateCollaboratorInfo(
+	currentCollaborator: unknown,
+	clientId: number
+): CollaboratorInfo {
+	const presentationInfo = {
 		browserType: getBrowserName(),
-		color: getNewUserColor( existingColors ),
 		enteredAt: Date.now(),
 	};
+
+	if ( 'object' === typeof currentCollaborator && currentCollaborator ) {
+		const user = currentCollaborator;
+		if ( 'id' in user && 'name' in user ) {
+			const collaboratorInfo = {
+				...presentationInfo,
+				...( 'avatar_urls' in user &&
+				hasValidAvatarUrls( user.avatar_urls )
+					? { avatar_urls: user.avatar_urls }
+					: {} ),
+				id: user.id,
+				name: user.name,
+				slug:
+					'slug' in user && 'string' === typeof user.slug
+						? user.slug
+						: '',
+			};
+
+			if (
+				isCollaboratorInfo( collaboratorInfo ) &&
+				null !== collaboratorInfo.id
+			) {
+				return collaboratorInfo;
+			}
+		}
+	}
+
+	// The Yjs client ID remains available on the surrounding awareness state for
+	// session-specific UI identity and also makes the fallback slug deterministic.
+	return {
+		...presentationInfo,
+		id: null,
+		// Keep shared awareness data language-neutral. The editor localizes this
+		// fallback name for the viewer when it is displayed.
+		name: 'Anonymous User',
+		slug: `anonymous-${ clientId }`,
+	};
+}
+
+export function getRecordValue< RecordType, Key extends keyof RecordType >(
+	obj: unknown,
+	key: Key
+): RecordType[ Key ] | null {
+	if ( 'object' === typeof obj && null !== obj && key in obj ) {
+		return ( obj as RecordType )[ key ];
+	}
+
+	return null;
+}
+
+export function getTypedKeys< T extends object >( obj: T ): Array< keyof T > {
+	return Object.keys( obj ) as Array< keyof T >;
 }

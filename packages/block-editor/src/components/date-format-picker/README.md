@@ -31,10 +31,10 @@ const Example = () => {
 
 ### `format`
 
-The current date format selected by the user. If `null`, _Default_ is selected.
+The current date format selected by the user. If `null` or unset, _Default_ is selected.
 
 -   Type: `string|null`
--   Required: Yes
+-   Required: No
 
 ### `defaultFormat`
 

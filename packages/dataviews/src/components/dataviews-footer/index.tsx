@@ -1,19 +1,15 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
-import DataViewsPagination from '../dataviews-pagination';
-import {
-	BulkActionsFooter,
-	useSomeItemHasAPossibleBulkAction,
-} from '../dataviews-bulk-actions';
+import DataViewsPagination, {
+	hasPaginationControls,
+} from '../dataviews-pagination';
+import { useSomeItemHasAPossibleBulkAction } from '../dataviews-bulk-actions';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
+import { useDelayedLoading } from '../../hooks/use-delayed-loading';
+import DataViewsItemCount from './item-count';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -23,30 +19,41 @@ export default function DataViewsFooter() {
 		paginationInfo: { totalItems = 0, totalPages },
 		data,
 		actions = EMPTY_ARRAY,
+		isLoading,
+		hasInitiallyLoaded,
 	} = useContext( DataViewsContext );
+
+	const isRefreshing = !! isLoading && hasInitiallyLoaded && !! data?.length;
+
+	const isDelayedRefreshing = useDelayedLoading( !! isRefreshing );
+
 	const hasBulkActions =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
-	if (
-		! totalItems ||
-		! totalPages ||
-		( totalPages <= 1 && ! hasBulkActions )
-	) {
+	const hasPagination = hasPaginationControls( view, {
+		totalItems,
+		totalPages,
+	} );
+
+	if ( ! totalItems || ( ! hasBulkActions && ! hasPagination ) ) {
 		return null;
 	}
+
 	return (
-		!! totalItems && (
+		<div className="dataviews-footer" inert={ inertValue( isRefreshing ) }>
 			<Stack
 				direction="row"
 				justify="end"
 				align="center"
-				className="dataviews-footer"
-				gap="xs"
+				className={ clsx( 'dataviews-footer__content', {
+					'is-refreshing': isDelayedRefreshing,
+				} ) }
+				gap="sm"
 			>
-				{ hasBulkActions && <BulkActionsFooter /> }
+				{ hasBulkActions && <DataViewsItemCount /> }
 				<DataViewsPagination />
 			</Stack>
-		)
+		</div>
 	);
 }

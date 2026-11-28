@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'HTML block', () => {
@@ -11,7 +8,7 @@ test.describe( 'HTML block', () => {
 	test( 'can be created by typing "/html"', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/html' );
 		await expect(
@@ -44,7 +41,7 @@ test.describe( 'HTML block', () => {
 	test( 'should not encode <', async ( { editor, page } ) => {
 		// Create a Custom HTML block with the slash shortcut.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/html' );
 		await expect(
@@ -63,7 +60,132 @@ test.describe( 'HTML block', () => {
 		await editor.publishPost();
 		await page.reload();
 		await expect(
-			editor.canvas.locator( '[data-type="core/html"] iframe' )
-		).toBeVisible();
+			editor.canvas.locator( '[data-type="core/html"]' )
+		).toContainText( '1 < 2' );
+	} );
+
+	test( 'shows a selectable marker when the markup renders nothing', async ( {
+		editor,
+	} ) => {
+		// The canvas strips scripts, so a script-only block renders nothing.
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>Before</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<script>window.__customHtmlBlock = true;</script>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>After</p>
+<!-- /wp:paragraph -->` );
+
+		const block = editor.canvas.locator( '[data-type="core/html"]' );
+		const marker = block.locator( '.block-library-html__no-output-marker' );
+
+		// The block takes no space, as on the front end, and a marker floats
+		// over its position instead.
+		await expect( marker ).toBeVisible();
+		expect(
+			await block.evaluate(
+				( element ) => element.getBoundingClientRect().height
+			)
+		).toBe( 0 );
+
+		await marker.click();
+		await expect( block ).toHaveClass( /is-selected/ );
+		await expect( block ).toBeFocused();
+	} );
+
+	test( 'keeps the markers of consecutive blocks apart', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>Before</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:html -->
+<script>window.__first = true;</script>
+<!-- /wp:html -->
+
+<!-- wp:html -->
+<style>.second { color: red; }</style>
+<!-- /wp:html -->
+
+<!-- wp:paragraph -->
+<p>After</p>
+<!-- /wp:paragraph -->` );
+
+		// Both blocks sit at the same position, so their markers must not
+		// cover each other: a click on each one selects its own block.
+		const blocks = editor.canvas.locator( '[data-type="core/html"]' );
+		for ( const index of [ 0, 1 ] ) {
+			const block = blocks.nth( index );
+			await block
+				.locator( '.block-library-html__no-output-marker' )
+				.click();
+			await expect( block ).toHaveClass( /is-selected/ );
+		}
+	} );
+
+	test( 'shows no marker when the markup renders content', async ( {
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:html -->
+<p>Hello</p>
+<!-- /wp:html -->` );
+
+		const block = editor.canvas.locator( '[data-type="core/html"]' );
+		await expect( block ).toContainText( 'Hello' );
+		await expect(
+			block.locator( '.block-library-html__no-output-marker' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'supports editable inner blocks within static HTML', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:html -->
+<div class="banner"><h1>Static heading</h1><!-- wp:paragraph -->
+<p>Editable paragraph</p>
+<!-- /wp:paragraph --><footer>Static footer</footer></div>
+<!-- /wp:html -->`
+		);
+
+		// The inner paragraph renders at its position within the static
+		// markup and is editable in place.
+		const paragraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i]'
+		);
+		await expect( paragraph ).toBeVisible();
+		await paragraph.click();
+		await expect( paragraph ).toBeFocused();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' updated' );
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:html -->
+<div class="banner"><h1>Static heading</h1><!-- wp:paragraph -->
+<p>Editable paragraph updated</p>
+<!-- /wp:paragraph --><footer>Static footer</footer></div>
+<!-- /wp:html -->`
+		);
+
+		// The inner block is locked: the options menu offers no removal and
+		// the toolbar offers no movers.
+		await editor.clickBlockToolbarButton( 'Options' );
+		const optionsMenu = page.getByRole( 'menu', { name: 'Options' } );
+		await expect( optionsMenu ).toBeVisible();
+		await expect(
+			optionsMenu.getByRole( 'menuitem', { name: 'Delete' } )
+		).toBeHidden();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator(
+				'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
+			)
+		).toBeHidden();
 	} );
 } );

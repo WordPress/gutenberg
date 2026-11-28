@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 972" width="1240" height="972" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Upload flow: the client-side path (WASM worker processing plus the sideload endpoint) and the server-side path (POST /wp/v2/media plus PHP thumbnails) both converge at wp_generate_attachment_metadata.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5c6470"/>
+    </marker>
+    <style>
+      .eyebrow { fill:#2d40e8; font-weight:700; font-size:13px; letter-spacing:1.5px; }
+      .title { fill:#101419; font-weight:800; font-size:34px; }
+      .subtitle { fill:#5c6470; font-size:19px; }
+      .body { fill:#3c434a; font-size:18px; }
+      .sub { fill:#5c6470; font-size:16px; }
+      .mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+      .pill { fill:#ffffff; font-weight:700; font-size:20px; }
+      .lbl { font-weight:700; font-size:13px; letter-spacing:1px; }
+    </style>
+  </defs>
+
+  <rect width="1240" height="972" fill="#ffffff"/>
+
+  <text class="eyebrow" x="40" y="52">CLIENT-SIDE MEDIA PROCESSING</text>
+  <text class="title" x="40" y="95">Upload flow</text>
+  <text class="subtitle" x="40" y="128">Both paths converge at <tspan class="mono" font-size="17">wp_generate_attachment_metadata</tspan>, so server-side hooks see the same surface either way.</text>
+
+  <!-- start pill -->
+  <rect x="385" y="172" width="470" height="54" rx="27" fill="#1e1e1e"/>
+  <text class="pill" x="620" y="206" text-anchor="middle">User uploads an image in the editor</text>
+
+  <line x1="620" y1="226" x2="620" y2="262" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- decision -->
+  <rect x="300" y="266" width="640" height="92" rx="10" fill="#ffffff" stroke="#2d40e8" stroke-width="2"/>
+  <text x="620" y="303" text-anchor="middle" fill="#101419" font-weight="700" font-size="21">Client-side processing available?</text>
+  <text class="sub" x="620" y="331" text-anchor="middle">browser support + feature detection + not disabled</text>
+
+  <!-- branch -->
+  <path d="M620 358 L620 392 M310 392 L930 392" fill="none" stroke="#5c6470" stroke-width="2"/>
+  <line x1="310" y1="392" x2="310" y2="448" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="930" y1="392" x2="930" y2="448" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <text class="lbl" x="90" y="428" fill="#8a8f98">IN THE BROWSER</text>
+  <text class="lbl" x="345" y="428" fill="#0a8043" font-size="15">Yes</text>
+  <text class="lbl" x="895" y="428" fill="#cc1818" font-size="15" text-anchor="end">No</text>
+  <text class="lbl" x="1150" y="428" fill="#8a8f98" text-anchor="end">ON THE SERVER</text>
+
+  <!-- left col box A -->
+  <rect x="90" y="452" width="440" height="110" rx="10" fill="#f4f5f6" stroke="#e4e6e8" stroke-width="1.5"/>
+  <text class="body" x="310" y="491" text-anchor="middle">WASM worker decodes, resizes, and encodes the original</text>
+  <text class="body" x="310" y="517" text-anchor="middle">+ all thumbnails</text>
+  <text class="body mono" x="310" y="547" text-anchor="middle" fill="#5566c9">@wordpress/vips · libvips</text>
+
+  <!-- right col box A -->
+  <rect x="710" y="452" width="440" height="110" rx="10" fill="#f4f5f6" stroke="#e4e6e8" stroke-width="1.5"/>
+  <text class="body" x="930" y="497" text-anchor="middle">File is POSTed to the server</text>
+  <text class="body mono" x="930" y="533" text-anchor="middle" fill="#5566c9">POST /wp/v2/media</text>
+
+  <line x1="310" y1="562" x2="310" y2="594" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="930" y1="562" x2="930" y2="594" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- left col box B -->
+  <rect x="90" y="598" width="440" height="100" rx="10" fill="#f4f5f6" stroke="#e4e6e8" stroke-width="1.5"/>
+  <text class="body" x="310" y="637" text-anchor="middle">Files uploaded via the sideload endpoint</text>
+  <text class="body mono" x="310" y="672" text-anchor="middle" fill="#5566c9">POST /wp/v2/media/{id}/sideload</text>
+
+  <!-- right col box B -->
+  <rect x="710" y="598" width="440" height="100" rx="10" fill="#f4f5f6" stroke="#e4e6e8" stroke-width="1.5"/>
+  <text class="body" x="930" y="637" text-anchor="middle">PHP generates thumbnails</text>
+  <text class="sub" x="930" y="671" text-anchor="middle">GD or Imagick, as configured</text>
+
+  <!-- converge -->
+  <path d="M310 698 L310 726 M930 698 L930 726 M310 726 L930 726" fill="none" stroke="#5c6470" stroke-width="2"/>
+  <line x1="620" y1="726" x2="620" y2="762" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="180" y="766" width="880" height="92" rx="10" fill="#eef0fc" stroke="#2d40e8" stroke-width="2"/>
+  <text class="mono" x="620" y="802" text-anchor="middle" fill="#2d40e8" font-weight="700" font-size="21">wp_generate_attachment_metadata</text>
+  <text class="sub" x="620" y="830" text-anchor="middle">fired with context <tspan class="mono" font-size="15">'update'</tspan> — watermarking, CDN sync, and other plugins run here on both paths</text>
+
+  <line x1="620" y1="858" x2="620" y2="894" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- end pill -->
+  <rect x="405" y="898" width="430" height="54" rx="27" fill="#1e1e1e"/>
+  <text class="pill" x="620" y="932" text-anchor="middle">Attachment ready in the post</text>
+</svg>

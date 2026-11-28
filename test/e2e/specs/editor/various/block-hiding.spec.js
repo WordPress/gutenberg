@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Hiding', () => {
@@ -52,11 +49,11 @@ test.describe( 'Block Hiding', () => {
 		// Open the settings sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Verify the block inspector shows "Block is hidden".
+		// Verify the block inspector shows "Hidden".
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Block is hidden' )
+				.getByText( 'Hidden', { exact: true } )
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".
@@ -67,6 +64,149 @@ test.describe( 'Block Hiding', () => {
 				.getByRole( 'menuitem', {
 					name: 'Show',
 				} )
+		).toBeVisible();
+	} );
+
+	test( 'can show a block from toolbar', async ( { page, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Test paragraph',
+				metadata: { blockVisibility: false },
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Hidden' );
+		const modal = page.getByRole( 'dialog', { name: 'Hide block' } );
+		await modal
+			.getByRole( 'checkbox', { name: 'Omit from published content' } )
+			.uncheck();
+		await modal.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Visible', exact: true } )
+		).toBeFocused();
+	} );
+
+	test( 'should not allow block visibility shortcut on children of a content-only locked section, but should after editing section', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block in the code editor.
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:paragraph -->
+			<p>Locked block a</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>Locked block b</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
+
+		// Select the content locked group block.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+
+		// Select a nested paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+
+		// Press the visibility shortcut (Shift+Cmd+H / Shift+Ctrl+H).
+		await pageUtils.pressKeys( 'primaryShift+h' );
+
+		// The visibility modal should NOT appear.
+		await expect(
+			page.getByRole( 'dialog', { name: 'Hide block' } )
+		).toBeHidden();
+
+		// Now enter edit mode via "Edit pattern".
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		// Select a nested paragraph again.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+
+		// Press the visibility shortcut again.
+		await pageUtils.pressKeys( 'primaryShift+h' );
+
+		// The visibility modal SHOULD appear now.
+		await expect(
+			page.getByRole( 'dialog', { name: 'Hide block' } )
+		).toBeVisible();
+	} );
+
+	test( 'should not allow block visibility shortcut on children of an unsynced pattern, but should after editing section', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert an unsynced pattern with patternName metadata.
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"core/block/123","name":"My pattern"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Select the pattern block.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+
+		// Select the nested paragraph.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		// Press the visibility shortcut.
+		await pageUtils.pressKeys( 'primaryShift+h' );
+
+		// The visibility modal should NOT appear.
+		await expect(
+			page.getByRole( 'dialog', { name: 'Hide block' } )
+		).toBeHidden();
+
+		// Select the pattern block and enter edit mode via "Edit pattern".
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		// Select the nested paragraph again.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		// Press the visibility shortcut again.
+		await pageUtils.pressKeys( 'primaryShift+h' );
+
+		// The visibility modal SHOULD appear now.
+		await expect(
+			page.getByRole( 'dialog', { name: 'Hide block' } )
 		).toBeVisible();
 	} );
 
@@ -105,11 +245,11 @@ test.describe( 'Block Hiding', () => {
 		// Open the settings sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Verify the block inspector shows "Block is hidden on Mobile".
+		// Verify the block inspector shows "Hidden on Mobile".
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Block is hidden on Mobile' )
+				.getByText( 'Hidden on Mobile' )
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".

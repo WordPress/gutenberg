@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { readFileSync, existsSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -22,7 +19,6 @@ const packagePathCache = new Map();
  * @property {string}                 [license]               Package license.
  * @property {string}                 [main]                  Main entry point.
  * @property {string}                 [module]                ES module entry point.
- * @property {string}                 [react-native]          React Native entry point.
  * @property {Record<string, string>} [dependencies]          Runtime dependencies.
  * @property {Record<string, string>} [devDependencies]       Development dependencies.
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
@@ -70,7 +66,7 @@ function findPackageRoot( startDir ) {
  * and external dependencies in pnpm/yarn/npm workspaces.
  *
  * @param {string}      fullPackageName The full package name (e.g., '@wordpress/blocks').
- * @param {string|null} resolveDir      Optional directory context for resolution (from esbuild).
+ * @param {string|null} resolveDir      Optional directory context for resolution (the importer's directory).
  * @return {PackageJson|null} Package.json object or null if not found.
  */
 export function getPackageInfo( fullPackageName, resolveDir = null ) {
@@ -87,7 +83,26 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	// Resolve from the package root context to get correct versions
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const require = createRequire( contextPath );
-	const resolved = require.resolve( `${ fullPackageName }/package.json` );
+
+	let resolved;
+	try {
+		resolved = require.resolve( `${ fullPackageName }/package.json` );
+	} catch ( error ) {
+		// Treat a genuine resolution miss (package not installed, or it doesn't
+		// expose its package.json) as `null` so callers can fall through to
+		// the bundler's own resolution. Rethrow anything unexpected so real errors
+		// (invalid specifiers, resolver bugs) aren't silently swallowed.
+		const code = /** @type {NodeJS.ErrnoException} */ ( error ).code;
+		if (
+			code === 'MODULE_NOT_FOUND' ||
+			code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+		) {
+			packageJsonCache.set( cacheKey, null );
+			return null;
+		}
+		throw error;
+	}
+
 	const result = getPackageInfoFromFile( resolved );
 	packageJsonCache.set( cacheKey, result );
 
@@ -109,3 +124,17 @@ export function getPackageInfoFromFile( packageJsonPath ) {
 	packagePathCache.set( packageJsonPath, packageJson );
 	return packageJson;
 }
+
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
+ */
+export const boolConfigVal = ( value ) => {
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
+};

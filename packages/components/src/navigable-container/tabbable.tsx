@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import NavigableContainer from './container';
 import type { TabbableContainerProps } from './types';
 
@@ -18,6 +8,12 @@ export function UnforwardedTabbableContainer(
 	{ eventToOffset, ...props }: TabbableContainerProps,
 	ref: ForwardedRef< any >
 ) {
+	deprecated( 'wp.components.TabbableContainer', {
+		since: '7.3',
+		version: '7.5',
+		hint: 'For focus trapping, consider the useConstrainedTabbing hook from @wordpress/compose.',
+	} );
+
 	const innerEventToOffset = ( evt: KeyboardEvent ) => {
 		const { code, shiftKey } = evt;
 		if ( 'Tab' === code ) {
@@ -55,6 +51,11 @@ export function UnforwardedTabbableContainer(
 
 /**
  * A container for tabbable elements.
+ *
+ * This component is deprecated. For focus trapping, consider the
+ * `useConstrainedTabbing` hook from `@wordpress/compose`.
+ *
+ * @deprecated
  *
  *  ```jsx
  *  import {

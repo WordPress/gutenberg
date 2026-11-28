@@ -2,9 +2,7 @@
  * Tests for schema validation utilities.
  */
 
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { validateValueFromSchema } from '../validation';
 
 describe( 'validateValueFromSchema', () => {
@@ -137,37 +135,23 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'edge cases', () => {
 		it( 'should pass validation when empty schema provided', () => {
-			const consoleSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
-
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'The "type" schema keyword for value is required.'
 			);
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'should warn when type is missing but still pass validation', () => {
-			const consoleSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
 			const schema = { properties: { name: { type: 'string' } } };
 			const result = validateValueFromSchema( { name: 'test' }, schema );
 
 			expect( result ).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'The "type" schema keyword for value is required.'
 			);
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'should include param name in warning when provided', () => {
-			const consoleSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
 			const schema = { format: 'email' }; // Schema without type
 			const result = validateValueFromSchema(
 				'test@example.com',
@@ -176,11 +160,9 @@ describe( 'validateValueFromSchema', () => {
 			);
 
 			expect( result ).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'The "type" schema keyword for email_field is required.'
 			);
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'should handle null values correctly', () => {
@@ -212,6 +194,144 @@ describe( 'validateValueFromSchema', () => {
 			expect( validateValueFromSchema( 'not-a-date', schema ) ).toBe(
 				'Invalid date.'
 			);
+		} );
+
+		// The forms of a date that `rest_parse_date()` accepts on the server.
+		it.each( [
+			[ 'a date in UTC', '2026-10-21T08:30:00Z' ],
+			[ 'a date with an offset', '2026-10-21T09:30:00+01:00' ],
+			[ 'a date with a negative offset', '2026-10-21T05:00:00-03:30' ],
+			[
+				'a date with a fraction of a second',
+				'2026-10-21T08:30:00.123Z',
+			],
+			[ 'a date without an offset', '2026-10-21T09:30:00' ],
+			[
+				'a date without an offset, with a fraction of a second',
+				'2026-10-21T09:30:00.123',
+			],
+			[
+				'a date without an offset, with a space before the time',
+				'2026-10-21 09:30:00',
+			],
+		] )( 'should accept %s as a date-time', ( _description, value ) => {
+			const schema = { type: 'string', format: 'date-time' };
+			expect( validateValueFromSchema( value, schema ) ).toBe( true );
+		} );
+
+		it.each( [
+			[ 'an empty string', '' ],
+			[ 'a date without a time', '2026-10-21' ],
+			[ 'a time without a date', '09:30:00' ],
+			[ 'a time without seconds', '2026-10-21T09:30' ],
+			[ 'a month that does not exist', '2026-13-01T09:30:00' ],
+			[ 'a day that does not exist', '2026-02-30T09:30:00' ],
+			[ 'an hour that does not exist', '2026-10-21T25:00:00' ],
+			[ 'a date in words', 'October 21, 2026' ],
+		] )( 'should reject %s as a date-time', ( _description, value ) => {
+			const schema = { type: 'string', format: 'date-time' };
+			expect( validateValueFromSchema( value, schema ) ).toBe(
+				'Invalid date.'
+			);
+		} );
+
+		it( 'should validate the dates in an input shaped like the input of a core ability', () => {
+			// The shape proposed for `core/content-create`: a date in the site's time, in GMT, or both.
+			const schema = {
+				type: 'object',
+				required: [ 'data' ],
+				properties: {
+					data: {
+						type: 'object',
+						properties: {
+							title: { type: 'string' },
+							date: {
+								type: 'object',
+								additionalProperties: false,
+								minProperties: 1,
+								properties: {
+									site: {
+										type: 'string',
+										format: 'date-time',
+									},
+									gmt: {
+										type: 'string',
+										format: 'date-time',
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			// Without an offset: 09:30 in the site's time, as `date` is read in the REST API.
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: { site: '2026-10-21T09:30:00' },
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( true );
+
+			// With an offset: the same moment, whatever the time zone of the site.
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: {
+								site: '2026-10-21T09:30:00+01:00',
+								gmt: '2026-10-21T08:30:00Z',
+							},
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( true );
+
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: { site: '2026-10-21' },
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( 'Invalid date.' );
+		} );
+
+		it( 'should validate the dates in a result that has them in the form the REST API returns', () => {
+			// `date` and `date_gmt` of a post in the REST API have no offset.
+			const schema = {
+				type: 'object',
+				properties: {
+					id: { type: 'integer' },
+					date: { type: 'string', format: 'date-time' },
+					date_gmt: { type: 'string', format: 'date-time' },
+				},
+			};
+
+			expect(
+				validateValueFromSchema(
+					{
+						id: 1,
+						date: '2026-10-21T09:30:00',
+						date_gmt: '2026-10-21T08:30:00',
+					},
+					schema,
+					'output'
+				)
+			).toBe( true );
 		} );
 
 		it( 'should validate UUID format', () => {
@@ -248,6 +368,124 @@ describe( 'validateValueFromSchema', () => {
 			expect( validateValueFromSchema( 'not a hostname!', schema ) ).toBe(
 				' is not a valid hostname.'
 			);
+		} );
+
+		it( 'should validate URI format', () => {
+			const schema = { type: 'string', format: 'uri' };
+			expect(
+				validateValueFromSchema( 'https://example.com/path', schema )
+			).toBe( true );
+			expect( validateValueFromSchema( 'not a uri', schema ) ).toBe(
+				' is not a valid URI.'
+			);
+		} );
+
+		// The forms a WordPress URL takes in the output of an ability.
+		it.each( [
+			[
+				'a pretty permalink',
+				'https://example.com/2026/11/hello-world/',
+			],
+			[ 'a plain permalink', 'https://example.com/?p=123' ],
+			[
+				'a plain permalink of a custom post type',
+				'https://example.com/?post_type=book&p=5',
+			],
+			[
+				'a percent-encoded slug',
+				'https://example.com/%e6%96%87%e7%ab%a0/',
+			],
+			[ 'a local site with a port', 'http://localhost:8889/?page_id=2' ],
+			[
+				'an avatar with query arguments',
+				'https://secure.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346?s=96&d=mm&r=g',
+			],
+			[
+				'a permalink structure with non-ASCII characters',
+				'https://example.com/блог/hello-world/',
+			],
+			[
+				'a post type slug with non-ASCII characters',
+				'https://example.com/produkte-größe/stuhl/',
+			],
+			[
+				'an internationalized domain name',
+				'https://例え.jp/hello-world/',
+			],
+			[
+				'an internationalized domain name in Punycode',
+				'https://xn--r8jz45g.jp/hello-world/',
+			],
+			[
+				'a file with a non-ASCII name',
+				'https://example.com/wp-content/uploads/2026/11/写真.jpg',
+			],
+		] )( 'should accept %s as a URI', ( _description, value ) => {
+			const schema = { type: 'string', format: 'uri' };
+			expect( validateValueFromSchema( value, schema ) ).toBe( true );
+		} );
+
+		it.each( [
+			[ 'an empty string', '' ],
+			[ 'a root-relative URL', '/2026/11/hello-world/' ],
+			[ 'a protocol-relative URL', '//example.com/hello-world/' ],
+			[ 'a URL without a host', 'https://' ],
+			[ 'a host with a space', 'https://exa mple.com/' ],
+		] )( 'should reject %s as a URI', ( _description, value ) => {
+			const schema = { type: 'string', format: 'uri' };
+			expect( validateValueFromSchema( value, schema ) ).toBe(
+				' is not a valid URI.'
+			);
+		} );
+
+		it( 'should validate the links in a result shaped like the output of a core ability', () => {
+			// The shape of `core/content-query`: a page of posts, each with a `link`.
+			const schema = {
+				type: 'object',
+				required: [ 'items' ],
+				properties: {
+					items: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								id: { type: 'integer' },
+								link: { type: 'string', format: 'uri' },
+							},
+						},
+					},
+				},
+			};
+
+			expect(
+				validateValueFromSchema(
+					{
+						items: [
+							{ id: 1, link: 'https://example.com/hello-world/' },
+							{
+								id: 2,
+								link: 'https://example.com/блог/привет-мир/',
+							},
+							{ id: 3, link: 'https://例え.jp/?p=3' },
+						],
+					},
+					schema,
+					'output'
+				)
+			).toBe( true );
+
+			expect(
+				validateValueFromSchema(
+					{
+						items: [
+							{ id: 1, link: 'https://example.com/hello-world/' },
+							{ id: 2, link: '/hello-world/' },
+						],
+					},
+					schema,
+					'output'
+				)
+			).toBe( 'output[items][1][link] is not a valid URI.' );
 		} );
 	} );
 
@@ -443,24 +681,14 @@ describe( 'validateValueFromSchema', () => {
 
 	describe( 'schema edge cases and errors', () => {
 		it( 'should handle empty schema object as valid but warn about missing type', () => {
-			const consoleSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
-
 			// Empty object schema triggers warning about missing type
 			expect( validateValueFromSchema( 'anything', {} ) ).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'The "type" schema keyword for value is required.'
 			);
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'should warn for invalid schema types but still pass validation', () => {
-			const consoleSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
-
 			// Testing edge cases where schema is not a valid object
 			expect(
 				validateValueFromSchema(
@@ -468,51 +696,42 @@ describe( 'validateValueFromSchema', () => {
 					undefined as unknown as Record< string, any >
 				)
 			).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Schema must be an object. Received undefined.'
 			);
 
-			consoleSpy.mockClear();
 			expect(
 				validateValueFromSchema(
 					123,
 					null as unknown as Record< string, any >
 				)
 			).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Schema must be an object. Received object.' // typeof null === 'object'
 			);
 
-			consoleSpy.mockClear();
 			expect(
 				validateValueFromSchema(
 					true,
 					false as unknown as Record< string, any >
 				)
 			).toBe( true );
-			expect( consoleSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveWarnedWith(
 				'Schema must be an object. Received boolean.'
 			);
-
-			consoleSpy.mockRestore();
 		} );
 
 		it( 'should handle schema compilation errors', () => {
 			// Pass an invalid schema that will cause compilation error
 			const invalidSchema = { type: 'invalid-type' };
-			const consoleErrorSpy = jest
-				.spyOn( console, 'error' )
-				.mockImplementation();
 
 			const result = validateValueFromSchema( 'test', invalidSchema );
 
 			expect( result ).toBe( 'Invalid schema provided for validation.' );
-			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+			expect( console ).toHaveErroredWith(
 				'Schema compilation error:',
 				expect.any( Error )
 			);
-
-			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'should handle const validation keyword', () => {
@@ -526,6 +745,63 @@ describe( 'validateValueFromSchema', () => {
 			);
 			expect( validateValueFromSchema( 'different-value', schema ) ).toBe(
 				'must be equal to constant'
+			);
+		} );
+	} );
+
+	describe( 'WordPress-specific schema keywords', () => {
+		// All of these keywords are valid on WordPress REST API schemas
+		// (sanitize_callback / validate_callback / arg_options from
+		// register_meta and route args, context / readonly from REST
+		// response shaping, example / examples from OpenAPI-style docs,
+		// and boolean `required` from per-arg flags) but are not part of
+		// JSON Schema draft-04. AJV rejects them at compile time (either
+		// strict mode or meta-schema), so the catch block surfaces a
+		// generic "Invalid schema" error rather than ignoring them.
+		it.each( [
+			[ 'sanitize_callback', 'sanitize_text_field' ],
+			[ 'validate_callback', 'rest_validate_request_arg' ],
+			[ 'arg_options', { sanitize_callback: 'sanitize_key' } ],
+			[ 'example', 'an example value' ],
+			[ 'examples', [ 'first', 'second' ] ],
+			[ 'context', [ 'view', 'edit', 'embed' ] ],
+			[ 'readonly', true ],
+			[ 'required', true ],
+		] )(
+			'should fail compilation when a property uses `%s`',
+			( keyword, value ) => {
+				const schema = {
+					type: 'object',
+					properties: {
+						name: {
+							type: 'string',
+							[ keyword ]: value,
+						},
+					},
+				};
+
+				expect(
+					validateValueFromSchema( { name: 'hello' }, schema )
+				).toBe( 'Invalid schema provided for validation.' );
+				expect( console ).toHaveErroredWith(
+					'Schema compilation error:',
+					expect.any( Error )
+				);
+			}
+		);
+
+		it( 'should fail compilation when a WP-specific keyword sits at the top level of the schema', () => {
+			const schema = {
+				type: 'string',
+				sanitize_callback: 'sanitize_text_field',
+			};
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( console ).toHaveErroredWith(
+				'Schema compilation error:',
+				expect.any( Error )
 			);
 		} );
 	} );

@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
 
 .document-outline {
@@ -11,10 +12,6 @@
 .document-outline__item {
 	display: flex;
 	margin: 4px 0;
-
-	a {
-		text-decoration: none;
-	}
 
 	.document-outline__emdash::before {
 		color: $gray-300;
@@ -43,7 +40,7 @@
 }
 
 .document-outline__button {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	background: none;
 	border: none;
 	display: flex;
@@ -51,6 +48,7 @@
 	margin: 0 0 0 -1px;
 	padding: 2px 5px 2px 1px;
 	color: $gray-900;
+	font: inherit;
 	text-align: left;
 	border-radius: $radius-small;
 
@@ -61,10 +59,12 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Override style from wp-admin common.css.
+		box-shadow: none;
 
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
+		&:not(:active) {
+			@include mixins.outset-ring__focus();
+		}
 	}
 }
 
@@ -72,7 +72,7 @@
 	background: $gray-300;
 	color: $gray-900;
 	border-radius: 3px;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	padding: 1px 6px;
 	margin-right: 4px;
 

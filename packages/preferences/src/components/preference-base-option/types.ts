@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { ToggleControl } from '@wordpress/components';
 
 type ToggleControlProps = Parameters< typeof ToggleControl >[ 0 ];

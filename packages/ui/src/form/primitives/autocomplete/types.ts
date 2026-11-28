@@ -1,0 +1,135 @@
+import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
+import type { ReactElement, ReactNode } from 'react';
+import type { ComponentProps } from '../../../utils/types';
+import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
+
+export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
+
+export type PortalProps = ComponentProps< typeof _Autocomplete.Portal >;
+
+export type PositionerProps = ComponentProps< typeof _Autocomplete.Positioner >;
+
+export type AutocompleteClearProps = ComponentProps<
+	typeof _Autocomplete.Clear
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteEmptyProps = ComponentProps<
+	typeof _Autocomplete.Empty
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteGroupProps = ComponentProps<
+	typeof _Autocomplete.Group
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteGroupLabelProps = ComponentProps<
+	typeof _Autocomplete.GroupLabel
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteInputProps = Omit<
+	ComponentProps< typeof _Autocomplete.Input >,
+	'size' | 'type' // The combobox role is only valid on input type="text".
+>;
+
+export type AutocompleteInputGroupProps = ComponentProps<
+	typeof _Autocomplete.InputGroup
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteItemLabelProps = ComponentProps< 'span' > & {
+	/**
+	 * The primary label and accessible name of an autocomplete item.
+	 */
+	children: ReactNode;
+};
+
+export type AutocompleteItemDescriptionProps = ComponentProps< 'span' > & {
+	/**
+	 * Content that contributes to the autocomplete item's accessible description.
+	 */
+	children: ReactNode;
+};
+
+type AutocompleteItemChildren =
+	| ReactElement< AutocompleteItemLabelProps >
+	| [
+			ReactElement< AutocompleteItemLabelProps >,
+			...(
+				| ReactElement< AutocompleteItemDescriptionProps >
+				| false
+				| null
+				| undefined
+			)[],
+	  ];
+
+export type AutocompleteItemProps = Omit<
+	ComponentProps< typeof _Autocomplete.Item >,
+	'children'
+> & {
+	/**
+	 * One direct ItemLabel, followed by zero or more ItemDescription components.
+	 */
+	children: AutocompleteItemChildren;
+};
+
+export type AutocompleteListProps = ComponentProps<
+	typeof _Autocomplete.List
+> & {
+	children?: _Autocomplete.List.Props[ 'children' ];
+};
+
+export type AutocompleteListBodyProps = ComponentProps< 'div' > & {
+	children?: React.ReactNode;
+};
+
+export type AutocompletePopupProps = ComponentProps<
+	typeof _Autocomplete.Popup
+> &
+	ItemPopupWidthProps & {
+		children?: React.ReactNode;
+		/**
+		 * Optional portal element, typically `<Autocomplete.Portal />` with custom
+		 * `container`. When omitted, `Autocomplete.Popup` uses
+		 * `Autocomplete.Portal` with default props. Do not pass `children` on the
+		 * portal element; they would be ignored.
+		 */
+		portal?: ReactElement< Omit< PortalProps, 'children' > >;
+		/**
+		 * Optional positioner element, typically `<Autocomplete.Positioner />`
+		 * with custom positioning props (`side`, `align`, `sideOffset`, collision
+		 * settings, etc.). When omitted, `Autocomplete.Popup` uses
+		 * `Autocomplete.Positioner` with default props. Do not pass `children` on
+		 * the positioner element; they would be ignored.
+		 */
+		positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+	};
+
+export type AutocompleteRootProps< Value = unknown > =
+	_Autocomplete.Root.Props< Value >;
+
+export type AutocompleteRowProps = ComponentProps<
+	typeof _Autocomplete.Row
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteSeparatorProps = Omit<
+	ComponentProps< typeof _Autocomplete.Separator >,
+	'orientation'
+>;
+
+export type AutocompleteStatusProps = ComponentProps<
+	typeof _Autocomplete.Status
+> & {
+	children?: React.ReactNode;
+};
+
+export type AutocompleteValueProps = _Autocomplete.Value.Props;

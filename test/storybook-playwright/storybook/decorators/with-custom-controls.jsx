@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useId, useState } from '@wordpress/element';
 
 export const WithCustomControls = ( Story, context ) => {

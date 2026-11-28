@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { flushSync, useEffect, useState } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 

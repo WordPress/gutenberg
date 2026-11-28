@@ -1,13 +1,7 @@
-/* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
+/* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments, @wordpress/i18n-plural-placeholder */
 
-/**
- * WordPress dependencies
- */
+import { describe, expect, it, test } from 'vitest';
 import { createHooks } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { createI18n } from '..';
 import type { I18nDomainMetadata, LocaleData } from '../types';
 
@@ -579,4 +573,4 @@ describe( 'i18n filters', () => {
 	} );
 } );
 
-/* eslint-enable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
+/* eslint-enable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments, @wordpress/i18n-plural-placeholder */

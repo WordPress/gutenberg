@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 760" width="1240" height="760" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="Architecture overview: the block editor calls mediaUpload() from @wordpress/media-utils, which hands off to the @wordpress/upload-media store, which orchestrates the @wordpress/vips web worker and the REST API endpoints.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5c6470"/>
+    </marker>
+    <style>
+      .eyebrow { fill:#2d40e8; font-weight:700; font-size:13px; letter-spacing:1.5px; }
+      .title { fill:#101419; font-weight:800; font-size:34px; }
+      .subtitle { fill:#5c6470; font-size:19px; }
+      .ct { fill:#101419; font-weight:700; font-size:22px; }
+      .ctm { fill:#2d40e8; font-weight:700; font-size:21px; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+      .body { fill:#3c434a; font-size:18px; }
+      .mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+      .bt { font-weight:700; font-size:12px; letter-spacing:1px; }
+      /* Inverted fills for text on the dark REST API panel. Declared after
+         .ct/.body so they win the cascade — a stylesheet rule outranks a
+         presentation fill attribute, so the light color must live here too. */
+      .ct-inv { fill:#ffffff; }
+      .body-inv { fill:#e8eaed; }
+    </style>
+  </defs>
+
+  <rect width="1240" height="760" fill="#ffffff"/>
+
+  <text class="eyebrow" x="40" y="52">CLIENT-SIDE MEDIA PROCESSING</text>
+  <text class="title" x="40" y="95">Architecture overview</text>
+  <text class="subtitle" x="40" y="128">The pipeline flows through three browser packages before reaching the server.</text>
+
+  <!-- Block editor -->
+  <rect x="40" y="172" width="1160" height="88" rx="10" fill="#ffffff" stroke="#dcdcde" stroke-width="1.5"/>
+  <rect x="1106" y="190" width="78" height="24" rx="6" fill="#e5e8fb"/>
+  <text class="bt" x="1145" y="207" fill="#2d40e8" text-anchor="middle">BROWSER</text>
+  <text class="ct" x="64" y="214">Block editor</text>
+  <text class="body" x="64" y="242">Image, Gallery, and other media blocks call <tspan class="mono" fill="#2d40e8">mediaUpload()</tspan> from <tspan class="mono" fill="#2d40e8">@wordpress/block-editor</tspan></text>
+
+  <line x1="620" y1="262" x2="620" y2="296" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- media-utils -->
+  <rect x="40" y="300" width="1160" height="88" rx="10" fill="#ffffff" stroke="#dcdcde" stroke-width="1.5"/>
+  <rect x="1106" y="318" width="78" height="24" rx="6" fill="#e5e8fb"/>
+  <text class="bt" x="1145" y="335" fill="#2d40e8" text-anchor="middle">BROWSER</text>
+  <text class="ctm" x="64" y="342">@wordpress/media-utils</text>
+  <text class="body" x="64" y="370"><tspan class="mono">uploadMedia()</tspan> / <tspan class="mono">sideloadMedia()</tspan> — HTTP transport to the REST API</text>
+
+  <line x1="620" y1="390" x2="620" y2="424" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- upload-media (highlighted) -->
+  <rect x="40" y="428" width="1160" height="88" rx="10" fill="#eef0fc" stroke="#2d40e8" stroke-width="2"/>
+  <rect x="1106" y="446" width="78" height="24" rx="6" fill="#dbe0fb"/>
+  <text class="bt" x="1145" y="463" fill="#2d40e8" text-anchor="middle">BROWSER</text>
+  <text class="ctm" x="64" y="470">@wordpress/upload-media</text>
+  <text class="body" x="64" y="498"><tspan class="mono">core/upload-media</tspan> store — upload queue, concurrency limits, operation orchestration</text>
+
+  <!-- branch -->
+  <path d="M620 516 L620 544 M310 544 L930 544" fill="none" stroke="#5c6470" stroke-width="2"/>
+  <line x1="310" y1="544" x2="310" y2="580" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="930" y1="544" x2="930" y2="580" stroke="#5c6470" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- vips -->
+  <rect x="40" y="584" width="540" height="140" rx="10" fill="#ffffff" stroke="#dcdcde" stroke-width="1.5"/>
+  <rect x="462" y="602" width="102" height="24" rx="6" fill="#e5e8fb"/>
+  <text class="bt" x="513" y="619" fill="#2d40e8" text-anchor="middle">WEB WORKER</text>
+  <text class="ctm" x="64" y="632">@wordpress/vips</text>
+  <text class="body" x="64" y="668">WASM image processing with libvips — decode, resize, crop,</text>
+  <text class="body" x="64" y="694">rotate, and encode off the main thread</text>
+
+  <!-- REST API -->
+  <rect x="660" y="584" width="540" height="150" rx="10" fill="#1e1e1e"/>
+  <rect x="1114" y="602" width="70" height="24" rx="6" fill="#ffffff"/>
+  <text class="bt" x="1149" y="619" fill="#1e1e1e" text-anchor="middle">SERVER</text>
+  <text class="ct ct-inv" x="684" y="632">REST API</text>
+  <text class="body mono body-inv" x="684" y="668">POST /wp/v2/media</text>
+  <text class="body mono body-inv" x="684" y="698">POST /wp/v2/media/{id}/sideload</text>
+  <text class="body mono body-inv" x="684" y="728">POST /wp/v2/media/{id}/finalize</text>
+</svg>

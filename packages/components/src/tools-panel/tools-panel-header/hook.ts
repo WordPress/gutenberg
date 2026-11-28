@@ -1,16 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import clsx from 'clsx';
+import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelHeaderProps } from '../types';
 
 export function useToolsPanelHeader(
@@ -22,35 +14,18 @@ export function useToolsPanelHeader(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelHeader' );
 
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.ToolsPanelHeader, className );
-	}, [ className, cx ] );
-
-	const dropdownMenuClassName = useMemo( () => {
-		return cx( styles.DropdownMenu );
-	}, [ cx ] );
-
-	const headingClassName = useMemo( () => {
-		return cx( styles.ToolsPanelHeading );
-	}, [ cx ] );
-
-	const defaultControlsItemClassName = useMemo( () => {
-		return cx( styles.DefaultControlsItem );
-	}, [ cx ] );
-
 	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
 		useToolsPanelContext();
 
 	return {
 		...otherProps,
 		areAllOptionalControlsHidden,
-		defaultControlsItemClassName,
-		dropdownMenuClassName,
+		defaultControlsItemClassName: styles[ 'default-controls-item' ],
+		dropdownMenuClassName: styles[ 'dropdown-menu' ],
 		hasMenuItems,
-		headingClassName,
+		headingClassName: styles[ 'tools-panel-heading' ],
 		headingLevel,
 		menuItems,
-		className: classes,
+		className: clsx( styles[ 'tools-panel-header' ], className ),
 	};
 }

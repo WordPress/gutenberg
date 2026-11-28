@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "One<br>Two",
+			"citation": "...with a caption",
+			"anchor": "test-anchor"
+		},
+		"innerBlocks": []
+	}
+]

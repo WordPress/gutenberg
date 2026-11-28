@@ -99,6 +99,179 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Builds a minimal block instance pointing at the test post.
+	 *
+	 * @return stdClass Block instance with the post context set.
+	 */
+	private function get_block_for_test_post() {
+		$block          = new stdClass();
+		$block->context = array( 'postId' => self::$post->ID );
+		return $block;
+	}
+
+	/**
+	 * A single space must separate the excerpt and the more link when both are
+	 * present and rendered on the same line.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_add_single_space_between_excerpt_and_more_link() {
+		$attributes = array(
+			'moreText'          => 'Read More',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+		$this->assertStringContainsString(
+			'Post Expert content <a class="wp-block-post-excerpt__more-link"',
+			$rendered,
+			'Failed to assert that a single space separates the excerpt and the more link.'
+		);
+	}
+
+	/**
+	 * No trailing space must be left after the excerpt when the more text is
+	 * empty and rendered on the same line.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_not_add_trailing_space_when_more_text_is_empty() {
+		$attributes = array(
+			'moreText'          => '',
+			'showMoreOnNewLine' => false,
+			'excerptLength'     => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+		$this->assertStringContainsString(
+			'Post Expert content</p>',
+			$rendered,
+			'Failed to assert that no trailing space is added when the more text is empty.'
+		);
+	}
+
+	/**
+	 * With the default (unset) showMoreOnNewLine attribute and an empty more
+	 * text, the excerpt paragraph must simply be closed without a trailing
+	 * space. This is the same branch fixed for the Post Template block.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_close_paragraph_when_more_text_empty_and_show_more_on_new_line_default() {
+		$attributes = array(
+			'moreText'      => '',
+			'excerptLength' => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+		$this->assertStringContainsString(
+			'Post Expert content</p>',
+			$rendered,
+			'Failed to assert that the paragraph is closed without a trailing space when showMoreOnNewLine is unset.'
+		);
+	}
+
+	/**
+	 * No leading space must precede the more link when the excerpt is empty.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_not_add_leading_space_before_more_link_when_excerpt_is_empty() {
+		// The test post has an excerpt, so force an empty one for this scenario.
+		$force_empty_excerpt = static function () {
+			return '';
+		};
+		add_filter( 'get_the_excerpt', $force_empty_excerpt );
+
+		try {
+			$attributes = array(
+				'moreText'          => 'Read More',
+				'showMoreOnNewLine' => false,
+				'excerptLength'     => 55,
+			);
+
+			$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+			$this->assertStringContainsString(
+				'wp-block-post-excerpt__excerpt"><a class="wp-block-post-excerpt__more-link"',
+				$rendered,
+				'Failed to assert that no leading space precedes the more link when the excerpt is empty.'
+			);
+		} finally {
+			remove_filter( 'get_the_excerpt', $force_empty_excerpt );
+		}
+	}
+
+	/**
+	 * The more link must name the post for screen readers, without nesting a
+	 * link from the post title inside it.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_add_plain_post_title_for_screen_readers_to_more_link() {
+		$post_id        = self::factory()->post->create(
+			array(
+				'post_title'   => 'Hello <a href="https://example.com">linked</a> world',
+				'post_excerpt' => 'Post Expert content',
+			)
+		);
+		$block          = new stdClass();
+		$block->context = array( 'postId' => $post_id );
+		$attributes     = array(
+			'moreText'      => 'Read More',
+			'excerptLength' => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'Read More<span class="screen-reader-text">: Hello linked world</span></a>',
+			$rendered,
+			'Failed to assert that the more link names the post for screen readers.'
+		);
+		$this->assertSame(
+			1,
+			substr_count( $rendered, '<a ' ),
+			'Failed to assert that the link in the post title is not nested in the more link.'
+		);
+	}
+
+	/**
+	 * An empty excerpt with no more text must render an empty paragraph.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_render_empty_paragraph_when_excerpt_and_more_text_are_empty() {
+		// The test post has an excerpt, so force an empty one for this scenario.
+		$force_empty_excerpt = static function () {
+			return '';
+		};
+		add_filter( 'get_the_excerpt', $force_empty_excerpt );
+
+		try {
+			$attributes = array(
+				'moreText'          => '',
+				'showMoreOnNewLine' => false,
+				'excerptLength'     => 55,
+			);
+
+			$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+			$this->assertStringContainsString(
+				'<p class="wp-block-post-excerpt__excerpt"></p>',
+				$rendered,
+				'Failed to assert that an empty excerpt with no more text renders an empty paragraph.'
+			);
+		} finally {
+			remove_filter( 'get_the_excerpt', $force_empty_excerpt );
+		}
+	}
+
+	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method.
 	 */
 	public function test_should_render_correct_excerpt() {

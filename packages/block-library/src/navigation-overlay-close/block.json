@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/navigation-overlay-close",
 	"title": "Navigation Overlay Close",
@@ -26,8 +25,20 @@
 				"text": true
 			}
 		},
+		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"spacing": {
 			"padding": true,
+			"margin": true,
 			"__experimentalDefaultControls": {
 				"padding": true
 			}

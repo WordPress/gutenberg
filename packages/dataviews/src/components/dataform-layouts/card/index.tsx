@@ -1,12 +1,3 @@
-/**
- * WordPress dependencies
- */
-import {
-	Button,
-	Card,
-	CardBody,
-	CardHeader as OriginalCardHeader,
-} from '@wordpress/components';
 import {
 	useCallback,
 	useContext,
@@ -15,13 +6,12 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { chevronDown, chevronUp } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { speak } from '@wordpress/a11y';
+import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import { Card, CollapsibleCard, Stack, Text } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -31,108 +21,17 @@ import type {
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
+import getValidationMessage from '../get-validation-message';
 import { getSummaryFields } from '../get-summary-fields';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import ValidationBadge from '../validation-badge';
-
-const NonCollapsibleCardHeader = ( {
-	children,
-	...props
-}: {
-	children: React.ReactNode;
-} ) => (
-	<OriginalCardHeader isBorderless { ...props }>
-		<div
-			style={ {
-				height: '40px', // This is to match the chevron's __next40pxDefaultSize
-				width: '100%',
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			} }
-		>
-			{ children }
-		</div>
-	</OriginalCardHeader>
-);
-
-export function useCardHeader( layout: NormalizedCardLayout ) {
-	const { isOpened, isCollapsible } = layout;
-	const [ isOpen, setIsOpen ] = useState( isOpened );
-	const [ touched, setTouched ] = useState( false );
-
-	// Sync internal state when the isOpened prop changes.
-	// This is unlikely to happen in production, but it helps with storybook controls.
-	useEffect( () => {
-		setIsOpen( isOpened );
-	}, [ isOpened ] );
-
-	const toggle = useCallback( () => {
-		// Mark as touched when collapsing (going from open to closed)
-		if ( isOpen ) {
-			setTouched( true );
-		}
-		setIsOpen( ( prev ) => ! prev );
-	}, [ isOpen ] );
-
-	const CollapsibleCardHeader = useCallback(
-		( {
-			children,
-			...props
-		}: {
-			children: React.ReactNode;
-			[ key: string ]: any;
-		} ) => (
-			<OriginalCardHeader
-				{ ...props }
-				onClick={ toggle }
-				style={ {
-					cursor: 'pointer',
-					...props.style,
-				} }
-				isBorderless
-			>
-				<div
-					style={ {
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-					} }
-				>
-					{ children }
-				</div>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					icon={ isOpen ? chevronUp : chevronDown }
-					aria-expanded={ isOpen }
-					aria-label={ isOpen ? 'Collapse' : 'Expand' }
-				/>
-			</OriginalCardHeader>
-		),
-		[ toggle, isOpen ]
-	);
-
-	const effectiveIsOpen = isCollapsible ? isOpen : true;
-	const CardHeaderComponent = isCollapsible
-		? CollapsibleCardHeader
-		: NonCollapsibleCardHeader;
-
-	return {
-		isOpen: effectiveIsOpen,
-		CardHeader: CardHeaderComponent,
-		touched,
-		setTouched,
-	};
-}
 
 function isSummaryFieldVisible< Item >(
 	summaryField: NormalizedField< Item >,
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -178,16 +77,152 @@ function isSummaryFieldVisible< Item >(
 	return true;
 }
 
+function HeaderContent< Item >( {
+	data,
+	fields,
+	label,
+	layout,
+	isOpen,
+	touched,
+	validity,
+}: {
+	data: Item;
+	fields: NormalizedField< Item >[];
+	label: string | undefined;
+	layout: NormalizedCardLayout;
+	isOpen: boolean;
+	touched: boolean;
+	validity: FieldLayoutProps< Item >[ 'validity' ];
+} ) {
+	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
+
+	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
+		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
+	);
+
+	const hasBadge = touched && layout.isCollapsible;
+	const hasSummary = visibleSummaryFields.length > 0 && layout.withHeader;
+	// A collapsible card's heading wraps its toggle, so only a static card
+	// renders its title as the heading.
+	const HeadingTag =
+		layout.withHeader && ! layout.isCollapsible && layout.headingLevel
+			? ( `h${ layout.headingLevel }` as const )
+			: undefined;
+
+	const description = ( hasBadge || hasSummary ) && (
+		<>
+			{ hasBadge && <ValidationBadge validity={ validity } /> }
+			{ hasSummary && (
+				<div className="dataforms-layouts-card__field-summary">
+					{ visibleSummaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) ) }
+				</div>
+			) }
+		</>
+	);
+
+	return (
+		<Stack
+			align="center"
+			justify="space-between"
+			className="dataforms-layouts-card__field-header-content"
+		>
+			<Card.Title render={ HeadingTag && <HeadingTag /> }>
+				{ label }
+			</Card.Title>
+			{ description &&
+				( layout.isCollapsible ? (
+					<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
+						{ description }
+					</CollapsibleCard.HeaderDescription>
+				) : (
+					// A static card has no toggle for the description to
+					// describe, so it is plain, readable text instead. It renders
+					// as a div because the summary is a div, which a span can't
+					// contain.
+					<Text
+						render={ <div /> }
+						variant="body-md"
+						className="dataforms-layouts-card__field-header-content-description"
+					>
+						{ description }
+					</Text>
+				) ) }
+		</Stack>
+	);
+}
+
+function BodyContent< Item >( {
+	data,
+	field,
+	form,
+	onChange,
+	hideLabelFromVision,
+	markWhenOptional,
+	validity,
+	withHeader,
+}: {
+	data: Item;
+	field: FieldLayoutProps< Item >[ 'field' ];
+	form: NormalizedForm;
+	onChange: FieldLayoutProps< Item >[ 'onChange' ];
+	hideLabelFromVision?: boolean;
+	markWhenOptional?: boolean;
+	validity: FieldLayoutProps< Item >[ 'validity' ];
+	withHeader: boolean;
+} ) {
+	if ( field.children ) {
+		return (
+			<>
+				{ field.description && (
+					<div className="dataforms-layouts-card__field-description">
+						{ field.description }
+					</div>
+				) }
+				<DataFormLayout
+					data={ data }
+					form={ form }
+					onChange={ onChange }
+					validity={ validity?.children }
+				/>
+			</>
+		);
+	}
+
+	const SingleFieldLayout = getFormFieldLayout( 'regular' )?.component;
+	if ( ! SingleFieldLayout ) {
+		return null;
+	}
+
+	return (
+		<SingleFieldLayout
+			data={ data }
+			field={ field }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision || withHeader }
+			markWhenOptional={ markWhenOptional }
+			validity={ validity }
+		/>
+	);
+}
+
 export default function FormCardField< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
-	const cardBodyRef = useRef< HTMLDivElement >( null );
+	const contentRef = useRef< HTMLDivElement >( null );
+	const hasFocusedContentRef = useRef( false );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -197,160 +232,145 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
+	const { isOpened, isCollapsible } = layout;
+	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const [ touched, setTouched ] = useState( false );
 
-	// Mark the card as touched when any field inside it is blurred.
-	// This aligns with how validated controls show errors on blur.
-	const handleBlur = useCallback( () => {
-		setTouched( true );
-	}, [ setTouched ] );
+	// Sync internal state when the isOpened prop changes.
+	// This is unlikely to happen in production, but it helps with storybook controls.
+	useEffect( () => {
+		setIsOpen( isOpened );
+	}, [ isOpened ] );
+
+	const handleOpenChange = useCallback( ( open: boolean ) => {
+		// Mark as touched when collapsing (going from open to closed)
+		if ( ! open ) {
+			setTouched( true );
+		}
+		setIsOpen( open );
+	}, [] );
 
 	// When the card is expanded after being touched (collapsed with errors),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity( cardBodyRef, isOpen && touched );
-
-	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
-
-	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
-		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
+	// reveal the field-level errors.
+	const revealValidity = useRevealValidity(
+		contentRef,
+		( isCollapsible ? isOpen : true ) && touched
 	);
 
-	const validationBadge =
-		touched && layout.isCollapsible ? (
-			<ValidationBadge validity={ validity } />
-		) : null;
+	const handleContentFocus = useCallback( () => {
+		hasFocusedContentRef.current = true;
+	}, [] );
 
-	const sizeCard = {
-		blockStart: 'medium' as const,
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
+	// Reveal the errors of every field in the card once focus leaves the card.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within the card doesn't count,
+	// so the natural tab sequence is preserved.
+	const handleFocusOutside = useCallback( () => {
+		// Leaving without ever entering the fields — for instance tabbing past
+		// the header of a collapsed card — isn't an interaction to report on.
+		if ( ! hasFocusedContentRef.current ) {
+			return;
+		}
+		setTouched( true );
+		// A collapsed card reveals nothing: its content is hidden but still
+		// in the DOM, so the reveal would count the invalid fields and
+		// announce them. The header badge already conveys them, and expanding
+		// the card reveals the errors through the effect above.
+		if ( isCollapsible && ! isOpen ) {
+			return;
+		}
+		// The errors appear without moving focus, so announce them: their
+		// arrival is otherwise imperceptible to assistive technology.
+		const revealedCount = revealValidity();
+		const message = getValidationMessage( validity );
+		if ( revealedCount > 0 && message ) {
+			speak( message, 'polite' );
+		}
+	}, [ isCollapsible, isOpen, revealValidity, validity ] );
 
-	if ( !! field.children ) {
-		const withHeader = !! field.label && layout.withHeader;
+	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 
-		const sizeCardBody = {
-			blockStart: withHeader
-				? ( 'none' as const )
-				: ( 'medium' as const ),
-			blockEnd: 'medium' as const,
-			inlineStart: 'medium' as const,
-			inlineEnd: 'medium' as const,
-		};
+	let label = field.label;
+	let withHeader: boolean;
 
+	if ( field.children ) {
+		withHeader = !! label && layout.withHeader;
+	} else {
+		const fieldDefinition = fields.find(
+			( fieldDef ) => fieldDef.id === field.id
+		);
+
+		if ( ! canRenderField( fieldDefinition ) ) {
+			return null;
+		}
+
+		label = fieldDefinition.label;
+		withHeader = !! label && layout.withHeader;
+	}
+
+	const bodyContent = (
+		<BodyContent
+			data={ data }
+			field={ field }
+			form={ form }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
+			validity={ validity }
+			withHeader={ withHeader }
+		/>
+	);
+
+	const headingLevel = layout.withHeader ? layout.headingLevel : undefined;
+	// A native heading only allows phrasing content, so the collapsible
+	// header's wrapper, which contains the toggle, takes heading semantics
+	// through ARIA instead.
+	const collapsibleHeadingProps = headingLevel
+		? { role: 'heading', 'aria-level': headingLevel }
+		: {};
+
+	const headerContent = (
+		<HeaderContent
+			data={ data }
+			fields={ fields }
+			label={ label }
+			layout={ layout }
+			isOpen={ isCollapsible ? !! isOpen : true }
+			touched={ touched }
+			validity={ validity }
+		/>
+	);
+
+	if ( withHeader && isCollapsible ) {
 		return (
-			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
-				{ withHeader && (
-					<CardHeader className="dataforms-layouts-card__field-header">
-						<span className="dataforms-layouts-card__field-header-label">
-							{ field.label }
-						</span>
-						{ validationBadge }
-						{ visibleSummaryFields.length > 0 &&
-							layout.withHeader && (
-								<div className="dataforms-layouts-card__field-summary">
-									{ visibleSummaryFields.map(
-										( summaryField ) => (
-											<summaryField.render
-												key={ summaryField.id }
-												item={ data }
-												field={ summaryField }
-											/>
-										)
-									) }
-								</div>
-							) }
-					</CardHeader>
-				) }
-				{ ( isOpen || ! withHeader ) && (
-					// If it doesn't have a header, keep it open.
-					// Otherwise, the card will not be visible.
-					<CardBody
-						size={ sizeCardBody }
-						className="dataforms-layouts-card__field-control"
-						ref={ cardBodyRef }
-						onBlur={ handleBlur }
-					>
-						{ field.description && (
-							<div className="dataforms-layouts-card__field-description">
-								{ field.description }
-							</div>
-						) }
-						<DataFormLayout
-							data={ data }
-							form={ form }
-							onChange={ onChange }
-							validity={ validity?.children }
-						/>
-					</CardBody>
-				) }
-			</Card>
+			<CollapsibleCard.Root
+				className="dataforms-layouts-card__field"
+				open={ isOpen }
+				onOpenChange={ handleOpenChange }
+				{ ...focusOutsideProps }
+			>
+				<CollapsibleCard.Header { ...collapsibleHeadingProps }>
+					{ headerContent }
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content
+					ref={ contentRef }
+					onFocus={ handleContentFocus }
+				>
+					{ bodyContent }
+				</CollapsibleCard.Content>
+			</CollapsibleCard.Root>
 		);
 	}
 
-	const fieldDefinition = fields.find(
-		( fieldDef ) => fieldDef.id === field.id
-	);
-
-	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
-		return null;
-	}
-
-	const RegularLayout = getFormFieldLayout( 'regular' )?.component;
-	if ( ! RegularLayout ) {
-		return null;
-	}
-	const withHeader = !! fieldDefinition.label && layout.withHeader;
-
-	const sizeCardBody = {
-		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
-
 	return (
-		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
-			{ withHeader && (
-				<CardHeader className="dataforms-layouts-card__field-header">
-					<span className="dataforms-layouts-card__field-header-label">
-						{ fieldDefinition.label }
-					</span>
-					{ validationBadge }
-					{ visibleSummaryFields.length > 0 && layout.withHeader && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CardHeader>
-			) }
-			{ ( isOpen || ! withHeader ) && (
-				// If it doesn't have a header, keep it open.
-				// Otherwise, the card will not be visible.
-				<CardBody
-					size={ sizeCardBody }
-					className="dataforms-layouts-card__field-control"
-					ref={ cardBodyRef }
-					onBlur={ handleBlur }
-				>
-					<RegularLayout
-						data={ data }
-						field={ field }
-						onChange={ onChange }
-						hideLabelFromVision={
-							hideLabelFromVision || withHeader
-						}
-						validity={ validity }
-					/>
-				</CardBody>
-			) }
-		</Card>
+		<Card.Root
+			className="dataforms-layouts-card__field"
+			{ ...focusOutsideProps }
+		>
+			{ withHeader && <Card.Header>{ headerContent }</Card.Header> }
+			<Card.Content ref={ contentRef } onFocus={ handleContentFocus }>
+				{ bodyContent }
+			</Card.Content>
+		</Card.Root>
 	);
 }

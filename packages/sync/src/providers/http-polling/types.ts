@@ -31,8 +31,9 @@ interface SyncEnvelopeFromClient {
 
 interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
-	compaction_request?: SyncUpdate[];
+	compaction_request?: SyncUpdate[]; // deprecated
 	end_cursor: number; // use as `after` in next request
+	should_compact?: boolean;
 	room: string;
 	updates: SyncUpdate[];
 }
@@ -51,7 +52,10 @@ export interface UpdateQueue {
 	clear: () => void;
 	get: () => SyncUpdate[];
 	pause: () => void;
+	peek: () => SyncUpdate[];
 	restore: ( updates: SyncUpdate[] ) => void;
+	restoreExact: ( updates: SyncUpdate[] ) => void;
 	resume: () => void;
 	size: () => number;
+	take: ( count: number ) => SyncUpdate[];
 }

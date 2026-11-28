@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import type { AnimateProps, GetAnimateOptions } from './types';
 
 /**
@@ -46,6 +40,12 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
 /**
  * Simple interface to introduce animations to components.
  *
+ * This component is deprecated. Write your own CSS animations instead,
+ * preferably using the [motion tokens](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs)
+ * available in `@wordpress/theme`.
+ *
+ * @deprecated
+ *
  * ```jsx
  * import { Animate, Notice } from '@wordpress/components';
  *
@@ -61,6 +61,11 @@ export function getAnimateClassName( options: GetAnimateOptions ) {
  * ```
  */
 export function Animate( { type, options = {}, children }: AnimateProps ) {
+	deprecated( 'wp.components.Animate', {
+		since: '7.2',
+		version: '7.4',
+	} );
+
 	return children( {
 		className: getAnimateClassName( {
 			type,

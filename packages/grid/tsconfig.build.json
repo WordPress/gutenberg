@@ -1,0 +1,14 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"types": [ "style-imports" ]
+	},
+	"references": [
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" }
+	]
+}

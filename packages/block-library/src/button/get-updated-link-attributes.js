@@ -1,12 +1,5 @@
-/**
- * Internal dependencies
- */
+import { prependHTTPS } from '@wordpress/url';
 import { NEW_TAB_REL, NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
-
-/**
- * WordPress dependencies
- */
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Updates the link attributes.
@@ -29,9 +22,6 @@ export function getUpdatedLinkAttributes( {
 
 	if ( opensInNewTab ) {
 		newLinkTarget = NEW_TAB_TARGET;
-		updatedRel = updatedRel?.includes( NEW_TAB_REL )
-			? updatedRel
-			: updatedRel + ` ${ NEW_TAB_REL }`;
 	} else {
 		const relRegex = new RegExp( `\\b${ NEW_TAB_REL }\\s*`, 'g' );
 		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
@@ -47,7 +37,7 @@ export function getUpdatedLinkAttributes( {
 	}
 
 	return {
-		url: prependHTTP( url ),
+		url: prependHTTPS( url ),
 		linkTarget: newLinkTarget,
 		rel: updatedRel || undefined,
 	};
