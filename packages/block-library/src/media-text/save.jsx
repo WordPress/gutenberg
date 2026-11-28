@@ -10,6 +10,7 @@ export default function save( { attributes } ) {
 	const {
 		isStackedOnMobile,
 		mediaAlt,
+		mediaTitle,
 		mediaPosition,
 		mediaType,
 		mediaUrl,
@@ -39,6 +40,7 @@ export default function save( { attributes } ) {
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
+			title={ mediaTitle }
 			className={ imageClasses || null }
 			style={ positionStyles }
 		/>
