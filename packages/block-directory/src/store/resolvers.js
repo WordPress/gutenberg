@@ -1,5 +1,6 @@
 import { camelCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import { fetchDownloadableBlocks, receiveDownloadableBlocks } from './actions';
 
 export const getDownloadableBlocks =
@@ -12,7 +13,9 @@ export const getDownloadableBlocks =
 		try {
 			dispatch( fetchDownloadableBlocks( filterValue ) );
 			const results = await apiFetch( {
-				path: `wp/v2/block-directory/search?term=${ filterValue }`,
+				path: addQueryArgs( 'wp/v2/block-directory/search', {
+					term: filterValue,
+				} ),
 			} );
 			const blocks = results.map( ( result ) =>
 				Object.fromEntries(

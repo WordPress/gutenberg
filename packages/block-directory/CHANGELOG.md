@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Encode the search term in the Block Directory search request, so text with characters like `&`, `#`, `+` or `%` is searched as typed ([#87185](https://github.com/WordPress/gutenberg/pull/87185)).
+
 ## 6.2.0 (2026-11-18)
 
 ## 6.1.0 (2026-11-04)
