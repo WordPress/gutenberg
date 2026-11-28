@@ -6,6 +6,13 @@
 	border-left: none;
 	border-right: none;
 	border-bottom: none;
+
+	// Use background-color instead of border to avoid alpha stacking issues.
+	&.has-background:not(.is-style-dots) {
+		border: none !important;
+		background-color: currentColor;
+		height: 1px;
+	}
 }
 
 // An empty <hr> has no intrinsic width, so it collapses to zero inside flex
