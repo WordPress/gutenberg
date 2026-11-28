@@ -2889,6 +2889,10 @@ class WP_Theme_JSON_Gutenberg {
 								'name'  => $property,
 								'value' => 'var(' . $css_var . ') !important',
 							),
+							array(
+								'name'  => '--' . $property,
+								'value' => 'var(' . $css_var . ')',
+							),
 						)
 					);
 				}
