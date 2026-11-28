@@ -171,6 +171,12 @@
 
 -   The bundled `eslint` dependency has been updated from `^8.3.0` to `^8.57.1` ([#74316](https://github.com/WordPress/gutenberg/pull/74316)).
 
+## 31.2.0 (2025-12-23)
+
+### Breaking Changes
+
+-   The bundled `@wordpress/eslint-plugin` dependency has been updated to `^23.0.0`, which reports `@wordpress/` imports that are not installed. Add every `@wordpress/` package your code imports to `package.json`, even when the build externalizes it ([#72978](https://github.com/WordPress/gutenberg/pull/72978)).
+
 ## 31.1.0 (2025-11-26)
 
 ## 31.0.0 (2025-11-12)

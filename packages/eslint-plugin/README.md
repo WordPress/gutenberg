@@ -78,6 +78,8 @@ npm install typescript --save-dev
 
 There is also `recommended-with-formatting` ruleset for projects that want to ensure that [Prettier](https://prettier.io) and [TypeScript](https://www.typescriptlang.org) integration is never activated. This preset has the native ESLint code formatting rules enabled instead.
 
+Both presets report unresolved imports in JavaScript files, including `@wordpress/` packages. Add every `@wordpress/` package your code imports to `package.json`, even when your build turns it into a `wp.*` global. Do not ignore `^@wordpress/` in `import/no-unresolved`: some packages, such as `@wordpress/icons`, are bundled rather than externalized, so those errors are real.
+
 ### Rulesets
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
