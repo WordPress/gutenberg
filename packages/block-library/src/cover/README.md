@@ -176,6 +176,15 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `postId`
 - `postType`
 
+## Block Styles
+
+_Defined via the [`styles`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) property in block.json._
+
+| Style Name | Label | Default |
+|------------|-------|---------|
+| `default` | Default | Yes |
+| `hover-reveal` | Hover reveal | No |
+
 ## CSS Selectors
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
