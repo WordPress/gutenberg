@@ -32,25 +32,25 @@
 	}
 
 	// Icon sizes.
-	// Small.
+	// Small. 16 makes for a quarter-padding that keeps the icon centered.
 	&.has-small-icon-size {
-		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+		font-size: var(--wp--social-icons--size--small, 16px);
 	}
 
 	// Normal/default.
 	&,
 	&.has-normal-icon-size {
-		font-size: 24px;
+		font-size: var(--wp--social-icons--size--normal, 24px);
 	}
 
 	// Large.
 	&.has-large-icon-size {
-		font-size: 36px;
+		font-size: var(--wp--social-icons--size--large, 36px);
 	}
 
 	// Huge.
 	&.has-huge-icon-size {
-		font-size: 48px;
+		font-size: var(--wp--social-icons--size--huge, 48px);
 	}
 
 	// Center flex items. This has an equivalent in editor.scss.
@@ -150,8 +150,8 @@
 		padding: 0;
 	}
 	:where(.wp-block-social-links.is-style-pill-shape .wp-social-link a) {
-		padding-left: calc((2/3) * 1em);
-		padding-right: calc((2/3) * 1em);
+		padding-left: calc((2 / 3) * 1em);
+		padding-right: calc((2 / 3) * 1em);
 	}
 }
 
