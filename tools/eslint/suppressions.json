@@ -709,25 +709,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/archives/edit.jsx": {
+	"packages/block-library/src/archives/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/archives/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/archives/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/audio/deprecated.jsx": {
@@ -2672,24 +2656,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/loginout/edit.jsx": {
+	"packages/block-library/src/loginout/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/loginout/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/loginout/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -4865,25 +4833,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/rss/edit.jsx": {
+	"packages/block-library/src/rss/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/rss/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/rss/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/search/edit.jsx": {
@@ -5874,30 +5826,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/tag-cloud/edit.jsx": {
+	"packages/block-library/src/tag-cloud/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/tag-cloud/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/tag-cloud/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/tag-cloud/transforms.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/template-part/edit/advanced-controls.tsx": {

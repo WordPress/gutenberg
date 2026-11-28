@@ -207,6 +207,40 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The more link must name the post for screen readers, without nesting a
+	 * link from the post title inside it.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_add_plain_post_title_for_screen_readers_to_more_link() {
+		$post_id        = self::factory()->post->create(
+			array(
+				'post_title'   => 'Hello <a href="https://example.com">linked</a> world',
+				'post_excerpt' => 'Post Expert content',
+			)
+		);
+		$block          = new stdClass();
+		$block->context = array( 'postId' => $post_id );
+		$attributes     = array(
+			'moreText'      => 'Read More',
+			'excerptLength' => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $block );
+
+		$this->assertStringContainsString(
+			'Read More<span class="screen-reader-text">: Hello linked world</span></a>',
+			$rendered,
+			'Failed to assert that the more link names the post for screen readers.'
+		);
+		$this->assertSame(
+			1,
+			substr_count( $rendered, '<a ' ),
+			'Failed to assert that the link in the post title is not nested in the more link.'
+		);
+	}
+
+	/**
 	 * An empty excerpt with no more text must render an empty paragraph.
 	 *
 	 * @covers ::gutenberg_render_block_core_post_excerpt
