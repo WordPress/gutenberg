@@ -1,6 +1,8 @@
 <?php
 /**
  * Tests block template registry via block-related functions.
+ *
+ * @package gutenberg
  */
 class Tests_Block_Template extends WP_UnitTestCase {
 	public function set_up() {

@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @package gutenberg
  * @group script-dependencies
  */
 class Test_Script_Dependencies extends WP_UnitTestCase {

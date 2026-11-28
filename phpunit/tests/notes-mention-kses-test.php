@@ -8,6 +8,7 @@
  * narrow: `span` may only carry the two mention class tokens, and every other
  * tag and attribute is sanitized exactly as by core's defaults.
  *
+ * @package gutenberg
  * @group notes
  */
 class Tests_Notes_Mention_Kses extends WP_UnitTestCase {

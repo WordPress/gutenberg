@@ -8,6 +8,8 @@
  * metadata). The swap to a video happens in the editor (the Video block's "GIF"
  * variation), so the only PHP responsibility is removing those companions when
  * the attachment is deleted. See lib/media/animated-gif-to-video.php.
+ *
+ * @package gutenberg
  */
 class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 	/**

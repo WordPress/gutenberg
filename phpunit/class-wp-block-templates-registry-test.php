@@ -2,6 +2,8 @@
 /**
  * Test WP_Block_Templates_Registry class.
  *
+ *
+ * @package gutenberg
  * @covers WP_Block_Templates_Registry
  */
 class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {

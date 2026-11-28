@@ -1,5 +1,11 @@
 <?php
 /**
+ * Script modules support for block metadata.
+ *
+ * @package gutenberg
+ */
+
+/**
  * Add module fields from block metadata to WP_Block_Type settings.
  *
  * This filter allows us to register modules from block metadata and attach additional fields to

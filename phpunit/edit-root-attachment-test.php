@@ -3,6 +3,7 @@
  * Tests for the edit_root REST field and the
  * `wp_edited_image_metadata` hook that maintains it.
  *
+ * @package gutenberg
  * @group media
  */
 class Gutenberg_Edit_Root_Attachment_Test extends WP_UnitTestCase {

@@ -5,6 +5,8 @@
  * The sync module reads its polling intervals via applyFilters at load time.
  * The sync module is bundled into the wp-core-data script, so the filters
  * must be registered before that script executes.
+ *
+ * @package gutenberg
  */
 add_action(
 	'enqueue_block_editor_assets',

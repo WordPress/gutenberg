@@ -2,6 +2,8 @@
 /**
  * Router for PHP's built-in server: serves existing files as they are and
  * sends everything else to WordPress, like the rewrite rules in .htaccess.
+ *
+ * @package gutenberg
  */
 
 $root = $_SERVER['DOCUMENT_ROOT'];

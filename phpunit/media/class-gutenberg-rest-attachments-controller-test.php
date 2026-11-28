@@ -5,6 +5,8 @@
  * Tests the REST API controller for media attachments which provides
  * client-side media processing functionality including sideload support
  * and sub-size generation control.
+ *
+ * @package gutenberg
  */
 
 /**

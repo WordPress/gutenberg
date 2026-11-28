@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * REST API: Gutenberg_REST_Templates_Controller_7_2 class
+ *
+ * @package gutenberg
+ */
+
+/**
  * Core class used to access templates via the REST API before WordPress 7.2.
  *
  * This class extension exists to prevent a fatal error when a `null` template

@@ -8,6 +8,8 @@
  * uploading to the server. It can be disabled via the
  * 'wp_client_side_media_processing_enabled' filter or checked using
  * the gutenberg_is_client_side_media_processing_enabled() helper function.
+ *
+ * @package gutenberg
  */
 class Media_Processing_Test extends WP_UnitTestCase {
 	/**

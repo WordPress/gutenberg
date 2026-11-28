@@ -4,6 +4,8 @@
  * given plugins.
  *
  * Usage: php install.php <site folder> <title> [plugin folder ...]
+ *
+ * @package gutenberg
  */
 
 $_SERVER['HTTP_HOST'] = 'localhost';
