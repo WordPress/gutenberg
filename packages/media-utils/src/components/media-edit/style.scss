@@ -215,6 +215,20 @@ fieldset.media-edit {
 			@include preview-overlay;
 		}
 
+		.media-edit__expanded-overlay .media-edit__expanded-replace {
+			position: absolute;
+			bottom: $grid-unit-05;
+			left: $grid-unit-05;
+			padding: $grid-unit-05 $grid-unit-10;
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			color: $gray-900;
+			// Clicks go through to the preview, which does the replacing. The
+			// overlay selector outranks the overlay's `pointer-events: auto`.
+			pointer-events: none;
+			@include preview-overlay;
+		}
+
 		.media-edit__expanded-item {
 			position: relative;
 			min-width: 0;

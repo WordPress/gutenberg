@@ -420,6 +420,22 @@ function ExpandedMediaEditAttachments( {
 						</MediaPickerButton>
 						{ ! isBlob && (
 							<div className="media-edit__expanded-overlay">
+								{ /*
+								 * Clicking the preview replaces the media, but
+								 * the buttons that show on hover don't say so.
+								 * Show it on the preview, unless an upload is
+								 * in progress and the preview ignores clicks.
+								 * The preview's own label already names the
+								 * action for assistive technologies.
+								 */ }
+								{ ! isUploading && (
+									<span
+										className="media-edit__expanded-replace"
+										aria-hidden="true"
+									>
+										{ __( 'Replace' ) }
+									</span>
+								) }
 								<HStack
 									className="media-edit__expanded-actions"
 									spacing={ 0 }

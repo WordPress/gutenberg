@@ -122,6 +122,39 @@ describe( 'MediaEdit', () => {
 		);
 	} );
 
+	it( 'shows that clicking the preview replaces the media', () => {
+		render(
+			<RegistryProvider
+				value={ createTestRegistry( {
+					attachments: [
+						{
+							id: 5,
+							source_url: 'https://example.com/photo.jpg',
+							mime_type: 'image/jpeg',
+							title: { rendered: 'Photo' },
+							alt_text: '',
+						},
+					],
+				} ) }
+			>
+				<MediaEditControl
+					data={ { featured_media: 5 } }
+					field={ field }
+					onChange={ () => {} }
+					isExpanded
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Replace Photo' } )
+		).toBeInTheDocument();
+		// A visual hint only: the preview's label already names the action.
+		expect( screen.getByText( 'Replace' ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
+		);
+	} );
+
 	it( 'shows a message instead of the picker without upload permission', () => {
 		render(
 			<RegistryProvider
