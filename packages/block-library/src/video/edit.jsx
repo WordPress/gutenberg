@@ -227,7 +227,6 @@ function VideoEdit( {
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
 							onReset={ onResetVideo }
-							variant="toolbar"
 						/>
 					</BlockControls>
 				</>

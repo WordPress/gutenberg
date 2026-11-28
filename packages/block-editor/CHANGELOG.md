@@ -49,6 +49,7 @@
 
 ### Enhancements
 
+-   Block toolbar: Paint the floating toolbar and parent selector with the `Menu` popup surface, and separate groups with inset hairlines. The docked toolbar stays a flat bar. Toolbar popovers, including the link popover, no longer opt into the high-contrast `toolbar` variant. This is the alternative to the menu variant proposed in #83850 ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).

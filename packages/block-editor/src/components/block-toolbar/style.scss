@@ -37,10 +37,18 @@
 		margin-bottom: -$border-width;
 
 		// The component is born with a border, but we only need some of them.
+		// The toolbar paints one surface for all groups, so legacy groups in
+		// the `NavigableMenu` fallback drop their own surface too.
 		border: 0;
+		border-radius: 0;
+		box-shadow: none;
 
-		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $gray-300;
+		// Groups in the block toolbar are not siblings, so the component's
+		// `:not(:last-child)` hairline does not run between segments. Show it
+		// on every segment here, then clear it on the last segment below.
+		&::after {
+			content: "";
+		}
 	}
 
 	&.is-connected {
@@ -79,11 +87,15 @@
 	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar,
 	// If the last toolbar group is empty,
-	// we need to remove the double border from the penultimate one.
+	// we need to remove the divider from the penultimate one.
 	&:has(> :last-child:empty) > :nth-last-child(2),
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
-		border-right: none;
+		// `display`, not `content`, so header toolbars that restyle the
+		// hairline cannot bring it back on the last segment.
+		&::after {
+			display: none;
+		}
 	}
 
 	.components-toolbar-group:empty {
@@ -98,14 +110,8 @@
 	display: block;
 	width: 100%;
 	// Block UI appearance.
-	background-color: $white;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	flex-shrink: 3;
-
-	// Raise the specificity.
-	&.components-accessible-toolbar {
-		border: none;
-		border-radius: 0;
-	}
 
 	&.is-unstyled {
 		box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
@@ -118,14 +124,6 @@
 
 		// Prevents padding from being applied to the left and right sides of the element.
 		scrollbar-gutter: auto;
-
-		> :last-child,
-		> :last-child .components-toolbar-group,
-		> :last-child .components-toolbar {
-			&::after {
-				display: none;
-			}
-		}
 	}
 
 	& > .block-editor-block-toolbar {
@@ -191,6 +189,13 @@
 	.block-editor-block-contextual-toolbar:not(.editor-header__toolbar *) {
 		background-color: transparent;
 		border: none;
+		// Follow the wrapped groups' shape. Mirrors `$elevation-medium`.
+		box-shadow: none;
+		filter:
+			drop-shadow(0 2px 3px rgba($black, 0.05))
+			drop-shadow(0 4px 5px rgba($black, 0.04))
+			drop-shadow(0 12px 12px rgba($black, 0.03))
+			drop-shadow(0 16px 16px rgba($black, 0.02));
 
 		.block-editor-block-toolbar {
 			flex-wrap: wrap;
@@ -201,38 +206,42 @@
 				flex-wrap: wrap;
 			}
 			.components-toolbar-group {
-				background-color: $white;
+				background-color: var(--wpds-color-background-surface-neutral-strong);
 			}
 			// Groups can wrap onto several rows, so each one carries its own
 			// border instead of the toolbar having a single outer border.
 			.components-toolbar-group,
 			.components-toolbar,
 			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
-				border: $border-width solid $gray-900;
+				border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 				margin: 0 (-$border-width) (-$border-width) 0;
 				padding: 0;
 
-				//Nested groups shouldn't duplicate border styles.
+				// The border separates the groups, so drop the hairline. The mover
+				// keeps its own, which separates it from the block switcher.
+				&:not(.block-editor-block-mover)::after {
+					content: none;
+				}
+
+				// Nested groups shouldn't duplicate border styles.
 				.components-toolbar-group {
 					border: none;
 					margin: 0;
-
-					// Except if there are adjacent groups which need a border between them.
-					+ .components-toolbar-group {
-						border-left: 1px solid $gray-900;
-					}
 				}
+			}
+
+			// Separate the stacked movers from the drag handle with a full
+			// height border, like the borders between groups.
+			.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				border-inline-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			}
 
 			.block-editor-block-parent-selector,
 			.block-editor-block-parent-selector__button {
 				border: none;
+				border-radius: 0;
 				margin: 0;
-
-				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
-				.components-toolbar-group:last-child {
-					border-right: 1px solid $gray-900;
-				}
+				box-shadow: none;
 			}
 		}
 	}
@@ -290,7 +299,7 @@
 				content: "";
 				height: $border-width;
 				width: 100%;
-				background: $gray-200;
+				background: var(--wpds-color-stroke-surface-neutral-weak);
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -298,10 +307,10 @@
 				// X axis allows to make the separator always centered regardless of its width.
 				transform: translate(-50%, 0);
 				margin-top: -$border-width * 0.5;
-			}
 
-			@include break-medium {
-				background: $gray-900;
+				@media ( forced-colors: active ) {
+					background: CanvasText;
+				}
 			}
 		}
 	}
@@ -321,10 +330,26 @@
 
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		border-left: 1px solid $gray-300;
 		margin-left: 6px;
 		margin-right: -6px;
 		white-space: nowrap;
+
+		&::after {
+			content: "";
+			position: absolute;
+			z-index: 1;
+			inset-block: 0;
+			inset-inline-start: 0;
+			margin-block: auto;
+			width: var(--wpds-border-width-xs);
+			height: var(--wpds-dimension-size-sm);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			pointer-events: none;
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
+		}
 	}
 
 	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {

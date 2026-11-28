@@ -44,6 +44,7 @@
 
 ### Enhancements
 
+-   Image, Gallery, Cover, Audio, Video, Site Logo, and Playlist: Open toolbar media and text popovers with the default popover instead of the high-contrast `toolbar` variant ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).

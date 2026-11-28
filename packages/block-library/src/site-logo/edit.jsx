@@ -540,7 +540,6 @@ export default function LogoEdit( {
 			<MediaReplaceFlow
 				{ ...mediaReplaceFlowProps }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				variant="toolbar"
 			/>
 		</BlockControls>
 	);

@@ -22,15 +22,8 @@
 }
 
 .block-editor-block-switcher__popover-preview {
-	overflow: hidden;
-
 	.components-popover__content {
 		width: 300px;
-		border: $border-width solid $gray-900;
-		background: $white;
-		border-radius: $radius-medium;
-		outline: none;
-		box-shadow: none;
 		overflow: auto;
 		scroll-padding-block: calc(2 * var(--wpds-border-width-focus));
 	}
