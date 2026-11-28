@@ -6,7 +6,6 @@ import type { BlockModule } from '../utils/types';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
-import type { QueryNoResultsAttributes } from './types';
 
 const TEMPLATE: TemplateItem[] = [
 	[
@@ -22,7 +21,7 @@ const TEMPLATE: TemplateItem[] = [
 const { name } = metadata;
 export { metadata, name };
 
-export const settings: BlockModule< QueryNoResultsAttributes >[ 'settings' ] = {
+export const settings: BlockModule[ 'settings' ] = {
 	icon,
 	template: TEMPLATE,
 	edit,
@@ -32,7 +31,6 @@ export const settings: BlockModule< QueryNoResultsAttributes >[ 'settings' ] = {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					// @ts-expect-error BlockExampleInnerBlock['attributes'] is typed as a BlockType attribute schema.
 					content: __( 'No posts were found.' ),
 				},
 			},
@@ -43,7 +41,6 @@ export const settings: BlockModule< QueryNoResultsAttributes >[ 'settings' ] = {
 export const init = () =>
 	initBlock( {
 		name,
-		metadata:
-			metadata as unknown as BlockModule< QueryNoResultsAttributes >[ 'metadata' ],
+		metadata: metadata as unknown as BlockModule[ 'metadata' ],
 		settings,
 	} );
