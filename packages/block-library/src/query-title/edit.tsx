@@ -11,14 +11,20 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useArchiveLabel } from './use-archive-label';
 import { usePostTypeLabel } from './use-post-type-label';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import type { QueryTitleAttributes, QueryTitleBlockContext } from './types';
 
 const SUPPORTED_TYPES = [ 'archive', 'search', 'post-type' ];
 
-export default function QueryTitleEdit( props ) {
+export default function QueryTitleEdit(
+	props: BlockEditProps< QueryTitleAttributes > & {
+		context: QueryTitleBlockContext;
+	}
+) {
 	useDeprecatedTextAlign( props );
 
 	const {
@@ -37,7 +43,7 @@ export default function QueryTitleEdit( props ) {
 		className: 'wp-block-query-title__placeholder',
 	} );
 
-	if ( ! SUPPORTED_TYPES.includes( type ) ) {
+	if ( ! SUPPORTED_TYPES.includes( type! ) ) {
 		return (
 			<div { ...blockProps }>
 				<Warning>{ __( 'Provided type is not supported.' ) }</Warning>

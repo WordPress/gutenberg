@@ -1,5 +1,8 @@
+import type { BlockAlignment } from '@wordpress/blocks';
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { StyledBlockAttributes } from '../utils/types';
+import type { QueryTitleAttributes } from './types';
 
 const v2 = {
 	attributes: {
@@ -19,7 +22,7 @@ const v2 = {
 	},
 	supports: {
 		anchor: true,
-		align: [ 'wide', 'full' ],
+		align: [ 'wide', 'full' ] as BlockAlignment[],
 		html: false,
 		color: {
 			gradients: true,
@@ -62,7 +65,7 @@ const v2 = {
 		},
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
+	isEligible( attributes: QueryTitleAttributes ) {
 		return (
 			!! attributes.textAlign ||
 			!! attributes.className?.match(
@@ -87,7 +90,7 @@ const v1 = {
 		},
 	},
 	supports: {
-		align: [ 'wide', 'full' ],
+		align: [ 'wide', 'full' ] as BlockAlignment[],
 		html: false,
 		color: {
 			gradients: true,
@@ -105,8 +108,8 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style } ) {
-		return style?.typography?.fontFamily;
+	isEligible( { style }: StyledBlockAttributes ) {
+		return !! style?.typography?.fontFamily;
 	},
 };
 
