@@ -83,10 +83,55 @@
 		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
+	// Give empty meta box areas a height while dragging, so that a meta box can
+	// be dropped into them.
+	.is-dragging-metaboxes & .meta-box-sortables {
+		min-height: 60px;
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		// Contain the margin of the sortable placeholder.
+		display: flex;
+		flex-direction: column;
+
+		.sortable-placeholder {
+			border-radius: 0;
+			// Keep the dashed border apart from the adjacent borders, so it's visible.
+			margin: $grid-unit-05;
+		}
+	}
+
 	// Hide disabled meta boxes using CSS so that we don't interfere with plugins
 	// that modify `element.style.display` on the meta box.
 	.is-hidden {
 		display: none;
+	}
+}
+
+// Don't let the drag helper add page scrollbars when it overflows.
+body.is-dragging-metaboxes {
+	overflow: hidden;
+}
+
+// The drag helper is rendered in a wrapper outside the meta box areas. Core's
+// icon styles require `.meta-box-sortables`, which the wrapper can't have,
+// since `postboxes` treats every element with it as a sortable.
+.edit-post-meta-boxes-area.is-drag-helper .postbox {
+	.order-higher-indicator::before,
+	.order-lower-indicator::before,
+	.toggle-indicator::before {
+		display: inline-block;
+		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
+		font: 400 20px/1 dashicons;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-decoration: none;
+	}
+
+	.toggle-indicator::before {
+		content: "\f142";
+	}
+
+	&.closed .handlediv .toggle-indicator::before {
+		content: "\f140";
 	}
 }
 

@@ -30,6 +30,28 @@ function hasIncompatibleMetaBox( metaBoxes ) {
 	return metaBoxes.some( ( metaBox ) => ! compatibleIds.has( metaBox.id ) );
 }
 
+const META_BOX_SORTABLES = '.edit-post-meta-boxes-area .meta-box-sortables';
+
+/**
+ * Scrolls the other meta box areas into view when a meta box drag starts. A drop
+ * zone that is scrolled out of view, e.g. at the bottom of the sidebar, can't
+ * be reached while dragging.
+ *
+ * `postboxes` adds the `is-dragging-metaboxes` class, which gives empty areas a
+ * height, and refreshes the cached drop zone positions only after this handler
+ * runs. The class is added here so that the enlarged drop zones are scrolled to.
+ *
+ * @param {Event} event The jQuery UI `sortstart` event.
+ */
+function revealMetaBoxDropZones( event ) {
+	document.body.classList.add( 'is-dragging-metaboxes' );
+	document.querySelectorAll( META_BOX_SORTABLES ).forEach( ( sortables ) => {
+		if ( sortables !== event.currentTarget ) {
+			sortables.scrollIntoView( { block: 'nearest' } );
+		}
+	} );
+}
+
 /**
  * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
  *
@@ -94,4 +116,48 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		hasActiveMetaBoxes,
 		updateEditorSettings,
 	] );
+
+	// Adjust the drag and drop that `postboxes` sets up, which assumes the
+	// classic editor's single scrolling page. Runs after the effect above, which
+	// initializes `postboxes`.
+	useEffect( () => {
+		const jQuery = window.jQuery;
+		if ( ! isEnabledAndEditorReady || ! jQuery?.fn?.sortable ) {
+			return;
+		}
+
+		// Keep the drag helper out of the meta box scroll containers, so it
+		// doesn't stretch or get clipped by them. The wrapper matches the meta
+		// box area markup, so that the helper keeps the meta box styles.
+		const dragHelperWrapper = document.createElement( 'div' );
+		dragHelperWrapper.className =
+			'edit-post-meta-boxes-area is-drag-helper';
+		const dragHelperContainer = document.createElement( 'div' );
+		dragHelperContainer.id = 'poststuff';
+		dragHelperWrapper.append( dragHelperContainer );
+		document.body.append( dragHelperWrapper );
+
+		// Not limited to `META_BOX_SORTABLES`: an area that isn't rendered yet,
+		// e.g. the sidebar one while the sidebar is closed, is outside it.
+		jQuery( '.meta-box-sortables' ).sortable(
+			'option',
+			'appendTo',
+			dragHelperContainer
+		);
+
+		jQuery( document ).on(
+			'sortstart',
+			META_BOX_SORTABLES,
+			revealMetaBoxDropZones
+		);
+
+		return () => {
+			jQuery( document ).off(
+				'sortstart',
+				META_BOX_SORTABLES,
+				revealMetaBoxDropZones
+			);
+			dragHelperWrapper.remove();
+		};
+	}, [ isEnabledAndEditorReady ] );
 };
