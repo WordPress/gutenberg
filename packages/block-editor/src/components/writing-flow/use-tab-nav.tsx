@@ -74,11 +74,14 @@ export default function useTabNav(): [
 		if ( hasMultiSelection() ) {
 			containerRef.current!.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			if ( getLastFocus()?.current ) {
-				getLastFocus().current.focus();
+			const lastFocus = getLastFocus()?.current;
+			if ( lastFocus?.isConnected ) {
+				lastFocus.focus();
 			} else {
-				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
-				// The selected block is rendered.
+				// Handles when the last focus has not been set yet, has been
+				// cleared by new blocks being added via the inserter, or is no
+				// longer in the document, such as when changing a heading's
+				// level replaces its element. The selected block is rendered.
 				containerRef
 					.current!.querySelector< HTMLElement >(
 						`[data-block="${ getSelectedBlockClientId() }"]`

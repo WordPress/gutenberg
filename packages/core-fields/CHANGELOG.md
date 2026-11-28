@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+- Status field: Leave the trash out of the status options, so forms no longer have to filter it out ([#87552](https://github.com/WordPress/gutenberg/pull/87552)).
 - Template field: Disable the field for the front page and the posts page, whose template comes from the reading settings ([#87541](https://github.com/WordPress/gutenberg/pull/87541)).
 - Author fields: Show initials when the author's profile image is unavailable ([#85208](https://github.com/WordPress/gutenberg/pull/85208)).
 

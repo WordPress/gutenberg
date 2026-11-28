@@ -1,3 +1,4 @@
+import type { MouseEvent, ReactNode } from 'react';
 import clsx from 'clsx';
 import {
 	Placeholder,
@@ -16,10 +17,13 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+import type { Taxonomy, Term } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { SelectControl, VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { CategoriesAttributes } from './types';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -35,14 +39,14 @@ export default function CategoriesEdit( {
 	setAttributes,
 	className,
 	clientId,
-} ) {
+}: BlockEditProps< CategoriesAttributes > & { className?: string } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
-	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
-		'root',
-		'taxonomy',
-		{ per_page: -1 }
-	);
+	const {
+		records: allTaxonomies,
+		// @ts-expect-error Bug: `useEntityRecords` returns `isResolving`, so this is always `undefined`.
+		isResolvingTaxonomies,
+	} = useEntityRecords< Taxonomy >( 'root', 'taxonomy', { per_page: -1 } );
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
 	const taxonomyItems = ( taxonomies ?? [] ).map( ( t ) => ( {
@@ -55,19 +59,25 @@ export default function CategoriesEdit( {
 	const isHierarchicalTaxonomy =
 		! isResolvingTaxonomies && taxonomy?.hierarchical;
 
-	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
+	const query: Record< string, unknown > = {
+		per_page: -1,
+		hide_empty: ! showEmpty,
+		context: 'view',
+	};
 	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
 		query.parent = 0;
 	}
 
-	const { records: categories, isResolving } = useEntityRecords(
+	const { records: categories, isResolving } = useEntityRecords< Term >(
 		'taxonomy',
 		taxonomySlug,
 		query
 	);
 
 	const { createWarningNotice } = useDispatch( noticeStore );
-	const showRedirectionPreventedNotice = ( event ) => {
+	const showRedirectionPreventedNotice = (
+		event: MouseEvent< HTMLAnchorElement >
+	) => {
 		event.preventDefault();
 		createWarningNotice( __( 'Links are disabled in the editor.' ), {
 			id: `block-library/core/categories/redirection-prevented/${ clientId }`,
@@ -75,7 +85,7 @@ export default function CategoriesEdit( {
 		} );
 	};
 
-	const getCategoriesList = ( parentId ) => {
+	const getCategoriesList = ( parentId: number | null ): Term[] => {
 		if ( ! categories?.length ) {
 			return [];
 		}
@@ -85,10 +95,12 @@ export default function CategoriesEdit( {
 		return categories.filter( ( { parent } ) => parent === parentId );
 	};
 
-	const toggleAttribute = ( attributeName ) => ( newValue ) =>
-		setAttributes( { [ attributeName ]: newValue } );
+	const toggleAttribute =
+		( attributeName: keyof CategoriesAttributes ) =>
+		( newValue: boolean ) =>
+			setAttributes( { [ attributeName ]: newValue } );
 
-	const renderCategoryName = ( name ) =>
+	const renderCategoryName = ( name?: string ) =>
 		! name ? __( '(Untitled)' ) : decodeEntities( name ).trim();
 
 	const renderCategoryList = () => {
@@ -99,7 +111,7 @@ export default function CategoriesEdit( {
 		);
 	};
 
-	const renderCategoryListItem = ( category ) => {
+	const renderCategoryListItem = ( category: Term ) => {
 		const childCategories = getCategoriesList( category.id );
 		const { id, link, count, name } = category;
 		return (
@@ -149,7 +161,7 @@ export default function CategoriesEdit( {
 						{ sprintf(
 							/* translators: %s: taxonomy's singular name */
 							__( 'Select %s' ),
-							taxonomy?.labels?.singular_name
+							taxonomy?.labels?.singular_name!
 						) }
 					</option>
 					{ categoriesList.map( ( category ) =>
@@ -160,7 +172,10 @@ export default function CategoriesEdit( {
 		);
 	};
 
-	const renderCategoryDropdownItem = ( category, level ) => {
+	const renderCategoryDropdownItem = (
+		category: Term,
+		level: number
+	): ReactNode => {
 		const { id, count, name } = category;
 		const childCategories = getCategoriesList( id );
 		return [
@@ -239,7 +254,7 @@ export default function CategoriesEdit( {
 								onValueChange={ ( item ) =>
 									item &&
 									setAttributes( {
-										taxonomy: item.value,
+										taxonomy: item.value!,
 									} )
 								}
 							/>
@@ -346,10 +361,10 @@ export default function CategoriesEdit( {
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (
-				<p>{ taxonomy.labels.no_terms }</p>
+				<p>{ taxonomy!.labels.no_terms }</p>
 			) }
 			{ ! isResolving &&
-				categories?.length > 0 &&
+				categories?.length! > 0 &&
 				( displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() ) }
