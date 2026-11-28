@@ -5,28 +5,40 @@ import {
 	createBlock,
 	getBlockType,
 	getBlockVariations,
+	type Block,
 } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
 import { kebabCase } from '@wordpress/kebab-case';
 import metadata from './block.json';
 import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
+import type {
+	EmbedAttributes,
+	EmbedPreviewData,
+	EmbedVariation,
+	UpgradeableEmbedProps,
+} from './types';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
-
-/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
  * Returns the embed block's information by matching the provided service provider
  *
- * @param {string} provider The embed block's provider
- * @return {WPBlockVariation|undefined} The embed block's information
+ * @param provider The embed block's provider
+ * @return The embed block's information
  */
-export const getEmbedInfoByProvider = ( provider ) => {
+export const getEmbedInfoByProvider = (
+	provider?: string
+): EmbedVariation | undefined => {
 	if ( ! provider ) {
 		return;
 	}
 
-	return getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+	// Embed variations declare `patterns` and icon descriptors, which
+	// `BlockVariation` doesn't.
+	return (
+		getBlockVariations( DEFAULT_EMBED_BLOCK ) as
+			EmbedVariation[] | undefined
+	 )?.find(
 		( { name, attributes } ) =>
 			name === provider || attributes?.providerNameSlug === provider
 	);
@@ -35,45 +47,53 @@ export const getEmbedInfoByProvider = ( provider ) => {
 /**
  * Returns true if any of the regular expressions match the URL.
  *
- * @param {string} url      The URL to test.
- * @param {Array}  patterns The list of regular expressions to test against.
- * @return {boolean} True if any of the regular expressions match the URL.
+ * @param url      The URL to test.
+ * @param patterns The list of regular expressions to test against.
+ * @return True if any of the regular expressions match the URL.
  */
-export const matchesPatterns = ( url, patterns = [] ) =>
-	patterns.some( ( pattern ) => url.match( pattern ) );
+export const matchesPatterns = (
+	url: string,
+	patterns: RegExp[] = []
+): boolean => patterns.some( ( pattern ) => url.match( pattern ) );
 
 /**
  * Finds the block variation that should be used for the URL,
  * based on the provided URL and the variation's patterns.
  *
- * @param {string} url The URL to test.
- * @return {WPBlockVariation} The block variation that should be used for this URL
+ * @param url The URL to test.
+ * @return The block variation that should be used for this URL
  */
-export const findMoreSuitableBlock = ( url ) =>
-	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find( ( { patterns } ) =>
-		matchesPatterns( url, patterns )
-	);
+export const findMoreSuitableBlock = (
+	url: string
+): EmbedVariation | undefined =>
+	// Embed variations declare `patterns` and icon descriptors, which
+	// `BlockVariation` doesn't.
+	(
+		getBlockVariations( DEFAULT_EMBED_BLOCK ) as
+			EmbedVariation[] | undefined
+	 )?.find( ( { patterns } ) => matchesPatterns( url, patterns ) );
 
 /**
  * Rewrites `x.com` URLs to `twitter.com` as a workaround while the
  * WordPress oEmbed registry lacks an X provider. See: https://core.trac.wordpress.org/ticket/59142.
  *
- * @param {string} url The URL to rewrite.
- * @return {string} The (possibly) rewritten URL.
+ * @param url The URL to rewrite.
+ * @return The (possibly) rewritten URL.
  */
-export function rewriteXToTwitter( url ) {
+export function rewriteXToTwitter< T extends string | undefined >( url: T ): T {
 	if ( ! url || getAuthority( url ) !== 'x.com' ) {
 		return url;
 	}
 	const rewritten = new URL( url );
 	rewritten.host = 'twitter.com';
-	return rewritten.toString();
+	// The rewritten URL is a string whenever the input was one.
+	return rewritten.toString() as T;
 }
 
-export const isFromWordPress = ( html ) =>
+export const isFromWordPress = ( html?: string ): boolean | '' | undefined =>
 	html && html.includes( 'class="wp-embedded-content"' );
 
-export const getPhotoHtml = ( photo ) => {
+export const getPhotoHtml = ( photo: EmbedPreviewData ): string => {
 	// If full image url not found use thumbnail.
 	const imageUrl = photo.url || photo.thumbnail_url;
 
@@ -97,14 +117,14 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props                   The block's props.
- * @param {Object} [attributesFromPreview] Attributes generated from the block's most up to date preview.
- * @return {Object|undefined} A more suitable embed block if one exists.
+ * @param props                   The block's props.
+ * @param [attributesFromPreview] Attributes generated from the block's most up to date preview.
+ * @return A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = (
-	props,
-	attributesFromPreview = {}
-) => {
+	props: UpgradeableEmbedProps,
+	attributesFromPreview: EmbedAttributes = {}
+): Block | undefined => {
 	const { preview, attributes = {} } = props;
 	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
@@ -123,7 +143,9 @@ export const createUpgradedEmbedBlock = (
 	const shouldCreateNewBlock =
 		! isCurrentBlockWP &&
 		matchedBlock &&
-		( matchedBlock.attributes.providerNameSlug !== providerNameSlug ||
+		// Variations matched by URL patterns are embed providers, which
+		// always declare their attributes.
+		( matchedBlock.attributes!.providerNameSlug !== providerNameSlug ||
 			! providerNameSlug );
 	if ( shouldCreateNewBlock ) {
 		return createBlock( DEFAULT_EMBED_BLOCK, {
@@ -165,10 +187,10 @@ export const createUpgradedEmbedBlock = (
 /**
  * Determine if the block already has an aspect ratio class applied.
  *
- * @param {string} existingClassNames Existing block classes.
- * @return {boolean} True or false if the classnames contain an aspect ratio class.
+ * @param existingClassNames Existing block classes.
+ * @return True or false if the classnames contain an aspect ratio class.
  */
-export const hasAspectRatioClass = ( existingClassNames ) => {
+export const hasAspectRatioClass = ( existingClassNames?: string ): boolean => {
 	if ( ! existingClassNames ) {
 		return false;
 	}
@@ -181,10 +203,12 @@ export const hasAspectRatioClass = ( existingClassNames ) => {
  * Removes all previously set aspect ratio related classes and return the rest
  * existing class names.
  *
- * @param {string} existingClassNames Any existing class names.
- * @return {string} The class names without any aspect ratio related class.
+ * @param existingClassNames Any existing class names.
+ * @return The class names without any aspect ratio related class.
  */
-export const removeAspectRatioClasses = ( existingClassNames ) => {
+export const removeAspectRatioClasses = < T extends string | undefined >(
+	existingClassNames: T
+): T => {
 	if ( ! existingClassNames ) {
 		// Avoids extraneous work and also, by returning the same value as
 		// received, ensures the post is not dirtied by a change of the block
@@ -198,11 +222,12 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 		},
 		[ 'wp-has-aspect-ratio' ]
 	);
-	let outputClassNames = existingClassNames;
+	let outputClassNames: string = existingClassNames;
 	for ( const className of aspectRatioClassNames ) {
 		outputClassNames = outputClassNames.replace( className, '' );
 	}
-	return outputClassNames.trim();
+	// Trimming keeps a defined class name a string.
+	return outputClassNames.trim() as T;
 };
 
 /**
@@ -210,29 +235,30 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
  * Some embed providers (like Flickr) include their own responsive wrapper
  * with padding-bottom or padding-top percentages for aspect ratio.
  *
- * @param {string} html The embed HTML to check.
- * @return {boolean} True if the HTML already has responsive styling.
+ * @param html The embed HTML to check.
+ * @return True if the HTML already has responsive styling.
  */
-export function hasInlineResponsivePadding( html ) {
+export function hasInlineResponsivePadding( html?: string ): boolean {
 	// Check for padding-bottom or padding-top with percentage values in style attributes
 	// This pattern matches: padding-bottom: 56.25%; or padding-top: 50%; etc.
 	const paddingPattern = /padding-(top|bottom)\s*:\s*[\d.]+%/i;
-	return paddingPattern.test( html );
+	// `RegExp#test` converts `undefined` to the string "undefined".
+	return paddingPattern.test( html as string );
 }
 
 /**
  * Returns class names with any relevant responsive aspect ratio names.
  *
- * @param {string}  html               The preview HTML that possibly contains an iframe with width and height set.
- * @param {string}  existingClassNames Any existing class names.
- * @param {boolean} allowResponsive    If the responsive class names should be added, or removed.
- * @return {string} Deduped class names.
+ * @param html               The preview HTML that possibly contains an iframe with width and height set.
+ * @param existingClassNames Any existing class names.
+ * @param allowResponsive    If the responsive class names should be added, or removed.
+ * @return Deduped class names.
  */
 export function getClassNames(
-	html,
-	existingClassNames,
-	allowResponsive = true
-) {
+	html?: string,
+	existingClassNames?: string,
+	allowResponsive: boolean = true
+): string | undefined {
 	if ( ! allowResponsive ) {
 		return removeAspectRatioClasses( existingClassNames );
 	}
@@ -244,12 +270,17 @@ export function getClassNames(
 	}
 
 	const previewDocument = document.implementation.createHTMLDocument( '' );
-	previewDocument.body.innerHTML = html;
+	// Assigning `undefined` sets the text "undefined", as the browser converts it.
+	previewDocument.body.innerHTML = html as string;
 	const iframe = previewDocument.body.querySelector( 'iframe' );
 
 	// If we have a fixed aspect iframe, and it's a responsive embed block.
 	if ( iframe && iframe.height && iframe.width ) {
-		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+		// Division converts the `width` and `height` attribute strings to numbers.
+		const aspectRatio = (
+			( iframe.width as unknown as number ) /
+			( iframe.height as unknown as number )
+		).toFixed( 2 );
 		// Given the actual aspect ratio, find the widest ratio to support it.
 		for (
 			let ratioIndex = 0;
@@ -260,7 +291,10 @@ export function getClassNames(
 			if ( aspectRatio >= potentialRatio.ratio ) {
 				// Evaluate the difference between actual aspect ratio and closest match.
 				// If the difference is too big, do not scale the embed according to aspect ratio.
-				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				// Subtraction converts both ratio strings to numbers.
+				const ratioDiff =
+					( aspectRatio as unknown as number ) -
+					( potentialRatio.ratio as unknown as number );
 				if ( ratioDiff > 0.1 ) {
 					// No close aspect ratio match found.
 					return removeAspectRatioClasses( existingClassNames );
@@ -282,10 +316,13 @@ export function getClassNames(
  * Fallback behaviour for unembeddable URLs.
  * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
  *
- * @param {string}   url       The URL that could not be embedded.
- * @param {Function} onReplace Function to call with the created fallback block.
+ * @param url       The URL that could not be embedded.
+ * @param onReplace Function to call with the created fallback block.
  */
-export function fallback( url, onReplace ) {
+export function fallback(
+	url: string | undefined,
+	onReplace: ( block: Block ) => void
+): void {
 	const link = <a href={ url }>{ url }</a>;
 	onReplace(
 		createBlock( 'core/paragraph', { content: renderToString( link ) } )
@@ -295,26 +332,26 @@ export function fallback( url, onReplace ) {
 /***
  * Gets block attributes based on the preview and responsive state.
  *
- * @param {Object} preview The preview data.
- * @param {string} title The block's title, e.g. Twitter.
- * @param {Object} currentClassNames The block's current class names.
- * @param {boolean} isResponsive Boolean indicating if the block supports responsive content.
- * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
- * @return {Object} Attributes and values.
+ * @param preview The preview data.
+ * @param title The block's title, e.g. Twitter.
+ * @param currentClassNames The block's current class names.
+ * @param isResponsive Boolean indicating if the block supports responsive content.
+ * @param allowResponsive Apply responsive classes to fixed size content.
+ * @return Attributes and values.
  */
 export const getAttributesFromPreview = memoize(
 	(
-		preview,
-		title,
-		currentClassNames,
-		isResponsive,
-		allowResponsive = true
-	) => {
+		preview: EmbedPreviewData | undefined,
+		title: string,
+		currentClassNames: string | undefined,
+		isResponsive: boolean | undefined,
+		allowResponsive: boolean | undefined = true
+	): EmbedAttributes => {
 		if ( ! preview ) {
 			return {};
 		}
 
-		const attributes = {};
+		const attributes: EmbedAttributes = {};
 		// Some plugins only return HTML with no type info, so default this to 'rich'.
 		let { type = 'rich' } = preview;
 		// If we got a provider name from the API, use it for the slug, otherwise we use the title,
@@ -353,18 +390,18 @@ export const getAttributesFromPreview = memoize(
 /**
  * Returns the attributes derived from the preview, merged with the current attributes.
  *
- * @param {Object}  currentAttributes The current attributes of the block.
- * @param {Object}  preview           The preview data.
- * @param {string}  title             The block's title, e.g. Twitter.
- * @param {boolean} isResponsive      Boolean indicating if the block supports responsive content.
- * @return {Object} Merged attributes.
+ * @param currentAttributes The current attributes of the block.
+ * @param preview           The preview data.
+ * @param title             The block's title, e.g. Twitter.
+ * @param isResponsive      Boolean indicating if the block supports responsive content.
+ * @return Merged attributes.
  */
 export const getMergedAttributesWithPreview = (
-	currentAttributes,
-	preview,
-	title,
-	isResponsive
-) => {
+	currentAttributes: EmbedAttributes,
+	preview: EmbedPreviewData | undefined,
+	title: string,
+	isResponsive: boolean | undefined
+): EmbedAttributes => {
 	const { allowResponsive, className } = currentAttributes;
 
 	return {

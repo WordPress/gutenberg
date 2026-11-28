@@ -6,6 +6,7 @@ import { useState } from '@wordpress/element';
 import { getAuthority } from '@wordpress/url';
 import { getPhotoHtml } from './util';
 import WpEmbedPreview from './wp-embed-preview';
+import type { EmbedPreviewProps } from './types';
 
 export default function EmbedPreview( {
 	preview,
@@ -16,7 +17,7 @@ export default function EmbedPreview( {
 	className,
 	icon,
 	label,
-} ) {
+}: EmbedPreviewProps ) {
 	const [ interactive, setInteractive ] = useState( false );
 
 	if ( ! isSelected && interactive ) {
@@ -38,7 +39,9 @@ export default function EmbedPreview( {
 	const { scripts } = preview;
 
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-	const embedSourceUrl = getAuthority( url );
+	// The preview renders for a submitted URL. Without one, or without an
+	// authority, the message reads "undefined", as it did before.
+	const embedSourceUrl = getAuthority( url as string ) as string;
 	const iframeTitle = sprintf(
 		// translators: %s: host providing embed content e.g: www.youtube.com
 		__( 'Embedded content from %s' ),

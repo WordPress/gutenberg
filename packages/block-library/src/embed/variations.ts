@@ -1,4 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
+import type { BlockVariation } from '@wordpress/blocks';
 import {
 	embedContentIcon,
 	embedAudioIcon,
@@ -22,10 +23,9 @@ import {
 	embedPocketCastsIcon,
 	embedBlueskyIcon,
 } from './icons';
+import type { EmbedVariation } from './types';
 
-/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
-
-function getTitle( providerName ) {
+function getTitle( providerName: string ) {
 	return sprintf(
 		/* translators: %s: provider name */
 		__( '%s Embed' ),
@@ -35,10 +35,8 @@ function getTitle( providerName ) {
 
 /**
  * The embed provider services.
- *
- * @type {WPBlockVariation[]}
  */
-const variations = [
+const variations: EmbedVariation[] = [
 	{
 		name: 'twitter',
 		title: getTitle( 'X' ),
@@ -362,4 +360,5 @@ variations.forEach( ( variation ) => {
 		variationAttributes.providerNameSlug;
 } );
 
-export default variations;
+// `BlockVariation` doesn't accept the icon descriptors embed variations use.
+export default variations as BlockVariation[];

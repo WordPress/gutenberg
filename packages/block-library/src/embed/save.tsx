@@ -4,8 +4,12 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
+import type { BlockSaveProps } from '@wordpress/blocks';
+import type { EmbedAttributes } from './types';
 
-export default function save( { attributes } ) {
+export default function save( {
+	attributes,
+}: BlockSaveProps< EmbedAttributes > ) {
 	const { url, caption, type, providerNameSlug } = attributes;
 
 	if ( ! url ) {
