@@ -1,4 +1,5 @@
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { CommentEditLinkAttributes } from './types';
 
 const v1 = {
 	attributes: {
@@ -47,7 +48,7 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
+	isEligible( attributes: CommentEditLinkAttributes ) {
 		return (
 			!! attributes.textAlign ||
 			!! attributes.className?.match(
