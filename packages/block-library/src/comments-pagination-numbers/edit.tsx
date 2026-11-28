@@ -1,5 +1,4 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import type { MouseEvent } from 'react';
 import type { PaginationItemProps } from './types';
 
 const PaginationItem = ( {
