@@ -273,6 +273,7 @@ export interface EntityConfig {
 	rawAttributes?: ReadonlyArray< string >;
 	transientEdits?: Record< string, boolean | TransientEditConfig >;
 	mergedEdits?: Record< string, boolean >;
+	partialEdits?: Record< string, boolean >;
 	supportsPagination?: boolean;
 	getTitle?: ( record: EntityTitleRecord ) => string | undefined;
 	getRevisionsUrl?: (
