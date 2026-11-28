@@ -13,6 +13,7 @@ import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
 import { getDeviceType } from './viewport';
+import { unlock } from '../../lock-unlock';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -43,18 +44,11 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	} ) as string | undefined;
 
 	/*
-	 * Where clicking a previewed canvas goes, resolved the same way the editor
-	 * resolves anywhere else it sends you to edit an entity, and whether it
-	 * should go anywhere at all: a trashed entity has to be restored before it
-	 * can be edited.
-	 *
-	 * The record is the one the editor loads for this canvas, so reading it
-	 * here costs no request of its own.
-	 */
-	/*
-	 * A route that names no entity leaves the editor to resolve one, which it
-	 * does from the block templates only a block theme has. `undefined` while
-	 * the theme is still being read.
+	 * Whether the route names an entity — both a post type and a post — for the
+	 * editor to open. One that does not either leaves the editor to resolve the
+	 * home page (see `resolvesHomePage` below) or gives it nothing to open, and
+	 * either way the editor needs the block templates only a block theme has.
+	 * `isBlockTheme` is `undefined` while the theme is still being read.
 	 */
 	const hasEntity = !! ( canvas.postType && canvas.postId );
 	const isBlockTheme = useSelect(
@@ -66,27 +60,59 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		[]
 	);
 
+	/*
+	 * Where clicking a previewed canvas goes, resolved the same way the editor
+	 * resolves anywhere else it sends you to edit an entity, and whether it
+	 * should go anywhere at all: a trashed entity has to be restored before it
+	 * can be edited.
+	 *
+	 * A route that names neither a post type nor a post previews whatever the
+	 * editor resolves the site's home page to — a static front page or the
+	 * template that shows the front page — so clicking it edits that, resolved
+	 * the same way the editor does. A route that names a post type but no post,
+	 * such as the navigation list of a site with no menus, previews nothing the
+	 * editor resolves, so there is nothing to edit.
+	 *
+	 * The records are the ones the editor loads for this canvas, so reading
+	 * them here costs no request of their own. Only a block theme mounts the
+	 * editor, which is why the home page is resolved for no other: on a
+	 * classic theme nothing else would have fetched it.
+	 */
+	const resolvesHomePage = ! canvas.postType && ! canvas.postId;
 	const { editLink, isTrashed } = useSelect(
 		( select ) => {
-			if ( ! canvas.postType || ! canvas.postId ) {
+			let postType: string | undefined = canvas.postType;
+			let postId: string | number | undefined = canvas.postId;
+
+			if ( resolvesHomePage ) {
+				if ( ! isBlockTheme ) {
+					return { editLink: undefined, isTrashed: false };
+				}
+
+				const homePage = unlock( select( coreStore ) ).getHomePage() as
+					| { postType?: string; postId?: string | number }
+					| null
+					| undefined;
+				postType = homePage?.postType;
+				postId = homePage?.postId;
+			}
+
+			if ( ! postType || ! postId ) {
 				return { editLink: undefined, isTrashed: false };
 			}
 
 			const record = select( coreStore ).getEntityRecord(
 				'postType',
-				canvas.postType,
-				canvas.postId
+				postType,
+				postId
 			) as { status?: string } | undefined;
 
 			return {
-				editLink: select( bootStore ).getEntityLink(
-					canvas.postType,
-					canvas.postId
-				),
+				editLink: select( bootStore ).getEntityLink( postType, postId ),
 				isTrashed: record?.status === 'trash',
 			};
 		},
-		[ canvas.postType, canvas.postId ]
+		[ canvas.postType, canvas.postId, resolvesHomePage, isBlockTheme ]
 	);
 
 	/*

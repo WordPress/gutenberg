@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Open the home page for editing when the preview canvas of a route that names no post type or post, such as the home route, is clicked. Before, clicking it did nothing ([#87409](https://github.com/WordPress/gutenberg/pull/87409)).
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 -   Keep the sidebar's Dashboard link readable when it has keyboard focus. Before, the admin color scheme's link focus color made the label hard to read on the dark sidebar ([#87419](https://github.com/WordPress/gutenberg/pull/87419)).
 
