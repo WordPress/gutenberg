@@ -3120,9 +3120,6 @@
 		"no-restricted-syntax": {
 			"count": 8
 		},
-		"react-hooks/immutability": {
-			"count": 3
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
