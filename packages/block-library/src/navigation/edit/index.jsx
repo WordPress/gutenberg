@@ -516,7 +516,10 @@ function Navigation( {
 	// that automatically saves the menu as an entity when changes are made to the inner blocks.
 	const hasUnsavedBlocks = hasUncontrolledInnerBlocks && ! isEntityAvailable;
 
-	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+	const { getNavigationFallbackId, getEditedEntityRecord } = unlock(
+		useSelect( coreStore )
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
 		? getNavigationFallbackId()
@@ -666,6 +669,18 @@ function Navigation( {
 
 	const onSelectNavigationMenu = ( menuId ) => {
 		handleUpdateMenu( menuId );
+
+		// A draft menu is only rendered on the front end once it's published.
+		// Mark it for publishing so that it shows up in the multi entity save
+		// flow, as happens when a menu is created or a classic menu imported.
+		if (
+			getEditedEntityRecord( 'postType', 'wp_navigation', menuId )
+				?.status === 'draft'
+		) {
+			editEntityRecord( 'postType', 'wp_navigation', menuId, {
+				status: 'publish',
+			} );
+		}
 	};
 
 	useEffect( () => {
