@@ -21,4 +21,13 @@ describe( 'shipped configs', () => {
 			require( '@wordpress/npm-package-json-lint-config' )
 		);
 	} );
+
+	it( 'resolves the default Playwright testDir from the project root', () => {
+		const config = require(
+			path.join( configDirectory, 'playwright.config.js' )
+		);
+
+		expect( path.isAbsolute( config.testDir ) ).toBe( true );
+		expect( config.testDir ).toBe( path.join( process.cwd(), 'specs' ) );
+	} );
 } );

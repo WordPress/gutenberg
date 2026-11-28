@@ -18,7 +18,7 @@ const config = defineConfig( {
 	timeout: parseInt( process.env.TIMEOUT || '', 10 ) || 100_000, // Defaults to 100 seconds.
 	// Don't report slow test "files", as we will be running our tests in serial.
 	reportSlowTests: null,
-	testDir: './specs',
+	testDir: path.join( process.cwd(), 'specs' ),
 	outputDir: path.join( process.env.WP_ARTIFACTS_PATH, 'test-results' ),
 	snapshotPathTemplate:
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
