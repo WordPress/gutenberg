@@ -17,27 +17,13 @@ Without the MCP server, an AI agent may produce a functional and convincing resu
 
 ## Setup
 
-### Claude Code
+Every setup below runs the server with `npx`, so [Node.js](https://nodejs.org/) 22.13.0 or newer must be installed.
 
-```bash
-claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
-```
+For an interactive setup guide, pick your AI tool in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai-mcp--docs#setup) to see only the instructions for it.
 
-### OpenAI Codex
+### Shared configuration
 
-The [Codex CLI](https://developers.openai.com/codex/cli) must be installed first.
-
-```bash
-codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
-```
-
-### Cursor
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
-
-### Other (Claude Desktop, VS Code)
-
-Add to your MCP client configuration (`mcp.json` or equivalent):
+Most clients accept the same `mcpServers` configuration. The sections below say where it goes for each one, and show the full configuration for clients that use a different format.
 
 ```json
 {
@@ -55,11 +41,118 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 }
 ```
 
-Configuration instructions for common clients:
+### Claude Code
 
-- [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
-- [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
-    - This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
+```bash
+claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
+```
+
+Start Claude Code and run `/mcp` to confirm `wordpress-design-system` is connected. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) for more options.
+
+### OpenAI Codex
+
+The [Codex CLI](https://developers.openai.com/codex/cli) must be installed first.
+
+```bash
+codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
+```
+
+Start Codex and run `/mcp` to confirm `wordpress-design-system` is connected.
+
+### Cursor
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
+
+Or add the [shared configuration](#shared-configuration) to `~/.cursor/mcp.json`, as described in the [Cursor MCP documentation](https://cursor.com/docs/mcp). Then open Cursor Settings, go to MCP, and confirm `wordpress-design-system` is enabled.
+
+### VS Code
+
+[Install in VS Code](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wordpress-design-system%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522-y%2522%252C%2522--ignore-scripts%2522%252C%2522--min-release-age%253D2%2522%252C%2522%2540wordpress%252Fdesign-system-mcp%2540latest%2522%255D%257D), or add this to `.vscode/mcp.json`, as described in the [VS Code MCP documentation](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file). VS Code uses `servers` instead of `mcpServers`:
+
+```json
+{
+	"servers": {
+		"wordpress-design-system": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"--ignore-scripts",
+				"--min-release-age=2",
+				"@wordpress/design-system-mcp@latest"
+			]
+		}
+	}
+}
+```
+
+Start the server from the MCP view, or from the `MCP: List Servers` command.
+
+### JetBrains
+
+In PhpStorm, WebStorm, or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add. Paste the [shared configuration](#shared-configuration) into the JSON configuration field, then click OK and Apply. Check that `wordpress-design-system` shows as connected in the Status column.
+
+### Claude Desktop
+
+Open Claude Desktop, then Settings, Developer, and Edit Config. Add the [shared configuration](#shared-configuration) to the `claude_desktop_config.json` file that opens, then quit and reopen Claude Desktop. The [Claude Desktop guide](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server) shows the same steps for the "filesystem" server.
+
+### Antigravity
+
+Add the [shared configuration](#shared-configuration) to `~/.gemini/config/mcp_config.json`. See the [Antigravity MCP documentation](https://antigravity.google/docs/mcp#getting-started-by-surface) for the App, CLI, and IDE. Antigravity replaces Gemini CLI.
+
+### OpenCode
+
+Add this to `opencode.json`, as described in the [OpenCode MCP documentation](https://opencode.ai/docs/mcp-servers/). OpenCode uses `mcp.servers`, needs `"type": "local"`, and takes the command and its arguments as one `command` array:
+
+```json
+{
+	"mcp": {
+		"servers": {
+			"wordpress-design-system": {
+				"type": "local",
+				"command": [
+					"npx",
+					"-y",
+					"--ignore-scripts",
+					"--min-release-age=2",
+					"@wordpress/design-system-mcp@latest"
+				]
+			}
+		}
+	}
+}
+```
+
+Restart OpenCode and run `opencode mcp list` to confirm the server is connected.
+
+### Zed
+
+Add this to the Zed `settings.json` file, as described in the [Zed MCP documentation](https://zed.dev/docs/ai/mcp#as-custom-servers). Zed uses `context_servers` instead of `mcpServers`:
+
+```json
+{
+	"context_servers": {
+		"wordpress-design-system": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"--ignore-scripts",
+				"--min-release-age=2",
+				"@wordpress/design-system-mcp@latest"
+			]
+		}
+	}
+}
+```
+
+Open the Agent Panel settings and confirm `wordpress-design-system` shows as active.
+
+### Raycast
+
+Run the [Install MCP Server command](https://manual.raycast.com/ai/model-context-protocol) in Raycast and choose Standard Input/Output as the transport. Enter `npx` as the Command and `-y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest` as the Arguments, then press Install MCP Server.
+
+### Other clients
+
+Add the [shared configuration](#shared-configuration) to your client's MCP configuration (`mcp.json` or equivalent), as described in the [MCP documentation](https://modelcontextprotocol.io/docs/develop/connect-local-servers). Then restart the client so it picks up the new server.
 
 ## Importing the package
 

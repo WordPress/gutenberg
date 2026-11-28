@@ -1,0 +1,134 @@
+.root {
+	margin: 24px 0;
+	container: mcp-setup / inline-size;
+}
+
+.tiles {
+	/* As many columns as fit with tiles at least 130px wide, up to 6. */
+	--tile-gap: 12px;
+	--tile-min-width: max(130px, calc((100% - 5 * var(--tile-gap)) / 6));
+
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--tile-min-width), 1fr));
+	gap: var(--tile-gap);
+}
+
+/*
+ * A dropdown replaces the tiles when only two columns would fit:
+ * three 130px tiles and two 12px gaps need 414px.
+ */
+.picker {
+	display: none;
+}
+
+.option {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.option .logo,
+.option .mark {
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+	font-size: 10px;
+}
+
+@container mcp-setup (max-width: 413px) {
+	.picker {
+		display: block;
+	}
+
+	.tiles {
+		display: none;
+	}
+}
+
+.tile {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 20px 12px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: var(--wpds-cursor-control);
+}
+
+.tile:hover {
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
+}
+
+.tile[aria-pressed="true"] {
+	border-color: var(--wpds-color-stroke-interactive-brand);
+	background: var(--wpds-color-background-surface-neutral);
+}
+
+.tile:focus-visible {
+	outline: 2px solid var(--wpds-color-stroke-focus);
+	outline-offset: 2px;
+}
+
+.mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	background: var(--wpds-color-background-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.panel {
+	padding-top: 24px;
+}
+
+.root .panel ol {
+	margin: 16px 0 40px;
+	padding: 0;
+	list-style: none;
+	counter-reset: step;
+}
+
+.root .panel ol li {
+	position: relative;
+	min-height: 24px;
+	margin: 0 0 10px;
+	padding-inline-start: 36px;
+	counter-increment: step;
+}
+
+.root .panel ol li::before {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: var(--wpds-color-background-surface-neutral-strong);
+	content: counter(step);
+}
+
+.root .panel ol code,
+.root .panel p code {
+	padding: 1px 4px;
+}
+
+.logo {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
+}
