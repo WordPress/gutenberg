@@ -60,12 +60,12 @@ const v1 = {
 	isEligible( attributes: LatestCommentsDeprecatedAttributes ) {
 		return attributes?.displayExcerpt === false;
 	},
-	migrate( attributes: LatestCommentsDeprecatedAttributes ) {
+	migrate(
+		attributes: LatestCommentsDeprecatedAttributes
+	): LatestCommentsAttributes {
 		return {
 			...attributes,
-			displayContent: ( attributes.displayExcerpt
-				? 'excerpt'
-				: 'none' ) as LatestCommentsAttributes[ 'displayContent' ],
+			displayContent: attributes.displayExcerpt ? 'excerpt' : 'none',
 		};
 	},
 };

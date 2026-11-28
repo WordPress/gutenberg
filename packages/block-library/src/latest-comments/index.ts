@@ -17,10 +17,4 @@ export const settings: BlockModule< LatestCommentsAttributes >[ 'settings' ] = {
 	deprecated,
 };
 
-export const init = () =>
-	initBlock( {
-		name,
-		metadata:
-			metadata as BlockModule< LatestCommentsAttributes >[ 'metadata' ],
-		settings,
-	} );
+export const init = () => initBlock( { name, metadata, settings } );
