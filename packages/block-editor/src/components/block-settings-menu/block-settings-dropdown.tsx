@@ -9,7 +9,7 @@ import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import { pipe, useCopyToClipboard, useViewportMatch } from '@wordpress/compose';
 import type { ComponentProps } from 'react';
 import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
@@ -26,6 +26,16 @@ import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
+};
+
+const MOBILE_POPOVER_PROPS = {
+	...POPOVER_PROPS,
+	shift: true,
+	resize: false,
+};
+
+const MENU_PROPS: ComponentProps< typeof DropdownMenu >[ 'menuProps' ] = {
+	style: { maxHeight: 'calc(100dvh - 16px)', overflow: 'auto' },
 };
 
 function CopyMenuItem( {
@@ -75,6 +85,7 @@ export function BlockSettingsDropdown( {
 	isContentOnlyListView,
 	...props
 }: BlockSettingsDropdownProps ) {
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	// Get the client id of the current block for this menu, if one is set.
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
@@ -240,7 +251,12 @@ export function BlockSettingsDropdown( {
 						icon={ moreVertical }
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
-						popoverProps={ POPOVER_PROPS }
+						popoverProps={
+							isMobileViewport
+								? MOBILE_POPOVER_PROPS
+								: POPOVER_PROPS
+						}
+						menuProps={ isMobileViewport ? MENU_PROPS : undefined }
 						noIcons
 						{ ...props }
 					>
