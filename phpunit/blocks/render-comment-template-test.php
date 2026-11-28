@@ -172,4 +172,89 @@ END;
 			"Inner block inserted by render_block_data isn't named as expected."
 		);
 	}
+
+	/**
+	 * Tests that comment blocks expose the comment pages count for the main post.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/48323
+	 *
+	 * @dataProvider data_blocks_exposing_comment_pages_count
+	 *
+	 * @param string $block_markup Markup of the block to render.
+	 */
+	public function test_rendering_block_sets_comment_pages_count( $block_markup ) {
+		$post_id = self::factory()->post->create();
+		// 11 comments at 5 per page: 3 pages.
+		self::factory()->comment->create_post_comments( $post_id, 11 );
+		$this->go_to( get_permalink( $post_id ) );
+
+		$this->assertSame( 0, get_comment_pages_count(), 'The comment pages count should start empty.' );
+
+		$this->render_block_for_post( $block_markup, $post_id );
+
+		$this->assertSame( 3, get_comment_pages_count() );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_blocks_exposing_comment_pages_count() {
+		return array(
+			'comment template'            => array( '<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->' ),
+			'comments pagination'         => array( '<!-- wp:comments-pagination --><!-- wp:comments-pagination-numbers /--><!-- /wp:comments-pagination -->' ),
+			'comments pagination next'    => array( '<!-- wp:comments-pagination-next /-->' ),
+			'comments pagination numbers' => array( '<!-- wp:comments-pagination-numbers /-->' ),
+		);
+	}
+
+	/**
+	 * Tests that comment blocks for a post other than the main post don't set the count.
+	 *
+	 * @dataProvider data_blocks_exposing_comment_pages_count
+	 *
+	 * @param string $block_markup Markup of the block to render.
+	 */
+	public function test_rendering_block_for_other_post_does_not_set_comment_pages_count( $block_markup ) {
+		$main_post_id  = self::factory()->post->create();
+		$other_post_id = self::factory()->post->create();
+		self::factory()->comment->create_post_comments( $other_post_id, 11 );
+		$this->go_to( get_permalink( $main_post_id ) );
+
+		$this->render_block_for_post( $block_markup, $other_post_id );
+
+		$this->assertSame( 0, get_comment_pages_count() );
+	}
+
+	/**
+	 * Tests that the Comment Template block sets one comment page without pagination.
+	 */
+	public function test_rendering_comment_template_without_pagination_sets_one_comment_page() {
+		update_option( 'page_comments', false );
+
+		$post_id = self::factory()->post->create();
+		self::factory()->comment->create_post_comments( $post_id, 11 );
+		$this->go_to( get_permalink( $post_id ) );
+
+		$this->render_block_for_post( '<!-- wp:comment-template --><!-- wp:comment-content /--><!-- /wp:comment-template -->', $post_id );
+
+		$this->assertSame( 1, get_comment_pages_count() );
+	}
+
+	/**
+	 * Renders a block with the given post ID as context.
+	 *
+	 * @param string $block_markup Markup of the block to render.
+	 * @param int    $post_id      Post ID.
+	 */
+	private function render_block_for_post( $block_markup, $post_id ) {
+		$block = new WP_Block(
+			parse_blocks( $block_markup )[0],
+			array(
+				'postId' => $post_id,
+			)
+		);
+		$block->render();
+	}
 }

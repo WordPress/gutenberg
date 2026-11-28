@@ -27,6 +27,12 @@ function render_block_core_comments_pagination_numbers( $attributes, $content, $
 	$total   = ( new WP_Comment_Query( $comment_vars ) )->max_num_pages;
 	$current = ! empty( $comment_vars['paged'] ) ? $comment_vars['paged'] : null;
 
+	// Expose the comment pages count for get_comment_pages_count() on the main post.
+	global $wp_query;
+	if ( $total && $wp_query instanceof WP_Query && is_singular() && get_queried_object_id() === (int) $block->context['postId'] ) {
+		$wp_query->max_num_comment_pages = $total;
+	}
+
 	// Render links.
 	$content = paginate_comments_links(
 		array(
