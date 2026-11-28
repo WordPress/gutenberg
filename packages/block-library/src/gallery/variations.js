@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { gallery, grid } from '@wordpress/icons';
+import { gallery, galleryGrid } from '@wordpress/icons';
 import { ATTACHED_MEDIA } from './dynamic-source';
 import { isGalleryFlexLayout } from './shared';
 
@@ -45,7 +45,7 @@ const variations = [
 		name: 'gallery-grid',
 		title: __( 'Gallery Grid' ),
 		description: __( 'Arrange images in a grid.' ),
-		icon: grid,
+		icon: galleryGrid,
 		attributes: {
 			layout: {
 				type: 'grid',
