@@ -1,6 +1,8 @@
 import { createBlock } from '@wordpress/blocks';
+import type { BlockConfiguration } from '@wordpress/blocks';
+import type { CalendarAttributes } from './types';
 
-const transforms = {
+const transforms: BlockConfiguration< CalendarAttributes >[ 'transforms' ] = {
 	from: [
 		{
 			type: 'block',
