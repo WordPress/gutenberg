@@ -129,7 +129,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-	$suffix          = SCRIPT_DEBUG ? '' : '.min';
+	$suffix          = gutenberg_should_load_debug_assets() ? '' : '.min';
 
 	$style_path      = "build/styles/block-library/$block_name/";
 	$stylesheet_url  = $gutenberg_url_root . $style_path . 'style' . $suffix . '.css';
