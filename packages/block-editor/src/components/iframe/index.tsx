@@ -164,17 +164,16 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 	} );
 }
 
-const iframeSrcCache = new WeakMap< ResolvedAssets, string >();
-const iframeSrcCleanup = globalThis.FinalizationRegistry
-	? new globalThis.FinalizationRegistry< string >( ( url ) =>
-			URL.revokeObjectURL( url )
-		)
-	: undefined;
+const iframeSrcDocCache = new WeakMap< ResolvedAssets, string >();
 
-function getIframeSrc( resolvedAssets: ResolvedAssets ) {
-	let src = iframeSrcCache.get( resolvedAssets );
-	if ( src ) {
-		return src;
+// The initial document is passed through `srcdoc` rather than a `blob:` URL.
+// Navigating an iframe to a `blob:` URL does not complete reliably when the
+// top-level navigation is controlled by some browser automation tools (e.g.
+// AI browser agents), which leaves the editor canvas blank.
+function getIframeSrcDoc( resolvedAssets: ResolvedAssets ) {
+	let srcDoc = iframeSrcDocCache.get( resolvedAssets );
+	if ( srcDoc ) {
+		return srcDoc;
 	}
 
 	let body = '';
@@ -209,10 +208,9 @@ function getIframeSrc( resolvedAssets: ResolvedAssets ) {
 	${ body }
 </html>`;
 
-	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
-	iframeSrcCache.set( resolvedAssets, src );
-	iframeSrcCleanup?.register( resolvedAssets, src );
-	return src;
+	srcDoc = html;
+	iframeSrcDocCache.set( resolvedAssets, srcDoc );
+	return srcDoc;
 }
 
 function Iframe( {
@@ -255,12 +253,12 @@ function Iframe( {
 					?.startsWith( '#' )
 			) {
 				event.preventDefault();
-				// Manually handle link fragment navigation within the iframe. The iframe's
-				// location is a blob URL, which can't be used to resolve relative links like
-				// `#hash`. The relative link would be resolved against the iframe's base URL
-				// or the parent frame's URL, causing the iframe to navigate to a completely
-				// different page. Setting the `location.hash` works because it really sets the
-				// blob URL's hash.
+				// Manually handle link fragment navigation within the iframe. The
+				// iframe's location is `about:srcdoc`, so a relative link like
+				// `#hash` would be resolved against the `<base>` URL, causing the
+				// iframe to navigate to the parent page. Setting `location.hash`
+				// works because it stays on the `about:srcdoc` document, scrolls
+				// to the anchor, and updates `:target`.
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
@@ -391,7 +389,7 @@ function Iframe( {
 	);
 
 	// The settings are initialized before the iframe renders.
-	const src = getIframeSrc( resolvedAssets! );
+	const srcDoc = getIframeSrcDoc( resolvedAssets! );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -414,7 +412,7 @@ function Iframe( {
 					setRef,
 				] ) }
 				tabIndex={ tabIndex }
-				src={ src }
+				srcDoc={ srcDoc }
 				title={ title }
 			>
 				{ iframeDocument &&

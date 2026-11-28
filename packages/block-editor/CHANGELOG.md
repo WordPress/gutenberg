@@ -78,6 +78,7 @@
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
 -   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
+-   `Iframe`: Load the editor canvas document through `srcdoc` instead of a `blob:` URL, so the canvas no longer stays blank when navigation is controlled by browser automation such as AI browser agents. Scripts running in the canvas now see `window.location.origin` as `"null"`; use `window.origin` instead ([#85143](https://github.com/WordPress/gutenberg/pull/85143)).
 -   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
 -   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
 -   Block drag: restore the dragged block (styles, pointer events, dragging state) when the drag ends without `drop` or `dragend` reaching the canvas document ([#85462](https://github.com/WordPress/gutenberg/pull/85462)).
