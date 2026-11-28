@@ -23,10 +23,13 @@ async function isBlockTheme() {
  * `gutenberg_get_theme_preview_url()` for the full account.
  */
 export const route = {
-	beforeLoad: () => {
+	beforeLoad: async () => {
 		if ( isThemePreviewAdminPage() && ! getPreviewedStylesheet() ) {
 			throw notFound();
 		}
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 	},
 
 	title: async () => {

@@ -9,6 +9,9 @@ import { ensureView, viewToQuery } from './view-utils';
  */
 export const route = {
 	async beforeLoad() {
+		// The content reads the editor's globals as soon as it loads.
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
 		// `block-template-parts` lets a classic theme opt into template parts
 		// alone, as the Template Part block itself allows.
 		const theme = await resolveSelect( coreStore ).getCurrentTheme();

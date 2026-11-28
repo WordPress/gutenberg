@@ -18,6 +18,7 @@
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/global-styles-ui/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/lazy-editor/tsconfig.build.json" },
 		{ "path": "../../packages/private-apis/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
