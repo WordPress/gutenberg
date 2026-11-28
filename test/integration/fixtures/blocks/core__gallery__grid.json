@@ -25,6 +25,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"animation": "",
 					"url": "https://sergioestevaofolio.files.wordpress.com/2016/09/cropped-img_9054-1.jpg?w=190",
 					"alt": "Image gallery image",
 					"caption": "",
@@ -39,6 +40,7 @@
 				"name": "core/image",
 				"isValid": true,
 				"attributes": {
+					"animation": "",
 					"url": "https://sergioestevaofolio.files.wordpress.com/2017/09/cropped-l1001498-1.jpg?w=580",
 					"alt": "Image gallery image",
 					"caption": "",
