@@ -3740,16 +3740,53 @@ describe( 'state', () => {
 			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					partial< Block >( { clientId: 'another-block' } ),
-					partial< Block >( { clientId: 'chicken' } ),
-					partial< Block >( { clientId: 'this-is-a-block-too' } ),
-					partial< Block >( { clientId: 'cow' } ),
+					partial< Block >( {
+						clientId: 'another-block',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'chicken',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'this-is-a-block-too',
+						innerBlocks: [],
+					} ),
+					partial< Block >( { clientId: 'cow', innerBlocks: [] } ),
 				],
 			};
 			const state = selection( original, action );
 
 			expect( state.selectionStart ).toEqual( original.selectionStart );
 			expect( state.selectionEnd ).toEqual( original.selectionEnd );
+		} );
+
+		it( 'should keep the same selection on RESET_BLOCKS if the selected inner blocks continue to exist', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'cow' },
+			} );
+			const action: Action = {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'group',
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								innerBlocks: [],
+							} ),
+							partial< Block >( {
+								clientId: 'cow',
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				],
+			};
+			const state = selection( original, action );
+
+			expect( state ).toBe( original );
 		} );
 
 		it( 'should collapse the selection on RESET_BLOCKS if the selection start exists, but the end does not', () => {
@@ -3760,9 +3797,18 @@ describe( 'state', () => {
 			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					partial< Block >( { clientId: 'another-block' } ),
-					partial< Block >( { clientId: 'chicken' } ),
-					partial< Block >( { clientId: 'this-is-a-block-too' } ),
+					partial< Block >( {
+						clientId: 'another-block',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'chicken',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'this-is-a-block-too',
+						innerBlocks: [],
+					} ),
 				],
 			};
 			const state = selection( original, action );
@@ -3779,8 +3825,14 @@ describe( 'state', () => {
 			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					partial< Block >( { clientId: 'another-block' } ),
-					partial< Block >( { clientId: 'this-is-a-block-too' } ),
+					partial< Block >( {
+						clientId: 'another-block',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'this-is-a-block-too',
+						innerBlocks: [],
+					} ),
 				],
 			};
 			const state = selection( original, action );
