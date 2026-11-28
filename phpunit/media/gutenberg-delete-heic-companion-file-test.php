@@ -5,6 +5,7 @@
  * Covers cleanup of the source-format companion file recorded under the
  * 'source_image' metadata key when its attachment is deleted.
  *
+ * @package gutenberg
  * @group media
  * @covers ::gutenberg_delete_heic_companion_file
  */

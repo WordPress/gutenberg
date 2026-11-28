@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Server timing MU-plugin for e2e tests.
+ *
+ * @package gutenberg
+ */
+
 /*
  * Note: As of WordPress 6.9, there is a template enhancement output buffer which can be used instead of the following
  * template_include code which opens its own buffer. It is enabled by default in classic themes, but it can be enabled

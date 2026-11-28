@@ -7,6 +7,7 @@
  * and its matching closer - so no note marker or metadata reaches the public
  * HTML, while the marked text (and any nested formatting) is preserved.
  *
+ * @package gutenberg
  * @group notes
  */
 class Tests_Strip_Inline_Note_Markers extends WP_UnitTestCase {

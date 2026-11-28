@@ -1,7 +1,7 @@
 <?php
 
 /**
- * REST templates controller compatibility for WordPress 7.2.
+ * REST API: Gutenberg_REST_Templates_Controller_7_2 class
  *
  * @package gutenberg
  */
