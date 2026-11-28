@@ -5,16 +5,23 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	RangeControl,
 } from '@wordpress/components';
+import type { ReactElement } from 'react';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { QueryPaginationNumbersAttributes } from './types';
 
-const createPaginationItem = ( content, Tag = 'a', extraClass = '' ) => (
+const createPaginationItem = (
+	content: string | number,
+	Tag: 'a' | 'span' = 'a',
+	extraClass = ''
+) => (
 	<Tag key={ content } className={ `page-numbers ${ extraClass }` }>
 		{ content }
 	</Tag>
 );
 
-const previewPaginationNumbers = ( midSize ) => {
-	const paginationItems = [];
+const previewPaginationNumbers = ( midSize: number ) => {
+	const paginationItems: ReactElement[] = [];
 
 	// First set of pagination items.
 	for ( let i = 1; i <= midSize; i++ ) {
@@ -43,10 +50,10 @@ const previewPaginationNumbers = ( midSize ) => {
 export default function QueryPaginationNumbersEdit( {
 	attributes,
 	setAttributes,
-} ) {
+}: BlockEditProps< QueryPaginationNumbersAttributes > ) {
 	const { midSize } = attributes;
 	const paginationNumbers = previewPaginationNumbers(
-		parseInt( midSize, 10 )
+		parseInt( String( midSize ), 10 )
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -72,7 +79,7 @@ export default function QueryPaginationNumbersEdit( {
 							value={ midSize }
 							onChange={ ( value ) => {
 								setAttributes( {
-									midSize: parseInt( value, 10 ),
+									midSize: parseInt( String( value ), 10 ),
 								} );
 							} }
 							min={ 0 }
