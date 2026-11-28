@@ -1,8 +1,16 @@
+/** The media types the editor tells apart, by MIME type prefix. */
+export const MEDIA_TYPES = [
+	'image',
+	'video',
+	'audio',
+	'application',
+] as const;
+
 /**
  * Media type result.
  */
 export interface MediaType {
-	type: 'image' | 'video' | 'audio' | 'application';
+	type: ( typeof MEDIA_TYPES )[ number ];
 }
 
 /**
