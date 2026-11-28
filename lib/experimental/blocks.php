@@ -12,14 +12,26 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	 * Scripts enqueued using this function will only get printed
 	 * when the block gets rendered on the frontend.
 	 *
+	 * Pass a registered script handle to reuse its registration, or an array
+	 * containing a handle and script registration arguments. Strings containing
+	 * an equals sign are parsed as query-string arguments.
+	 *
+	 * Call this function before the block is rendered. The block does not need
+	 * to be registered yet. Header placement depends on when the block renders.
+	 *
 	 * @since 6.2.0
 	 *
-	 * @param string $block_name The block name, including namespace.
-	 * @param array  $args       An array of arguments [handle,src,deps,ver,media,textdomain].
+	 * @param string       $block_name The block name, including namespace.
+	 * @param string|array $args       A registered script handle, or an array or query string of
+	 *                                 arguments [handle,src,deps,ver,in_footer,textdomain,domainpath].
 	 *
 	 * @return void
 	 */
 	function wp_enqueue_block_view_script( $block_name, $args ) {
+		if ( is_string( $args ) && false === strpos( $args, '=' ) ) {
+			$args = array( 'handle' => $args );
+		}
+
 		$args = wp_parse_args(
 			$args,
 			array(
@@ -49,12 +61,12 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 				return $content;
 			}
 
-			// Register the stylesheet.
+			// Register the script.
 			if ( ! empty( $args['src'] ) ) {
 				wp_register_script( $args['handle'], $args['src'], $args['deps'], $args['ver'], $args['in_footer'] );
 			}
 
-			// Enqueue the stylesheet.
+			// Enqueue the script.
 			wp_enqueue_script( $args['handle'] );
 
 			// If a textdomain is defined, use it to set the script translations.
