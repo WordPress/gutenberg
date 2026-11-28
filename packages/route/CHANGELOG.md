@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update `@tanstack/react-router` and `@tanstack/history` to fix a memory leak that retained previous navigation state in `@tanstack/router-core` ([#87066](https://github.com/WordPress/gutenberg/pull/87066)).
+
+## 0.26.0 (2026-11-18)
+
+## 0.25.0 (2026-11-04)
+
+## 0.24.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ## 0.23.0 (2026-10-07)
 
 ### Bug Fixes

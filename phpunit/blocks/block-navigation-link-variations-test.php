@@ -117,7 +117,7 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 		$variation = $this->get_variation_by_name( 'custom_book', $variations );
 		$this->assertIsArray( $variation, 'Block variation does not exist' );
 		$this->assertArrayHasKey( 'title', $variation, 'Block variation has no title' );
-		$this->assertEquals( 'Custom Book', $variation['title'], 'Variation title is different than the post type label' );
+		$this->assertSame( 'Custom Book', $variation['title'], 'Variation title is different than the post type label' );
 	}
 
 	/**
@@ -145,7 +145,7 @@ class Block_Navigation_Link_Variations_Test extends WP_UnitTestCase {
 		$variation = $this->get_variation_by_name( 'book_type', $variations );
 		$this->assertIsArray( $variation, 'Block variation does not exist' );
 		$this->assertArrayHasKey( 'title', $variation, 'Block variation has no title' );
-		$this->assertEquals( 'Book Type', $variation['title'], 'Variation title is different than the post type label' );
+		$this->assertSame( 'Book Type', $variation['title'], 'Variation title is different than the post type label' );
 	}
 
 	/**

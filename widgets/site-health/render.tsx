@@ -1,7 +1,7 @@
 import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
 import { HostLink, useWidgetActions } from '@wordpress/widget-primitives';
 import { CircleProgress, type HealthTone } from './components';
@@ -168,7 +168,7 @@ export default function SiteHealth() {
 				align="center"
 				justify="center"
 			>
-				<Spinner />
+				<WCSpinner />
 			</Stack>
 		);
 	}

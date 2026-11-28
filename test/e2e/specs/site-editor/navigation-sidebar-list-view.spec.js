@@ -147,6 +147,363 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test( 'does not select blocks in the canvas preview when editing from the sidebar', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+
+		await expect( canvas.getByText( 'Existing Item' ) ).toBeVisible();
+
+		// Select an item, then add a new one from the appender. The edit is
+		// what carries the sidebar's selection over to the entity.
+		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
+		// The click opens the item's settings a moment later, and they move
+		// focus after they open. Wait for that focus, so the settings can't
+		// take focus from the appender.
+		await expect(
+			page.getByRole( 'button', { name: 'Settings options' } )
+		).toBeFocused();
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await linkControl.useLinkControlSearch( 'Test Page 2' );
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 2' } )
+		).toBeVisible();
+
+		// The preview picks up the change without adopting the selection.
+		await expect( canvas.getByText( 'Test Page 2' ) ).toBeVisible();
+		await expect( blockToolbar ).toBeHidden();
+		expect(
+			await page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId()
+			)
+		).toBeNull();
+	} );
+
+	test( 'can edit links from the settings popover', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Test Navigation Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->' +
+				'<!-- wp:navigation-submenu {"label":"Submenu Item","type":"custom","url":"http://www.wordpress.org/submenu/","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Child Item","type":"custom","url":"http://www.wordpress.org/child/","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"No URL"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const labelInput = page.getByRole( 'textbox', { name: 'Text' } );
+
+		await test.step( 'opens when selecting a link', async () => {
+			await listView
+				.getByRole( 'link', { name: 'Existing Item' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'heading', { name: 'Settings' } )
+			).toBeVisible();
+			await expect( labelInput ).toHaveValue( 'Existing Item' );
+			await expect(
+				page.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'link', { name: 'View' } )
+			).toBeVisible();
+			// Matches the content-only popover: less common fields are
+			// available from the panel menu rather than shown by default.
+			await expect(
+				page.getByRole( 'textbox', { name: 'Description' } )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'textbox', { name: 'Rel attribute' } )
+			).toBeHidden();
+		} );
+
+		await test.step( 'edits the link label', async () => {
+			await labelInput.fill( 'Changed Label' );
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Changed Label' } )
+			).toBeVisible();
+			await expect(
+				listView.getByRole( 'link', { name: 'Existing Item' } )
+			).toBeHidden();
+		} );
+
+		await test.step( 'closes with Escape and returns focus to the item', async () => {
+			await labelInput.focus();
+			await page.keyboard.press( 'Escape' );
+
+			await expect( labelInput ).toBeHidden();
+			await expect(
+				listView.getByRole( 'link', { name: 'Changed Label' } )
+			).toBeFocused();
+		} );
+
+		await test.step( 'opens with Enter from the keyboard', async () => {
+			// Focus is on the edited item's row after Escape.
+			await page.keyboard.press( 'ArrowDown' );
+			await expect(
+				listView.getByRole( 'link', { name: 'Submenu Item' } )
+			).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+
+			await expect( labelInput ).toHaveValue( 'Submenu Item' );
+		} );
+
+		await test.step( 'edits a submenu label', async () => {
+			await labelInput.fill( 'Changed Submenu' );
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Changed Submenu' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'switches to another item while the popover is open', async () => {
+			// Hold the click as a person does. The popover's focus-outside check
+			// runs between mouse down and up, before the row's click opens the
+			// popover for the new item. An instant click would run it afterward.
+			await listView
+				.getByRole( 'link', { name: 'No URL' } )
+				.click( { delay: 100 } );
+
+			await expect( labelInput ).toHaveValue( 'No URL' );
+		} );
+
+		await test.step( 'adds a link to an item that has no URL', async () => {
+			// The item is kept; the popover offers to add its link.
+			await expect(
+				listView.getByRole( 'link', { name: 'No URL' } )
+			).toBeVisible();
+			const linkPicker = page.getByRole( 'button', {
+				name: /^Link to/,
+			} );
+			await expect( linkPicker ).toHaveText( /Add link/ );
+			await linkPicker.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+			// The item keeps its label and gains the link.
+			await expect( linkPicker ).toHaveText( /Test Page 1/ );
+			await expect(
+				listView.getByRole( 'link', { name: 'No URL' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( 'shows the appender for an empty menu', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Empty Navigation Menu',
+			content: '',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			page.getByText( 'This Navigation Menu is empty.' )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'button', { name: 'Add page' } )
+		).toBeVisible();
+	} );
+
+	test( 'can add the first item to an empty menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Empty Navigation Menu',
+			content: '',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 1' } )
+		).toBeVisible();
+		await expect(
+			page.getByText( 'This Navigation Menu is empty.' )
+		).toBeHidden();
+	} );
+
+	test( 'lists the pages of a Page List block', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Page List Menu',
+			content: '<!-- wp:page-list /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 1' } )
+		).toBeVisible();
+		await expect(
+			listView.getByRole( 'row', { name: 'Test Page 2' } )
+		).toBeVisible();
+	} );
+
+	test( 'can add submenu links from the Options menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Add Submenu Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Existing Item' } );
+
+		await test.step( 'a link becomes a submenu holding the new link', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'a submenu gets the new link at its end', async () => {
+			await row.hover();
+			await row.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 2' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 2' } )
+					.filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( "returns focus to the item's Options after adding a submenu link", async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Focus Return Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"Existing Item","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const row = listView.getByRole( 'row', { name: 'Existing Item' } );
+		const optionsButton = row.getByRole( 'button', { name: 'Options' } );
+		const addSubmenuLink = page.getByRole( 'menuitem', {
+			name: 'Add submenu link',
+		} );
+
+		await test.step( 'when the link search is dismissed', async () => {
+			await row.hover();
+			await optionsButton.click();
+			await addSubmenuLink.click();
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( optionsButton ).toBeFocused();
+		} );
+
+		await test.step( 'when a link is chosen', async () => {
+			await page.keyboard.press( 'Enter' );
+			await addSubmenuLink.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Test Page 1' } )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect( optionsButton ).toBeFocused();
+		} );
+	} );
 } );
 
 class LinkControl {

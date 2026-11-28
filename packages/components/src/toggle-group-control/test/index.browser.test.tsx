@@ -2,6 +2,7 @@ import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 import Button from '../../button';
@@ -30,11 +31,6 @@ const expectGroupChromeDisabled = ( group: HTMLElement ) => {
 
 const sleep = ( milliseconds: number ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
-
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
 
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
@@ -271,9 +267,9 @@ describe.each( [
 
 		await userEvent.hover( firstRadio );
 
-		const tooltip = await screen.findByRole( 'tooltip', {
-			name: 'Click for Delicious Gnocchi',
-		} );
+		const tooltip = await screen.findByText(
+			'Click for Delicious Gnocchi'
+		);
 
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
@@ -281,11 +277,38 @@ describe.each( [
 		await hoverOutside();
 
 		// Tooltip should hide
-		expect(
-			screen.queryByRole( 'tooltip', {
-				name: 'Click for Delicious Gnocchi',
-			} )
-		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.queryByText( 'Click for Delicious Gnocchi' )
+			).not.toBeInTheDocument()
+		);
+	} );
+
+	it( 'should show the next tooltip without a delay when moving between options', async () => {
+		await render(
+			<Component label="Test Toggle Group Control">
+				<ToggleGroupControlOptionIcon
+					value="uppercase"
+					icon={ formatUppercase }
+					label="Uppercase"
+				/>
+				<ToggleGroupControlOptionIcon
+					value="lowercase"
+					icon={ formatLowercase }
+					label="Lowercase"
+				/>
+			</Component>
+		);
+
+		await userEvent.hover( screen.getByLabelText( 'Uppercase' ) );
+		const firstTooltip = await screen.findByText( 'Uppercase' );
+		await waitFor( () => expect( firstTooltip ).toBeVisible() );
+
+		await userEvent.hover( screen.getByLabelText( 'Lowercase' ) );
+		await waitFor(
+			() => expect( screen.getByText( 'Lowercase' ) ).toBeVisible(),
+			{ timeout: TOOLTIP_DELAY / 2 }
+		);
 	} );
 
 	it( 'should not render tooltip', async () => {
@@ -919,7 +942,7 @@ describe.each( [
 	} );
 } );
 
-test( 'should render block styles without Emotion-generated classes', async () => {
+test( 'should render block styles with enclosing borders', async () => {
 	await render(
 		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
 			{ options }
@@ -930,7 +953,6 @@ test( 'should render block styles without Emotion-generated classes', async () =
 		name: 'Test Toggle Group Control',
 	} );
 
-	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 0 );
 	expect( control ).toHaveClass(
 		controlStyles[ 'toggle-group-control' ],
 		controlStyles[ 'is-block' ],
@@ -960,4 +982,31 @@ test( 'should render deselectable styles without enclosing borders', async () =>
 		optionStyles.button,
 		optionStyles[ 'is-deselectable' ]
 	);
+} );
+
+test( 'should keep its width when the pressed option changes', async () => {
+	await render(
+		<ControlledToggleGroupControl
+			label="Test Toggle Group Control"
+			value="narrow"
+		>
+			<ToggleGroupControlOption value="narrow" label="i" />
+			<ToggleGroupControlOption value="wide" label="MMMMMMMM" />
+		</ControlledToggleGroupControl>
+	);
+
+	const control = screen.getByRole( 'radiogroup', {
+		name: 'Test Toggle Group Control',
+	} );
+	const wideOption = screen.getByRole( 'radio', { name: 'MMMMMMMM' } );
+	const initialWidth = control.getBoundingClientRect().width;
+
+	await userEvent.click( wideOption );
+	await waitFor( () => expect( wideOption ).toBeChecked() );
+	// Wait for the font weight transition to finish.
+	await Promise.all(
+		wideOption.getAnimations().map( ( animation ) => animation.finished )
+	);
+
+	expect( control.getBoundingClientRect().width ).toBe( initialWidth );
 } );

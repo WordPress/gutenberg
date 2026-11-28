@@ -1,4 +1,4 @@
-import { Card, CardBody } from '@wordpress/components';
+import { Card as WCCard, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { ScreenHeader } from './screen-header';
 import { StyleVariationsContent } from './style-variations-content';
@@ -13,7 +13,7 @@ function ScreenStyleVariations() {
 				) }
 			/>
 
-			<Card
+			<WCCard
 				size="small"
 				isBorderless
 				className="global-styles-ui-screen-style-variations"
@@ -21,7 +21,7 @@ function ScreenStyleVariations() {
 				<CardBody>
 					<StyleVariationsContent />
 				</CardBody>
-			</Card>
+			</WCCard>
 		</>
 	);
 }

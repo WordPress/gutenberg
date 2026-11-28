@@ -16,6 +16,13 @@ const meta: Meta< typeof RadioGroup > = {
 			whereUsed: 'global',
 		},
 	},
+	render: ( args ) => (
+		<RadioGroup { ...args }>
+			{ [ 'Apple', 'Banana', 'Orange' ].map( ( label ) => (
+				<Radio key={ label } value={ label } aria-label={ label } />
+			) ) }
+		</RadioGroup>
+	),
 };
 
 export default meta;
@@ -26,13 +33,6 @@ export const Default: Story = {
 	args: {
 		'aria-label': 'Fruit',
 	},
-	render: ( args ) => (
-		<RadioGroup { ...args }>
-			{ [ 'Apple', 'Banana', 'Orange' ].map( ( label ) => (
-				<Radio key={ label } value={ label } aria-label={ label } />
-			) ) }
-		</RadioGroup>
-	),
 };
 
 export const Checked: Story = {
@@ -40,7 +40,6 @@ export const Checked: Story = {
 		...Default.args,
 		defaultValue: 'Apple',
 	},
-	render: Default.render,
 };
 
 export const Disabled: Story = {
@@ -49,5 +48,4 @@ export const Disabled: Story = {
 		defaultValue: 'Apple',
 		disabled: true,
 	},
-	render: Default.render,
 };

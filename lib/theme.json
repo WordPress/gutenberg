@@ -276,6 +276,11 @@
 				"unit": "rem"
 			}
 		},
+		"transform": {
+			"rotate": false,
+			"translate": false,
+			"scale": false
+		},
 		"typography": {
 			"customFontSize": true,
 			"defaultFontSizes": true,
@@ -356,6 +361,11 @@
 							"size": "100%"
 						}
 					]
+				}
+			},
+			"core/cover": {
+				"dimensions": {
+					"minHeight": true
 				}
 			},
 			"core/image": {

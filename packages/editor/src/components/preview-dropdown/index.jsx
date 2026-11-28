@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { desktop, mobile, tablet } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -10,14 +9,19 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import MoreMenuItem from '../more-menu/more-menu-item';
 import { toMenuItems } from '../more-menu/more-menu-submenu';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
-import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
+import {
+	DEVICE_TYPE_METADATA,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -113,12 +117,6 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		}
 	};
 
-	const deviceIcons = {
-		desktop,
-		mobile,
-		tablet,
-	};
-
 	/**
 	 * The choices for the device type.
 	 * Duplicated in block-editor block-visibility constants, and in the edit-site
@@ -129,7 +127,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	const choices = [
 		{
 			value: 'Desktop',
-			label: __( 'Desktop' ),
+			label: DEVICE_TYPE_METADATA.Desktop.label,
 			info: isResponsiveEditing
 				? __( 'Style all viewports.' )
 				: __( 'Preview desktop viewport.' ),
@@ -138,7 +136,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			? [
 					{
 						value: 'Tablet',
-						label: __( 'Tablet' ),
+						label: DEVICE_TYPE_METADATA.Tablet.label,
 						info: isResponsiveEditing
 							? __( 'Style tablet only.' )
 							: __( 'Preview tablet viewport.' ),
@@ -149,7 +147,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			? [
 					{
 						value: 'Mobile',
-						label: __( 'Mobile' ),
+						label: DEVICE_TYPE_METADATA.Mobile.label,
 						info: isResponsiveEditing
 							? __( 'Style mobile only.' )
 							: __( 'Preview mobile viewport.' ),
@@ -165,10 +163,11 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 				render={
 					<Button
 						className={ clsx( 'editor-preview-dropdown__toggle', {
-							'is-responsive-editing': isResponsiveEditing,
+							'is-responsive-editing':
+								isResponsiveEditing && deviceType !== 'Desktop',
 						} ) }
 						size="compact"
-						icon={ deviceIcons[ deviceType.toLowerCase() ] }
+						icon={ DEVICE_TYPE_METADATA[ deviceType ].icon }
 						label={ __( 'View' ) }
 						showTooltip={ ! showIconLabels }
 						accessibleWhenDisabled={ disabled }
@@ -202,6 +201,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						<Menu.Separator />
 						<Menu.Group>
 							<Menu.CheckboxItem
+								disabled={ deviceType === 'Desktop' }
 								checked={ isResponsiveEditing }
 								onCheckedChange={
 									handleResponsiveEditingChange
@@ -211,9 +211,13 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 									{ __( 'Responsive styles' ) }
 								</Menu.ItemLabel>
 								<Menu.ItemDescription>
-									{ __(
-										'Style changes apply only to the selected viewport.'
-									) }
+									{ deviceType === 'Desktop'
+										? __(
+												'Select Tablet or Mobile to style a specific viewport.'
+											)
+										: __(
+												'Style changes apply only to the selected viewport.'
+											) }
 								</Menu.ItemDescription>
 							</Menu.CheckboxItem>
 						</Menu.Group>

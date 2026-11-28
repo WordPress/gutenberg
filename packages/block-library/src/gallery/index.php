@@ -336,7 +336,7 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
  * @param int   $attachment_id The image attachment ID.
  * @param array $attributes    The gallery block attributes.
  * @return array Partial image block attributes (`href`, `linkDestination`,
- *               `linkTarget`, `rel`, `lightbox`).
+ *               `linkTarget`, `lightbox`).
  */
 function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attributes ) {
 	$link_to = $attributes['linkTo'] ?? 'none';
@@ -362,7 +362,6 @@ function block_core_gallery_dynamic_image_link_attributes( $attachment_id, $attr
 
 	if ( ! empty( $attrs['href'] ) && '_blank' === ( $attributes['linkTarget'] ?? '' ) ) {
 		$attrs['linkTarget'] = '_blank';
-		$attrs['rel']        = 'noopener';
 	}
 
 	return $attrs;
@@ -420,10 +419,9 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
 	// Wrap in a link when the gallery links images somewhere.
 	if ( ! empty( $image_attributes['href'] ) ) {
 		$image_markup = sprintf(
-			'<a href="%1$s"%2$s%3$s>%4$s</a>',
+			'<a href="%1$s"%2$s>%3$s</a>',
 			esc_url( $image_attributes['href'] ),
 			isset( $image_attributes['linkTarget'] ) ? ' target="' . esc_attr( $image_attributes['linkTarget'] ) . '"' : '',
-			isset( $image_attributes['rel'] ) ? ' rel="' . esc_attr( $image_attributes['rel'] ) . '"' : '',
 			$image_markup
 		);
 	}
@@ -463,12 +461,17 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  *
  * @since 6.0.0
  *
- * @param array  $attributes Attributes of the block being rendered.
- * @param string $content    Content of the block being rendered.
- * @param array  $block      The block instance being rendered.
+ * @param array    $attributes Attributes of the block being rendered.
+ * @param string   $content    Content of the block being rendered.
+ * @param WP_Block $block      The block instance being rendered.
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
+	/*
+	 * Reads global styles once per request. wp_get_global_styles() has no cache
+	 * of its own, so without this static each gallery would merge the theme.json
+	 * data again wherever the resolver does not cache the merged result.
+	 */
 	static $global_styles = null;
 
 	// Gallery blocks created before layout variations existed do not have an
@@ -554,13 +557,6 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$style_attr = is_array( $attributes['style'] ?? null )
 		? $attributes['style']
 		: array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
-	}
 
 	$global_settings          = wp_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;

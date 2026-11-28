@@ -7,8 +7,13 @@ import {
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useEffect, useMemo, useState } from '@wordpress/element';
-import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
+import { useMemo, useState } from '@wordpress/element';
+import {
+	store as coreStore,
+	useEntityRecords,
+	useEntityProp,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import useNavigationMenu from '../use-navigation-menu';
 
 function buildMenuLabel( title, id, status ) {
@@ -35,8 +40,6 @@ function NavigationMenuSelector( {
 	onSelectClassicMenu,
 	onCreateNew,
 	actionLabel,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -54,10 +57,18 @@ function NavigationMenuSelector( {
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
-		canUserCreateNavigationMenus,
 		canSwitchNavigationMenu,
 		isNavigationMenuMissing,
 	} = useNavigationMenu( currentMenuId );
+
+	const canUserCreateNavigationMenus = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_navigation',
+			} ),
+		[]
+	);
 
 	const [ currentTitle ] = useEntityProp(
 		'postType',
@@ -122,24 +133,6 @@ function NavigationMenuSelector( {
 		selectorLabel = currentTitle;
 	}
 
-	useEffect( () => {
-		if (
-			isUpdatingMenuRef &&
-			( createNavigationMenuIsSuccess || createNavigationMenuIsError )
-		) {
-			setIsUpdatingMenuRef( false );
-		}
-	}, [
-		hasResolvedNavigationMenus,
-		createNavigationMenuIsSuccess,
-		canUserCreateNavigationMenus,
-		createNavigationMenuIsError,
-		isUpdatingMenuRef,
-		menuUnavailable,
-		noBlockMenus,
-		noMenuSelected,
-	] );
-
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
@@ -195,8 +188,12 @@ function NavigationMenuSelector( {
 							<MenuItem
 								onClick={ async () => {
 									setIsUpdatingMenuRef( true );
-									await onCreateNew();
-									setIsUpdatingMenuRef( false );
+									// Creating the menu rejects on error.
+									try {
+										await onCreateNew();
+									} finally {
+										setIsUpdatingMenuRef( false );
+									}
 									onClose();
 								} }
 								disabled={

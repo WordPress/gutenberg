@@ -13,6 +13,9 @@
 	],
 	"supports": {
 		"anchor": true,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"background": true,
 			"gradients": true
@@ -24,8 +27,7 @@
 			"__experimentalDefaultControls": {
 				"padding": true
 			},
-			"__experimentalSkipSerialization": true,
-			"__experimentalSelector": ".wp-block-accordion-heading__toggle"
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,

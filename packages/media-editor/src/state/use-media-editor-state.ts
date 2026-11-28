@@ -6,18 +6,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import {
-	DEFAULT_STATE,
-	ORIGINAL_ASPECT_RATIO,
-	areCropperStatesEqual,
-	buildCropperSetters,
-	enforceContainment,
-	exportCroppedImage,
-	type CropperAction,
-	type CropperController,
-	type CropperState,
-	type NormalizedRect,
-	type Size,
-} from '../image-editor';
+	createImageEditorState,
+	useImageEditor,
+	type ImageEditorController,
+	type ImageEditorState,
+} from '@wordpress/image-editor';
+import { ORIGINAL_ASPECT_RATIO } from './aspect-ratio-presets';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
@@ -25,41 +19,36 @@ import {
 } from './composite-reducer';
 import type {
 	CropOptionsSlice,
+	EditsSlice,
+	EditValue,
 	MediaEditorAction,
 	MediaEditorState,
 } from './types';
 
 /**
  * Resolve an aspect-ratio preset value (the string the dropdown
- * round-trips) into a numeric width/height ratio for the cropper.
+ * round-trips) into a numeric width/height ratio for the image editor.
  *
  * - `'0'` → `undefined` (Free; no lock)
  * - `'-1'` (Original) → image's natural width / height, or `undefined`
  *   if no image is loaded.
  * - Any positive decimal → the parsed number.
  *
- * Centralizing here means the dropdown, the action dispatcher, and
- * the test harness all resolve the same way.
- *
- * @param presetKey    Preset value from the dropdown.
- * @param cropperImage The cropper's loaded image, or `null`.
+ * @param presetKey Preset value from the dropdown.
+ * @param image     The image editor's loaded image, or `null`.
  * @return The resolved ratio, or `undefined` for Free / unresolvable.
  */
-export function resolveAspectRatio(
+function resolveAspectRatio(
 	presetKey: string,
-	cropperImage: CropperState[ 'image' ] | null
+	image: ImageEditorState[ 'image' ] | null
 ): number | undefined {
 	const num = parseFloat( presetKey );
 	if ( num === 0 || Number.isNaN( num ) ) {
 		return undefined;
 	}
 	if ( num === ORIGINAL_ASPECT_RATIO ) {
-		if (
-			cropperImage &&
-			cropperImage.naturalWidth > 0 &&
-			cropperImage.naturalHeight > 0
-		) {
-			return cropperImage.naturalWidth / cropperImage.naturalHeight;
+		if ( image && image.naturalWidth > 0 && image.naturalHeight > 0 ) {
+			return image.naturalWidth / image.naturalHeight;
 		}
 		return undefined;
 	}
@@ -69,9 +58,9 @@ export function resolveAspectRatio(
 	return undefined;
 }
 
-function areCropperImagesEqual(
-	a: CropperState[ 'image' ],
-	b: CropperState[ 'image' ]
+function areImagesEqual(
+	a: ImageEditorState[ 'image' ],
+	b: ImageEditorState[ 'image' ]
 ): boolean {
 	return (
 		a?.src === b?.src &&
@@ -86,31 +75,41 @@ function areCropperImagesEqual(
  * The session owns what is being edited and how: the source image,
  * every editing slice, the shared undo/redo history, gesture
  * boundaries, and whether the edits change the saved image. The
- * cropper is one participant in the session — `cropper` is a
- * geometry-only controller that a `<Cropper>` takes via its
- * `controller` prop — rather than the session itself.
+ * image editor is one participant in the session — `imageEditor` is the
+ * controller an `<ImageEditorCanvas>` takes via its `controller` prop — rather
+ * than the session itself.
  */
 export interface MediaEditorSession {
 	/**
-	 * Geometry controller for the cropper slice. Its setters record
-	 * history in the session; its `isDirty` covers geometry only.
-	 * Its `setImage` is `setSourceImage`, so the `<Cropper>` reporting
-	 * a newly loaded image starts a fresh session.
+	 * Controller for the image editor. Its setters record history in the
+	 * session; its `isDirty` covers the crop only. Its `setImage` is
+	 * `setSourceImage`, so the `<ImageEditorCanvas>` reporting a newly loaded
+	 * image starts a fresh session.
 	 */
-	cropper: CropperController;
+	imageEditor: ImageEditorController;
 	/** The cropOptions slice. */
 	cropOptions: CropOptionsSlice;
-	/** Set the aspect-ratio preset. Atomic with the cropRect reshape. */
+	/** Set the aspect-ratio preset and reshape the crop in one undo entry. */
 	setAspectRatioValue: ( presetKey: string ) => void;
-	/** Reset cropOptions to defaults. */
-	resetCropOptions: () => void;
+	/**
+	 * Put every slice back to its starting state in one undo entry:
+	 * default crop and crop options, no edits. Keeps the image.
+	 */
+	reset: () => void;
+	/** The named edits other than crop, keyed by edit name. */
+	edits: EditsSlice;
+	/**
+	 * Set a named edit, or remove it by passing `undefined`. Recorded
+	 * in the session history like any crop change. Setting a value
+	 * equal in content to the current one is a no-op.
+	 */
+	setEdit: ( name: string, value: EditValue | undefined ) => void;
 	/**
 	 * Replace the image being edited. A different image starts a
-	 * fresh session: default geometry and crop options, a clean
-	 * baseline, and no history. Reporting the same image again is a
-	 * no-op.
+	 * fresh session: default crop and crop options, a clean baseline,
+	 * and no history. Reporting the same image again is a no-op.
 	 */
-	setSourceImage: ( image: CropperState[ 'image' ] ) => void;
+	setSourceImage: ( image: ImageEditorState[ 'image' ] ) => void;
 	/**
 	 * Whether anything in the session differs from its baseline,
 	 * including editor-only state such as the aspect-ratio preset.
@@ -125,14 +124,14 @@ export interface MediaEditorSession {
 	hasUndo: boolean;
 	/** Whether there's a redoable change in history. */
 	hasRedo: boolean;
-	/** Undo the last committed action across all slices. */
+	/** Undo the last committed change across all slices. */
 	undo: () => void;
-	/** Redo the last undone action across all slices. */
+	/** Redo the last undone change across all slices. */
 	redo: () => void;
 	/**
-	 * Open a gesture boundary. During a gesture all state-changing
-	 * actions coalesce into one undo entry — the snapshot taken at
-	 * `beginGesture`. Pair with `endGesture` on pointer-up / key-up.
+	 * Open a gesture boundary. During a gesture all changes coalesce
+	 * into one undo entry — the snapshot taken at `beginGesture`. Pair
+	 * with `endGesture` on pointer-up / key-up.
 	 */
 	beginGesture: () => void;
 	/** Close a gesture boundary and commit the pre-gesture snapshot. */
@@ -142,24 +141,23 @@ export interface MediaEditorSession {
 /**
  * The media editor session.
  *
- * Owns the only undo/redo history for the editor. Cropper geometry
- * actions and sidebar cropOptions actions flow through the same
- * reducer and the same history stack.
+ * Owns the only undo/redo history for the editor. The image editor's state,
+ * the sidebar crop options and named edits are slices of one state, so
+ * one history stack covers them all. The image editor works out its own
+ * changes and reports each next state through `onChange`.
  *
  * History semantics:
- * - Each action's pre-state is pushed to the undo stack before the
- *   action commits, unless a gesture is open or the action is a
- *   no-op (post-state value-equal to pre-state).
- * - During a gesture (`beginGesture` → `endGesture`) all mutations
- *   coalesce: only the pre-gesture snapshot is pushed, at gesture
- *   end. Any pending gesture is flushed on undo/redo.
- * - Viewport-driven cropRect reshapes (window resize) use a
- *   dedicated non-recording dispatch path so they never produce
- *   undo entries.
+ * - Each change pushes its pre-state to the undo stack, unless a
+ *   gesture is open or the change is a no-op (post-state value-equal
+ *   to pre-state).
+ * - During a gesture (`beginGesture` → `endGesture`) changes coalesce:
+ *   only the pre-gesture snapshot is pushed, at gesture end. Undo and
+ *   redo close an open gesture first.
+ * - Changes the image editor marks as not edits (an image loading, a refit
+ *   after a window resize) are never recorded.
  *
- * `isDirty` tracks the full editor session, including undoable UI
- * state. Use `hasOutputEdits` when deciding whether the image output
- * needs saving.
+ * `isDirty` tracks the full session, including undoable UI state. Use
+ * `hasOutputEdits` when deciding whether the image output needs saving.
  *
  * The session starts empty. Call `setSourceImage` to load an image.
  *
@@ -167,36 +165,29 @@ export interface MediaEditorSession {
  */
 export function useMediaEditorState(): MediaEditorSession {
 	const [ state, dispatch ] = useReducer( mediaEditorReducer, null, () =>
-		buildInitialMediaEditorState( { ...DEFAULT_STATE } )
+		buildInitialMediaEditorState( createImageEditorState() )
 	);
 
 	// The "clean" snapshot the current state is compared against for
-	// `isDirty`. Stored in state (not a ref) so the comparison reads
-	// a value, not a ref's `current`. `setSourceImage` refreshes this when
-	// a new image establishes a fresh baseline.
+	// `isDirty`. `setSourceImage` refreshes it when a new image starts a
+	// fresh session.
 	const [ initialBaseline, setInitialBaseline ] =
 		useState< MediaEditorState >( () => state );
 
-	// Latest-state ref used by setters that need to read fresh state
-	// (focal-point zoom, dispatch wrapper). Every mutation path
-	// (`dispatchWithHistory`, `setSourceImage`, `undo`, `redo`) writes this
-	// synchronously, so multiple actions in one event see the latest
-	// reducer output before React commits.
+	// Latest state, so several actions in one event see each other's
+	// output before React commits. Every mutation path writes it
+	// synchronously.
 	const stateRef = useRef( state );
-	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
 
-	// History stacks: full composite snapshots. Refs avoid re-renders
-	// on every push; a boolean state pair drives the enabled/disabled
-	// indicators for undo/redo buttons.
+	// History stacks: full snapshots. Refs avoid re-renders on every
+	// push; a boolean state pair drives the undo/redo indicators.
 	const historyRef = useRef< MediaEditorState[] >( [] );
 	const redoStackRef = useRef< MediaEditorState[] >( [] );
 	const [ hasUndo, setHasUndo ] = useState( false );
 	const [ hasRedo, setHasRedo ] = useState( false );
 
-	// Gesture state. While open, the first non-no-op action captures
-	// the pre-gesture snapshot; subsequent actions don't push.
-	// `endGesture` pushes the captured snapshot (or nothing, if the
-	// gesture produced no changes).
+	// Gesture state. While open, the first change captures the
+	// pre-gesture snapshot; later changes don't push.
 	const isGestureOpenRef = useRef( false );
 	const gestureSnapshotRef = useRef< MediaEditorState | null >( null );
 
@@ -211,22 +202,20 @@ export function useMediaEditorState(): MediaEditorSession {
 		setHasRedo( false );
 	}, [] );
 
-	// Core dispatch wrapper. Synchronously computes the post-state via
-	// the pure reducer so we can skip history pushes for no-op actions
-	// and keep `stateRef` in lockstep with React's pending state.
 	const dispatchWithHistory = useCallback(
 		( action: MediaEditorAction, recordHistory = true ) => {
 			const preState = stateRef.current;
 			const postState = mediaEditorReducer( preState, action );
-			if ( recordHistory ) {
-				if ( ! areMediaEditorStatesEqual( preState, postState ) ) {
-					if ( isGestureOpenRef.current ) {
-						if ( gestureSnapshotRef.current === null ) {
-							gestureSnapshotRef.current = preState;
-						}
-					} else {
-						pushSnapshot( preState );
+			if (
+				recordHistory &&
+				! areMediaEditorStatesEqual( preState, postState )
+			) {
+				if ( isGestureOpenRef.current ) {
+					if ( gestureSnapshotRef.current === null ) {
+						gestureSnapshotRef.current = preState;
 					}
+				} else {
+					pushSnapshot( preState );
 				}
 			}
 			stateRef.current = postState;
@@ -243,8 +232,8 @@ export function useMediaEditorState(): MediaEditorSession {
 		gestureSnapshotRef.current = null;
 	}, [] );
 
-	// Close a gesture (or flush a pending one before undo/redo).
-	// Pushes the pre-gesture snapshot only if it differs from current
+	// Close a gesture (or flush a pending one before undo/redo). Pushes
+	// the pre-gesture snapshot only if it differs from the current
 	// state. Safe to call when no gesture is open.
 	const endGesture = useCallback( () => {
 		const snapshot = gestureSnapshotRef.current;
@@ -258,90 +247,104 @@ export function useMediaEditorState(): MediaEditorSession {
 		isGestureOpenRef.current = false;
 	}, [ pushSnapshot ] );
 
-	// =====================================================================
-	// Cropper-slice setters (built from the shared factory so the pure
-	// hook and this composite stay in lockstep — add a setter in
-	// `buildCropperSetters` once and both hooks get it).
-	// =====================================================================
-
-	const dispatchCropperAction = useCallback(
-		( action: CropperAction ) => {
-			dispatchWithHistory( { type: 'CROPPER', action } );
+	// Run several changes as one undo entry, unless a gesture is already
+	// open, which groups them anyway.
+	const asOneUndoEntry = useCallback(
+		( run: () => void ) => {
+			if ( isGestureOpenRef.current ) {
+				run();
+				return;
+			}
+			beginGesture();
+			run();
+			endGesture();
 		},
-		[ dispatchWithHistory ]
+		[ beginGesture, endGesture ]
 	);
 
-	const cropperSetters = useMemo(
-		() =>
-			buildCropperSetters(
-				dispatchCropperAction,
-				() => stateRef.current.cropper
-			),
-		[ dispatchCropperAction ]
-	);
-
-	const setSourceImage = useCallback( ( image: CropperState[ 'image' ] ) => {
-		if ( areCropperImagesEqual( stateRef.current.cropper.image, image ) ) {
-			return;
-		}
-		// New image = fresh session: default geometry and crop options, a
-		// clean baseline, and no history. Built from defaults rather than
-		// dispatching SET_IMAGE, which keeps the current pan / zoom /
-		// rotation / flip / cropRect — edits made against one image must
-		// not survive onto another.
-		const next = buildInitialMediaEditorState(
-			enforceContainment( { ...DEFAULT_STATE, image } )
-		);
-		stateRef.current = next;
-		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
-		setInitialBaseline( next );
-		isGestureOpenRef.current = false;
-		gestureSnapshotRef.current = null;
-		historyRef.current = [];
-		redoStackRef.current = [];
-		setHasUndo( false );
-		setHasRedo( false );
-	}, [] );
-
-	const reset = useCallback(
-		( resetState?: Partial< CropperState > ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'RESET', payload: resetState },
-			} );
+	const setSourceImage = useCallback(
+		( image: ImageEditorState[ 'image' ] ) => {
+			if ( areImagesEqual( stateRef.current.imageEditor.image, image ) ) {
+				return;
+			}
+			// New image = fresh session: default crop and crop options, a
+			// clean baseline, and no history. Edits made against one
+			// image must not survive onto another.
+			const next = buildInitialMediaEditorState(
+				createImageEditorState( { image } )
+			);
+			stateRef.current = next;
+			dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
+			setInitialBaseline( next );
+			isGestureOpenRef.current = false;
+			gestureSnapshotRef.current = null;
+			historyRef.current = [];
+			redoStackRef.current = [];
+			setHasUndo( false );
+			setHasRedo( false );
 		},
-		[ dispatchWithHistory ]
+		[]
 	);
 
-	// =====================================================================
-	// CropOptions-slice setters
-	// =====================================================================
+	const handleImageEditorChange = useCallback(
+		( nextState: ImageEditorState, { isEdit }: { isEdit: boolean } ) => {
+			if (
+				! areImagesEqual(
+					stateRef.current.imageEditor.image,
+					nextState.image
+				)
+			) {
+				setSourceImage( nextState.image );
+				return;
+			}
+			dispatchWithHistory(
+				{ type: 'SET_IMAGE_EDITOR', payload: nextState },
+				isEdit
+			);
+		},
+		[ dispatchWithHistory, setSourceImage ]
+	);
 
+	const imageEditorController = useImageEditor( {
+		state: state.imageEditor,
+		onChange: handleImageEditorChange,
+	} );
+
+	// The locked ratio has two owners: the preset the sidebar shows, and
+	// the number the image editor holds. This is the only path that sets
+	// both, so call it rather than `imageEditor.setAspectRatio`, which
+	// would leave the sidebar showing a ratio the crop no longer has.
 	const setAspectRatioValue = useCallback(
 		( presetKey: string ) => {
-			const resolved = resolveAspectRatio(
-				presetKey,
-				stateRef.current.cropper.image
-			);
+			asOneUndoEntry( () => {
+				dispatchWithHistory( {
+					type: 'SET_ASPECT_RATIO_VALUE',
+					payload: presetKey,
+				} );
+				imageEditorController.setAspectRatio(
+					resolveAspectRatio(
+						presetKey,
+						stateRef.current.imageEditor.image
+					)
+				);
+			} );
+		},
+		[ asOneUndoEntry, dispatchWithHistory, imageEditorController ]
+	);
+
+	const reset = useCallback( () => {
+		dispatchWithHistory( { type: 'RESET' } );
+	}, [ dispatchWithHistory ] );
+
+	const setEdit = useCallback(
+		( name: string, value: EditValue | undefined ) => {
 			dispatchWithHistory( {
-				type: 'SET_ASPECT_RATIO_VALUE',
-				payload: {
-					presetKey,
-					resolved,
-					visualSize: visualSizeRef.current,
-				},
+				type: 'SET_EDIT',
+				payload: { name, value },
 			} );
 		},
 		[ dispatchWithHistory ]
 	);
-
-	const resetCropOptions = useCallback( () => {
-		dispatchWithHistory( { type: 'RESET_CROP_OPTIONS' } );
-	}, [ dispatchWithHistory ] );
-
-	// =====================================================================
-	// History
-	// =====================================================================
 
 	const undo = useCallback( () => {
 		endGesture();
@@ -371,84 +374,33 @@ export function useMediaEditorState(): MediaEditorSession {
 		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
 	}, [ endGesture ] );
 
-	// =====================================================================
-	// Viewport
-	// =====================================================================
-
-	const setVisualSize = useCallback( ( size: Size ) => {
-		visualSizeRef.current = size;
-	}, [] );
-
-	const adjustCropRectForViewport = useCallback(
-		( rect: NormalizedRect ) => {
-			dispatchWithHistory(
-				{ type: 'VIEWPORT_ADJUST_CROP_RECT', payload: rect },
-				false
-			);
-		},
-		[ dispatchWithHistory ]
+	const imageEditor = useMemo< ImageEditorController >(
+		() => ( { ...imageEditorController, setImage: setSourceImage } ),
+		[ imageEditorController, setSourceImage ]
 	);
-
-	// =====================================================================
-	// Derived
-	// =====================================================================
 
 	const isDirty = ! areMediaEditorStatesEqual( state, initialBaseline );
-	const isCropperDirty = ! areCropperStatesEqual(
-		state.cropper,
-		initialBaseline.cropper
-	);
 
-	const getCroppedImage = useCallback(
-		( mimeType?: string, quality?: number ): Promise< Blob > => {
-			if ( ! state.cropper.image ) {
-				return Promise.reject(
-					new Error( 'No image loaded — call setSourceImage first.' )
-				);
-			}
-			return exportCroppedImage(
-				state.cropper.image.src,
-				state.cropper,
-				mimeType,
-				quality
-			);
-		},
-		[ state.cropper ]
-	);
-
-	const cropper = useMemo< CropperController >(
+	return useMemo(
 		() => ( {
-			...cropperSetters,
-			state: state.cropper,
-			setImage: setSourceImage,
-			reset,
-			isDirty: isCropperDirty,
-			getCroppedImage,
-			setVisualSize,
-			adjustCropRectForViewport,
-		} ),
-		[
-			cropperSetters,
-			state.cropper,
-			setSourceImage,
-			reset,
-			isCropperDirty,
-			getCroppedImage,
-			setVisualSize,
-			adjustCropRectForViewport,
-		]
-	);
-
-	const session = useMemo< MediaEditorSession >(
-		() => ( {
-			cropper,
+			imageEditor,
 			cropOptions: state.cropOptions,
 			setAspectRatioValue,
-			resetCropOptions,
+			edits: state.edits,
+			setEdit,
 			setSourceImage,
+			reset,
 			isDirty,
-			// Only geometry changes the saved image so far.
-			hasOutputEdits: isCropperDirty,
+			// Only the crop changes the saved image so far.
+			//
+			// This reads the image editor's own clean state, not the
+			// session's. The two agree because the session only ever
+			// replaces the editor's slice with a state the editor handed
+			// out, and because a fresh state for an image matches the
+			// default one on every field `isDirty` compares. Change
+			// either and this has to compare against the session's
+			// baseline instead.
+			hasOutputEdits: imageEditor.isDirty,
 			hasUndo,
 			hasRedo,
 			undo,
@@ -457,13 +409,14 @@ export function useMediaEditorState(): MediaEditorSession {
 			endGesture,
 		} ),
 		[
-			cropper,
+			imageEditor,
 			state.cropOptions,
 			setAspectRatioValue,
-			resetCropOptions,
+			state.edits,
+			setEdit,
 			setSourceImage,
+			reset,
 			isDirty,
-			isCropperDirty,
 			hasUndo,
 			hasRedo,
 			undo,
@@ -472,5 +425,4 @@ export function useMediaEditorState(): MediaEditorSession {
 			endGesture,
 		]
 	);
-	return session;
 }

@@ -1,3 +1,4 @@
+export { Avatar } from './avatar';
 export * from './badge';
 export * as Breadcrumb from './breadcrumb';
 export * from './button';

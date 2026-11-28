@@ -9,8 +9,11 @@ export type SectionScope = 'commit' | 'pr-state';
 
 export type SectionDefinition = {
 	id: string;
-	/* Led by an emoji, so a reader can pick out their section at a glance. */
-	heading: string;
+	/*
+	 * Led by an emoji, so a reader can pick out their section at a glance.
+	 * Omitted for a body that labels itself, such as a badge.
+	 */
+	heading?: string;
 	scope: SectionScope;
 	/** Maximum characters of rendered body before the section is truncated. */
 	budget: number;
@@ -21,11 +24,17 @@ export type SectionDefinition = {
 };
 
 /*
- * Render order, independent of the order the workflows finish in. The two a
- * human acts on lead: the welcome greets a first-time contributor, and props
- * is copied out by hand at merge time.
+ * Render order, independent of the order the workflows finish in. The
+ * Playground badge sits right under the comment heading. The two a human acts
+ * on follow: the welcome greets a first-time contributor, and props is copied
+ * out by hand at merge time.
  */
 export const SECTIONS: SectionDefinition[] = [
+	{
+		id: 'playground',
+		scope: 'pr-state',
+		budget: 1000,
+	},
 	{
 		id: 'welcome',
 		heading: '👋 Welcome',

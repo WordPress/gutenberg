@@ -33,6 +33,89 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		] );
 	} );
 
+	it.each( [
+		'foreground.interactive.brand',
+		'foreground.interactive.brand-active',
+	] )( 'reports %s text below 4.5:1 on neutral surfaces', ( token ) => {
+		const colorValues = new Map( [
+			[ `--wpds-color-${ token.replaceAll( '.', '-' ) }`, '#777' ],
+			[ '--wpds-color-background-surface-neutral', '#fff' ],
+		] );
+
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.neutral',
+				backgroundColor: '#fff',
+				foregroundToken: token,
+				foregroundColor: '#777',
+				requiredContrast: 4.5,
+				achievedContrast: expect.closeTo( 4.478, 3 ),
+			},
+		] );
+	} );
+
+	it( 'reports insufficient focus-ring contrast against brand surfaces', () => {
+		const colorValues = new Map( [
+			[ '--wpds-color-stroke-focus', '#fff' ],
+			[ '--wpds-color-background-surface-brand', '#fff' ],
+		] );
+
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.brand',
+				backgroundColor: '#fff',
+				foregroundToken: 'stroke.focus',
+				foregroundColor: '#fff',
+				requiredContrast: 3,
+				achievedContrast: 1,
+			},
+		] );
+	} );
+
+	it.each( [
+		{ color: '#959595', warnings: 1 },
+		{ color: '#949494', warnings: 0 },
+	] )(
+		'checks the unrounded 3:1 threshold for $color',
+		( { color, warnings } ) => {
+			const colorValues = new Map( [
+				[ '--wpds-color-stroke-focus', color ],
+				[ '--wpds-color-background-surface-neutral', '#fff' ],
+			] );
+
+			expect(
+				collectThemeProviderColorWarnings( new Map(), colorValues )
+			).toHaveLength( warnings );
+		}
+	);
+
+	it( 'reports a resting brand fill below 3:1 on neutral surfaces', () => {
+		const colorValues = new Map( [
+			[ '--wpds-color-background-interactive-brand-strong', '#0f755d' ],
+			[ '--wpds-color-background-surface-neutral-strong', '#252525' ],
+		] );
+
+		expect(
+			collectThemeProviderColorWarnings( new Map(), colorValues )
+		).toEqual( [
+			{
+				type: 'contrast',
+				backgroundToken: 'background.surface.neutral-strong',
+				backgroundColor: '#252525',
+				foregroundToken: 'background.interactive.brand-strong',
+				foregroundColor: '#0f755d',
+				requiredContrast: 3,
+				achievedContrast: expect.closeTo( 2.7174, 4 ),
+			},
+		] );
+	} );
+
 	it( 'reports ramp-generation warnings', () => {
 		const backgroundRamp: RampResult = {
 			...buildBgRamp( '#fcfcfc' ),

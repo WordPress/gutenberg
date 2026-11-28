@@ -48,8 +48,6 @@ Refer to documentation for [Button's `disabled` prop](/packages/components/src/b
 
 Text to use as description for button text.
 
-Refer to documentation for [`label`](#label).
-
 ### `icon`
 
 -   Type: `string`

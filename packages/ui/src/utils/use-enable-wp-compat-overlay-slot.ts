@@ -9,6 +9,10 @@
  * be able to turn off shared infrastructure for everyone else; if the slot
  * isn't wanted, simply don't call this hook.
  *
+ * The opt-in applies to the whole window, including other React roots and
+ * package copies, and remains enabled after the calling component unmounts.
+ * Explicit portal containers still take precedence.
+ *
  * Where `window.wp.components` is on the global — the typical setup for
  * plugins enqueueing `wp-components` through WordPress's script-loader —
  * the slot auto-enables and this hook is a no-op.

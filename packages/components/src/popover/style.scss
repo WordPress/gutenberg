@@ -5,9 +5,9 @@
 
 $arrow-triangle-base-size: 14px;
 
-$shadow-popover-border-default: 0 0 0 $border-width $gray-400;
+$shadow-popover-border-default: 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
-$shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
+$shadow-popover-border-top-only: 0 calc(var(--wpds-border-width-xs) * -1) 0 0 var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover {
@@ -25,9 +25,10 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 }
 
 .components-popover__content {
-	background: $white;
+	background: var(--wpds-color-background-surface-neutral-strong);
+	// The stroke stays on the box-shadow, since consumers override it there.
 	box-shadow: $shadow-popover-border-default, $elevation-medium;
-	border-radius: $radius-medium;
+	border-radius: var(--wpds-border-radius-md);
 	box-sizing: border-box;
 	width: min-content;
 
@@ -54,11 +55,19 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	.components-popover.is-expanded.is-alternate & {
 		box-shadow: $shadow-popover-border-top-only-alternate;
 	}
+
+	// Forced colors removes box-shadow. The transparent outline is drawn as the system text color instead.
+	// Exclusions stay in :where() so a consumer outline, such as the caption toolbar's `outline: none`, still wins.
+	@media (forced-colors: active) {
+		.components-popover:where(:not(.is-unstyled):not(.is-expanded)) & {
+			outline: var(--wpds-border-width-xs) solid transparent;
+		}
+	}
 }
 
 .components-popover__header {
 	align-items: center;
-	background: $white;
+	background: var(--wpds-color-background-surface-neutral-strong);
 	display: flex;
 	height: $panel-header-height;
 	justify-content: space-between;
@@ -85,11 +94,15 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	&::before {
 		content: "";
 		position: absolute;
-		top: -1px;
+		top: calc(var(--wpds-border-width-xs) * -1);
 		left: 1px;
-		height: 2px;
+		height: calc(var(--wpds-border-width-xs) * 2);
 		right: 1px;
-		background-color: $white;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
+
+		@media (forced-colors: active) {
+			background-color: Canvas;
+		}
 	}
 
 	// Position and rotate the arrow depending on the popover's placement.
@@ -122,16 +135,26 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__triangle-bg {
 	// Fill color is the same as the .components-popover__content's background
-	fill: $white;
+	fill: var(--wpds-color-background-surface-neutral-strong);
+
+	@media (forced-colors: active) {
+		fill: Canvas;
+	}
 }
 
 .components-popover__triangle-border {
 	// Stroke colors are the same as the .components-popover__content's outline
 	fill: transparent;
-	stroke-width: $border-width;
-	stroke: $gray-400;
+	stroke-width: var(--wpds-border-width-xs);
+	stroke: var(--wpds-color-stroke-surface-neutral);
 
 	.is-alternate & {
 		stroke: $gray-900;
+	}
+
+	@media (forced-colors: active) {
+		.components-popover:not(.is-unstyled) & {
+			stroke: CanvasText;
+		}
 	}
 }

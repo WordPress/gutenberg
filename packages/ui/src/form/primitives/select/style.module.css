@@ -9,13 +9,6 @@
 		.list {
 			display: block;
 			min-block-size: 0;
-			overflow-block: auto;
-			overscroll-behavior: contain;
-			scroll-padding-block: var(--wp-ui-popup-padding);
-
-			&:not(:empty) {
-				padding-block: var(--wp-ui-popup-padding);
-			}
 		}
 	}
 }

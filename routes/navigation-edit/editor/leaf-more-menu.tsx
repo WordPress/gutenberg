@@ -2,9 +2,9 @@ import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -13,10 +13,24 @@ const POPOVER_PROPS = {
 
 export default function LeafMoreMenu( {
 	clientId,
+	updateExpansion,
+	setInsertedBlockClientId,
 	...props
 }: {
 	clientId: string;
+	updateExpansion: ( action: {
+		type: 'expand' | 'collapse';
+		clientIds: string[];
+	} ) => void;
+	setInsertedBlockClientId: ( clientId: string ) => void;
 } ) {
+	// Read from the global rather than imported, for the reason given in
+	// `content.tsx`: `@wordpress/block-library` loads with the lazily loaded
+	// editor assets, after this bundle initializes.
+	const { AddSubmenuItem } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
+
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -29,7 +43,8 @@ export default function LeafMoreMenu( {
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		BlockTitle( { clientId, maximumLength: 25 } )
+		// The menu is for an existing block, which has a title.
+		BlockTitle( { clientId, maximumLength: 25 } ) as string
 	);
 
 	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
@@ -58,8 +73,12 @@ export default function LeafMoreMenu( {
 				return {
 					rootClientId: _rootClientId,
 					canDuplicate:
-						hasBlockSupport( _blockName, 'multiple', true ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
+						// The menu is for an existing block, which has a name.
+						hasBlockSupport(
+							_blockName as string,
+							'multiple',
+							true
+						) && canInsertBlockType( _blockName, _rootClientId ),
 					canInsertBlock:
 						( canInsertDefaultBlock || !! directInsertBlock ) &&
 						canInsertBlockType( _blockName, _rootClientId ),
@@ -104,6 +123,14 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
+						<AddSubmenuItem
+							clientId={ clientId }
+							onClose={ onClose }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
 						{ canDuplicate && (
 							<MenuItem
 								onClick={ () => {

@@ -1,19 +1,27 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Fragment } from '@wordpress/element';
 import { SearchableSelect } from '../';
+import { Avatar } from '../../../../avatar';
 import {
 	GROUPED_ITEMS,
 	type FixtureGroup,
 	type FixtureItem,
 } from '../../combobox/stories/fixtures';
 import { ITEMS } from './fixtures';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof SearchableSelect > = {
 	title: 'Components/@wordpress-ui/Form/Primitives/SearchableSelect',
 	id: 'design-system-components-form-primitives-searchableselect',
 	component: SearchableSelect,
 	subcomponents: {
+		'SearchableSelect.LoadingIndicator': SearchableSelect.LoadingIndicator,
+		'SearchableSelect.Trigger': SearchableSelect.Trigger,
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Separator': SearchableSelect.Separator,
@@ -80,37 +88,47 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 			gap: 8,
 		} }
 	>
-		<img
-			src={ `https://gravatar.com/avatar/?d=initials&initials=${ label }` }
-			alt=""
-			width="20"
-			style={ {
-				borderRadius: '50%',
-			} }
-		/>
+		<Avatar name={ label } size="xs" aria-hidden />
 		{ label }
 	</span>
 );
 
 /**
- * To customize what is rendered inside the trigger element, pass a
- * render function to the `triggerContent` prop.
- *
- * The item list can be customized by passing a render function as `children`,
- * returning a `Item` subcomponent for each item.
+ * Customize the item list by passing a render function as `children`,
+ * returning an `Item` subcomponent for each item. The trigger keeps the
+ * standard item label.
  */
-export const WithCustomTriggerAndItems: Story = {
+export const WithCustomItems: Story = {
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 0 ],
-		triggerContent: ( item: ( typeof ITEMS )[ 0 ] | null ) =>
-			item ? <CustomFruitItem label={ item.label } /> : null,
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
 				<SearchableSelect.ItemLabel>
 					😋 { item.label }
 				</SearchableSelect.ItemLabel>
 			</SearchableSelect.Item>
+		),
+	},
+};
+
+/**
+ * Pass a `SearchableSelect.Trigger` element to `trigger` to customize button
+ * props and content independently of the popup items.
+ */
+export const WithCustomTrigger: Story = {
+	args: {
+		...Default.args,
+		defaultValue: ITEMS[ 0 ],
+		trigger: (
+			<SearchableSelect.Trigger
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			>
+				{ ( item ) =>
+					item ? <CustomFruitItem label={ item.label } /> : null
+				}
+			</SearchableSelect.Trigger>
 		),
 	},
 };
@@ -178,5 +196,17 @@ export const WithSeparator: Story = {
 				</SearchableSelect.Item>
 			</Fragment>
 		),
+	},
+};
+
+/**
+ * Use `popupWidth` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		'aria-label': 'Tags',
+		items: longLabelPopupItems,
+		popupWidth: 'sm',
 	},
 };

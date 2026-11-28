@@ -9,8 +9,7 @@ export type ContentEditableControlProps = Pick<
 	 */
 	label: string;
 	/**
-	 * Whether the field is non-editable. A disabled field exposes
-	 * `aria-disabled`, leaves the tab order, and keeps focus if it had it.
+	 * Whether the field is non-editable.
 	 *
 	 * @default false
 	 */

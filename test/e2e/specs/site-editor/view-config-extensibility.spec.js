@@ -4,8 +4,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 // renders the view list as tabs, the classic editor's as sidebar buttons.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 
+// Views trail the label with their item count, as in "Drafts 3", so the
+// count is optional in the name. Views without a count have none.
 const getViewItem = ( page, name ) =>
-	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', { name, exact: true } );
+	page.getByRole( isSiteEditorV2 ? 'tab' : 'button', {
+		name: new RegExp( `^${ name } ?[\\d,]*$` ),
+	} );
 
 const PLUGIN_SLUG = 'gutenberg-test-view-config-extensibility';
 const MATCHING_PAGE_TITLE = 'Published in 2021';
@@ -78,6 +82,17 @@ test.describe( 'View config extensibility', () => {
 		await expect( getViewItem( page, 'Scheduled' ) ).toHaveCount( 0 );
 		await expect( getViewItem( page, 'Pending' ) ).toBeVisible();
 
+		// A view narrowed by more than its status gets no count, since a
+		// status total would not describe it: "In progress" holds only the
+		// drafts after its date, and "Published after 2020" only some of the
+		// published pages.
+		await expect( getViewItem( page, 'In progress' ) ).toHaveAccessibleName(
+			'In progress'
+		);
+		await expect(
+			getViewItem( page, 'Published after 2020' )
+		).toHaveAccessibleName( 'Published after 2020' );
+
 		// The default view and the only allowed layout reach DataViews.
 		const table = page.getByRole( 'table' );
 		await expect( table ).toBeVisible();
@@ -101,7 +116,9 @@ test.describe( 'View config extensibility', () => {
 		);
 
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await expect( page.getByLabel( 'Sort by' ) ).toHaveValue( 'date' );
+		await expect(
+			page.getByRole( 'combobox', { name: 'Sort by' } )
+		).toHaveText( 'Date' );
 		await expect(
 			page.getByRole( 'radio', { name: 'Sort descending' } )
 		).toBeChecked();
@@ -169,7 +186,7 @@ test.describe( 'View config extensibility', () => {
 			name: new RegExp( MATCHING_PAGE_TITLE ),
 		} );
 		await matchingPageRow
-			.getByRole( 'button', { name: 'Quick Edit' } )
+			.getByRole( 'button', { name: 'Quick edit' } )
 			.click();
 
 		const quickEditModal = page.locator(

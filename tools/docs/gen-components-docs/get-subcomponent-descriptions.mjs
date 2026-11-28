@@ -1,7 +1,6 @@
 import fs from 'node:fs/promises';
-import babel from '@babel/core';
+import { parse } from '@babel/parser';
 import { parse as commentParser } from 'comment-parser';
-import { ROOT_DIR } from './index.mjs';
 
 /**
  * Try to get subcomponent descriptions from the main component Object.assign() call.
@@ -13,11 +12,9 @@ export async function getDescriptionsForSubcomponents(
 	mainComponentName
 ) {
 	const fileContent = await fs.readFile( filePath, 'utf8' );
-	const parsedFile = babel.parse( fileContent, {
-		filename: filePath,
+	const parsedFile = parse( fileContent, {
 		sourceType: 'module',
-		cwd: ROOT_DIR,
-		rootMode: 'upward-optional',
+		plugins: [ 'jsx', 'typescript' ],
 	} );
 	const mainComponent = parsedFile.program.body
 		.filter( ( node ) => node.type === 'ExportNamedDeclaration' )

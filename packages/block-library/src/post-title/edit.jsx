@@ -20,7 +20,15 @@ import { createInterpolateElement } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	attributes: { level, levelOptions, isLink, rel, linkTarget, placeholder },
+	attributes: {
+		level,
+		levelOptions,
+		isLink,
+		rel,
+		linkTarget,
+		placeholder,
+		fitText,
+	},
 	setAttributes,
 	context: { postType, postId, queryId },
 } ) {
@@ -98,6 +106,13 @@ export default function PostTitleEdit( {
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
 					disableLineBreaks
+					// Rich text only sets pre-wrap when white-space is empty,
+					// and it does not update that later. Inherit lets fit
+					// text's nowrap apply; pre-wrap restores it when fit text
+					// is off.
+					style={ {
+						whiteSpace: fitText ? 'inherit' : 'pre-wrap',
+					} }
 				/>
 			</TagName>
 		) : (

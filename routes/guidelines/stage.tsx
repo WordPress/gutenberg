@@ -1,7 +1,10 @@
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Spinner as WCSpinner,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
@@ -32,7 +35,7 @@ function GuidelinesPage() {
 		>
 			{ ! hasLoaded ? (
 				<div className="guidelines__loading">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) : (
 				<VStack className="guidelines__content">

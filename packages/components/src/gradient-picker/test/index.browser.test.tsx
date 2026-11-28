@@ -231,4 +231,76 @@ describe( 'GradientPicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( GRADIENT_B, 0, 'blush' );
 		} );
 	} );
+
+	it( 'keeps focus on a gradient whose origin is shifted by a removal', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const theme = {
+			slug: 'theme',
+			name: 'Theme',
+			gradients: [
+				{ name: 'Ocean', slug: 'ocean', gradient: GRADIENT_A },
+			],
+		};
+		const custom = {
+			slug: 'custom',
+			name: 'Custom',
+			gradients: [
+				{ name: 'Blush', slug: 'blush', gradient: GRADIENT_B },
+			],
+		};
+		const view = await render(
+			<GradientPicker
+				gradients={ [ theme, custom ] }
+				onChange={ onChange }
+				disableCustomGradients
+			/>
+		);
+		await user.click(
+			screen.getByRole( 'option', { name: 'Gradient: Blush' } )
+		);
+		onChange.mockClear();
+
+		await view.rerender(
+			<GradientPicker
+				gradients={ [ custom ] }
+				onChange={ onChange }
+				disableCustomGradients
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'option', { name: 'Gradient: Blush' } )
+		).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+			GRADIENT_B,
+			0,
+			'blush'
+		);
+	} );
+
+	it( 'should render only the custom gradient editor without presets or a Clear button', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			<GradientPicker
+				clearable={ false }
+				value={ GRADIENT_B }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Clear' } )
+		).not.toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'combobox', { name: 'Type' } ) );
+		await user.click( screen.getByRole( 'option', { name: 'Radial' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			'radial-gradient(rgb(122,220,180) 0%,rgb(0,208,130) 100%)'
+		);
+	} );
 } );

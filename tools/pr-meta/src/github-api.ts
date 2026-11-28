@@ -99,6 +99,25 @@ class GitHubAPI {
 	}
 
 	/**
+	 * Whether a branch already contains a commit.
+	 *
+	 * @param ref Branch name.
+	 * @param sha Commit to look for.
+	 * @return True when the branch is at or ahead of the commit.
+	 */
+	async branchContains( ref: string, sha: string ): Promise< boolean > {
+		// Compared this way round, a branch holding the commit lists no files.
+		const { status } = await this.#request< { status: string } >(
+			'GET',
+			`${ this.#base }/compare/${ encodeURIComponent(
+				ref
+			) }...${ sha }?per_page=1`
+		);
+
+		return status === 'behind' || status === 'identical';
+	}
+
+	/**
 	 * Finds the unified comment, and any standalone one a section replaces.
 	 *
 	 * Both the marker and the author have to match. Anyone can post a comment

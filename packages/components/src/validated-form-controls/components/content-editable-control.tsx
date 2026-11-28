@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import ContentEditableControl from '../../content-editable-control';
@@ -7,7 +8,7 @@ import ContentEditableControl from '../../content-editable-control';
 /**
  * A `contentEditable` field does not participate in the Constraint Validation
  * API, so — like `ValidatedToggleGroupControl` — the validity state lives on a
- * visually hidden delegate input that mirrors whether the field has content.
+ * hidden delegate input that mirrors whether the field has content.
  */
 const UnforwardedValidatedContentEditableControl = (
 	{
@@ -30,6 +31,9 @@ const UnforwardedValidatedContentEditableControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ editableRef, forwardedRef ] );
+	const getInteractiveTarget = () => editableRef.current;
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -39,9 +43,10 @@ const UnforwardedValidatedContentEditableControl = (
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<ContentEditableControl
-					ref={ forwardedRef }
+					ref={ mergedRef }
 					className={ clsx(
 						'components-validated-control__content-editable',
 						className
@@ -61,12 +66,9 @@ const UnforwardedValidatedContentEditableControl = (
 				// text-oriented form field is expected to validate `required`.
 				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
-				onFocus={ ( e ) => {
-					e.target.previousElementSibling
-						?.querySelector< HTMLElement >( '[role="textbox"]' )
-						?.focus();
-				} }
+				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>
 		</div>
 	);

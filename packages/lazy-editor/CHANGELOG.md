@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Show media upload progress in a snackbar while the editor is open ([#86999](https://github.com/WordPress/gutenberg/pull/86999)).
+
+## 2.2.0 (2026-11-18)
+
+## 2.1.0 (2026-11-04)
+
+## 2.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
 ## 1.23.0 (2026-10-07)
 
 ### Bug Fixes

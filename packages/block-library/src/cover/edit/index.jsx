@@ -3,14 +3,19 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	useCallback,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	SandBox,
+	Spinner as WCSpinner,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+} from '@wordpress/components';
 import {
 	compose,
+	useEvent,
 	useMergeRefs,
 	useReducedMotion,
 	useResizeObserver,
@@ -23,6 +28,7 @@ import {
 	__experimentalUseGradient,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	useSettings,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -54,7 +60,9 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import { getBackgroundEmbedHtml } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 
-const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
+const { openMediaEditorModalKey, cleanEmptyObject } = unlock(
+	blockEditorPrivateApis
+);
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -84,6 +92,41 @@ function getInnerBlocksTemplate( attributes ) {
  */
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
+/**
+ * Gets the pixel size of a CSS length unit in the element's document.
+ *
+ * @param {HTMLElement|null|undefined} element Element used to resolve the unit.
+ * @param {string}                     unit    CSS length unit.
+ * @return {number|undefined} Pixels per unit, if it can be resolved.
+ */
+function getPixelsPerUnit( element, unit ) {
+	if ( ! element ) {
+		return undefined;
+	}
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return undefined;
+	}
+
+	switch ( unit ) {
+		case 'px':
+			return 1;
+		case 'em':
+			return parseFloat( view.getComputedStyle( element ).fontSize );
+		case 'rem':
+			return parseFloat(
+				view.getComputedStyle( element.ownerDocument.documentElement )
+					.fontSize
+			);
+		case 'vw':
+			return view.innerWidth / 100;
+		case 'vh':
+			return view.innerHeight / 100;
+		default:
+			return undefined;
+	}
+}
+
 function CoverEdit( {
 	attributes,
 	clientId,
@@ -105,8 +148,7 @@ function CoverEdit( {
 		hasParallax,
 		isDark,
 		isRepeated,
-		minHeight,
-		minHeightUnit,
+		style,
 		alt,
 		allowedBlocks,
 		templateLock,
@@ -133,12 +175,9 @@ function CoverEdit( {
 		useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
-	// Ref to access latest values after async operations (e.g. getMediaColor),
+	// Reads the latest values after async operations (e.g. getMediaColor),
 	// avoiding stale values that could overwrite concurrent remote changes.
-	const propsRef = useRef( { attributes, overlayColor } );
-	useLayoutEffect( () => {
-		propsRef.current = { attributes, overlayColor };
-	} );
+	const getLatestProps = useEvent( () => ( { attributes, overlayColor } ) );
 
 	const { media } = useSelect(
 		( select ) => {
@@ -176,7 +215,7 @@ function CoverEdit( {
 
 			// Read latest values after await to avoid stale closures.
 			const { attributes: currentAttrs, overlayColor: currentOverlay } =
-				propsRef.current;
+				getLatestProps();
 
 			let newOverlayColor = currentOverlay.color;
 			if ( ! currentAttrs.isUserOverlayColor ) {
@@ -204,6 +243,7 @@ function CoverEdit( {
 		setAttributes,
 		setOverlayColor,
 		useFeaturedImage,
+		getLatestProps,
 	] );
 
 	// instead of destructuring the attributes
@@ -262,7 +302,7 @@ function CoverEdit( {
 
 		// Read latest values to avoid stale closures.
 		const { attributes: currentAttrs, overlayColor: currentOverlay } =
-			propsRef.current;
+			getLatestProps();
 
 		let newOverlayColor = currentOverlay.color;
 		if ( ! currentAttrs.isUserOverlayColor ) {
@@ -362,7 +402,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest dimRatio after await to avoid stale closure.
-		const { attributes: currentAttrs } = propsRef.current;
+		const { attributes: currentAttrs } = getLatestProps();
 
 		const newIsDark = compositeIsDark(
 			currentAttrs.dimRatio,
@@ -392,7 +432,7 @@ function CoverEdit( {
 		const averageBackgroundColor = await getMediaColor( url );
 
 		// Read latest overlayColor after await to avoid stale closure.
-		const { overlayColor: currentOverlay } = propsRef.current;
+		const { overlayColor: currentOverlay } = getLatestProps();
 
 		const newIsDark = compositeIsDark(
 			newDimRatio,
@@ -482,23 +522,19 @@ function CoverEdit( {
 	const hasNonContentControls = blockEditingMode === 'default';
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
+	const [ isMinHeightEnabled ] = useSettings( 'dimensions.minHeight' );
+	const minHeight = style?.dimensions?.minHeight;
 	const resizableBoxDimensions = useMemo( () => {
+		const [ quantity, unit ] = parseQuantityAndUnitFromRawValue(
+			minHeight ?? ''
+		);
 		return {
-			height: minHeightUnit === 'px' && minHeight ? minHeight : 'auto',
+			height: unit === 'px' && quantity ? quantity : 'auto',
 			width: 'auto',
 		};
-	}, [ minHeight, minHeightUnit ] );
-
-	const minHeightWithUnit =
-		minHeight && minHeightUnit
-			? `${ minHeight }${ minHeightUnit }`
-			: minHeight;
+	}, [ minHeight ] );
 
 	const isImgElement = ! ( hasParallax || isRepeated );
-
-	const style = {
-		minHeight: minHeightWithUnit || undefined,
-	};
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
@@ -522,6 +558,7 @@ function CoverEdit( {
 	);
 
 	const ref = useRef();
+	const resizeUnitRef = useRef( { unit: 'px', pixelsPerUnit: 1 } );
 	// State, not a ref, so that the element is there on the next render.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
@@ -564,7 +601,7 @@ function CoverEdit( {
 			return;
 		}
 
-		const previousImage = { id, url: propsRef.current.attributes.url };
+		const previousImage = { id, url: getLatestProps().attributes.url };
 		let isUndone = false;
 		openMediaEditorModal( {
 			id,
@@ -606,7 +643,7 @@ function CoverEdit( {
 					const {
 						attributes: currentAttrs,
 						overlayColor: currentOverlay,
-					} = propsRef.current;
+					} = getLatestProps();
 
 					let newOverlayColor = currentOverlay.color;
 					if ( ! currentAttrs.isUserOverlayColor ) {
@@ -633,7 +670,7 @@ function CoverEdit( {
 				const {
 					hasParallax: currentHasParallax,
 					isRepeated: currentIsRepeated,
-				} = propsRef.current.attributes;
+				} = getLatestProps().attributes;
 				if ( currentHasParallax || currentIsRepeated ) {
 					setIsSwappingMedia( false );
 				}
@@ -641,6 +678,7 @@ function CoverEdit( {
 		} );
 	}, [
 		id,
+		getLatestProps,
 		openMediaEditorModal,
 		setAttributes,
 		setOverlayColor,
@@ -665,7 +703,7 @@ function CoverEdit( {
 
 		// Read latest values after await to avoid stale closures.
 		const { attributes: currentAttrs, overlayColor: currentOverlay } =
-			propsRef.current;
+			getLatestProps();
 
 		const newOverlayColor = ! currentAttrs.isUserOverlayColor
 			? averageBackgroundColor
@@ -745,24 +783,53 @@ function CoverEdit( {
 		/>
 	);
 
+	const setMinHeight = ( pixelHeight ) => {
+		const { unit, pixelsPerUnit } = resizeUnitRef.current;
+		const value =
+			pixelHeight === undefined
+				? undefined
+				: Number( ( pixelHeight / pixelsPerUnit ).toFixed( 2 ) );
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				dimensions: {
+					...style?.dimensions,
+					minHeight:
+						value === undefined ? undefined : `${ value }${ unit }`,
+				},
+			} ),
+		} );
+	};
+
 	const resizableCoverProps = {
 		className: 'block-library-cover__resize-container',
 		clientId,
 		height,
-		minHeight: minHeightWithUnit,
+		minHeight,
 		onResizeStart: () => {
-			setAttributes( { minHeightUnit: 'px' } );
+			const [ , minHeightUnit = 'px' ] =
+				parseQuantityAndUnitFromRawValue( minHeight );
+			// The resize handle can be outside the canvas iframe. Resolve units
+			// against the Cover itself, independently of its content's height.
+			const pixelsPerUnit = getPixelsPerUnit(
+				ref.current,
+				minHeightUnit
+			);
+			// Keep the existing pixel fallback for custom units that cannot be
+			// resolved here, or when their reference dimension is zero.
+			resizeUnitRef.current =
+				Number.isFinite( pixelsPerUnit ) && pixelsPerUnit > 0
+					? { unit: minHeightUnit, pixelsPerUnit }
+					: { unit: 'px', pixelsPerUnit: 1 };
 			toggleSelection( false );
 		},
-		onResize: ( value ) => {
-			setAttributes( { minHeight: value } );
-		},
+		onResize: setMinHeight,
 		onResizeStop: ( newMinHeight ) => {
 			toggleSelection( true );
-			setAttributes( { minHeight: newMinHeight } );
+			setMinHeight( newMinHeight );
 		},
 		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
-		showHandle: ! attributes.style?.dimensions?.aspectRatio,
+		showHandle: ! style?.dimensions?.aspectRatio,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -772,16 +839,12 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ hasNonContentControls && isSelected && (
+				{ hasNonContentControls && isSelected && isMinHeightEnabled && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
 					{ ...blockProps }
 					className={ clsx( 'is-placeholder', blockProps.className ) }
-					style={ {
-						...blockProps.style,
-						minHeight: minHeightWithUnit || undefined,
-					} }
 				>
 					{ resizeListener }
 					<CoverPlaceholder
@@ -828,7 +891,6 @@ function CoverEdit( {
 			<TagName
 				{ ...blockProps }
 				className={ clsx( classes, blockProps.className ) }
-				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				{ resizeListener }
@@ -893,7 +955,7 @@ function CoverEdit( {
 					</div>
 				) }
 				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
-					<Spinner />
+					<WCSpinner />
 				) }
 
 				{ showOverlay && (
@@ -918,7 +980,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <WCSpinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons
@@ -928,7 +990,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ hasNonContentControls && isSelected && (
+			{ hasNonContentControls && isSelected && isMinHeightEnabled && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>

@@ -1,5 +1,10 @@
+@use "sass:math";
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
+
+$point-size: 6px;
+$point-size-active: 10px;
 
 .grid-container {
 	direction: ltr;
@@ -40,6 +45,17 @@
 	appearance: none;
 	border: none;
 	outline: none;
+
+	// Keep the focus ring outside the point's scale transform.
+	&[data-focus-visible]::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		width: $point-size-active;
+		height: $point-size-active;
+		@include outset-ring__focus();
+	}
 }
 
 .point {
@@ -47,7 +63,7 @@
 	contain: strict;
 
 	box-sizing: border-box;
-	width: 6px;
+	width: $point-size;
 	aspect-ratio: 1;
 
 	margin: auto;
@@ -56,23 +72,17 @@
 
 	/* Use border instead of background color so that the point shows
 	in Windows High Contrast Mode */
-	border: 3px solid currentColor;
+	border: math.div($point-size, 2) solid currentColor;
 
 	/* Highlight active item */
 	.cell[data-active-item] & {
 		color: $components-color-foreground;
-		transform: scale(calc(5 / 3));
+		transform: scale(math.div($point-size-active, $point-size));
 	}
 
 	/* Hover styles for non-active items */
 	.cell:not([data-active-item]):hover & {
 		color: $components-color-accent;
-	}
-
-	/* Show an outline only when interacting with keyboard */
-	.cell[data-focus-visible] & {
-		outline: 1px solid $components-color-accent;
-		outline-offset: 1px;
 	}
 
 	@media not (prefers-reduced-motion) {

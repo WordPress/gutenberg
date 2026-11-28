@@ -16,7 +16,7 @@ function getChipsToolbarLabel( selectedCount: number ): string | undefined {
 	if ( selectedCount === 0 ) {
 		return undefined;
 	}
-	return _n( 'Selected item', 'Selected items', selectedCount );
+	return __( 'Selected items' );
 }
 
 function getInputSelectionHint( selectedCount: number ): string | undefined {
@@ -52,6 +52,7 @@ export const SearchableChipSelect = forwardRef<
 		emptyContent = __( 'No results found.' ),
 		statusContent,
 		items,
+		onValueChange,
 		chipsContent,
 		searchPlaceholder = __( 'Search' ),
 		popupWidth,
@@ -74,6 +75,13 @@ export const SearchableChipSelect = forwardRef<
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
+			onValueChange={ ( value, eventDetails ) => {
+				if ( eventDetails.reason === 'escape-key' ) {
+					eventDetails.cancel();
+					return;
+				}
+				onValueChange?.( value, eventDetails );
+			} }
 			readOnly={ undefined }
 		>
 			<Combobox.InputGroup>

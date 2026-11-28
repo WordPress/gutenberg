@@ -22,8 +22,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -35,11 +35,12 @@ import {
 	type ViewListEntry,
 	type ViewOverrides,
 } from './view-utils';
+import { ViewTabCount } from './view-tab-count';
 import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 /**
  * Style dependencies
  */
@@ -111,6 +112,7 @@ function PostListView( {
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
+	const { invalidateResolution } = useDispatch( coreStore );
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
@@ -166,9 +168,19 @@ function PostListView( {
 		}
 	};
 
+	const hasTaxonomies = !! postTypeObject?.taxonomies?.length;
+	const taxonomies = useSelect(
+		( select ) =>
+			hasTaxonomies
+				? select( coreStore ).getTaxonomies( {
+						type: postType,
+					} )
+				: undefined,
+		[ hasTaxonomies, postType ]
+	);
 	const postTypeQuery = useMemo(
-		() => viewToQuery( view, postType ),
-		[ view, postType ]
+		() => viewToQuery( view, postType, taxonomies ?? [] ),
+		[ view, postType, taxonomies ]
 	);
 	const {
 		records: posts,
@@ -230,10 +242,27 @@ function PostListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
+	// The tab counts come with the view config, which is cached per post type.
+	// Fetching it again after a change updates the counts only: the user's
+	// view lives in preferences, which this does not touch.
+	const refreshViewCounts = useCallback( () => {
+		// @ts-expect-error `getViewConfig` is private, so it is missing from the
+		// selector names `invalidateResolution` accepts.
+		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
+	}, [ invalidateResolution, postType ] );
+
+	// Leaving the list, such as to publish a draft in the editor, can change
+	// the totals without any action here to report it. Marking the counts stale
+	// on the way out makes the route loader fetch them again on the way back.
+	useEffect( () => refreshViewCounts, [ refreshViewCounts ] );
+
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: Post[] ) => {
+			// Any action may change the totals, including a plugin's, so
+			// refresh after each one rather than tracking which do.
+			refreshViewCounts();
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
@@ -247,7 +276,8 @@ function PostListView( {
 	const quickEditAction = useMemo(
 		() => ( {
 			id: 'quick-edit',
-			label: __( 'Quick Edit' ),
+			label: ( items: Post[] ) =>
+				items.length > 1 ? __( 'Bulk edit' ) : __( 'Quick edit' ),
 			icon: drawerRight,
 			isPrimary: true,
 			supportsBulk: true,
@@ -273,17 +303,7 @@ function PostListView( {
 	);
 
 	const actions = useMemo( () => {
-		const _actions = [
-			...postTypeActions?.flatMap< Action< Post > >( ( action ) => {
-				switch ( action.id ) {
-					// Skip revisions as the admin does not support it
-					case 'view-post-revisions':
-						return [];
-				}
-
-				return [ action ];
-			} ),
-		];
+		const _actions = [ ...postTypeActions ];
 		if ( view.type !== LAYOUT_LIST ) {
 			_actions.unshift( quickEditAction );
 		}
@@ -351,18 +371,19 @@ function PostListView( {
 		>
 			{ viewList && viewList.length > 1 && (
 				<div className="routes-post-list__tabs-wrapper">
-					<Tabs onSelect={ handleTabChange } selectedTabId={ slug }>
-						<Tabs.TabList>
+					<WCTabs onSelect={ handleTabChange } selectedTabId={ slug }>
+						<WCTabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ entry.slug }
 									key={ entry.slug }
 								>
 									{ entry.title }
-								</Tabs.Tab>
+									<ViewTabCount count={ entry.count } />
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews
@@ -421,6 +442,7 @@ function PostListView( {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						onSave={ refreshViewCounts }
 						quickEditForm={ quickEditForm }
 					/>
 				) }

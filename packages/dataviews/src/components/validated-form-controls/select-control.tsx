@@ -1,7 +1,13 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { SelectControl as WCSelectControl } from '@wordpress/components';
-import { ControlWithError } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Requires an HTMLSelectElement ref for native constraint validation.
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type SelectControlProps = React.ComponentProps< typeof WCSelectControl >;

@@ -15,6 +15,8 @@ test.describe( 'RSS', () => {
 			plainText: 'https://developer.wordpress.org/news/feed/',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
+		// The URL is saved to the block only when the form is submitted.
+		await pageUtils.pressKeys( 'Enter' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

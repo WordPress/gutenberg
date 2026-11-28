@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Select from '../';
+import { Avatar } from '../../../../avatar';
+import {
+	longLabelPopupItems,
+	narrowContainerDecorator,
+} from '../../../stories/shared';
 
 const meta: Meta< typeof Select.Root > = {
 	tags: [ 'manifest' ],
@@ -400,14 +405,7 @@ export const WithCustomTriggerAndItem: Story = {
 							gap: 8,
 						} }
 					>
-						<img
-							src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
-							alt=""
-							width="20"
-							style={ {
-								borderRadius: '50%',
-							} }
-						/>
+						<Avatar name={ item.value } size="xs" aria-hidden />
 
 						{ item.label }
 					</span>
@@ -500,4 +498,26 @@ export const WithCustomZIndex: Story = {
 			</Select.Popup>,
 		],
 	},
+};
+
+/**
+ * Use `width` on `Select.Popup` to constrain the popup relative to a narrow anchor.
+ */
+export const PopupWidth: Story = {
+	decorators: [ narrowContainerDecorator ],
+	args: {
+		items: longLabelPopupItems,
+	},
+	render: ( args ) => (
+		<Select.Root { ...args }>
+			<Select.Trigger aria-label="Label" />
+			<Select.Popup width="sm">
+				{ longLabelPopupItems.map( ( item ) => (
+					<Select.Item key={ item.value } value={ item }>
+						<Select.ItemLabel>{ item.label }</Select.ItemLabel>
+					</Select.Item>
+				) ) }
+			</Select.Popup>
+		</Select.Root>
+	),
 };

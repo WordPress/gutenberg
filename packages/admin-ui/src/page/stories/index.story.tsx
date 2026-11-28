@@ -1,17 +1,22 @@
+import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useCallback, useState } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
-import { Badge, Button, Text } from '@wordpress/ui';
+import {
+	Badge,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
+	Button,
+	Text,
+} from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
-import type { NavigationLinkProps } from '../../navigation/types';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
 	id: 'admin-ui-page',
 	title: 'Design System/Admin UI/Page',
+	tags: [ 'manifest' ],
 	parameters: {
 		layout: 'fullscreen',
 	},
@@ -195,7 +200,11 @@ export const WithInteractiveNavigation: Story = {
 	render: function Render( args ) {
 		const [ currentHref, setCurrentHref ] = useState( '/overview' );
 		const link = useCallback(
-			( { href, children, ...props }: NavigationLinkProps ) => (
+			( {
+				href,
+				children,
+				...props
+			}: ComponentProps< 'a' > & { href: string } ) => (
 				<a
 					{ ...props }
 					href={ href }
