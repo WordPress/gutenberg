@@ -27,6 +27,11 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	 */
 	private $original_block_supports;
 
+	/**
+	 * @var string
+	 */
+	private $original_permalink_structure;
+
 	public static function wpSetUpBeforeClass() {
 		// Register a unique CPT before creating posts of that type so go_to() can resolve them.
 		// has_archive enables get_post_type_archive_link() for the archive branch tests.
@@ -156,6 +161,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
+		$this->original_permalink_structure = get_option( 'permalink_structure' );
 		$this->original_block_supports      = WP_Block_Supports::$block_to_render;
 		WP_Block_Supports::$block_to_render = array(
 			'attrs'     => array(),
@@ -165,7 +171,38 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 
 	public function tear_down() {
 		WP_Block_Supports::$block_to_render = $this->original_block_supports;
+		if ( post_type_exists( 'gb_test_nav_arch' ) ) {
+			unregister_post_type( 'gb_test_nav_arch' );
+		}
+		if ( get_option( 'permalink_structure' ) !== $this->original_permalink_structure ) {
+			$this->set_permalink_structure( $this->original_permalink_structure );
+		}
 		parent::tear_down();
+	}
+
+	/**
+	 * Switches to pretty permalinks and registers a post type with an archive.
+	 *
+	 * The post type is registered after the switch so that its archive gets a pretty URL.
+	 *
+	 * @return array The archive URL under plain ('plain') and pretty ('pretty') permalinks.
+	 */
+	private function register_archive_post_type_with_pretty_permalinks(): array {
+		$plain_url = home_url( '?post_type=gb_test_nav_arch' );
+		$this->set_permalink_structure( '/%postname%/' );
+		register_post_type(
+			'gb_test_nav_arch',
+			array(
+				'public'      => true,
+				'has_archive' => true,
+			)
+		);
+		flush_rewrite_rules();
+
+		return array(
+			'plain'  => $plain_url,
+			'pretty' => get_post_type_archive_link( 'gb_test_nav_arch' ),
+		);
 	}
 
 	/**
@@ -686,6 +723,80 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'aria-current', $output );
 	}
 
+	/**
+	 * Archive links are matched on post type, so a URL saved under plain permalinks
+	 * still matches after the site switches to pretty permalinks.
+	 */
+	public function test_current_menu_item_for_archive_link_saved_before_switching_to_pretty_permalinks() {
+		$urls = $this->register_archive_post_type_with_pretty_permalinks();
+		$this->assertNotSame( $urls['plain'], $urls['pretty'], 'The archive URL should change with the permalink structure.' );
+
+		$this->go_to( $urls['pretty'] );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Archive',
+				'type'  => 'gb_test_nav_arch',
+				'kind'  => 'post-type-archive',
+				'url'   => $urls['plain'],
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	public function test_current_menu_item_for_archive_link_saved_before_switching_to_plain_permalinks() {
+		$urls = $this->register_archive_post_type_with_pretty_permalinks();
+		$this->set_permalink_structure( '' );
+
+		$this->go_to( $urls['plain'] );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Archive',
+				'type'  => 'gb_test_nav_arch',
+				'kind'  => 'post-type-archive',
+				'url'   => $urls['pretty'],
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * A site that moves domain or switches to HTTPS keeps its old archive URLs in saved
+	 * navigation links until someone edits them.
+	 */
+	public function test_current_menu_item_for_archive_link_with_outdated_domain_and_scheme() {
+		$this->go_to( get_post_type_archive_link( 'gb_test_nav_cpt' ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'post-type-archive',
+				'url'   => 'https://old-domain.example/?post_type=gb_test_nav_cpt',
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * Classic menus converted to blocks by older editor versions stored the kind of a
+	 * post type archive item as "post-type_archive".
+	 */
+	public function test_current_menu_item_for_archive_link_converted_from_classic_menu() {
+		$this->go_to( get_post_type_archive_link( 'gb_test_nav_cpt' ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'post-type_archive',
+				'url'   => 'https://old-domain.example/?post_type=gb_test_nav_cpt',
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
 	// -------------------------------------------------------------------------
 	// Group 7: Only the matching item is active in a menu
 	// -------------------------------------------------------------------------
@@ -710,6 +821,19 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			array( get_term_link( self::$category ) ),
 			$this->get_current_item_urls( $output ),
 			'Only the link to the current term should have current-menu-item.'
+		);
+		$this->assertSame( 1, substr_count( $output, 'aria-current="page"' ) );
+	}
+
+	public function test_only_the_link_to_the_current_archive_is_active_in_a_menu() {
+		$archive_url = get_post_type_archive_link( 'gb_test_nav_cpt' );
+		$this->go_to( $archive_url );
+		$output = $this->render_nav_links( $this->get_mixed_menu_links() );
+
+		$this->assertSame(
+			array( $archive_url ),
+			$this->get_current_item_urls( $output ),
+			'Only the link to the current post type archive should have current-menu-item.'
 		);
 		$this->assertSame( 1, substr_count( $output, 'aria-current="page"' ) );
 	}

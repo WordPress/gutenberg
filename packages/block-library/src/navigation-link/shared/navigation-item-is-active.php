@@ -9,13 +9,16 @@
  * Determines whether a navigation item should be marked as the active/current item
  * based on the current WordPress query context.
  *
- * Mirrors the two ID-based active-state checks of the classic menu system
+ * Mirrors the active-state checks of the classic menu system
  * (`_wp_menu_item_classes_by_context()` in wp-includes/nav-menu-template.php):
  *
  * - Entity ID match: the item's stored entity ID matches the current queried object ID,
  *   with an object-type guard to prevent false positives from post/term ID collisions.
- * - Post-type archive URL match: the item's URL matches the current archive permalink,
- *   regardless of whether an entity ID is stored.
+ * - Post type archive match: the item is a post type archive link and the current page
+ *   is that post type's archive. This does not depend on the stored URL.
+ * - Post type archive URL match: a fallback that compares the item's URL with the current
+ *   archive permalink, for links such as custom links that point at an archive without
+ *   being stored as archive links.
  *
  * @since 7.3.0
  *
@@ -53,8 +56,13 @@ function block_core_shared_navigation_item_is_active( $attributes ) {
 	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
 	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
 	$item_kind      = empty( $stored_kind ) || 'custom' === $stored_kind ? $kind_from_type : $stored_kind;
-	// Archive links match by URL (via is_post_type_archive()), not by entity ID, so skip ID matching.
-	$enable_id_match = 'post-type-archive' !== $item_kind;
+
+	/*
+	 * Backwards compatibility - the "post-type_archive" kind:
+	 * Classic menus converted to blocks by older editor versions replaced only the first
+	 * underscore of the menu item type "post_type_archive", storing "post-type_archive".
+	 */
+	$is_archive_link = in_array( $item_kind, array( 'post-type-archive', 'post-type_archive' ), true );
 
 	/*
 	 * Entity ID match.
@@ -78,15 +86,31 @@ function block_core_shared_navigation_item_is_active( $attributes ) {
 		? $queried_object instanceof WP_Term
 		: $queried_object instanceof WP_Post;
 
-	if ( $enable_id_match && $ids_match && $object_type_matches ) {
+	// Archive links are matched on post type below, never by entity ID.
+	if ( ! $is_archive_link && $ids_match && $object_type_matches ) {
+		return true;
+	}
+
+	if ( ! is_post_type_archive() ) {
+		return false;
+	}
+
+	/*
+	 * Post type archive match - mirrors the classic menu's is_post_type_archive() check.
+	 * Matching on the stored post type rather than the URL means the link stays active
+	 * after a change of permalink structure, scheme or domain, all of which change the
+	 * archive URL without updating the URL saved in the block.
+	 */
+	if ( $is_archive_link && '' !== $stored_type && is_post_type_archive( $stored_type ) ) {
 		return true;
 	}
 
 	/*
-	 * Post-type archive URL match.
-	 * Active when the current URL matches the archive permalink, regardless of stored ID.
+	 * Post type archive URL match.
+	 * Covers links that point at an archive without being stored as archive links, such
+	 * as custom links, and archive links without a usable type.
 	 */
-	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
+	if ( ! empty( $attributes['url'] ) ) {
 		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
 		if ( $attributes['url'] === $queried_archive_link ) {
 			return true;

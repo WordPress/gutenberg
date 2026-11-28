@@ -143,7 +143,8 @@ function menuItemToBlockAttributes(
 		object = 'tag';
 	}
 
-	const inferredKind = menuItemTypeField?.replace( '_', '-' ) || 'custom';
+	// Replace every underscore so that `post_type_archive` becomes `post-type-archive`.
+	const inferredKind = menuItemTypeField?.replaceAll( '_', '-' ) || 'custom';
 
 	return {
 		label: menuItemTitleField?.rendered || '',

@@ -513,4 +513,33 @@ describe( 'converting menu items to blocks', () => {
 		// Label should still be set correctly
 		expect( actual[ 0 ].attributes.label ).toBe( 'Invalid Kind Item' );
 	} );
+
+	it( 'converts post type archive menu items to the post-type-archive kind', () => {
+		const { innerBlocks: actual } = menuItemsToBlocks( [
+			{
+				id: 11,
+				title: {
+					raw: 'Books',
+					rendered: 'Books',
+				},
+				url: 'http://localhost:8889/books/',
+				attr_title: '',
+				description: '',
+				type: 'post_type_archive',
+				type_label: 'Post Type Archive',
+				object: 'book',
+				object_id: 0,
+				parent: 0,
+				menu_order: 1,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+		] );
+
+		expect( actual ).toHaveLength( 1 );
+		expect( actual[ 0 ].attributes.kind ).toBe( 'post-type-archive' );
+		expect( actual[ 0 ].attributes.type ).toBe( 'book' );
+		expect( actual[ 0 ].attributes ).not.toHaveProperty( 'id' );
+	} );
 } );
