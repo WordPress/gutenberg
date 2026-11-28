@@ -1,6 +1,9 @@
-import { Button } from '@wordpress/components';
+/**
+ * WordPress dependencies
+ */
+import { Button, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
@@ -13,6 +16,8 @@ import { isAppleOS } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 
 const ZoomOutToggle = ( { disabled } ) => {
+	const [ zoomValue, setZoomValue ] = useState( 0.45 );
+
 	const { isZoomOut, showIconLabels, isDistractionFree } = useSelect(
 		( select ) => ( {
 			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
@@ -54,11 +59,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 	useShortcut(
 		'core/editor/zoom',
 		() => {
-			if ( isZoomOut ) {
-				resetZoomLevel();
-			} else {
-				setZoomLevel( 'auto-scaled' );
-			}
+			handleZoomOut();
 		},
 		{
 			isDisabled: isDistractionFree,
@@ -70,21 +71,45 @@ const ZoomOutToggle = ( { disabled } ) => {
 			resetZoomLevel();
 		} else {
 			setZoomLevel( 'auto-scaled' );
+			setZoomValue( 0.45 );
 		}
 	};
 
+	const handleZoomChange = ( value ) => {
+		setZoomValue( value );
+		setZoomLevel( value );
+	};
+
 	return (
-		<Button
-			accessibleWhenDisabled
-			disabled={ disabled }
-			onClick={ handleZoomOut }
-			icon={ zoomOutIcon }
-			label={ __( 'Zoom Out' ) }
-			isPressed={ isZoomOut }
-			size="compact"
-			showTooltip={ ! showIconLabels }
-			className="editor-zoom-out-toggle"
-		/>
+		<>
+			<Button
+				accessibleWhenDisabled
+				disabled={ disabled }
+				onClick={ handleZoomOut }
+				icon={ zoomOutIcon }
+				label={ __( 'Zoom Out' ) }
+				isPressed={ isZoomOut }
+				size="compact"
+				showTooltip={ ! showIconLabels }
+				className="editor-zoom-out-toggle"
+			/>
+			{ isZoomOut && (
+				<div className="editor-zoom-control-wrapper">
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						className="editor-zoom-control"
+						value={ zoomValue }
+						onChange={ handleZoomChange }
+						min={ 0.45 }
+						max={ 0.95 }
+						step={ 0.05 }
+						disabled={ disabled }
+						withInputField={ false }
+					/>
+				</div>
+			) }
+		</>
 	);
 };
 
