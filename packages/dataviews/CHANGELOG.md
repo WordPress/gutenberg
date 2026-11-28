@@ -17,6 +17,7 @@
 -   Keep hiding empty badge fields in the `grid` and `pickerGrid` layouts with the updated `Badge` from `@wordpress/ui` ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 -   Add a ring around the selection checkbox in the `grid` and `pickerGrid` layouts, so it stays visible on any preview ([#87223](https://github.com/WordPress/gutenberg/pull/87223)).
 -   List layout: The up and down arrow keys on an item's actions button move focus to the adjacent row when one item ID is a prefix of another, such as `1` and `12`, instead of jumping to the wrong row ([#84541](https://github.com/WordPress/gutenberg/pull/84541)).
+-   Drop the `15ch` minimum width on a table's primary column when it shows a title and no description, so that a narrow table with short titles no longer scrolls sideways ([#87473](https://github.com/WordPress/gutenberg/pull/87473)).
 
 ### Internal
 

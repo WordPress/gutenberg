@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ComponentProps, ReactElement } from 'react';
 import { Stack } from '@wordpress/ui';
 import type { MediaAspectRatio, NormalizedField } from '../../../types';
@@ -70,7 +71,10 @@ function ColumnPrimary< Item >( {
 			<Stack
 				direction="column"
 				align="flex-start"
-				className="dataviews-view-table__primary-column-content"
+				className={ clsx(
+					'dataviews-view-table__primary-column-content',
+					{ 'has-description': !! descriptionField }
+				) }
 			>
 				{ titleField && (
 					<ItemClickWrapper
