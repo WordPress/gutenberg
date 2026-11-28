@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Warn when inline text and highlight colors have low contrast ([#86710](https://github.com/WordPress/gutenberg/pull/86710)).
+
 ## 6.2.0 (2026-11-18)
 
 ### New Features
