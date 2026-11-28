@@ -34,6 +34,26 @@ async function openControl( user: UserEvent ) {
 }
 
 describe( 'DuotoneControl', () => {
+	it( 'describes the duotone options with the explanatory text', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<DuotoneControl
+				duotonePalette={ DUPLICATE_PALETTE }
+				colorPalette={ COLOR_PALETTE }
+				value={ undefined }
+				onChange={ vi.fn() }
+			/>
+		);
+		await openControl( user );
+
+		expect(
+			screen.getByRole( 'listbox', { name: 'Apply duotone filter' } )
+		).toHaveAccessibleDescription(
+			'Create a two-tone color effect without losing your original image.'
+		);
+	} );
+
 	it( 'reports the slug of the duplicate that was picked', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
