@@ -51,10 +51,10 @@ const v2 = {
 		return null;
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes: Record< string, unknown > ) {
+	isEligible( attributes: StyledBlockAttributes & { className?: string } ) {
 		return (
 			!! attributes.textAlign ||
-			!! ( attributes.className as string )?.match(
+			!! attributes.className?.match(
 				/\bhas-text-align-(left|center|right)\b/
 			)
 		);
