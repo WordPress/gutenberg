@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: keep the HTML serialization of rich-text values read from the shared document, so syncing a local edit no longer serializes every rich-text value in the post again ([#85324](https://github.com/WordPress/gutenberg/pull/85324)).
+
 ### Bug Fixes
 
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
