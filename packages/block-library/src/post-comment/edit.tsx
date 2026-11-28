@@ -3,8 +3,13 @@ import { Placeholder, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import type { BlockEditProps } from '@wordpress/blocks';
+import type { PostCommentAttributes } from './types';
 
-export default function Edit( { attributes: { commentId }, setAttributes } ) {
+export default function Edit( {
+	attributes: { commentId },
+	setAttributes,
+}: BlockEditProps< PostCommentAttributes > ) {
 	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps );
@@ -20,6 +25,7 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
 					) }
 				>
 					<TextControl
+						// @ts-expect-error Bug: commentId may be undefined when rendered.
 						value={ commentId }
 						onChange={ ( val ) =>
 							setCommentIdInput( parseInt( val ) )
