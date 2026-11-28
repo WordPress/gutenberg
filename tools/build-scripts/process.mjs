@@ -1,8 +1,17 @@
 import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
+
+const WATCHDOG_PATH = fileURLToPath(
+	new URL( './watchdog.mjs', import.meta.url )
+);
 
 /**
  * Start a long-running watch process.
+ *
+ * Outside Windows, the watcher runs in its own process group so that
+ * `stopWatchProcess` can stop it with its descendants. A watchdog stops that
+ * group if this process dies without running its cleanup.
  *
  * @param {string}   command Command to execute.
  * @param {string[]} args    Command arguments.
@@ -10,10 +19,20 @@ import spawn from 'cross-spawn';
  * @return {Object} Child process.
  */
 export function spawnWatchProcess( command, args = [], options = {} ) {
-	return spawn( command, args, {
-		...options,
-		detached: process.platform !== 'win32',
-	} );
+	const detached = process.platform !== 'win32';
+	const child = spawn( command, args, { ...options, detached } );
+
+	if ( detached && child.pid ) {
+		// The watchdog has its own process group, so it outlives a signal
+		// sent to this process's group, and is unreferenced, so it never
+		// keeps this process alive.
+		spawn( process.execPath, [ WATCHDOG_PATH, String( child.pid ) ], {
+			detached: true,
+			stdio: 'ignore',
+		} ).unref();
+	}
+
+	return child;
 }
 
 /**

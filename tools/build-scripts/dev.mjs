@@ -191,9 +191,11 @@ async function dev() {
 		// Start package build watch and wait for initial build to complete
 		// before signaling ready. wp-build outputs "Watching for changes..."
 		// when its initial build is done.
-		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
+		const buildWatch = spawnWatchProcess( 'wp-build', [ '--watch' ], {
 			cwd: ROOT_DIR,
-			stdio: [ 'inherit', 'pipe', 'inherit' ],
+			// The command runs in its own process group, which cannot read
+			// from the terminal.
+			stdio: [ 'ignore', 'pipe', 'inherit' ],
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
@@ -204,7 +206,7 @@ async function dev() {
 			console.log( '\n\n👋 Stopping watch mode...' );
 			stopWatchProcess( tscWatch );
 			stopWatchProcess( onReadyProcess );
-			buildWatch.kill();
+			stopWatchProcess( buildWatch );
 			process.exit( 0 );
 		};
 
