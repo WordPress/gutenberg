@@ -6,6 +6,11 @@ import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 import { statusIndexer } from './status-indexer.js';
+import {
+	docgenReexportGuardPlugin,
+	workspaceSourcePlugin,
+} from './workspace-source-plugin.js';
+import { packageStylesPlugin } from './package-styles-plugin.js';
 
 /**
  * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
@@ -143,18 +148,6 @@ const config: StorybookConfig = {
 			 * spreads this gets its own workspace rather than this one.
 			 */
 			root: options.configDir,
-			resolve: {
-				alias: [
-					{
-						// Source stories and package imports must share one store.
-						find: /^@wordpress\/block-editor$/,
-						replacement: path.resolve(
-							import.meta.dirname,
-							'../packages/block-editor/src/index.ts'
-						),
-					},
-				],
-			},
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,
@@ -214,6 +207,14 @@ const config: StorybookConfig = {
 						return null;
 					},
 				},
+				// Packages resolve to their source, so the dev server needs no
+				// package build and edits to any package hot reload.
+				workspaceSourcePlugin(),
+				docgenReexportGuardPlugin(),
+				// A static build uses the stylesheets the package build emits.
+				...( options.configType === 'DEVELOPMENT'
+					? [ packageStylesPlugin() ]
+					: [] ),
 			],
 			build: {
 				// Let the browser discover JavaScript dependencies as it

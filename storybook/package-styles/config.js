@@ -1,28 +1,43 @@
-import blockEditorLtr from '../package-styles/block-editor-ltr.lazy.scss?inline';
-import blockEditorRtl from '../package-styles/block-editor-rtl.lazy.scss?inline';
-import blockLibraryLtr from '../package-styles/block-library-ltr.lazy.scss?inline';
-import blockLibraryRtl from '../package-styles/block-library-rtl.lazy.scss?inline';
-import componentsLtr from '../package-styles/components-ltr.lazy.scss?inline';
-import componentsRtl from '../package-styles/components-rtl.lazy.scss?inline';
-import commandsLtr from '../package-styles/commands-ltr.lazy.scss?inline';
-import commandsRtl from '../package-styles/commands-rtl.lazy.scss?inline';
-import editorLtr from '../package-styles/editor-ltr.lazy.scss?inline';
-import editorRtl from '../package-styles/editor-rtl.lazy.scss?inline';
-import formatLibraryLtr from '../package-styles/format-library-ltr.lazy.scss?inline';
-import formatLibraryRtl from '../package-styles/format-library-rtl.lazy.scss?inline';
-import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss?inline';
-import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss?inline';
-import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss?inline';
-import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss?inline';
-import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
-import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
-import imageEditorLtr from '../package-styles/image-editor-ltr.lazy.scss?inline';
-import imageEditorRtl from '../package-styles/image-editor-rtl.lazy.scss?inline';
-import mediaEditorLtr from '../package-styles/media-editor-ltr.lazy.scss?inline';
-import mediaEditorRtl from '../package-styles/media-editor-rtl.lazy.scss?inline';
-import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
-import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+import blockEditorLtr from '../../packages/block-editor/build-style/style.css?inline';
+import blockEditorRtl from '../../packages/block-editor/build-style/style-rtl.css?inline';
+import blockLibraryStyleLtr from '../../packages/block-library/build-style/style.css?inline';
+import blockLibraryThemeLtr from '../../packages/block-library/build-style/theme.css?inline';
+import blockLibraryEditorLtr from '../../packages/block-library/build-style/editor.css?inline';
+import blockLibraryStyleRtl from '../../packages/block-library/build-style/style-rtl.css?inline';
+import blockLibraryThemeRtl from '../../packages/block-library/build-style/theme-rtl.css?inline';
+import blockLibraryEditorRtl from '../../packages/block-library/build-style/editor-rtl.css?inline';
+import componentsLtr from '../../packages/components/build-style/style.css?inline';
+import componentsRtl from '../../packages/components/build-style/style-rtl.css?inline';
+import commandsLtr from '../../packages/commands/build-style/style.css?inline';
+import commandsRtl from '../../packages/commands/build-style/style-rtl.css?inline';
+import editorLtr from '../../packages/editor/build-style/style.css?inline';
+import editorRtl from '../../packages/editor/build-style/style-rtl.css?inline';
+import formatLibraryLtr from '../../packages/format-library/build-style/style.css?inline';
+import formatLibraryRtl from '../../packages/format-library/build-style/style-rtl.css?inline';
+import editSiteLtr from '../../packages/edit-site/build-style/style.css?inline';
+import editSiteRtl from '../../packages/edit-site/build-style/style-rtl.css?inline';
+import dataviewsLtr from '../../packages/dataviews/build-style/style.css?inline';
+import dataviewsRtl from '../../packages/dataviews/build-style/style-rtl.css?inline';
+import fieldsLtr from '../../packages/fields/build-style/style.css?inline';
+import fieldsRtl from '../../packages/fields/build-style/style-rtl.css?inline';
+import imageEditorLtr from '../../packages/image-editor/build-style/style.css?inline';
+import imageEditorRtl from '../../packages/image-editor/build-style/style-rtl.css?inline';
+import mediaEditorLtr from '../../packages/media-editor/build-style/style.css?inline';
+import mediaEditorRtl from '../../packages/media-editor/build-style/style-rtl.css?inline';
+import mediaFieldsLtr from '../../packages/media-fields/build-style/style.css?inline';
+import mediaFieldsRtl from '../../packages/media-fields/build-style/style-rtl.css?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
+
+const blockLibraryLtr = [
+	blockLibraryStyleLtr,
+	blockLibraryThemeLtr,
+	blockLibraryEditorLtr,
+].join( '\n' );
+const blockLibraryRtl = [
+	blockLibraryStyleRtl,
+	blockLibraryThemeRtl,
+	blockLibraryEditorRtl,
+].join( '\n' );
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
