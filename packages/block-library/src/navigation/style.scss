@@ -29,6 +29,11 @@ $navigation-icon-size: 24px;
 		list-style: none;
 	}
 
+	// Menu container.
+	.wp-block-navigation__container {
+		font-size: inherit !important;
+	}
+
 	// Menu item container.
 	.wp-block-navigation-item {
 		background-color: inherit;
