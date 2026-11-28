@@ -604,6 +604,110 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
+
+		describe( 'while a viewport state is selected', () => {
+			const settings: StyleSettings = {
+				typography: {
+					...baseSettings.typography,
+					fontSizes: {
+						theme: [
+							{ slug: 'small', size: '13px', name: 'Small' },
+							{ slug: 'medium', size: '20px', name: 'Medium' },
+							{ slug: 'large', size: '24px', name: 'Large' },
+						],
+					},
+				},
+			};
+			// The inherited size the caller resolved for the viewport: Large.
+			const inheritedValue = {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			};
+
+			it( 'shows the inherited size rather than the default state size', async () => {
+				const onChange = vi.fn();
+
+				// In Global Styles, a theme's Tablet size applies over its
+				// default size, and arrives already resolved in `inheritedValue`.
+				await renderPanel( {
+					settings,
+					inheritedValue,
+					baseValue: {
+						typography: { fontSize: 'var:preset|font-size|small' },
+					},
+					onChange,
+				} );
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Large' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Small' } )
+				).not.toBeChecked();
+				expect( onChange ).not.toHaveBeenCalled();
+			} );
+
+			it( 'shows an inherited custom font size', async () => {
+				const onChange = vi.fn();
+
+				await renderPanel( {
+					settings,
+					inheritedValue: { typography: { fontSize: '14px' } },
+					onChange,
+				} );
+
+				expect(
+					screen.getByRole( 'spinbutton', { name: 'Font size' } )
+				).toHaveValue( 14 );
+				expect(
+					screen.queryByRole( 'radio', { name: 'Large' } )
+				).not.toBeInTheDocument();
+				expect( onChange ).not.toHaveBeenCalled();
+			} );
+
+			it( 'leaves the font size unset when an inherited custom size is cleared', async () => {
+				const onChange = vi.fn();
+
+				await renderPanel( {
+					settings,
+					inheritedValue: { typography: { fontSize: '30px' } },
+					onChange,
+				} );
+
+				await userEvent.clear(
+					screen.getByRole( 'spinbutton', { name: 'Font size' } )
+				);
+
+				// Saving the inherited 30px would stop later Desktop edits
+				// from applying to the state.
+				expect( onChange ).toHaveBeenCalled();
+				for ( const [ newValue ] of onChange.mock.calls ) {
+					expect( newValue?.typography?.fontSize ).toBeUndefined();
+				}
+			} );
+
+			it( 'shows the font size set for the state itself', async () => {
+				await renderPanel( {
+					settings,
+					value: {
+						typography: { fontSize: 'var:preset|font-size|medium' },
+					},
+					inheritedValue,
+					baseValue: {
+						typography: { fontSize: 'var:preset|font-size|small' },
+					},
+				} );
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Medium' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Small' } )
+				).not.toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Large' } )
+				).not.toBeChecked();
+			} );
+		} );
 	} );
 
 	it( 'treats local zero values as local overrides instead of inherited placeholders', async () => {
