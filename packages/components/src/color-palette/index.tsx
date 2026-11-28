@@ -10,6 +10,7 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	getOptionGroupKeys,
 	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
@@ -114,12 +115,14 @@ function MultiplePalettes( {
 		return null;
 	}
 
+	const keys = getOptionGroupKeys( colors );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
 				const id = `${ instanceId }-${ index }`;
 				return (
-					<VStack spacing={ 2 } key={ index }>
+					<VStack spacing={ 2 } key={ keys[ index ] }>
 						<Heading
 							className={ styles[ 'color-heading' ] }
 							id={ id }

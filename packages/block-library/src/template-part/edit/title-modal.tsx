@@ -1,3 +1,4 @@
+import type { FormEvent } from 'react';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -8,12 +9,22 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
+interface TitleModalProps {
+	areaLabel: string;
+	onClose: () => void;
+	onSubmit: ( title: string ) => void;
+}
+
+export default function TitleModal( {
+	areaLabel,
+	onClose,
+	onSubmit,
+}: TitleModalProps ) {
 	// Restructure onCreate to set the blocks on local state.
 	// Add modal to confirm title and trigger onCreate.
 	const [ title, setTitle ] = useState( '' );
 
-	const submitForCreation = ( event ) => {
+	const submitForCreation = ( event: FormEvent ) => {
 		event.preventDefault();
 		onSubmit( title );
 	};

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import {
 	FlexBlock,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 } from '@wordpress/components';
@@ -59,7 +59,7 @@ export default function DrilldownItem( {
 	};
 
 	return (
-		<Item
+		<WCItem
 			className={ clsx( styles.item, className ) }
 			onClick={ handleClick }
 		>
@@ -74,6 +74,6 @@ export default function DrilldownItem( {
 					icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 				/>
 			</HStack>
-		</Item>
+		</WCItem>
 	);
 }
