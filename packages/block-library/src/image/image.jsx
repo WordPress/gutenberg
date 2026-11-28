@@ -45,6 +45,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { Stack, Field } from '@wordpress/ui';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
@@ -721,6 +722,13 @@ export default function Image( {
 		);
 	};
 
+	// A width/height saved earlier (for example while the image sat in a
+	// regular Group) keeps applying inside flex and grid layouts, where the
+	// Width/Height fields are hidden.
+	const hasCustomSize =
+		( !! activeWidth && activeWidth !== 'auto' ) ||
+		( !! activeHeight && activeHeight !== 'auto' );
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
@@ -1078,6 +1086,39 @@ export default function Image( {
 				} }
 			>
 				{ dimensionsControl }
+				{ showDimensionsControls &&
+					SIZED_LAYOUTS.includes( parentLayoutType ) && (
+						<ToolsPanelItem
+							label={ __( 'Image size' ) }
+							isShownByDefault
+							hasValue={ () => hasCustomSize }
+							onDeselect={ () =>
+								setDimensionAttributes( {
+									width: undefined,
+									height: undefined,
+								} )
+							}
+							panelId={ clientId }
+						>
+							{ hasCustomSize && (
+								<Stack direction="column" gap="xs">
+									<Field.VisualLabel>
+										{ __( 'Image size' ) }
+									</Field.VisualLabel>
+									{ sprintf(
+										// translators: 1: Width. 2: Height.
+										_x( '%1$s × %2$s', 'image dimensions' ),
+										activeWidth && activeWidth !== 'auto'
+											? activeWidth
+											: __( 'Auto' ),
+										activeHeight && activeHeight !== 'auto'
+											? activeHeight
+											: __( 'Auto' )
+									) }
+								</Stack>
+							) }
+						</ToolsPanelItem>
+					) }
 				{ ! hasSelectedStyleState && url && scale && (
 					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
