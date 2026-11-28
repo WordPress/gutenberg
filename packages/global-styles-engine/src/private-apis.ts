@@ -2,6 +2,7 @@ import {
 	getResponsiveMediaQueries,
 	getViewportBreakpoints,
 	getViewportBreakpointValueInPixels,
+	getViewportPreviewSizes,
 } from './utils/viewport';
 import {
 	getDuotoneFilter,
@@ -18,6 +19,7 @@ lock( privateApis, {
 	getResponsiveMediaQueries,
 	getViewportBreakpoints,
 	getViewportBreakpointValueInPixels,
+	getViewportPreviewSizes,
 	getDuotoneFilter,
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
