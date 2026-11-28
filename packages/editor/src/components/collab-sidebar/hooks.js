@@ -48,6 +48,8 @@ import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+const EMPTY_ARRAY = [];
+
 /**
  * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
  */
@@ -69,12 +71,38 @@ export function useNoteThreads( postId ) {
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { clientIds } = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants } = select( blockEditorStore );
-		return {
-			clientIds: getClientIdsWithDescendants(),
-		};
-	}, [] );
+	const hasThreads = !! threads?.length;
+
+	/*
+	 * Flat `[ clientId, noteId, clientId, noteId, ... ]` pairs, in document
+	 * order, for blocks with notes. `useSelect` compares arrays by position
+	 * (objects by key), so moving a block with notes changes the result.
+	 * Pairs stay flat because nested arrays would never compare equal, and
+	 * the raw `noteId` keeps its store reference until the notes change.
+	 */
+	const blockNotes = useSelect(
+		( select ) => {
+			if ( ! hasThreads ) {
+				return EMPTY_ARRAY;
+			}
+
+			const {
+				getClientIdsWithDescendants,
+				getBlockAttributes: selectBlockAttributes,
+			} = select( blockEditorStore );
+
+			const pairs = [];
+			for ( const clientId of getClientIdsWithDescendants() ) {
+				const noteId =
+					selectBlockAttributes( clientId )?.metadata?.noteId;
+				if ( noteId !== undefined ) {
+					pairs.push( clientId, noteId );
+				}
+			}
+			return pairs;
+		},
+		[ hasThreads ]
+	);
 
 	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
@@ -83,7 +111,7 @@ export function useNoteThreads( postId ) {
 		}
 
 		/*
-		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * Single pass over blockNotes builds the forward map and reverse lookup
 		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
 		 * types returned by the comments REST endpoint.
 		 */
@@ -91,9 +119,11 @@ export function useNoteThreads( postId ) {
 		// Duplicating or splitting a block copies its notes, so a note can
 		// belong to several blocks.
 		const clientIdsByNoteId = new Map();
-		for ( const clientId of clientIds ) {
-			const metadata = getBlockAttributes( clientId )?.metadata;
-			const noteIds = getNoteIdsFromMetadata( metadata );
+		for ( let i = 0; i < blockNotes.length; i += 2 ) {
+			const clientId = blockNotes[ i ];
+			const noteIds = getNoteIdsFromMetadata( {
+				noteId: blockNotes[ i + 1 ],
+			} );
 			if ( noteIds.length === 0 ) {
 				continue;
 			}
@@ -185,7 +215,7 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+	}, [ blockNotes, threads, getBlockAttributes ] );
 
 	return {
 		notes,
@@ -1014,6 +1044,7 @@ export function useFloatingBoard( {
 	selectedNoteId,
 	isFloating,
 	sidebarRef,
+	orderedBlockIds,
 } ) {
 	const [ store ] = useState( createBoardStore );
 
@@ -1028,7 +1059,7 @@ export function useFloatingBoard( {
 	// Moving blocks shifts anchors without resizing anything or re-registering.
 	useLayoutEffect( () => {
 		store.requestMeasure();
-	}, [ store, threads ] );
+	}, [ store, threads, orderedBlockIds ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(

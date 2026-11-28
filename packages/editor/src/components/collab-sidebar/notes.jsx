@@ -120,6 +120,7 @@ export function Notes( {
 			selectedNoteId: selectedNote,
 			isFloating,
 			sidebarRef,
+			orderedBlockIds,
 		} );
 	useNoteFocus( {
 		sidebarRef,
