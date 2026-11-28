@@ -8,9 +8,17 @@ import {
 	Text,
 } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
+import {
+	Link as RouterLink,
+	privateApis as routePrivateApis,
+} from '@wordpress/route';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
+// eslint-disable-next-line no-restricted-imports -- Stories are not shipped in the package
+import { unlock } from '../../lock-unlock';
 import { withRouter } from '../../stories/with-router';
+
+const { useLocation } = unlock( routePrivateApis );
 
 const meta: Meta< typeof Page > = {
 	component: Page,
@@ -237,6 +245,59 @@ export const WithInteractiveNavigation: Story = {
 	},
 	args: {
 		title: 'Analytics',
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+function RouterNavigationLink( {
+	href,
+	...props
+}: ComponentProps< 'a' > & { href: string } ) {
+	return (
+		<RouterLink
+			to={ href }
+			// By default, the router also marks links to parent paths, like
+			// Overview, with `aria-current="page"`.
+			activeOptions={ { exact: true } }
+			{ ...props }
+		/>
+	);
+}
+
+/**
+ * Demonstrates `components.link` with the router link from
+ * `@wordpress/route`.
+ */
+export const WithRouterNavigation: Story = {
+	decorators: [ withRouter ],
+	parameters: {
+		initialPath: '/settings/privacy',
+	},
+	render: function Render( args ) {
+		const { pathname } = useLocation();
+
+		return (
+			<Page
+				{ ...args }
+				components={ { link: RouterNavigationLink } }
+				navigation={ {
+					items: [
+						{ label: 'Overview', href: '/settings' },
+						{ label: 'Privacy', href: '/settings/privacy' },
+						{
+							label: 'Notifications',
+							href: '/settings/notifications',
+						},
+					],
+					currentHref: pathname,
+				} }
+			/>
+		);
+	},
+	args: {
+		title: 'Settings',
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,

@@ -1,3 +1,4 @@
+import type { Decorator } from '@storybook/react-vite';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { unlock } from '../lock-unlock';
 
@@ -9,14 +10,17 @@ const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =
  *
  * Wraps stories in a minimal tanstack router (via `@wordpress/route` private
  * APIs) so that components consuming `Link` from `@wordpress/route` can
- * render without errors.
+ * render without errors. The router starts at the story's `initialPath`
+ * parameter, or at `/`.
  */
-export function withRouter( Story: React.ComponentType ) {
+export const withRouter: Decorator = ( Story, { parameters } ) => {
 	const rootRoute = createRootRoute( { component: Story } );
 	const router = createRouter( {
 		routeTree: rootRoute,
-		history: createMemoryHistory( { initialEntries: [ '/' ] } ),
+		history: createMemoryHistory( {
+			initialEntries: [ parameters.initialPath ?? '/' ],
+		} ),
 		defaultNotFoundComponent: () => null,
 	} );
 	return <RouterProvider router={ router } />;
-}
+};
