@@ -78,10 +78,21 @@ jobs:
         needs: route
         if: ${{ needs.route.outputs.reviewers != '[]' }}
         runs-on: 'ubuntu-slim'
-        permissions:
-            pull-requests: write
+        permissions: {}
         timeout-minutes: 5
         steps:
+            # `GITHUB_TOKEN` cannot see the organization's teams, so an app token
+            # requests the reviews.
+            - name: Generate application token
+              uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+              id: app-token
+              with:
+                  client-id: ${{ vars.REVIEW_ROUTING_APP_ID }}
+                  private-key: ${{ secrets.REVIEW_ROUTING_APP_KEY }}
+                  permission-pull-requests: write
+                  permission-issues: read
+                  permission-members: read
+
             # A reviewer is requested at most once for each pull request. GitHub
             # removes a reviewer from the requested reviewers after they review,
             # so the timeline is used instead.
@@ -90,6 +101,7 @@ jobs:
               env:
                   REVIEWERS: ${{ needs.route.outputs.reviewers }}
               with:
+                  github-token: ${{ steps.app-token.outputs.token }}
                   script: |
                       const { owner, repo } = context.repo;
                       const pull = context.payload.pull_request;

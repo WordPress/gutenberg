@@ -1,5 +1,5 @@
 ---
-reviewer: [aduth, ciampo]
+reviewer: WordPress/gutenberg-components
 threshold: 0.8
 ---
 
