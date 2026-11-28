@@ -4,7 +4,9 @@ import { addQueryArgs } from '@wordpress/url';
 import Editor from '../editor';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarGlobalStyles from '../sidebar-global-styles';
+import SidebarGlobalStyles, {
+	useIsStyleBookOpened,
+} from '../sidebar-global-styles';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { StyleBookPreview, useGlobalStyles } = unlock( editorPrivateApis );
@@ -36,9 +38,9 @@ function StyleBookPreviewArea( { siteData } ) {
 }
 
 function StylesPreviewArea( { siteData } ) {
-	const { query } = useLocation();
+	const isStyleBookOpened = useIsStyleBookOpened();
 
-	if ( query.preview === 'stylebook' ) {
+	if ( isStyleBookOpened ) {
 		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 

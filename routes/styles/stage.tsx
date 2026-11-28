@@ -18,9 +18,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { backup, seen } from '@wordpress/icons';
 import { useEffect, useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { ActivatePanel } from './activate-panel';
 import { getPreviewedStylesheet, getPreviewTitle } from './previewed-theme';
+import { STYLE_BOOK_PREFERENCE, shouldShowStyleBook } from './utils';
 import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
@@ -85,15 +87,49 @@ function Stage() {
 		setStylesPath( section );
 		return () => setStylesPath( '/' );
 	}, [ areRevisionsOpened, section, setStylesPath ] );
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
-		search.preview === 'stylebook'
+	const styleBookPreference = useSelect(
+		( select ) =>
+			select( preferencesStore ).get(
+				'core/edit-site',
+				STYLE_BOOK_PREFERENCE
+			) as boolean | undefined,
+		[]
 	);
+	const { set: setPreference } = useDispatch( preferencesStore );
+	// `preview=stylebook` in the URL shows the Style Book; otherwise the
+	// section and the user's preference decide, as in the route's canvas.
+	const isStyleBookOpened =
+		search.preview === 'stylebook' ||
+		shouldShowStyleBook( section, styleBookPreference );
+
+	// The canvas is chosen when the URL changes, so write the Style Book into
+	// the URL when the preference shows it. Turning it off then always
+	// changes the URL too.
+	const isStyleBookMissingFromUrl =
+		isStyleBookOpened && search.preview !== 'stylebook';
+	useEffect( () => {
+		if ( isStyleBookMissingFromUrl ) {
+			navigate( {
+				search: { ...search, preview: 'stylebook' },
+				replace: true,
+			} );
+		}
+	}, [ isStyleBookMissingFromUrl, navigate, search ] );
 
 	const onChangeSection = ( updatedSection: string ) => {
+		const { preview, ...restSearch } = search;
+		// Each section follows the preference, so a Style Book turned on for
+		// Revisions or Additional CSS doesn't carry over.
 		navigate( {
 			search: {
-				...search,
+				...restSearch,
 				section: updatedSection,
+				...( shouldShowStyleBook(
+					updatedSection,
+					styleBookPreference
+				) && {
+					preview: 'stylebook',
+				} ),
 			},
 		} );
 	};
@@ -112,13 +148,15 @@ function Stage() {
 									icon={ seen }
 									label={ __( 'Style Book' ) }
 									onClick={ () => {
-										const newIsStyleBookOpened =
-											! isStyleBookOpened;
-										setIsStyleBookOpened(
-											newIsStyleBookOpened
+										// Remember the choice, so every
+										// section and later visits follow it.
+										setPreference(
+											'core/edit-site',
+											STYLE_BOOK_PREFERENCE,
+											! isStyleBookOpened
 										);
 										navigate( {
-											search: newIsStyleBookOpened
+											search: ! isStyleBookOpened
 												? {
 														...search,
 														preview: 'stylebook',

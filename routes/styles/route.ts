@@ -1,13 +1,15 @@
-import { resolveSelect } from '@wordpress/data';
+import { resolveSelect, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
+import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getPreviewedStylesheet,
 	getPreviewTitle,
 	isThemePreviewAdminPage,
 } from './previewed-theme';
+import { STYLE_BOOK_PREFERENCE, shouldShowStyleBook } from './utils';
 
 async function isBlockTheme() {
 	const currentTheme = await resolveSelect( coreStore ).getCurrentTheme();
@@ -47,12 +49,19 @@ export const route = {
 
 	async canvas( context: any ) {
 		// Use the custom canvas (StyleBookPreview) when the style book is the
-		// only thing to render, or when its preview is toggled on. Otherwise,
+		// only thing to render, or when it is shown: by `preview=stylebook`,
+		// or by the user's preference when the URL doesn't say. Otherwise,
 		// use the default editor canvas.
-		if (
+		const isStyleBookOpened =
 			context.search.preview === 'stylebook' ||
-			! ( await isBlockTheme() )
-		) {
+			shouldShowStyleBook(
+				context.search.section ?? '/',
+				select( preferencesStore ).get(
+					'core/edit-site',
+					STYLE_BOOK_PREFERENCE
+				) as boolean | undefined
+			);
+		if ( isStyleBookOpened || ! ( await isBlockTheme() ) ) {
 			return null;
 		}
 		return {

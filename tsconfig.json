@@ -129,6 +129,7 @@
 		{ "path": "routes/post-new" },
 		{ "path": "routes/site-health" },
 		{ "path": "routes/styles" },
+		{ "path": "routes/styles/tsconfig.test.json" },
 		{ "path": "routes/template" },
 		{ "path": "routes/template-list" },
 		{ "path": "routes/template-part" },
