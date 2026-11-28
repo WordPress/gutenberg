@@ -15,6 +15,7 @@
 -   `BlockConfiguration`: Type `example.attributes` as `Partial< Attributes >` instead of the `BlockType` attribute schema ([#87543](https://github.com/WordPress/gutenberg/pull/87543)).
 -   `BlockVariation`: Type `attributes` as `Partial< Attributes >` ([#87551](https://github.com/WordPress/gutenberg/pull/87551)).
 -   `BlockExampleInnerBlock`: Type `attributes` as `Record< string, unknown >` instead of the `BlockType` attribute schema ([#87585](https://github.com/WordPress/gutenberg/pull/87585)).
+-   `BlockDeprecation`: Make `attributes`, `save`, and `supports` optional since deprecations inherit omitted properties ([#87606](https://github.com/WordPress/gutenberg/pull/87606)).
 
 ### Internal
 

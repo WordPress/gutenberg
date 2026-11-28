@@ -1,7 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
+import type { QueryPaginationLabelControlProps } from './types';
 
-export function QueryPaginationLabelControl( { value, onChange } ) {
+export function QueryPaginationLabelControl( {
+	value,
+	onChange,
+}: QueryPaginationLabelControlProps ) {
 	return (
 		<ToggleControl
 			label={ __( 'Show label text' ) }

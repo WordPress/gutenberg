@@ -11,15 +11,17 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { QueryPaginationArrowControls } from './query-pagination-arrow-controls';
 import { QueryPaginationLabelControl } from './query-pagination-label-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { QueryPaginationAttributes } from './types';
 
 export default function QueryPaginationEdit( {
 	attributes: { paginationArrow, showLabel },
 	setAttributes,
 	clientId,
-} ) {
+}: BlockEditProps< QueryPaginationAttributes > ) {
 	const hasNextPreviousBlocks = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
@@ -81,7 +83,10 @@ export default function QueryPaginationEdit( {
 							<QueryPaginationArrowControls
 								value={ paginationArrow }
 								onChange={ ( value ) => {
-									setAttributes( { paginationArrow: value } );
+									setAttributes( {
+										paginationArrow: value as
+											string | undefined,
+									} );
 								} }
 							/>
 						</ToolsPanelItem>
