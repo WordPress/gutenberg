@@ -99,6 +99,14 @@ export interface UploadMediaFromBlobURLArgs {
 	 * Function called when an error happens.
 	 */
 	onError?: ( message: string ) => void;
+	/**
+	 * Durable upload identifier. When omitted a new one is generated.
+	 */
+	uploadId?: string;
+	/**
+	 * Function called with the resolved upload id when the upload starts.
+	 */
+	onUploadStart?: ( uploadId: string ) => void;
 }
 
 /**

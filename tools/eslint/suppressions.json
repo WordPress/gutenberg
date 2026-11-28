@@ -6078,7 +6078,7 @@
 	},
 	"packages/block-library/src/utils/hooks.ts": {
 		"no-restricted-syntax": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-library/src/utils/media-control.tsx": {
