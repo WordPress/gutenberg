@@ -16,6 +16,8 @@
 
 	.custom-logo-link {
 		cursor: inherit;
+		// Fill the resized box, so a linked SVG without its own size isn't 0px wide.
+		display: block;
 
 		&:focus {
 			box-shadow: none;
