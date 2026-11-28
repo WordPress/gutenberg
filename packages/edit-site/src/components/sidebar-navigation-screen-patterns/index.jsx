@@ -1,6 +1,6 @@
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -132,7 +132,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
 								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<Item>{ __( 'No items found' ) }</Item>
+									<WCItem>{ __( 'No items found' ) }</WCItem>
 								</ItemGroup>
 							) }
 							<CategoriesGroup
