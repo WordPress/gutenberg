@@ -1,4 +1,5 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { TextControl } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -6,12 +7,23 @@ import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { TemplatePartImportControls } from './import-controls';
 import { unlock } from '../../lock-unlock';
+import type { TemplatePartAttributes } from '../types';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 // The default tag name is stored as an empty string, but the select treats an
 // empty value as no selection and shows its placeholder.
 const DEFAULT_TAG_NAME = '__default';
+
+interface TemplatePartAdvancedControlsProps {
+	tagName?: string;
+	setAttributes: BlockEditProps< TemplatePartAttributes >[ 'setAttributes' ];
+	isEntityAvailable: boolean;
+	templatePartId: string | null;
+	defaultWrapper: string;
+	hasInnerBlocks: boolean;
+	clientId: string;
+}
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -21,19 +33,19 @@ export function TemplatePartAdvancedControls( {
 	defaultWrapper,
 	hasInnerBlocks,
 	clientId,
-} ) {
+}: TemplatePartAdvancedControlsProps ) {
 	const [ area, setArea ] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'area',
-		templatePartId
+		templatePartId!
 	);
 
 	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		'wp_template_part',
 		'title',
-		templatePartId
+		templatePartId!
 	);
 
 	const defaultTemplatePartAreas = useSelect(
@@ -44,7 +56,7 @@ export function TemplatePartAdvancedControls( {
 	);
 
 	const areaOptions = defaultTemplatePartAreas.map(
-		( { label, area: _area } ) => ( {
+		( { label, area: _area }: { label: string; area: string } ) => ( {
 			label,
 			value: _area,
 		} )
@@ -56,7 +68,7 @@ export function TemplatePartAdvancedControls( {
 				<>
 					<TextControl
 						label={ __( 'Title' ) }
-						value={ title }
+						value={ title as string }
 						onChange={ ( value ) => {
 							setTitle( value );
 						} }
@@ -67,7 +79,8 @@ export function TemplatePartAdvancedControls( {
 						items={ areaOptions }
 						value={
 							areaOptions.find(
-								( item ) => item.value === area
+								( item: { value: string } ) =>
+									item.value === area
 							) ?? null
 						}
 						onValueChange={ ( item ) => {
@@ -80,7 +93,7 @@ export function TemplatePartAdvancedControls( {
 			) }
 			<HTMLElementControl
 				tagName={ tagName || DEFAULT_TAG_NAME }
-				onChange={ ( value ) =>
+				onChange={ ( value: string ) =>
 					setAttributes( {
 						tagName: value === DEFAULT_TAG_NAME ? '' : value,
 					} )
@@ -106,7 +119,7 @@ export function TemplatePartAdvancedControls( {
 			/>
 			{ ! hasInnerBlocks && (
 				<TemplatePartImportControls
-					area={ area }
+					area={ area as string | undefined }
 					setAttributes={ setAttributes }
 				/>
 			) }
