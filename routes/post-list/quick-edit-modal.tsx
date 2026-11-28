@@ -80,7 +80,7 @@ export function QuickEditModal( {
 	const [ localEdits, setLocalEdits ] = useState< Record< string, any > >(
 		{}
 	);
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const store = select( coreDataStore );
 			const { getEditedEntityRecord } = store;
@@ -94,24 +94,12 @@ export function QuickEditModal( {
 
 			const args = [ 'postType', postType, postId[ 0 ] ] as const;
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: ( store as any ).hasFinishedResolution(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -123,22 +111,6 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements.filter(
-							( element: { value: string } ) =>
-								element.value !== 'trash'
-						),
-					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
 				if ( field.id === 'featured_media' && field.Edit ) {
 					return {
 						...field,
@@ -148,7 +120,7 @@ export function QuickEditModal( {
 
 				return field;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields ]
 	);
 
 	const form = useMemo( (): Form => {
@@ -169,27 +141,6 @@ export function QuickEditModal( {
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData: Record< string, any > = {
-			...record,
-			...localEdits,
-		};
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {

@@ -5,9 +5,14 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { LoginOutAttributes } from './types';
 
-export default function LoginOutEdit( { attributes, setAttributes } ) {
+export default function LoginOutEdit( {
+	attributes,
+	setAttributes,
+}: BlockEditProps< LoginOutAttributes > ) {
 	const { displayLoginAsForm, redirectToCurrent } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 

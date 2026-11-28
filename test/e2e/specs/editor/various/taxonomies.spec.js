@@ -114,6 +114,86 @@ test.describe( 'Taxonomies', () => {
 		await expect( newCategory ).toBeChecked();
 	} );
 
+	test( 'should be able to add a category again after a failed attempt', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Categories' );
+
+		let createRequestCount = 0;
+		await page.route( '**/wp/v2/categories**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				await route.continue();
+				return;
+			}
+
+			createRequestCount++;
+			if ( createRequestCount === 1 ) {
+				await failRequest( route );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		const categoryName = 'category-' + generateRandomNumber();
+		await page
+			.getByRole( 'button', { name: 'Add Category', expanded: false } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'New Category Name' } )
+			.fill( categoryName );
+		await page.keyboard.press( 'Enter' );
+
+		await expect( page.getByTestId( 'snackbar' ) ).toBeVisible();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			page
+				.getByRole( 'group', { name: 'Categories' } )
+				.getByRole( 'checkbox', { name: categoryName } )
+		).toBeChecked();
+	} );
+
+	test( 'should keep a category checked while another one is being created', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Categories' );
+
+		const heldCreateRequest = defer();
+		await page.route( '**/wp/v2/categories**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				await route.continue();
+				return;
+			}
+
+			await heldCreateRequest;
+			await route.continue();
+		} );
+
+		const categoryName = 'category-' + generateRandomNumber();
+		await page
+			.getByRole( 'button', { name: 'Add Category', expanded: false } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'New Category Name' } )
+			.fill( categoryName );
+		await page.keyboard.press( 'Enter' );
+
+		const categories = page.getByRole( 'group', { name: 'Categories' } );
+		const uncategorized = categories.getByRole( 'checkbox', {
+			name: 'Uncategorized',
+		} );
+		await uncategorized.check();
+
+		heldCreateRequest.resolve();
+
+		await expect(
+			categories.getByRole( 'checkbox', { name: categoryName } )
+		).toBeChecked();
+		await expect( uncategorized ).toBeChecked();
+	} );
+
 	test( 'should be able to open the tags panel and create a new tag', async ( {
 		editor,
 		page,
