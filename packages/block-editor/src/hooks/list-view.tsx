@@ -4,6 +4,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
+import { Text } from '@wordpress/ui';
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
@@ -93,9 +94,12 @@ export function ListViewPanel( {
 				onToggle={ handleToggle }
 			>
 				{ ! hasChildren && (
-					<p className="block-editor-block-inspector__no-blocks">
+					<Text
+						render={ <p /> }
+						className="block-editor-block-inspector__no-blocks"
+					>
 						{ __( 'No items yet.' ) }
-					</p>
+					</Text>
 				) }
 				<PrivateListView
 					key={ `${ clientId }-${ expandRevision }` }
