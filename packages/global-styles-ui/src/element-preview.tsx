@@ -10,6 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
 import type { GlobalStylesStyles } from '@wordpress/global-styles-engine';
+import useStickyPreviewScrollPadding from './use-sticky-preview-scroll-padding';
 
 interface ElementPreviewProps {
 	element: string;
@@ -83,6 +84,7 @@ export default function ElementPreview( {
 	state,
 	stateStyles,
 }: ElementPreviewProps ) {
+	const stickyPreviewRef = useStickyPreviewScrollPadding();
 	const styles = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().styles,
 		[]
@@ -184,16 +186,21 @@ export default function ElementPreview( {
 	}
 
 	return (
-		<div className="global-styles-ui-element-preview">
-			<Iframe
-				tabIndex={ -1 }
-				readonly
-				title={ __( 'Element preview' ) }
-				aria-hidden="true"
-			>
-				<EditorStyles styles={ editorStyles } />
-				{ sample }
-			</Iframe>
+		<div
+			className="global-styles-ui__sticky-preview"
+			ref={ stickyPreviewRef }
+		>
+			<div className="global-styles-ui-element-preview">
+				<Iframe
+					tabIndex={ -1 }
+					readonly
+					title={ __( 'Element preview' ) }
+					aria-hidden="true"
+				>
+					<EditorStyles styles={ editorStyles } />
+					{ sample }
+				</Iframe>
+			</div>
 		</div>
 	);
 }
