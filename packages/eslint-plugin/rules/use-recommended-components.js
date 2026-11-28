@@ -77,6 +77,7 @@ const ALLOWLIST = {
 			'IconButton',
 			'Menu',
 			'Meter',
+			'NavigationMenu',
 			'Popover',
 			'SearchableSelect',
 			'SearchableSelectControl',
