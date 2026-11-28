@@ -282,7 +282,7 @@ export const getTransformedBlocksFromPattern = (
 	queryBlockAttributes
 ) => {
 	const {
-		query: { postType, inherit },
+		query: { postType },
 		namespace,
 	} = queryBlockAttributes;
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
@@ -294,7 +294,6 @@ export const getTransformedBlocksFromPattern = (
 			block.attributes.query = {
 				...block.attributes.query,
 				postType,
-				inherit,
 			};
 			if ( namespace ) {
 				block.attributes.namespace = namespace;
