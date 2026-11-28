@@ -14,8 +14,10 @@ import { ComplementaryArea } from '@wordpress/interface';
  * @param {Object}                props                                 Element props.
  * @param {string}                props.name                            A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
  * @param {React.ReactNode}       [props.children]                      Children to be rendered.
- * @param {string}                [props.className]                     An optional class name added to the sidebar body.
+ * @param {string}                [props.className]                     An optional class name added to the panel that wraps the sidebar contents. To add a class name to the sidebar's root element, use `render` instead.
  * @param {string}                props.title                           Title displayed at the top of the sidebar.
+ * @param {React.ReactNode}       [props.header]                        A custom header that replaces the default title and pin button.
+ * @param {React.ReactElement}    [props.render]                        An element that replaces the sidebar's default `div` root element. Its `className` and `style` are merged with the root element's own, e.g. `render={ <div className="my-sidebar" /> }` adds a class name to the root element.
  * @param {boolean}               [props.isPinnable=true]               Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
