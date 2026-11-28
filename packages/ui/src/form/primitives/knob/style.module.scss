@@ -1,0 +1,115 @@
+@use "../../../utils/css/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			position: relative;
+			display: inline-block;
+			inline-size: var(--wpds-dimension-size-lg);
+			aspect-ratio: 1;
+			flex: none;
+			border-radius: 50%;
+			vertical-align: middle;
+
+			&:has(input:focus-visible) {
+				@include mixins.focus-ring();
+			}
+		}
+
+		.thumb {
+			display: block;
+			inline-size: 100%;
+			block-size: 100%;
+			user-select: none;
+
+			&:has(input:enabled) {
+				touch-action: none;
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
+			}
+
+			svg {
+				display: block;
+				inline-size: 100%;
+				block-size: 100%;
+			}
+
+			/* Pointer positions belong to the dial. The range handles keyboard and AT input. */
+			input,
+			svg {
+				pointer-events: none;
+			}
+		}
+
+		.outline {
+			fill: none;
+			stroke: var(--wpds-color-stroke-interactive-neutral);
+			stroke-width: var(--wpds-border-width-xs);
+		}
+
+		/* Each state sets `color`, which the filled and the hollow dot both use. */
+		.indicator {
+			color: var(--wpds-color-background-thumb-brand);
+			fill: currentColor;
+			stroke: none;
+			stroke-width: var(--wpds-border-width-sm);
+		}
+
+		/* A hollow dot marks a heading that is shown but not set. */
+		.thumb[data-empty] .indicator {
+			fill: none;
+			stroke: currentColor;
+		}
+
+		@media (forced-colors: none) {
+			.thumb:has(input:enabled):is(:hover, :active) {
+				.outline {
+					stroke: var(--wpds-color-stroke-interactive-neutral-active);
+				}
+
+				.indicator {
+					color: var(--wpds-color-background-thumb-brand-active);
+				}
+			}
+
+			.thumb:has(input:disabled) {
+				.outline {
+					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
+				}
+
+				.indicator {
+					color: var(--wpds-color-background-thumb-brand-disabled);
+				}
+			}
+		}
+
+		@media (forced-colors: active) {
+			.thumb {
+				forced-color-adjust: none;
+			}
+
+			.outline {
+				stroke: ButtonText;
+			}
+
+			.indicator {
+				color: Highlight;
+			}
+
+			.thumb:has(input:disabled) {
+				.outline {
+					stroke: GrayText;
+				}
+
+				.indicator {
+					color: GrayText;
+				}
+			}
+		}
+	}
+}
