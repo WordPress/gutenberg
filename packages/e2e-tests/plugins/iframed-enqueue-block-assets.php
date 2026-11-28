@@ -30,5 +30,17 @@ add_action(
 				'test' => 'Iframed Enqueue Block Assets!',
 			)
 		);
+		wp_register_script_module(
+			'iframed-enqueue-block-assets-module-dependency',
+			plugin_dir_url( __FILE__ ) . 'iframed-enqueue-block-assets/module-dependency.js',
+			array(),
+			filemtime( plugin_dir_path( __FILE__ ) . 'iframed-enqueue-block-assets/module-dependency.js' )
+		);
+		wp_enqueue_script_module(
+			'iframed-enqueue-block-assets-module',
+			plugin_dir_url( __FILE__ ) . 'iframed-enqueue-block-assets/module.js',
+			array( 'iframed-enqueue-block-assets-module-dependency' ),
+			filemtime( plugin_dir_path( __FILE__ ) . 'iframed-enqueue-block-assets/module.js' )
+		);
 	}
 );
