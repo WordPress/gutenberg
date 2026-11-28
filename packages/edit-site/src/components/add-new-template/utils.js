@@ -236,6 +236,19 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			}, {} ),
 		[ publicPostTypes ]
 	);
+	// The template that applies to every item of a post type is not always the
+	// prefix its specific templates are built from. `post` is the exception:
+	// its general template is `single`, while a template for one post is
+	// `single-post-{slug}`.
+	const generalTemplateSlugs = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { slug } ) => {
+				accumulator[ slug ] =
+					slug === 'post' ? 'single' : templatePrefixes[ slug ];
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes, templatePrefixes ]
+	);
 	const postTypesInfo = useEntitiesInfo( 'postType', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
@@ -246,7 +259,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			// We need to check if the general template is part of the
 			// defaultTemplateTypes. If it is, just use that info and
 			// augment it with the specific template functionality.
-			const generalTemplateSlug = templatePrefixes[ slug ];
+			const generalTemplateSlug = generalTemplateSlugs[ slug ];
 			const defaultTemplateType = defaultTemplateTypes?.find(
 				( { slug: _slug } ) => _slug === generalTemplateSlug
 			);
@@ -354,7 +367,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 				( accumulator, postType ) => {
 					const { slug } = postType;
 					let key = 'postTypesMenuItems';
-					if ( slug === 'page' ) {
+					if ( [ 'page', 'single' ].includes( slug ) ) {
 						key = 'defaultPostTypesMenuItems';
 					}
 					accumulator[ key ].push( postType );
@@ -364,7 +377,9 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			),
 		[ menuItems ]
 	);
-	return postTypesMenuItems;
+	// Until the post types are known we cannot tell which of the default
+	// templates these menu items replace.
+	return { ...postTypesMenuItems, isResolving: ! publicPostTypes };
 };
 
 export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
@@ -523,7 +538,9 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 			),
 		[ menuItems ]
 	);
-	return taxonomiesMenuItems;
+	// Until the taxonomies are known we cannot tell which of the default
+	// templates these menu items replace.
+	return { ...taxonomiesMenuItems, isResolving: ! publicTaxonomies };
 };
 
 const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
