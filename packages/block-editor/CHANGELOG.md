@@ -45,6 +45,10 @@
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 
+### Bug Fixes
+
+-   Background: Don't add `has-background` to the wrapper of a block that skips background gradient serialization when migrating a legacy gradient. ([#87225](https://github.com/WordPress/gutenberg/pull/87225))
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
