@@ -1142,14 +1142,14 @@ export interface SpacingProps {
 	 *
 	 * (default) false
 	 */
-	margin: boolean | CSSDirection[];
+	margin: boolean | CSSDirection[] | AxialDirection[];
 
 	/**
 	 * Enable padding control UI for all or specified element directions.
 	 *
 	 * (default) false
 	 */
-	padding: boolean | CSSDirection[];
+	padding: boolean | CSSDirection[] | AxialDirection[];
 
 	/**
 	 * Whether to skip the serialization to HTML markup.
