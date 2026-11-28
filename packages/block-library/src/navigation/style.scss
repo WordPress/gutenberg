@@ -17,7 +17,8 @@ $navigation-icon-size: 24px;
 	position: relative;
 
 	// Normalize list styles.
-	ul {
+	ul.wp-block-navigation__container,
+	ul.wp-block-navigation__container ul {
 		margin-top: 0;
 		margin-bottom: 0;
 		margin-left: 0;
