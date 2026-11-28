@@ -1,0 +1,10 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+// The block settings menu stays mounted while the media modal is open, because
+// Dropdown preserves a popover when focus moves into a separate dialog. Without
+// this the menu would render on top of the modal, since popovers sit well above
+// it. Changing the z-index of popovers permanently has wider implications, so
+// only lower it while the modal is open.
+.modal-open .block-editor-block-settings-menu__popover {
+	z-index: z-index(".block-editor-block-settings-menu__popover");
+}
