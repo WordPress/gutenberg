@@ -51,5 +51,6 @@
 			"width": true,
 			"style": true
 		}
-	}
+	},
+	"style": "wp-block-comments-pagination-numbers"
 }

@@ -69,5 +69,6 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
-	}
+	},
+	"style": "wp-block-comments-title"
 }

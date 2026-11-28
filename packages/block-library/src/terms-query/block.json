@@ -41,5 +41,6 @@
 			"blockGap": true
 		},
 		"interactivity": true
-	}
+	},
+	"style": "wp-block-terms-query"
 }

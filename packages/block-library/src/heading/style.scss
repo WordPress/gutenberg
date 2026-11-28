@@ -6,6 +6,11 @@ h3,
 h4,
 h5,
 h6 {
+	&:where(.wp-block-heading) {
+		// This block has customizable padding, border-box makes that more predictable.
+		box-sizing: border-box;
+	}
+
 	&:where(.wp-block-heading).has-background {
 		padding: $block-bg-padding;
 	}

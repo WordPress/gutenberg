@@ -55,5 +55,6 @@
 			"width": true,
 			"style": true
 		}
-	}
+	},
+	"style": "wp-block-tab-panels"
 }
