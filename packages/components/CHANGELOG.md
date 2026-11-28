@@ -105,6 +105,7 @@
 -   `TimePicker`: Replace every underscore in the time zone tooltip, so `Asia/Ho_Chi_Minh` shows as `Asia/Ho Chi Minh` instead of `Asia/Ho Chi_Minh` ([#86826](https://github.com/WordPress/gutenberg/pull/86826)).
 -   `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across themes and interaction states, including numbered toolbar buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
+-   Type declarations: Stop inlining React DOM attribute types into the published declarations of component hooks and polymorphic components, so they type-check with `@types/react` 18 again ([#84526](https://github.com/WordPress/gutenberg/pull/84526)).
 
 ### Internal
 

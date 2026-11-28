@@ -23,7 +23,7 @@ const CSS_WIDE_KEYWORDS = new Set( [
  */
 export default function useText(
 	props: WordPressComponentProps< Props, 'span' >
-) {
+): ReturnType< typeof useTruncate > {
 	const {
 		adjustLineHeightForInnerControls,
 		align,
