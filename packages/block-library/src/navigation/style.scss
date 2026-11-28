@@ -509,6 +509,14 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+// The inner container shares the `wp-block-navigation` class with the wrapper, so
+// global styles that target `.wp-block-navigation` (e.g. a theme.json font size)
+// would otherwise apply twice and multiply relative units. The wrapper alone sets
+// the font size; the container inherits it.
+.wp-block-navigation__container.wp-block-navigation {
+	font-size: inherit;
+}
+
 // Navigation block inner container.
 .wp-block-navigation__container {
 	display: flex;
