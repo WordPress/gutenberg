@@ -1,0 +1,290 @@
+/*
+ * The drop area and the selected-file rows share one shape. An empty drop
+ * area is the height of an input. A chosen file is taller, with a larger
+ * thumbnail and its type and size below its name, so the change reads as
+ * intentional.
+ *
+ * The drop area is a control, so it uses the same neutral interactive colors
+ * as an outline `Button`, with a dashed border where a file can go.
+ */
+.surface {
+	position: relative;
+	box-sizing: border-box;
+	min-block-size: var(--wpds-dimension-size-lg);
+	min-inline-size: 0;
+	border:
+		var(--wpds-border-width-xs) dashed
+		var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-interactive-neutral-weak);
+	color: var(--wpds-color-foreground-interactive-neutral);
+}
+
+/*
+ * A row shows a file that is already chosen. It isn't a control itself, so it
+ * uses surface colors and a solid border. Its padding matches a picker
+ * button that shows a chosen file, so a row and a drop area line up.
+ */
+.row {
+	border-style: solid;
+	border-color: var(--wpds-color-stroke-surface-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+	padding-block: var(--file-row-padding);
+	padding-inline-start: var(--file-row-padding);
+}
+
+/*
+ * The padding of a picker button that prompts for a file, and of a chosen
+ * file. A picker button also declares them, so it keeps its padding outside
+ * a drop area.
+ */
+.surface,
+.choose {
+	--file-picker-padding-block: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
+	--file-row-padding: calc(var(--wpds-dimension-padding-md) - var(--wpds-border-width-xs));
+}
+
+/* The picker button fills the drop area, apart from the space the remove button takes. */
+.choose {
+	flex: 1;
+	min-inline-size: 0;
+	padding-block: var(--file-picker-padding-block);
+	padding-inline: var(--wpds-dimension-padding-sm);
+	color: inherit;
+	text-align: start;
+
+	&:not([data-disabled]) {
+		cursor: var(--wpds-cursor-control);
+	}
+
+	&[data-disabled] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+
+		@media (forced-colors: active) {
+			color: GrayText;
+		}
+	}
+}
+
+/* A picker button that shows a chosen file has the same padding as a row. */
+.choose:has(> .summary) {
+	padding-block: var(--file-row-padding);
+	padding-inline-start: var(--file-row-padding);
+}
+
+/*
+ * The picker button can't wrap the remove button, so the drop area draws the
+ * button's focus ring. It then spans the whole row, like the hover background.
+ * `Button` shows its ring on any focus that isn't a press, so this does too.
+ */
+.surface > .choose:focus {
+	outline: none;
+}
+
+.surface:has(> .choose:focus:not(:active)) {
+	outline:
+		var(--wpds-border-width-focus) solid
+		var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
+}
+
+/* The picker button fills the drop area's height, so all of it is clickable. */
+.surface > .choose {
+	align-self: stretch;
+}
+
+/*
+ * Leave room for the remove button at the end of a drop area or row, with the
+ * same spacing as a button in an input's suffix.
+ */
+.surface:has(> .remove),
+.row {
+	padding-inline-end: calc(var(--wpds-dimension-padding-md) - var(--wpds-dimension-padding-xs));
+}
+
+/*
+ * Center the remove button on the first line of the name, as the actions in a
+ * DataViews table are.
+ */
+.row > .remove {
+	margin-block-start: calc((var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-sm)) / 2);
+}
+
+/* In a drop area, the picker button holds the padding, so add it here. */
+.surface:has(> .choose) > .remove {
+	margin-block-start: calc(var(--file-row-padding) + (var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-sm)) / 2);
+}
+
+.surface:has(> .choose:not([data-disabled]):hover) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
+}
+
+/*
+ * `Button` stays focusable when disabled, so the browser doesn't gray it out
+ * in forced-colors mode. Do it here, as `Button` does.
+ */
+.surface:has(> .choose[data-disabled]) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+
+	@media (forced-colors: active) {
+		border-color: GrayText;
+	}
+}
+
+/* A box for the add icon in a picker button that prompts for a file. */
+.prompt-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: var(--wpds-dimension-size-sm);
+	block-size: var(--wpds-dimension-size-sm);
+}
+
+/*
+ * The thumbnail of a chosen file, as tall as the name and the type and size
+ * below it. A file that isn't an image shows its icon on a weak background.
+ */
+.thumbnail {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: var(--wpds-dimension-size-lg);
+	block-size: var(--wpds-dimension-size-lg);
+	overflow: hidden;
+	/* One step smaller than the row's radius, so it nests inside it. */
+	border-radius: var(--wpds-border-radius-xs);
+	background: var(--wpds-color-background-surface-neutral-weak);
+
+	& img {
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+	}
+}
+
+/*
+ * A hairline inside an image's edge, so a light image stays visible on a
+ * light row. It matches the media thumbnails in DataViews.
+ */
+.thumbnail:has(img) {
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+	}
+}
+
+.summary {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+/*
+ * The filename, and what follows it on the line below, such as the type and
+ * size. With a one-line name, both lines are as tall as the thumbnail. Every
+ * row has this layout, whatever the length of its name.
+ */
+.text {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-sm);
+	min-inline-size: 0;
+	/*
+	 * Nothing here is cut, so everyone can read all of it, also on a touch
+	 * screen, where a tooltip isn't available. A filename often has no
+	 * spaces, so let it, and the type taken from it, break anywhere.
+	 */
+	overflow-wrap: anywhere;
+}
+
+/*
+ * What follows the name: the type and size, a progress bar, or a status and
+ * its buttons. It keeps the height of a line of text while a progress bar
+ * takes its place.
+ */
+.trailing {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-sm);
+	min-block-size: var(--wpds-typography-line-height-xs);
+}
+
+.name {
+	/*
+	 * The lines of a wrapped name sit closer to each other than to the type
+	 * and size below them, so the name reads as one item.
+	 */
+	line-height: var(--wpds-typography-line-height-xs);
+}
+
+/*
+ * Text in a picker button is emphasized, as on other buttons. A filename in a
+ * row isn't interactive, so it stays regular.
+ */
+.choose .name,
+.prompt {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.weak {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+/* Inside a picker button, weaker text follows the button's own colors. */
+.choose .weak {
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
+}
+
+.choose[data-disabled] .weak {
+	color: inherit;
+}
+
+/*
+ * While a file uploads, a progress bar takes the place of its type and size,
+ * across the width of the name.
+ */
+.progress {
+	flex: 1;
+	/*
+	 * The bar is 1.5px tall. Centered at that height, it would start on a
+	 * fraction of a pixel, and look thicker in some rows than in others. A
+	 * whole-pixel box keeps every bar on the pixel grid.
+	 */
+	block-size: 2px;
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/*
+ * An error names the file, and a filename can be one long word, so let it
+ * break anywhere instead of making the page scroll sideways.
+ */
+.error {
+	overflow-wrap: anywhere;
+}
+
+/* The `DropZone` overlay covers the nearest positioned ancestor. */
+.drop-target {
+	position: relative;
+}
+
+/* A menu trigger that reads like a select, as in the source menu design. */
+.select {
+	inline-size: 100%;
+	justify-content: space-between;
+}

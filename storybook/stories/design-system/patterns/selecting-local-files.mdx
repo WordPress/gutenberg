@@ -1,0 +1,167 @@
+import { Canvas, Markdown, Meta, Source } from '@storybook/addon-docs/blocks';
+import * as FilePickerButtonStories from './file-picker-button.story';
+import * as FilePickerImportStories from './file-picker-import.story';
+import * as FilePickerMenuStories from './file-picker-menu.story';
+import * as FilePickerDropZoneStories from './file-picker-drop-zone.story';
+import * as FilePickerMultipleStories from './file-picker-multiple.story';
+import * as FilePickerUploadStories from './file-picker-upload.story';
+import * as FilePickerPanelStories from './file-picker-panel.story';
+import FilePickerButtonSource from './file-picker-button.tsx?raw';
+import FilePickerImportSource from './file-picker-import.tsx?raw';
+import FilePickerMenuSource from './file-picker-menu.tsx?raw';
+import FilePickerDropZoneSource from './file-picker-drop-zone.tsx?raw';
+import FilePickerMultipleSource from './file-picker-multiple.tsx?raw';
+import FilePickerUploadSource from './file-picker-upload.tsx?raw';
+import FilePickerPanelSource from './file-picker-panel.tsx?raw';
+import FilePickerPreviewSource from './file-picker-preview.tsx?raw';
+import FilePickerPreviewStylesSource from './file-picker-preview.module.css?raw';
+import SelectedFileSource from './selected-file.tsx?raw';
+import FilePickerStylesSource from './file-picker.module.css?raw';
+
+<Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
+
+# Selecting Local Files
+
+Let people choose files from their device with a drop area, a button, or a menu, and show what they chose. Use `FormFileUpload` from `@wordpress/components` to open the native file picker. Its `render` prop receives `openFileDialog`, so any control can open the picker, while the file input stays hidden. It also handles browser quirks, such as `accept="audio/*"` on iOS.
+
+<Markdown>{ `
+| Pattern | Use it when |
+| --- | --- |
+| [Drop area](#drop-area) | A form field takes one file, such as a cover image. |
+| [Drop area for several files](#drop-area-for-several-files) | A form field collects a list of files, such as receipts and photos. |
+| [Upload status](#upload-status) | Each file uploads as soon as it's added. |
+| [Panel drop target](#panel-drop-target) | A whole panel or dialog accepts files, such as the Font Library. |
+| [Import on choose](#import-on-choose) | The file is used as soon as it's chosen, such as when importing a pattern. |
+| [Choose, then submit](#choose-then-submit) | A form uses the file when it's submitted. |
+| [Media sources](#media-sources) | People can pick from the Media Library or upload from their device. |
+` }</Markdown>
+
+## Drop area
+
+Lay the field out like other form fields: the label, then the drop area, then the description. The drop area is the dashed box. A picker button, a `Button` with `variant="unstyled"`, fills it, so a click, Enter, or Space opens the picker. Dropping a file is an extra way to choose one, not the only way.
+
+<Canvas
+	of={ FilePickerDropZoneStories.ChooseFile }
+	source={ { code: FilePickerDropZoneSource, language: 'tsx', type: 'code' } }
+/>
+
+- **Let the whole field accept a drop.** Place `DropZone` inside the `Fieldset`. Its overlay covers the nearest positioned ancestor, so the fieldset needs `position: relative`. The overlay then has room for its icon and label, which don't fit in a field the height of an input, and a file dropped on the legend or description doesn't open in the browser tab.
+- **Send chosen and dropped files through one handler.** Both paths then follow the same rules. `accept` only filters the picker, and people can still choose or drop any file, so check every file in the handler.
+- **Keep the last valid file when a new one is rejected.** Show the error below the description, in a live region, and link it to the button with `aria-describedby`.
+- **Show what was chosen.** The picker button shows a thumbnail, the filename, and the file type and size. Other files show a file icon in place of the thumbnail.
+- **Say that dropping works.** The picker button names the action, such as "Add an image", and the description says a file can be dropped there. A dashed border alone doesn't tell people that.
+- **Put the remove button beside the picker button, inside the drop area.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the picker button after a removal. Removing a file only clears the selection. It doesn't delete a file that was already uploaded.
+- **Name the picker button after its action.** When it shows a file, put a visually hidden "Replace" before the file, so its accessible name is "Replace cover.png PNG 812 KB". An `aria-label` would hide the type and size from assistive technology.
+- **Mark the field the way the rest of the form does.** Add "(Required)" to required fields, or "(Optional)" when the form marks optional fields instead, in the legend's own style.
+
+A `Fieldset` groups the drop area and the remove button under one legend. A disabled fieldset disables the buttons and the hidden input natively, but each `Button` also needs its own `disabled` prop to look disabled. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
+
+<Canvas of={ FilePickerDropZoneStories.Disabled } sourceState="none" />
+
+## Drop area for several files
+
+Set `multiple` on `FormFileUpload` and show each file in its own row, above the drop area. The drop target covers the whole field, so a large area accepts files, and a file dropped on the legend doesn't open in the browser tab.
+
+<Canvas
+	of={ FilePickerMultipleStories.ChooseFiles }
+	source={ { code: FilePickerMultipleSource, language: 'tsx', type: 'code' } }
+/>
+
+- **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can usually be told apart.
+- **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the picker button when the list is empty.
+- **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
+- **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". An otherwise valid file dropped on a full field gets the limit message.
+- **Show the whole filename.** Don't cut a long name with an ellipsis. A tooltip can't bring the rest back on a touch screen, and two files with the same start then look the same. Let the name wrap, and let it break inside a word, because filenames often have no spaces. A long name makes only its own row taller.
+- **Show the file type below the name.** The type and size sit on their own line, so people can tell `report.pdf` from `report.png` at a glance. Every row has the same layout, whatever the length of its name, and the thumbnail and the remove button line up with the first line of the name.
+- **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
+
+## Upload status
+
+When each file uploads as soon as it's added, show the upload's status in its row. While a file uploads, a short `Progress` bar takes the place of its type and size, and its name is weaker. When it finishes, the type and size come back, followed by "Uploaded" in plain text: a finished upload is the normal state, so it doesn't need to draw the eye. When it fails, the row shows only a `Badge` with `intent="high"` that says "Couldn't upload", and a "Retry" button, so the failure stands out. In a narrow row, the badge and "Retry" move below the name together, as the type and size do.
+
+<Canvas
+	of={ FilePickerUploadStories.UploadStatus }
+	source={ { code: FilePickerUploadSource, language: 'tsx', type: 'code' } }
+/>
+
+The upload here is simulated, and the first try for each PDF fails, so you can try "Retry".
+
+- **Keep each row's actions visible.** While a file uploads, its remove button cancels the upload, so its name says so: "Cancel upload of photo.jpg".
+- **Keep focus in the row after "Retry".** The button goes away when the upload restarts, so move focus to the row's remove button.
+- **Announce the result, not the progress.** Call `speak()` when a file finishes or fails. The `Progress` bar exposes its value to assistive technology, so don't announce each step. Each `speak()` call replaces the previous message, so combine results that arrive together into one announcement.
+- **Say the status in words.** "Couldn't upload" is a `Badge` with the error colors, and "Uploaded" is plain text. The words carry the meaning without the color.
+- **Keep "Uploaded" in the row.** The progress bar going away is easy to miss, and the announcement is spoken once. The word still says the file is done to someone who comes back later, and it tells an uploaded file from one that is only chosen.
+
+## Panel drop target
+
+When a whole panel or dialog accepts files, put the `DropZone` in the panel's container, so a file dropped anywhere in it is added. The Font Library and the media dialog work this way. An `EmptyState` explains what to drop, and a button in the panel's header opens the picker.
+
+<Canvas
+	of={ FilePickerPanelStories.PanelDropTarget }
+	source={ { code: FilePickerPanelSource, language: 'tsx', type: 'code' } }
+/>
+
+Keep the button in the same place when files arrive. If it moved from the empty state to the header, it would lose focus as soon as the first file was added.
+
+## Import on choose
+
+When choosing a file is the whole task, start the work as soon as the picker closes, as "Import pattern from JSON" on the Patterns screen does. In this example, the button shows its `loading` state until the import finishes.
+
+<Canvas
+	of={ FilePickerImportStories.ImportOnChoose }
+	source={ { code: FilePickerImportSource, language: 'tsx', type: 'code' } }
+/>
+
+A snackbar confirms the import, as on the Patterns screen. An error stays below the button until the next try, because a snackbar can disappear before people read it.
+
+The preview keeps its own snackbar list and a stand-in for the import request. A WordPress screen uses its existing snackbar region and its real request.
+
+<Source code={ FilePickerPreviewSource } language="tsx" />
+
+<Source code={ FilePickerPreviewStylesSource } language="css" />
+
+## Choose, then submit
+
+When people should check their choice before the work starts, or the file is one part of a larger form, keep the chosen `File` in state and pass it to the submit handler. The import form on the Manage Patterns screen works this way. Show it below the button with the same row as a list of several files.
+
+<Canvas
+	of={ FilePickerButtonStories.ChooseFile }
+	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
+/>
+
+- **End the label with an ellipsis.** The button opens another interface. A drop area's prompt, such as "Add an image", follows the field design and has none.
+- **Clear the input after reading the file.** Then choosing the same file again fires another change. When the picker closes without a selection, keep the previous file.
+- **Check the file type.** `accept` only filters the picker, so people can still choose a PDF here.
+- **Check required files on submit.** Keep the submit button enabled. If no file is chosen, show the error and move focus to "Choose file…". The hidden input can't show the browser's own message, because it can't receive focus.
+
+## Media sources
+
+When people can pick an image from the Media Library or upload one, offer both in a menu. Wrap the whole menu in `FormFileUpload`, not only the "Upload…" item. The menu closes when an item is activated and unmounts its content, so an input inside the item would be gone before the selection arrives.
+
+<Canvas
+	of={ FilePickerMenuStories.ChooseFile }
+	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
+/>
+
+In this preview, a dialog with three sample images stands in for the Media Library. In the editor, use [`MediaUpload`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/media-upload/README.md) inside `MediaUploadCheck`, with `allowedTypes={ [ 'image' ] }`. Keep it outside the menu, like `FormFileUpload`, and call `open` from its `render` prop in the menu item, because it closes the library when it unmounts. Its `onSelect` receives an attachment, not a `File`, so keep whichever one people chose.
+
+- **Keep the remove button in the row.** Don't hide it as a "Reset" item in the menu, where people can't see it.
+- **Return focus to the trigger.** The menu item that opened the dialog is gone when the dialog closes, so pass the trigger to the dialog's `finalFocus`.
+
+## Shared parts
+
+The examples share the parts that show a chosen file. `FileSummary` renders only phrasing content, so it can be the content of a button. `SelectedFile` is a row with a remove button, and it can also show a status, a progress bar, and other actions. `FilePickerError` says why a file was rejected, in a live region that stays mounted.
+
+<Source code={ SelectedFileSource } language="tsx" />
+
+The drop area is a control, so it uses the same neutral interactive tokens as an outline `Button`, with a dashed border where a file can go. The rows show files that are already chosen, so they use surface tokens.
+
+<Source code={ FilePickerStylesSource } language="css" />
+
+## Checklist
+
+- **Keep a click target.** Dropping files never replaces a button that people can reach with a keyboard or a single tap.
+- **Check every file.** Validate type, size, and count in the handler, for files from the picker and from a drop.
+- **Clear the input after reading it.** Otherwise choosing the same file again does nothing.
+- **Announce changes.** Use `speak()` when a file is added, removed, uploaded, or fails, and put errors in a live region beside the field.
+- **Keep the `File` for later.** If a separate button submits the form, keep the chosen `File` in state and pass it to the submit handler.

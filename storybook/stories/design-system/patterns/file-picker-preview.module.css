@@ -1,0 +1,30 @@
+/*
+ * Styles for the preview only: where the snackbars sit, and the Media
+ * Library stand-in. A WordPress screen has its own for both.
+ */
+
+/*
+ * The snackbars sit below the example, in the page flow, so a long one never
+ * covers the controls.
+ */
+.snackbars:global(.components-snackbar-list) {
+	position: static;
+}
+
+/* A Media Library item: the whole row picks the image. */
+.option {
+	display: flex;
+	box-sizing: border-box;
+	inline-size: 100%;
+	min-block-size: var(--wpds-dimension-size-lg);
+	border:
+		var(--wpds-border-width-xs) solid
+		var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-interactive-neutral-weak);
+
+	&:hover {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		background: var(--wpds-color-background-interactive-neutral-weak-active);
+	}
+}
