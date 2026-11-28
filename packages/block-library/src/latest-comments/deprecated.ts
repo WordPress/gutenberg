@@ -1,3 +1,8 @@
+import type {
+	LatestCommentsAttributes,
+	LatestCommentsDeprecatedAttributes,
+} from './types';
+
 const v1 = {
 	attributes: {
 		commentsToShow: {
@@ -52,10 +57,12 @@ const v1 = {
 			clientNavigation: true,
 		},
 	},
-	isEligible( attributes ) {
+	isEligible( attributes: LatestCommentsDeprecatedAttributes ) {
 		return attributes?.displayExcerpt === false;
 	},
-	migrate( attributes ) {
+	migrate(
+		attributes: LatestCommentsDeprecatedAttributes
+	): LatestCommentsAttributes {
 		return {
 			...attributes,
 			displayContent: attributes.displayExcerpt ? 'excerpt' : 'none',

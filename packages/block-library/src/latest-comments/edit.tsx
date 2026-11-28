@@ -10,29 +10,34 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 import { SelectControl } from '@wordpress/ui';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import type { LatestCommentsAttributes } from './types';
 
 /**
  * Minimum number of comments a user can show using this block.
- *
- * @type {number}
  */
 const MIN_COMMENTS = 1;
 /**
  * Maximum number of comments a user can show using this block.
- *
- * @type {number}
  */
 const MAX_COMMENTS = 100;
 
-const DISPLAY_CONTENT_ITEMS = [
+const DISPLAY_CONTENT_ITEMS: {
+	label: string;
+	value: NonNullable< LatestCommentsAttributes[ 'displayContent' ] >;
+}[] = [
 	{ label: __( 'No content' ), value: 'none' },
 	{ label: __( 'Excerpt' ), value: 'excerpt' },
 	{ label: __( 'Full content' ), value: 'full' },
 ];
 
-export default function LatestComments( { attributes, setAttributes, name } ) {
+export default function LatestComments( {
+	attributes,
+	setAttributes,
+	name,
+}: BlockEditProps< LatestCommentsAttributes > ) {
 	const { commentsToShow, displayAvatar, displayDate, displayContent } =
 		attributes;
 
@@ -122,7 +127,10 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 							}
 							onValueChange={ ( item ) =>
 								item &&
-								setAttributes( { displayContent: item.value } )
+								setAttributes( {
+									displayContent:
+										item.value as LatestCommentsAttributes[ 'displayContent' ],
+								} )
 							}
 						/>
 					</ToolsPanelItem>
@@ -159,7 +167,7 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						{ sprintf(
 							/* translators: %s: error message returned when rendering the block. */
 							__( 'Error: %s' ),
-							error
+							error!
 						) }
 					</p>
 				</div>
