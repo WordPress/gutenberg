@@ -1,6 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
