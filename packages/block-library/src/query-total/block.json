@@ -13,7 +13,7 @@
 			"default": "total-results"
 		}
 	},
-	"usesContext": [ "queryId", "query" ],
+	"usesContext": [ "queryId", "query", "useAlphabeticalPagination" ],
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
