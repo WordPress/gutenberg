@@ -8,13 +8,43 @@ const { parseDirectiveName } = privateApis(
 /** Prefix of attributes eligible for directive name parsing in `toVdom()`. */
 const directivePrefix = 'data-wp-';
 
+/** Keep host eligibility aligned with `interactivity/src/html.ts`. */
+const unsupportedHtmlElements = new Set( [
+	'area',
+	'base',
+	'basefont',
+	'bgsound',
+	'br',
+	'col',
+	'embed',
+	'frame',
+	'hr',
+	'img',
+	'input',
+	'keygen',
+	'link',
+	'meta',
+	'param',
+	'source',
+	'track',
+	'wbr',
+	'textarea',
+	'title',
+	'script',
+	'style',
+	'iframe',
+	'xmp',
+	'noembed',
+	'noframes',
+] );
+
 /**
  * Finds the closest element, starting with `element` itself, whose content is
  * inert `data-wp-html` content.
  *
- * Inside an interactive region, this mirrors `toVdom()`: the element has a
- * `data-wp-html` entry without a suffix (as parsed by `parseDirectiveName()`;
- * a unique ID is allowed), and no `data-wp-text`, `data-wp-each` or
+ * Inside an interactive region, this mirrors `toVdom()`: the host supports HTML
+ * content, has a `data-wp-html` entry without a suffix or unique ID (as parsed
+ * by `parseDirectiveName()`), and no `data-wp-text`, `data-wp-each` or
  * `data-wp-router-region` entry with any suffix or unique ID. Keep both in
  * sync; `test/html-directive-element.jsdom.test.ts` compares them.
  *
@@ -27,6 +57,9 @@ export function closestHtmlDirectiveElement(
 	for ( let current = element; current; current = current.parentElement ) {
 		if ( ! current.closest( '[data-wp-interactive]' ) ) {
 			return null;
+		}
+		if ( unsupportedHtmlElements.has( current.localName ) ) {
+			continue;
 		}
 		let hasDefaultHtmlDirective = false;
 		let hasConflict = false;
@@ -41,8 +74,8 @@ export function closestHtmlDirectiveElement(
 			if ( ! parsed ) {
 				continue;
 			}
-			const { prefix, suffix } = parsed;
-			if ( prefix === 'html' && suffix === null ) {
+			const { prefix, suffix, uniqueId } = parsed;
+			if ( prefix === 'html' && suffix === null && uniqueId === null ) {
 				hasDefaultHtmlDirective = true;
 			}
 			if ( [ 'text', 'each', 'router-region' ].includes( prefix ) ) {

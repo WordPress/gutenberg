@@ -718,7 +718,7 @@ function ImageEditorCanvasInner(
 		if ( ! showDimensions || ! activeHandle || ! state.image ) {
 			return null;
 		}
-		// Use the mapper's near-full-crop rule. The size is measured in
+		// Use `getImageEdit`'s near-full-crop rule. The size is measured in
 		// state.image pixels, which may differ from the saved file.
 		return getOutputSize( state );
 	}, [ showDimensions, activeHandle, state ] );

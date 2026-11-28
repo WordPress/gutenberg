@@ -94,7 +94,7 @@ function render_block_core_video( array $attributes, string $content ): string {
 	if ( ! is_string( $style ) ) {
 		$style = '';
 	}
-	$aspect_ratio_style = sprintf( 'aspect-ratio: %d / %d;', $metadata['width'], $metadata['height'] );
+	$aspect_ratio_style = sprintf( 'aspect-ratio: auto %d / %d;', $metadata['width'], $metadata['height'] );
 	$p->set_attribute( 'style', $aspect_ratio_style . $style );
 
 	return $p->get_updated_html();

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PluginArea` subscribes to plugin registration under a namespace for its scope, so unmounting an area no longer stops areas with other scopes from updating when a plugin is registered or unregistered ([#87510](https://github.com/WordPress/gutenberg/pull/87510)).
+
+## 8.2.0 (2026-11-18)
+
 ## 8.1.0 (2026-11-04)
 
 ### Internal

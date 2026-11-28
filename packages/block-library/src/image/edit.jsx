@@ -21,11 +21,10 @@ import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
-import { isValidFileType } from './utils';
+import { getDefaultLinkDestination, isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
@@ -255,43 +254,20 @@ export function ImageEdit( {
 			};
 		}
 
-		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
-			// Use the WordPress option to determine the proper default.
-			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			switch (
-				window?.wp?.media?.view?.settings?.defaultProps?.link ||
-				LINK_DESTINATION_NONE
-			) {
-				case 'file':
-				case LINK_DESTINATION_MEDIA:
-					linkDestination = LINK_DESTINATION_MEDIA;
-					break;
-				case 'post':
-				case LINK_DESTINATION_ATTACHMENT:
-					linkDestination = LINK_DESTINATION_ATTACHMENT;
-					break;
-				case LINK_DESTINATION_CUSTOM:
-					linkDestination = LINK_DESTINATION_CUSTOM;
-					break;
-				case LINK_DESTINATION_NONE:
-					linkDestination = LINK_DESTINATION_NONE;
-					break;
-			}
-		}
+		const linkDestination =
+			attributes.linkDestination || getDefaultLinkDestination();
 
-		// Check if the image is linked to it's media.
-		let href;
 		switch ( linkDestination ) {
 			case LINK_DESTINATION_MEDIA:
-				href = media.url;
+				mediaAttributes.href = media.url;
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
-				href = media.link;
+				mediaAttributes.href = media.link;
+				break;
+			case LINK_DESTINATION_NONE:
+				mediaAttributes.href = undefined;
 				break;
 		}
-		mediaAttributes.href = href;
 
 		setAttributes( {
 			blob: undefined,

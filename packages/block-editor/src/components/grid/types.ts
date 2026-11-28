@@ -7,13 +7,14 @@ import type {
 } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { GridRect } from './utils';
+import type { BlockStyleState, ChildLayoutBlockStyle } from '../../hooks/types';
 
 /**
  * The position and size of a block within its grid, from `style.layout`.
  */
 export interface GridItemLayout {
-	columnStart?: number;
-	rowStart?: number;
+	columnStart?: number | null;
+	rowStart?: number | null;
 	columnSpan?: number;
 	rowSpan?: number;
 	[ key: string ]: unknown;
@@ -31,8 +32,8 @@ export interface GridItemAttributes {
  * The area of a grid a `GridRect` covers. Spans take precedence over ends.
  */
 export interface GridRectOptions {
-	columnStart?: number;
-	rowStart?: number;
+	columnStart?: number | null;
+	rowStart?: number | null;
 	columnEnd?: number;
 	rowEnd?: number;
 	columnSpan?: number;
@@ -86,11 +87,16 @@ export interface GridItemResizerInnerProps extends Omit<
 	blockElement: HTMLElement;
 	rootBlockElement: HTMLElement;
 	isManualGrid?: boolean;
+	collapseEmptyColumnGaps?: boolean;
 }
 
 export interface GridItemMoversProps {
-	/** Position and size of the grid item. */
-	layout?: GridItemLayout;
+	/** Style attributes of the grid item. */
+	style?: ChildLayoutBlockStyle;
+	/** Selected style state of the grid item. */
+	selectedState?: BlockStyleState;
+	/** Whether responsive editing is enabled. */
+	isResponsiveEditing?: boolean;
 	/** Layout of the grid block. */
 	parentLayout?: Layout;
 	/** Called with the new position of the grid item. */

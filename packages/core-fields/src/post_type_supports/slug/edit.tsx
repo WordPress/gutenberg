@@ -1,5 +1,5 @@
 import { Button } from '@wordpress/components';
-import { copySmall } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useRef, useState } from '@wordpress/element';
@@ -88,7 +88,9 @@ const SlugEdit = ( {
 							) }
 						</span>
 						<Link
-							href="https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink"
+							href={ __(
+								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+							) }
 							openInNewTab
 						>
 							{ __( 'Learn more' ) }
@@ -100,7 +102,7 @@ const SlugEdit = ( {
 							<InputLayout.Slot padding="minimal">
 								<Button
 									size="small"
-									icon={ copySmall }
+									icon={ copy }
 									ref={ copyButtonRef }
 									label={ __( 'Copy' ) }
 								/>

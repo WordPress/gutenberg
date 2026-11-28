@@ -1,19 +1,18 @@
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	MenuGroup,
-	MenuItem,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import type { ReactNode } from 'react';
-import { check } from '@wordpress/icons';
-import { Text } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Text,
+} from '@wordpress/ui';
 import EditContents from './edit-contents';
 import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
@@ -81,6 +80,13 @@ function StyleInspectorSlots( {
 				label={ __( 'Dimensions' ) }
 			/>
 			<InspectorControls.Slot group="border" label={ __( 'Borders' ) } />
+			<InspectorControls.Slot
+				group="transform"
+				label={ _x(
+					'Transform',
+					'Visual transform styles such as rotate, move and scale'
+				) }
+			/>
 			<InspectorControls.Slot
 				group="elements"
 				label={ __( 'Elements' ) }
@@ -152,6 +158,13 @@ function StyleStateInspectorSlots( {
 					<InspectorControls.Slot
 						group="border"
 						label={ __( 'Borders' ) }
+					/>
+					<InspectorControls.Slot
+						group="transform"
+						label={ _x(
+							'Transform',
+							'Visual transform styles such as rotate, move and scale'
+						) }
 					/>
 					<InspectorControls.Slot
 						group="elements"
@@ -503,11 +516,10 @@ const BlockInspectorSingleBlock = ( {
 							value={ selectedBlockStyleState }
 							onChange={ onBlockStyleStateChange }
 						>
-							<MenuGroup>
-								<MenuItem
-									role="menuitemcheckbox"
-									isSelected={ showStateOnCanvas }
-									icon={ showStateOnCanvas ? check : null }
+							<Menu.Group>
+								<Menu.CheckboxItem
+									checked={ showStateOnCanvas }
+									closeOnClick={ false }
 									// Previewing is only meaningful while a
 									// non-default pseudo state is selected.
 									disabled={
@@ -515,15 +527,15 @@ const BlockInspectorSingleBlock = ( {
 											selectedBlockStyleState
 										)
 									}
-									onClick={ () =>
-										onShowStateOnCanvasChange(
-											! showStateOnCanvas
-										)
+									onCheckedChange={
+										onShowStateOnCanvasChange
 									}
 								>
-									{ __( 'Preview on canvas' ) }
-								</MenuItem>
-							</MenuGroup>
+									<Menu.ItemLabel>
+										{ __( 'Preview on canvas' ) }
+									</Menu.ItemLabel>
+								</Menu.CheckboxItem>
+							</Menu.Group>
 						</BlockStatesControl>
 					)
 				}

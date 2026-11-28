@@ -15,7 +15,7 @@ import {
 	SearchControl,
 } from '@wordpress/components';
 import { InputControl, Spinner, Stack } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useDebounce, useEvent } from '@wordpress/compose';
 import {
 	store as coreStore,
@@ -143,7 +143,7 @@ export function findTerm( terms, parent, name ) {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&
-			term.name.toLowerCase() === name.toLowerCase()
+			decodeEntities( term.name ).toLowerCase() === name.toLowerCase()
 		);
 	} );
 }
@@ -178,7 +178,7 @@ export function getFilterMatcher( filterValue ) {
 		// (i.e. some child matched at some point in the tree) then return it.
 		if (
 			-1 !==
-				normalizeTextString( term.name ).indexOf(
+				normalizeTextString( decodeEntities( term.name ) ).indexOf(
 					normalizedFilterValue
 				) ||
 			term.children.length > 0
@@ -258,7 +258,9 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ slug ]
 	);
 
-	const { editPost } = useDispatch( editorStore );
+	const registry = useRegistry();
+	const { editPost, lockPostSaving, unlockPostSaving } =
+		useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -369,30 +371,41 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-		let newTerm;
+		// Lock saving until the term is assigned, so the post isn't saved
+		// without it.
+		const lockName = `term-create-${ slug }`;
+		lockPostSaving( lockName );
 		try {
-			newTerm = await addTerm( {
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			} );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-			return;
+			let newTerm;
+			try {
+				newTerm = await addTerm( {
+					name: formName,
+					parent: formParent ? formParent : undefined,
+				} );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+				return;
+			}
+			const defaultName =
+				slug === 'category' ? __( 'Category' ) : __( 'Term' );
+			const termAddedMessage = sprintf(
+				/* translators: %s: term name. */
+				_x( '%s added', 'term' ),
+				taxonomy?.labels?.singular_name ?? defaultName
+			);
+			speak( termAddedMessage, 'assertive' );
+			setFormName( '' );
+			setFormParent( '' );
+			const assignedTermIds = registry
+				.select( editorStore )
+				.getEditedPostAttribute( taxonomy.rest_base );
+			onUpdateTerms( [ ...assignedTermIds, newTerm.id ] );
+		} finally {
+			setAdding( false );
+			unlockPostSaving( lockName );
 		}
-		const defaultName =
-			slug === 'category' ? __( 'Category' ) : __( 'Term' );
-		const termAddedMessage = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s added', 'term' ),
-			taxonomy?.labels?.singular_name ?? defaultName
-		);
-		speak( termAddedMessage, 'assertive' );
-		setAdding( false );
-		setFormName( '' );
-		setFormParent( '' );
-		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
 	const labelWithFallback = (

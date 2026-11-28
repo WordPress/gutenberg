@@ -44,6 +44,11 @@
 			}
 		},
 		"shadow": true,
+		"transform": {
+			"rotate": true,
+			"translate": true,
+			"scale": true
+		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,

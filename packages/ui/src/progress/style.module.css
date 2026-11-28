@@ -36,7 +36,7 @@
 			inset-block-start: 0;
 			height: 100%;
 			border-radius: inherit;
-			color: var(--wpds-color-background-thumb-neutral);
+			color: var(--wpds-color-background-indicator-neutral);
 			background-color: currentColor;
 
 			@media not (prefers-reduced-motion) {

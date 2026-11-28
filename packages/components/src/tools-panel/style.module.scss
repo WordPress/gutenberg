@@ -1,9 +1,7 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 .tools-panel {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	margin-top: -$border-width;
 	padding: $grid-unit-20;
 }
@@ -88,7 +86,7 @@
 }
 
 .reset-label {
-	color: $components-color-accent-darker-10;
+	color: var(--wpds-color-foreground-interactive-brand);
 	font-size: var(--wpds-typography-font-size-xs);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 1.4;
@@ -97,7 +95,7 @@
 }
 
 .default-controls-item {
-	color: $gray-900;
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	// Match the foreground of the highlighted item's brand fill.
 	&:focus .reset-label {
@@ -108,14 +106,10 @@
 // Preserve the established specificity so disabled MenuItem styles
 // continue to override its defaults.
 .default-controls-item.default-controls-item[aria-disabled="true"] {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	opacity: 1;
 
 	&:hover {
-		color: $gray-700;
-	}
-
-	.reset-label {
-		opacity: 0.3;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 }

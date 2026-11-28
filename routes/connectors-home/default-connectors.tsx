@@ -13,7 +13,11 @@ import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
+import {
+	useConnectorPlugin,
+	type InstallButtonClickEvent,
+	type PluginStatus,
+} from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
@@ -127,7 +131,7 @@ interface ConnectorActionAreaProps {
 	actionButtonRef: {
 		current: HTMLButtonElement | null;
 	};
-	handleButtonClick: () => void;
+	handleButtonClick: ( event?: InstallButtonClickEvent ) => void;
 	getButtonLabel: () => string;
 }
 

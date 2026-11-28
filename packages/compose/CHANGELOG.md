@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `__experimentalUseFixedWindowList` has been deprecated ([#87454](https://github.com/WordPress/gutenberg/pull/87454)).
+
+### Bug Fixes
+
+-   `useDialog`: Don't close the dialog when Escape is pressed to cancel an IME composition ([#87329](https://github.com/WordPress/gutenberg/pull/87329)).
+
+## 9.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`. ([#86445](https://github.com/WordPress/gutenberg/pull/86445))
+-   `useStateWithHistory`: Preserve the initial value type, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
+-   `useFixedWindowList`: Update the visible rows when an ancestor becomes the list's scroll container. ([#87019](https://github.com/WordPress/gutenberg/pull/87019))
+
 ## 9.1.0 (2026-11-04)
 
 ### Enhancements

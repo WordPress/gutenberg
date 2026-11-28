@@ -210,12 +210,15 @@ function useToolbarFocus( {
 				return;
 			}
 			// The last focused element is only recorded once focus has left
-			// the canvas, so fall back to the selected block. Without it
-			// escape leaves focus stranded in the toolbar, with no way back
+			// the canvas, and it may since have been removed from the
+			// document, such as when changing a heading's level replaces its
+			// element. In both cases, fall back to the selected block. Without
+			// it escape leaves focus stranded in the toolbar, with no way back
 			// to the canvas by keyboard.
-			const target =
-				getLastFocus()?.current ??
-				refsMap.get( getSelectedBlockClientId() );
+			const lastFocus = getLastFocus()?.current;
+			const target = lastFocus?.isConnected
+				? lastFocus
+				: refsMap.get( getSelectedBlockClientId() );
 			if ( target ) {
 				event.preventDefault();
 				// Block elements are HTML elements.

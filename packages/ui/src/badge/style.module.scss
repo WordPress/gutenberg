@@ -5,9 +5,18 @@
 
 	@layer components {
 		.badge {
+			display: inline-block;
 			padding-inline: var(--wpds-dimension-padding-sm);
 			padding-block: var(--wpds-dimension-padding-xs);
 			border-radius: var(--wpds-border-radius-lg);
+		}
+
+		.label {
+			display: inline-block;
+			max-width: 100%;
+			overflow: inherit;
+			text-overflow: inherit;
+			vertical-align: top;
 		}
 
 		.infotip-trigger {
@@ -66,6 +75,9 @@
 		.is-draft-intent {
 			background-color: var(--wpds-color-background-surface-neutral-weak);
 			color: var(--wpds-color-foreground-content-neutral);
+			border: var(--wpds-border-width-xs) dashed var(--wpds-color-stroke-surface-neutral);
+			padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+			padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
 		}
 
 		.is-none-intent {

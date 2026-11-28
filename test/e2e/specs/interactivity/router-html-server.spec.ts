@@ -204,7 +204,8 @@ test.describe( 'Router server-rendered HTML content', () => {
 		interactivityUtils: utils,
 	} ) => {
 		// One element's state is copied from `getServerState()`, the other's
-		// context from `getServerContext()` alone. Both are null on page one.
+		// context from `getServerContext()` and read through a getter. Both are
+		// null on page one.
 		const synced = [ 'synced-state-html', 'synced-context-html' ];
 		await page.goto( withServerProcessing( utils.getLink( 'sync one' ) ) );
 		await expect( page.getByTestId( 'hydrated' ) ).toHaveText( 'yes' );

@@ -6,7 +6,7 @@
 	margin-left: auto;
 	padding: 0 ( $grid-unit-15 + 6px );
 	color: var(--wpds-color-foreground-content-neutral);
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 
 	.editor-viewport-status__responsive-styles {
 		// Match the responsive styles cue in the View menu.
