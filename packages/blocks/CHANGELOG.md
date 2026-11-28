@@ -12,6 +12,7 @@
 ### Bug Fixes
 
 -   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
+-   `BlockConfiguration`: Type `example.attributes` as `Partial< Attributes >` instead of the `BlockType` attribute schema ([#87543](https://github.com/WordPress/gutenberg/pull/87543)).
 -   Preserve explicitly saved registered custom attributes when migrating deprecated block content ([#85723](https://github.com/WordPress/gutenberg/pull/85723)).
 
 ### Internal
