@@ -296,6 +296,7 @@ export default function BlockTools( {
 	}
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
+	const gridVisualizerRef = usePopoverScroll( __unstableContentRef );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -345,6 +346,13 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
+				{ /* Grid drop targets must remain visible while other popovers are hidden during dragging. */ }
+				<div className="block-editor-block-tools__grid-visualizer">
+					<WCPopover.Slot
+						name="block-editor-grid-visualizer"
+						ref={ gridVisualizerRef }
+					/>
+				</div>
 				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
 						// @ts-expect-error The inserters ignore `__unstableContentRef`.

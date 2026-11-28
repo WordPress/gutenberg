@@ -410,6 +410,8 @@ function GridTools( {
 	isManualPlacement,
 	parentLayout,
 }: GridToolsProps ) {
+	const isManualGrid =
+		isManualPlacement && window.__experimentalEnableGridInteractivity;
 	const {
 		rootClientId,
 		isVisible,
@@ -420,6 +422,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		isResponsiveEditing,
+		isDragging,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -429,13 +432,17 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				getDraggedBlockClientIds,
+				isDraggingBlocks,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
+			// The Canvas renders the overlay during a multi-selection drag.
 			if (
 				getTemplateLock( _rootClientId ) ||
-				getBlockEditingMode( _rootClientId ) !== 'default'
+				getBlockEditingMode( _rootClientId ) !== 'default' ||
+				( isManualGrid && getDraggedBlockClientIds().length > 1 )
 			) {
 				return {
 					rootClientId: _rootClientId,
@@ -463,9 +470,10 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				isResponsiveEditing: getIsResponsiveEditing(),
+				isDragging: isDraggingBlocks(),
 			};
 		},
-		[ clientId ]
+		[ clientId, isManualGrid ]
 	);
 
 	// Get the block's DOM element to derive the canvas iframe window,
@@ -520,7 +528,10 @@ function GridTools( {
 		return null;
 	}
 
-	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
+	// A dragged block is scaled down as its own drag preview. Unmount the
+	// resizer for the drag, so that its handles don't keep that scale.
+	const showResizer =
+		allowSizingOnChildren && ! isBlockItselfCurrentlyHidden && ! isDragging;
 
 	function updateLayout( layout: ChildLayout ) {
 		setAttributes( {
@@ -550,18 +561,17 @@ function GridTools( {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualPlacement &&
-				window.__experimentalEnableGridInteractivity && (
-					<GridItemMovers
-						style={ style }
-						selectedState={ selectedState }
-						isResponsiveEditing={ isResponsiveEditing }
-						parentLayout={ parentLayout }
-						onChange={ updateLayout }
-						gridClientId={ rootClientId }
-						blockClientId={ clientId }
-					/>
-				) }
+			{ isManualGrid && (
+				<GridItemMovers
+					style={ style }
+					selectedState={ selectedState }
+					isResponsiveEditing={ isResponsiveEditing }
+					parentLayout={ parentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
+				/>
+			) }
 		</>
 	);
 }

@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { blockDragOffsets } from '../../block-draggable/drag-offset';
 
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
@@ -52,6 +53,8 @@ export function useEventHandlers( {
 		resetZoomLevel,
 		startDraggingBlocks,
 		stopDraggingBlocks,
+		stopDragging,
+		hideInsertionPoint,
 		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
@@ -357,6 +360,13 @@ export function useEventHandlers( {
 				const { ownerDocument } = node;
 				// A rendered block's document has a window with a selection.
 				const defaultView = ownerDocument.defaultView!;
+				const frame =
+					defaultView.frameElement as HTMLIFrameElement | null;
+				const outerDocument = frame?.ownerDocument;
+				const dragDocuments = new Set( [
+					ownerDocument,
+					outerDocument,
+				] );
 				const selection = defaultView.getSelection()!;
 				selection.removeAllRanges();
 
@@ -442,6 +452,13 @@ export function useEventHandlers( {
 
 				// Scale everything to 200px.
 				const dragScale = rect.height > 200 ? 200 / rect.height : 1;
+				if ( isDirectBlockDrag ) {
+					blockDragOffsets.set( node, {
+						left: originX * dragScale,
+						right: ( rect.width - originX ) * dragScale,
+						top: originY * dragScale,
+					} );
+				}
 
 				node.style.zIndex = '1000';
 				node.style.transformOrigin = `${ originX * inverted }px ${
@@ -451,9 +468,10 @@ export function useEventHandlers( {
 				node.style.transform = `scale(${ dragScale })`;
 				node.style.opacity = '0.9';
 
-				// If the block has no background color, use the parent's
-				// background color.
+				// Give multi-selection cards a solid backdrop. Direct drags retain
+				// the block's own background, including transparency.
 				if (
+					isMultiSelectionDrag &&
 					isColorTransparent(
 						defaultView.getComputedStyle( node ).backgroundColor
 					)
@@ -481,15 +499,31 @@ export function useEventHandlers( {
 				let lastClientY = originClientY;
 
 				function dragOver( e: DragEvent ) {
+					let { clientX, clientY } = e;
+					if ( frame && e.currentTarget === outerDocument ) {
+						// Canvas dragover events are already handled in the canvas,
+						// then forwarded to the iframe element in the outer document.
+						if ( e.target === frame ) {
+							return;
+						}
+						// Grid overlays live outside the canvas. Convert their pointer
+						// coordinates back to the canvas before moving the drag visual.
+						const frameRect = frame.getBoundingClientRect();
+						const scaleX = frameRect.width / frame.offsetWidth;
+						const scaleY = frameRect.height / frame.offsetHeight;
+						clientX =
+							( clientX - frameRect.left ) / scaleX -
+							frame.clientLeft;
+						clientY =
+							( clientY - frameRect.top ) / scaleY -
+							frame.clientTop;
+					}
 					// Only trigger `over` if the mouse has moved.
-					if (
-						e.clientX === lastClientX &&
-						e.clientY === lastClientY
-					) {
+					if ( clientX === lastClientX && clientY === lastClientY ) {
 						return;
 					}
-					lastClientX = e.clientX;
-					lastClientY = e.clientY;
+					lastClientX = clientX;
+					lastClientY = clientY;
 					over();
 				}
 
@@ -525,10 +559,19 @@ export function useEventHandlers( {
 				}
 
 				function end() {
+					if ( ! endDrag ) {
+						return;
+					}
 					endDrag = undefined;
-					ownerDocument.removeEventListener( 'dragover', dragOver );
-					ownerDocument.removeEventListener( 'dragend', end );
-					ownerDocument.removeEventListener( 'drop', end );
+					blockDragOffsets.delete( node );
+					for ( const dragDocument of dragDocuments ) {
+						dragDocument?.removeEventListener(
+							'dragover',
+							dragOver
+						);
+						dragDocument?.removeEventListener( 'dragend', end );
+						dragDocument?.removeEventListener( 'drop', end );
+					}
 					ownerDocument.removeEventListener(
 						'mousemove',
 						endOnMouseMove
@@ -547,6 +590,8 @@ export function useEventHandlers( {
 					pile?.end();
 					dragElement.remove();
 					stopDraggingBlocks();
+					stopDragging();
+					hideInsertionPoint();
 					document.body.classList.remove(
 						'is-dragging-components-draggable'
 					);
@@ -555,14 +600,16 @@ export function useEventHandlers( {
 					);
 				}
 
-				ownerDocument.addEventListener( 'dragover', dragOver );
-				ownerDocument.addEventListener( 'dragend', end );
-				ownerDocument.addEventListener( 'drop', end );
+				endDrag = end;
+				for ( const dragDocument of dragDocuments ) {
+					dragDocument?.addEventListener( 'dragover', dragOver );
+					dragDocument?.addEventListener( 'dragend', end );
+					dragDocument?.addEventListener( 'drop', end );
+				}
 				// The mouse moves that start a drag are dispatched before
 				// `dragstart`, so none reaches this listener mid-drag.
 				ownerDocument.addEventListener( 'mousemove', endOnMouseMove );
 				ownerDocument.addEventListener( 'scroll', over );
-				endDrag = end;
 
 				startDraggingBlocks( clientIds );
 				// Important because it hides the block toolbar.
@@ -638,6 +685,8 @@ export function useEventHandlers( {
 			canMoveBlocks,
 			startDraggingBlocks,
 			stopDraggingBlocks,
+			stopDragging,
+			hideInsertionPoint,
 			isSectionBlock,
 			editedContentOnlySection,
 			editContentOnlySection,
