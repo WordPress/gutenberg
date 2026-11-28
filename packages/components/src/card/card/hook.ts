@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useSurface } from '../../surface';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
 import type { Props } from '../types';
 
 type CardProps = WordPressComponentProps< Props, 'div' >;
@@ -53,16 +45,14 @@ export function useCard( props: CardProps ) {
 		...otherProps
 	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
 
-	const cx = useCx();
-
-	const classes = useMemo( () => {
-		return cx(
-			styles.Card,
-			isBorderless && styles.boxShadowless,
-			isRounded && styles.rounded,
-			className
-		);
-	}, [ className, cx, isBorderless, isRounded ] );
+	const classes = clsx(
+		styles.card,
+		{
+			[ styles[ 'card-borderless' ] ]: isBorderless,
+			[ styles[ 'is-rounded' ] ]: isRounded,
+		},
+		className
+	);
 
 	const surfaceProps = useSurface( { ...otherProps, className: classes } );
 

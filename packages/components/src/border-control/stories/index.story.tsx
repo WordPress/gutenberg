@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { BorderControl } from '..';
 import type { Border } from '../types';
 
 const meta: Meta< typeof BorderControl > = {
-	title: 'Components/BorderControl',
+	id: 'components-bordercontrol',
+	title: 'Components/@wordpress-components/BorderControl',
 	component: BorderControl,
 	argTypes: {
 		onChange: {
@@ -29,7 +19,7 @@ const meta: Meta< typeof BorderControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},
@@ -86,7 +76,6 @@ const Template: StoryFn< typeof BorderControl > = ( {
 
 	return (
 		<BorderControl
-			__next40pxDefaultSize
 			onChange={ onChangeMerged }
 			value={ border }
 			{ ...props }
@@ -98,7 +87,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
-	__next40pxDefaultSize: true,
 	enableAlpha: true,
 	enableStyle: true,
 	shouldSanitizeBorder: true,

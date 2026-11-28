@@ -21,15 +21,6 @@ npm run test:e2e -- <path_to_test_file> # E.g., npm run test:e2e -- site-editor/
 npm run test:e2e -- --debug
 ```
 
-If you're developing in Linux, it currently requires testing Webkit browsers in headed mode. If you don't want to or can't run it with the GUI (e.g. if you don't have a graphic interface), prepend the command with [`xvfb-run`](https://manpages.ubuntu.com/manpages/xenial/man1/xvfb-run.1.html) to run it in a virtual environment.
-
-```bash
-# Run all available tests.
-xvfb-run npm run test:e2e
-
-# Only run webkit tests.
-xvfb-run -- npm run test:e2e -- --project=webkit
-```
 If you're already editing in VS Code, you may find the [Playwright extension](https://playwright.dev/docs/getting-started-vscode) helpful for running, writing and debugging tests.
 
 ## Best practices
@@ -79,7 +70,9 @@ It's slow to set states manually before or after tests, especially when they're 
 
 ### Avoid global variables
 
-Previously in our Jest + Puppeteer E2E tests, `page` and `browser` are exposed as global variables. This makes it harder to work with when we have multiple pages/tabs in the same test, or if we want to run multiple tests in parallel. `@playwright/test` has the concept of [fixtures](https://playwright.dev/docs/test-fixtures) which allows us to inject `page`, `browser`, and other parameters into the tests.
+In the previous E2E setup, `page` and `browser` were global variables, which made working with multiple pages or parallel tests harder.
+
+`@playwright/test` uses fixtures to inject `page`, `browser`, and other parameters into tests.
 
 ### Make explicit assertions
 

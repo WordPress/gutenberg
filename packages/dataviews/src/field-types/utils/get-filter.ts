@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FilterOperatorMap } from '../../types';
 import type { FieldType } from '../../types/private';
 import { getOperatorByName } from '../../utils/operators';

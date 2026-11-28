@@ -1,24 +1,13 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import _CustomSelect from '../custom-select-control-v2/custom-select';
-import CustomSelectItem from '../custom-select-control-v2/item';
-import * as Styled from '../custom-select-control-v2/styles';
+import CustomSelect from './custom-select';
+import CustomSelectItem from './item';
+import styles from './style.module.scss';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function useDeprecatedProps< T extends CustomSelectOption >( {
 	__experimentalShowSelectedHint,
@@ -52,12 +41,25 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
 	return sprintf( __( 'Currently selected: %s' ), currentName );
 }
 
+/**
+ * `CustomSelectControl` is a dropdown for selecting a single option from a
+ * list, with support for custom styling.
+ *
+ * @deprecated Use `SelectControl` from `@wordpress/ui` instead.
+ */
 function CustomSelectControl< T extends CustomSelectOption >(
 	props: CustomSelectProps< T >
 ) {
+	deprecated( 'wp.components.CustomSelectControl', {
+		since: '7.3',
+		version: '7.6',
+		alternative: 'SelectControl from @wordpress/ui',
+		link: 'https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide',
+	} );
+
 	const {
-		__next40pxDefaultSize = false,
-		__shouldNotWarnDeprecated36pxSize,
+		// Prevent passing legacy props to internal component.
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		describedBy,
 		options,
 		onChange,
@@ -68,19 +70,12 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		...restProps
 	} = useDeprecatedProps( props );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'CustomSelectControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
 	const descriptionId = useInstanceId(
 		CustomSelectControl,
 		'custom-select-control__description'
 	);
 
-	// Forward props + store from v2 implementation
+	// Keep the legacy callback contract while using the internal select store.
 	const store = Ariakit.useSelectStore< string >( {
 		async setValue( nextValue ) {
 			const nextOption = options.find(
@@ -120,15 +115,18 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		.map( applyOptionDeprecations )
 		.map( ( { name, key, hint, style, className } ) => {
 			const withHint = (
-				<Styled.WithHintItemWrapper>
+				<div className={ styles[ 'hint-wrapper' ] }>
 					<span>{ name }</span>
-					<Styled.WithHintItemHint
+					<span
 						// Keeping the classname for legacy reasons
-						className="components-custom-select-control__item-hint"
+						className={ clsx(
+							styles[ 'item-hint' ],
+							'components-custom-select-control__item-hint'
+						) }
 					>
 						{ hint }
-					</Styled.WithHintItemHint>
-				</Styled.WithHintItemWrapper>
+					</span>
+				</div>
 			);
 
 			return (
@@ -162,48 +160,37 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		}
 
 		return (
-			<Styled.SelectedExperimentalHintWrapper>
+			<div className={ styles[ 'selected-hint-wrapper' ] }>
 				{ selectedOption?.name }
-				<Styled.SelectedExperimentalHintItem
+				<span
 					// Keeping the classname for legacy reasons
-					className="components-custom-select-control__hint"
+					className={ clsx(
+						styles[ 'selected-hint' ],
+						'components-custom-select-control__hint'
+					) }
 				>
 					{ selectedOption?.hint }
-				</Styled.SelectedExperimentalHintItem>
-			</Styled.SelectedExperimentalHintWrapper>
+				</span>
+			</div>
 		);
 	};
 
-	const translatedSize = ( () => {
-		if (
-			( __next40pxDefaultSize && size === 'default' ) ||
-			size === '__unstable-large'
-		) {
-			return 'default';
-		}
-		if ( ! __next40pxDefaultSize && size === 'default' ) {
-			return 'compact';
-		}
-		return size;
-	} )();
-
 	return (
 		<>
-			<_CustomSelect
+			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
-				size={ translatedSize }
+				size={ size }
 				store={ store }
 				className={ clsx(
 					// Keeping the classname for legacy reasons
 					'components-custom-select-control',
 					classNameProp
 				) }
-				isLegacy
 				{ ...restProps }
 			>
 				{ children }
-			</_CustomSelect>
+			</CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
 					{ getDescribedBy( selectedOption?.name, describedBy ) }

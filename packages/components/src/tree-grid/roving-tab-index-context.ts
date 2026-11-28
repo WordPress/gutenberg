@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext } from '@wordpress/element';
 
 const RovingTabIndexContext = createContext<

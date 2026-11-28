@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -47,12 +44,20 @@ export function usePaddingAppender( enabled ) {
 				const lastBlock = registry
 					.select( blockEditorStore )
 					.getBlock( lastBlockClientId );
-				const { selectBlock, insertDefaultBlock } =
-					registry.dispatch( blockEditorStore );
+				const {
+					selectBlock,
+					insertDefaultBlock,
+					__unstableMarkNextChangeAsNotPersistent,
+				} = registry.dispatch( blockEditorStore );
 
 				if ( lastBlock && isUnmodifiedDefaultBlock( lastBlock ) ) {
 					selectBlock( lastBlockClientId );
 				} else {
+					if ( ! blockOrder.length ) {
+						__unstableMarkNextChangeAsNotPersistent( {
+							history: 'ignore',
+						} );
+					}
 					insertDefaultBlock();
 				}
 			}

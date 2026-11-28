@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { SurfaceProps } from '../surface/types';
 import type { FlexProps } from '../flex/types';
 

@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -40,9 +41,15 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
+
+## dom
+
+Private exports:
+- `isStyleTransformAxisAligned`: whether a computed style's transform keeps the element's edges parallel to its parent's axes.
+- `getViewportVectorTransform`: maps movements and directions from an element's axes to the viewport, including ancestor transforms.
+- `getBorderBoxPointTransform`: maps a point on an element's border box to where its own transform paints it.
 
 ## commands
 
@@ -96,7 +103,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -115,18 +121,17 @@ Private exports:
 - `globalStylesLinksDataKey`
 - `selectBlockPatternsKey`
 - `requiresWrapperOnCopy`
-- `PrivateRichText`: has an extra prop `readOnly` added in #58916 and #60327 (Feb and Mar 2024).
 - `PrivateInserterLibrary`: has an extra prop `onPatternCategorySelection` added in #62130 (May 2024).
 - `reusableBlocksSelectKey`
 - `PrivateBlockPopover`: has two extra props, `__unstableContentRef` and `__unstablePopoverSlot`.
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 
@@ -181,7 +186,6 @@ Private selectors:
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
 - `getZoomLevel`
-- `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
 - `isBlockSubtreeDisabled`
 - `isDragging`
@@ -192,15 +196,21 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
 
 Private actions:
+- `receiveEntityActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
+- `getEntityActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`
@@ -215,6 +225,8 @@ Private exports:
 - `CreatePatternModal`
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
+- `CreateTemplatePartModal`
+- `CreateTemplatePartModalContents`
 - `isOverridableBlock`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
@@ -244,7 +256,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 
@@ -261,9 +274,7 @@ Private exports:
 ## editor
 
 Private exports:
-- `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
 - `PluginPostExcerpt`
 - `PostCardPanel`
@@ -286,24 +297,20 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
 - `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
-- `getEntityActions`
 - `getInserter`
 - `getInserterSidebarToggleRef`
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post

@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { __ } from '@wordpress/i18n';
 import type {
 	Form,
 	Layout,
@@ -55,12 +53,31 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			? summary
 			: [ summary ];
 
+		const openAs = layout?.openAs;
+		let normalizedOpenAs: NormalizedPanelLayout[ 'openAs' ];
+		if ( typeof openAs === 'object' && openAs.type === 'modal' ) {
+			normalizedOpenAs = {
+				type: 'modal',
+				applyLabel: openAs.applyLabel?.trim() || __( 'Apply' ),
+				cancelLabel: openAs.cancelLabel?.trim() || __( 'Cancel' ),
+			};
+		} else if ( openAs === 'modal' ) {
+			normalizedOpenAs = {
+				type: 'modal',
+				applyLabel: __( 'Apply' ),
+				cancelLabel: __( 'Cancel' ),
+			};
+		} else {
+			normalizedOpenAs = { type: 'dropdown' };
+		}
+
 		normalizedLayout = {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
-			openAs: layout?.openAs ?? 'dropdown',
+			openAs: normalizedOpenAs,
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
+			showPlaceholderIfEmpty: layout?.showPlaceholderIfEmpty ?? false,
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
@@ -88,6 +105,9 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					layout.isCollapsible === undefined
 						? true
 						: layout.isCollapsible,
+				...( layout.headingLevel && {
+					headingLevel: layout.headingLevel,
+				} ),
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

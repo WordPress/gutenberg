@@ -8,10 +8,6 @@
 	&.is-button {
 		border-radius: $radius-large;
 	}
-
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
 }
 
 .editor-style-book__iframe {
@@ -26,6 +22,15 @@
 		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
 	}
+}
+
+.editor-style-book__tabs {
+	// `Tabs.Root` renders a wrapping element, so it establishes the flex column
+	// that keeps the tab list at the top and lets the tab panel fill the height.
+	height: 100%;
+
+	display: flex;
+	flex-direction: column;
 }
 
 .editor-style-book__tablist-container {

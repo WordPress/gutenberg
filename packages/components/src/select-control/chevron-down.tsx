@@ -1,24 +1,20 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
+import { isRTL } from '@wordpress/i18n';
 import { chevronDown, Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import {
-	chevronIconSize,
-	DownArrowWrapper,
-	InputControlSuffixWrapperWithClickThrough,
-} from './styles/select-control-styles';
+import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
+import styles from './style.module.scss';
 
 const SelectControlChevronDown = () => {
 	return (
-		<InputControlSuffixWrapperWithClickThrough>
-			<DownArrowWrapper>
-				<Icon icon={ chevronDown } size={ chevronIconSize } />
-			</DownArrowWrapper>
-		</InputControlSuffixWrapperWithClickThrough>
+		<InputControlSuffixWrapper
+			className={ clsx( styles.suffix, {
+				[ styles[ 'is-rtl' ] ]: isRTL(),
+			} ) }
+		>
+			<div className={ styles[ 'down-arrow' ] }>
+				<Icon icon={ chevronDown } size={ 18 } />
+			</div>
+		</InputControlSuffixWrapper>
 	);
 };
 

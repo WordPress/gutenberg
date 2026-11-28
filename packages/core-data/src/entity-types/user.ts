@@ -1,13 +1,9 @@
-/**
- * Internal dependencies
- */
 import type {
 	AvatarUrls,
 	Context,
 	ContextualField,
 	OmitNevers,
 } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {

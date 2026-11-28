@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
 import type { ObservableMap } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import SlotFillContext from '../context';
 import type { SlotKey } from '../types';
 

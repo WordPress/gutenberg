@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, memo, useContext } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 import { useDebouncedInput } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 
 interface SearchProps {
@@ -35,7 +28,8 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 		if ( debouncedSearch !== viewRef.current?.search ) {
 			onChangeViewRef.current( {
 				...viewRef.current,
-				page: 1,
+				page: view.page ? 1 : undefined,
+				startPosition: view.startPosition ? 1 : undefined,
 				search: debouncedSearch,
 			} );
 		}

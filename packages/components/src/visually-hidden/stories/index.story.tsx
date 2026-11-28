@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
-	title: 'Components/Typography/VisuallyHidden',
+	title: 'Components/@wordpress-components/Typography/VisuallyHidden',
 	id: 'components-visuallyhidden',
 	argTypes: {
 		children: { control: false },
@@ -22,8 +15,9 @@ const meta: Meta< typeof VisuallyHidden > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`VisuallyHidden`](?path=/docs/design-system-components-visuallyhidden--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

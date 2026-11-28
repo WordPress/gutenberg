@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import { ObservableV2 } from 'lib0/observable';
 import { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type {
 	ConnectionStatus,
 	ProviderCreator,
@@ -18,13 +11,14 @@ import { pollingManager } from './polling-manager';
 export interface ProviderOptions {
 	awareness?: Awareness;
 	debug?: boolean;
+	flushLocalUpdates?: () => void;
 	room: string;
 	ydoc: Y.Doc;
 }
 
 /**
- * Event types for HttpPollingProvider.
- * ObservableV2 expects event handlers as functions.
+ * Event types for HttpPollingProvider. ObservableV2 expects event handlers as
+ * functions. `status` mirrors the generic `ProviderEventMap`.
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
@@ -37,7 +31,6 @@ type HttpPollingEvents = {
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
 	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
-	protected synced = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
@@ -57,9 +50,9 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			room: this.options.room,
 			doc: this.options.ydoc,
 			awareness: this.awareness,
+			flushLocalUpdates: this.options.flushLocalUpdates,
 			log: this.log,
 			onStatusChange: this.emitStatus,
-			onSync: this.onSync,
 		} );
 	}
 
@@ -83,7 +76,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 	/**
 	 * Emit connection status, passing the full object through so that
-	 * additional fields (e.g. `retryInMs`) are preserved for consumers.
+	 * additional fields (e.g. `willAutoRetryInMs`) are preserved for consumers.
 	 *
 	 * @param connectionStatus The connection status object
 	 */
@@ -111,27 +104,28 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	/**
 	 * Log debug messages if debugging is enabled.
 	 *
-	 * @param message The debug message
-	 * @param debug   Additional debug information
+	 * @param message    The debug message
+	 * @param debug      Additional debug information
+	 * @param errorLevel The console method to use for logging
+	 * @param force      Whether to force logging regardless of debug setting
 	 */
-	protected log = ( message: string, debug: object = {} ): void => {
-		if ( this.options.debug ) {
-			// eslint-disable-next-line no-console
-			console.log( `[${ this.constructor.name }]: ${ message }`, {
-				room: this.options.room,
-				...debug,
-			} );
+	protected log = (
+		message: string,
+		debug: object = {},
+		errorLevel: 'log' | 'warn' | 'error' = 'log',
+		force = false
+	): void => {
+		if ( ! this.options.debug && ! force ) {
+			return;
 		}
-	};
 
-	/**
-	 * Handle synchronization events from the polling manager.
-	 */
-	protected onSync = (): void => {
-		if ( ! this.synced ) {
-			this.synced = true;
-			this.log( 'Synced' );
-		}
+		// eslint-disable-next-line no-console
+		const logFn = console[ errorLevel ] || console.log;
+
+		logFn( `[${ this.constructor.name }]: ${ message }`, {
+			room: this.options.room,
+			...debug,
+		} );
 	};
 }
 
@@ -141,6 +135,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 export function createHttpPollingProvider(): ProviderCreator {
 	return async ( {
 		awareness,
+		flushLocalUpdates,
 		objectType,
 		objectId,
 		ydoc,
@@ -150,6 +145,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 		const provider = new HttpPollingProvider( {
 			awareness,
 			// debug: true,
+			flushLocalUpdates,
 			room,
 			ydoc,
 		} );
@@ -161,6 +157,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 			on: ( event, callback ) => {
 				provider.on( event, callback );
 			},
+			supportsDeferredUpdates: true,
 		};
 	};
 }

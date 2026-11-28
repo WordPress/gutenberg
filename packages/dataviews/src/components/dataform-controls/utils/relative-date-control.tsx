@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
-	SelectControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { SelectControl, Stack } from '@wordpress/ui';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../../constants';
 import type { DataFormControlProps } from '../../../types';
 
@@ -59,9 +47,12 @@ export default function RelativeDateControl< Item >( {
 		];
 
 	const { id, label, description, getValue, setValue } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const { value: relValue = '', unit = options[ 0 ].value } =
 		fieldValue && typeof fieldValue === 'object' ? fieldValue : {};
+	const selectedUnitItem =
+		options.find( ( item ) => item.value === unit ) ?? options[ 0 ];
 
 	const onChangeValue = useCallback(
 		( newValue: string | undefined ) =>
@@ -95,22 +86,29 @@ export default function RelativeDateControl< Item >( {
 		>
 			<Stack direction="row" gap="sm">
 				<NumberControl
-					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"
 					spinControls="none"
 					min={ 1 }
 					step={ 1 }
 					value={ relValue }
 					onChange={ onChangeValue }
+					disabled={ disabled }
 				/>
 				<SelectControl
 					className="dataviews-controls__relative-date-unit"
-					__next40pxDefaultSize
 					label={ __( 'Unit' ) }
-					value={ unit }
-					options={ options }
-					onChange={ onChangeUnit }
+					value={ selectedUnitItem }
+					items={ options }
+					onValueChange={ ( item ) => {
+						if (
+							item?.value &&
+							item.value !== selectedUnitItem.value
+						) {
+							onChangeUnit( item.value );
+						}
+					} }
 					hideLabelFromVision
+					disabled={ disabled }
 				/>
 			</Stack>
 		</BaseControl>

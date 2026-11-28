@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
@@ -12,14 +9,12 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
-	getJestOverrideConfigFile,
 	getPhpFilePaths,
 	getProjectSourcePath,
 	getWebpackArgs,
 	getWebpackEntryPoints,
 	hasBabelConfig,
 	hasCssnanoConfig,
-	hasJestConfig,
 	hasPostCSSConfig,
 	hasPrettierConfig,
 } = require( './config' );
@@ -43,7 +38,6 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
-	getJestOverrideConfigFile,
 	getNodeArgsFromCLI,
 	getPackageProp,
 	getPhpFilePaths,
@@ -56,7 +50,6 @@ module.exports = {
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasFileArgInCLI,
-	hasJestConfig,
 	hasPackageProp,
 	hasPostCSSConfig,
 	hasPrettierConfig,

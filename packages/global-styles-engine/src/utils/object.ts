@@ -24,12 +24,12 @@ export function setImmutably(
 	// Traverse object from root to leaf, shallowly cloning at each level
 	let prev = object;
 	for ( const key of path ) {
-		// @ts-expect-error
+		// @ts-expect-error `prev` is typed as `Object`, which has no index signature.
 		const lvl = prev[ key ];
-		// @ts-expect-error
+		// @ts-expect-error `prev` is typed as `Object`, which has no index signature.
 		prev = prev[ key ] = Array.isArray( lvl ) ? [ ...lvl ] : { ...lvl };
 	}
-	// @ts-expect-error
+	// @ts-expect-error `leaf` is possibly `undefined`, which cannot be an index type.
 	prev[ leaf ] = value;
 
 	return object;
@@ -57,7 +57,7 @@ export const getValueFromObjectPath = (
 	const arrayPath = Array.isArray( path ) ? path : path.split( '.' );
 	let value = object;
 	arrayPath.forEach( ( fieldName ) => {
-		// @ts-expect-error
+		// @ts-expect-error `value` is typed as `Object`, which has no index signature.
 		value = value?.[ fieldName ];
 	} );
 	return value ?? defaultValue;

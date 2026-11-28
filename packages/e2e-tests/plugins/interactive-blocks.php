@@ -36,3 +36,15 @@ add_action(
 		}
 	}
 );
+
+add_action(
+	'send_headers',
+	function () {
+		if (
+			isset( $_GET['require_trusted_types'] ) &&
+			'true' === $_GET['require_trusted_types']
+		) {
+			header( "Content-Security-Policy: require-trusted-types-for 'script'" );
+		}
+	}
+);

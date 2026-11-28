@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { pipe } from '@wordpress/compose';
 
 /**

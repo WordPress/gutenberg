@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { Attachment, Updatable, Post, User } from '@wordpress/core-data';
 
 export type MediaKind = 'image' | 'video' | 'audio' | 'application';

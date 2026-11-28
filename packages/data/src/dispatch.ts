@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { AnyConfig, StoreDescriptor, DispatchReturn } from './types';
 import defaultRegistry from './default-registry';
 
@@ -32,5 +29,7 @@ export function dispatch<
 >(
 	storeNameOrDescriptor: StoreNameOrDescriptor
 ): DispatchReturn< StoreNameOrDescriptor > {
-	return defaultRegistry.dispatch( storeNameOrDescriptor );
+	return defaultRegistry.dispatch(
+		storeNameOrDescriptor
+	) as DispatchReturn< StoreNameOrDescriptor >;
 }

@@ -193,7 +193,7 @@ The Interactivity API uses a fine-grained reactivity system. Here's how it works
 
 Let's break down these concepts by reviewing the previous example:
 
-```javascript
+```js
 const { state } = store( 'myInteractivePlugin', {
 	state: {
 		isVisible: false,
@@ -245,18 +245,18 @@ Unlike many other reactive frameworks, **the Interactivity API does not require 
 
 For example, you can push a new item to an array like this:
 
-```javascript
+```js
 const { state } = store( 'myArrayPlugin', {
 	state: {
 		list: [ 'item 1', 'item 2' ],
 	},
 	actions: {
 		addItem() {
-			// Right:
+			// Preferred — direct mutation:
 			state.list.push( 'new item' );
 
-			// Wrong:
-			state.list = [ ...state.list, 'new item' ]; // Don't do this!
+			// Unnecessary — this works, but it's more complex and can cause unnecessary rerenders.
+			state.list = [ ...state.list, 'new item' ];
 		},
 	},
 } );
@@ -281,7 +281,9 @@ Here's an example of how you might use `data-wp-watch`:
 </div>
 ```
 
-```javascript
+```js
+import { store, getContext } from '@wordpress/interactivity';
+
 store( 'myCounterPlugin', {
 	actions: {
 		increment() {

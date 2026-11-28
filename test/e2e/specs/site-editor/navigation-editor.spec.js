@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editing Navigation Menus', () => {
@@ -107,10 +104,10 @@ test.describe( 'Editing Navigation Menus', () => {
 				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 
-			// The Settings tab is visible due to Custom CSS support.
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
-			).toBeVisible();
+			).toBeHidden();
+
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Styles' } )
 			).toBeHidden();

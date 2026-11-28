@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
 export const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';

@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preventing Pattern Recursion (client)', () => {
 	test.beforeEach( async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {

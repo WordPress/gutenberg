@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/accordion-heading",
+		"isValid": true,
+		"attributes": {
+			"openByDefault": false,
+			"title": "Accordion Title",
+			"iconPosition": "right",
+			"showIcon": true
+		},
+		"innerBlocks": []
+	}
+]

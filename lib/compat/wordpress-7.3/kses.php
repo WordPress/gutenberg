@@ -1,0 +1,239 @@
+<?php
+/**
+ * Compatibility shims for KSES (content filtering) for WordPress 7.3.
+ *
+ * @package gutenberg
+ */
+
+/**
+ * Allows CSS color functions, such as rgba() and color-mix(), in inline styles.
+ *
+ * Replaces each color function whose contents are plain color syntax,
+ * innermost first, then reruns Core's leftover check.
+ *
+ * Hooked at PHP_INT_MIN so it runs before any other filter, like Core's own
+ * check. A filter at any later priority can still reject the declaration.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_css_color_functions( $allow_css, $css_test_string ) {
+	$color_function = '/(?<![\w-])(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color-mix|color|light-dark)\(([^()]*)\)/i';
+
+	if ( $allow_css || ! preg_match( $color_function, $css_test_string ) ) {
+		return $allow_css;
+	}
+
+	/*
+	 * Each pass replaces the innermost color functions, so 4 passes allow 4 levels
+	 * of nesting. That is the deepest real combination, for example:
+	 * light-dark(color-mix(in srgb, rgb(from hsl(200 50% 40%) r g b) 50%, #fff), #000)
+	 */
+	for ( $pass = 0; $pass < 4; $pass++ ) {
+		$count = preg_match_all( $color_function, $css_test_string, $matches );
+
+		if ( false === $count ) {
+			return $allow_css;
+		}
+
+		if ( 0 === $count ) {
+			break;
+		}
+
+		foreach ( $matches[1] as $contents ) {
+			if ( ! preg_match( '/^[a-z0-9#%.,\/+\s-]*$/i', $contents ) ) {
+				return $allow_css;
+			}
+		}
+
+		$css_test_string = preg_replace( $color_function, '0', $css_test_string );
+
+		if ( null === $css_test_string ) {
+			return $allow_css;
+		}
+	}
+
+	return 0 === preg_match( '%[\\\(&=}]|/\*%', $css_test_string );
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_css_color_functions', PHP_INT_MIN, 2 );
+
+/**
+ * Adds 'box-sizing' to the list of safe CSS properties.
+ *
+ * The layout block support gives a child with a fixed size in a flex layout
+ * `box-sizing: border-box`, so that its padding and borders stay inside that size.
+ * The style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_box_sizing_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'box-sizing', $attr, true ) ) {
+		$attr[] = 'box-sizing';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_box_sizing_to_safe_style_css' );
+
+/**
+ * Adds 'text-wrap' to the list of safe CSS properties.
+ * This is needed for the typography text wrap style.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_text_wrap_to_safe_style_css( $attr ) {
+	if ( ! in_array( 'text-wrap', $attr, true ) ) {
+		$attr[] = 'text-wrap';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_text_wrap_to_safe_style_css' );
+
+/**
+ * Adds 'rotate' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `rotate` property. The
+ * style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_rotate_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'rotate', $attr, true ) ) {
+		$attr[] = 'rotate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_rotate_to_safe_style_css' );
+
+/**
+ * Only allows a single angle as the value of the `rotate` property.
+ *
+ * Mirrors the style engine, so axis and list forms are rejected too.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_rotate_angle_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) || 'rotate' !== strtolower( trim( $parts[0] ) ) ) {
+		return $allow_css;
+	}
+
+	return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_ANGLE_PATTERN, trim( $parts[1] ) );
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_rotate_angle_only', 10, 2 );
+
+/**
+ * Adds 'translate' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `translate` property.
+ * The style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_translate_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'translate', $attr, true ) ) {
+		$attr[] = 'translate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_translate_to_safe_style_css' );
+
+/**
+ * Only allows lengths or percentages for `translate` and its axis custom properties.
+ *
+ * Mirrors the style engine: each axis property takes a single length or
+ * percentage, and `translate` takes one or two, or functions such as `var()`,
+ * which Core allows and removes before this check.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_translate_lengths_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) ) {
+		return $allow_css;
+	}
+
+	$property = strtolower( trim( $parts[0] ) );
+	if ( '--wp--style--translate-x' === $property || '--wp--style--translate-y' === $property ) {
+		return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_LENGTH_PERCENTAGE_PATTERN, trim( $parts[1] ) );
+	}
+
+	if ( 'translate' !== $property ) {
+		return $allow_css;
+	}
+
+	if ( '' === trim( $parts[1] ) ) {
+		return true;
+	}
+
+	$axes = preg_split( '/\s+/', trim( $parts[1] ) );
+	if ( false === $axes || count( $axes ) > 2 ) {
+		return false;
+	}
+
+	foreach ( $axes as $axis ) {
+		if ( 1 !== preg_match( WP_Style_Engine_Gutenberg::VALID_LENGTH_PERCENTAGE_PATTERN, $axis ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_translate_lengths_only', 10, 2 );
+
+/**
+ * Adds 'scale' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `scale` property. The
+ * style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_scale_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'scale', $attr, true ) ) {
+		$attr[] = 'scale';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_scale_to_safe_style_css' );
+
+/**
+ * Only allows a single uniform scale as the value of the `scale` property.
+ *
+ * Mirrors the style engine, so negative values, per-axis lists and functions
+ * such as `calc()` or `var()` are rejected.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_scale_uniform_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) || 'scale' !== strtolower( trim( $parts[0] ) ) ) {
+		return $allow_css;
+	}
+
+	return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_SCALE_PATTERN, trim( $parts[1] ) );
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_scale_uniform_only', 10, 2 );

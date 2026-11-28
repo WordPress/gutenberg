@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueryArgs } from './get-query-args';
 
 export interface QueryArgObject {

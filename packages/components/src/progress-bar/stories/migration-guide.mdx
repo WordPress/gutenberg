@@ -1,0 +1,34 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import * as ProgressBarStories from './index.story';
+
+<Meta of={ ProgressBarStories } name="Migration Guide" />
+
+# ProgressBar migration guide
+
+Migrate from [`ProgressBar`](?path=/docs/components-progressbar--docs) in `@wordpress/components` to [`Progress`](?path=/docs/design-system-components-progress--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Replace `ProgressBar` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator`. Pass the progress value to `Progress.Root`. Use `null` for indeterminate progress instead of omitting `value`. If an existing value can be `undefined`, convert it to `null` with `value={ value ?? null }`.
+
+```jsx
+import { Progress } from '@wordpress/ui';
+
+const MyLoadingComponent = ( { progress = null } ) => (
+	<Progress.Root value={ progress } aria-label="Uploading files">
+		<Progress.Track>
+			<Progress.Indicator />
+		</Progress.Track>
+	</Progress.Root>
+);
+```
+
+Give the progress bar an accessible name that describes the operation in progress, such as "Uploading files" or "Exporting a report". Set this name with `aria-label`, `aria-labelledby`, or `Progress.Label`. Unlike `ProgressBar`, `Progress.Root` does not provide a default accessible name. Add `Progress.Value` when a visible progress value is useful.
+
+## Props and styling
+
+Both components support progress values from 0 to 100 by default. `Progress.Root` also supports `min` and `max` for other ranges.
+
+Move custom width styles to `Progress.Root`, which sets the overall width. Style the track with `Progress.Track` and the filled indicator with `Progress.Indicator`. For example, pass `style={ { width: '100%' } }` to `Progress.Root` to fill its container. Update CSS selectors that depend on the legacy markup.
+
+`ProgressBar` forwards its ref and additional HTML props to a native `progress` element. `Progress.Root` renders a `div` with the `progressbar` role by default, so update refs typed as `HTMLProgressElement` and any code that relies on native `progress` properties.

@@ -1,16 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-// @ts-expect-error No exported types.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-// @ts-expect-error No exported types.
 import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { type CRDTDoc, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	createBlockSelectionHistory,
 	YSelectionType,
@@ -18,7 +9,11 @@ import {
 	type YFullSelection,
 	type YSelection,
 } from './block-selection-history';
-import { findBlockByClientIdInDoc } from './crdt-utils';
+import {
+	asHtmlStringIndex,
+	findBlockByClientIdInDoc,
+	htmlIndexToRichTextOffset,
+} from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 // WeakMap to store BlockSelectionHistory instances per Y.Doc
@@ -53,6 +48,40 @@ export function updateSelectionHistory(
 }
 
 /**
+ * Record a selection after the current transaction captures undo metadata.
+ *
+ * Convert offsets before remote changes can shift the text. Store the
+ * positions after undo metadata saves the previous selection, but before
+ * remote changes trigger reconciliation.
+ *
+ * @param ydoc        The document whose selection changed.
+ * @param wpSelection The selection after the local edit.
+ */
+export function scheduleSelectionHistory(
+	ydoc: CRDTDoc,
+	wpSelection: WPSelection
+): void {
+	const history = getBlockSelectionHistory( ydoc );
+	const selection = history.resolveSelection( wpSelection );
+
+	if ( ! selection ) {
+		return;
+	}
+
+	// Join the caller's transaction, or create one for selection-only calls
+	// made outside a transaction.
+	ydoc.transact( ( transaction ) => {
+		const recordSelection = ( completed: Y.Transaction ) => {
+			if ( completed === transaction ) {
+				ydoc.off( 'afterTransactionCleanup', recordSelection );
+				history.addSelection( selection );
+			}
+		};
+		ydoc.on( 'afterTransactionCleanup', recordSelection );
+	} );
+}
+
+/**
  * Convert a YSelection to a WPBlockSelection.
  * @param ySelection The YSelection (relative) to convert
  * @param ydoc       The Y.Doc to convert the selection to a block selection for
@@ -74,7 +103,10 @@ function convertYSelectionToBlockSelection(
 			return {
 				clientId,
 				attributeKey,
-				offset: absolutePosition.index,
+				offset: htmlIndexToRichTextOffset(
+					absolutePosition.type.toString(),
+					asHtmlStringIndex( absolutePosition.index )
+				),
 			};
 		}
 	} else if ( ySelection.type === YSelectionType.BlockSelection ) {

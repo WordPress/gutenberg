@@ -1,35 +1,25 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
+	NormalizedPanelLayout,
+	PanelOpenAsModal,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
@@ -48,6 +38,8 @@ function ModalContent< Item >( {
 	fieldLabel: string;
 	touched: boolean;
 } ) {
+	const { openAs } = field.layout as NormalizedPanelLayout;
+	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
@@ -62,7 +54,7 @@ function ModalContent< Item >( {
 			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+					[ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -100,8 +92,8 @@ function ModalContent< Item >( {
 	const mergedRef = useMergeRefs( [ focusOnMountRef, contentRef ] );
 
 	// When the modal is opened after being previously closed (touched),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity( contentRef, touched );
+	// reveal the field-level errors.
+	useRevealValidity( contentRef, touched );
 
 	return (
 		<Modal
@@ -147,14 +139,14 @@ function ModalContent< Item >( {
 					onClick={ onClose }
 					__next40pxDefaultSize
 				>
-					{ __( 'Cancel' ) }
+					{ cancelLabel }
 				</Button>
 				<Button
 					variant="primary"
 					onClick={ onApply }
 					__next40pxDefaultSize
 				>
-					{ __( 'Apply' ) }
+					{ applyLabel }
 				</Button>
 			</Stack>
 		</Modal>
@@ -176,6 +168,9 @@ function PanelModal< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+	const isDisabled =
+		fieldDefinition.readOnly === true ||
+		fieldDefinition.isDisabled( { item: data, field: fieldDefinition } );
 
 	const handleClose = () => {
 		setIsOpen( false );
@@ -191,9 +186,9 @@ function PanelModal< Item >( {
 				summaryFields={ summaryFields }
 				validity={ validity }
 				touched={ touched }
-				disabled={ fieldDefinition.readOnly === true }
+				disabled={ isDisabled }
 				onClick={ () => setIsOpen( true ) }
-				aria-expanded={ isOpen }
+				isOpen={ isOpen }
 			/>
 			{ isOpen && (
 				<ModalContent

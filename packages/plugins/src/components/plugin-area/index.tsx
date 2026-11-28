@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import { PluginContextProvider } from '../plugin-context';
 import { PluginErrorBoundary } from '../plugin-error-boundary';
 import { getPlugins } from '../../api';
@@ -72,6 +61,9 @@ function PluginArea( {
 } ) {
 	const store = useMemo( () => {
 		let lastValue: WPPlugin[] = [];
+		const namespace = scope
+			? `core/plugins/plugin-area/${ scope }`
+			: 'core/plugins/plugin-area';
 
 		return {
 			subscribe(
@@ -80,25 +72,11 @@ function PluginArea( {
 					name: WPPlugin[ 'name' ]
 				) => void
 			) {
-				addAction(
-					'plugins.pluginRegistered',
-					'core/plugins/plugin-area/plugins-registered',
-					listener
-				);
-				addAction(
-					'plugins.pluginUnregistered',
-					'core/plugins/plugin-area/plugins-unregistered',
-					listener
-				);
+				addAction( 'plugins.pluginRegistered', namespace, listener );
+				addAction( 'plugins.pluginUnregistered', namespace, listener );
 				return () => {
-					removeAction(
-						'plugins.pluginRegistered',
-						'core/plugins/plugin-area/plugins-registered'
-					);
-					removeAction(
-						'plugins.pluginUnregistered',
-						'core/plugins/plugin-area/plugins-unregistered'
-					);
+					removeAction( 'plugins.pluginRegistered', namespace );
+					removeAction( 'plugins.pluginUnregistered', namespace );
 				};
 			},
 			getValue() {

@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
-import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { cleanForSlug } from '@wordpress/url';
 import {
 	Button,
 	TextControl,
@@ -48,9 +41,12 @@ function AddCustomGenericTemplateModalContent( {
 		try {
 			await createTemplate(
 				{
+					// The REST API only accepts Latin letters in template slugs.
 					slug:
-						kebabCase( title || defaultTitle ) ||
-						'wp-custom-template',
+						cleanForSlug( title || defaultTitle ).replace(
+							/[^\w-]+/g,
+							''
+						) || 'wp-custom-template',
 					title: title || defaultTitle,
 				},
 				false
@@ -63,7 +59,6 @@ function AddCustomGenericTemplateModalContent( {
 		<form onSubmit={ onCreateTemplate }>
 			<VStack spacing={ 6 }>
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }
