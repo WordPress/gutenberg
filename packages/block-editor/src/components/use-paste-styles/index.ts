@@ -100,13 +100,13 @@ function getStyleAttributes(
 }
 
 /**
- * Update the target blocks with style attributes recursively.
+ * Update only the target blocks with style attributes, leaving their children unchanged.
  *
  * @param targetBlocks          The target blocks to be updated.
- * @param sourceBlocks          The source blocks to get th style attributes from.
+ * @param sourceBlocks          The source blocks to get the style attributes from.
  * @param updateBlockAttributes The function to update the attributes.
  */
-function recursivelyUpdateBlockAttributes(
+function updateBlockStyleAttributes(
 	targetBlocks: Block[],
 	sourceBlocks: Block[],
 	updateBlockAttributes: (
@@ -122,12 +122,6 @@ function recursivelyUpdateBlockAttributes(
 		updateBlockAttributes(
 			targetBlocks[ index ].clientId,
 			getStyleAttributes( sourceBlocks[ index ], targetBlocks[ index ] )
-		);
-
-		recursivelyUpdateBlockAttributes(
-			targetBlocks[ index ].innerBlocks,
-			sourceBlocks[ index ].innerBlocks,
-			updateBlockAttributes
 		);
 	}
 }
@@ -191,7 +185,7 @@ export default function usePasteStyles() {
 			if ( copiedBlocks.length === 1 ) {
 				// Apply styles of the block to all the target blocks.
 				registry.batch( () => {
-					recursivelyUpdateBlockAttributes(
+					updateBlockStyleAttributes(
 						targetBlocks,
 						targetBlocks.map( () => copiedBlocks[ 0 ] ),
 						updateBlockAttributes
@@ -199,7 +193,7 @@ export default function usePasteStyles() {
 				} );
 			} else {
 				registry.batch( () => {
-					recursivelyUpdateBlockAttributes(
+					updateBlockStyleAttributes(
 						targetBlocks,
 						copiedBlocks,
 						updateBlockAttributes
@@ -230,7 +224,7 @@ export default function usePasteStyles() {
 			}
 		},
 		[
-			registry.batch,
+			registry,
 			updateBlockAttributes,
 			createSuccessNotice,
 			createWarningNotice,
