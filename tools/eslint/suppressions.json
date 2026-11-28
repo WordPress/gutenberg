@@ -2267,30 +2267,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/latest-comments/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/latest-comments/edit.jsx": {
+	"packages/block-library/src/latest-comments/edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/latest-comments/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/latest-comments/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/latest-posts/constants.js": {
