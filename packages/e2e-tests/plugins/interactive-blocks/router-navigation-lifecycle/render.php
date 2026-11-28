@@ -52,7 +52,7 @@ if ( isset( $attributes['secondRegionId'] ) ) {
 		'id'            => $attributes['secondRegionId'],
 		// The second region's own "navigate" link targets `other`, not
 		// `next` -- deliberately, so a cross-region flow has two distinct
-		// hrefs for the router's `navigatingTo` bail to separate. "Same
+		// hrefs whose requests a test can hold separately. "Same
 		// structure as the first" stops here: every other link below keeps
 		// its usual meaning for both regions.
 		'navigate_href' => $other_href,

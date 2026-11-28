@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove the empty `search` query arg from the Patterns URL after resetting the filters or clearing the search ([#87383](https://github.com/WordPress/gutenberg/pull/87383)).
+-   Navigation: Keep selected links readable on hover and keyboard focus when a custom theme changes the selection color ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
+
+## 8.2.0 (2026-11-18)
+
+### Enhancements
+
+-   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#84029](https://github.com/WordPress/gutenberg/pull/84029)).
+
+### Bug Fixes
+
+-   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
+
 ## 8.1.0 (2026-11-04)
 
 ## 8.0.0 (2026-10-20)
@@ -201,6 +216,12 @@
 
 ## 6.1.0 (2024-06-15)
 
+## 6.0.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -226,6 +247,12 @@
 
 ## 5.29.0 (2024-02-21)
 
+## 5.28.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 5.28.0 (2024-02-09)
 
 ## 5.27.0 (2024-01-24)
@@ -243,6 +270,12 @@
 ## 5.21.0 (2023-10-18)
 
 ## 5.20.0 (2023-10-05)
+
+## 5.19.19 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 5.19.0 (2023-09-20)
 
@@ -264,6 +297,12 @@
 -   Site editor sidebar: add footer to template part and ensure nested template areas display [#51669](https://github.com/WordPress/gutenberg/pull/51669).
 -   Global styles: split styles menus into revisions and other styles actions ([#51318](https://github.com/WordPress/gutenberg/pull/51318)).
 
+## 5.12.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 5.12.0 (2023-06-07)
 
 ## 5.11.0 (2023-05-24)
@@ -281,6 +320,12 @@
 ## 5.5.0 (2023-03-01)
 
 ## 5.4.0 (2023-02-15)
+
+## 5.3.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 5.3.0 (2023-02-01)
 

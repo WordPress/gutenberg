@@ -21,6 +21,79 @@ test.describe( 'Video', () => {
 		);
 	} );
 
+	test( 'edits track Kind inside the Text tracks dropdown @webkit @firefox', async ( {
+		editor,
+		page,
+	} ) => {
+		const track = {
+			src: 'https://example.com/subtitles.vtt',
+			label: 'English subtitles',
+			srcLang: 'en',
+			kind: 'subtitles',
+			default: false,
+		};
+		await editor.insertBlock( {
+			name: 'core/video',
+			attributes: {
+				src: 'https://example.com/video.mp4',
+				tracks: [ track ],
+			},
+		} );
+		await editor.clickBlockToolbarButton( 'Text tracks' );
+		await page
+			.getByRole( 'button', { name: 'Edit English subtitles' } )
+			.click();
+		const kind = page.getByRole( 'combobox', {
+			name: 'Kind',
+			exact: true,
+		} );
+		const apply = page.getByRole( 'button', {
+			name: 'Apply',
+			exact: true,
+		} );
+
+		await kind.focus();
+		await kind.press( 'Enter' );
+		await expect(
+			page.getByRole( 'option', { name: 'Subtitles', exact: true } )
+		).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			page.getByRole( 'option', { name: 'Captions', exact: true } )
+		).toBeFocused();
+		await page.keyboard.press( 'Enter' );
+		await expect( kind ).toHaveText( 'Captions' );
+		await expect( kind ).toBeFocused();
+		await expect( apply ).toBeVisible();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { attributes: { tracks: [ track ] } } ] );
+
+		await kind.press( 'Enter' );
+		await expect(
+			page.getByRole( 'option', { name: 'Captions', exact: true } )
+		).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			page.getByRole( 'option', { name: 'Descriptions', exact: true } )
+		).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+		await expect( kind ).toBeFocused();
+		await expect( kind ).toHaveText( 'Captions' );
+		await expect( apply ).toBeVisible();
+
+		await apply.click();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { tracks: [ { ...track, kind: 'captions' } ] } },
+			] );
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.getByRole( 'button', { name: 'Text tracks', exact: true } )
+		).toBeFocused();
+	} );
+
 	test( 'keeps the video when a replacement upload fails, and Reset still removes it', async ( {
 		editor,
 		page,

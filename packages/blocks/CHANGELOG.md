@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+-   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
+
+### Bug Fixes
+
+-   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
+-   `BlockConfiguration`: Type `example.attributes` as `Partial< Attributes >` instead of the `BlockType` attribute schema ([#87543](https://github.com/WordPress/gutenberg/pull/87543)).
+-   `BlockVariation`: Type `attributes` as `Partial< Attributes >` ([#87551](https://github.com/WordPress/gutenberg/pull/87551)).
+-   `BlockExampleInnerBlock`: Type `attributes` as `Record< string, unknown >` instead of the `BlockType` attribute schema ([#87585](https://github.com/WordPress/gutenberg/pull/87585)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 17.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).
+-   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements

@@ -46,7 +46,6 @@ function createController(): InternalImageEditorController {
 		minZoom: MIN_ZOOM,
 		maxZoom: MAX_ZOOM,
 		maxRotationOffset: MAX_ROTATION_OFFSET,
-		getCroppedImage: vi.fn(),
 		adjustCropRectForViewport: vi.fn(),
 	} as unknown as InternalImageEditorController;
 }

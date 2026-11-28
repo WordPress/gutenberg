@@ -84,13 +84,14 @@
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
-	border: $border-width solid $gray-300;
-	background-color: $gray-100;
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	overflow: hidden;
 	width: auto;
 
 	&.is-selected {
-		background-color: $white;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 		box-shadow: $elevation-medium;
 		z-index: 1;
 	}
@@ -131,7 +132,7 @@
 	font-weight: 400;
 	line-height: 16px;
 	text-align: left;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	overflow-wrap: anywhere;
 }
 
@@ -140,7 +141,7 @@
 	font-weight: 400;
 	line-height: 16px;
 	text-align: left;
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .editor-collab-sidebar-panel__show-more-button {
@@ -220,7 +221,7 @@
 
 .editor-collab-sidebar-panel__deleted-block-notice {
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .editor-collab-sidebar-panel__resolution-text {

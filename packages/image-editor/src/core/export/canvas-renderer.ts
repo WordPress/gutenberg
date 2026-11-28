@@ -1,5 +1,9 @@
+import { mat2d } from 'gl-matrix';
 import type { InternalImageEditorState } from '../types';
 import { createExportCamera, getRotatedBBox } from '../camera';
+import { degreesToRadians } from '../math/rotation';
+import { getOutputSize } from '../../get-output-size';
+import { getImageEdit } from '../../get-image-edit';
 
 /** Default export quality for lossy formats (JPEG, WebP). */
 const DEFAULT_QUALITY = 0.92;
@@ -14,7 +18,11 @@ export function loadImage( src: string ): Promise< HTMLImageElement > {
 	return new Promise( ( resolve, reject ) => {
 		const image = new Image();
 		image.addEventListener( 'load', () => resolve( image ) );
-		image.addEventListener( 'error', ( error ) => reject( error ) );
+		// The event carries no message, so reject with an Error a consumer
+		// can show, as the other failures here do.
+		image.addEventListener( 'error', () =>
+			reject( new Error( `Could not load the image at ${ src }.` ) )
+		);
 		image.crossOrigin = 'anonymous';
 		image.src = src;
 	} );
@@ -35,16 +43,23 @@ export function renderToCanvas(
 	state: InternalImageEditorState
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
-	const { rotation, cropRect } = state;
 	const imageSize = { width: naturalWidth, height: naturalHeight };
 
-	// Output size is the crop region in the snap-rotation bbox — matches
-	// the preview's reference frame so the exported pixels track exactly
-	// what the stencil framed, even at fine rotation angles.
-	const snapRotation = Math.round( rotation / 90 ) * 90;
-	const rotBBox = getRotatedBBox( naturalWidth, naturalHeight, snapRotation );
-	const outW = Math.round( cropRect.width * rotBBox.width );
-	const outH = Math.round( cropRect.height * rotBBox.height );
+	// The output has the size `getOutputSize` reports, so a consumer that
+	// read the size before saving gets a file of that size. That helper
+	// divides the crop by the zoom, since the view shows the image zoomed,
+	// and treats a crop within a hair of the full frame as no crop, as the
+	// server path does. The element is what gets drawn, so its natural size
+	// is the one that counts, whatever `state.image` says.
+	const sizedState = {
+		...state,
+		image: { src: state.image?.src ?? '', naturalWidth, naturalHeight },
+	};
+	const outputSize = getOutputSize( sizedState ) ?? { width: 0, height: 0 };
+	const outW = Math.round( outputSize.width );
+	const outH = Math.round( outputSize.height );
+
+	const hasCrop = Boolean( getImageEdit( sizedState )?.crop );
 
 	const canvas = document.createElement( 'canvas' );
 	canvas.width = outW;
@@ -56,10 +71,32 @@ export function renderToCanvas(
 		);
 	}
 
-	const camera = createExportCamera( state, imageSize, {
-		width: outW,
-		height: outH,
-	} );
+	// When the crop is too near full to be saved, the file is the whole
+	// image and only the flip and rotation apply, as the server path leaves
+	// it. The export camera would still scale it by the zoom and stretch the
+	// crop frame onto the output, resampling every pixel, so the image is
+	// placed directly instead: at 1:1, turned about its centre, in the
+	// middle of its rotated bounds. The order of flip and rotation matches
+	// `createExportCamera`, so the pixels agree with the preview.
+	let camera;
+	if ( hasCrop ) {
+		camera = createExportCamera( state, imageSize, {
+			width: outW,
+			height: outH,
+		} );
+	} else {
+		camera = mat2d.create();
+		mat2d.translate( camera, camera, [ outW / 2, outH / 2 ] );
+		mat2d.scale( camera, camera, [
+			state.flip.horizontal ? -1 : 1,
+			state.flip.vertical ? -1 : 1,
+		] );
+		mat2d.rotate( camera, camera, degreesToRadians( state.rotation ) );
+		mat2d.translate( camera, camera, [
+			-naturalWidth / 2,
+			-naturalHeight / 2,
+		] );
+	}
 	ctx.setTransform(
 		camera[ 0 ],
 		camera[ 1 ],
@@ -120,8 +157,8 @@ export function canvasToDataURL(
  * Load an image, render with transforms, and export as a Blob.
  *
  * Throws on failure so callers can distinguish error cases:
- * - Image load failures (network errors, 404s) throw the native
- *   load error from the Image element.
+ * - Image load failures (network errors, 404s) throw an Error naming
+ *   the URL.
  * - Cross-origin failures manifest as tainted-canvas errors from
  *   `canvas.toBlob()` — the browser rejects reading pixel data
  *   from a canvas that drew an image without valid CORS headers.
@@ -215,36 +252,4 @@ export function applyToCanvas(
 	);
 	ctx.drawImage( source, 0, 0 );
 	return canvas;
-}
-
-/**
- * Download the cropped image as a file.
- *
- * Loads the source image, applies all transforms, and triggers a
- * browser download via exportCroppedImage() + object URL + anchor click.
- *
- * Throws on export failure (see `exportCroppedImage`).
- *
- * @param src      - The image URL to load.
- * @param state    - The editor state with all transform settings.
- * @param filename - The download filename. Defaults to 'cropped-image'.
- * @param mimeType - The output MIME type. Defaults to 'image/png'.
- * @param quality  - The quality parameter for lossy formats (0-1). Defaults to DEFAULT_QUALITY.
- * @return A promise that resolves when the download is triggered.
- */
-export async function downloadCroppedImage(
-	src: string,
-	state: InternalImageEditorState,
-	filename: string = 'cropped-image',
-	mimeType: string = 'image/png',
-	quality: number = DEFAULT_QUALITY
-): Promise< void > {
-	const blob = await exportCroppedImage( src, state, mimeType, quality );
-	const ext = mimeType.split( '/' )[ 1 ] ?? 'png';
-	const url = URL.createObjectURL( blob );
-	const a = document.createElement( 'a' );
-	a.href = url;
-	a.download = `${ filename }.${ ext }`;
-	a.click();
-	URL.revokeObjectURL( url );
 }

@@ -73,6 +73,8 @@ export default function BlockLockModal( {
 		} );
 	}, [ isEditLocked, isMoveLocked, isRemoveLocked, allowsEditLocking ] );
 
+	const canApplyTemplateLock =
+		hasTemplateLock && ! ( lock.move && ! lock.remove );
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
@@ -80,7 +82,7 @@ export default function BlockLockModal( {
 		lock.move !== isMoveLocked ||
 		lock.remove !== isRemoveLocked ||
 		( allowsEditLocking && lock.edit !== isEditLocked ) ||
-		( hasTemplateLock && applyTemplateLock !== !! templateLock );
+		( canApplyTemplateLock && applyTemplateLock !== !! templateLock );
 
 	return (
 		<Modal
@@ -102,9 +104,11 @@ export default function BlockLockModal( {
 					}
 					updateBlockAttributes( [ clientId ], {
 						lock,
-						templateLock: applyTemplateLock
-							? getTemplateLockValue( lock )
-							: undefined,
+						...( canApplyTemplateLock && {
+							templateLock: applyTemplateLock
+								? getTemplateLockValue( lock )
+								: undefined,
+						} ),
 					} );
 					onClose();
 				} }
@@ -209,7 +213,7 @@ export default function BlockLockModal( {
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }
-							disabled={ lock.move && ! lock.remove }
+							disabled={ ! canApplyTemplateLock }
 							onChange={ () =>
 								setApplyTemplateLock( ! applyTemplateLock )
 							}

@@ -1,0 +1,55 @@
+# PHPStan configuration holding selected parts of Gutenberg to a stricter rule level.
+#
+# phpstan.neon.dist analyzes all of Gutenberg at a lower rule level. This analyzes only the paths listed under `paths!`
+# below, at the `level` set below, so that code which already meets that stricter level keeps meeting it.
+# `composer phpstan` runs both analyses, and `composer phpstan:strict` runs only this one.
+#
+# The rest of Gutenberg is scanned rather than analyzed, so that what the strict paths use is known.
+#
+# https://phpstan.org/config-reference
+
+includes:
+	# Everything phpstan.neon.dist enforces: the base configuration, the strict rules, the errors ignored as not
+	# actionable, and its baseline. An error that both analyses report is baselined once, in the baseline of
+	# phpstan.neon.dist.
+	- phpstan.neon.dist
+
+	# Preexisting errors at this level in the strict paths, beyond those in the baseline of phpstan.neon.dist.
+	# Regenerate with `composer phpstan:baselines`, or remove the entries for fixed errors with `composer phpstan:fix:strict`.
+	- tools/phpstan/baseline-strict.neon
+
+parameters:
+	# The level is set explicitly rather than as `max`, so that a PHPStan update that adds a level does not raise it.
+	# https://phpstan.org/user-guide/rule-levels
+	level: 10
+
+	# The two analyses share the cache of what PHPStan reads from each file, but each needs its own result cache. Its
+	# metadata includes the rule level and the paths analyzed, so a shared one would be discarded by every run of the
+	# other analysis.
+	resultCachePath: %tmpDir%/resultCache-strict.php
+
+	# The paths held to this rule level, replacing those analyzed by phpstan.neon.dist. A directory covers every file
+	# below it.
+	#
+	# Before adding a path, fix the errors this analysis reports in it, or baseline those that cannot be fixed yet.
+	paths!:
+		- lib/compat/wordpress-7.1/block-comments.php
+		- lib/compat/wordpress-7.3
+		- lib/experimental/knowledge/class-gutenberg-knowledge-post-type.php
+		- packages/block-library/src/video
+		- packages/core-actions/src
+		- packages/core-fields/src
+		- packages/icons/src
+		- packages/style-engine/src/class-wp-style-engine-css-rules-store.php
+
+	# The code outside the strict paths that they can use: the `paths` of tools/phpstan/base.neon, other than those
+	# entirely within the strict paths. Keep them in sync, since code a strict path uses from a path missing here is
+	# reported as unknown by this analysis only.
+	scanFiles:
+		- gutenberg.php
+	scanDirectories:
+		- lib
+		- packages/block-library/src
+		- packages/block-serialization-default-parser
+		- packages/style-engine/src
+		- packages/widgets/src

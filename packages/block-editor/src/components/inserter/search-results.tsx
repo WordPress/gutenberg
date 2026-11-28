@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
@@ -19,7 +19,7 @@ import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
 import { store as blockEditorStore } from '../../store';
-import type { InserterSearchResultsProps } from './types';
+import type { InsertPattern, InserterSearchResultsProps } from './types';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -76,9 +76,13 @@ function InserterSearchResults( {
 		blockTypeCollections,
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
+	const onInsertPattern: InsertPattern = useCallback(
+		( blocks, patternName, ...args ) =>
+			onInsertBlocks( blocks, { patternName }, ...args ),
+		[ onInsertBlocks ]
+	);
 	const [ patterns, , onClickPattern ] = usePatternsState(
-		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
-		onInsertBlocks,
+		onInsertPattern,
 		destinationRootClientId,
 		undefined,
 		isQuick

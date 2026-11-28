@@ -43,7 +43,7 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 				}
 				variant="body-sm"
 			>
-				{ children }
+				<span className={ styles.label }>{ children }</span>
 				{ infotip && (
 					<Icon
 						icon={ help }

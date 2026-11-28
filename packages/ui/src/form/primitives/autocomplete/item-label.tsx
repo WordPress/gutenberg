@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../../../text';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import type { AutocompleteItemLabelProps } from './types';
 
 /**

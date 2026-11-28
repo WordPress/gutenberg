@@ -1,9 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, renderHook } from '@testing-library/react';
+import {
+	act,
+	render,
+	screen,
+	renderHook,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRef } from '@wordpress/element';
 import { AutocompleterUI } from '../autocompleter-ui';
 import { useLastDifferentValue } from '..';
+import getDefaultUseItems from '../get-default-use-items';
 
 type FruitOption = { visual: string; name: string; id: number };
 
@@ -194,4 +201,57 @@ describe( 'AutocompleterUI', () => {
 			expect( resetSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
+} );
+
+describe( 'getDefaultUseItems', () => {
+	it.each( [ false, true ] )(
+		'ignores stale query results when isDebounced is %s',
+		async ( isDebounced ) => {
+			let resolveFirst!: ( options: string[] ) => void;
+			let resolveSecond!: ( options: string[] ) => void;
+			const first = new Promise< string[] >( ( resolve ) => {
+				resolveFirst = resolve;
+			} );
+			const second = new Promise< string[] >( ( resolve ) => {
+				resolveSecond = resolve;
+			} );
+			const options = vi.fn( ( query: string ) =>
+				query === 'A' ? first : second
+			);
+			const completer = {
+				name: 'fruit',
+				triggerPrefix: '~',
+				isDebounced,
+				options,
+				getOptionLabel: ( option: string ) => option,
+			};
+			const view = renderHook(
+				( { query } ) => getDefaultUseItems( completer )( query ),
+				{
+					initialProps: { query: 'A' },
+				}
+			);
+
+			try {
+				await waitFor( () =>
+					expect( options ).toHaveBeenCalledWith( 'A' )
+				);
+				view.rerender( { query: 'Ap' } );
+				await waitFor( () =>
+					expect( options ).toHaveBeenCalledWith( 'Ap' )
+				);
+				await act( async () => resolveSecond( [ 'Apricot' ] ) );
+				expect(
+					view.result.current[ 0 ].map( ( option ) => option.label )
+				).toEqual( [ 'Apricot' ] );
+
+				await act( async () => resolveFirst( [ 'Apple' ] ) );
+				expect(
+					view.result.current[ 0 ].map( ( option ) => option.label )
+				).toEqual( [ 'Apricot' ] );
+			} finally {
+				view.unmount();
+			}
+		}
+	);
 } );

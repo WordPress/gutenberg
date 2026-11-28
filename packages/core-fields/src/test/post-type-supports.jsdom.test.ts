@@ -14,6 +14,7 @@ describe( 'post_type_supports', () => {
 			'password',
 			'ping_status',
 			'post-content-info',
+			'publish_date',
 			'scheduled_date',
 			'slug',
 			'status',
@@ -228,10 +229,11 @@ describe( 'post_type_supports', () => {
 		} );
 	} );
 
-	it( 'provides the control and the render of the template', () => {
+	it( 'provides the control, the render, and the disabled state of the template', () => {
 		expect( postTypeSupports.template ).toEqual( {
 			Edit: expect.any( Function ),
 			render: expect.any( Function ),
+			isDisabled: expect.any( Function ),
 		} );
 	} );
 

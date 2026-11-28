@@ -15,9 +15,10 @@ export type Completer = UseAutocompletePropsOptions[ 'completers' ][ number ];
 
 export type UseBlockEditorAutocompletePropsOptions = Omit<
 	UseAutocompletePropsOptions,
-	'completers'
+	'completers' | 'onReplace'
 > & {
 	completers?: Completer[];
+	onReplace?: UseAutocompletePropsOptions[ 'onReplace' ];
 };
 
 export type BlockEditorAutocompleteProps = Omit<

@@ -56,7 +56,7 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
-	&[class*="wp-block-button__width"] {
+	&.wp-block-button__width {
 		width:
 			calc(var(--wp--block-button--width) * 1% -
 			(
@@ -101,7 +101,7 @@ $blocks-block__margin: 0.5em;
 
 // For vertical buttons, gap is not factored into width calculations.
 .wp-block-buttons.is-vertical > .wp-block-button {
-	&[class*="wp-block-button__width"] {
+	&.wp-block-button__width {
 		width: calc(var(--wp--block-button--width) * 1%);
 	}
 

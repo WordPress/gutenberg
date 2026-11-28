@@ -17,7 +17,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert';
-import jsYaml from 'js-yaml';
+import { dump } from 'js-yaml';
 
 /** @typedef {import('storybook/internal/types').ComponentManifest} StorybookComponentManifest */
 
@@ -215,7 +215,7 @@ const header =
 	'# Auto-generated snapshot of the Storybook components manifest.\n' +
 	'# Do not edit by hand. Regenerate with `npm run storybook:manifest-snapshot`\n' +
 	'# and commit the result. See `storybook/README.md` for details.\n';
-const snapshotYaml = header + jsYaml.dump( entries, { lineWidth: -1 } );
+const snapshotYaml = header + dump( entries, { lineWidth: -1 } );
 
 await Promise.all( [
 	writeFile( SNAPSHOT_PATH, snapshotYaml ),

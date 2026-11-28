@@ -1,5 +1,6 @@
 import {
 	store,
+	getConfig,
 	getContext,
 	getElement,
 	withSyncEvent,
@@ -87,12 +88,15 @@ const { actions, state } = store(
 					return;
 				}
 
+				// Swap the Left and Right arrows on RTL sites.
+				const step = getConfig().isRTL ? -1 : 1;
+
 				if ( event.key === 'ArrowRight' ) {
 					event.preventDefault();
-					actions.moveFocus( tabIndex + 1 );
+					actions.moveFocus( tabIndex + step );
 				} else if ( event.key === 'ArrowLeft' ) {
 					event.preventDefault();
-					actions.moveFocus( tabIndex - 1 );
+					actions.moveFocus( tabIndex - step );
 				} else if ( event.key === 'Home' ) {
 					event.preventDefault();
 					actions.moveFocus( 0 );

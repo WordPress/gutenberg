@@ -337,7 +337,13 @@ export function useNoteActions() {
 				newAttributes[ removed.attributeKey ] = removed.value;
 			}
 			const range = ranges.get( clientId );
-			if ( range ) {
+			const bindings = attributes.metadata?.bindings;
+			// Selection offsets are in the bound value, not the stored one.
+			if (
+				range &&
+				! bindings?.[ range.attributeKey ] &&
+				! bindings?.__default
+			) {
 				const { attributeKey, start, end } = range;
 				const value =
 					newAttributes[ attributeKey ] ?? attributes[ attributeKey ];

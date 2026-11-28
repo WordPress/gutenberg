@@ -1,0 +1,9 @@
+{
+	"name": "@example/greeting",
+	"version": "1.0.0",
+	"module": "build-module/index.mjs",
+	"wpScript": true,
+	"wpWorkers": {
+		"./worker": "./src/worker.ts"
+	}
+}
