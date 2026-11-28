@@ -131,6 +131,7 @@ export interface TypographyStyleSettings {
 	 * Which paragraphs to indent, or `false` when the control is hidden.
 	 */
 	textIndent?: 'subsequent' | 'all' | boolean;
+	textWrap?: boolean;
 	textShadow?: boolean;
 	[ setting: string ]: unknown;
 }

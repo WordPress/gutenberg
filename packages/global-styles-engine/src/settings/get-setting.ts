@@ -75,6 +75,7 @@ const VALID_SETTINGS = [
 	'typography.defaultTextShadowPresets',
 	'typography.textShadowPresets',
 	'typography.textTransform',
+	'typography.textWrap',
 	'typography.writingMode',
 	'viewport.mobile',
 	'viewport.tablet',

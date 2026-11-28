@@ -54,6 +54,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textAlign',
 	'textDecoration',
 	'textIndent',
+	'textWrap',
 	'textTransform',
 	'textShadow',
 	'letterSpacing',
@@ -141,6 +142,11 @@ function filterElementBlockSupports(
 
 		// Text indent is only available for blocks, not elements
 		if ( support === 'textIndent' && ! name ) {
+			return false;
+		}
+
+		// Text wrap is only available for blocks, not elements
+		if ( support === 'textWrap' && ! name ) {
 			return false;
 		}
 

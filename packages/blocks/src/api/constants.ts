@@ -296,6 +296,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', 'textIndent' ],
 		useEngine: true,
 	},
+	textWrap: {
+		value: [ 'typography', 'textWrap' ],
+		support: [ 'typography', 'textWrap' ],
+		useEngine: true,
+	},
 	textShadow: {
 		value: [ 'typography', 'textShadow' ],
 		support: [ 'typography', 'textShadow' ],

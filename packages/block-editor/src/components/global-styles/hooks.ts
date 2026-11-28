@@ -102,6 +102,7 @@ export function useSettingsForBlockElement(
 			'textTransform',
 			'textDecoration',
 			'textIndent',
+			'textWrap',
 			'textShadow',
 			'writingMode',
 		].forEach( ( key ) => {

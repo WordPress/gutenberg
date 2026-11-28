@@ -223,6 +223,7 @@ Settings related to typography.
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
+| textWrap | Allow users to set the text wrapping behavior. | `boolean` | `true` |
 | textShadow | Allow users to set custom text shadows. | `boolean` | `true` |
 | defaultTextShadowPresets | Allow users to choose text shadows from the default text shadow presets. | `boolean` | `true` |
 | textShadowPresets | Text shadow presets for the text shadow picker. | `[ { name, slug, textShadow } ]` |  |
@@ -391,10 +392,10 @@ Typography styles.
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
+| textWrap | Sets the `text-wrap` CSS property. | `string`, `{ ref }` |
 | textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
-| textWrap | Sets the `text-wrap` CSS property. | `string`, `{ ref }` |
 
 ---
 

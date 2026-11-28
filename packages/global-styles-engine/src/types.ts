@@ -313,6 +313,7 @@ export interface GlobalStylesStyles {
 		letterSpacing?: UnresolvedValue;
 		textTransform?: UnresolvedValue;
 		textIndent?: UnresolvedValue;
+		textWrap?: UnresolvedValue;
 	};
 	spacing?: {
 		padding?: UnresolvedValue | Record< string, UnresolvedValue >;
