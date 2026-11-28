@@ -1,8 +1,10 @@
 import { getBlockType } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext, useMemo, useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import {
-	PanelBody,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
@@ -205,6 +207,23 @@ function ScreenBlock( {
 	const baseValue = hasSelectedState ? baseStyle : undefined;
 	const inheritedStyleWithResolvedBackground =
 		useStyleWithResolvedBackground( inheritedStyle );
+	const [ themeStyle ] = useStyle(
+		prefix,
+		name,
+		'base',
+		false,
+		hasSelectedState ? stateParam : undefined
+	);
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const dropdownMenuProps = ! isMobileViewport
+		? {
+				popoverProps: {
+					placement: 'left-start' as const,
+					offset: 259,
+				},
+			}
+		: {};
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -467,20 +486,39 @@ function ScreenBlock( {
 			) }
 
 			{ canEditCSS && (
-				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
-					<StylesAdvancedPanel
-						value={ style }
-						onChange={ setStyle }
-						inheritedValue={ inheritedStyle }
-						help={ sprintf(
-							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-							__(
-								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
-							),
-							blockType?.title!
-						) }
-					/>
-				</PanelBody>
+				<ToolsPanel
+					label={ __( 'Advanced' ) }
+					resetAll={ () => {
+						const { css: _css, ...rest } = style ?? {};
+						setStyle( rest );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Additional CSS' ) }
+						isShownByDefault
+						hasValue={ () =>
+							inheritedStyle?.css !== themeStyle?.css
+						}
+						onDeselect={ () => {
+							const { css: _css, ...rest } = style ?? {};
+							setStyle( rest );
+						} }
+					>
+						<StylesAdvancedPanel
+							value={ style }
+							onChange={ setStyle }
+							inheritedValue={ inheritedStyle }
+							help={ sprintf(
+								// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+								__(
+									'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
+								),
+								blockType?.title!
+							) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			) }
 		</>
 	);

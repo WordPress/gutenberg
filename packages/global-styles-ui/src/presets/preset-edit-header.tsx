@@ -19,7 +19,7 @@ export interface PresetEditHeaderMenuItem {
 
 interface PresetEditHeaderProps {
 	title: string;
-	description?: string;
+	description?: string | React.ReactElement;
 	menuLabel: string;
 	menuItems: PresetEditHeaderMenuItem[];
 }
