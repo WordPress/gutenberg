@@ -26,6 +26,10 @@
 -   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).
 -   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
 
+### Bug Fixes
+
+-   Paste handling: remove Microsoft Word comments, with their markers and authors, from pasted content ([#86812](https://github.com/WordPress/gutenberg/pull/86812)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements

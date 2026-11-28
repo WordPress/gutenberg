@@ -11,6 +11,7 @@ import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import msListIgnore from './ms-list-ignore';
+import msCommentRemover from './ms-comment-remover';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -46,6 +47,7 @@ function filterInlineHTML( HTML: string ): string {
 		headRemover,
 		googleDocsUIDRemover,
 		msListIgnore,
+		msCommentRemover,
 		phrasingContentReducer,
 		commentRemover,
 	] );
@@ -201,6 +203,7 @@ export function pasteHandler( {
 
 			const filters = [
 				googleDocsUIDRemover,
+				msCommentRemover,
 				msListConverter,
 				headRemover,
 				listReducer,
