@@ -87,7 +87,7 @@ function App() {
 }
 ```
 
-This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is shared across React roots and `@wordpress/ui` package copies in the same window and remains enabled after the calling component unmounts. Explicit portal containers still take precedence. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is shared across React roots and `@wordpress/ui` package copies in the same window and remains enabled after the calling component unmounts. Overlays that are already open when the slot is enabled stay in their container, and overlays opened afterwards use the slot. A portal rendered with `keepMounted` keeps its container until it unmounts, so that it keeps its contents' state. Explicit portal containers still take precedence. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
 

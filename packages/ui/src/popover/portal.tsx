@@ -1,7 +1,7 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { wpCompatOverlaySlotContainer } from '../utils/wp-compat-overlay-slot';
 
 /**
  * Used to apply custom portal behavior to `Popover`'s floating content.
@@ -13,7 +13,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 			<_Popover.Portal
 				container={
 					container === undefined
-						? getWpCompatOverlaySlot()
+						? wpCompatOverlaySlotContainer
 						: container
 				}
 				{ ...restProps }

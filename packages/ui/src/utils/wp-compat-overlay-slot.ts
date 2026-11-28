@@ -130,6 +130,25 @@ export function getWpCompatOverlaySlot(): HTMLDivElement | undefined {
 }
 
 /**
+ * Default `container` for the `@wordpress/ui` overlay portals.
+ *
+ * Base UI resolves a ref container when the portal mounts, not on every
+ * render. So an overlay that is already open keeps its container when a
+ * component enables the slot later, and only overlays opened afterwards move
+ * into the slot. A `keepMounted` portal stays mounted while closed, so it
+ * keeps its container until it unmounts. Passing `getWpCompatOverlaySlot()`
+ * directly would move a mounted portal on its next render, which remounts its
+ * contents and loses their state, such as unsaved input.
+ */
+export const wpCompatOverlaySlotContainer: {
+	readonly current: HTMLDivElement | null;
+} = {
+	get current() {
+		return getWpCompatOverlaySlot() ?? null;
+	},
+};
+
+/**
  * Test-only escape hatch that drops the cached singleton.
  */
 export function __resetWpCompatOverlaySlotCacheForTests(): void {

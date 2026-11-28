@@ -39,6 +39,10 @@
 
 -   `CollapsibleCard.Header`: Recommend `role="heading"` and `aria-level` to expose the header as a heading, instead of rendering it as a native `<h1>`–`<h6>` element, which can't contain the `<div>` trigger ([#87460](https://github.com/WordPress/gutenberg/pull/87460)).
 
+### Bug Fixes
+
+-   Preserve the contents and state of open overlays when the compat overlay slot is enabled later ([#87111](https://github.com/WordPress/gutenberg/pull/87111)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes

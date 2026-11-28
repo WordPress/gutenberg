@@ -22,11 +22,11 @@ export function useEnableWpCompatOverlaySlot(): void {
 		return;
 	}
 
-	// Applied during render (not in `useLayoutEffect`) so descendants in
-	// the same render pass — e.g. `Tooltip.Portal`, which reads
-	// `getWpCompatOverlaySlot()` on every render — see the gate open on
-	// first mount. Safe to write during render: the value is an idempotent
-	// boolean.
+	// Applied during render (not in `useLayoutEffect`) so descendant
+	// overlays that mount in the same pass see the gate open. Their portals
+	// resolve the container in a layout effect, which runs before this
+	// component's own layout effects. Safe to write during render: the value
+	// is an idempotent boolean.
 	const internalWindow = window as {
 		__wpUiCompatOverlaySlotEnabled?: boolean;
 	};
