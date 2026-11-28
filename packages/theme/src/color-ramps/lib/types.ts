@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-import type { TaperChromaOptions } from './taper-chroma';
+import type { TaperChromaOptions } from './taper-chroma.ts';
 
 export type Ramp = {
 	// Backgrounds for surfaces (nuanced, slight variations compared to bg)
@@ -35,9 +32,16 @@ export type Ramp = {
 
 export type RampDirection = 'lighter' | 'darker';
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
+export type ReferenceName = keyof Ramp | 'seed' | 'neutralSurface';
+
 export type ContrastRequirement = {
-	/** The reference color against which to calculate the contrast */
-	reference: keyof Ramp | 'seed';
+	/** The primary contrast relationship for this step. */
+	reference: ReferenceName;
+	/** Other references may require a different minimum contrast. */
+	additionalReferences?: readonly {
+		reference: ReferenceName;
+		target: number;
+	}[];
 	/**
 	 * Which direction should the algorithm search a matching color in:
 	 * - main: follow the same direction as the ramp's main direction
@@ -73,13 +77,13 @@ export type RampStepConfig = {
 	 * the contrast requirements. This reduces the number of unique colors
 	 * in the ramp and improves consistency.
 	 */
-	sameAsIfPossible?: keyof Ramp;
+	sameAsIfPossible?: keyof Ramp | 'seed';
 };
 
 export type RampConfig = Record< keyof Ramp, RampStepConfig >;
 
 export type RampResult = {
 	ramp: Record< keyof Ramp, string >;
-	warnings?: string[];
+	warnings?: ( keyof Ramp )[];
 	direction: RampDirection;
 };

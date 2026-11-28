@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { confirm } = require( '@inquirer/prompts' );
-
-/**
- * Internal dependencies
- */
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
@@ -16,14 +9,21 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
 /**
  * Destroy the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean} options.force   If true, skips the confirmation prompt.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}      options
+ * @param {Object}      options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}     options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.force   If true, skips the confirmation prompt.
+ * @param {boolean}     options.debug   True if debug mode is enabled.
+ * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
  */
-module.exports = async function destroy( { spinner, scripts, force, debug } ) {
-	const config = await loadConfig( path.resolve( '.' ) );
+module.exports = async function destroy( {
+	spinner,
+	scripts,
+	force,
+	debug,
+	config: customConfigPath,
+} ) {
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 
 	try {
 		await fs.readdir( config.workDirectoryPath );

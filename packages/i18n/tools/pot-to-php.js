@@ -1,10 +1,6 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
-const gettextParser = require( 'gettext-parser' );
 const fs = require( 'fs' );
+const gettextParser = require( 'gettext-parser' );
 
 const TAB = '\t';
 const NEWLINE = '\n';

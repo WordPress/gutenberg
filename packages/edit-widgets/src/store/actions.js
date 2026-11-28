@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
@@ -115,7 +108,7 @@ export const saveWidgetAreas =
  */
 export const saveWidgetArea =
 	( widgetAreaId ) =>
-	async ( { dispatch, select, registry } ) => {
+	async ( { select, registry } ) => {
 		const widgets = select.getWidgets();
 
 		const post = registry
@@ -162,9 +155,32 @@ export const saveWidgetArea =
 		const batchMeta = [];
 		const batchTasks = [];
 		const sidebarWidgetsIds = [];
+		const claimedWidgetIds = new Set();
 		for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 			const block = widgetsBlocks[ i ];
-			const widgetId = getWidgetIdFromBlock( block );
+			let widgetId = getWidgetIdFromBlock( block );
+
+			// Splitting a block, e.g. pressing Enter in the middle of a
+			// paragraph, copies all of its attributes to the new block,
+			// including the widget ID, and the new block can then be moved to
+			// another widget area. Only the first block with a given ID, in the
+			// first widget area that holds it, updates that widget. Any other
+			// block with the same ID is saved as a new widget.
+			if ( widgetId ) {
+				if (
+					claimedWidgetIds.has( widgetId ) ||
+					select.getWidgetAreaForWidgetId( widgetId )?.id !==
+						widgetAreaId
+				) {
+					widgetId = undefined;
+					// Drop the duplicate ID now, so nothing reads it before the
+					// new widget's ID is written back after the batch.
+					delete block.attributes.__internalWidgetId;
+				} else {
+					claimedWidgetIds.add( widgetId );
+				}
+			}
+
 			const oldWidget = widgets[ widgetId ];
 			const widget = transformBlockToWidget( block, oldWidget );
 
@@ -237,7 +253,7 @@ export const saveWidgetArea =
 
 			// Set __internalWidgetId on the block. This will be persisted to the
 			// store when we dispatch receiveEntityRecords( post ) below.
-			post.blocks[ position ].attributes.__internalWidgetId = widget.id;
+			block.attributes.__internalWidgetId = widget.id;
 
 			const error = registry
 				.select( coreStore )
@@ -271,17 +287,9 @@ export const saveWidgetArea =
 			{ undoIgnore: true }
 		);
 
-		dispatch( trySaveWidgetArea( widgetAreaId ) );
-
-		registry
-			.dispatch( coreStore )
-			.receiveEntityRecords( KIND, POST_TYPE, post, undefined );
-	};
-
-const trySaveWidgetArea =
-	( widgetAreaId ) =>
-	( { registry } ) => {
-		registry
+		// Sidebar and widget requests can both rewrite the sidebar lists. Finish
+		// this write before saveWidgetAreas starts saving the next area.
+		await registry
 			.dispatch( coreStore )
 			.saveEditedEntityRecord(
 				KIND,
@@ -291,6 +299,10 @@ const trySaveWidgetArea =
 					throwOnError: true,
 				}
 			);
+
+		registry
+			.dispatch( coreStore )
+			.receiveEntityRecords( KIND, POST_TYPE, post, undefined );
 	};
 
 /**

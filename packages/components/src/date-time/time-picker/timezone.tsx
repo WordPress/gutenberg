@@ -1,0 +1,83 @@
+import clsx from 'clsx';
+import { __, sprintf } from '@wordpress/i18n';
+import { getSettings as getDateSettings } from '@wordpress/date';
+import {
+	Button,
+	Popover,
+	VisuallyHidden,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
+import styles from './style.module.scss';
+
+/**
+ * Displays timezone information when user timezone is different from site
+ * timezone.
+ */
+const TimeZone = () => {
+	useEnableWpCompatOverlaySlot();
+
+	const { timezone } = getDateSettings();
+
+	// Convert timezone offset to hours.
+	const userTimezoneOffset = -1 * ( new Date().getTimezoneOffset() / 60 );
+
+	// System timezone and user timezone match, nothing needed.
+	// Compare as numbers because it comes over as string.
+	if ( Number( timezone.offset ) === userTimezoneOffset ) {
+		return null;
+	}
+
+	const offsetSymbol = Number( timezone.offset ) >= 0 ? '+' : '';
+	const zoneAbbr =
+		'' !== timezone.abbr && isNaN( Number( timezone.abbr ) )
+			? timezone.abbr
+			: `UTC${ offsetSymbol }${ timezone.offsetFormatted }`;
+
+	// Replace underscores with spaces in strings like `America/Costa_Rica`.
+	const prettyTimezoneString = timezone.string.replaceAll( '_', ' ' );
+
+	const timezoneDetail =
+		'UTC' === timezone.string
+			? __( 'Coordinated Universal Time' )
+			: `(${ zoneAbbr }) ${ prettyTimezoneString }`;
+
+	// When the prettyTimezoneString is empty, there is no additional timezone
+	// detail information to show in an infotip.
+	const hasNoAdditionalTimezoneDetail =
+		prettyTimezoneString.trim().length === 0;
+
+	if ( hasNoAdditionalTimezoneDetail ) {
+		return (
+			<div className="components-datetime__timezone">{ zoneAbbr }</div>
+		);
+	}
+
+	return (
+		<Popover.Root>
+			<Popover.Trigger
+				openOnHover
+				render={ <Button variant="unstyled" /> }
+				className={ clsx(
+					'components-datetime__timezone',
+					styles[ 'time-zone-trigger' ]
+				) }
+				aria-label={ sprintf(
+					/* translators: %s: timezone abbreviation, e.g. "CEST" or "UTC+3". */
+					__( 'Timezone: %s' ),
+					zoneAbbr
+				) }
+			>
+				{ zoneAbbr }
+			</Popover.Trigger>
+			<Popover.Popup positioner={ <Popover.Positioner side="top" /> }>
+				<Popover.Arrow />
+				<VisuallyHidden render={ <Popover.Title /> }>
+					{ __( 'Timezone' ) }
+				</VisuallyHidden>
+				<Popover.Description>{ timezoneDetail }</Popover.Description>
+			</Popover.Popup>
+		</Popover.Root>
+	);
+};
+
+export default TimeZone;

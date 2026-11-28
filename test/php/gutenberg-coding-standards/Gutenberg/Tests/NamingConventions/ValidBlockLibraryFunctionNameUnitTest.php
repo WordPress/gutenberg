@@ -68,7 +68,6 @@ final class ValidBlockLibraryFunctionNameUnitTest extends AbstractSniffUnitTest 
 	 * Get a list of all test files to check.
 	 *
 	 * @param string $testFileBase The base path that the unit tests files will have.
-	 *
 	 * @return string[]
 	 */
 	protected function getTestFiles( $testFileBase ) {

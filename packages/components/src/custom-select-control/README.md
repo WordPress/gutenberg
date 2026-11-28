@@ -1,5 +1,7 @@
 # CustomSelectControl
 
+<p class="callout callout-alert">This component is deprecated. Use <code>SelectControl</code> from <code>@wordpress/ui</code> instead. See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide">migration guide</a>.</p>
+
 `CustomSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md), with the addition of being able to provide custom styles for each item in the menu. This means it does not use a native `<select>`, so should only be used if the custom styling is necessary.
 
 ## Design guidelines
@@ -41,7 +43,6 @@ function MyCustomSelectControl() {
 	const [ , setFontSize ] = useState();
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -53,7 +54,6 @@ function MyControlledCustomSelectControl() {
 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
 	return (
 		<CustomSelectControl
-			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -99,9 +99,11 @@ Function called with the control's internal state changes. The `selectedItem` pr
 
 The list of options that can be chosen from.
 
+Options can provide custom styles through `style` and `className`. Hovered and keyboard-active options use the design system's highlight colors so text stays readable. Custom text and background colors apply while the option is inactive; other custom styling remains in effect.
+
 -   Required: Yes
 
-#### `size`: `'default' | 'small' | '\_\_unstable-large'`
+#### `size`: `'default' | 'small'`
 
 The size of the control.
 
@@ -143,13 +145,6 @@ A handler for `focus` events on the trigger button.
 A handler for `blur` events on the trigger button.
 
 -   Required: No
-
-#### `__next40pxDefaultSize`: `boolean`
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Required: No
-- Default: `false`
 
 ## Related components
 

@@ -1,0 +1,3 @@
+.root {
+	padding-block-start: calc(var(--wpds-dimension-padding-3xl) * 3.5);
+}

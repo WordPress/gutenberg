@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueryArgs } from './get-query-args';
 import { buildQueryString } from './build-query-string';
 

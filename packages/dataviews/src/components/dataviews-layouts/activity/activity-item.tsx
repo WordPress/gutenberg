@@ -1,20 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { VisuallyHidden } from '@wordpress/components';
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
@@ -100,9 +88,9 @@ function ActivityItem< Item >(
 	const verticalGap = useMemo( () => {
 		switch ( density ) {
 			case 'comfortable':
-				return 'sm';
+				return 'md';
 			default:
-				return 'xs';
+				return 'sm';
 		}
 	}, [ density ] );
 
@@ -121,10 +109,10 @@ function ActivityItem< Item >(
 				density === 'comfortable' && 'is-comfortable'
 			) }
 		>
-			<Stack direction="row" gap="md" justify="start" align="flex-start">
+			<Stack direction="row" gap="lg" justify="start" align="flex-start">
 				<Stack
 					direction="column"
-					gap="2xs"
+					gap="xs"
 					align="center"
 					className="dataviews-view-activity__item-type"
 				>
@@ -162,8 +150,8 @@ function ActivityItem< Item >(
 								className="dataviews-view-activity__item-field"
 							>
 								<VisuallyHidden
-									as="span"
 									className="dataviews-view-activity__item-field-label"
+									render={ <span /> }
 								>
 									{ field.label }
 								</VisuallyHidden>

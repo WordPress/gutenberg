@@ -1,7 +1,7 @@
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
-	type: 'problem',
 	meta: {
+		type: 'problem',
 		schema: [
 			{
 				type: 'object',
@@ -60,6 +60,11 @@ function makeListener( { allowedImports, context } ) {
 
 		node.specifiers.forEach( ( specifierNode ) => {
 			if ( specifierNode.type !== 'ImportSpecifier' ) {
+				return;
+			}
+
+			/* `imported` may be a string literal (e.g. `import { 'a' as b }`); only identifiers are relevant here. */
+			if ( specifierNode.imported.type !== 'Identifier' ) {
 				return;
 			}
 

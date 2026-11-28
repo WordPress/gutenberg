@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createUndoManager } from '@wordpress/undo-manager';
 import { useCallback, useReducer } from '@wordpress/element';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -15,7 +12,7 @@ function undoRedoReducer< T >(
 	action:
 		| { type: 'UNDO' }
 		| { type: 'REDO' }
-		| { type: 'RECORD'; value: T; isStaged: boolean }
+		| { type: 'RECORD'; value: T; isStaged?: boolean }
 ): UndoRedoState< T > {
 	switch ( action.type ) {
 		case 'UNDO': {
@@ -60,9 +57,9 @@ function undoRedoReducer< T >(
 	return state;
 }
 
-function initReducer< T >( value: T ) {
+function initReducer< T >( value: T ): UndoRedoState< T > {
 	return {
-		manager: createUndoManager(),
+		manager: createUndoManager< T >(),
 		value,
 	};
 }
@@ -75,14 +72,14 @@ function initReducer< T >( value: T ) {
  */
 export default function useStateWithHistory< T >( initialValue: T ) {
 	const [ state, dispatch ] = useReducer(
-		undoRedoReducer,
+		undoRedoReducer< T >,
 		initialValue,
-		initReducer
+		initReducer< T >
 	);
 
 	return {
 		value: state.value,
-		setValue: useCallback( ( newValue: T, isStaged: boolean ) => {
+		setValue: useCallback( ( newValue: T, isStaged?: boolean ) => {
 			dispatch( {
 				type: 'RECORD',
 				value: newValue,

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -116,19 +109,19 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 						createBlock( 'core/post-author-name', {
 							isLink,
 							linkTarget,
-							textAlign,
 							style: {
 								typography: {
 									fontSize: '1em',
+									textAlign,
 								},
 							},
 						} ),
 					shouldInsertPostAuthorBiographyBlock &&
 						createBlock( 'core/post-author-biography', {
-							textAlign,
 							style: {
 								typography: {
 									fontSize: '0.7em',
+									textAlign,
 								},
 							},
 						} ),

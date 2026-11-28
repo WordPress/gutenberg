@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef, FocusEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 
@@ -28,12 +17,14 @@ export function UnForwardedTokenInput(
 		onChange,
 		onFocus,
 		onBlur,
+		'aria-describedby': ariaDescribedBy,
 		...restProps
 	} = props;
 
 	const [ hasFocus, setHasFocus ] = useState( false );
 
 	const size = value ? value.length + 1 : 0;
+	const suggestionsId = `components-form-token-suggestions-${ instanceId }`;
 
 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
 		if ( onChange ) {
@@ -72,21 +63,17 @@ export function UnForwardedTokenInput(
 			role="combobox"
 			aria-expanded={ isExpanded }
 			aria-autocomplete="list"
-			aria-owns={
-				isExpanded
-					? `components-form-token-suggestions-${ instanceId }`
-					: undefined
-			}
+			aria-controls={ isExpanded ? suggestionsId : undefined }
 			aria-activedescendant={
 				// Only add the `aria-activedescendant` attribute when:
 				// - the user is actively interacting with the input (`hasFocus`)
 				// - there is a selected suggestion (`selectedSuggestionIndex !== -1`)
 				// - the list of suggestions are rendered in the DOM (`isExpanded`)
 				hasFocus && selectedSuggestionIndex !== -1 && isExpanded
-					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+					? `${ suggestionsId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
-			aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
+			aria-describedby={ ariaDescribedBy }
 		/>
 	);
 }

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	Navigator,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { IconWithCurrentColor } from './icon-with-current-color';
 
 interface GenericNavigationButtonProps {
@@ -25,7 +18,7 @@ function GenericNavigationButton( {
 	...props
 }: GenericNavigationButtonProps ) {
 	return (
-		<Item { ...props }>
+		<WCItem { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
 					<IconWithCurrentColor icon={ icon } size={ 24 } />
@@ -33,7 +26,7 @@ function GenericNavigationButton( {
 				</HStack>
 			) }
 			{ ! icon && children }
-		</Item>
+		</WCItem>
 	);
 }
 
@@ -46,8 +39,4 @@ interface NavigationButtonProps {
 
 export function NavigationButtonAsItem( props: NavigationButtonProps ) {
 	return <Navigator.Button as={ GenericNavigationButton } { ...props } />;
-}
-
-export function NavigationBackButtonAsItem( props: NavigationButtonProps ) {
-	return <Navigator.BackButton as={ GenericNavigationButton } { ...props } />;
 }

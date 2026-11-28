@@ -1,13 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Fieldset } from '../../../..';
+import * as Fieldset from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
-	title: 'Design System/Components/Form/Primitives/Fieldset',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/Primitives/Fieldset',
+	id: 'design-system-components-form-primitives-fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
-		Legend: Fieldset.Legend,
-		Description: Fieldset.Description,
-		Details: Fieldset.Details,
+		'Fieldset.Legend': Fieldset.Legend,
+		'Fieldset.Description': Fieldset.Description,
+		'Fieldset.Details': Fieldset.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -16,20 +25,38 @@ type Story = StoryObj< typeof Fieldset.Root >;
 
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Description>
-					This is a description for the entire fieldset.
-				</Fieldset.Description>
-			</>
-		),
+		children: [
+			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			<Fieldset.Description key="description">
+				This is a description for the entire fieldset.
+			</Fieldset.Description>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+		],
+	},
+};
+
+/**
+ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLegend: Story = {
+	args: {
+		children: [
+			<Fieldset.Legend hideFromVision key="legend">
+				Legend
+			</Fieldset.Legend>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+		],
 	},
 };
 
@@ -45,23 +72,17 @@ export const Default: Story = {
  */
 export const WithDetails: Story = {
 	args: {
-		children: (
-			<>
-				<Fieldset.Legend>Legend</Fieldset.Legend>
-				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
-					// eslint-disable-next-line jsx-a11y/label-has-associated-control
-					<label key={ fruit }>
-						<input type="checkbox" /> { fruit }
-					</label>
-				) ) }
-				<Fieldset.Details>
-					Details can include{ ' ' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Fieldset.Details>
-			</>
-		),
+		children: [
+			<Fieldset.Legend key="legend">Legend</Fieldset.Legend>,
+			<Fieldset.Details key="details">
+				{ DETAILS_EXAMPLE }
+			</Fieldset.Details>,
+			[ 'Apples', 'Bananas' ].map( ( fruit ) => (
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				<label key={ fruit }>
+					<input type="checkbox" /> { fruit }
+				</label>
+			) ),
+		],
 	},
 };

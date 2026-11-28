@@ -36,7 +36,7 @@ html.interface-interface-skeleton__html-container {
 		top: $admin-bar-height;
 
 		.is-fullscreen-mode & {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 	}
 }
@@ -75,7 +75,7 @@ html.interface-interface-skeleton__html-container {
 	// Footer overlap prevention
 	.has-footer & {
 		@include break-medium() {
-			padding-bottom: $button-size-small + $border-width;
+			padding-bottom: calc(var(--wpds-dimension-size-md) + #{$border-width});
 		}
 	}
 }
@@ -169,16 +169,6 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		display: flex;
 	}
-
-	.block-editor-block-breadcrumb {
-		z-index: z-index(".edit-post-layout__footer");
-		display: flex;
-		background: $white;
-		height: $button-size-small;
-		align-items: center;
-		font-size: $default-font-size;
-		padding: 0 ($grid-unit-15 + 6px);
-	}
 }
 
 .interface-interface-skeleton__actions {
@@ -200,17 +190,19 @@ html.interface-interface-skeleton__html-container {
 	&:focus-within {
 		top: auto;
 		bottom: 0;
+	}
 
-		.is-entity-save-view-open & {
-			top: $admin-bar-height-big;
+	// Keep the open save panel visible when the document loses focus.
+	.is-entity-save-view-open & {
+		top: $admin-bar-height-big;
+		bottom: 0;
 
-			@include break-medium() {
-				border-left: $border-width solid $gray-300;
-				top: $admin-bar-height;
+		@include break-medium() {
+			border-left: $border-width solid $gray-300;
+			top: $admin-bar-height;
 
-				.is-fullscreen-mode & {
-					top: 0;
-				}
+			.is-fullscreen-mode & {
+				top: var(--wp-admin--admin-bar--height, 0);
 			}
 		}
 	}

@@ -1,16 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../types';
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
-	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
@@ -63,7 +55,6 @@ export default {
 		// Multiple selection
 		OPERATOR_IS_ANY,
 		OPERATOR_IS_NONE,
-		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
 	format: {},

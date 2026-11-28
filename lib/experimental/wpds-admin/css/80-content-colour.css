@@ -1,0 +1,109 @@
+/**
+ * Admin content colours (page ground, list tables, metaboxes) from design
+ * system tokens.
+ *
+ * Tokens are mapped by role, following `@wordpress/admin-ui`'s Page component
+ * and the site editor shell:
+ *
+ *   page ground        background-surface-neutral-weak
+ *   card/table surface background-surface-neutral-strong
+ *   container borders  stroke-surface-neutral
+ *   primary text       foreground-content-neutral
+ *   secondary text     foreground-content-neutral-weak
+ *
+ * Body text contrast goes from 8.8:1 to 15.4:1. Container borders get lighter,
+ * from #c3c4c7 to #dbdbdb. Both values are already below the 3:1 WCAG asks of
+ * UI boundaries, but the tables and boxes do look softer. Links and the
+ * semantic reds, greens and ambers are not changed.
+ *
+ * No `!important` here; see 99-overrides.css.
+ */
+
+@layer wpds-overrides, wp-legacy, wpds;
+
+@layer wpds {
+
+	body {
+		background: var(--wpds-color-background-surface-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	/*
+	 * Container surfaces and borders. The selector lists are copied from the
+	 * shared colour block in common.css so the restyle covers the same elements.
+	 */
+
+	.widget-top,
+	.menu-item-handle,
+	.widget-inside,
+	#menu-settings-column .accordion-container,
+	#menu-management .menu-edit,
+	.manage-menus,
+	table.widefat,
+	.stuffbox,
+	p.popular-tags,
+	.widgets-holder-wrap,
+	.wp-editor-container,
+	.popular-tags,
+	.feature-filter,
+	.comment-ays,
+	.postbox {
+		border-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	table.widefat,
+	.wp-editor-container,
+	.stuffbox,
+	p.popular-tags,
+	.widgets-holder-wrap,
+	.popular-tags,
+	.feature-filter,
+	.comment-ays,
+	.postbox {
+		background: var(--wpds-color-background-surface-neutral-strong);
+	}
+
+	/* List table dividers */
+
+	.wp-list-table thead th,
+	.wp-list-table thead td,
+	.wp-list-table tfoot th,
+	.wp-list-table tfoot td,
+	.widefat thead th,
+	.widefat thead td,
+	.widefat tfoot th,
+	.widefat tfoot td,
+	#the-list tr td,
+	#the-list tr th {
+		border-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	/*
+	 * There is no striping rule here, so core's `#f6f7f7` stays. Neither neutral
+	 * below white works for it: `background-surface-neutral` (#fcfcfc) is too
+	 * faint to separate rows that have no border, and `-neutral-weak` is the page
+	 * background, so the stripe would match the page behind the table.
+	 */
+
+	/* Core sets a colour on these, so they do not inherit from body. */
+
+	.form-table th,
+	.form-wrap label,
+	.wrap h1,
+	.wrap h2 {
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	/* Secondary text */
+
+	.row-actions,
+	.wp-list-table .column-description .plugin-version-author-uri,
+	#wpfooter,
+	#wpfooter p,
+	.form-table span.description,
+	p.description,
+	span.description,
+	.described-by-description {
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+}

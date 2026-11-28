@@ -1,8 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 
+/** @type {Array<import('react').ComponentProps<typeof import('./shortcut').default>>} */
 export const textFormattingShortcuts = [
 	{
 		keyCombination: { modifier: 'primary', character: 'b' },
@@ -22,6 +20,8 @@ export const textFormattingShortcuts = [
 	},
 	{
 		keyCombination: { character: '[[' },
+		/* translators: The keyboard sequence [[, pressing the left bracket key twice. */
+		ariaLabel: __( 'Left bracket twice' ),
 		description: __( 'Insert a link to a post or page.' ),
 	},
 	{

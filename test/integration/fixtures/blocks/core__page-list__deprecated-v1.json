@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/page-list",
+		"isValid": true,
+		"attributes": {
+			"parentPageID": 0
+		},
+		"innerBlocks": []
+	}
+]

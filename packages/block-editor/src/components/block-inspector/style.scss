@@ -8,7 +8,7 @@
 
 	h2,
 	h3 {
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}
@@ -45,10 +45,26 @@
 .block-editor-block-inspector__no-blocks,
 .block-editor-block-inspector__no-block-tools {
 	display: block;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	background: $white;
 	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
+}
+
+// Styles for the style state badges row, shown when a style state is
+// active. The badges replace the block description, so the row is pulled up
+// against the block card to match the description's spacing.
+.block-editor-block-inspector__state-badges {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-20;
+	margin-top: -$grid-unit-20;
+}
+
+.block-editor-block-inspector__state-badges-text {
+	white-space: nowrap;
 }
 
 .block-editor-block-inspector__no-block-tools {

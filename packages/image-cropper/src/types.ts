@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Point, Area, MediaSize } from 'react-easy-crop';
 
 // Re-export types for convenience.

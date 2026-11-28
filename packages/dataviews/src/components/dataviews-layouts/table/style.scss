@@ -1,7 +1,21 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
-@use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
+@use "../../../dataviews/style" as *;
+
+// Width of the cells at the edges of the table that cover the columns
+// scrolling under them, while there are more columns to scroll to. It matches
+// the padding at the ends of the rows, which the cells take the place of, so
+// that the columns do not move.
+$scroll-fade-size: var(--wpds-dimension-padding-2xl);
+
+// Without actions, the cell at the end of the rows is wider, so that a vertical
+// scrollbar over the edge of the table (overlay scrollbars take no space) does
+// not cut the columns off before they fade out. The cell at the start keeps the
+// padding of the components above the table, so the first column lines up with
+// them.
+$scroll-fade-end-size: var(--wpds-dimension-padding-3xl);
+
+// Width of the fade itself, over the columns next to a covering cell.
+$scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
 .dataviews-view-table {
 	width: 100%;
@@ -9,40 +23,68 @@
 	border-color: inherit;
 	border-collapse: collapse;
 	position: relative;
-	color: $gray-700;
+	// Keep the sticky header's z-index inside the table, so the bulk actions
+	// toolbar (a sibling) covers it without rising above the page's own layers.
+	isolation: isolate;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-bottom: auto;
 	background-color: inherit;
+	// Physical sides of the start and end of the rows, for the directions of
+	// the scroll fades and the origins of their transforms.
+	--dataviews-view-table-fade-to-start: left;
+	--dataviews-view-table-fade-to-end: right;
+
+	&:dir(rtl) {
+		--dataviews-view-table-fade-to-start: right;
+		--dataviews-view-table-fade-to-end: left;
+	}
 
 	th {
 		text-align: left;
-		color: $gray-900;
-		font-weight: normal;
-		font-size: $default-font-size;
+		color: var(--wpds-color-foreground-content-neutral);
+		font-weight: 400;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 	td,
 	th {
-		padding: $grid-unit-15;
+		padding: var(--wpds-dimension-padding-md);
 
 		&.dataviews-view-table__actions-column {
 			text-align: right;
-		}
-
-		&.dataviews-view-table__actions-column--sticky {
 			position: sticky;
-			right: 0;
-			background-color: var(--wp-dataviews-color-background, $white);
-		}
+			inset-inline-end: 0;
+			background-color: var(--dataviews-view-table-row-background);
 
-		&.dataviews-view-table__actions-column--stuck {
-			&::after {
-				display: block;
+			// While there are more columns to scroll to, the strip at the
+			// start of the cell covers them and its share of the row line, and
+			// the columns fade out next to it. A child rather than a mask, as
+			// Firefox moves the mask of a sticky cell behind the cell while
+			// scrolling, and cuts the cell off.
+			&::before {
 				content: "";
 				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
+				inset-block: 0;
+				inset-inline-start: calc(-1 * #{$scroll-fade-ramp});
+				width: calc(#{$scroll-fade-ramp} + #{$scroll-fade-size});
+				background-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, var(--dataviews-view-table-row-background) #{$scroll-fade-ramp});
+				pointer-events: none;
+			}
+
+			// Divider between the strip and the actions.
+			&::after {
+				content: "";
+				position: absolute;
+				inset-block: 0;
+				inset-inline-start: $scroll-fade-size;
 				width: 1px;
-				background-color: $gray-100;
+				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			}
+
+			// Hidden at the end of the scroll range, and when nothing scrolls,
+			// see `has-columns-after` below.
+			&::before,
+			&::after {
+				opacity: 0;
 			}
 		}
 
@@ -56,17 +98,25 @@
 		}
 	}
 	tr {
-		border-top: 1px solid $gray-100;
+		--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-neutral-weak);
+		// The row's background, for the fades: they cover the columns with
+		// it beyond their own box, where they cannot inherit it.
+		--dataviews-view-table-row-background: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+		// Keeps the space of the line between rows. The cells draw the line
+		// itself, so the fades can hide it, see below.
+		border-top: 1px solid transparent;
 		background-color: inherit;
 
+		// The fade cells at the ends of each row take the place of the outer
+		// padding of the first and last columns, so the columns do not move.
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-30;
+			padding-inline-start: 0;
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-30;
+			padding-inline-end: 0;
 		}
 
 		&:last-child {
@@ -85,16 +135,13 @@
 		}
 
 		&.is-selected {
-			background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
-			color: $gray-700;
+			--dataviews-view-table-row-background: var(--wpds-color-background-interactive-brand-weak-active);
+			background-color: var(--dataviews-view-table-row-background);
+			color: var(--wpds-color-foreground-content-neutral);
 
 			&,
 			& + tr {
-				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
-			}
-
-			.dataviews-view-table__actions-column--sticky {
-				background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
+				--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-brand);
 			}
 		}
 
@@ -108,74 +155,87 @@
 		}
 	}
 
-	// Additional styles when bulk actions are available
-	&.has-bulk-actions {
-		tr {
-			&:focus-within,
-			&:hover {
-				.dataviews-view-table__actions-column--sticky {
-					background-color: var(--wp-dataviews-color-background, $white);
-				}
-			}
-
-			&.is-selected,
-			&.is-selected:hover {
-				.dataviews-view-table__actions-column--sticky {
-					background-color: color-mix(in srgb, rgb(var(--wp-admin-theme-color--rgb)) 4%, $white);
-				}
-			}
-		}
-	}
-
 	thead {
 		position: sticky;
 		inset-block-start: 0;
-		z-index: z-index(".dataviews-view-table thead");
+		// Ensure the header stays above the scrolling content, including the
+		// fade cells at the start of the rows.
+		z-index: 2;
 		background-color: inherit;
+
+		&.dataviews-view-table__thead--stuck {
+			&::after {
+				display: block;
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				height: 1px;
+				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			}
+		}
 
 		tr {
 			border: 0;
 		}
 		th {
+			vertical-align: middle;
+
+			[role="checkbox"] {
+				display: flex;
+			}
 			background-color: inherit;
-			padding-top: $grid-unit-10;
-			padding-bottom: $grid-unit-10;
+			padding-top: var(--wpds-dimension-padding-sm);
+			padding-bottom: var(--wpds-dimension-padding-sm);
 			font-size: 11px;
 			text-transform: uppercase;
-			font-weight: $font-weight-medium;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 
 			&:has(.dataviews-view-table-header-button) {
-				padding-left: $grid-unit-05;
-				padding-right: $grid-unit-05;
+				padding-inline: var(--wpds-dimension-padding-xs);
 
 				.dataviews-view-table-header-button {
-					gap: $grid-unit-05;
+					gap: var(--wpds-dimension-gap-xs);
 				}
 			}
 
+			// Next to the fade cells, the header button pulls back by its own
+			// padding, so that its label lines up with the cells.
 			&:has(.dataviews-view-table-header-button):first-child {
-				// Table cell padding minus the header button padding.
-				padding-left: $grid-unit-50;
+				padding-inline-start: 0;
+
+				.dataviews-view-table-header-button {
+					margin-inline-start: calc(-1 * var(--wpds-dimension-padding-sm));
+				}
 			}
 
 			&:has(.dataviews-view-table-header-button):last-child {
-				// Table cell padding minus the header button padding.
-				padding-right: $grid-unit-50;
+				padding-inline-end: 0;
+
+				.dataviews-view-table-header-button {
+					margin-inline-end: calc(-1 * var(--wpds-dimension-padding-sm));
+				}
 			}
 		}
 	}
 	tbody {
+		// Passed on to the rows, so the fade at their end has a color to
+		// fade into.
+		background-color: inherit;
+
 		td {
 			vertical-align: top;
 		}
 		.dataviews-view-table__cell-content-wrapper {
-			min-height: $grid-unit-40;
+			min-height: var(--wpds-dimension-size-md);
 			display: flex;
 			align-items: center;
 			white-space: nowrap;
 
 			&.dataviews-view-table__cell-align-end {
 				justify-content: flex-end;
+				font-variant-numeric: tabular-nums;
 			}
 
 			&.dataviews-view-table__cell-align-center {
@@ -188,13 +248,13 @@
 		}
 	}
 	.dataviews-view-table-header-button {
-		padding: $grid-unit-05 $grid-unit-10;
+		padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 		font-size: 11px;
 		text-transform: uppercase;
-		font-weight: $font-weight-medium;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 
 		&:not(:hover) {
-			color: $gray-900;
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		span {
@@ -207,7 +267,7 @@
 	}
 
 	.dataviews-view-table-header {
-		padding-left: $grid-unit-05;
+		padding-left: var(--wpds-dimension-padding-xs);
 	}
 
 	.dataviews-view-table__actions-column {
@@ -218,27 +278,19 @@
 
 	// Density style overrides.
 	&.has-compact-density {
-		thead {
-			th {
-				&:has(.dataviews-view-table-header-button):not(:first-child) {
-					padding-left: 0;
-				}
-
-				&:has(.dataviews-view-table-header-button):not(:last-child) {
-					padding-right: 0;
-				}
-			}
+		thead th:has(.dataviews-view-table-header-button) {
+			padding-inline: 0;
 		}
 		td,
 		th {
-			padding: $grid-unit-05 $grid-unit-10;
+			padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 		}
 	}
 
 	&.has-comfortable-density {
 		td,
 		th {
-			padding: $grid-unit-20 $grid-unit-15;
+			padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-md);
 		}
 	}
 
@@ -251,29 +303,105 @@
 			}
 		}
 	}
-}
 
+	// The sticky actions column ends the row in place of the fade cell, and
+	// keeps room for its fade strip before its start padding. Repeats `tr` and
+	// the cell types to outrank the padding of the first and last columns.
+	tr > td.dataviews-view-table__actions-column,
+	tr > th.dataviews-view-table__actions-column {
+		padding-inline: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-md)) var(--wpds-dimension-padding-2xl);
+	}
 
-.dataviews-view-table-selection-checkbox {
-	--checkbox-input-size: 24px;
-	@include break-small() {
-		--checkbox-input-size: 16px;
+	&.has-compact-density tr > td.dataviews-view-table__actions-column,
+	&.has-compact-density tr > th.dataviews-view-table__actions-column {
+		padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
+	}
+
+	// Sticky cells at the edges of each row cover the columns scrolling under
+	// them, and fade out the columns next to them, while there are more columns
+	// to scroll to on their side. With actions, the sticky actions column
+	// covers the end instead.
+	tr::before,
+	&:not(.has-actions) tr::after {
+		content: "";
+		display: table-cell;
+		position: sticky;
+		width: $scroll-fade-size;
+		// Keeps the width against the shrink-to-fit width of the columns.
+		min-width: $scroll-fade-size;
+		padding: 0;
+		pointer-events: none;
+		// The side of the cell at the edge of the row, see below.
+		transform-origin: var(--dataviews-view-table-fade-edge);
+	}
+
+	tr::before {
+		--dataviews-view-table-fade-edge: var(--dataviews-view-table-fade-to-start);
+		inset-inline-start: 0;
+		// Above the positioned content of the cells that follow it.
+		z-index: 1;
+	}
+
+	&:not(.has-actions) tr::after {
+		--dataviews-view-table-fade-edge: var(--dataviews-view-table-fade-to-end);
+		inset-inline-end: 0;
+		width: $scroll-fade-end-size;
+		min-width: $scroll-fade-end-size;
+	}
+
+	// Each cell draws its share of the line between rows, so a fade can hide
+	// its own share while it is active: the lines of the columns scrolling
+	// under it then fade out along with their content.
+	tbody tr > *,
+	tbody tr::before,
+	&:not(.has-actions) tbody tr::after {
+		background-image: linear-gradient(var(--dataviews-view-table-row-stroke), var(--dataviews-view-table-row-stroke));
+		background-repeat: no-repeat;
+		background-size: 100% 1px;
+	}
+
+	// While there are more columns to scroll to on its side, as the table's
+	// `has-columns-before` and `has-columns-after` classes tell, the cell at
+	// the edge of the rows covers the columns scrolling under it, in the row's
+	// background, and fades out the columns next to it over
+	// `$scroll-fade-ramp`. Doubled in width from the edge of the row, its
+	// outer half covers its own space, and its inner half holds the ramp,
+	// which needs the cell to be at least as wide as the ramp. The cell also
+	// hides its share of the row line, so the lines fade out with the
+	// columns. At rest, the cell is transparent, so it does not cover what the
+	// columns next to it paint over its space, like a focus ring.
+	//
+	// A transform rather than a mask over an outline or a box shadow, as
+	// Firefox misplaces the mask of a sticky cell while scrolling, and Chrome
+	// does not paint box shadows on table cells. These rules follow the ones
+	// above, to outrank them.
+	&.has-columns-before tr::before,
+	&.has-columns-after:not(.has-actions) tr::after {
+		background-image: linear-gradient(to var(--dataviews-view-table-fade-edge), transparent calc(50% - #{$scroll-fade-ramp} / 2), var(--dataviews-view-table-row-background) 50%);
+		background-size: auto;
+		transform: scaleX(2);
+	}
+
+	&.has-columns-after .dataviews-view-table__actions-column::before,
+	&.has-columns-after .dataviews-view-table__actions-column::after {
+		opacity: 1;
 	}
 }
 
+
 .dataviews-column-primary__media {
 	max-width: 60px;
-	min-width: $grid-unit-40;
-	min-height: $grid-unit-40;
+	min-width: var(--wpds-dimension-size-md);
+	min-height: var(--wpds-dimension-size-md);
 	overflow: hidden;
 	position: relative;
 	flex-shrink: 0;
-	background-color: $white;
-	border-radius: $radius-medium;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	border-radius: var(--wpds-border-radius-md);
 
 	img {
-		width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: var(--wpds-dimension-size-md);
+		height: var(--wpds-dimension-size-md);
 		object-fit: cover;
 	}
 
@@ -284,8 +412,29 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
-		border-radius: $radius-medium;
+		box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+		border-radius: var(--wpds-border-radius-md);
+	}
+}
+
+// Only when the view configures `layout.aspectRatio` (the table then carries
+// the `has-media-aspect-ratio` modifier): the preview box takes a fixed
+// height while the configured ratio sets its width, keeping rows uniform.
+// Sized on the wrapper rather than the img so custom media field renders are
+// covered too; ratios wider than ~17/9 at this height are clipped by the base
+// rule's `max-width` rather than allowed to crowd out the title. Views
+// without `aspectRatio` keep the base sizing above, unchanged.
+.dataviews-view-table.has-media-aspect-ratio .dataviews-column-primary__media {
+	height: var(--wpds-dimension-size-md);
+	aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
+	// Release the base rule's `min-width`: it equals the fixed height, so for
+	// ratios narrower than 1/1 the ratio-derived width would fall below it
+	// and the minimum would win, forcing the box back to a square.
+	min-width: 0;
+
+	img {
+		width: 100%;
+		height: 100%;
 	}
 }
 
@@ -299,13 +448,49 @@
 
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
-		font-weight: $font-weight-medium;
-		padding: $grid-unit-15 $grid-unit-30;
-		color: $gray-900;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+		padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 }
 
 /* Column width intents via colgroup: make non-primary columns shrink-to-fit */
-.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data) {
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data):not(.dataviews-view-table__col-expand) {
 	width: 1%;
+}
+
+.dataviews-view-table.is-refreshing {
+	@include dataviews-refreshing();
+}
+
+.dataviews-view-table__bulk-actions-overlay {
+	position: sticky;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	z-index: 1;
+	height: 0;
+	flex-shrink: 0;
+
+	> .dataviews-bulk-actions {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-start: 0;
+		height: var(--wp-dataviews-table-header-height);
+		min-height: 0;
+	}
+
+	&.is-refreshing {
+		// Keep covered headers behind an opaque surface while the toolbar fades.
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			height: var(--wp-dataviews-table-header-height);
+			background: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
+		}
+
+		> .dataviews-bulk-actions {
+			@include dataviews-refreshing();
+		}
+	}
 }

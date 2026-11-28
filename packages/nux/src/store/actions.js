@@ -1,8 +1,8 @@
 /**
- * Returns an action object that, when dispatched, presents a guide that takes
- * the user through a series of tips step by step.
+ * Returns a no-op action object. This package is deprecated and no longer
+ * displays tips, but the action remains for backward compatibility.
  *
- * @param {string[]} tipIds Which tips to show in the guide.
+ * @param {string[]} tipIds Which tips would have been shown in the guide.
  *
  * @return {Object} Action object.
  */
@@ -14,10 +14,10 @@ export function triggerGuide( tipIds ) {
 }
 
 /**
- * Returns an action object that, when dispatched, dismisses the given tip. A
- * dismissed tip will not show again.
+ * Returns a no-op action object. This package is deprecated and no longer
+ * displays tips, but the action remains for backward compatibility.
  *
- * @param {string} id The tip to dismiss.
+ * @param {string} id The tip that would have been dismissed.
  *
  * @return {Object} Action object.
  */
@@ -29,8 +29,8 @@ export function dismissTip( id ) {
 }
 
 /**
- * Returns an action object that, when dispatched, prevents all tips from
- * showing again.
+ * Returns a no-op action object. This package is deprecated and no longer
+ * displays tips, but the action remains for backward compatibility.
  *
  * @return {Object} Action object.
  */
@@ -41,7 +41,8 @@ export function disableTips() {
 }
 
 /**
- * Returns an action object that, when dispatched, makes all tips show again.
+ * Returns a no-op action object. This package is deprecated and no longer
+ * displays tips, but the action remains for backward compatibility.
  *
  * @return {Object} Action object.
  */

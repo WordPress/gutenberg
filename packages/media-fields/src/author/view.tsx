@@ -1,20 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+} from '@wordpress/components';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 
 export default function AuthorView( {
@@ -60,14 +51,14 @@ export default function AuthorView( {
 					<img
 						ref={ imgRef }
 						onLoad={ handleLoad }
-						alt={ __( 'Author avatar' ) }
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>
 			) }
 			{ ! imageUrl && (
 				<div className="media-author-field__icon">
-					<Icon icon={ authorIcon } />
+					<WCIcon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="media-author-field__name">{ text }</span>

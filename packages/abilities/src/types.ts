@@ -25,7 +25,7 @@ export type PermissionCallback = (
 export interface Ability {
 	/**
 	 * The unique name/identifier of the ability, with its namespace.
-	 * Example: 'my-plugin/my-ability'
+	 * Supports 2-4 segments (e.g. 'my-plugin/my-ability', 'core/posts/find', 'my-plugin/resource/sub/action').
 	 * @see WP_Ability::get_name()
 	 */
 	name: string;
