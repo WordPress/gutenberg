@@ -29,6 +29,10 @@ import { resolveColumnCount } from '../shared/column-policy';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
+import {
+	resolveWidthChoices,
+	snapSpanToWidthChoices,
+} from './snap-resize-width';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -110,6 +114,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			rowHeight = 'auto',
 			minColumnWidth,
 			itemLimits,
+			itemResizeWidths,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -151,9 +156,13 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		// resize handle reports `delta` absolute from the gesture start,
 		// so the baseline must stay frozen — reading from the already
 		// mutated `activeLayout` would compound the delta each frame.
+		// `token` is the width as stored (it may be named or unset);
+		// gestures on an item with width choices keep that token unless
+		// the horizontal span actually changes.
 		const resizeBaselineRef = useRef< {
 			width: number;
 			height: number;
+			token: number | 'full' | 'fill' | undefined;
 		} | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
 		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
@@ -551,24 +560,56 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				resizeBaselineRef.current = {
 					width: baseWidth,
 					height: baseItem?.height ?? 1,
+					token: baseItem?.width,
 				};
 			}
 			const baseline = resizeBaselineRef.current;
-			const newWidth = clampSpan(
-				baseline.width + relativeDelta.width,
-				bounds?.minWidth ?? 1,
-				bounds?.maxWidth ?? effectiveColumns
-			);
+			const minSpan = bounds?.minWidth ?? 1;
+			const maxSpan = bounds?.maxWidth ?? effectiveColumns;
+			// The width choices an `itemResizeWidths` entry declares, or
+			// `undefined` to keep the current whole-column snapping.
+			const widthTokens = itemResizeWidths?.[ id ];
 			const newHeight = clampSpan(
 				baseline.height + relativeDelta.height,
 				bounds?.minHeight ?? 1,
 				bounds?.maxHeight ?? Infinity
 			);
 
+			let newWidth: number | 'full' | 'fill' | undefined;
+			let previewSpan: number;
+			if ( widthTokens === undefined ) {
+				newWidth = clampSpan(
+					baseline.width + relativeDelta.width,
+					minSpan,
+					maxSpan
+				);
+				previewSpan = newWidth;
+			} else if ( widthTokens.length === 0 ) {
+				// Horizontal frozen: the width keeps its gesture-start
+				// token and only the height tracks the gesture.
+				newWidth = baseline.token;
+				previewSpan = clampSpan( baseline.width, minSpan, maxSpan );
+			} else {
+				const snapped = snapSpanToWidthChoices( {
+					impliedSpan: baseline.width + relativeDelta.width,
+					startSpan: baseline.width,
+					startToken: baseline.token,
+					choices: resolveWidthChoices(
+						widthTokens,
+						bounds,
+						effectiveColumns
+					),
+					bounds,
+					effectiveColumns,
+				} );
+				newWidth = snapped.token;
+				previewSpan = snapped.span;
+			}
+
 			setResizeSnapPreview( {
 				id,
 				snap: gridSpanToPixelSize(
-					newWidth,
+					previewSpan,
 					newHeight,
 					columnWidth,
 					gapPx,
@@ -596,10 +637,17 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			// the bounded view: the resized tile takes its new span and
 			// every other tile keeps its stored one.
 			const updatedLayout = ( latestLayoutRef.current ?? layout ).map(
-				( item ) =>
-					item.key === id
-						? { ...item, width: newWidth, height: newHeight }
-						: item
+				( item ) => {
+					if ( item.key !== id ) {
+						return item;
+					}
+					// A preserved token (an unchanged horizontal span)
+					// must not introduce a `width` key on an item that
+					// stores none.
+					return item.width === newWidth
+						? { ...item, height: newHeight }
+						: { ...item, width: newWidth, height: newHeight };
+				}
 			);
 
 			latestLayoutRef.current = updatedLayout;
@@ -728,6 +776,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						{ gridOverlay }
 						{ items.map( ( id ) => {
 							const limitsPx = resizeLimitsByKey.get( id );
+							const widthTokens = itemResizeWidths?.[ id ];
 							return (
 								<GridItem
 									key={ id }
@@ -739,6 +788,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 									maxColumns={
 										spanBoundsByKey.get( id )?.maxWidth ??
 										effectiveColumns
+									}
+									widthLocked={
+										widthTokens !== undefined &&
+										widthTokens.length === 0
 									}
 									disabled={ ! editMode }
 									draggable={

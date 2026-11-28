@@ -152,6 +152,7 @@ interface DashboardGridLayoutItem {
 | `minColumnWidth`     | `number`                                   | —        | Per-column floor in pixels: the count drops on narrow containers so no column is narrower, down to one. Alone, as many columns as fit.                 |
 | `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
 | `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
+| `itemResizeWidths`   | `Record< string, ( number \| 'full' )[] >` | —        | Width choices the resize gesture may commit, keyed by layout item key. See [Width choices](#width-choices).                                             |
 | `editMode`           | `boolean`                                  | `false`  | Enables drag-to-reorder and resize handles.                                                                                                             |
 | `onChangeLayout`     | `( layout ) => void`                       | —        | Fired when the user commits a drag or resize.                                                                                                           |
 | `onPreviewLayout`    | `( layout ) => void`                       | —        | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result.       |
@@ -438,6 +439,31 @@ reserves at least its minimum and never exceeds its maximum.
 Height limits apply when `rowHeight` is numeric and stay open with
 `'auto'` rows. `DashboardLanes` takes `GridItemWidthLimits`: lane
 heights are content-driven.
+
+### Width choices
+
+`itemResizeWidths` declares, per item, the width tokens a resize gesture may commit, keyed by layout item key:
+
+```jsx
+<DashboardGrid
+	layout={ layout }
+	columns={ 2 }
+	itemResizeWidths={ {
+		chart: [ 1, 'full' ],
+	} }
+>
+	{ tiles }
+</DashboardGrid>
+```
+
+Every token resolves for the current geometry — `'full'` takes the item's largest allowed span, a numeric token clamps between the item's span bounds — and the resolved spans are both the snapping targets and the values that commit. The item's stored token changes only to a listed token: an unchanged horizontal span keeps the gesture-start token, so a narrow container where two choices look identical does not swap the stored token on its own, and ties prefer the gesture-start token when eligible, then the declared order. `'fill'` cannot be a gesture target: its span depends on the row, so it stays a menu choice for the consumer.
+
+An entry declared for an item governs its whole horizontal axis:
+
+-   A missing entry keeps the default whole-column snapping.
+-   An empty entry freezes the width: horizontal tracking and commits stay at the gesture-start token while the height keeps resizing.
+
+Widths are not written into the layout by reorders or by other tiles' resizes, and a stored width outside the choices stays stored until a gesture changes it.
 
 ### Accessibility
 

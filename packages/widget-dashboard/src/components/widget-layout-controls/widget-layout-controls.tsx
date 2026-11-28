@@ -7,7 +7,11 @@ import {
 	Menu,
 } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import type { DashboardWidget, GridTilePlacement } from '../../types';
+import type {
+	DashboardWidget,
+	DashboardWidthOption,
+	GridTilePlacement,
+} from '../../types';
 
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
@@ -39,6 +43,11 @@ export interface WidgetLayoutControlsProps {
  * Customize-mode controls: width menu and removal, each following the
  * policy's answer for its operation.
  *
+ * The width menu offers the host's `widthOptions` when the dashboard
+ * declares them, and the native 'use available width'/'make full width'
+ * choices otherwise. With a failed width configuration the menu is not
+ * offered at all: ungoverned choices are not restored to the consumer.
+ *
  * @param {WidgetLayoutControlsProps} props Component props.
  */
 export function WidgetLayoutControls( {
@@ -46,8 +55,12 @@ export function WidgetLayoutControls( {
 	canRemove = true,
 	canResize = true,
 }: WidgetLayoutControlsProps ): React.ReactNode {
-	const { layout, onLayoutChange } = useDashboardInternalContext();
+	const { layout, onLayoutChange, widthOptions } =
+		useDashboardInternalContext();
 	const width = widget.placement?.width;
+	const widthChoices: readonly DashboardWidthOption[] | null =
+		widthOptions.kind === 'custom' ? widthOptions.options : null;
+	const offersWidthMenu = canResize && widthOptions.kind !== 'invalid';
 
 	const updateWidth = ( nextWidth: GridTilePlacement[ 'width' ] ) => {
 		const nextLayout = layout.map( ( currentWidget ) =>
@@ -68,6 +81,20 @@ export function WidgetLayoutControls( {
 		updateWidth( nextWidth );
 	};
 
+	/*
+	 * The stored token selects the radio verbatim; numeric tokens match
+	 * on their string form. A stored width no choice covers (a legacy
+	 * stored value) checks nothing, staying visible without a change.
+	 */
+	const onWidthOptionChange = ( nextValue: string ) => {
+		const choice = widthChoices?.find(
+			( option ) => String( option.value ) === nextValue
+		);
+		if ( choice ) {
+			updateWidth( choice.value );
+		}
+	};
+
 	const onRemove = () => {
 		onLayoutChange(
 			layout.filter(
@@ -78,7 +105,7 @@ export function WidgetLayoutControls( {
 
 	return (
 		<>
-			{ canResize && (
+			{ offersWidthMenu && (
 				<Menu.Root>
 					<Menu.Trigger
 						render={
@@ -93,22 +120,48 @@ export function WidgetLayoutControls( {
 					/>
 
 					<Menu.Popup>
-						<Menu.RadioGroup
-							value={ width ?? null }
-							onValueChange={ onNamedWidthChange }
-						>
-							<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
-							<Menu.RadioItem value="fill" closeOnClick>
-								<Menu.ItemLabel>
-									{ __( 'Use available width' ) }
-								</Menu.ItemLabel>
-							</Menu.RadioItem>
-							<Menu.RadioItem value="full" closeOnClick>
-								<Menu.ItemLabel>
-									{ __( 'Make full width' ) }
-								</Menu.ItemLabel>
-							</Menu.RadioItem>
-						</Menu.RadioGroup>
+						{ widthChoices ? (
+							<Menu.RadioGroup
+								value={
+									width === undefined ? null : String( width )
+								}
+								onValueChange={ onWidthOptionChange }
+							>
+								<Menu.GroupLabel>
+									{ __( 'Width' ) }
+								</Menu.GroupLabel>
+								{ widthChoices.map( ( option ) => (
+									<Menu.RadioItem
+										key={ String( option.value ) }
+										value={ String( option.value ) }
+										closeOnClick
+									>
+										<Menu.ItemLabel>
+											{ option.label }
+										</Menu.ItemLabel>
+									</Menu.RadioItem>
+								) ) }
+							</Menu.RadioGroup>
+						) : (
+							<Menu.RadioGroup
+								value={ width ?? null }
+								onValueChange={ onNamedWidthChange }
+							>
+								<Menu.GroupLabel>
+									{ __( 'Width' ) }
+								</Menu.GroupLabel>
+								<Menu.RadioItem value="fill" closeOnClick>
+									<Menu.ItemLabel>
+										{ __( 'Use available width' ) }
+									</Menu.ItemLabel>
+								</Menu.RadioItem>
+								<Menu.RadioItem value="full" closeOnClick>
+									<Menu.ItemLabel>
+										{ __( 'Make full width' ) }
+									</Menu.ItemLabel>
+								</Menu.RadioItem>
+							</Menu.RadioGroup>
+						) }
 					</Menu.Popup>
 				</Menu.Root>
 			) }

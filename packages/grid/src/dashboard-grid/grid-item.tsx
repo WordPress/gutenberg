@@ -29,6 +29,7 @@ function getItemCursor(
 export function GridItem( {
 	item,
 	maxColumns,
+	widthLocked = false,
 	disabled = false,
 	draggable = true,
 	resizable = true,
@@ -102,8 +103,13 @@ export function GridItem( {
 			baselineSize = { width, height };
 			setInitialContentSize( baselineSize );
 		}
+		/*
+		 * A locked width zeroes the horizontal delta at the handle, so the
+		 * tile content does not track the cursor horizontally either; the
+		 * pixel limits still bound the height.
+		 */
 		let clamped: ResizeDelta = {
-			width: delta.width,
+			width: widthLocked ? 0 : delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
 		if ( baselineSize ) {
@@ -111,13 +117,24 @@ export function GridItem( {
 				clamped,
 				baselineSize,
 				{
-					width: minResizeWidthPx,
+					width: widthLocked ? 0 : minResizeWidthPx,
 					height: verticalResizable ? minResizeHeightPx : undefined,
 				},
-				{
-					width: maxResizeWidthPx,
-					height: verticalResizable ? maxResizeHeightPx : undefined,
-				}
+				widthLocked
+					? // No width clamp: the delta is already zero, and a
+						// max below the current content width would force a
+						// shrink instead of freezing the tile.
+						{
+							height: verticalResizable
+								? maxResizeHeightPx
+								: undefined,
+						}
+					: {
+							width: maxResizeWidthPx,
+							height: verticalResizable
+								? maxResizeHeightPx
+								: undefined,
+						}
 			);
 		}
 		setResizeDelta( clamped );
