@@ -5,6 +5,7 @@
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+-   Build the polyfill without `core-js-builder`. The built files now use ES2015 syntax ([#81914](https://github.com/WordPress/gutenberg/pull/81914)).
 
 ## 10.2.0 (2026-11-18)
 

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
-import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
+import { Card, CollapsibleCard, Stack, Text } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
 import { canRenderField } from '../can-render-field';
@@ -109,6 +109,23 @@ function HeaderContent< Item >( {
 			? ( `h${ layout.headingLevel }` as const )
 			: undefined;
 
+	const description = ( hasBadge || hasSummary ) && (
+		<>
+			{ hasBadge && <ValidationBadge validity={ validity } /> }
+			{ hasSummary && (
+				<div className="dataforms-layouts-card__field-summary">
+					{ visibleSummaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) ) }
+				</div>
+			) }
+		</>
+	);
+
 	return (
 		<Stack
 			align="center"
@@ -118,22 +135,24 @@ function HeaderContent< Item >( {
 			<Card.Title render={ HeadingTag && <HeadingTag /> }>
 				{ label }
 			</Card.Title>
-			{ ( hasBadge || hasSummary ) && (
-				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
-					{ hasBadge && <ValidationBadge validity={ validity } /> }
-					{ hasSummary && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CollapsibleCard.HeaderDescription>
-			) }
+			{ description &&
+				( layout.isCollapsible ? (
+					<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
+						{ description }
+					</CollapsibleCard.HeaderDescription>
+				) : (
+					// A static card has no toggle for the description to
+					// describe, so it is plain, readable text instead. It renders
+					// as a div because the summary is a div, which a span can't
+					// contain.
+					<Text
+						render={ <div /> }
+						variant="body-md"
+						className="dataforms-layouts-card__field-header-content-description"
+					>
+						{ description }
+					</Text>
+				) ) }
 		</Stack>
 	);
 }
