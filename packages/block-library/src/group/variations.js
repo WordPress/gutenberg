@@ -93,8 +93,8 @@ if ( window.__experimentalEnableGridInteractivity ) {
 			layout: {
 				type: 'grid',
 				isManualPlacement: true,
-				columnCount: 3,
-				rowCount: 3,
+				columnCount: 8,
+				rowCount: 8,
 			},
 		},
 		scope: [ 'block', 'inserter', 'transform' ],

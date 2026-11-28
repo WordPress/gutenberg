@@ -34,7 +34,7 @@ const canvasTransform = {
 	},
 	transform: ( attributes, innerBlocks ) => {
 		const layout = getLayout( attributes );
-		const columnCount = getColumnCount( layout ) ?? 3;
+		const columnCount = getColumnCount( layout ) ?? 8;
 		const minimumColumnWidth = getMinimumColumnWidth( layout );
 
 		return createBlock(
@@ -45,7 +45,7 @@ const canvasTransform = {
 					type: 'grid',
 					isManualPlacement: true,
 					columnCount,
-					rowCount: 3,
+					rowCount: 8,
 					...( minimumColumnWidth && { minimumColumnWidth } ),
 				},
 			},
