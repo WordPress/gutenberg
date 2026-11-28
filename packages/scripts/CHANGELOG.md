@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Allow passing a custom output path to the `--blocks-manifest` flag of the `build` and `start` commands, e.g. `--blocks-manifest=dist/blocks-manifest.php` ([#83876](https://github.com/WordPress/gutenberg/pull/83876)).
+
 ### Bug Fixes
 
 -   `check-licenses`: Accept the `PSF-2.0` license outside GPL-2.0-only mode, as `Python-2.0` already is. `argparse` 3, which Stylelint 18 depends on through `cosmiconfig` 10 and `js-yaml` 5, uses it ([#87151](https://github.com/WordPress/gutenberg/pull/87151)).
