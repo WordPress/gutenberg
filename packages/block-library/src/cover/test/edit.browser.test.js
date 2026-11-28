@@ -461,6 +461,16 @@ describe( 'Cover block', () => {
 				expect(
 					await screen.findByRole( 'heading', { name: 'Settings' } )
 				).toBeInTheDocument();
+
+				await userEvent.click(
+					screen.getByRole( 'tab', { name: 'Content' } )
+				);
+				const mediaButton = screen.getByRole( 'button', {
+					name: 'my-image.jpg',
+				} );
+				expect(
+					within( mediaButton ).queryByRole( 'list' )
+				).not.toBeInTheDocument();
 			} );
 		} );
 
