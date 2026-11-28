@@ -139,6 +139,11 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 		}
 	} elseif (
 		! empty( $enhanced_query_stack ) &&
+		! (
+			// Post Excerpt strips this markup, but other excerpt consumers may retain it.
+			doing_filter( 'get_the_excerpt' ) &&
+			'core/post-excerpt' === ( WP_Block_Supports::$block_to_render['blockName'] ?? null )
+		) &&
 		isset( $block_name ) &&
 		( ! $supports_client_navigation )
 	) {
