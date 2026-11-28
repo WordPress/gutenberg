@@ -38,15 +38,13 @@
 -   Block Inspector: In a multiselection, hide the List View tab, which only shows the first block's inner blocks ([#87435](https://github.com/WordPress/gutenberg/pull/87435)).
 -   Block editing modes: Ignore editing mode actions for a removed block that had controlled inner blocks ([#87312](https://github.com/WordPress/gutenberg/pull/87312)).
 -   Inspector: Show the Styles tab for blocks whose only style controls are in the `background`, `filter` or `elements` groups ([#87403](https://github.com/WordPress/gutenberg/pull/87403)).
+-   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
+-   Block toolbar: Return focus to the block with Tab or Escape after a toolbar action replaces the block's element, such as changing a heading's level ([#87360](https://github.com/WordPress/gutenberg/pull/87360)).
+-   Clipboard: Include resolved content from opted-in binding sources when copying blocks, preserve saved fallbacks and bindings, and consistently wrap copied List Items ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
 
 ### Internal
 
 -   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
-
-### Bug Fixes
-
--   RichText: Hide the slash inserter in a block that cannot be removed, instead of throwing when an item is picked ([#87152](https://github.com/WordPress/gutenberg/pull/87152)).
--   Clipboard: Include resolved content from opted-in binding sources when copying blocks, preserve saved fallbacks and bindings, and consistently wrap copied List Items ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
 
 ## 20.1.0 (2026-11-18)
 

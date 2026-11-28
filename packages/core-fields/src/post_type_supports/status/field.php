@@ -1,8 +1,10 @@
 <?php
 /**
  * The status of a post, for every post type but the design ones. Its
- * JavaScript parts (`getValue`, `render`, and `isDisabled`) are in
- * `field.tsx`, next to this file; the render adds the icon of each status.
+ * JavaScript parts (`getValue`, `setValue`, `render`, `Edit`, and
+ * `isDisabled`) are in `field.tsx`, next to this file; the render adds the
+ * icon of each status, and `Edit` leaves out the statuses that can't be
+ * picked.
  *
  * Custom statuses are not supported, see
  * https://github.com/WordPress/gutenberg/issues/55886.
@@ -13,7 +15,6 @@
 return array(
 	'type'          => 'text',
 	'label'         => __( 'Status' ),
-	'Edit'          => 'radio',
 	'elements'      => array(
 		array(
 			'value'       => 'draft',
