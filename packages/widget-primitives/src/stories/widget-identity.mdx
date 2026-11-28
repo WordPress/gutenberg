@@ -1,15 +1,9 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
-import WidgetIdentityDoc from './widget-identity.md?raw';
-import widgetIdentityFlow from './assets/widget-identity-flow.svg';
+import WidgetIdentityDoc from './widget-identity.md?doc';
 
 <Meta
 	id="widget-primitives-widget-identity"
 	title="Widgets/Primitives/Widget Identity"
 />
 
-<Markdown>
-	{ WidgetIdentityDoc.replace(
-		'./assets/widget-identity-flow.svg',
-		widgetIdentityFlow
-	) }
-</Markdown>
+<Markdown>{ WidgetIdentityDoc }</Markdown>

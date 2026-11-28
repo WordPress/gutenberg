@@ -1,9 +1,6 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
-import PolicyDoc from './policy.md?raw';
-import policySeam from './assets/policy-seam.svg';
+import PolicyDoc from './policy.md?doc';
 
 <Meta id="widget-dashboard-policy" title="Widgets/Dashboard/Policy" />
 
-<Markdown>
-	{ PolicyDoc.replace( './assets/policy-seam.svg', policySeam ) }
-</Markdown>
+<Markdown>{ PolicyDoc }</Markdown>
