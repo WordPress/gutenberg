@@ -159,6 +159,7 @@ require __DIR__ . '/compat/wordpress-7.2/post.php';
 
 // WordPress 7.3 compat.
 require __DIR__ . '/compat/wordpress-7.3/kses.php';
+require __DIR__ . '/compat/wordpress-7.3/post.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
