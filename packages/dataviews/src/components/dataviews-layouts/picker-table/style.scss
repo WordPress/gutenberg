@@ -12,12 +12,10 @@
 		width: 48px;
 	}
 
-	tbody:focus-visible {
-		// Only show one focus outline at a time. When focus is on a child element,
-		// hide the table's own focus outline.
-		&[aria-activedescendant] {
-			outline: none;
-		}
+	// The table itself is the composite widget that takes focus, but the focus
+	// outline belongs on the active row rather than on the table.
+	&:focus-visible {
+		outline: none;
 
 		[data-active-item="true"] {
 			outline: 2px solid var(--wpds-color-stroke-focus);
