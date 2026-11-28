@@ -1,3 +1,14 @@
 .wp-block-post-content {
 	display: flow-root;
+
+	// Apply list styles only to unordered lists to prevent overriding ordered list styles.
+	ul > li {
+		list-style-type: disc;
+		> ul > li {
+			list-style-type: circle;
+			> ul > li {
+				list-style-type: square;
+			}
+		}
+	}
 }
