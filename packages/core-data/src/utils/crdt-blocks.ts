@@ -13,6 +13,7 @@ import { Y } from '@wordpress/sync';
 import {
 	asRichTextOffset,
 	createYMap,
+	isRecord,
 	richTextOffsetToHtmlIndex,
 	splitHtmlTag,
 	tokenizeHtml,
@@ -21,6 +22,12 @@ import {
 	type YMapWrap,
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
+import {
+	collapseUniqueLists,
+	expandUniqueLists,
+	findUniqueLists,
+	type UniqueList,
+} from './crdt-unique-lists';
 import { Delta } from '../sync';
 import { type WPBlockSelection } from '../types';
 
@@ -126,7 +133,10 @@ function makeBlockAttributesSerializable(
 
 		newAttributes[ key ] = serializeAttributeValue( value );
 	}
-	return newAttributes;
+
+	// Store each item of a list of unique items under its own key, so that
+	// collaborators who change the list at the same time do not conflict.
+	return expandUniqueLists( newAttributes, getBlockUniqueLists( blockName ) );
 }
 
 /**
@@ -215,8 +225,13 @@ function deserializeAttributeValue(
  */
 export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 	return blocks.map( ( block: Block ) => {
-		const { name, innerBlocks, attributes, ...rest } = block;
+		const { name, innerBlocks, ...rest } = block;
 
+		// Put the items of lists of unique items back into their attributes.
+		const attributes = collapseUniqueLists(
+			block.attributes,
+			getBlockUniqueLists( name )
+		);
 		const newAttributes = { ...attributes };
 
 		for ( const [ key, value ] of Object.entries( attributes ) ) {
@@ -400,16 +415,6 @@ function createYValueFromSchema(
 	}
 
 	return value;
-}
-
-/**
- * Type guard that narrows `unknown` to `Record< string, unknown >`.
- *
- * @param value Value to check.
- * @return True if `value` is a non-null, non-array object.
- */
-function isRecord( value: unknown ): value is Record< string, unknown > {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
 }
 
 /**
@@ -1068,11 +1073,53 @@ function resolveRichTextCursorPosition(
 		: null;
 }
 
+// What is cached for each block type.
+interface CachedBlockAttributeSchema {
+	// The type definition of each attribute, by attribute name.
+	attributes: Map< string, BlockAttributeSchema >;
+
+	// The lists of unique items that the block type declares.
+	uniqueLists: UniqueList[];
+}
+
 // Cached block attribute types, populated once from getBlockTypes().
-let cachedBlockAttributeSchemas: Map<
-	string,
-	Map< string, BlockAttributeSchema >
->;
+let cachedBlockAttributeSchemas:
+	Map< string, CachedBlockAttributeSchema > | undefined;
+
+/**
+ * Get the cached attribute definitions of a block type. The definitions of
+ * all block types are read once, the first time this is called.
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The cached definitions. Undefined when the block type is not registered.
+ */
+function getCachedBlockAttributeSchema(
+	blockName: string
+): CachedBlockAttributeSchema | undefined {
+	if ( ! cachedBlockAttributeSchemas ) {
+		const schemas = new Map< string, CachedBlockAttributeSchema >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const attributes = blockType.attributes ?? {};
+
+			schemas.set( blockType.name, {
+				attributes: new Map< string, BlockAttributeSchema >(
+					Object.entries( attributes ).map(
+						( [ name, definition ] ) => {
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
+						}
+					)
+				),
+				uniqueLists: findUniqueLists( attributes ),
+			} );
+		}
+
+		cachedBlockAttributeSchemas = schemas;
+	}
+
+	return cachedBlockAttributeSchemas.get( blockName );
+}
 
 /**
  * Get the attribute type definition for a block attribute.
@@ -1085,26 +1132,19 @@ function getBlockAttributeSchema(
 	blockName: string,
 	attributeName: string
 ): BlockAttributeSchema | undefined {
-	if ( ! cachedBlockAttributeSchemas ) {
-		// Parse the attributes for all blocks once.
-		cachedBlockAttributeSchemas = new Map();
+	return getCachedBlockAttributeSchema( blockName )?.attributes.get(
+		attributeName
+	);
+}
 
-		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			cachedBlockAttributeSchemas.set(
-				blockType.name,
-				new Map< string, BlockAttributeSchema >(
-					Object.entries( blockType.attributes ?? {} ).map(
-						( [ name, definition ] ) => {
-							const { role, type, query } = definition;
-							return [ name, { role, type, query } ];
-						}
-					)
-				)
-			);
-		}
-	}
-
-	return cachedBlockAttributeSchemas.get( blockName )?.get( attributeName );
+/**
+ * Get the lists of unique items that a block type declares in its attributes.
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The lists of unique items. Empty when the block type has none.
+ */
+function getBlockUniqueLists( blockName: string ): UniqueList[] {
+	return getCachedBlockAttributeSchema( blockName )?.uniqueLists ?? [];
 }
 
 /**

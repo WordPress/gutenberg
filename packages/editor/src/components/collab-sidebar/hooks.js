@@ -48,6 +48,8 @@ import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+const EMPTY_ARRAY = [];
+
 /**
  * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
  */
@@ -76,6 +78,30 @@ export function useNoteThreads( postId ) {
 		};
 	}, [] );
 
+	// The note IDs of each block, in the order of `clientIds`. They are
+	// selected to react to note IDs that arrive from collaborators during
+	// real-time collaboration. `useSelect` compares the entries one by one,
+	// so the result only changes when the note IDs of a block change.
+	const hasThreads = !! threads?.length;
+	const noteIdsByBlock = useSelect(
+		( select ) => {
+			if ( ! hasThreads ) {
+				return EMPTY_ARRAY;
+			}
+
+			const {
+				getClientIdsWithDescendants,
+				getBlockAttributes: selectBlockAttributes,
+			} = select( blockEditorStore );
+
+			return getClientIdsWithDescendants().map(
+				( clientId ) =>
+					selectBlockAttributes( clientId )?.metadata?.noteId
+			);
+		},
+		[ hasThreads ]
+	);
+
 	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
@@ -91,9 +117,10 @@ export function useNoteThreads( postId ) {
 		// Duplicating or splitting a block copies its notes, so a note can
 		// belong to several blocks.
 		const clientIdsByNoteId = new Map();
-		for ( const clientId of clientIds ) {
-			const metadata = getBlockAttributes( clientId )?.metadata;
-			const noteIds = getNoteIdsFromMetadata( metadata );
+		for ( const [ index, clientId ] of clientIds.entries() ) {
+			const noteIds = getNoteIdsFromMetadata( {
+				noteId: noteIdsByBlock[ index ],
+			} );
 			if ( noteIds.length === 0 ) {
 				continue;
 			}
@@ -185,7 +212,7 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+	}, [ clientIds, noteIdsByBlock, threads, getBlockAttributes ] );
 
 	return {
 		notes,
@@ -378,11 +405,9 @@ export function useNoteActions() {
 
 			/*
 			 * If it's a top-level note, update the block attributes with the
-			 * note id. Read-modify-write on metadata is racy under concurrent
-			 * edits: two near-simultaneous adds against the same base will each
-			 * write a 2-element array and the later write wins, dropping the
-			 * other id. Tracking issue:
-			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 * note id. Collaborators can do this at the same time, because
+			 * `hooks/note-sync.ts` declares the note ids as a list of
+			 * unique items for real-time collaboration.
 			 */
 			if ( ! parent && savedRecord?.id ) {
 				updateNoteAnchors( clientIds, ( attributes ) => {

@@ -7,3 +7,4 @@ import './template-part-navigation-edit-button';
 import './push-changes-to-global-styles';
 import './note-format';
 import './note-merge';
+import './note-sync';

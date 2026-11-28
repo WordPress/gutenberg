@@ -25,6 +25,7 @@
 
 -   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).
 -   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+-   Block attribute definitions accept `uniqueItems` on `array` attributes and `properties` on `object` attributes. During real-time collaboration, the items that collaborators add to or remove from a list of unique items at the same time are all kept ([#86628](https://github.com/WordPress/gutenberg/pull/86628)).
 
 ## 17.1.0 (2026-11-04)
 

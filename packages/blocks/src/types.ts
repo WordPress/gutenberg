@@ -213,6 +213,19 @@ export interface BlockAttribute {
 	__experimentalRole?: string;
 	query?: Record< string, BlockAttribute >;
 	items?: BlockAttribute;
+	/**
+	 * Definitions of the properties of an `object` attribute, by name.
+	 */
+	properties?: Record< string, BlockAttribute >;
+	/**
+	 * Whether no two items of an `array` attribute are the same. During
+	 * real-time collaboration, the items that collaborators add to or remove
+	 * from such a list at the same time are all kept. Without it, one
+	 * collaborator's list replaces the other's.
+	 *
+	 * Items must be strings or numbers.
+	 */
+	uniqueItems?: boolean;
 	enum?: unknown[];
 	multiline?: string;
 	__unstablePreserveWhiteSpace?: boolean;

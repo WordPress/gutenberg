@@ -190,6 +190,14 @@
 							"type": "string",
 							"enum": [ "content", "local" ]
 						},
+						"properties": {
+							"description": "Describes the properties of an attribute with the `object` type. Each key is the name of a property, and each value is a definition with the same fields as an attribute, such as `type`, `uniqueItems`, and `properties`.\n\nUse it to declare a list of unique items that is inside an object attribute.",
+							"type": "object"
+						},
+						"uniqueItems": {
+							"description": "Declares that no two items of an attribute with the `array` type are the same. The items must be strings or numbers.\n\nDuring real-time collaboration, a list of unique items is merged item by item. When collaborators add or remove different items at the same time, all of their changes are kept. Without it, one collaborator's list replaces the other's.",
+							"type": "boolean"
+						},
 						"default": {
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
 						}
