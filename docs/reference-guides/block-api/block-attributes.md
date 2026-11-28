@@ -83,6 +83,10 @@ The `type` field MUST be one of the following:
 - `string`
 - `integer`
 - `number` (same as `integer`)
+- `datetime` (a date and time string)
+- `url` (a URL string; any string is accepted, including relative URLs)
+
+`datetime` and `url` are [Field API types](/docs/explanations/architecture/block-attribute-types.md). They can't be part of a list of types, such as `[ "string", "null" ]`.
 
 Note that the validity of an `object` is determined by your `source`. For an example, see the `query` details below.
 

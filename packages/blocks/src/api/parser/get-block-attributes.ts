@@ -32,8 +32,14 @@ export const toBooleanAttributeMatcher =
 	( domNode: Element ): boolean =>
 		matcher( domNode ) !== undefined;
 
+const SERVER_DATE_TIME_PATTERN =
+	/^\d{4}-\d{2}-\d{2}[Tt ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}(?::\d{2})?)?$/;
+
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
+ *
+ * The Field API types `datetime` and `url` accept the same values as the
+ * server, which checks them as `date-time` and `uri` strings.
  *
  * @see http://json-schema.org/latest/json-schema-validation.html#rfc.section.6.25
  *
@@ -48,7 +54,14 @@ export function isOfType( value: unknown, type: string ): boolean {
 			return value instanceof RichTextData;
 
 		case 'string':
+		case 'url':
 			return typeof value === 'string';
+
+		case 'datetime':
+			return (
+				typeof value === 'string' &&
+				SERVER_DATE_TIME_PATTERN.test( value )
+			);
 
 		case 'boolean':
 			return typeof value === 'boolean';

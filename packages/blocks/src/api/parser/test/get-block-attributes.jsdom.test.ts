@@ -78,6 +78,39 @@ describe( 'attributes parsing', () => {
 			expect( isOfType( {}, 'object' ) ).toBe( true );
 			expect( isOfType( null, 'object' ) ).toBe( false );
 		} );
+
+		it( 'accepts the same datetime values as the server', () => {
+			expect( isOfType( '2025-12-03T10:20:30', 'datetime' ) ).toBe(
+				true
+			);
+			expect( isOfType( '2025-12-03 10:20:30', 'datetime' ) ).toBe(
+				true
+			);
+			expect( isOfType( '2025-12-03T10:20:30.123Z', 'datetime' ) ).toBe(
+				true
+			);
+			expect( isOfType( '2025-12-03T10:20:30+02:00', 'datetime' ) ).toBe(
+				true
+			);
+			expect( isOfType( '2025-12-03', 'datetime' ) ).toBe( false );
+			expect( isOfType( 'Post date', 'datetime' ) ).toBe( false );
+			expect( isOfType( 1764757230, 'datetime' ) ).toBe( false );
+		} );
+
+		it( 'accepts any string as a url, like the server', () => {
+			expect( isOfType( 'https://example.org/a.jpg', 'url' ) ).toBe(
+				true
+			);
+			expect( isOfType( '/wp-content/a.jpg', 'url' ) ).toBe( true );
+			expect( isOfType( '#section', 'url' ) ).toBe( true );
+			expect( isOfType( 'mailto:a@example.org', 'url' ) ).toBe( true );
+			expect( isOfType( 'tel:+34600000000', 'url' ) ).toBe( true );
+			expect( isOfType( 'blob:https://example.org/uuid', 'url' ) ).toBe(
+				true
+			);
+			expect( isOfType( 5, 'url' ) ).toBe( false );
+			expect( isOfType( null, 'url' ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isOfTypes', () => {

@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as WCText,
@@ -117,10 +117,16 @@ export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
 	hasSupport( name: string ) {
-		return ! [
-			'core/post-date',
-			'core/navigation-link',
-			'core/navigation-submenu',
-		].includes( name );
+		const attribute = (
+			{
+				'core/post-date': 'datetime',
+				'core/navigation-link': 'url',
+				'core/navigation-submenu': 'url',
+			} as Record< string, string >
+		 )[ name ];
+		return (
+			! attribute ||
+			getBlockType( name )?.attributes?.[ attribute ]?.type !== 'string'
+		);
 	},
 };

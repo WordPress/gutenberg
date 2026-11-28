@@ -29,7 +29,7 @@
 			"default": false
 		},
 		"url": {
-			"type": "string",
+			"type": "url",
 			"role": "content"
 		},
 		"title": {

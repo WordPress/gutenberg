@@ -123,7 +123,9 @@
 										"string",
 										"rich-text",
 										"integer",
-										"number"
+										"number",
+										"datetime",
+										"url"
 									]
 								},
 								{
