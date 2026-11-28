@@ -450,6 +450,7 @@ export function ImageEdit( {
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ layoutType }
 					maxContentWidth={ maxContentWidth }
+					blockRef={ containerRef }
 				/>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
