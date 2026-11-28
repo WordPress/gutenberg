@@ -1,7 +1,15 @@
 import clsx from 'clsx';
 import { colord } from 'colord';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+	useMemo,
+} from '@wordpress/element';
+import type { ForwardedRef } from 'react';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import Button from '../../button';
@@ -24,6 +32,7 @@ import {
 } from './constants';
 import type { WordPressComponentProps } from '../../context';
 import type {
+	ControlPoint,
 	ControlPointButtonProps,
 	ControlPointMoveState,
 	ControlPointsProps,
@@ -32,18 +41,22 @@ import type {
 import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
-function ControlPointButton( {
-	isOpen,
-	position,
-	color,
-	disablePositioning,
-	...additionalProps
-}: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
-	const instanceId = useInstanceId( ControlPointButton );
+function UnforwardedControlPointButton(
+	{
+		isOpen,
+		position,
+		color,
+		disablePositioning,
+		...additionalProps
+	}: WordPressComponentProps< ControlPointButtonProps, 'button', true >,
+	ref: ForwardedRef< HTMLButtonElement >
+) {
+	const instanceId = useInstanceId( UnforwardedControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
 		<>
 			<Button
+				ref={ ref }
 				aria-label={ sprintf(
 					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
@@ -74,6 +87,8 @@ function ControlPointButton( {
 		</>
 	);
 }
+
+const ControlPointButton = forwardRef( UnforwardedControlPointButton );
 
 function GradientColorPickerDropdown( {
 	isRenderedInSidebar,
@@ -106,6 +121,21 @@ function GradientColorPickerDropdown( {
 			className={ mergedClassName }
 			{ ...props }
 		/>
+	);
+}
+
+type KeyboardMove = {
+	button: HTMLButtonElement;
+	point: ControlPoint;
+	rank: number;
+	previousControlPoints: ControlPoint[];
+};
+
+function isSamePoint( first: ControlPoint, second: ControlPoint ) {
+	return (
+		first.position === second.position &&
+		colord( first.color ).toRgbString() ===
+			colord( second.color ).toRgbString()
 	);
 }
 
@@ -176,6 +206,62 @@ function ControlPoints( {
 		};
 	}, [] );
 
+	const buttonsRef = useRef< ( HTMLButtonElement | null )[] >( [] );
+	const keyboardMoveRef = useRef< KeyboardMove >( undefined );
+
+	const moveControlPointWithKeyboard = (
+		button: HTMLButtonElement,
+		index: number,
+		position: number
+	) => {
+		const newControlPoints = updateControlPointPosition(
+			controlPoints,
+			index,
+			position
+		);
+		const point = newControlPoints[ index ];
+		if ( point.position !== controlPoints[ index ].position ) {
+			keyboardMoveRef.current = {
+				button,
+				point,
+				// A stable sort keeps identical points in this order.
+				rank: newControlPoints
+					.slice( 0, index )
+					.filter( ( other ) => isSamePoint( other, point ) ).length,
+				previousControlPoints: controlPoints,
+			};
+		}
+		onChange( newControlPoints );
+	};
+
+	// Sorting the new value can give the moved point another index, but the
+	// focused button keeps the old index. Move focus to the moved point.
+	useLayoutEffect( () => {
+		const move = keyboardMoveRef.current;
+		// The parent can render again before it applies the new value.
+		if (
+			! move ||
+			( controlPoints.length === move.previousControlPoints.length &&
+				controlPoints.every( ( point, index ) =>
+					isSamePoint( point, move.previousControlPoints[ index ] )
+				) )
+		) {
+			return;
+		}
+		keyboardMoveRef.current = undefined;
+		if ( ! move.button.matches( ':focus' ) ) {
+			return;
+		}
+		const targetIndex = controlPoints
+			.map( ( point, index ) =>
+				isSamePoint( point, move.point ) ? index : -1
+			)
+			.filter( ( index ) => index !== -1 )[ move.rank ];
+		if ( targetIndex !== undefined ) {
+			buttonsRef.current[ targetIndex ]?.focus();
+		}
+	}, [ controlPoints ] );
+
 	return (
 		<>
 			{ controlPoints.map( ( point, index ) => {
@@ -191,6 +277,9 @@ function ControlPoints( {
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<ControlPointButton
 									key={ index }
+									ref={ ( button ) => {
+										buttonsRef.current[ index ] = button;
+									} }
 									onClick={ () => {
 										if (
 											controlPointMoveStateRef.current &&
@@ -252,14 +341,12 @@ function ControlPoints( {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
 											event.stopPropagation();
-											onChange(
-												updateControlPointPosition(
-													controlPoints,
-													index,
-													clampPercent(
-														point.position -
-															KEYBOARD_CONTROL_POINT_VARIATION
-													)
+											moveControlPointWithKeyboard(
+												event.currentTarget,
+												index,
+												clampPercent(
+													point.position -
+														KEYBOARD_CONTROL_POINT_VARIATION
 												)
 											);
 										} else if (
@@ -268,14 +355,12 @@ function ControlPoints( {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
 											event.stopPropagation();
-											onChange(
-												updateControlPointPosition(
-													controlPoints,
-													index,
-													clampPercent(
-														point.position +
-															KEYBOARD_CONTROL_POINT_VARIATION
-													)
+											moveControlPointWithKeyboard(
+												event.currentTarget,
+												index,
+												clampPercent(
+													point.position +
+														KEYBOARD_CONTROL_POINT_VARIATION
 												)
 											);
 										}

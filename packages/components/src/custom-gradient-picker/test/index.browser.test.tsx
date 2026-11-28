@@ -106,6 +106,64 @@ describe( 'CustomGradientPicker', () => {
 		} );
 	} );
 
+	describe( 'control point keyboard movement', () => {
+		it( 'keeps focus on a control point moved past another one', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			await render(
+				<ControlledCustomGradientPicker
+					initialValue="linear-gradient(90deg,#ff0000 40%,#0000ff 50%)"
+					onChange={ onChange }
+				/>
+			);
+
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 40% with color code #ff0000/,
+				} )
+			).toHaveFocus();
+
+			// The first press ties the points; the second passes the other one.
+			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
+
+			expect( onChange ).toHaveBeenLastCalledWith(
+				'linear-gradient(90deg,rgb(0,0,255) 50%,rgb(255,0,0) 70%)'
+			);
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 70% with color code rgb\(255,0,0\)/,
+				} )
+			).toHaveFocus();
+		} );
+
+		it( 'keeps focus on a moved control point that ties an identical one', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ControlledCustomGradientPicker initialValue="linear-gradient(90deg,#ff0000 40%,#0000ff 50%,#ff0000 50%)" />
+			);
+			const points = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+			points[ 2 ].focus();
+
+			await user.keyboard( '[ArrowLeft]' );
+
+			// The stable sort keeps the moved point after the identical one.
+			expect(
+				screen.getAllByRole( 'button', {
+					name: /Gradient control point/,
+				} )[ 1 ]
+			).toHaveFocus();
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code rgb\(0,0,255\)/,
+				} )
+			).toHaveFocus();
+		} );
+	} );
+
 	describe( 'GradientTypePicker selection', () => {
 		it( 'keeps an empty gradient unchanged when Linear is reselected', async () => {
 			const user = userEvent.setup();
@@ -463,6 +521,77 @@ describe( 'CustomGradientBar', () => {
 			{ position: KEYBOARD_CONTROL_POINT_VARIATION, color: 'rgb(0,0,0)' },
 			POINTS[ 1 ],
 		] );
+	} );
+
+	it( 'does not move focus back to a moved control point after focus leaves it', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const points = [
+			{ position: 30, color: 'rgb(255,0,0)' },
+			{ position: 70, color: 'rgb(0,0,255)' },
+		];
+		const props = {
+			background: 'linear-gradient(90deg, red, blue)',
+			hasGradient: true,
+			onChange,
+		};
+		const view = await render(
+			<CustomGradientBar { ...props } value={ points } />
+		);
+		const [ red, blue ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		red.focus();
+		await user.keyboard( '[ArrowRight]' );
+		blue.focus();
+
+		// The parent applies the move after focus has left the moved point.
+		await view.rerender(
+			<CustomGradientBar
+				{ ...props }
+				value={ [ { ...points[ 0 ], position: 40 }, points[ 1 ] ] }
+			/>
+		);
+
+		expect( blue ).toHaveFocus();
+	} );
+
+	it( 'keeps focus on a moved control point when the parent renders before applying the move', async () => {
+		const user = userEvent.setup();
+		const points = [
+			{ position: 50, color: 'rgb(255,0,0)' },
+			{ position: 50, color: 'rgb(0,0,255)' },
+		];
+		const props = {
+			background: 'linear-gradient(90deg, red, blue)',
+			hasGradient: true,
+			onChange: vi.fn(),
+		};
+		const view = await render(
+			<CustomGradientBar { ...props } value={ points } />
+		);
+		screen
+			.getByRole( 'button', {
+				name: /position 50% with color code rgb\(255,0,0\)/,
+			} )
+			.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		await view.rerender(
+			<CustomGradientBar { ...props } value={ [ ...points ] } />
+		);
+		await view.rerender(
+			<CustomGradientBar
+				{ ...props }
+				value={ [ points[ 1 ], { ...points[ 0 ], position: 60 } ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /position 60% with color code rgb\(255,0,0\)/,
+			} )
+		).toHaveFocus();
 	} );
 
 	it( 'moves a control point when dragged from above its handle', async () => {
