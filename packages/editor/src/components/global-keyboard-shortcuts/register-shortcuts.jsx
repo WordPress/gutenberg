@@ -5,6 +5,13 @@ import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
 
+// Safari reserves Cmd+Shift+\ for its tab overview, so the event never
+// reaches the page.
+const isSafari =
+	typeof window !== 'undefined' &&
+	window.navigator.userAgent.includes( 'Safari' ) &&
+	! window.navigator.userAgent.includes( 'Chrome' );
+
 /**
  * Component for registering editor keyboard shortcuts.
  *
@@ -81,7 +88,7 @@ function EditorKeyboardShortcutsRegister() {
 			category: 'global',
 			description: __( 'Enter or exit distraction free mode.' ),
 			keyCombination: {
-				modifier: 'primaryShift',
+				modifier: isSafari ? 'secondary' : 'primaryShift',
 				character: '\\',
 			},
 		} );

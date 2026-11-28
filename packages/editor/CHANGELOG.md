@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Distraction free: Use `Cmd+Shift+Option+\` in Safari, which reserves `Cmd+Shift+\` ([#87529](https://github.com/WordPress/gutenberg/pull/87529)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Keep the form to add a term usable after creating a term fails, instead of ignoring every later attempt ([#87498](https://github.com/WordPress/gutenberg/pull/87498)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Keep categories checked while a new one is being created, and match category names containing HTML entities when searching or adding ([#87517](https://github.com/WordPress/gutenberg/pull/87517)).
 -   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
