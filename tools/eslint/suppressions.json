@@ -4227,24 +4227,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/query-pagination-next/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination-next/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query-pagination-next/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/query-pagination-numbers/edit.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
