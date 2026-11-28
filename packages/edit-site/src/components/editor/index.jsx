@@ -125,14 +125,17 @@ export default function EditSiteEditor( {
 	const { getShowStylebook } = unlock( useSelect( editorStore ) );
 
 	// Revisions and the style book render in place of the block editor, and
-	// belong to the styles route in edit mode. Anywhere else they would show
+	// belong to the styles route in edit mode, or in browse mode while the
+	// Styles page has its revisions screen open. Anywhere else they would show
 	// the styles canvas where the block editor is expected: a site preview
 	// that cannot be clicked into, or the next route's content missing.
 	//
 	// Routes render their own element for this area, so navigating between
 	// them remounts this component. The check therefore runs on every render
 	// rather than on a transition, which a remount would never observe.
-	const isStylesEditing = isEditMode && location.name === 'styles';
+	const isStylesEditing =
+		location.name === 'styles' &&
+		( isEditMode || !! location.query.section?.startsWith( '/revisions' ) );
 	useEffect( () => {
 		if ( ! isStylesEditing ) {
 			resetStylesNavigation();
