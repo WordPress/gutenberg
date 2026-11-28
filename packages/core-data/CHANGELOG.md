@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Export 'getViewConfig' as a public selector on the core data store ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 
 ## 9.2.0 (2026-11-18)
@@ -23,6 +24,7 @@
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
 -   Real-time collaboration: Re-parse blocks of persisted CRDT documents that hold missing or invalid blocks, so a block does not stay missing after its plugin is reactivated or stay invalid after its block type accepts its markup again ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
 -   Core Data: Reject unsafe entity record keys.
+
 
 ## 9.1.0 (2026-11-04)
 

@@ -52,6 +52,10 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	// the opt-in at module load, so a plugin bundling one of those copies
 	// throws at load time if this entry is missing.
 	'@wordpress/sync',
+	// Do not remove: older `@wordpress/views` versions published to npm call
+	// the opt-in at module load, so a plugin bundling one of those copies
+	// throws at load time if this entry is missing.
+	'@wordpress/views',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
 	'@wordpress/media-editor',
@@ -60,7 +64,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
-	'@wordpress/views',
 	'@wordpress/widget-dashboard',
 ];
 

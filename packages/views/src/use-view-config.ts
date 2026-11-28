@@ -1,7 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
-import { unlock } from './lock-unlock';
 
 /**
  * A hook that retrieves the view configuration for a given entity
@@ -38,14 +37,21 @@ export function useViewConfig( {
 	const fieldsKey = fieldList ? fieldList.toSorted().join( ',' ) : undefined;
 	return useSelect(
 		( select ) => {
-			return unlock( select( coreStore ) ).getViewConfig(
-				kind,
-				name,
-				fieldsKey
-					? {
-							fields: fieldsKey,
-						}
-					: undefined
+			return (
+				( select( coreStore ).getViewConfig(
+					kind,
+					name,
+					fieldsKey
+						? {
+								fields: fieldsKey,
+							}
+						: undefined
+				) as any ) ?? {
+					default_view: undefined,
+					default_layouts: undefined,
+					view_list: undefined,
+					form: undefined,
+				}
 			);
 		},
 		[ kind, name, fieldsKey ]
