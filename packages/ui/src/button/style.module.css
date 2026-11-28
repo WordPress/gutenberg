@@ -26,6 +26,7 @@
 			--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 			/* Icons are rendered as 24px but need to occupy a 16px footprint */
 			--wp-ui-button-icon-margin: calc((var(--wpds-dimension-size-2xs) - var(--wpds-dimension-size-sm)) / 2);
+			--_wp-ui-button-pressed-scale: 0.97;
 
 			/* by default, borders have the same color as the background */
 			--wp-ui-button-border-color: var(--wp-ui-button-background-color);
@@ -68,7 +69,9 @@
 			}
 
 			@media not ( prefers-reduced-motion ) {
-				transition: color 0.1s ease-out;
+				transition:
+					color 0.1s ease-out,
+					transform var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced);
 
 				* {
 					transition: opacity 0.1s ease-out;
@@ -96,6 +99,22 @@
 				background-color: var(--wp-ui-button-background-color-active);
 				color: var(--wp-ui-button-foreground-color-active);
 				border-color: var(--wp-ui-button-border-color-active);
+			}
+
+			/* Press feedback. The scale also applies under reduced motion, only
+			   without the transition. Popup triggers skip it, so that their popup
+			   does not anchor to a scaled-down trigger. */
+			&:not([data-disabled], [aria-haspopup]):active {
+				transform: scale(var(--_wp-ui-button-pressed-scale));
+
+				/* Keep the hit area at the unscaled size, so that releasing the
+				   pointer near an edge still clicks the button. The containing
+				   block is the padding box, so add the 1px border on each side. */
+				&::before {
+					content: "";
+					position: absolute;
+					inset: calc(-1px - (100% + 2px) * (1 / var(--_wp-ui-button-pressed-scale) - 1) / 2);
+				}
 			}
 
 			&[data-disabled]:not(.is-loading) {
