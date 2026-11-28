@@ -94,6 +94,12 @@ function getNodeAsString( node ) {
 		case 'StringLiteral':
 			return node.value;
 
+		case 'TemplateLiteral':
+			if ( node.expressions.length === 0 ) {
+				return node.quasis.map( ( q ) => q.value.cooked ).join( '' );
+			}
+			return '';
+
 		default:
 			return '';
 	}
