@@ -37,8 +37,7 @@ export default function QueryTitleEdit(
 	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const TagName = ( level === 0 ? 'p' : `h${ level }` ) as
-		'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 
 	const blockProps = useBlockProps( {
 		className: 'wp-block-query-title__placeholder',
