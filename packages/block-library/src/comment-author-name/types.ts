@@ -5,9 +5,6 @@ export interface CommentAuthorNameAttributes extends StyledBlockAttributes {
 	linkTarget?: string;
 }
 
-export interface CommentAuthorNameBlockContext extends Record<
-	string,
-	unknown
-> {
+export interface CommentAuthorNameBlockContext {
 	commentId?: string | number;
 }
