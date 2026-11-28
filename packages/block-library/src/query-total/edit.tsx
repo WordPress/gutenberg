@@ -1,9 +1,14 @@
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { resultsFound, displayingResults } from './icons';
+import type { QueryTotalAttributes } from './types';
 
-export default function QueryTotalEdit( { attributes, setAttributes } ) {
+export default function QueryTotalEdit( {
+	attributes,
+	setAttributes,
+}: BlockEditProps< QueryTotalAttributes > ) {
 	const { displayType } = attributes;
 
 	// Block properties and classes.
@@ -15,12 +20,14 @@ export default function QueryTotalEdit( { attributes, setAttributes } ) {
 				return resultsFound;
 			case 'range-display':
 				return displayingResults;
+			default:
+				return undefined;
 		}
 	};
 
 	const buttonPositionControls = [
 		{
-			role: 'menuitemradio',
+			role: 'menuitemradio' as const,
 			title: __( 'Total results' ),
 			isActive: displayType === 'total-results',
 			icon: resultsFound,
@@ -29,7 +36,7 @@ export default function QueryTotalEdit( { attributes, setAttributes } ) {
 			},
 		},
 		{
-			role: 'menuitemradio',
+			role: 'menuitemradio' as const,
 			title: __( 'Range display' ),
 			isActive: displayType === 'range-display',
 			icon: displayingResults,
