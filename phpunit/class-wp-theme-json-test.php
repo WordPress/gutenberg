@@ -3831,6 +3831,43 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that a custom root selector is used for settings nodes too, so
+	 * scoped preset variables and classes don't end up under `:root`.
+	 */
+	public function test_get_stylesheet_custom_root_selector_for_settings() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'scratch',
+								'name'  => 'Scratch',
+								'color' => '#123456',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$options = array(
+			'root_selector' => '.custom',
+			'scope'         => '.custom',
+		);
+
+		$this->assertSameCSS(
+			'.custom{--wp--preset--color--scratch: #123456;}',
+			$theme_json->get_stylesheet( array( 'variables' ), null, $options )
+		);
+		$this->assertSameCSS(
+			':where(.custom).has-scratch-color{color: var(--wp--preset--color--scratch) !important;}:where(.custom).has-scratch-background-color{background-color: var(--wp--preset--color--scratch) !important;}:where(.custom).has-scratch-border-color{border-color: var(--wp--preset--color--scratch) !important;}',
+			$theme_json->get_stylesheet( array( 'presets' ), null, $options )
+		);
+	}
+
 	public function test_get_stylesheet_generates_fluid_typography_values() {
 		register_block_type(
 			'test/clamp-me',
