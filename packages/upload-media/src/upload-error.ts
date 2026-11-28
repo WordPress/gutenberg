@@ -22,6 +22,9 @@ export enum ErrorCode {
 	// server failed to finalize the attachment (write its metadata).
 	MEDIA_FINALIZE_ERROR = 'MEDIA_FINALIZE_ERROR',
 
+	// The site's storage limit (a multisite upload quota) rejected the file.
+	STORAGE_LIMIT_REACHED = 'STORAGE_LIMIT_REACHED',
+
 	// Generic fallback
 	GENERAL = 'GENERAL',
 }
@@ -51,4 +54,17 @@ export class UploadError extends Error {
 		this.code = code;
 		this.file = file;
 	}
+}
+
+/**
+ * Tells whether an error is the site's storage limit rejecting a file.
+ *
+ * @param error The error to check.
+ * @return Whether the storage limit caused the error.
+ */
+export function isStorageLimitError( error: unknown ): boolean {
+	return (
+		( error as { code?: unknown } | null | undefined )?.code ===
+		ErrorCode.STORAGE_LIMIT_REACHED
+	);
 }

@@ -2,6 +2,7 @@ import {
 	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
+	type AddWarningAction,
 	type CacheBlobUrlAction,
 	type CancelAction,
 	ItemStatus,
@@ -10,6 +11,7 @@ import {
 	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
+	type RecordSubSizeErrorAction,
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
@@ -22,6 +24,7 @@ import {
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
+import { isStorageLimitError } from '../upload-error';
 import {
 	DEFAULT_MAX_CONCURRENT_UPLOADS,
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
@@ -41,11 +44,14 @@ const DEFAULT_STATE: State = {
 		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
 	failureCount: 0,
+	warnings: [],
 };
 
 type Action =
 	| AccumulateSubSizeAction
 	| AddAction
+	| AddWarningAction
+	| RecordSubSizeErrorAction
 	| RemoveAction
 	| CancelAction
 	| RetryItemAction
@@ -305,6 +311,31 @@ function reducer(
 							}
 						: item
 				),
+			};
+
+		case Type.RecordSubSizeError:
+			return {
+				...state,
+				queue: state.queue.map( ( item ): QueueItem => {
+					if ( item.id !== action.id ) {
+						return item;
+					}
+					// A storage limit error explains the other failures
+					// too, so it replaces an earlier error of another kind.
+					const keepsCurrent =
+						item.subSizeError &&
+						( isStorageLimitError( item.subSizeError ) ||
+							! isStorageLimitError( action.error ) );
+					return keepsCurrent
+						? item
+						: { ...item, subSizeError: action.error };
+				} ),
+			};
+
+		case Type.AddWarning:
+			return {
+				...state,
+				warnings: [ ...state.warnings, action.warning ],
 			};
 
 		case Type.UpdateSettings: {

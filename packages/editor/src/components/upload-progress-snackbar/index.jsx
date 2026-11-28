@@ -1,8 +1,8 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { store as uploadStore } from '@wordpress/upload-media';
+import { store as uploadStore, ErrorCode } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 import { Icon as WCIcon, Spinner as WCSpinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
@@ -13,6 +13,7 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const NOTICE_ID = 'upload-progress';
+const WARNING_NOTICE_ID = 'upload-warning';
 
 // How long the completion checkmark is shown before the snackbar dismisses.
 const COMPLETION_DISPLAY_MS = 3000;
@@ -76,12 +77,15 @@ export const UPLOAD_DONE = (
  * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
-	const { items, csmFailureCount } = useSelect( ( select ) => {
+	const { items, csmFailureCount, warnings } = useSelect( ( select ) => {
 		const { getItems } = select( uploadStore );
-		const { getFailureCount } = unlock( select( uploadStore ) );
+		const { getFailureCount, getWarnings } = unlock(
+			select( uploadStore )
+		);
 		return {
 			items: getItems(),
 			csmFailureCount: getFailureCount(),
+			warnings: getWarnings(),
 		};
 	}, [] );
 	const tracker = useTracker();
@@ -127,17 +131,71 @@ export default function UploadProgressSnackbar() {
 	// brief display. Held so a new upload can cancel it.
 	const completionTimeoutRef = useRef( null );
 
-	// Remove the notice on unmount. Nothing would update it after that, so an
-	// in-progress notice would be left showing the spinner. Uploads keep
-	// running, and a remount picks them up again.
+	// Remove the notices on unmount. Nothing would update them after that, so
+	// an in-progress notice would be left showing the spinner, and a warning
+	// would outlive the editor it belongs to. Uploads keep running, and a
+	// remount picks them up again.
 	useEffect( () => {
 		return () => {
 			if ( completionTimeoutRef.current ) {
 				clearTimeout( completionTimeoutRef.current );
 			}
 			removeNotice( NOTICE_ID );
+			removeNotice( WARNING_NOTICE_ID );
 		};
 	}, [ removeNotice ] );
+
+	// An image that uploaded without all of its image sizes counts as
+	// uploaded, so nothing above reports it. One snackbar covers every warning
+	// added since it was last dismissed, so a gallery on a full site does not
+	// stack one per image. Starting at the current length keeps a remount from
+	// bringing back warnings that were already shown.
+	const handledWarningsRef = useRef( warnings.length );
+	useEffect( () => {
+		const added = warnings.slice( handledWarningsRef.current );
+		if ( added.length === 0 ) {
+			return;
+		}
+
+		// Count uploads, not warnings, in case one upload ever has several.
+		const count = new Set( added.map( ( { id } ) => id ) ).size;
+
+		let message = added[ 0 ].message;
+		if ( count > 1 ) {
+			const isOutOfStorage = added.every(
+				( { code } ) => code === ErrorCode.STORAGE_LIMIT_REACHED
+			);
+			message = isOutOfStorage
+				? sprintf(
+						/* translators: %d: number of images */
+						_n(
+							'%d image was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+							'%d images were uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+							count
+						),
+						count
+					)
+				: sprintf(
+						/* translators: %d: number of images */
+						_n(
+							'%d image was uploaded, but some of the image sizes could not be saved.',
+							'%d images were uploaded, but some of the image sizes could not be saved.',
+							count
+						),
+						count
+					);
+		}
+
+		createNotice( 'warning', message, {
+			id: WARNING_NOTICE_ID,
+			type: 'snackbar',
+			explicitDismiss: true,
+			// Later warnings start a new snackbar and a new count.
+			onDismiss: () => {
+				handledWarningsRef.current = warnings.length;
+			},
+		} );
+	}, [ warnings, createNotice ] );
 
 	useEffect( () => {
 		const isUploading = remaining > 0;

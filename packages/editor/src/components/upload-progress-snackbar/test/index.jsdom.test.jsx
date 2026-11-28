@@ -25,14 +25,17 @@ vi.mock( import( '@wordpress/a11y' ), () => ( {
 	speak: vi.fn(),
 } ) );
 
-function mockQueue( items, failureCount = 0 ) {
+function mockQueue( items, failureCount = 0, warnings = [] ) {
 	const storeSelect = {
 		getItems: () => items,
 		isUploading: () => items.length > 0,
 	};
-	// `getFailureCount` is a private selector, so the component reads it
-	// through `unlock`.
-	lock( storeSelect, { getFailureCount: () => failureCount } );
+	// `getFailureCount` and `getWarnings` are private selectors, so the
+	// component reads them through `unlock`.
+	lock( storeSelect, {
+		getFailureCount: () => failureCount,
+		getWarnings: () => warnings,
+	} );
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => storeSelect )
 	);
@@ -297,6 +300,140 @@ describe( 'UploadProgressSnackbar', () => {
 		);
 	} );
 
+	it( 'names the file when one upload is missing files', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'First warning',
+			{
+				id: 'upload-warning',
+				type: 'snackbar',
+				explicitDismiss: true,
+				onDismiss: expect.any( Function ),
+			}
+		);
+	} );
+
+	it( 'counts the uploads in one snackbar when several are missing files', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+		const second = {
+			id: 'b',
+			code: 'STORAGE_LIMIT_REACHED',
+			message: 'Second warning',
+		};
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
+		mockQueue( [], 0, [ first, second ] );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
+		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+			'warning',
+			'2 images were uploaded, but some of the image sizes could not be saved.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'blames storage space when it caused every missing file', () => {
+		const warnings = [ 'a', 'b', 'c' ].map( ( id ) => ( {
+			id,
+			code: 'STORAGE_LIMIT_REACHED',
+			message: `Warning ${ id }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'3 images were uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'starts the count again once the warning is dismissed', () => {
+		const warnings = [ 'a', 'b', 'c' ].map( ( id ) => ( {
+			id,
+			code: 'GENERAL',
+			message: `Warning ${ id }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings.slice( 0, 2 ) );
+		rerender( <UploadProgressSnackbar /> );
+
+		// The user dismisses the snackbar that reported two images.
+		mockCreateNotice.mock.lastCall[ 2 ].onDismiss();
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
+		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+			'warning',
+			'Warning c',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'counts an upload once when it has several warnings', () => {
+		const warnings = [ 'a', 'a', 'b' ].map( ( id, index ) => ( {
+			id,
+			code: 'GENERAL',
+			message: `Warning ${ index }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'2 images were uploaded, but some of the image sizes could not be saved.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'does not repeat earlier warnings when it mounts again', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+		const second = { id: 'b', code: 'GENERAL', message: 'Second warning' };
+
+		mockQueue( [], 0, [ first ] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
+
+		mockQueue( [], 0, [ first, second ] );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'Second warning',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
 	it( 'removes the progress notice when it unmounts during an upload', () => {
 		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
 		const { unmount } = render( <UploadProgressSnackbar /> );
@@ -305,5 +442,20 @@ describe( 'UploadProgressSnackbar', () => {
 		unmount();
 
 		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+	} );
+
+	it( 'removes the warning notice when it unmounts', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+
+		mockQueue( [] );
+		const { rerender, unmount } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
+		expect( mockRemoveNotice ).not.toHaveBeenCalled();
+
+		unmount();
+
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-warning' );
 	} );
 } );
