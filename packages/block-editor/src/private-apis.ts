@@ -76,7 +76,7 @@ import { PrivateBlockContext } from './components/block-list/private-block-conte
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
 import SafeRawHTML from './components/safe-raw-html';
-import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
+import { useFieldHistoryTracking, usesNativeUndo } from './utils/native-undo';
 import isURLLike, {
 	isHashLink,
 	isRelativePath,
@@ -159,7 +159,7 @@ lock( privateApis, {
 	isURLLike,
 	InnerContent,
 	SafeRawHTML,
-	useNativeUndo,
+	useFieldHistoryTracking,
 	usesNativeUndo,
 	isElementVisible,
 	getPopulatedCategories,

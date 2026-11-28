@@ -10,14 +10,12 @@ import {
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useNativeUndo } from '../../utils/native-undo';
 import type { TreeBlock } from '../../store/types';
 
 const { applyBuiltInValidationFixes } = unlock( blocksPrivateApis );
 
 function BlockHTML( { clientId }: { clientId: string } ) {
 	const [ html, setHtml ] = useState( '' );
-	const nativeUndoRef = useNativeUndo();
 	const block = useSelect(
 		// The HTML editor only renders for an existing block.
 		( select ) =>
@@ -102,9 +100,6 @@ function BlockHTML( { clientId }: { clientId: string } ) {
 			value={ html }
 			onBlur={ onChange }
 			onChange={ ( event ) => setHtml( event.target.value ) }
-			// The edits are local state until committed on blur, so undo
-			// and redo must remain the browser's own within the field.
-			ref={ nativeUndoRef }
 		/>
 	);
 }

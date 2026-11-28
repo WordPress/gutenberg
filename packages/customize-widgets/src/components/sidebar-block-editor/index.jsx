@@ -101,6 +101,7 @@ export default function SidebarBlockEditor( {
 					undo={ sidebar.undo }
 					redo={ sidebar.redo }
 					save={ sidebar.save }
+					getRevision={ sidebar.getWidgets }
 				/>
 
 				<Header
