@@ -2,6 +2,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -41,9 +42,12 @@ export default function Edit( props ) {
 
 			if ( comment && ! authorName ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
-				return user?.name ?? __( 'Anonymous' );
+				return user?.name
+					? decodeEntities( user.name )
+					: __( 'Anonymous' );
 			}
-			return authorName ?? '';
+			// Author names are stored as HTML text, e.g. `Tom &amp; Jerry`.
+			return authorName ? decodeEntities( authorName ) : '';
 		},
 		[ commentId ]
 	);
