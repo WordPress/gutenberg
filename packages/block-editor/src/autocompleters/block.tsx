@@ -131,24 +131,41 @@ function createBlockCompleter(): BlockCompleter {
 				blocks,
 			} = inserterItem;
 
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = ( blocks ?? [] ).map( ( block ) =>
+				cloneBlock( block )
+			);
+
+			let value;
+			if ( syncStatus === 'unsynced' ) {
+				if ( name === 'core/block' && initialAttributes?.ref ) {
+					value = unsyncedFallbackBlock;
+				} else if ( unsyncedBlocks.length ) {
+					value = unsyncedBlocks;
+				} else {
+					value = unsyncedFallbackBlock;
+				}
+			} else {
+				value = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate(
+						// Variations hold inner block templates.
+						innerBlocks as Parameters<
+							typeof createBlocksFromInnerBlocksTemplate
+						>[ 0 ]
+					),
+					innerContent
+				);
+			}
+
 			return {
 				action: 'replace',
-				value:
-					syncStatus === 'unsynced'
-						? ( blocks ?? [] ).map( ( block ) =>
-								cloneBlock( block )
-							)
-						: createBlock(
-								name,
-								initialAttributes,
-								createBlocksFromInnerBlocksTemplate(
-									// Variations hold inner block templates.
-									innerBlocks as Parameters<
-										typeof createBlocksFromInnerBlocksTemplate
-									>[ 0 ]
-								),
-								innerContent
-							),
+				value,
 			};
 		},
 	};

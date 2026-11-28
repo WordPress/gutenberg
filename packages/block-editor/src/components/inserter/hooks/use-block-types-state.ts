@@ -1,13 +1,17 @@
 import {
+	getBlockType,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 	parse,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import type { BlockCategory, BlockCollection } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import { isFiltered } from '../../../store/utils';
 import type { InserterItem } from '../../../store/types';
 import type { BlockTypesState, InsertBlocks } from '../types';
@@ -47,6 +51,10 @@ const useBlockTypesState = (
 		},
 		[]
 	);
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onSelectItem = useCallback(
 		(
@@ -60,26 +68,70 @@ const useBlockTypesState = (
 			}: InserterItem,
 			shouldFocusBlock?: boolean
 		) => {
-			const insertedBlock =
-				syncStatus === 'unsynced'
-					? // Unsynced patterns hold their content.
-						parse( content as string, {
-							__unstableSkipMigrationLogs: true,
-						} )
-					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate(
-								// Variations hold inner block templates.
-								innerBlocks as Parameters<
-									typeof createBlocksFromInnerBlocksTemplate
-								>[ 0 ]
-							),
-							innerContent
-						);
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			const destinationClientId = getClosestAllowedInsertionPoint(
+				name,
+				rootClientId
+			);
+			if ( destinationClientId === null ) {
+				const title = getBlockType( name )?.title ?? name;
+				createErrorNotice(
+					sprintf(
+						/* translators: %s: block pattern title. */
+						__( 'Block "%s" can\'t be inserted.' ),
+						title
+					),
+					{
+						type: 'snackbar',
+						id: 'inserter-notice',
+					}
+				);
+				return;
+			}
+
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = parse( content ?? '', {
+				__unstableSkipMigrationLogs: true,
+			} );
+
+			let insertedBlock;
+			if ( syncStatus === 'unsynced' ) {
+				if ( name === 'core/block' && initialAttributes?.ref ) {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				} else if ( unsyncedBlocks.length ) {
+					insertedBlock = unsyncedBlocks;
+				} else {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				}
+			} else {
+				insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate(
+						// Variations hold inner block templates.
+						innerBlocks as Parameters<
+							typeof createBlocksFromInnerBlocksTemplate
+						>[ 0 ]
+					),
+					innerContent
+				);
+			}
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				destinationClientId
+			);
 		},
-		[ onInsert ]
+		[
+			getClosestAllowedInsertionPoint,
+			rootClientId,
+			onInsert,
+			createErrorNotice,
+		]
 	);
 
 	return [ items, categories, collections, onSelectItem ];
