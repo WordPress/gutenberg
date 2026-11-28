@@ -105,13 +105,15 @@ if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 		 * }
 		 *
 		 * @return string The computed CSS.
+		 *
+		 * @phpstan-param array{ context?: string|null, optimize?: bool, prettify?: bool } $options
 		 */
 		public function get_css( $options = array() ) {
 			$defaults = array(
 				'optimize' => false,
 				'prettify' => SCRIPT_DEBUG,
 			);
-			$options  = wp_parse_args( $options, $defaults );
+			$options  = array_merge( $defaults, $options );
 
 			// If we have stores, get the rules from them.
 			foreach ( $this->stores as $store ) {

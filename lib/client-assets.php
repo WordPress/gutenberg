@@ -303,6 +303,14 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
  * @return void
  */
 function gutenberg_enqueue_stored_styles( $options = array() ) {
+	if ( '' === $options ) {
+		// Handle being called as an action callback.
+		$options = array(
+			'optimize' => false,
+			'prettify' => false,
+		);
+	}
+
 	$is_block_theme   = wp_is_block_theme();
 	$is_classic_theme = ! $is_block_theme;
 

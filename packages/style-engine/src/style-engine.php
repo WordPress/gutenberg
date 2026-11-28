@@ -21,8 +21,8 @@
  *
  * @since 6.1.0
  *
- * @param array $block_styles The style object.
- * @param array $options      {
+ * @param array<string, mixed> $block_styles The style object.
+ * @param array                $options      {
  *     Optional. An array of options. Default empty array.
  *
  *     @type string|null $context                    An identifier describing the origin of the style object, e.g., 'block-supports' or 'global-styles'. Default is `null`.
@@ -37,15 +37,26 @@
  *     @type string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
  *     @type string   $classnames   Classnames separated by a space.
  * }
+ *
+ * @phpstan-param array{
+ *     context?: string|null,
+ *     convert_vars_to_classnames?: bool,
+ *     selector?: string,
+ * }|null $options
+ * @phpstan-return array{
+ *     css?: string,
+ *     declarations?: non-empty-array<non-falsy-string, non-empty-string>,
+ *     classnames?: string,
+ * }
  */
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
-	$options = wp_parse_args(
-		$options,
+	$options = array_merge(
 		array(
-			'selector'                   => null,
+			'selector'                   => '',
 			'context'                    => null,
 			'convert_vars_to_classnames' => false,
-		)
+		),
+		$options ?? array()
 	);
 
 	$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
@@ -99,17 +110,28 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
  * }
  *
  * @return string A string of compiled CSS declarations, or empty string.
+ *
+ * @phpstan-param array<array{
+ *     rules_group?: string,
+ *     selector?: string,
+ *     declarations?: array<string, string>|WP_Style_Engine_CSS_Declarations,
+ * }> $css_rules
+ * @phpstan-param array{
+ *     context?: string|null,
+ *     optimize?: bool,
+ *     prettify?: bool,
+ * } $options
  */
 function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = array() ) {
 	if ( empty( $css_rules ) ) {
 		return '';
 	}
 
-	$options = wp_parse_args(
-		$options,
+	$options = array_merge(
 		array(
 			'context' => null,
-		)
+		),
+		$options
 	);
 
 	$css_rule_objects = array();
@@ -123,7 +145,7 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 			continue;
 		}
 
-		$rules_group = $css_rule['rules_group'] ?? null;
+		$rules_group = $css_rule['rules_group'] ?? '';
 		if ( ! empty( $options['context'] ) ) {
 			WP_Style_Engine::store_css_rule( $options['context'], $css_rule['selector'], $declarations, $rules_group );
 		}
@@ -152,6 +174,11 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
  * }
  *
  * @return string A compiled CSS string.
+ *
+ * @phpstan-param array{
+ *     optimize?: bool,
+ *     prettify?: bool,
+ * } $options
  */
 function wp_style_engine_get_stylesheet_from_context( $context, $options = array() ) {
 	if ( empty( $context ) ) {
