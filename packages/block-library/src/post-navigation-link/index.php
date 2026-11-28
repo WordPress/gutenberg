@@ -105,8 +105,14 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	 * @see https://developer.wordpress.org/reference/functions/get_next_post_link/
 	 */
 	$get_link_function = "get_{$navigation_type}_post_link";
+	$post              = get_post();
 
-	if ( ! empty( $attributes['taxonomy'] ) ) {
+	if ( 'previous' === $navigation_type && is_attachment() && $post && 0 === (int) $post->post_parent ) {
+		// Core's attachment fallback treats parent ID zero as the current post.
+		// Keep the no-adjacent-post filter contract without generating a self-link.
+		/** This filter is documented in wp-includes/link-template.php */
+		$content = apply_filters( 'previous_post_link', '', $format, $link, '', 'previous' );
+	} elseif ( ! empty( $attributes['taxonomy'] ) ) {
 		$content = $get_link_function( $format, $link, true, '', $attributes['taxonomy'] );
 	} else {
 		$content = $get_link_function( $format, $link );
