@@ -75,7 +75,11 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **background**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
+- **border**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
+- **color**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
 - **shadow**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
+- **spacing**: `.wp-block-navigation-submenu > .wp-block-navigation__submenu-container`
 
 ## Block Markup
 
