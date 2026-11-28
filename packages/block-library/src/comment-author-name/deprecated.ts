@@ -1,5 +1,6 @@
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { StyledBlockAttributes } from '../utils/types';
 
 const v2 = {
 	attributes: {
@@ -91,8 +92,8 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateFontFamily,
-	isEligible( { style }: Record< string, any > ) {
-		return style?.typography?.fontFamily;
+	isEligible( { style }: StyledBlockAttributes ) {
+		return !! style?.typography?.fontFamily;
 	},
 };
 
