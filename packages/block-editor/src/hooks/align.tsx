@@ -8,7 +8,12 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import { ToolbarButton } from '@wordpress/components';
 import { BlockControls, BlockAlignmentControl } from '../components';
+import {
+	BLOCK_ALIGNMENTS_CONTROLS,
+	DEFAULT_CONTROL,
+} from '../components/block-alignment-control/constants';
 import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
@@ -200,6 +205,11 @@ function BlockEditAlignmentToolbarControlsPure( {
 
 	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
+	const isTopLevel = useSelect(
+		( select ) =>
+			! select( blockEditorStore ).getBlockRootClientId( clientId ),
+		[ clientId ]
+	);
 	/*
 	 * Only render when some alignment actually works. Many blocks — Paragraph,
 	 * Heading, List, Group among them — support nothing but wide and full, so
@@ -207,10 +217,40 @@ function BlockEditAlignmentToolbarControlsPure( {
 	 * would sit on the toolbar unable to change anything.
 	 */
 	const isRendered = enabled.length > 0 && blockEditingMode === 'default';
+	/*
+	 * The exception is the top level, such as the root of a template or
+	 * template part. There, a Group that supports only wide and full would lose
+	 * its alignment control with no explanation, and there is no containing
+	 * block to point to. Show the control disabled instead, with a tooltip
+	 * saying why.
+	 */
+	const isUnavailableAtTopLevel =
+		! isRendered &&
+		isTopLevel &&
+		unavailable.length > 0 &&
+		blockEditingMode === 'default';
 	const constraint = useAlignmentConstraint(
 		clientId,
 		isRendered && unavailable.length > 0
 	);
+
+	if ( isUnavailableAtTopLevel ) {
+		// An unset or unknown value looks up no control.
+		const { icon } =
+			BLOCK_ALIGNMENTS_CONTROLS[ align as string ] ??
+			BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+		return (
+			<BlockControls group="block">
+				<ToolbarButton
+					icon={ icon }
+					label={ __(
+						"Wide and full width aren't available at the top level"
+					) }
+					disabled
+				/>
+			</BlockControls>
+		);
+	}
 
 	if ( ! isRendered ) {
 		return null;
