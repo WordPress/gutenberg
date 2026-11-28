@@ -111,3 +111,33 @@ CSS;
 	wp_add_inline_style( 'admin-bar', $css );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_enable_admin_bar' );
+
+/**
+ * Preloads the block editor settings on the site editor page.
+ *
+ * The settings include the assets of the editor canvas. Built in a REST
+ * request, they miss styles that plugins add only in wp-admin: Jetpack, for
+ * example, adds its block editor styles on `enqueue_block_assets` only when
+ * `is_admin()`. Where those styles are served from another origin, such as a
+ * CDN, the canvas cannot copy them from the page either, so blocks render
+ * without them. Building the settings while the page loads gives the canvas
+ * the same assets as site-editor.php.
+ */
+function gutenberg_site_editor_v2_preload_editor_settings() {
+	// `rest_preload_api_request()` only keeps a response that succeeded, so on
+	// an error the client requests the settings itself.
+	$preload_data = rest_preload_api_request( array(), '/wp-block-editor/v1/settings' );
+	if ( empty( $preload_data ) ) {
+		return;
+	}
+
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
+}
+add_action( 'site-editor-v2_init', 'gutenberg_site_editor_v2_preload_editor_settings' );
