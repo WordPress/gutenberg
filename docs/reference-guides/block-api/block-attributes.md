@@ -4,7 +4,7 @@ Block attributes provide information about the data stored by a block. For examp
 
 A block can contain any number of attributes, and these are specified by the `attributes` field - an object where each key is the name of the attribute, and the value is the attribute definition.
 
-The attribute definition will contain, at a minimum, either a `type` or an `enum`. There may be additional fields.
+Define a `type` for each attribute to support WordPress's PHP and REST API validation. An optional `enum` restricts the allowed values. There may be additional fields.
 
 _Example_: Attributes object defining three attributes - `url`, `title`, and `size`.
 
@@ -20,6 +20,7 @@ _Example_: Attributes object defining three attributes - `url`, `title`, and `si
 		type: 'string',
 	},
 	size: {
+		type: 'string',
 		enum: [ 'large', 'small' ],
 	},
 }
@@ -30,7 +31,7 @@ When a block is parsed this definition will be used to extract data from the blo
 This parsing process can be summarized as:
 
 1. Extract value from the `source`.
-1. Check value matches the `type`, or is one of the `enum` values.
+1. Check that the value matches the declared `type` and, when an `enum` is present, is one of its allowed values.
 
 _Example_: Attributes available in the `edit` and function, using the above attributes definition.
 
@@ -72,9 +73,9 @@ If an attribute changes over time then a [block deprecation](/docs/reference-gui
 
 The `type` indicates the type of data that is stored by the attribute. It does not indicate where the data is stored, which is defined by the `source` field.
 
-A `type` is required, unless an `enum` is provided. A `type` can be used with an `enum`.
+The JavaScript block parser accepts an `enum` without a `type`, but WordPress's PHP validation and REST API require a `type`, including when an `enum` is present. Include both when an attribute should be limited to a fixed set of values.
 
-The `type` field MUST be one of the following:
+The `type` field can be one of the following, or an array of these types:
 
 - `null`
 - `boolean`
@@ -88,17 +89,31 @@ Note that the validity of an `object` is determined by your `source`. For an exa
 
 ## Enum validation
 
-An attribute can be defined as one of a fixed set of values. This is specified by an `enum`, which contains an array of allowed values:
+An attribute can be defined as one of a fixed set of values. This is specified by an `enum`, which contains an array of allowed values. When both `type` and `enum` are present, a value must satisfy both. Adding a `type` does not disable enum validation.
 
 _Example_: Example `enum`.
 
 ```js
 {
 	size: {
+		type: 'string',
 		enum: [ 'large', 'small', 'tiny' ]
 	}
 }
 ```
+
+For an enum containing values of different types, list those types in an array:
+
+```js
+{
+	templateLock: {
+		type: [ 'string', 'boolean' ],
+		enum: [ 'all', 'insert', false ],
+	},
+}
+```
+
+In this example, `'all'`, `'insert'`, and `false` are allowed, while other strings and `true` are not.
 
 ## Value source
 
