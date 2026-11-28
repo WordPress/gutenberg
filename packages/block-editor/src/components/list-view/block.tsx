@@ -387,6 +387,9 @@ function ListViewBlock( {
 					// `isGroupable` requires a grouping block.
 					groupingBlockName!
 				);
+				if ( ! newBlocks ) {
+					return;
+				}
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();

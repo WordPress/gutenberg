@@ -1,5 +1,6 @@
 import { lock } from '../lock-unlock';
 import { isContentBlock } from './utils';
+import { isBlockAllowedInParent } from './is-block-allowed-in-parent';
 import { parseRawBlock as _parseRawBlock } from './parser';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 // The blocktype is the most important concept within the block API. It defines
@@ -184,6 +185,7 @@ const editableRootKey = Symbol( 'editableRoot' );
 export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
+	isBlockAllowedInParent,
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
 	applyBuiltInValidationFixes,

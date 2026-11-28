@@ -9,6 +9,47 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 
+const getGroupingBlockTransform = ( groupingBlockName: string ) =>
+	findTransform(
+		getBlockTransforms( 'from', groupingBlockName ),
+		( transform ) =>
+			transform.type === 'block' &&
+			!! transform.isMultiBlock &&
+			transform.blocks.includes( '*' )
+	) as NormalizedBlockTransform< BlockBlockTransform > | null;
+
+const matchesGroupingTransform = (
+	blocks: Block[],
+	transform: NormalizedBlockTransform< BlockBlockTransform > | null
+) =>
+	! transform?.__experimentalConvert ||
+	! transform.isMatch ||
+	transform.isMatch(
+		blocks.map( ( block ) => block.attributes ),
+		blocks
+	);
+
+/**
+ * Checks the grouping block's structural transform without converting blocks or
+ * considering the source blocks' own semantic transforms.
+ *
+ * @param blocks            Blocks to group.
+ * @param groupingBlockName Name of the grouping block.
+ * @return Whether the structural transform accepts the blocks.
+ */
+export function canGroupBlocks(
+	blocks: Block[],
+	groupingBlockName: string
+): boolean {
+	return (
+		blocks.length > 0 &&
+		matchesGroupingTransform(
+			blocks,
+			getGroupingBlockTransform( groupingBlockName )
+		)
+	);
+}
+
 /**
  * Wraps the given blocks in the grouping block. Unlike a plain
  * `switchToBlockType` call, the blocks' own transforms to the grouping block
@@ -25,13 +66,12 @@ export function groupBlocks(
 	blocks: Block[],
 	groupingBlockName: string
 ): Block[] | null {
-	const groupingBlockTransform = findTransform(
-		getBlockTransforms( 'from', groupingBlockName ),
-		( transform ) =>
-			transform.type === 'block' &&
-			!! transform.isMultiBlock &&
-			transform.blocks.includes( '*' )
-	) as NormalizedBlockTransform< BlockBlockTransform > | null;
+	const groupingBlockTransform =
+		getGroupingBlockTransform( groupingBlockName );
+
+	if ( ! matchesGroupingTransform( blocks, groupingBlockTransform ) ) {
+		return null;
+	}
 
 	if ( groupingBlockTransform?.__experimentalConvert ) {
 		const result = groupingBlockTransform.__experimentalConvert( blocks );

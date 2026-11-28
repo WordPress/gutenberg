@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { isBlockAllowedInParent } from '../is-block-allowed-in-parent';
 import type { BlockType } from '../../types';
 import { partial } from '../../store/test/fixtures/types';
 import '../../store';
@@ -569,5 +570,60 @@ describe( 'isUnmodifiedBlock', () => {
 			},
 		} );
 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+} );
+
+const relationships: [
+	parent: BlockType[ 'parent' ],
+	allowedBlocks: BlockType[ 'allowedBlocks' ],
+	expected: boolean,
+][] = [
+	[ undefined, undefined, true ],
+	[ [ 'test/container' ], undefined, true ],
+	[ [ 'test/other' ], undefined, false ],
+	[ [], undefined, false ],
+	[ undefined, [ 'test/child' ], true ],
+	[ undefined, [ 'test/other' ], false ],
+	[ undefined, [], false ],
+	[ [ 'test/container' ], [], true ],
+	[ [ 'test/other' ], [ 'test/child' ], true ],
+	[ [ 'test/other' ], [ 'test/other' ], false ],
+];
+
+describe( 'isBlockAllowedInParent', () => {
+	afterEach( () => {
+		getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+	} );
+
+	it.each( relationships )(
+		'checks parent %j and allowedBlocks %j',
+		( parent, allowedBlocks, expected ) => {
+			registerBlockType( 'test/child', {
+				apiVersion: 3,
+				title: 'Child',
+				category: 'text',
+				attributes: {},
+				save: () => null,
+				parent,
+			} );
+			registerBlockType( 'test/container', {
+				apiVersion: 3,
+				title: 'Container',
+				category: 'design',
+				attributes: {},
+				save: () => null,
+				allowedBlocks,
+			} );
+
+			expect(
+				isBlockAllowedInParent( 'test/child', 'test/container' )
+			).toBe( expected );
+		}
+	);
+
+	it( 'rejects unregistered types without throwing', () => {
+		expect( isBlockAllowedInParent( 'test/child', 'test/container' ) ).toBe(
+			false
+		);
 	} );
 } );
