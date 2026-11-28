@@ -1017,6 +1017,81 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
+	it( 'closes the swatch editor when its color is removed from outside', async () => {
+		const { rerender } = await render(
+			<PaletteEdit { ...defaultProps } colors={ colors } />
+		);
+
+		await userEvent.click( screen.getByLabelText( 'Secondary' ) );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Edit: Secondary' } )
+		).toBeVisible();
+
+		await rerender(
+			<PaletteEdit { ...defaultProps } colors={ [ colors[ 0 ] ] } />
+		);
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
+
+		// Restoring the color, for example on redo, does not reopen its editor.
+		await rerender( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+
+		expect( screen.getByLabelText( 'Secondary' ) ).toBeVisible();
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'closes the swatch editor when a color without a slug is removed from outside', async () => {
+		// Saved presets can lack a slug, even though the type requires one.
+		const slugless = colors.map(
+			( { slug, ...color } ) => color
+		) as unknown as Color[];
+		const { rerender } = await render(
+			<PaletteEdit { ...defaultProps } colors={ slugless } />
+		);
+
+		await userEvent.click( screen.getByLabelText( 'Secondary' ) );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Edit: Secondary' } )
+		).toBeVisible();
+
+		await rerender(
+			<PaletteEdit { ...defaultProps } colors={ [ slugless[ 0 ] ] } />
+		);
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'does not move the swatch editor to another color when colors move', async () => {
+		const tertiary = {
+			color: '#ff0000',
+			name: 'Tertiary',
+			slug: 'tertiary',
+		};
+		const { rerender } = await render(
+			<PaletteEdit { ...defaultProps } colors={ colors } />
+		);
+
+		await userEvent.click( screen.getByLabelText( 'Secondary' ) );
+		expect(
+			screen.getByRole( 'dialog', { name: 'Edit: Secondary' } )
+		).toBeVisible();
+
+		await rerender(
+			<PaletteEdit
+				{ ...defaultProps }
+				colors={ [ colors[ 0 ], tertiary, colors[ 1 ] ] }
+			/>
+		);
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
 	it( 'can update gradient palette value', async () => {
 		const onChange = vi.fn();
 
