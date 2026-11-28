@@ -6,7 +6,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routePrivateApis } from '@wordpress/route';
+import { unlock } from '../../lock-unlock';
+import type { CanvasData } from '../../store/types';
+
+const { useMatches } = unlock( routePrivateApis );
 
 const shortcutName = 'core/boot/save';
 
@@ -23,9 +27,9 @@ export default function useSaveShortcut( {
 } ) {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
-	const { hasNonPostEntityChanges, isPostSavingLocked } =
-		useSelect( editorStore );
-	const { savePost } = useDispatch( editorStore );
+	const matches = useMatches();
+	const canvas = ( matches[ matches.length - 1 ]?.loaderData as any )
+		?.canvas as CanvasData | null | undefined;
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
@@ -44,20 +48,26 @@ export default function useSaveShortcut( {
 		};
 	}, [ registerShortcut, unregisterShortcut ] );
 
-	useShortcut( shortcutName, ( event: Event ) => {
-		event.preventDefault();
-		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-		const hasDirtyEntities = !! dirtyEntityRecords.length;
-		const isSaving = dirtyEntityRecords.some( ( record ) =>
-			isSavingEntityRecord( record.kind, record.name, record.key )
-		);
-		if ( ! hasDirtyEntities || isSaving ) {
-			return;
-		}
-		if ( hasNonPostEntityChanges() ) {
+	/*
+	 * An editor canvas that is not a preview registers the editor's own save
+	 * shortcut, which takes over while it is shown, as in the site editor.
+	 */
+	const hasEditorCanvas = !! canvas && ! canvas.isPreview;
+
+	useShortcut(
+		shortcutName,
+		( event: Event ) => {
+			event.preventDefault();
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const hasDirtyEntities = !! dirtyEntityRecords.length;
+			const isSaving = dirtyEntityRecords.some( ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
+			);
+			if ( ! hasDirtyEntities || isSaving ) {
+				return;
+			}
 			openSavePanel();
-		} else if ( ! isPostSavingLocked() ) {
-			savePost();
-		}
-	} );
+		},
+		{ isDisabled: hasEditorCanvas }
+	);
 }

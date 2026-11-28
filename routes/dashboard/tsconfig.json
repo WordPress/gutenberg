@@ -13,6 +13,7 @@
 	"references": [
 		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
 		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
+		{ "path": "../../packages/compose/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data/tsconfig.build.json" },
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
@@ -23,7 +24,6 @@
 		{ "path": "../../packages/preferences/tsconfig.build.json" },
 		{ "path": "../../packages/route/tsconfig.build.json" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
-		{ "path": "../../packages/viewport/tsconfig.build.json" },
 		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" },
 		{ "path": "../../packages/widget-primitives/tsconfig.build.json" }
 	],
