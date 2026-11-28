@@ -259,7 +259,8 @@ export default function InsertionPoint( props: InsertionPointProps ) {
 	if (
 		! isVisible ||
 		// Don't render the insertion point if the block list is empty.
-		// The insertion point will be represented by the appender instead.
+		// The insertion point will be represented by the ghost block or the
+		// appender instead.
 		isBlockListEmpty
 	) {
 		return null;

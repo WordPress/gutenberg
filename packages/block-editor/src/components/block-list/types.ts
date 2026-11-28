@@ -46,6 +46,7 @@ export interface PrivateBlockContextValue {
 	isPartiallySelected?: boolean;
 	isReusable?: boolean;
 	isDragging?: boolean;
+	isGhostDropTarget?: boolean;
 	hasChildSelected?: boolean;
 	isSectionBlock?: boolean;
 	isWithinSectionBlock?: boolean;

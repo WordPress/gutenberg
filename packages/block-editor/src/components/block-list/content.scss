@@ -80,6 +80,18 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
+	// Drop indicator for an empty block list, drawn over its ghost block to
+	// match the one drawn over an empty default paragraph block.
+	.block-editor-block-list__block.is-drop-target::after {
+		content: "";
+		position: absolute;
+		z-index: 1;
+		pointer-events: none;
+		inset: 0;
+		background-color: var(--wp-admin-theme-color);
+		border-radius: $radius-small;
+	}
+
 	// Block highlight, and navigation mode, and focus, and hover where the
 	// grab cursor shows what a drag would take.
 	// This piece of code has gone back and forth between using a pseudo element
