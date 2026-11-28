@@ -10,3 +10,7 @@
 .dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 	padding: 0 var(--wpds-dimension-padding-xs);
 }
+
+.dataviews-primary-actions {
+	display: contents;
+}
