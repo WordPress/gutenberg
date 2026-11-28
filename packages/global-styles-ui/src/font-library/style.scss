@@ -21,6 +21,15 @@ $footer-height: 90px;
 	.components-modal__content {
 		padding: 0;
 		margin-bottom: $footer-height;
+		border: var(--wpds-border-width-focus) solid transparent;
+
+		@media (forced-colors: active) {
+			border-color: Canvas;
+		}
+	}
+
+	.font-library__footer {
+		inset-inline-start: 0;
 	}
 
 	.font-library__subtitle {
