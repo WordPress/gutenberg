@@ -6,6 +6,7 @@
 
 -   `update`: redraw the icon as two curved arrows circling each other, so it reads as a cycle. The two straight diagonal arrows it carried read closer to a resize affordance ([#87088](https://github.com/WordPress/gutenberg/pull/87088)).
 -   `update`, `replay`, `backup`: redraw the three on a shared round base, a 7.25 radius circle centred on the canvas with the same arrowhead, so they read as one family. The `update` arrows keep pointing clockwise, as in #87088, and the `backup` clock hands now meet at the centre of the circle ([#87101](https://github.com/WordPress/gutenberg/pull/87101)).
+-   `plus`: draw the strokes with square endcaps. The glyph grows from 12 to about 14 pixels, closer in weight to the icons it sits beside, such as the comment icon in the admin bar ([#87384](https://github.com/WordPress/gutenberg/pull/87384)).
 
 ### Internal
 
