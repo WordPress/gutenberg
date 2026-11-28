@@ -195,4 +195,284 @@ test.describe( 'Details', () => {
 			.toBe( 'core/details' );
 		await expect.poll( () => editor.ownsSelection( summary ) ).toBe( true );
 	} );
+
+	test( 'deleting empty core/details by pressing Backspace in empty summary', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+		} );
+
+		const summary = editor.canvas.getByRole( 'textbox', {
+			name: 'Write summary. Press Enter to expand or collapse the details.',
+		} );
+		await summary.focus();
+
+		// Press Backspace in the empty summary rich text.
+		await page.keyboard.press( 'Backspace' );
+
+		// The details block should be removed.
+		await expect.poll( editor.getBlocks ).toHaveLength( 0 );
+	} );
+
+	test( 'deleting empty inner block via Backspace preserves details block and shows custom prompt', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Details summary', showContent: true },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Temporary text' },
+				},
+			],
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.focus();
+
+		// Select all text and clear it.
+		await page.keyboard.press( 'ControlOrMeta+a' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Press Backspace again on the empty paragraph.
+		await page.keyboard.press( 'Backspace' );
+
+		// The parent core/details block must remain intact with 1 replacement inner block (no jump!).
+		await expect.poll( editor.getBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/details',
+				attributes: expect.objectContaining( {
+					summary: 'Details summary',
+				} ),
+				innerBlocks: [
+					expect.objectContaining( {
+						name: 'core/paragraph',
+						attributes: expect.objectContaining( {
+							placeholder: 'Type / to add a hidden block',
+						} ),
+					} ),
+				],
+			} ),
+		] );
+
+		// Exactly 1 "Type / to add a hidden block" placeholder prompt is shown.
+		await expect(
+			editor.canvas.locator(
+				'details [data-rich-text-placeholder="Type / to add a hidden block"]'
+			)
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator(
+				'details [data-rich-text-placeholder="Type / to choose a block"]'
+			)
+		).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByText( 'Type / to choose a block' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'pressing Backspace at start of modified inner paragraph does not bounce it outside details', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Details summary', showContent: true },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner text' },
+				},
+			],
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.focus();
+
+		// Move caret to start of paragraph.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Backspace' );
+
+		// The paragraph should remain inside core/details, not lifted to the root.
+		await expect.poll( editor.getBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/details',
+				innerBlocks: [
+					expect.objectContaining( {
+						name: 'core/paragraph',
+						attributes: expect.objectContaining( {
+							content: 'Inner text',
+						} ),
+					} ),
+				],
+			} ),
+		] );
+	} );
+
+	test( 'deleting inner block via options menu in unmodified details block preserves details block and prompt', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { showContent: true },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'To be deleted' },
+				},
+			],
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+
+		// Delete inner paragraph via options menu.
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		// Details block is preserved with 0 inner blocks even without summary.
+		await expect.poll( editor.getBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/details',
+				innerBlocks: [],
+			} ),
+		] );
+
+		// Exactly 1 "Type / to add a hidden block" prompt is shown.
+		await expect(
+			editor.canvas.getByText( 'Type / to add a hidden block' )
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.getByText( 'Type / to choose a block' )
+		).toHaveCount( 0 );
+
+		// Clicking that prompt inserts a new paragraph with "Type / to add a hidden block".
+		await editor.canvas.getByText( 'Type / to add a hidden block' ).click();
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/details',
+				innerBlocks: [
+					expect.objectContaining( {
+						name: 'core/paragraph',
+						attributes: expect.objectContaining( {
+							placeholder: 'Type / to add a hidden block',
+						} ),
+					} ),
+				],
+			} ),
+		] );
+
+		await expect(
+			editor.canvas.locator(
+				'details [data-rich-text-placeholder="Type / to add a hidden block"]'
+			)
+		).toHaveCount( 1 );
+		await expect(
+			editor.canvas.locator(
+				'details [data-rich-text-placeholder="Type / to choose a block"]'
+			)
+		).toHaveCount( 0 );
+		await expect(
+			editor.canvas.getByText( 'Type / to choose a block' )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'selecting text inside summary does not toggle details while single click or Enter toggles', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: { summary: 'Sample summary', showContent: false },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hidden content' },
+				},
+			],
+		} );
+
+		const details = editor.canvas.getByRole( 'document', {
+			name: 'Block: Details',
+		} );
+		const summary = editor.canvas.getByRole( 'textbox', {
+			name: 'Write summary. Press Enter to expand or collapse the details.',
+		} );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		// Initially hidden.
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Single clicking the summary text toggles <details> open.
+		await summary.click();
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+
+		// Single clicking the summary text again toggles <details> closed.
+		await summary.click();
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Double clicking a word in the summary leaves <details> in its original state (closed).
+		await summary.dblclick();
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Double clicking a word in an open summary leaves <details> in its original state (open).
+		await summary.click();
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+		await summary.dblclick();
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+		await summary.click();
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Click-and-dragging across the summary text to select it does not toggle <details>.
+		const summaryBox = await summary.boundingBox();
+		await page.mouse.move(
+			summaryBox.x + 5,
+			summaryBox.y + summaryBox.height / 2
+		);
+		await page.mouse.down();
+		await page.mouse.move(
+			summaryBox.x + summaryBox.width - 5,
+			summaryBox.y + summaryBox.height / 2
+		);
+		await page.mouse.up();
+
+		// Should remain closed after drag selection.
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+
+		// Pressing Enter inside summary toggles <details> open.
+		await page.keyboard.press( 'Enter' );
+		await expect( paragraph ).toBeVisible();
+		await expect( details ).toHaveAttribute( 'open' );
+
+		// Pressing Enter again toggles <details> closed.
+		await page.keyboard.press( 'Enter' );
+		await expect( paragraph ).toBeHidden();
+		await expect( details ).not.toHaveAttribute( 'open' );
+	} );
 } );

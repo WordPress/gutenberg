@@ -1,3 +1,13 @@
 .wp-block-details summary div {
 	display: inline;
 }
+
+.wp-block-details > .block-list-appender.block-list-appender {
+	position: relative;
+	margin-block-start: var(--wp--style--block-gap, 1em);
+	line-height: inherit;
+
+	.block-editor-default-block-appender__content {
+		display: block;
+	}
+}
