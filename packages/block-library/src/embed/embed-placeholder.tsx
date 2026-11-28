@@ -6,6 +6,7 @@ import {
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { Link, Stack } from '@wordpress/ui';
+import type { EmbedPlaceholderProps } from './types';
 
 export default function EmbedPlaceholder( {
 	icon,
@@ -16,7 +17,7 @@ export default function EmbedPlaceholder( {
 	cannotEmbed,
 	fallback,
 	tryAgain,
-} ) {
+}: EmbedPlaceholderProps ) {
 	return (
 		<Placeholder
 			icon={ <BlockIcon icon={ icon } showColors /> }

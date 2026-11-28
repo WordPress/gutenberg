@@ -9,8 +9,9 @@ import {
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { pencil } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { EmbedControlsProps } from './types';
 
-function getResponsiveHelp( checked ) {
+function getResponsiveHelp( checked: boolean ) {
 	return checked
 		? __(
 				'This embed will preserve its aspect ratio when the browser is resized.'
@@ -27,7 +28,7 @@ const EmbedControls = ( {
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
-} ) => {
+}: EmbedControlsProps ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (

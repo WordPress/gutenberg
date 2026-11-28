@@ -5,6 +5,7 @@ import {
 	registerBlockVariation,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
+import type { useSelect } from '@wordpress/data';
 import {
 	findMoreSuitableBlock,
 	getClassNames,
@@ -22,7 +23,9 @@ const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useSelect: () => ( {} ),
+	// A stub returning an empty object, which `useSelect`'s overloads don't
+	// describe.
+	useSelect: ( () => ( {} ) ) as unknown as typeof useSelect,
 } ) );
 
 describe( 'utils', () => {
@@ -64,8 +67,18 @@ describe( 'utils', () => {
 			);
 			expect( findMoreSuitableBlock( unknownURL ) ).toBeUndefined();
 		} );
+
+		test( 'findMoreSuitableBlock returns undefined without a URL', () => {
+			expect( findMoreSuitableBlock( undefined ) ).toBeUndefined();
+			expect( findMoreSuitableBlock( '' ) ).toBeUndefined();
+		} );
 	} );
 	describe( 'getClassNames', () => {
+		it( 'should not return aspect ratio class names for iframes with a percentage width', () => {
+			const html = '<iframe height="400" width="100%"></iframe>';
+			expect( getClassNames( html, 'foo' ) ).toEqual( 'foo' );
+		} );
+
 		it( 'should return aspect ratio class names for iframes with width and height', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'wp-embed-aspect-16-9 wp-has-aspect-ratio';
@@ -224,7 +237,8 @@ describe( 'utils', () => {
 
 				registerBlockVariation(
 					DEFAULT_EMBED_BLOCK,
-					variations.find( ( { name } ) => name === 'youtube' )
+					// The YouTube variation is defined.
+					variations.find( ( { name } ) => name === 'youtube' )!
 				);
 			} );
 			it( 'when no url provided', () => {

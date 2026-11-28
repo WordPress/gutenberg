@@ -1,21 +1,24 @@
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
+import type { WpEmbedMessage, WpEmbedPreviewProps } from './types';
 
-/** @typedef {React.SyntheticEvent} SyntheticEvent */
-
-const attributeMap = {
+const attributeMap: Record< string, string > = {
 	class: 'className',
 	frameborder: 'frameBorder',
 	marginheight: 'marginHeight',
 	marginwidth: 'marginWidth',
 };
 
-export default function WpEmbedPreview( { html } ) {
-	const ref = useRef();
+export default function WpEmbedPreview( { html }: WpEmbedPreviewProps ) {
+	const ref = useRef< HTMLIFrameElement >( undefined );
 	const props = useMemo( () => {
-		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
+		// `parseFromString` converts `undefined` to the string "undefined".
+		const doc = new window.DOMParser().parseFromString(
+			html as string,
+			'text/html'
+		);
 		const iframe = doc.querySelector( 'iframe' );
-		const iframeProps = {};
+		const iframeProps: Record< string, string > = {};
 
 		if ( ! iframe ) {
 			return iframeProps;
@@ -32,7 +35,8 @@ export default function WpEmbedPreview( { html } ) {
 	}, [ html ] );
 
 	useEffect( () => {
-		const { ownerDocument } = ref.current;
+		// Effects run after the iframe mounts and sets the ref.
+		const { ownerDocument } = ref.current!;
 		const { defaultView } = ownerDocument;
 
 		/**
@@ -48,19 +52,26 @@ export default function WpEmbedPreview( { html } ) {
 		 * WordPress core embed-template on resize:
 		 * https://github.com/WordPress/WordPress/blob/HEAD/wp-includes/js/wp-embed-template.js#L187
 		 *
-		 * @param {MessageEvent} event Message event.
+		 * @param event      Message event.
+		 * @param event.data Message data, which any window can post.
 		 */
-		function resizeWPembeds( { data: { secret, message, value } = {} } ) {
+		function resizeWPembeds( { data }: MessageEvent< unknown > ) {
+			// Messages from other sources may carry `null` or a primitive.
+			const { secret, message, value } = ( data ?? {} ) as WpEmbedMessage;
 			if ( message !== 'height' || secret !== props[ 'data-secret' ] ) {
 				return;
 			}
 
-			ref.current.height = value;
+			// The listener is removed before the iframe unmounts, and the
+			// `height` property converts the number to a string.
+			ref.current!.height = value as unknown as string;
 		}
 
-		defaultView.addEventListener( 'message', resizeWPembeds );
+		// A mounted element's document always has a window.
+		defaultView!.addEventListener( 'message', resizeWPembeds );
 		return () => {
-			defaultView.removeEventListener( 'message', resizeWPembeds );
+			// A mounted element's document always has a window.
+			defaultView!.removeEventListener( 'message', resizeWPembeds );
 		};
 	}, [] );
 

@@ -23,8 +23,13 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
+import type {
+	EmbedAttributes,
+	EmbedEditProps,
+	EmbedPreviewData,
+} from './types';
 
-const EmbedEdit = ( props ) => {
+const EmbedEdit = ( props: EmbedEditProps ) => {
 	const {
 		attributes: {
 			providerNameSlug,
@@ -37,7 +42,6 @@ const EmbedEdit = ( props ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
-		onFocus,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -71,7 +75,9 @@ const EmbedEdit = ( props ) => {
 				return { fetching: false, cannotEmbed: false };
 			}
 
-			const embedPreview = getEmbedPreview( attributesUrl );
+			// Embed previews arrive untyped from the oEmbed proxy endpoint.
+			const embedPreview = getEmbedPreview( attributesUrl ) as
+				EmbedPreviewData | undefined;
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
 			// No html to show: the provider or URL can't be embedded, or core
@@ -85,8 +91,10 @@ const EmbedEdit = ( props ) => {
 				// Also loading before the request starts, which is a tick
 				// after the URL is set.
 				fetching: ! resolved,
-				themeSupportsResponsive:
-					getThemeSupports()[ 'responsive-embeds' ],
+				// Theme supports arrive untyped from the REST API.
+				themeSupportsResponsive: getThemeSupports()[
+					'responsive-embeds'
+				] as boolean | undefined,
 				cannotEmbed: ! validPreview || previewIsFallback,
 				hasResolved: resolved,
 			};
@@ -97,7 +105,7 @@ const EmbedEdit = ( props ) => {
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
 	 *
-	 * @return {Object} Merged attributes.
+	 * @return Merged attributes.
 	 */
 	const getMergedAttributes = () =>
 		getMergedAttributesWithPreview(
@@ -107,9 +115,10 @@ const EmbedEdit = ( props ) => {
 			responsive
 		);
 
-	function toggleResponsive( newAllowResponsive ) {
+	function toggleResponsive( newAllowResponsive: boolean ) {
 		const { className } = attributes;
-		const { html } = preview;
+		// The controls calling this only render with a preview.
+		const { html } = preview!;
 		setAttributes( {
 			allowResponsive: newAllowResponsive,
 			className: getClassNames(
@@ -167,7 +176,10 @@ const EmbedEdit = ( props ) => {
 		}
 
 		const hasChanges = Object.keys( mergedAttributes ).some(
-			( key ) => mergedAttributes[ key ] !== attributes[ key ]
+			( key ) =>
+				// `Object.keys` returns the keys of the merged attributes.
+				mergedAttributes[ key as keyof EmbedAttributes ] !==
+				attributes[ key as keyof EmbedAttributes ]
 		);
 
 		if ( hasChanges ) {
@@ -200,7 +212,6 @@ const EmbedEdit = ( props ) => {
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
-					onFocus={ onFocus }
 					onSubmit={ ( event ) => {
 						if ( event ) {
 							event.preventDefault();
@@ -243,7 +254,6 @@ const EmbedEdit = ( props ) => {
 	// that `getMergedAttributes` uses is memoized so that we're not
 	// calculating them on every render.
 	const {
-		caption,
 		type,
 		allowResponsive,
 		className: classFromPreview,
@@ -275,16 +285,9 @@ const EmbedEdit = ( props ) => {
 					className={ className }
 					url={ url }
 					type={ type }
-					caption={ caption }
-					onCaptionChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
 					isSelected={ isSelected }
 					icon={ icon }
 					label={ label }
-					insertBlocksAfter={ insertBlocksAfter }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
 				/>
 				<Caption
 					attributes={ attributes }
