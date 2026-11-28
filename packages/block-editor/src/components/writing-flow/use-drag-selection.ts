@@ -13,6 +13,7 @@ export default function useDragSelection() {
 		getSettings,
 		isSelectionEnabled,
 		hasSelectedBlock,
+		hasMultiSelection,
 		isDraggingBlocks,
 		isMultiSelecting,
 	} = useSelect( blockEditorStore );
@@ -47,13 +48,35 @@ export default function useDragSelection() {
 					// A mounted element's window has a selection.
 					const selection = defaultView!.getSelection()!;
 
-					if ( selection.rangeCount ) {
+					if ( selection.rangeCount && ! hasMultiSelection() ) {
 						const range = selection.getRangeAt( 0 );
-						const { commonAncestorContainer } = range;
 						const clonedRange = range.cloneRange();
 
+						// When the pointer leaves the anchor element, the
+						// browser may place a boundary just outside it (e.g.
+						// on the table cell, or in an empty neighboring
+						// cell) without selecting any more text. Clamp the
+						// range to the anchor element in that case.
 						if (
-							anchorElement.contains( commonAncestorContainer )
+							! anchorElement.contains( range.startContainer )
+						) {
+							clonedRange.setStart( anchorElement, 0 );
+						}
+						if ( ! anchorElement.contains( range.endContainer ) ) {
+							clonedRange.setEnd(
+								anchorElement,
+								anchorElement.childNodes.length
+							);
+						}
+
+						// Ignore whitespace, which includes the placeholder
+						// (ZWNBSP) of empty rich text.
+						const getText = ( r: Range ) =>
+							r.toString().replace( /\s/g, '' );
+
+						if (
+							range.intersectsNode( anchorElement ) &&
+							getText( clonedRange ) === getText( range )
 						) {
 							anchorElement.focus();
 							selection.removeAllRanges();
