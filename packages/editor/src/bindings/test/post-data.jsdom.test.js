@@ -202,3 +202,114 @@ describe( 'post-data bindings', () => {
 		} );
 	} );
 } );
+
+describe( 'post-data values for copying', () => {
+	function createSelect( entityData, blockName = 'core/post-date' ) {
+		return ( store ) =>
+			store === blockEditorStore
+				? {
+						getBlockName: () => blockName,
+						getSelectedBlockClientId: () => 'block-1',
+						getBlockAttributes: () => ( { id: 456, type: 'page' } ),
+					}
+				: {
+						getEditedEntityRecord: () => entityData,
+						canUser: () => false,
+					};
+	}
+
+	it( 'omits an unknown field key even when the entity contains that property', () => {
+		const options = {
+			select: createSelect( { unknown: 'Not a supported field' } ),
+			context: { postId: 123, postType: 'post' },
+			clientId: 'block-1',
+			bindings: { content: { args: { field: 'unknown' } } },
+		};
+
+		expect( postDataBindings.getValues( options ) ).toEqual( {
+			content: 'unknown',
+		} );
+		expect(
+			postDataBindings.getValues( { ...options, isForCopy: true } )
+		).toEqual( {} );
+	} );
+
+	it( 'omits the display label when the entity is unavailable', () => {
+		const options = {
+			select: createSelect( undefined ),
+			context: { postId: 123, postType: 'post' },
+			clientId: 'block-1',
+			bindings: { content: { args: { field: 'date' } } },
+		};
+
+		expect( postDataBindings.getValues( options ) ).toEqual( {
+			content: 'Post Date',
+		} );
+		expect(
+			postDataBindings.getValues( { ...options, isForCopy: true } )
+		).toEqual( {} );
+	} );
+
+	it.each( [ 'date', 'Post Date', '', 0, false, null ] )(
+		'copies the genuine read-only entity value %s',
+		( value ) => {
+			const options = {
+				select: createSelect( { date: value } ),
+				context: { postId: 123, postType: 'post' },
+				clientId: 'block-1',
+				bindings: { content: { args: { field: 'date' } } },
+			};
+
+			expect( postDataBindings.canUserEditValue( options ) ).toBe(
+				false
+			);
+			expect( postDataBindings.getValues( options ) ).toEqual( {
+				content: value,
+			} );
+			expect(
+				postDataBindings.getValues( { ...options, isForCopy: true } )
+			).toEqual( { content: value } );
+		}
+	);
+
+	it( 'omits only unavailable attributes in a batched copy request', () => {
+		expect(
+			postDataBindings.getValues( {
+				select: createSelect( { date: '2026-11-24 07:00:00' } ),
+				context: { postId: 123, postType: 'post' },
+				clientId: 'block-1',
+				bindings: {
+					content: { args: { field: 'date' } },
+					title: { args: { field: 'unknown' } },
+					url: { args: { field: 'link' } },
+				},
+				isForCopy: true,
+			} )
+		).toEqual( { content: '2026-11-24 07:00:00' } );
+	} );
+
+	it( 'copies a read-only navigation link from its own entity', () => {
+		const select = ( store ) =>
+			store === blockEditorStore
+				? {
+						getBlockName: () => 'core/navigation-link',
+						getBlockAttributes: () => ( { id: 456, type: 'page' } ),
+					}
+				: {
+						getEditedEntityRecord: ( _, type, id ) =>
+							type === 'page' && id === 456
+								? { link: 'https://example.com/page' }
+								: undefined,
+					};
+
+		expect(
+			postDataBindings.getValues( {
+				select,
+				context: { postId: 123, postType: 'post' },
+				clientId: 'block-1',
+				bindings: { url: { args: { field: 'link' } } },
+				isForCopy: true,
+			} )
+		).toEqual( { url: 'https://example.com/page' } );
+	} );
+} );

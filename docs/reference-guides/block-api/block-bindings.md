@@ -374,6 +374,7 @@ The function to register a custom source is `registerBlockBindingsSource( args )
     -   `name`: `string` with the unique and machine-readable name.
     -   `label`: `string` with the human readable name of the custom source. In case it was defined already on the server, the server label will be overridden by this one, in that case, it is not recommended to be defined here. (optional)
     -   `usesContext`: `array` with the block context that the custom source may need. In case it was defined already on the server, it should not be defined here. (optional)
+    -   `supportsCopy`: `boolean` that opts the source in to resolving values for copied blocks. Defaults to `false`, so existing sources preserve the saved block attributes when copied. (optional)
     -   `getValues`: `function` that retrieves the values from the source. (optional)
     -   `setValues`: `function` that allows updating the values connected to the source. (optional)
     -   `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
@@ -390,7 +391,8 @@ registerBlockBindingsSource( {
 	name: 'wpmovies/visualization-date',
 	label: __( 'Visualization Date', 'custom-bindings' ), // We can skip the label, as it was already defined in the server in the previous example.
 	usesContext: [ 'postType' ], // We can skip postId, as it was already defined in the server in the previous example.
-	getValues( { select, context } ) {
+	supportsCopy: true,
+	getValues( { select, context, isForCopy } ) {
 		let wpMoviesVisualizationDate;
 		const { getEditedEntityRecord } = select( coreDataStore );
 		if ( context?.postType && context?.postId ) {
@@ -398,12 +400,18 @@ registerBlockBindingsSource( {
 				'postType',
 				context?.postType,
 				context?.postId
-			).meta?.wp_movies_visualization_date;
+			)?.meta?.wp_movies_visualization_date;
 		}
-		if ( wpMoviesVisualizationDate ) {
+		if (
+			wpMoviesVisualizationDate ||
+			( isForCopy && wpMoviesVisualizationDate === '' )
+		) {
 			return {
 				content: wpMoviesVisualizationDate,
 			};
+		}
+		if ( isForCopy ) {
+			return {};
 		}
 
 		return {
@@ -430,17 +438,20 @@ registerBlockBindingsSource( {
 
 #### getValues
 
-The `getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties:
+The `getValues` function retrieves values from the source when rendering a block. Sources with `supportsCopy: true` also receive copy requests to resolve bound attributes for the clipboard. It receives an `object` as an argument with the following properties:
 
 -   `bindings` returns the bindings object of the specific source. It must have the attributes as a key, and the value can be a `string` or an `object` with arguments.
 -   `clientId` returns a `string` with the current block client ID.
 -   `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+-   `isForCopy` is an optional `boolean` set to `true` when resolving clipboard values. It is omitted for display requests.
 -   `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
 
 `getValues` runs synchronously, so it can't fetch data. To show a value that comes from the server, see [Showing a server value in the editor](#showing-a-server-value-in-the-editor).
+
+Set `supportsCopy: true` only when the source handles copy requests. For copy requests, return the actual source values. Omit an attribute, or return `undefined` for it, when its value is unavailable and the editor displays a placeholder instead. This preserves the attribute's saved fallback in the copied block. Return genuine values even when they are empty, read-only, or equal to a field's key or label. In the example above, an empty stored date remains empty when copied, while missing or `null` meta omits the copied value; the display still falls back to today's date.
 
 #### setValues
 

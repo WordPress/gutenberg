@@ -757,6 +757,7 @@ export const registerBlockBindingsSource = (
 		name,
 		label,
 		usesContext,
+		supportsCopy,
 		getValues,
 		setValues,
 		canUserEditValue,
@@ -832,6 +833,12 @@ export const registerBlockBindingsSource = (
 	// Check the `usesContext` property is correct.
 	if ( usesContext && ! Array.isArray( usesContext ) ) {
 		warning( 'Block bindings source usesContext must be an array.' );
+		return;
+	}
+
+	// Check the `supportsCopy` property is correct.
+	if ( supportsCopy !== undefined && typeof supportsCopy !== 'boolean' ) {
+		warning( 'Block bindings source supportsCopy must be a boolean.' );
 		return;
 	}
 

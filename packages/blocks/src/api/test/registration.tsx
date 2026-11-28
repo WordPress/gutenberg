@@ -1774,6 +1774,56 @@ describe( 'blocks', () => {
 			] );
 		} );
 
+		it.each( [ true, false ] )(
+			'preserves an explicit supportsCopy capability of %s',
+			( supportsCopy ) => {
+				registerBlockBindingsSource( {
+					name: 'core/copy-support',
+					label: 'Copy support',
+					supportsCopy,
+				} );
+				const source = getBlockBindingsSource( 'core/copy-support' );
+				unregisterBlockBindingsSource( 'core/copy-support' );
+				expect( source ).toHaveProperty( 'supportsCopy', supportsCopy );
+			}
+		);
+
+		it.each( [ 0, '', null, 1, 'true', () => true, {} ] )(
+			'rejects a defined non-boolean supportsCopy value of %j',
+			( supportsCopy ) => {
+				registerBlockBindingsSource( {
+					name: 'core/invalid-copy-support',
+					label: 'Invalid copy support',
+					// @ts-expect-error Deliberately invalid supportsCopy to test runtime validation.
+					supportsCopy,
+				} );
+				const source = getBlockBindingsSource(
+					'core/invalid-copy-support'
+				);
+				if ( source ) {
+					unregisterBlockBindingsSource(
+						'core/invalid-copy-support'
+					);
+				}
+				expect( console ).toHaveWarnedWith(
+					'Block bindings source supportsCopy must be a boolean.'
+				);
+				expect( source ).toBeUndefined();
+			}
+		);
+
+		it( 'does not add a supportsCopy property to an unaware source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/unaware-copy-support',
+				label: 'Unaware source',
+			} );
+			const source = getBlockBindingsSource(
+				'core/unaware-copy-support'
+			);
+			unregisterBlockBindingsSource( 'core/unaware-copy-support' );
+			expect( source ).not.toHaveProperty( 'supportsCopy' );
+		} );
+
 		// Check the `getValues` callback is correct.
 		it( 'should reject invalid getValues callback', () => {
 			registerBlockBindingsSource( {

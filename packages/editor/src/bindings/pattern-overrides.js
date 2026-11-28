@@ -7,7 +7,8 @@ const CONTENT = 'content';
  */
 export default {
 	name: 'core/pattern-overrides',
-	getValues( { select, clientId, context, bindings } ) {
+	supportsCopy: true,
+	getValues( { select, clientId, context, bindings, isForCopy } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
@@ -27,7 +28,9 @@ export default {
 				continue;
 			} else {
 				overridesValues[ attributeName ] =
-					overridableValue === '' ? undefined : overridableValue;
+					overridableValue === '' && ! isForCopy
+						? undefined
+						: overridableValue;
 			}
 		}
 		return overridesValues;

@@ -5,6 +5,7 @@ import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
+import { stripBlockClipboardWrapper } from '../../utils/block-clipboard';
 import {
 	hasAlignSupport,
 	hasBorderSupport,
@@ -20,28 +21,27 @@ import {
 } from '../../hooks/supports';
 
 /**
- * Determine if the copied text looks like serialized blocks or not.
- * Since plain text will always get parsed into a freeform block,
- * we check that if the parsed blocks is anything other than that.
+ * Parse a clipboard representation that contains serialized blocks.
  *
  * @param text The copied text.
- * @return True if the text looks like serialized blocks, false otherwise.
+ * @return The serialized blocks, or an empty array for other content.
  */
-function hasSerializedBlocks( text: string ): boolean {
+function getSerializedBlocks( text: string ): Block[] {
 	try {
-		const blocks = parse( text, {
+		const content = stripBlockClipboardWrapper( text );
+		const blocks = parse( content, {
 			__unstableSkipMigrationLogs: true,
 			__unstableSkipAutop: true,
 		} );
 		if ( blocks.length === 1 && blocks[ 0 ].name === 'core/freeform' ) {
-			// It's likely that the text is just plain text and not serialized blocks.
-			return false;
+			return [];
 		}
-		return true;
+		if ( content !== text && blocks.length === 1 ) {
+			return blocks[ 0 ].innerBlocks;
+		}
+		return blocks;
 	} catch {
-		// Parsing error, the text is not serialized blocks.
-		// (Even though that it technically won't happen)
-		return false;
+		return [];
 	}
 }
 
@@ -145,7 +145,7 @@ export default function usePasteStyles() {
 
 	return useCallback(
 		async ( targetBlocks: Block[] ) => {
-			let html = '';
+			let copiedBlocks: Block[];
 			try {
 				// `http:` sites won't have the clipboard property on navigator.
 				// (with the exception of localhost.)
@@ -159,7 +159,9 @@ export default function usePasteStyles() {
 					return;
 				}
 
-				html = await window.navigator.clipboard.readText();
+				copiedBlocks = getSerializedBlocks(
+					await window.navigator.clipboard.readText()
+				);
 			} catch {
 				// Possibly the permission is denied.
 				createErrorNotice(
@@ -173,8 +175,7 @@ export default function usePasteStyles() {
 				return;
 			}
 
-			// Abort if the copied text is empty or doesn't look like serialized blocks.
-			if ( ! html || ! hasSerializedBlocks( html ) ) {
+			if ( ! copiedBlocks.length ) {
 				createWarningNotice(
 					__(
 						"Unable to paste styles. Block styles couldn't be found within the copied content."
@@ -185,8 +186,6 @@ export default function usePasteStyles() {
 				);
 				return;
 			}
-
-			const copiedBlocks = parse( html );
 
 			if ( copiedBlocks.length === 1 ) {
 				// Apply styles of the block to all the target blocks.

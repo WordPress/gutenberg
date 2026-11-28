@@ -1,0 +1,454 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { createElement, Fragment } from '@wordpress/element';
+import { createRegistry, RegistryProvider, useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	getBlockTypes,
+	parse,
+	registerBlockBindingsSource,
+	registerBlockType,
+	store as blocksStore,
+	unregisterBlockBindingsSource,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+import type { BlockBindingsSource } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+import Edit from '../edit';
+import { BlockContextProvider } from '../../block-context';
+import { PrivateBlockContext } from '../../block-list/private-block-context';
+import { BlockRefsProvider } from '../../provider/block-refs-provider';
+import useCanvasClipboard from '../../writing-flow/use-clipboard-handler';
+import useListClipboard from '../../list-view/use-clipboard-handler';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+import type { BlockAttributes } from '../../../store/types';
+
+describe( 'copying a rendered bound block', () => {
+	const blockName = 'testing/bound-paragraph';
+	const sourceName = 'testing/clipboard-source';
+	const bindings = { content: { source: sourceName } };
+	let source: BlockBindingsSource;
+
+	beforeEach( () => {
+		source = {
+			name: sourceName,
+			label: 'Clipboard source',
+			getValues: ( {
+				select,
+			}: {
+				select: ReturnType< typeof createRegistry >[ 'select' ];
+			} ) => ( {
+				content:
+					select( blockEditorStore ).getSettings().clipboardTestValue,
+			} ),
+			setValues: vi.fn(),
+			supportsCopy: true,
+		};
+		registerBlockBindingsSource( source );
+		registerBlockType< {
+			content: string;
+			metadata?: BlockAttributes[ 'metadata' ];
+		} >( blockName, {
+			apiVersion: 3,
+			title: 'Bound paragraph',
+			category: 'text',
+			merge: ( attributes, attributesToMerge ) => ( {
+				content: attributes.content + attributesToMerge.content,
+			} ),
+			attributes: {
+				metadata: { type: 'object' },
+				content: {
+					type: 'string',
+					source: 'html',
+					selector: 'p',
+					default: '',
+				},
+			},
+			edit: ( { attributes, clientId } ) =>
+				createElement( 'p', {
+					id: `block-${ clientId }`,
+					'data-block': clientId,
+					className: 'block-editor-block-list__block',
+					role: 'textbox',
+					'aria-label': 'Bound paragraph',
+					contentEditable: true,
+					suppressContentEditableWarning: true,
+					tabIndex: 0,
+					dangerouslySetInnerHTML: { __html: attributes.content },
+				} ),
+			save: ( { attributes } ) =>
+				createElement( 'p', {
+					dangerouslySetInnerHTML: { __html: attributes.content },
+				} ),
+		} );
+	} );
+
+	afterEach( () => {
+		document.getSelection()!.removeAllRanges();
+		act( () => {
+			unregisterBlockBindingsSource( sourceName );
+			if ( source.name !== sourceName ) {
+				unregisterBlockBindingsSource( source.name );
+			}
+			unregisterBlockType( blockName );
+		} );
+	} );
+
+	function BoundBlock( { clientId }: { clientId: string } ) {
+		const { attributes, blockBindingsSources } = useSelect(
+			( select ) => ( {
+				attributes:
+					select( blockEditorStore ).getBlockAttributes( clientId ),
+				blockBindingsSources: unlock(
+					select( blocksStore )
+				).getAllBlockBindingsSources(),
+			} ),
+			[ clientId ]
+		);
+		return createElement(
+			PrivateBlockContext.Provider,
+			{
+				value: {
+					bindableAttributes: [ 'content' ],
+					blockBindingsSources,
+				},
+			},
+			createElement( Edit, {
+				name: blockName,
+				clientId,
+				attributes: attributes!,
+			} )
+		);
+	}
+
+	function Canvas( { clientId }: { clientId: string } ) {
+		const clipboardRef = useCanvasClipboard();
+		return createElement(
+			'div',
+			{ ref: clipboardRef },
+			createElement( BoundBlock, { clientId } )
+		);
+	}
+
+	function ListView( { clientId }: { clientId: string } ) {
+		const clipboardRef = useListClipboard( { selectBlock: () => {} } );
+		return createElement(
+			Fragment,
+			null,
+			createElement( BoundBlock, { clientId } ),
+			createElement(
+				'div',
+				{ ref: clipboardRef },
+				createElement(
+					'div',
+					{ role: 'row', 'data-block': clientId, tabIndex: 0 },
+					'Bound paragraph'
+				)
+			)
+		);
+	}
+
+	function copyFrom( element: HTMLElement ) {
+		const clipboard = new Map< string, string >();
+		const event = new Event( 'copy', { bubbles: true, cancelable: true } );
+		Object.defineProperty( event, 'clipboardData', {
+			value: {
+				setData: ( type: string, content: string ) =>
+					clipboard.set( type, content ),
+				getData: ( type: string ) => clipboard.get( type ) ?? '',
+			},
+		} );
+		element.focus();
+		fireEvent( element, event );
+		expect( event.defaultPrevented ).toBe( true );
+		return {
+			plainText: clipboard.get( 'text/plain' ),
+			html: clipboard.get( 'text/html' )!,
+		};
+	}
+
+	it( 'keeps the saved fallback when a binding only has a server-side placeholder', () => {
+		source = {
+			name: 'testing/server-only-source',
+			label: 'Server Source',
+		};
+		registerBlockBindingsSource( source );
+		const registry = createRegistry();
+		registry.register( blocksStore );
+		registry.register( blockEditorStore );
+		registry.register( noticesStore );
+		registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+		unlock( registry.dispatch( blocksStore ) ).addBlockBindingsSource(
+			source
+		);
+		const actions = registry.dispatch( blockEditorStore );
+		const serverBindings = { content: { source: source.name } };
+		const boundBlock = createBlock( blockName, {
+			content: 'paragraph default content',
+			metadata: { bindings: serverBindings },
+		} );
+		const normalBlock = createBlock( blockName, {
+			content: 'Normal paragraph',
+		} );
+		actions.resetBlocks( [ boundBlock, normalBlock ] );
+		actions.multiSelect( boundBlock.clientId, normalBlock.clientId );
+		render(
+			createElement(
+				RegistryProvider,
+				{ value: registry },
+				createElement(
+					BlockRefsProvider,
+					null,
+					createElement( Canvas, { clientId: boundBlock.clientId } )
+				)
+			)
+		);
+
+		const paragraph = screen.getByRole( 'textbox', {
+			name: 'Bound paragraph',
+		} );
+		expect( paragraph ).toHaveTextContent( 'Server Source' );
+		const copied = copyFrom( paragraph );
+		expect( copied.plainText ).toBe(
+			'paragraph default content\n\nNormal paragraph'
+		);
+		expect( parse( copied.html )[ 0 ] ).toMatchObject( {
+			isValid: true,
+			attributes: {
+				content: 'paragraph default content',
+				metadata: { bindings: serverBindings },
+			},
+		} );
+		expect( boundBlock.attributes.content ).toBe(
+			'paragraph default content'
+		);
+	} );
+
+	it.each( [
+		[ 'omitted', {}, 'fallback content' ],
+		[ 'undefined', { content: undefined }, 'fallback content' ],
+		[
+			'a genuine field key',
+			{ content: 'unaccessible_field' },
+			'unaccessible_field',
+		],
+		[ 'a genuine label', { content: 'Field label' }, 'Field label' ],
+		[ 'an empty string', { content: '' }, '' ],
+	] )(
+		'copies %s from the mounted source only when copying',
+		( _, copyValues, expectedContent ) => {
+			unregisterBlockBindingsSource( sourceName );
+			const getValues = vi.fn(
+				( {
+					isForCopy,
+					select,
+				}: {
+					isForCopy?: boolean;
+					select: ReturnType< typeof createRegistry >[ 'select' ];
+				} ) =>
+					isForCopy
+						? select( blockEditorStore ).getSettings()
+								.clipboardCopyValues
+						: { content: 'unaccessible_field' }
+			);
+			source = {
+				...source,
+				usesContext: [ 'postId', 'postType' ],
+				getValues,
+				canUserEditValue: () => false,
+				getFieldsList: () => [],
+			};
+			registerBlockBindingsSource( source );
+			const registry = createRegistry();
+			registry.register( blocksStore );
+			registry.register( blockEditorStore );
+			registry.register( noticesStore );
+			registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+			unlock( registry.dispatch( blocksStore ) ).addBlockBindingsSource(
+				source
+			);
+			const actions = registry.dispatch( blockEditorStore );
+			const boundBindings = {
+				content: {
+					source: sourceName,
+					args: { key: 'unaccessible_field' },
+				},
+			};
+			const boundBlock = createBlock( blockName, {
+				content: 'fallback content',
+				metadata: { bindings: boundBindings },
+			} );
+			const normalBlock = createBlock( blockName, {
+				content: 'Normal paragraph',
+			} );
+			actions.resetBlocks( [ boundBlock, normalBlock ] );
+			actions.multiSelect( boundBlock.clientId, normalBlock.clientId );
+			actions.updateSettings( {
+				clipboardCopyValues: { content: 'Old value' },
+			} );
+			render(
+				createElement(
+					RegistryProvider,
+					{ value: registry },
+					createElement(
+						BlockRefsProvider,
+						null,
+						createElement( BlockContextProvider, {
+							value: { postId: 41, postType: 'post' },
+							children: createElement( Canvas, {
+								clientId: boundBlock.clientId,
+							} ),
+						} )
+					)
+				)
+			);
+			const paragraph = screen.getByRole( 'textbox', {
+				name: 'Bound paragraph',
+			} );
+			expect( paragraph ).toHaveTextContent( 'unaccessible_field' );
+			expect( getValues ).toHaveBeenCalled();
+			expect(
+				getValues.mock.calls.some(
+					( [ options ] ) => options.isForCopy
+				)
+			).toBe( false );
+			act( () => {
+				actions.updateSettings( { clipboardCopyValues: copyValues } );
+			} );
+			expect(
+				getValues.mock.calls.some(
+					( [ options ] ) => options.isForCopy
+				)
+			).toBe( false );
+
+			const copied = copyFrom( paragraph );
+			expect( parse( copied.html )[ 0 ] ).toMatchObject( {
+				isValid: true,
+				attributes: {
+					content: expectedContent,
+					metadata: { bindings: boundBindings },
+				},
+			} );
+			const copyCalls = getValues.mock.calls.filter(
+				( [ options ] ) => options.isForCopy
+			);
+			expect( copyCalls ).toHaveLength( 1 );
+			expect( copyCalls[ 0 ][ 0 ] ).toEqual(
+				expect.objectContaining( {
+					isForCopy: true,
+					clientId: boundBlock.clientId,
+					context: { postId: 41, postType: 'post' },
+					bindings: {
+						content: { args: { key: 'unaccessible_field' } },
+					},
+				} )
+			);
+			expect(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( boundBlock.clientId )
+			).toMatchObject( {
+				content: 'fallback content',
+				metadata: { bindings: boundBindings },
+			} );
+			expect( source.setValues ).not.toHaveBeenCalled();
+		}
+	);
+
+	it.each( [ 'canvas', 'list view', 'canvas with RichText endpoints' ] )(
+		'copies current resolved content from the %s without changing the source',
+		async ( mode ) => {
+			const registry = createRegistry();
+			registry.register( blocksStore );
+			registry.register( blockEditorStore );
+			registry.register( noticesStore );
+			registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+			unlock( registry.dispatch( blocksStore ) ).addBlockBindingsSource(
+				source
+			);
+			const actions = registry.dispatch( blockEditorStore );
+			const boundBlock = createBlock( blockName, {
+				content: '',
+				metadata: { bindings },
+			} );
+			const normalBlock = createBlock( blockName, {
+				content: 'Normal paragraph',
+			} );
+			actions.resetBlocks( [ boundBlock, normalBlock ] );
+			actions.updateSettings( {
+				clipboardTestValue: 'Bound <strong>text</strong>',
+			} );
+			if ( mode === 'canvas with RichText endpoints' ) {
+				actions.selectionChange( {
+					start: {
+						clientId: boundBlock.clientId,
+						attributeKey: 'content',
+						offset: 0,
+					},
+					end: {
+						clientId: normalBlock.clientId,
+						attributeKey: 'content',
+						offset: ( normalBlock.attributes.content as string )
+							.length,
+					},
+				} );
+			} else {
+				actions.multiSelect(
+					boundBlock.clientId,
+					normalBlock.clientId
+				);
+			}
+			const Fixture = mode === 'list view' ? ListView : Canvas;
+			render(
+				createElement(
+					RegistryProvider,
+					{ value: registry },
+					createElement(
+						BlockRefsProvider,
+						null,
+						createElement( BlockContextProvider, {
+							value: { postId: 41, postType: 'post' },
+							children: createElement( Fixture, {
+								clientId: boundBlock.clientId,
+							} ),
+						} )
+					)
+				)
+			);
+			const copyTarget =
+				mode === 'list view'
+					? screen.getByRole( 'row' )
+					: screen.getByRole( 'textbox', {
+							name: 'Bound paragraph',
+						} );
+			const copied = copyFrom( copyTarget );
+			expect( copied.plainText ).toBe( 'Bound text\n\nNormal paragraph' );
+			const pasted = parse( copied.html );
+			expect( pasted.map( ( block ) => block.isValid ) ).toEqual( [
+				true,
+				true,
+			] );
+			expect( pasted[ 0 ].attributes ).toMatchObject( {
+				content: 'Bound <strong>text</strong>',
+				metadata: { bindings },
+			} );
+			expect( pasted[ 1 ].attributes.content ).toBe( 'Normal paragraph' );
+
+			await act( async () => {
+				await actions.updateSettings( {
+					clipboardTestValue: 'Updated <em>value</em>',
+				} );
+			} );
+			expect( copyFrom( copyTarget ).plainText ).toBe(
+				'Updated value\n\nNormal paragraph'
+			);
+			expect(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( boundBlock.clientId )
+			).toMatchObject( { content: '', metadata: { bindings } } );
+			expect( source.setValues ).not.toHaveBeenCalled();
+		}
+	);
+} );

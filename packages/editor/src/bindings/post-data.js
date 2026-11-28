@@ -31,7 +31,8 @@ const postDataFields = [
  */
 export default {
 	name: 'core/post-data',
-	getValues( { select, context, bindings, clientId } ) {
+	supportsCopy: true,
+	getValues( { select, context, bindings, clientId, isForCopy } ) {
 		/*
 		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
 		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
@@ -65,6 +66,14 @@ export default {
 			const postDataField = postDataFields.find(
 				( field ) => field.args.field === binding.args.field
 			);
+
+			if (
+				isForCopy &&
+				( ! postDataField ||
+					entityDataValues?.[ binding.args.field ] === undefined )
+			) {
+				continue;
+			}
 
 			if ( ! postDataField ) {
 				// If the field is unknown, return the field name.

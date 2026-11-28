@@ -6,7 +6,13 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import type { ComponentType } from 'react';
 import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
@@ -17,6 +23,8 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import { BlockRefs } from '../provider/block-refs-provider';
+import { isPreviewModeKey, useBlockEditContext } from './context';
 import type { BlockEditPublicProps } from './types';
 
 const Edit = ( props: BlockEditPublicProps ) => {
@@ -54,6 +62,9 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		bindableAttributes,
 		blockBindingsSources: registeredSources = NO_SOURCES,
 	} = useContext( PrivateBlockContext );
+	const { attributesForCopy } = useContext( BlockRefs );
+	const { [ isPreviewModeKey ]: isPreviewMode } = useBlockEditContext();
+	const instanceToken = useRef( {} ).current;
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		return {
@@ -88,12 +99,8 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		registeredSources,
 	] );
 
-	const computedAttributes = useSelect(
-		( select ) => {
-			if ( ! blockBindings ) {
-				return attributes;
-			}
-
+	const getBoundAttributes = useCallback(
+		( select: typeof registry.select, isForCopy = false ) => {
 			const attributesFromSources: Record< string, unknown > = {};
 			const blockBindingsBySource = new Map<
 				Omit< BlockBindingsSource, 'name' >,
@@ -101,13 +108,14 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			>();
 
 			for ( const [ attributeName, binding ] of Object.entries(
-				blockBindings
+				blockBindings ?? {}
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				// An absent source looks up nothing.
 				const source = registeredSources[ sourceName as string ];
 				if (
 					! source ||
+					( isForCopy && source.supportsCopy !== true ) ||
 					! bindableAttributes?.includes( attributeName )
 				) {
 					continue;
@@ -126,6 +134,9 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 					// Get values in batch if the source supports it.
 					let values: Record< string, unknown > = {};
 					if ( ! source.getValues ) {
+						if ( isForCopy ) {
+							continue;
+						}
 						Object.keys( bindings ).forEach( ( attr ) => {
 							// Default to the source label when `getValues` doesn't exist.
 							values[ attr ] = source.label;
@@ -136,16 +147,24 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 							context,
 							clientId,
 							bindings,
+							...( isForCopy ? { isForCopy: true } : {} ),
 						} );
 					}
 					for ( const [ attributeName, value ] of Object.entries(
 						values
 					) ) {
+						if ( isForCopy && value === undefined ) {
+							continue;
+						}
 						if (
 							attributeName === 'url' &&
 							// Sources return URLs as strings.
 							( ! value || ! isURLLike( value as string ) )
 						) {
+							if ( isForCopy ) {
+								// Keep the saved fallback when a source URL is invalid.
+								continue;
+							}
 							// Return null if value is not a valid URL.
 							attributesFromSources[ attributeName ] = null;
 						} else {
@@ -155,20 +174,86 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 				}
 			}
 
-			return {
-				...attributes,
-				...attributesFromSources,
-			};
+			return attributesFromSources;
 		},
 		[
-			attributes,
 			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
 			registeredSources,
+			registry,
 		]
 	);
+	const computedAttributes = useSelect(
+		( select ) =>
+			blockBindings
+				? { ...attributes, ...getBoundAttributes( select ) }
+				: attributes,
+		[ attributes, blockBindings, getBoundAttributes ]
+	);
+	const getAttributesForCopy = useCallback(
+		() => getBoundAttributes( registry.select, true ),
+		[ getBoundAttributes, registry ]
+	);
+
+	const boundAttributeNames = useMemo(
+		() =>
+			Object.entries( blockBindings ?? {} )
+				.filter( ( [ attributeName, binding ] ) => {
+					const source =
+						registeredSources[ binding?.source as string ];
+					return (
+						bindableAttributes?.includes( attributeName ) &&
+						source?.supportsCopy === true &&
+						source.getValues
+					);
+				} )
+				.map( ( [ attributeName ] ) => attributeName ),
+		[ bindableAttributes, blockBindings, registeredSources ]
+	);
+	useLayoutEffect( () => {
+		if (
+			! clientId ||
+			! attributesForCopy ||
+			! boundAttributeNames.length ||
+			isPreviewMode ||
+			blockContext.query !== undefined ||
+			blockContext.queryId !== undefined ||
+			blockContext.termQuery !== undefined ||
+			blockContext.commentId !== undefined
+		) {
+			return;
+		}
+		const instances = attributesForCopy.get( clientId ) ?? new Map();
+		instances.set( instanceToken, {
+			attributes,
+			boundAttributeNames,
+			getAttributesForCopy,
+		} );
+		attributesForCopy.set( clientId, instances );
+		return () => {
+			instances.delete( instanceToken );
+			if (
+				! instances.size &&
+				attributesForCopy.get( clientId ) === instances
+			) {
+				attributesForCopy.delete( clientId );
+			}
+		};
+	}, [
+		attributes,
+		attributesForCopy,
+		blockContext.commentId,
+		blockContext.query,
+		blockContext.queryId,
+		blockContext.termQuery,
+		boundAttributeNames,
+		clientId,
+		getAttributesForCopy,
+		instanceToken,
+		isPreviewMode,
+	] );
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes: Record< string, unknown > ) => {

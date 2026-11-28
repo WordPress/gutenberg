@@ -9,6 +9,10 @@
 -   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 -   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
 
+### Enhancements
+
+-   Block Bindings: Add the optional `supportsCopy` capability and `isForCopy` argument to `getValues` so sources can opt in to resolving copied values without saving display placeholders ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+
 ### Bug Fixes
 
 -   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).

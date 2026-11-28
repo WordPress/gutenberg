@@ -205,3 +205,129 @@ describe( 'post-meta bindings', () => {
 		} );
 	} );
 } );
+
+describe( 'post-meta values for copying', () => {
+	function createSelect( meta = {}, hasEntity = true ) {
+		const selectors = {
+			getEditedEntityRecord: () => ( hasEntity ? { meta } : undefined ),
+			getEditorSettings: () => ( { enableCustomFields: false } ),
+			canUser: () => false,
+		};
+		lock( selectors, {
+			getRegisteredPostMeta: () => ( {
+				movie_field: {
+					title: 'Movie Field Label',
+					default: 'Movie field default value',
+					type: 'string',
+				},
+				_protected_field: { type: 'string' },
+				footnotes: { type: 'string' },
+			} ),
+		} );
+		return () => selectors;
+	}
+
+	it( 'keeps the saved fallback when the edited entity is unavailable', () => {
+		const options = {
+			select: createSelect( {}, false ),
+			context: { postType: 'movie', postId: 123 },
+			bindings: { content: { args: { key: 'movie_field' } } },
+		};
+
+		expect( postMetaBindings.getValues( options ) ).toEqual( {
+			content: 'Movie Field Label',
+		} );
+		expect(
+			postMetaBindings.getValues( { ...options, isForCopy: true } )
+		).toEqual( {} );
+	} );
+
+	it.each( [ 'inaccessible_field', '_protected_field', 'footnotes' ] )(
+		'omits the display key for unavailable field %s',
+		( key ) => {
+			const options = {
+				select: createSelect( { [ key ]: 'Unavailable value' } ),
+				context: { postType: 'movie', postId: 123 },
+				bindings: { content: { args: { key } } },
+			};
+
+			expect( postMetaBindings.getValues( options ) ).toEqual( {
+				content: key,
+			} );
+			expect(
+				postMetaBindings.getValues( { ...options, isForCopy: true } )
+			).toEqual( {} );
+		}
+	);
+
+	it( 'omits a display default when no post is available', () => {
+		const options = {
+			select: createSelect(),
+			context: { postType: 'movie' },
+			bindings: { content: { args: { key: 'movie_field' } } },
+		};
+
+		expect( postMetaBindings.getValues( options ) ).toEqual( {
+			content: 'Movie field default value',
+		} );
+		expect(
+			postMetaBindings.getValues( { ...options, isForCopy: true } )
+		).toEqual( {} );
+	} );
+
+	it.each( [ undefined, null ] )(
+		'omits the display label when the actual meta value is %s',
+		( value ) => {
+			const options = {
+				select: createSelect( { movie_field: value } ),
+				context: { postType: 'movie', postId: 123 },
+				bindings: { content: { args: { key: 'movie_field' } } },
+			};
+
+			expect( postMetaBindings.getValues( options ) ).toEqual( {
+				content: 'Movie Field Label',
+			} );
+			expect(
+				postMetaBindings.getValues( { ...options, isForCopy: true } )
+			).toEqual( {} );
+		}
+	);
+
+	it.each( [ 'movie_field', 'Movie Field Label', '', 0, false ] )(
+		'copies the genuine read-only meta value %s',
+		( value ) => {
+			const options = {
+				select: createSelect( { movie_field: value } ),
+				context: { postType: 'movie', postId: 123 },
+				bindings: { content: { args: { key: 'movie_field' } } },
+			};
+
+			expect(
+				postMetaBindings.canUserEditValue( {
+					...options,
+					args: { key: 'movie_field' },
+				} )
+			).toBe( false );
+			expect( postMetaBindings.getValues( options ) ).toEqual( {
+				content: value,
+			} );
+			expect(
+				postMetaBindings.getValues( { ...options, isForCopy: true } )
+			).toEqual( { content: value } );
+		}
+	);
+
+	it( 'omits only unavailable attributes in a batched copy request', () => {
+		expect(
+			postMetaBindings.getValues( {
+				select: createSelect( { movie_field: 'Readable value' } ),
+				context: { postType: 'movie', postId: 123 },
+				bindings: {
+					content: { args: { key: 'movie_field' } },
+					title: { args: { key: 'inaccessible_field' } },
+				},
+				isForCopy: true,
+			} )
+		).toEqual( { content: 'Readable value' } );
+	} );
+} );

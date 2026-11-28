@@ -55,6 +55,9 @@ export function addBlockBindingsSource( source: BlockBindingsSource ): Action {
 		name: source.name,
 		label: source.label,
 		usesContext: source.usesContext,
+		...( source.supportsCopy === undefined
+			? {}
+			: { supportsCopy: source.supportsCopy } ),
 		getValues: source.getValues,
 		setValues: source.setValues,
 		canUserEditValue: source.canUserEditValue,

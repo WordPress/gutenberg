@@ -125,6 +125,7 @@ export type Action =
 			name: string;
 			label?: string;
 			usesContext?: string[];
+			supportsCopy?: boolean;
 			getValues?: Function;
 			setValues?: Function;
 			canUserEditValue?: Function;

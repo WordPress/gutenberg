@@ -49,7 +49,7 @@ function getPostMetaFields( select, context ) {
 	return metaFields;
 }
 
-function getValue( { select, context, args } ) {
+function getValue( { select, context, args, isForCopy } ) {
 	const metaFields = getPostMetaFields( select, context );
 	const metaField = metaFields.find(
 		( field ) => field.args.key === args.key
@@ -57,13 +57,15 @@ function getValue( { select, context, args } ) {
 
 	// If the meta field was not found, it's either protected, inaccessible, or simply doesn't exist.
 	if ( ! metaField ) {
-		return args.key;
+		return isForCopy ? undefined : args.key;
 	}
 
 	// Without a postId, we cannot look up a meta value.
 	if ( ! context?.postId ) {
 		// Return the default value for the meta field if available.
-		return metaField.default || metaField.label || args.key;
+		return isForCopy
+			? undefined
+			: metaField.default || metaField.label || args.key;
 	}
 
 	const { getEditedEntityRecord } = select( coreDataStore );
@@ -71,9 +73,12 @@ function getValue( { select, context, args } ) {
 		'postType',
 		context?.postType,
 		context?.postId
-	).meta;
+	)?.meta;
 
-	return entityMetaValues?.[ args.key ] ?? metaField?.label ?? args.key;
+	const value = entityMetaValues?.[ args.key ];
+	return isForCopy
+		? ( value ?? undefined )
+		: ( value ?? metaField.label ?? args.key );
 }
 
 /**
@@ -81,14 +86,19 @@ function getValue( { select, context, args } ) {
  */
 export default {
 	name: 'core/post-meta',
-	getValues( { select, context, bindings } ) {
+	supportsCopy: true,
+	getValues( { select, context, bindings, isForCopy } ) {
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
-			newValues[ attributeName ] = getValue( {
+			const value = getValue( {
 				select,
 				context,
 				args: binding.args,
+				isForCopy,
 			} );
+			if ( ! isForCopy || value !== undefined ) {
+				newValues[ attributeName ] = value;
+			}
 		}
 		return newValues;
 	},
