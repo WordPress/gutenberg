@@ -11,6 +11,7 @@ import './context';
 import './each';
 import './html';
 import './init';
+import './input';
 import './on';
 import './router-region';
 import './run';
