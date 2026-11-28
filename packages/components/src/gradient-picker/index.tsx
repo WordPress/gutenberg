@@ -3,6 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	getOptionGroupKeys,
 	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
@@ -106,13 +107,14 @@ function MultipleOrigin( {
 	presentation,
 }: PickerProps< OriginObject > ) {
 	const instanceId = useInstanceId( MultipleOrigin );
+	const keys = getOptionGroupKeys( gradients );
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
-					<VStack spacing={ 2 } key={ index }>
+					<VStack spacing={ 2 } key={ keys[ index ] }>
 						<Heading
 							className={ colorPaletteStyles[ 'color-heading' ] }
 							level={ headingLevel }

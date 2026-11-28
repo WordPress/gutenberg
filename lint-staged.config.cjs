@@ -23,4 +23,6 @@ module.exports = {
 	],
 	// The validator takes the repository root, so staged paths are not passed.
 	'**/tsconfig*.json': [ () => 'npm run lint:tsconfig' ],
+	// The skill validator checks the whole catalog, so staged paths are not passed.
+	'.agents/skills/**': [ () => 'npm run lint:skills' ],
 };

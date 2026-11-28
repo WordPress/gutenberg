@@ -296,14 +296,6 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							ENTITIES[ postType ]?.[ namespace ]?.isVisible
 						);
 					}
-					if ( field.id === 'status' ) {
-						return {
-							...field,
-							elements: field.elements.filter(
-								( element ) => element.value !== 'trash'
-							),
-						};
-					}
 					if ( field.id === 'template' ) {
 						// `usePostTemplatePanelMode` is reused in the Post Template panel to match
 						// the existing behavior. If the panel rendered nothing we should exclude the
