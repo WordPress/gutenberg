@@ -17,6 +17,7 @@ import {
 	FiltersToggle,
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
+import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
 import {
 	DataViewsPickerFooter,
 	DataViewsPickerBulkActionToolbar,
@@ -32,6 +33,9 @@ import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
+import DataViewsViewMenu from '../components/dataviews-view-menu';
+import NarrowUI, { getNarrowOptions } from '../components/dataviews-narrow-ui';
+import { LAYOUT_PICKER_GRID } from '../constants';
 import normalizeFields from '../field-types';
 import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
@@ -329,6 +333,12 @@ function DataViewsPicker< Item >( {
 		return null;
 	}
 
+	// The narrow UI is an option of the grid layout.
+	const narrowOptions =
+		view.type === LAYOUT_PICKER_GRID
+			? getNarrowOptions( view.layout?.narrow )
+			: undefined;
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -360,10 +370,25 @@ function DataViewsPicker< Item >( {
 				intersectionObserver,
 			} }
 		>
-			<div className="dataviews-picker-wrapper">
-				{ children ?? (
-					<DefaultUI search={ search } searchLabel={ searchLabel } />
-				) }
+			<div
+				className={ clsx( 'dataviews-picker-wrapper', {
+					'is-narrow': !! narrowOptions && ! children,
+				} ) }
+			>
+				{ children ??
+					( narrowOptions ? (
+						<NarrowUI
+							search={ search }
+							searchLabel={ searchLabel }
+							footer={ <DataViewsPickerFooter /> }
+							{ ...narrowOptions }
+						/>
+					) : (
+						<DefaultUI
+							search={ search }
+							searchLabel={ searchLabel }
+						/>
+					) ) }
 			</div>
 		</DataViewsContext.Provider>
 	);
@@ -381,6 +406,7 @@ const DataViewsPickerSubComponents =
 		BulkActionToolbar: typeof DataViewsPickerBulkActionToolbar;
 		Footer: typeof DataViewsPickerFooter;
 		Filters: typeof Filters;
+		FilterTabs: typeof DataViewsFilterTabs;
 		FiltersToggled: typeof FiltersToggled;
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
@@ -390,6 +416,7 @@ const DataViewsPickerSubComponents =
 		Pagination: typeof DataViewsPagination;
 		Search: typeof DataViewsSearch;
 		ViewConfig: typeof DataviewsViewConfigDropdown;
+		ViewMenu: typeof DataViewsViewMenu;
 	};
 
 DataViewsPickerSubComponents.Actions = PickerActions;
@@ -397,6 +424,7 @@ DataViewsPickerSubComponents.BulkActionToolbar =
 	DataViewsPickerBulkActionToolbar;
 DataViewsPickerSubComponents.Footer = DataViewsPickerFooter;
 DataViewsPickerSubComponents.Filters = Filters;
+DataViewsPickerSubComponents.FilterTabs = DataViewsFilterTabs;
 DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
@@ -406,5 +434,6 @@ DataViewsPickerSubComponents.PageSelect = DataViewsPageSelect;
 DataViewsPickerSubComponents.Pagination = DataViewsPagination;
 DataViewsPickerSubComponents.Search = DataViewsSearch;
 DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsPickerSubComponents.ViewMenu = DataViewsViewMenu;
 
 export default DataViewsPickerSubComponents;

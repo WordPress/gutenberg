@@ -10,6 +10,7 @@ import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import deprecated from '@wordpress/deprecated';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
+import { LAYOUT_GRID } from '../constants';
 import {
 	Filters,
 	FiltersToggled,
@@ -17,6 +18,8 @@ import {
 	FiltersToggle,
 } from '../components/dataviews-filters';
 import DataViewsLayout from '../components/dataviews-layout';
+import DataViewsFilterTabs from '../components/dataviews-filter-tabs';
+import NarrowUI, { getNarrowOptions } from '../components/dataviews-narrow-ui';
 import DataViewsFooter from '../components/dataviews-footer';
 import DataViewsSearch from '../components/dataviews-search';
 import { DataViewsPagination } from '../components/dataviews-pagination';
@@ -24,6 +27,7 @@ import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
+import DataViewsViewMenu from '../components/dataviews-view-menu';
 import normalizeFields from '../field-types';
 import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
@@ -217,6 +221,12 @@ function DataViews< Item >( {
 		return null;
 	}
 
+	// The narrow UI is an option of the grid layout.
+	const narrowOptions =
+		view.type === LAYOUT_GRID
+			? getNarrowOptions( view.layout?.narrow )
+			: undefined;
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -250,14 +260,26 @@ function DataViews< Item >( {
 				intersectionObserver,
 			} }
 		>
-			<div className="dataviews-wrapper">
-				{ children ?? (
-					<DefaultUI
-						header={ header }
-						search={ search }
-						searchLabel={ searchLabel }
-					/>
-				) }
+			<div
+				className={ clsx( 'dataviews-wrapper', {
+					'is-narrow': !! narrowOptions && ! children,
+				} ) }
+			>
+				{ children ??
+					( narrowOptions ? (
+						<NarrowUI
+							search={ search }
+							searchLabel={ searchLabel }
+							footer={ <DataViewsFooter /> }
+							{ ...narrowOptions }
+						/>
+					) : (
+						<DefaultUI
+							header={ header }
+							search={ search }
+							searchLabel={ searchLabel }
+						/>
+					) ) }
 			</div>
 		</DataViewsContext.Provider>
 	);
@@ -272,6 +294,7 @@ function DataViews< Item >( {
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: () => React.JSX.Element;
 	Filters: typeof Filters;
+	FilterTabs: typeof DataViewsFilterTabs;
 	FiltersToggle: typeof FiltersToggle;
 	FiltersToggled: typeof FiltersToggled;
 	Layout: typeof DataViewsLayout;
@@ -279,6 +302,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
+	ViewMenu: typeof DataViewsViewMenu;
 	Footer: typeof DataViewsFooter;
 };
 
@@ -290,6 +314,7 @@ DataViewsSubComponents.BulkActionToolbar =
 		return <></>;
 	};
 DataViewsSubComponents.Filters = Filters;
+DataViewsSubComponents.FilterTabs = DataViewsFilterTabs;
 DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
 DataViewsSubComponents.Layout = DataViewsLayout;
@@ -297,6 +322,7 @@ DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.ViewMenu = DataViewsViewMenu;
 DataViewsSubComponents.Footer = DataViewsFooter;
 
 export default DataViewsSubComponents;

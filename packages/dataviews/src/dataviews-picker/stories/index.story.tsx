@@ -8,6 +8,12 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { ActionButton, MediaFit, View } from '../../types';
 import FreeCompositionComponent from './free-composition';
 import { data, fields, type SpaceObject } from './fixtures';
+import {
+	getNarrowOption,
+	narrowArgs,
+	narrowArgTypes,
+	type NarrowTabsField,
+} from '../../dataviews/stories/narrow';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -65,6 +71,8 @@ interface PickerContentProps {
 	infiniteScrollEnabled: boolean;
 	mediaFit?: MediaFit;
 	mediaFitControl?: boolean;
+	narrow?: boolean;
+	narrowTabsField?: NarrowTabsField;
 	actions?: ActionButton< SpaceObject >[];
 	selection?: string[];
 }
@@ -76,6 +84,8 @@ const DataViewsPickerContent = ( {
 	infiniteScrollEnabled,
 	mediaFit = 'cover',
 	mediaFitControl = true,
+	narrow = false,
+	narrowTabsField = 'type',
 	actions: customActions,
 	selection: customSelection,
 }: PickerContentProps ) => {
@@ -122,7 +132,11 @@ const DataViewsPickerContent = ( {
 				infiniteScrollEnabled,
 				// Spread the previous layout so a change made through the
 				// view options popover survives an unrelated arg change.
-				layout: { ...prevView.layout, mediaFit },
+				layout: {
+					...prevView.layout,
+					mediaFit,
+					narrow: getNarrowOption( narrow, narrowTabsField ),
+				},
 			};
 
 			if ( infiniteScrollEnabled ) {
@@ -143,7 +157,13 @@ const DataViewsPickerContent = ( {
 				startPosition: undefined,
 			} as View;
 		} );
-	}, [ isGrouped, infiniteScrollEnabled, mediaFit ] );
+	}, [
+		isGrouped,
+		infiniteScrollEnabled,
+		mediaFit,
+		narrow,
+		narrowTabsField,
+	] );
 
 	const [ selection, setSelection ] = useState< string[] >(
 		customSelection || []
@@ -186,6 +206,15 @@ const DataViewsPickerContent = ( {
 					}
 				` }</style>
 			) }
+			{ narrow && (
+				// Contained, to show the narrow UI at the width it is
+				// meant for.
+				<style>{ `
+					.dataviews-picker-wrapper {
+						max-width: 400px;
+					}
+				` }</style>
+			) }
 			<DataViewsPicker
 				actions={ actions }
 				selection={ selection }
@@ -217,6 +246,8 @@ export const Default = ( {
 	infiniteScrollEnabled,
 	mediaFit,
 	mediaFitControl,
+	narrow,
+	narrowTabsField,
 }: {
 	perPageSizes: number[];
 	isMultiselectable: boolean;
@@ -224,6 +255,8 @@ export const Default = ( {
 	infiniteScrollEnabled: boolean;
 	mediaFit?: MediaFit;
 	mediaFitControl?: boolean;
+	narrow?: boolean;
+	narrowTabsField?: NarrowTabsField;
 } ) => (
 	<DataViewsPickerContent
 		perPageSizes={ perPageSizes }
@@ -232,11 +265,13 @@ export const Default = ( {
 		infiniteScrollEnabled={ infiniteScrollEnabled }
 		mediaFit={ mediaFit }
 		mediaFitControl={ mediaFitControl }
+		narrow={ narrow }
+		narrowTabsField={ narrowTabsField }
 	/>
 );
 
-Default.args = storyArgs;
-Default.argTypes = storyArgTypes;
+Default.args = { ...storyArgs, ...narrowArgs };
+Default.argTypes = { ...storyArgTypes, ...narrowArgTypes };
 Default.parameters = {
 	// FIXME: Picker UI nests interactive controls (nested-interactive).
 	// See: https://github.com/WordPress/gutenberg/issues/81596

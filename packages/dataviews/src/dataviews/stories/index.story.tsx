@@ -13,6 +13,7 @@ import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
 import LargePageCountComponent from './large-page-count';
+import { narrowArgs, narrowArgTypes } from './narrow';
 
 const meta = {
 	tags: [ 'manifest' ],
@@ -100,6 +101,7 @@ export const LayoutGrid = {
 	},
 	render: LayoutGridComponent,
 	args: {
+		...narrowArgs,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -109,6 +111,7 @@ export const LayoutGrid = {
 		showMedia: true,
 	},
 	argTypes: {
+		...narrowArgTypes,
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',

@@ -504,6 +504,25 @@ export interface ViewActivity extends ViewBase {
 	};
 }
 
+/**
+ * Adjusts the UI for narrow containers of the grid layouts.
+ */
+export interface NarrowOptions {
+	/**
+	 * The id of a field to show as tabs above the content: the main way to
+	 * browse it, such as a category or a type. It is left out of the settings
+	 * menu.
+	 */
+	tabsField?: string;
+
+	/**
+	 * Whether the settings menu offers sorting.
+	 *
+	 * @default true
+	 */
+	showSort?: boolean;
+}
+
 export interface ViewGrid extends ViewBase {
 	/**
 	 * The layout discriminant: a grid view.
@@ -543,6 +562,14 @@ export interface ViewGrid extends ViewBase {
 		 * either way, so rows stay aligned. Defaults to `'cover'`.
 		 */
 		mediaFit?: MediaFit;
+
+		/**
+		 * Renders the UI for narrow, single-purpose containers, such as a
+		 * sidebar, in place of the default UI: a single settings button
+		 * replaces the filters and the view options buttons. It is meant
+		 * to be set by the consumer, not changed by the user.
+		 */
+		narrow?: boolean | NarrowOptions;
 	};
 }
 
@@ -578,6 +605,14 @@ export interface ViewPickerGrid extends ViewBase {
 		 * aligned. Defaults to `'cover'`.
 		 */
 		mediaFit?: MediaFit;
+
+		/**
+		 * Renders the UI for narrow, single-purpose containers, such as a
+		 * sidebar, in place of the default UI: a single settings button
+		 * replaces the filters and the view options buttons. It is meant
+		 * to be set by the consumer, not changed by the user.
+		 */
+		narrow?: boolean | NarrowOptions;
 	};
 }
 

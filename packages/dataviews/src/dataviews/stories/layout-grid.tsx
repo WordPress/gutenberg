@@ -4,6 +4,7 @@ import { LAYOUT_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { MediaFit, View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
+import { getNarrowOption, type NarrowTabsField } from './narrow';
 
 export const LayoutTableComponent = ( {
 	backgroundColor,
@@ -12,6 +13,8 @@ export const LayoutTableComponent = ( {
 	groupByLabel = true,
 	mediaFit = 'cover',
 	mediaFitControl = true,
+	narrow = false,
+	narrowTabsField = 'type',
 	perPageSizes = [ 10, 25, 50, 100 ],
 	showMedia = true,
 }: {
@@ -21,6 +24,8 @@ export const LayoutTableComponent = ( {
 	groupByLabel?: boolean;
 	mediaFit?: MediaFit;
 	mediaFitControl?: boolean;
+	narrow?: boolean;
+	narrowTabsField?: NarrowTabsField;
 	perPageSizes?: number[];
 	showMedia?: boolean;
 } ) => {
@@ -52,10 +57,21 @@ export const LayoutTableComponent = ( {
 				showMedia,
 				// Spread the previous layout so a change made through the
 				// view options popover survives an unrelated arg change.
-				layout: { ...prevView.layout, mediaFit },
+				layout: {
+					...prevView.layout,
+					mediaFit,
+					narrow: getNarrowOption( narrow, narrowTabsField ),
+				},
 			} as View;
 		} );
-	}, [ groupBy, groupByLabel, mediaFit, showMedia ] );
+	}, [
+		groupBy,
+		groupByLabel,
+		mediaFit,
+		showMedia,
+		narrow,
+		narrowTabsField,
+	] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
@@ -64,6 +80,9 @@ export const LayoutTableComponent = ( {
 		<div
 			style={ {
 				height: '100%',
+				// Contained like the list and activity stories, to show
+				// the narrow UI at the width it is meant for.
+				maxWidth: narrow ? '400px' : undefined,
 				'--wp-dataviews-color-background': backgroundColor,
 			} }
 		>
