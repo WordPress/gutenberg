@@ -151,37 +151,120 @@ test.describe( 'Style Revisions', () => {
 			color: { background: 'blue' },
 		} );
 
+		// This flow starts from the browse-mode sidebar, not the edit mode
+		// the shared `beforeEach` opens.
+		await admin.visitSiteEditor();
 		if ( isSiteEditorV2 ) {
-			await admin.visitSiteEditor();
 			await page.getByRole( 'link', { name: 'Styles' } ).click();
-			await page
-				.getByRole( 'region', { name: 'Styles' } )
-				.getByRole( 'button', { name: 'Revisions' } )
-				.click();
 		} else {
-			// This flow starts from the browse-mode sidebar, not the edit
-			// mode the shared `beforeEach` opens.
-			await admin.visitSiteEditor();
-
-			const navigationContainer = page.getByRole( 'region', {
-				name: 'Navigation',
-			} );
-
-			await navigationContainer
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
 
 			// wait for the editor canvas to be ready (to contain a block)
 			await editor.canvas.locator( '.wp-block' ).first().waitFor();
-
-			await navigationContainer
-				.getByRole( 'button', { name: 'Revisions' } )
-				.click();
 		}
+		await page
+			.getByRole( 'region', { name: 'Styles' } )
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
+	} );
+
+	test( 'should preview revisions from the Styles panel without leaving it', async ( {
+		admin,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+
+		await admin.visitSiteEditor();
+		if ( isSiteEditorV2 ) {
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+		} else {
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+		}
+		await page
+			.getByRole( 'region', { name: 'Styles' } )
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+
+		// The revisions stay in the Styles panel rather than opening the
+		// editor.
+		await expect( page ).not.toHaveURL( /canvas=edit/ );
+	} );
+
+	test( 'should show the selected revision in the style book from the Styles panel', async ( {
+		admin,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+
+		await admin.visitSiteEditor();
+		if ( isSiteEditorV2 ) {
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+		} else {
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+		}
+		const stylesPanel = page.getByRole( 'region', { name: 'Styles' } );
+		await stylesPanel
+			.getByRole( 'button', { name: 'Style Book', exact: true } )
+			.click();
+		const styleBookBody = page
+			.frameLocator( '[name="style-book-canvas"]' )
+			.locator( 'body' );
+		await expect( styleBookBody ).toHaveCSS(
+			'background-color',
+			'rgb(255, 0, 0)'
+		);
+
+		await stylesPanel
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await expect( styleBookBody ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 255)'
+		);
 	} );
 
 	test( 'should access from the site editor sidebar with a static front page', async ( {
@@ -212,33 +295,24 @@ test.describe( 'Style Revisions', () => {
 				color: { background: 'blue' },
 			} );
 
+			// This flow starts from the browse-mode sidebar, not the edit
+			// mode the shared `beforeEach` opens.
+			await admin.visitSiteEditor();
 			if ( isSiteEditorV2 ) {
-				await admin.visitSiteEditor();
 				await page.getByRole( 'link', { name: 'Styles' } ).click();
-				await page
-					.getByRole( 'region', { name: 'Styles' } )
-					.getByRole( 'button', { name: 'Revisions' } )
-					.click();
 			} else {
-				// This flow starts from the browse-mode sidebar, not the edit
-				// mode the shared `beforeEach` opens.
-				await admin.visitSiteEditor();
-
-				const navigationContainer = page.getByRole( 'region', {
-					name: 'Navigation',
-				} );
-
-				await navigationContainer
+				await page
+					.getByRole( 'region', { name: 'Navigation' } )
 					.getByRole( 'button', { name: 'Styles' } )
 					.click();
 
 				// wait for the editor canvas to be ready (to contain a block)
 				await editor.canvas.locator( '.wp-block' ).first().waitFor();
-
-				await navigationContainer
-					.getByRole( 'button', { name: /\d+ Revisions?/ } )
-					.click();
 			}
+			await page
+				.getByRole( 'region', { name: 'Styles' } )
+				.getByRole( 'button', { name: 'Revisions', exact: true } )
+				.click();
 
 			await expect(
 				page.getByLabel( 'Global styles revisions list' )
@@ -357,19 +431,23 @@ test.describe( 'Style Revisions', () => {
 				color: { background: 'blue' },
 			} );
 
-			// The styles route (site-editor.php?p=%2Fstyles) is where the
-			// Revisions entry lives.
+			// Enter the editor from the styles route
+			// (site-editor.php?p=%2Fstyles) and open its revisions.
 			await admin.visitSiteEditor();
-			const navigationContainer = page.getByRole( 'region', {
-				name: 'Navigation',
-			} );
-			await navigationContainer
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
 			await expect( page ).toHaveURL( /p=%2Fstyles/ );
-
-			await navigationContainer
-				.getByRole( 'button', { name: /\d+ Revisions?/ } )
+			await page
+				.locator(
+					'iframe.edit-site-visual-editor__editor-canvas[role="button"]'
+				)
+				.click();
+			await expect( page ).toHaveURL( /canvas=edit/ );
+			await userGlobalStylesRevisions.openStylesPanel();
+			await page
+				.getByRole( 'button', { name: 'Revisions', exact: true } )
 				.click();
 
 			// The revisions sidebar is open in the editor.
