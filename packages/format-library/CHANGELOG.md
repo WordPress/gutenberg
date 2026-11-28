@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Link: Don't open the link popover over the image popover when clicking a linked inline image ([#87583](https://github.com/WordPress/gutenberg/pull/87583)).
+
 ## 6.2.0 (2026-11-18)
 
 ### New Features

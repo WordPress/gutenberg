@@ -151,4 +151,36 @@ test.describe( 'adding inline tokens', () => {
 		await images.first().click();
 		await expect( width ).toHaveValue( '10' );
 	} );
+
+	test( 'should not open the link popover when clicking a linked image', async ( {
+		page,
+		editor,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		const { source_url: src } = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: `a <a href="https://wordpress.org">b <img class="wp-image-1" style="width: 10px;" src="${ src }" alt=""></a> c`,
+			},
+		} );
+
+		const image = editor.canvas.locator( 'img' );
+		const width = page.getByRole( 'spinbutton', { name: 'Width' } );
+		const linkControl = page.locator( '.block-editor-link-control' );
+
+		// The second click finds the link format active, which used to open
+		// the link popover over the image popover.
+		await image.click();
+		await image.click();
+		await expect( width ).toBeVisible();
+		await expect( linkControl ).toBeHidden();
+
+		// The link stays editable with the keyboard shortcut.
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect( linkControl ).toBeVisible();
+	} );
 } );
