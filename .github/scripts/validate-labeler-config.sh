@@ -1,12 +1,15 @@
 #!/bin/bash
 #
 # Validates that every package in packages/ has a corresponding entry
-# in .github/labeler.yml.
+# in .github/labeler.yml, and every block in packages/block-library/src/
+# one in .github/labeler-blocks.yml.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 LABELER_CONFIG="$REPO_ROOT/.github/labeler.yml"
+BLOCKS_LABELER_CONFIG="$REPO_ROOT/.github/labeler-blocks.yml"
+BLOCKS_DIR="$REPO_ROOT/packages/block-library/src"
 
 # DO NOT ADD TO THIS LIST. These are packages which do not have an associated
 # GitHub label yet. Remove entries from this list as labels are created.
@@ -49,6 +52,16 @@ EXCLUDED_PACKAGES=(
 	workflow
 )
 
+# DO NOT ADD TO THIS LIST unless the block has no [Block] label.
+EXCLUDED_BLOCKS=(
+	missing
+	navigation-overlay-close
+	post-comment
+	term-count
+	term-name
+	text-columns
+)
+
 is_excluded_package() {
 	local pkg_name="$1"
 	local excluded_package
@@ -83,6 +96,24 @@ for pkg_dir in "$REPO_ROOT"/packages/*/; do
 	fi
 done
 
+missing_blocks=()
+
+for block_dir in "$BLOCKS_DIR"/*/; do
+	if [ ! -f "$block_dir/block.json" ]; then
+		continue
+	fi
+
+	block_name="$(basename "$block_dir")"
+
+	if [[ " ${EXCLUDED_BLOCKS[*]} " == *" $block_name "* ]]; then
+		continue
+	fi
+
+	if ! grep -q "packages/block-library/src/${block_name}/\*\*" "$BLOCKS_LABELER_CONFIG"; then
+		missing_blocks+=("$block_name")
+	fi
+done
+
 stale=()
 
 for excluded_package in "${EXCLUDED_PACKAGES[@]}"; do
@@ -103,13 +134,29 @@ if [ ${#missing[@]} -gt 0 ]; then
 	status=1
 fi
 
+if [ ${#missing_blocks[@]} -gt 0 ]; then
+	echo "The following blocks are missing from .github/labeler-blocks.yml:"
+	for block in "${missing_blocks[@]}"; do
+		echo "  - packages/block-library/src/$block"
+	done
+	echo ""
+	echo "Add each one to the rule of its [Block] label in .github/labeler-blocks.yml."
+	status=1
+fi
+
+for excluded_block in "${EXCLUDED_BLOCKS[@]}"; do
+	if [ ! -f "$BLOCKS_DIR/$excluded_block/block.json" ]; then
+		stale+=("block-library/src/$excluded_block")
+	fi
+done
+
 if [ ${#stale[@]} -gt 0 ]; then
 	echo "The following excluded packages no longer exist:"
 	for pkg in "${stale[@]}"; do
 		echo "  - packages/$pkg"
 	done
 	echo ""
-	echo "Remove each one from EXCLUDED_PACKAGES in this script."
+	echo "Remove each one from EXCLUDED_PACKAGES or EXCLUDED_BLOCKS in this script."
 	status=1
 fi
 
@@ -117,4 +164,4 @@ if [ "$status" -ne 0 ]; then
 	exit 1
 fi
 
-echo "All packages have labeler config entries."
+echo "All packages and blocks have labeler config entries."
