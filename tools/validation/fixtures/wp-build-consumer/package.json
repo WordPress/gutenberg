@@ -1,0 +1,13 @@
+{
+	"name": "wp-build-consumer",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "wp-build"
+	},
+	"wpPlugin": {
+		"name": "example",
+		"packageNamespace": "example",
+		"scriptGlobal": "example"
+	}
+}

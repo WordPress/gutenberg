@@ -1,23 +1,21 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
-import { getBlockTypes } from '@wordpress/blocks';
+import {
+	getBlockType,
+	getBlockTypes,
+	getUnregisteredTypeHandlerName,
+	parse,
+	serialize,
+	type Block as WPBlock,
+} from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asRichTextOffset,
 	createYMap,
 	richTextOffsetToHtmlIndex,
+	splitHtmlTag,
+	tokenizeHtml,
 	type HtmlStringIndex,
 	type YMapRecord,
 	type YMapWrap,
@@ -46,6 +44,7 @@ export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
+	innerContent?: Array< string | null >;
 	isValid?: boolean;
 	name: string;
 	originalContent?: string;
@@ -68,6 +67,10 @@ export type YBlocks = Y.Array< YBlock >;
 // Block attribute schema cannot be known at compile time, so we use Y.Map.
 // Attribute values will be typed as the union of `Y.Text` and `unknown`.
 export type YBlockAttributes = Y.Map< Y.Text | unknown >;
+
+interface MergeCrdtBlocksOptions {
+	preserveClientIds?: boolean;
+}
 
 /**
  * Optional description of where a cursor falls.
@@ -234,6 +237,68 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
 		};
 	} );
+}
+
+/**
+ * Check whether the parser would build different blocks from the post content
+ * today than the blocks stored in a persisted CRDT document.
+ *
+ * A persisted CRDT document stores the blocks the editor had at the time. The
+ * loader decides whether to keep that document by serializing its blocks and
+ * comparing the result to the saved content. Two kinds of block serialize back
+ * to the markup they were loaded from, so that comparison cannot see that the
+ * parser would now treat them differently:
+ *
+ * - A missing block, stored while its block type was unavailable (for example,
+ *   its plugin was deactivated). Once the type is registered again, the parser
+ *   would build the real block.
+ * - An invalid block, stored while its markup did not match its block type's
+ *   save output (for example, after a plugin update). Once the block type or a
+ *   deprecation accepts the markup again, the parser would build a valid block.
+ *
+ * The reverse of the first case also applies: a block whose type is no longer
+ * registered cannot be edited or serialized by this client.
+ *
+ * @param blocks Blocks as stored in the CRDT document, as plain objects.
+ * @return True when at least one block should be re-parsed from the content.
+ */
+export function shouldReparseBlocks( blocks: Block[] ): boolean {
+	const missingBlockName = getUnregisteredTypeHandlerName();
+
+	return blocks.some( ( block ) => {
+		if ( block.name === missingBlockName ) {
+			const { originalName } = block.attributes ?? {};
+
+			if (
+				'string' === typeof originalName &&
+				getBlockType( originalName )
+			) {
+				return true;
+			}
+		} else if ( ! getBlockType( block.name ) ) {
+			return true;
+		} else if ( false === block.isValid && isBlockValidNow( block ) ) {
+			return true;
+		}
+
+		return shouldReparseBlocks( block.innerBlocks ?? [] );
+	} );
+}
+
+/**
+ * Check whether a block stored as invalid would parse as valid now.
+ *
+ * An invalid block serializes back to the markup it was loaded from, so
+ * parsing that markup again asks the same question the editor asked when it
+ * loaded the post, including any deprecations added since.
+ *
+ * @param block A block stored with `isValid: false`.
+ * @return True when the parser would now build a valid block from its markup.
+ */
+function isBlockValidNow( block: Block ): boolean {
+	const [ reparsedBlock ] = parse( serialize( [ block as WPBlock ] ) );
+
+	return true === reparsedBlock?.isValid;
 }
 
 /**
@@ -420,11 +485,13 @@ function createNewYBlock( block: Block ): YBlock {
  * @param attributeCursor When provided, describes a selection cursor falling within a
  *                        RichText field associated with a specific block and attribute.
  *                        Derived from the changes that produced the blocks.
+ * @param options         Optional settings for the merge operation.
  */
 export function mergeCrdtBlocks(
 	yblocks: YBlocks,
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	options: MergeCrdtBlocksOptions = {}
 ): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
@@ -594,32 +661,31 @@ export function mergeCrdtBlocks(
 						mergeCrdtBlocks(
 							yInnerBlocks,
 							incomingBlockPropertyValue ?? [],
-							attributeCursor
+							attributeCursor,
+							options
 						);
 						break;
 					}
 
 					case 'clientId': {
-						// Never overwrite the local block's clientId with the
-						// incoming one. Some callers (e.g. the Code Editor flow
-						// that parses raw HTML into blocks on every keystroke)
-						// produce randomized clientIds for blocks whose content
-						// has changed on every sync. Without this case the default
-						// branch would replace the stable Y.Doc clientId with
-						// a new one, causing remote peers to remount the block
-						// and flash the block's content on reload.
-						//
-						// This mirrors the clientId exclusion in `areBlocksEqual`.
-						// Convergence is preserved. Because we're not writing
-						// to the clientId, Yjs doesn't send an update to peers
-						// telling them to change the clientId, so everyone
-						// sees the same clientId per block.
-						// Inserts still use a new clientId via createNewYBlock,
-						// and the duplicate-clientId sweep below catches any
-						// edge cases. The clientId is anchored to the
-						// slot in the array rather than to specific content,
-						// which is consistent with areBlocksEqual ignoring
-						// clientId when diffing.
+						// Code Editor changes reparse raw HTML on every
+						// keystroke and regenerate fresh clientIds. Keep Y.Doc
+						// clientIds stable for the code editor so peers do not
+						// remount unchanged blocks on every edit.
+						if ( options.preserveClientIds ) {
+							break;
+						}
+
+						// Otherwise, accept new clientIds from updates
+						if (
+							incomingBlockPropertyValue !==
+							localYBlock.get( incomingBlockProperty )
+						) {
+							localYBlock.set(
+								incomingBlockProperty,
+								incomingBlockPropertyValue
+							);
+						}
 						break;
 					}
 
@@ -998,7 +1064,7 @@ function resolveRichTextCursorPosition(
 		? richTextOffsetToHtmlIndex(
 				updatedValue,
 				asRichTextOffset( cursorPosition.offset )
-		  )
+			)
 		: null;
 }
 
@@ -1115,9 +1181,14 @@ export function mergeRichTextUpdate(
 
 	const currentValueAsDelta = new Delta( blockYText.toDelta() );
 	const updatedValueAsDelta = new Delta( [ { insert: updatedValue } ] );
+	const diffOptions = {
+		tokenizer: tokenizeHtml,
+		splitToken: splitHtmlTag,
+	};
 	const deltaDiff = currentValueAsDelta.diffWithCursor(
 		updatedValueAsDelta,
-		htmlCursorIndex
+		htmlCursorIndex,
+		diffOptions
 	);
 
 	/**
@@ -1134,7 +1205,7 @@ export function mergeRichTextUpdate(
 		htmlCursorIndex === null ||
 		isDeltaVerificationMatch( blockYText, deltaDiff, updatedValue )
 			? deltaDiff
-			: currentValueAsDelta.diff( updatedValueAsDelta );
+			: currentValueAsDelta.diff( updatedValueAsDelta, diffOptions );
 
 	blockYText.applyDelta( safeDiff.ops );
 }

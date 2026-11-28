@@ -1,10 +1,3 @@
-/**
- * WordPress dependencies
- */
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesProvider } from '../provider';
 import FontLibraryProvider from './context';
 import InstalledFonts from './installed-fonts';

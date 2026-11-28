@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	FlexBlock,
-	__experimentalItem as Item,
-	// @ts-ignore
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
+import styles from '../navigation-item/style.module.scss';
 
 interface DrilldownItemProps {
 	/**
@@ -70,8 +59,8 @@ export default function DrilldownItem( {
 	};
 
 	return (
-		<Item
-			className={ clsx( 'boot-navigation-item', className ) }
+		<WCItem
+			className={ clsx( styles.item, className ) }
 			onClick={ handleClick }
 		>
 			<HStack
@@ -85,6 +74,6 @@ export default function DrilldownItem( {
 					icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
 				/>
 			</HStack>
-		</Item>
+		</WCItem>
 	);
 }

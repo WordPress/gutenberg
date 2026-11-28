@@ -404,7 +404,7 @@ const { state } = store( 'myFruitPlugin', {
       const context = getContext();
       return state.translatedFruits[ context.item ];
     }
-  }
+  },
   actions: {
     addMango() {
       state.fruits.push( 'mango' );

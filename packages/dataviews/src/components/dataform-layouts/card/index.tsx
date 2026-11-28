@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useContext,
@@ -9,13 +6,12 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { speak } from '@wordpress/a11y';
+import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+import { Card, CollapsibleCard, Stack, Text } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -25,8 +21,9 @@ import type {
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
+import getValidationMessage from '../get-validation-message';
 import { getSummaryFields } from '../get-summary-fields';
-import useReportValidity from '../../../hooks/use-report-validity';
+import useRevealValidity from '../../../hooks/use-reveal-validity';
 import ValidationBadge from '../validation-badge';
 
 function isSummaryFieldVisible< Item >(
@@ -34,7 +31,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -105,6 +102,29 @@ function HeaderContent< Item >( {
 
 	const hasBadge = touched && layout.isCollapsible;
 	const hasSummary = visibleSummaryFields.length > 0 && layout.withHeader;
+	// A collapsible card's heading wraps its toggle, so only a static card
+	// renders its title as the heading.
+	const HeadingTag =
+		layout.withHeader && ! layout.isCollapsible && layout.headingLevel
+			? ( `h${ layout.headingLevel }` as const )
+			: undefined;
+
+	const description = ( hasBadge || hasSummary ) && (
+		<>
+			{ hasBadge && <ValidationBadge validity={ validity } /> }
+			{ hasSummary && (
+				<div className="dataforms-layouts-card__field-summary">
+					{ visibleSummaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) ) }
+				</div>
+			) }
+		</>
+	);
 
 	return (
 		<Stack
@@ -112,23 +132,27 @@ function HeaderContent< Item >( {
 			justify="space-between"
 			className="dataforms-layouts-card__field-header-content"
 		>
-			<Card.Title>{ label }</Card.Title>
-			{ ( hasBadge || hasSummary ) && (
-				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
-					{ hasBadge && <ValidationBadge validity={ validity } /> }
-					{ hasSummary && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CollapsibleCard.HeaderDescription>
-			) }
+			<Card.Title render={ HeadingTag && <HeadingTag /> }>
+				{ label }
+			</Card.Title>
+			{ description &&
+				( layout.isCollapsible ? (
+					<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
+						{ description }
+					</CollapsibleCard.HeaderDescription>
+				) : (
+					// A static card has no toggle for the description to
+					// describe, so it is plain, readable text instead. It renders
+					// as a div because the summary is a div, which a span can't
+					// contain.
+					<Text
+						render={ <div /> }
+						variant="body-md"
+						className="dataforms-layouts-card__field-header-content-description"
+					>
+						{ description }
+					</Text>
+				) ) }
 		</Stack>
 	);
 }
@@ -198,6 +222,7 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
 	const contentRef = useRef< HTMLDivElement >( null );
+	const hasFocusedContentRef = useRef( false );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -225,18 +250,45 @@ export default function FormCardField< Item >( {
 		setIsOpen( open );
 	}, [] );
 
-	// Mark the card as touched when any field inside it is blurred.
-	// This aligns with how validated controls show errors on blur.
-	const handleBlur = useCallback( () => {
-		setTouched( true );
-	}, [] );
-
 	// When the card is expanded after being touched (collapsed with errors),
-	// trigger reportValidity to show field-level errors.
-	useReportValidity(
+	// reveal the field-level errors.
+	const revealValidity = useRevealValidity(
 		contentRef,
 		( isCollapsible ? isOpen : true ) && touched
 	);
+
+	const handleContentFocus = useCallback( () => {
+		hasFocusedContentRef.current = true;
+	}, [] );
+
+	// Reveal the errors of every field in the card once focus leaves the card.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within the card doesn't count,
+	// so the natural tab sequence is preserved.
+	const handleFocusOutside = useCallback( () => {
+		// Leaving without ever entering the fields — for instance tabbing past
+		// the header of a collapsed card — isn't an interaction to report on.
+		if ( ! hasFocusedContentRef.current ) {
+			return;
+		}
+		setTouched( true );
+		// A collapsed card reveals nothing: its content is hidden but still
+		// in the DOM, so the reveal would count the invalid fields and
+		// announce them. The header badge already conveys them, and expanding
+		// the card reveals the errors through the effect above.
+		if ( isCollapsible && ! isOpen ) {
+			return;
+		}
+		// The errors appear without moving focus, so announce them: their
+		// arrival is otherwise imperceptible to assistive technology.
+		const revealedCount = revealValidity();
+		const message = getValidationMessage( validity );
+		if ( revealedCount > 0 && message ) {
+			speak( message, 'polite' );
+		}
+	}, [ isCollapsible, isOpen, revealValidity, validity ] );
+
+	const focusOutsideProps = useFocusOutside( handleFocusOutside );
 
 	let label = field.label;
 	let withHeader: boolean;
@@ -248,7 +300,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+		if ( ! canRenderField( fieldDefinition ) ) {
 			return null;
 		}
 
@@ -269,6 +321,14 @@ export default function FormCardField< Item >( {
 		/>
 	);
 
+	const headingLevel = layout.withHeader ? layout.headingLevel : undefined;
+	// A native heading only allows phrasing content, so the collapsible
+	// header's wrapper, which contains the toggle, takes heading semantics
+	// through ARIA instead.
+	const collapsibleHeadingProps = headingLevel
+		? { role: 'heading', 'aria-level': headingLevel }
+		: {};
+
 	const headerContent = (
 		<HeaderContent
 			data={ data }
@@ -287,13 +347,14 @@ export default function FormCardField< Item >( {
 				className="dataforms-layouts-card__field"
 				open={ isOpen }
 				onOpenChange={ handleOpenChange }
+				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header { ...collapsibleHeadingProps }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content
 					ref={ contentRef }
-					onBlur={ handleBlur }
+					onFocus={ handleContentFocus }
 				>
 					{ bodyContent }
 				</CollapsibleCard.Content>
@@ -302,9 +363,12 @@ export default function FormCardField< Item >( {
 	}
 
 	return (
-		<Card.Root className="dataforms-layouts-card__field">
+		<Card.Root
+			className="dataforms-layouts-card__field"
+			{ ...focusOutsideProps }
+		>
 			{ withHeader && <Card.Header>{ headerContent }</Card.Header> }
-			<Card.Content ref={ contentRef } onBlur={ handleBlur }>
+			<Card.Content ref={ contentRef } onFocus={ handleContentFocus }>
 				{ bodyContent }
 			</Card.Content>
 		</Card.Root>

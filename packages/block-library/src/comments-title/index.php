@@ -17,27 +17,27 @@
 function render_block_core_comments_title( $attributes ) {
 
 	if ( post_password_required() ) {
-		return;
+		return '';
 	}
 
 	$align_class_name    = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$show_post_title     = ! empty( $attributes['showPostTitle'] ) && $attributes['showPostTitle'];
-	$show_comments_count = ! empty( $attributes['showCommentsCount'] ) && $attributes['showCommentsCount'];
+	$show_post_title     = ! empty( $attributes['showPostTitle'] );
+	$show_comments_count = ! empty( $attributes['showCommentsCount'] );
 	$wrapper_attributes  = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
-	$comments_count      = get_comments_number();
+	$comments_count      = (int) get_comments_number();
 	$post_title          = get_the_title();
 	$tag_name            = 'h2';
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 'h' . $attributes['level'];
 	}
 
-	if ( '0' === $comments_count ) {
-		return;
+	if ( 0 === $comments_count ) {
+		return '';
 	}
 
 	if ( $show_comments_count ) {
 		if ( $show_post_title ) {
-			if ( '1' === $comments_count ) {
+			if ( 1 === $comments_count ) {
 				/* translators: %s: Post title. */
 				$comments_title = sprintf( __( 'One response to &#8220;%s&#8221;' ), $post_title );
 			} else {
@@ -52,7 +52,7 @@ function render_block_core_comments_title( $attributes ) {
 					$post_title
 				);
 			}
-		} elseif ( '1' === $comments_count ) {
+		} elseif ( 1 === $comments_count ) {
 			$comments_title = __( 'One response' );
 		} else {
 			$comments_title = sprintf(
@@ -62,14 +62,14 @@ function render_block_core_comments_title( $attributes ) {
 			);
 		}
 	} elseif ( $show_post_title ) {
-		if ( '1' === $comments_count ) {
+		if ( 1 === $comments_count ) {
 			/* translators: %s: Post title. */
 			$comments_title = sprintf( __( 'Response to &#8220;%s&#8221;' ), $post_title );
 		} else {
 			/* translators: %s: Post title. */
 			$comments_title = sprintf( __( 'Responses to &#8220;%s&#8221;' ), $post_title );
 		}
-	} elseif ( '1' === $comments_count ) {
+	} elseif ( 1 === $comments_count ) {
 		$comments_title = __( 'Response' );
 	} else {
 		$comments_title = __( 'Responses' );

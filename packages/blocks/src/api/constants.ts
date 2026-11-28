@@ -59,6 +59,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'gradient' ],
 		useEngine: true,
 	},
+	backgroundClip: {
+		value: [ 'background', 'backgroundClip' ],
+		support: [ 'background', 'backgroundClip' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
@@ -251,6 +256,21 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	rotate: {
+		value: [ 'transform', 'rotate' ],
+		support: [ 'transform', 'rotate' ],
+		useEngine: true,
+	},
+	translate: {
+		value: [ 'transform', 'translate' ],
+		support: [ 'transform', 'translate' ],
+		useEngine: true,
+	},
+	scale: {
+		value: [ 'transform', 'scale' ],
+		support: [ 'transform', 'scale' ],
+		useEngine: true,
+	},
 	textAlign: {
 		value: [ 'typography', 'textAlign' ],
 		support: [ 'typography', 'textAlign' ],
@@ -274,6 +294,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	textIndent: {
 		value: [ 'typography', 'textIndent' ],
 		support: [ 'typography', 'textIndent' ],
+		useEngine: true,
+	},
+	textShadow: {
+		value: [ 'typography', 'textShadow' ],
+		support: [ 'typography', 'textShadow' ],
 		useEngine: true,
 	},
 	writingMode: {
@@ -307,6 +332,7 @@ export const __EXPERIMENTAL_ELEMENTS: Record< string, string > = {
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 	cite: 'cite',
+	label: 'label',
 	select: 'select',
 	textInput:
 		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',

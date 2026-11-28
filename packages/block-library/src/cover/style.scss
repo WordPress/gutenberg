@@ -15,6 +15,14 @@
 	overflow: hidden;
 	// Use clip instead of overflow: hidden so that sticky position works on child elements.
 	overflow: clip;
+
+	// Stop clipping while a Navigation overlay inside this cover is open. Safari
+	// clips a fixed overlay to this box when it sits inside a sticky element in
+	// the cover. The overlay covers the viewport, so nothing that would bleed is
+	// visible.
+	&:has(.wp-block-navigation__responsive-container.is-menu-open) {
+		overflow: visible;
+	}
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
@@ -182,6 +190,16 @@
 		box-shadow: none;
 	}
 
+	&.has-aspect-ratio {
+		// Safari clips overflowing content instead of growing the box when an
+		// aspect ratio is set. Floor the height to the content in WebKit only.
+		// `!important` is required because aspect-ratio covers serialize an
+		// inline `min-height: unset`, which outranks any stylesheet rule.
+		@supports (-webkit-hyphens: none) {
+			min-height: fit-content !important;
+		}
+	}
+
 	.wp-block-cover__embed-background {
 		position: absolute;
 		top: 0;
@@ -342,9 +360,9 @@ section.wp-block-cover-image > h2,
 // the deprecated version). In the color background or gradient option we don't
 // need the z-index because the elements are in the expected order.
 body:not(.editor-styles-wrapper) .wp-block-cover:not(
-.wp-block-cover:has(
-	.wp-block-cover__background + .wp-block-cover__inner-container
-)
+	.wp-block-cover:has(
+		.wp-block-cover__background + .wp-block-cover__inner-container
+	)
 ) {
 	.wp-block-cover__video-background {
 		// Background media sits at the base of the stack.

@@ -5,7 +5,8 @@ import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	title: 'Components/Icon',
+	id: 'components-icon',
+	title: 'Components/@wordpress-components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },
@@ -13,7 +14,7 @@ const meta: Meta< typeof Icon > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
+			notes: 'When rendering SVGs, use [`Icon`](?path=/docs/design-system-components-icon--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };
@@ -26,21 +27,6 @@ Default.args = {
 	icon: wordpress,
 };
 
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
-	return (
-		<div
-			style={ {
-				fill: 'blue',
-			} }
-		>
-			<Icon { ...args } />
-		</div>
-	);
-};
-FillColor.args = {
-	...Default.args,
-};
-
 /**
  * When `icon` is a function, it will be passed the `size` prop and any other additional props.
  */
@@ -51,7 +37,7 @@ WithAFunction.args = {
 		<img
 			width={ size }
 			height={ size }
-			src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+			src="wordpress-wmark.svg"
 			alt="WordPress"
 		/>
 	),
@@ -65,7 +51,7 @@ WithAFunction.parameters = {
     <img
       width={ size }
       height={ size }
-      src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+      src="wordpress-wmark.svg"
       alt="WordPress"
     />
   ) }

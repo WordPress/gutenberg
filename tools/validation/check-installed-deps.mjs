@@ -5,9 +5,12 @@
  * `package-lock.json` against `node_modules/.package-lock.json` (npm's hidden
  * lockfile, written on every install to record the actual installed tree).
  *
+ * Works with both the hoisted and isolated layouts.
+ *
  * Exits non-zero with a hint to run `npm install` if the trees diverge.
  */
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -22,6 +25,7 @@ const CACHE_FILE = path.join(
 	'node_modules',
 	'.check-installed-deps.cache.json'
 );
+const STORE = path.join( ROOT, 'node_modules', '.store' );
 
 const verbose = process.argv.includes( '--verbose' );
 
@@ -32,6 +36,51 @@ function fail( summary, details = '' ) {
 	}
 	console.error( msg );
 	process.exit( 1 );
+}
+
+/**
+ * Read the configured install strategy. npm resolves it across every .npmrc,
+ * the environment and the command line, so ask npm rather than parse a file.
+ *
+ * @return {string} The configured strategy.
+ */
+function configuredStrategy() {
+	// Set for anything npm runs, which is how this check is invoked.
+	if ( process.env.npm_config_install_strategy ) {
+		return process.env.npm_config_install_strategy;
+	}
+
+	try {
+		return execFileSync( 'npm', [ 'config', 'get', 'install-strategy' ], {
+			cwd: ROOT,
+			encoding: 'utf8',
+		} ).trim();
+	} catch {
+		return 'hoisted';
+	}
+}
+
+/*
+ * The lockfile is the same under either layout, and the comparison below
+ * reduces paths to name@version, so a tree installed with the other strategy
+ * passes everything. Compare the configured strategy against the real tree
+ * first, and before the mtime fast path, which such a tree would satisfy.
+ */
+const strategy = configuredStrategy();
+const installedIsolated = fs.existsSync( STORE );
+
+if ( strategy === 'linked' && ! installedIsolated ) {
+	fail(
+		'npm is configured for the isolated layout but node_modules is hoisted.',
+		`\tno ${ path.relative( ROOT, STORE ) }; run \`npm install\` to reinstall.`
+	);
+}
+
+if ( strategy !== 'linked' && installedIsolated ) {
+	fail(
+		`npm is configured for the ${ strategy } layout but node_modules is isolated.`,
+		`\t${ path.relative( ROOT, STORE ) } exists; run \`npm install\` to reinstall.`
+	);
 }
 
 /*
@@ -85,6 +134,28 @@ if ( needsCheck ) {
 	const lockPkgs = lock.packages || {};
 	const hiddenPkgs = hidden.packages || {};
 
+	// The package name is the path segment after the final `node_modules/`.
+	const NM = 'node_modules/';
+	const packageName = ( pkgPath ) => {
+		const i = pkgPath.lastIndexOf( NM );
+		return i === -1 ? pkgPath : pkgPath.slice( i + NM.length );
+	};
+
+	/*
+	 * Index installed packages by `name@version` → set of `resolved` sources.
+	 */
+	const installedByKey = new Map();
+	for ( const [ pkgPath, info ] of Object.entries( hiddenPkgs ) ) {
+		if ( info.link || ! info.version ) {
+			continue;
+		}
+		const key = `${ packageName( pkgPath ) }@${ info.version }`;
+		if ( ! installedByKey.has( key ) ) {
+			installedByKey.set( key, new Set() );
+		}
+		installedByKey.get( key ).add( info.resolved );
+	}
+
 	const reportedMismatches = [];
 	const MAX_REPORTED = 5;
 	let totalMismatches = 0;
@@ -100,22 +171,24 @@ if ( needsCheck ) {
 			continue;
 		}
 
-		const installed = hiddenPkgs[ pkgPath ];
+		// Optional/extraneous deps may legitimately not be installed.
+		if ( info.optional || info.extraneous ) {
+			continue;
+		}
+
+		/*
+		 * Match by name@version. For aliases `info.name` is the real name
+		 */
+		const leaf = packageName( pkgPath );
+		const resolvedSet =
+			installedByKey.get( `${ info.name || leaf }@${ info.version }` ) ||
+			installedByKey.get( `${ leaf }@${ info.version }` );
 
 		let mismatch;
-		if ( ! installed ) {
-			/*
-			 * Optional deps may be skipped by npm on the current platform
-			 * (e.g. macOS-only fsevents on Linux). Don't flag them as
-			 * missing. Real drift on an optional dep would still be caught
-			 * below as an integrity mismatch.
-			 */
-			if ( info.optional ) {
-				continue;
-			}
+		if ( ! resolvedSet ) {
 			mismatch = `missing: ${ pkgPath }`;
-		} else if ( installed.integrity !== info.integrity ) {
-			mismatch = `integrity mismatch: ${ pkgPath }`;
+		} else if ( info.resolved && ! resolvedSet.has( info.resolved ) ) {
+			mismatch = `source mismatch: ${ pkgPath }`;
 		}
 
 		if ( ! mismatch ) {

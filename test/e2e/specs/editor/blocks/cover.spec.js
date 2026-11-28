@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -247,7 +239,9 @@ test.describe( 'Cover', () => {
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		await expect(
-			coverBlockEditorSettings.getByLabel( 'Minimum height' )
+			coverBlockEditorSettings.getByRole( 'spinbutton', {
+				name: 'Minimum height',
+			} )
 		).toHaveValue( '' );
 
 		// There is no accessible locator for the draggable block resize edge,
@@ -259,7 +253,11 @@ test.describe( 'Cover', () => {
 
 		// Ensure the resize handle is in view before measuring its bounding box,
 		// so the cached coordinates match the actual position during the drag.
-		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+		// The handle is outside the canvas iframe, so scroll the block instead.
+		await coverBlock.evaluate( ( node ) =>
+			node.scrollIntoView( { block: 'center', behavior: 'instant' } )
+		);
+		await expect( coverBlockResizeHandle ).toBeInViewport( { ratio: 1 } );
 
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
@@ -410,12 +408,23 @@ test.describe( 'Cover', () => {
 		).toBeVisible();
 
 		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
 
-		const focalPointLeft = page.getByRole( 'spinbutton', {
+		// The focal point picker is in the Settings tab of the block inspector.
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
+
+		// The focal point picker renders as a `legend`-labelled group, so both
+		// spinbuttons are resolved through it.
+		const focalPointGroup = page.getByRole( 'group', {
+			name: 'Focal point',
+		} );
+		await expect( focalPointGroup ).toBeVisible();
+
+		const focalPointLeft = focalPointGroup.getByRole( 'spinbutton', {
 			name: 'Focal point left position',
 		} );
 
-		const focalPointTop = page.getByRole( 'spinbutton', {
+		const focalPointTop = focalPointGroup.getByRole( 'spinbutton', {
 			name: 'Focal point top position',
 		} );
 
@@ -568,6 +577,41 @@ test.describe( 'Cover', () => {
 
 		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 		await expect( overlay ).toBeVisible();
+	} );
+
+	test( 'hides overlay controls when a viewport style state is selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+		await coverBlock.getByRole( 'button', { name: 'Black' } ).click();
+
+		await editor.selectBlocks( coverBlock );
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await openStylesTabIfAvailable( editorSettings );
+
+		const overlayControl = editorSettings.getByRole( 'button', {
+			name: 'Overlay',
+		} );
+		await expect( overlayControl ).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( overlayControl ).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'slider', { name: 'Overlay opacity' } )
+		).toBeHidden();
 	} );
 } );
 

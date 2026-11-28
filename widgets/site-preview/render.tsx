@@ -1,30 +1,68 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
-
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Stack } from '@wordpress/ui';
+import { wordpress } from '@wordpress/icons';
+import { addQueryArgs } from '@wordpress/url';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { Button, Icon, Stack, Text } from '@wordpress/ui';
+import { useWidgetIdentity } from '@wordpress/widget-primitives';
 import styles from './style.module.css';
 
+function PreviewUrlBar( {
+	siteUrl,
+	siteIconUrl,
+}: {
+	siteUrl: string;
+	siteIconUrl?: string;
+} ) {
+	return (
+		<div className={ styles[ 'url-bar' ] }>
+			<Stack
+				direction="row"
+				align="center"
+				gap="xs"
+				className={ styles[ 'url-field' ] }
+			>
+				{ siteIconUrl ? (
+					<img
+						className={ styles[ 'url-favicon' ] }
+						src={ siteIconUrl }
+						alt=""
+					/>
+				) : (
+					<Icon
+						className={ styles[ 'url-icon' ] }
+						icon={ wordpress }
+						size={ 12 }
+					/>
+				) }
+				<Text className={ styles[ 'url-text' ] }>{ siteUrl }</Text>
+			</Stack>
+		</div>
+	);
+}
+
 export default function SitePreview() {
+	const { title } = useWidgetIdentity();
 	const [ isIframeLoading, setIsIframeLoading ] = useState( true );
 	const [ isVisitLoading, setIsVisitLoading ] = useState( false );
 	const [ isEditLoading, setIsEditLoading ] = useState( false );
-	const siteUrl = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord< { url: string } >(
-				'root',
-				'site',
-				undefined
-			)?.url,
-		[]
-	);
+	const { siteUrl, siteIconUrl } = useSelect( ( select ) => {
+		const site = select( coreStore ).getEntityRecord< { url: string } >(
+			'root',
+			'site',
+			undefined
+		);
+		const base = select( coreStore ).getEntityRecord< {
+			site_icon_url?: string;
+		} >( 'root', '__unstableBase', undefined );
+
+		return {
+			siteUrl: site?.url,
+			siteIconUrl: base?.site_icon_url,
+		};
+	}, [] );
 
 	const isBlockTheme = useSelect(
 		( select ) =>
@@ -40,12 +78,15 @@ export default function SitePreview() {
 		return null;
 	}
 
-	const src = `${ siteUrl }/?hide_banners=true&preview_overlay=true&preview=true`;
+	const src = addQueryArgs( siteUrl, {
+		wp_site_preview: 1,
+	} );
 	const editUrl = isBlockTheme ? 'site-editor.php' : 'customize.php';
 
 	return (
-		<div className={ styles.container }>
-			<div className={ styles.previewWrap }>
+		<Stack direction="column" className={ styles.container }>
+			<PreviewUrlBar siteUrl={ siteUrl } siteIconUrl={ siteIconUrl } />
+			<div className={ styles[ 'preview-wrap' ] }>
 				{ isIframeLoading && (
 					<Stack
 						direction="column"
@@ -53,52 +94,52 @@ export default function SitePreview() {
 						justify="center"
 						className={ styles.loading }
 					>
-						<Spinner />
+						<WCSpinner />
 					</Stack>
 				) }
 				<iframe
 					className={ styles.iframe }
 					loading="lazy"
 					scrolling="no"
-					title={ __( 'Site preview' ) }
+					title={ title ?? __( 'Site preview' ) }
 					src={ src }
 					onLoad={ () => setIsIframeLoading( false ) }
 					// @ts-expect-error — `inert` is not yet in React's HTMLAttributes
 					inert="true"
 				></iframe>
-				<Stack
-					direction="row"
-					align="center"
-					justify="center"
-					gap="sm"
-					className={ styles.overlay }
-				>
-					<Button
-						className={ styles.overlayButton }
-						variant="solid"
-						tone="neutral"
-						loading={ isVisitLoading }
-						onClick={ () => {
-							setIsVisitLoading( true );
-							window.location.href = siteUrl;
-						} }
+				{ ! isIframeLoading && (
+					<Stack
+						direction="row"
+						align="center"
+						justify="center"
+						gap="sm"
+						className={ styles.overlay }
 					>
-						{ __( 'Visit' ) }
-					</Button>
-					<Button
-						className={ styles.overlayButton }
-						variant="solid"
-						tone="brand"
-						loading={ isEditLoading }
-						onClick={ () => {
-							setIsEditLoading( true );
-							window.location.href = editUrl;
-						} }
-					>
-						{ __( 'Edit site' ) }
-					</Button>
-				</Stack>
+						<Button
+							variant="solid"
+							tone="neutral"
+							loading={ isVisitLoading }
+							onClick={ () => {
+								setIsVisitLoading( true );
+								window.location.href = siteUrl;
+							} }
+						>
+							{ __( 'Visit' ) }
+						</Button>
+						<Button
+							variant="solid"
+							tone="brand"
+							loading={ isEditLoading }
+							onClick={ () => {
+								setIsEditLoading( true );
+								window.location.href = editUrl;
+							} }
+						>
+							{ __( 'Edit site' ) }
+						</Button>
+					</Stack>
+				) }
 			</div>
-		</div>
+		</Stack>
 	);
 }

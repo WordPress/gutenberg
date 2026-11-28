@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useMergeRefs } from '@wordpress/compose';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { TabListProps } from './types';
 
 // Account for sub-pixel rounding errors.
@@ -54,21 +54,40 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				const scrollFromStart =
 					direction === 'rtl' && scrollLeft < 0
 						? // In RTL layouts, scrollLeft is typically 0 at the visual "start"
-						  // (right edge) and becomes negative toward the "end" (left edge).
-						  // Normalize value for correct first/last detection logic.
-						  -scrollLeft
+							// (right edge) and becomes negative toward the "end" (left edge).
+							// Normalize value for correct first/last detection logic.
+							-scrollLeft
 						: scrollLeft;
 
 				// Use SCROLL_EPSILON to handle subpixel rendering differences.
-				setOverflow( {
+				const next = {
 					first: scrollFromStart > SCROLL_EPSILON,
 					last: scrollFromStart < maxScroll - SCROLL_EPSILON,
 					isScrolling: scrollWidth > clientWidth,
-				} );
+				};
+				setOverflow( ( prev ) =>
+					prev.first === next.first &&
+					prev.last === next.last &&
+					prev.isScrolling === next.isScrolling
+						? prev
+						: next
+				);
 			};
 
 			const resizeObserver = new ResizeObserver( measureOverflow );
-			resizeObserver.observe( listEl );
+			const observeTabs = () => {
+				resizeObserver.disconnect();
+				resizeObserver.observe( listEl );
+				listEl
+					.querySelectorAll( '[role="tab"]' )
+					.forEach( ( tab ) => resizeObserver.observe( tab ) );
+			};
+
+			const mutationObserver = new MutationObserver( observeTabs );
+			mutationObserver.observe( listEl, {
+				childList: true,
+				subtree: true,
+			} );
 
 			let scrollTick = false;
 			const throttleMeasureOverflowOnScroll = () => {
@@ -86,7 +105,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				{ passive: true }
 			);
 
-			// Initial check.
+			observeTabs();
 			measureOverflow();
 
 			return () => {
@@ -95,6 +114,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					throttleMeasureOverflowOnScroll
 				);
 				resizeObserver.disconnect();
+				mutationObserver.disconnect();
 			};
 		}, [ listEl ] );
 
@@ -110,6 +130,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				data-select-on-move={ activateOnFocus ? 'true' : 'false' }
 				className={ clsx(
 					styles.tablist,
+					overflow.isScrolling && styles[ 'is-scrolling' ],
 					overflow.first && styles[ 'is-overflowing-first' ],
 					overflow.last && styles[ 'is-overflowing-last' ],
 					styles[ `is-${ variant }-variant` ],

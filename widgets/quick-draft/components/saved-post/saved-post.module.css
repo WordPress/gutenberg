@@ -3,7 +3,7 @@
 }
 
 .icon {
-	color: var(--wpds-color-fg-content-success);
+	color: var(--wpds-color-foreground-content-success);
 	border-color: var(--wpds-color-stroke-surface-success);
-	background-color: var(--wpds-color-bg-surface-success-weak);
+	background-color: var(--wpds-color-background-surface-success-weak);
 }

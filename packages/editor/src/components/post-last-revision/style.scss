@@ -3,7 +3,7 @@
 
 .editor-post-last-revision__title {
 	width: 100%;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .editor-post-last-revision__title.components-button.has-icon {
@@ -17,7 +17,7 @@
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		border-radius: 0;
 	}
 }

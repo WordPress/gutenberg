@@ -12,6 +12,80 @@
 	}
 }
 
+// Shown when the block's markup renders nothing in the canvas. The block keeps
+// its zero size, as on the front end, and the marker floats in the start
+// gutter. A zero-height block's margins collapse into the gap above it, which
+// puts the block on the next one's top edge, so the marker sits just above
+// that edge, between the two neighbors.
+.block-library-html__no-output-marker {
+	position: absolute;
+	top: -$grid-unit-05;
+	right: 100%;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	margin-right: $grid-unit-05;
+	transform: translateY(-100%);
+	// Match the placeholder material the block shows when it's empty.
+	border-radius: $radius-small;
+	background: $white;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+	color: $gray-900;
+	cursor: default;
+
+	.block-library-html__edit:hover > &,
+	.block-library-html__edit.is-selected > & {
+		background: var(--wp-admin-theme-color);
+		box-shadow: none;
+		color: $white;
+	}
+
+	// In a flex layout, margins don't collapse and the gap surrounds the block,
+	// so the marker is centered on it: vertically, and in a row, where the
+	// start gutter would overlap the previous item, horizontally too.
+	.is-layout-flex > .block-library-html__edit > & {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.is-layout-flex:not(.is-vertical) > .block-library-html__edit > & {
+		right: auto;
+		left: 50%;
+		margin: 0;
+		transform: translate(-50%, -50%);
+	}
+}
+
+// Consecutive blocks without output share the same position, so each marker
+// after the first in a run moves one step further into the gutter, and the
+// markers line up side by side instead of covering each other. Past five
+// blocks, the remaining markers share the last step; those blocks stay
+// reachable with the arrow keys and from the List View.
+$no-output-block: ".block-library-html__edit.has-no-output";
+$no-output-run: $no-output-block;
+
+@for $index from 1 through 4 {
+	$no-output-run: "#{$no-output-run} + #{$no-output-block}";
+
+	#{$no-output-run} > .block-library-html__no-output-marker {
+		margin-right: $grid-unit-05 + $index * ($grid-unit-30 + $grid-unit-05);
+	}
+}
+
+// The "Edit code" button in the inspector renders inside the tabs panel, so
+// it needs spacing on all sides, including against the tab list above it.
+.block-library-html__edit-code {
+	margin: $grid-unit-20;
+
+	.block-library-html__edit-code-button {
+		justify-content: center;
+	}
+}
+
 // Modal styles
 .block-library-html__modal {
 

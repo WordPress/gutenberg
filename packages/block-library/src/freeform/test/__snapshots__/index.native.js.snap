@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Classic block converts content into blocks 1`] = `
-"<!-- wp:paragraph -->
-<p>I'm classic!</p>
-<!-- /wp:paragraph -->"
-`;

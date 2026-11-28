@@ -16,21 +16,35 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-This package is designed to be loaded as a script module on WordPress admin pages. It exposes an `initialize()` function that, on first call:
+This package is designed to be loaded as a script module on WordPress admin pages. When loaded, it automatically:
 
-1. Fetches all ability categories from `/wp-abilities/v1/categories` and registers them with `@wordpress/abilities`
-2. Fetches all abilities from `/wp-abilities/v1/abilities` and registers them with a `callback` that handles execution via REST API
+1. Fetches all ability categories from `/wp-abilities/v1/categories`
+2. Registers them with `@wordpress/abilities`
+3. Fetches all abilities from `/wp-abilities/v1/abilities`
+4. Registers them with a `callback` that handles execution via REST API
 
-Initialization is lazy: importing the package does not trigger network requests. Call `initialize()` from the feature that needs abilities — for example, when the workflow palette opens. Repeated calls return the same in-flight or resolved promise, so the requests fire at most once.
+Simply import the package to initialize the WordPress abilities:
 
 ```js
-import { initialize } from '@wordpress/core-abilities';
+import '@wordpress/core-abilities';
+```
+
+Initialization is asynchronous because categories and abilities are fetched from the REST API. To wait for registration to finish before calling `getAbilities()` or `executeAbility()`, await the exported `ready` promise:
+
+```js
+import { ready } from '@wordpress/core-abilities';
 import { getAbilities, executeAbility } from '@wordpress/abilities';
 
-await initialize();
+await ready;
 
 console.log( getAbilities() );
 console.log( await executeAbility( 'core/get-site-info' ) );
+```
+
+To defer the network requests until a feature actually needs abilities, import the package dynamically from that feature — the module (and therefore its requests) only loads when the `import()` call runs:
+
+```js
+await import( '@wordpress/core-abilities' );
 ```
 
 ## Contributing to this package

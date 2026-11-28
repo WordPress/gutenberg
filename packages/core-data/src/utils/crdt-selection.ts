@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-// @ts-expect-error No exported types.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { type CRDTDoc, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	createBlockSelectionHistory,
 	YSelectionType,
@@ -53,6 +45,40 @@ export function updateSelectionHistory(
 	wpSelection: WPSelection
 ): void {
 	return getBlockSelectionHistory( ydoc ).updateSelection( wpSelection );
+}
+
+/**
+ * Record a selection after the current transaction captures undo metadata.
+ *
+ * Convert offsets before remote changes can shift the text. Store the
+ * positions after undo metadata saves the previous selection, but before
+ * remote changes trigger reconciliation.
+ *
+ * @param ydoc        The document whose selection changed.
+ * @param wpSelection The selection after the local edit.
+ */
+export function scheduleSelectionHistory(
+	ydoc: CRDTDoc,
+	wpSelection: WPSelection
+): void {
+	const history = getBlockSelectionHistory( ydoc );
+	const selection = history.resolveSelection( wpSelection );
+
+	if ( ! selection ) {
+		return;
+	}
+
+	// Join the caller's transaction, or create one for selection-only calls
+	// made outside a transaction.
+	ydoc.transact( ( transaction ) => {
+		const recordSelection = ( completed: Y.Transaction ) => {
+			if ( completed === transaction ) {
+				ydoc.off( 'afterTransactionCleanup', recordSelection );
+				history.addSelection( selection );
+			}
+		};
+		ydoc.on( 'afterTransactionCleanup', recordSelection );
+	} );
 }
 
 /**

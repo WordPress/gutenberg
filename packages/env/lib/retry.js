@@ -1,7 +1,4 @@
 'use strict';
-/**
- * External dependencies
- */
 const util = require( 'util' );
 
 /**

@@ -1,13 +1,12 @@
 'use strict';
-
-/**
- * Internal dependencies
- */
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
+const PhpRuntime = require( './php' );
 const {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 } = require( './errors' );
 const { setCache, getCache } = require( '../cache' );
 
@@ -16,6 +15,7 @@ const RUNTIME_CACHE_KEY = 'runtime';
 const runtimes = {
 	docker: DockerRuntime,
 	playground: PlaygroundRuntime,
+	php: PhpRuntime,
 };
 
 /**
@@ -88,4 +88,6 @@ module.exports = {
 	PlaygroundRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 };

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useLayoutEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GRID_ITEM_DATA_KEY } from './grid-item-key';
 
 /* `left`/`top` are relative to the grid container, not the viewport. */

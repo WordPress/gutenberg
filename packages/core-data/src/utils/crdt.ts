@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	__unstableSerializeAndClean,
 	parse,
@@ -19,14 +12,11 @@ import {
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
 	deserializeBlockAttributes,
+	shouldReparseBlocks,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
@@ -39,7 +29,7 @@ import type { WPSelection } from '../types';
 import {
 	getSelectionHistory,
 	getShiftedSelection,
-	updateSelectionHistory,
+	scheduleSelectionHistory,
 } from './crdt-selection';
 import {
 	asRichTextOffset,
@@ -94,34 +84,44 @@ const disallowedPostMetaKeys = new Set< string >( [
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 ] );
 
+// Read-only REST fields can differ between requests without a term edit,
+// such as the count after publishing a post or links after a URL change.
+// Ignore them when writing and reading, including in existing documents.
+const unsyncedTaxonomyProperties = new Set( [
+	'id',
+	'count',
+	'link',
+	'taxonomy',
+	'_links',
+	'_embedded',
+] );
+
 /**
- * Given a set of local changes to a generic entity record, apply those changes
+ * Given a set of local changes to a taxonomy term, apply those changes
  * to the local Y.Doc.
  *
  * @param {CRDTDoc}               ydoc
  * @param {Partial< ObjectData >} changes
  * @return {void}
  */
-function defaultApplyChangesToCRDTDoc(
+function applyTaxonomyChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: ObjectData
 ): void {
 	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
+		if ( unsyncedTaxonomyProperties.has( key ) ) {
+			return;
+		}
+
 		// Cannot serialize function values, so cannot sync them.
 		if ( 'function' === typeof newValue ) {
 			return;
 		}
 
-		switch ( key ) {
-			// Add support for additional data types here.
-
-			default: {
-				const currentValue = ymap.get( key );
-				updateMapValue( ymap, key, currentValue, newValue );
-			}
-		}
+		const currentValue = ymap.get( key );
+		updateMapValue( ymap, key, currentValue, newValue );
 	} );
 }
 
@@ -279,15 +279,9 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		const selection = changes.selection;
-		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the current selection before
-		// it is overwritten by the new selection from Gutenberg.
-		// Without this, selection history will already contain the latest
-		// selection (after this change) when the undo stack is saved.
-		setTimeout( () => {
-			updateSelectionHistory( ydoc, selection );
-		}, 0 );
+		// Record the new selection after undo metadata captures the old one,
+		// before a remote update can reconcile against the selection history.
+		scheduleSelectionHistory( ydoc, changes.selection );
 	}
 }
 
@@ -317,7 +311,8 @@ function mergeContentWithoutBlocks(
 	mergeCrdtBlocks(
 		currentBlocks,
 		parse( rawContent ) as Block[],
-		cursorPosition
+		cursorPosition,
+		{ preserveClientIds: true }
 	);
 }
 
@@ -340,12 +335,30 @@ function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
 				attributeKey: selectionStart.attributeKey,
 				clientId: selectionStart.clientId,
 				offset: asRichTextOffset( selectionStart.offset ),
-		  }
+			}
 		: null;
 }
 
-function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
-	return getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+function getTaxonomyChangesFromCRDTDoc(
+	crdtDoc: CRDTDoc,
+	editedRecord: ObjectData
+): ObjectData {
+	const docRecord = getRootMap( crdtDoc, CRDT_RECORD_MAP_KEY ).toJSON();
+
+	/*
+	 * Only report properties that differ from the edited record. Reporting
+	 * unchanged properties as edits marks the record dirty: `Y.Map.toJSON()`
+	 * returns fresh object instances, so without this comparison every synced
+	 * update (e.g. from another tab) re-dispatches the entire record as edits.
+	 * See https://github.com/WordPress/gutenberg/issues/79907.
+	 */
+	return Object.fromEntries(
+		Object.entries( docRecord ).filter(
+			( [ key, newValue ] ) =>
+				! unsyncedTaxonomyProperties.has( key ) &&
+				haveValuesChanged( editedRecord?.[ key ], newValue )
+		)
+	);
 }
 
 /**
@@ -399,6 +412,16 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
+						// Missing and invalid blocks serialize back to the markup
+						// they were loaded from, so the content comparison below
+						// cannot tell that the parser would now build a different
+						// block from that markup (for example, after a plugin is
+						// reactivated or updated). Check for those blocks first so
+						// the blocks are re-parsed from the content in that case.
+						if ( shouldReparseBlocks( blocksJson ) ) {
+							return true;
+						}
 
 						return (
 							__unstableSerializeAndClean( blocksJson ).trim() !==
@@ -531,13 +554,12 @@ export function getPostChangesFromCRDTDoc(
 }
 
 /**
- * This default sync config can be used for entities that are flat maps of
- * primitive values and do not require custom logic to merge changes.
+ * Syncs editable taxonomy term fields while leaving read-only REST data local.
  */
-export const defaultSyncConfig: SyncConfig = {
-	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+export const taxonomySyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: applyTaxonomyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
-	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+	getChangesFromCRDTDoc: getTaxonomyChangesFromCRDTDoc,
 };
 
 /**
@@ -560,7 +582,7 @@ export const defaultCollectionSyncConfig: SyncConfig = {
  * @param {unknown} value The value to extract from.
  * @return {string|undefined} The raw string value, or undefined if it could not be determined.
  */
-function getRawValue( value?: unknown ): string | undefined {
+export function getRawValue( value?: unknown ): string | undefined {
 	// Value may be a string property or a nested object with a `raw` property.
 	if ( 'string' === typeof value ) {
 		return value;

@@ -1,37 +1,41 @@
 import type { Dialog as _Dialog } from '@base-ui/react/dialog';
 import type { ReactElement, ReactNode } from 'react';
-
 import type { Button } from '../button';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Dialog.Portal >;
 
-export interface RootProps
-	extends Pick<
-		_Dialog.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'disablePointerDismissal'
-	> {
+export interface RootProps extends Pick<
+	_Dialog.Root.Props,
+	| 'open'
+	| 'onOpenChange'
+	| 'onOpenChangeComplete'
+	| 'defaultOpen'
+	| 'modal'
+	| 'disablePointerDismissal'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< 'button' > {
+// Detached triggers require handle and payload APIs that Dialog does not
+// expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Dialog.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
-}
+};
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
+	extends
+		ComponentProps< 'div' >,
 		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
@@ -50,8 +54,7 @@ export interface PopupProps
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
-	 * Renders the dialog at a preset width (excluding additional padding from
-	 * the viewport edges).
+	 * Controls the dialog width, excluding the viewport inset.
 	 *
 	 * Height is not directly controlled by `size`: for every value except
 	 * `'full'`, the dialog fits its content up to the viewport height
@@ -63,10 +66,15 @@ export interface PopupProps
 	 * - `'large'` — wide max-width.
 	 * - `'stretch'` — no max-width, stretches to fill available width.
 	 * - `'full'` — stretches to fill available width and height.
+	 * - `'auto'`: Fits content between the responsive minimum and available
+	 *   viewport width. The minimum is 320px below a 480px viewport and 400px
+	 *   otherwise, limited by the available width.
+	 *
+	 * Constrain wide content, such as images, to the available content width.
 	 *
 	 * @default 'medium'
 	 */
-	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full';
+	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full' | 'auto';
 }
 
 export interface ActionProps extends ComponentProps< typeof Button > {
@@ -144,11 +152,10 @@ export interface DescriptionProps extends ComponentProps< 'p' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps
-	extends Omit<
-		ComponentProps< typeof IconButton >,
-		'label' | 'icon' | 'loading' | 'loadingAnnouncement'
-	> {
+export interface CloseIconButtonProps extends Omit<
+	ComponentProps< typeof IconButton >,
+	'label' | 'icon' | 'loading' | 'loadingAnnouncement'
+> {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.

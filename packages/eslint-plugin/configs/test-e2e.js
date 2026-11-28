@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const globals = require( 'globals' );
 const jestPlugin = require( 'eslint-plugin-jest' );
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'data-wp-on-document', () => {
@@ -65,6 +62,7 @@ test.describe( 'data-wp-on-document', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '2' );
 	} );
+
 	test( 'should work with multiple event handlers on the same event type', async ( {
 		page,
 	} ) => {

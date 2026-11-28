@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
-import { describe, expect, it } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
-import Delta from '../Delta';
+import { describe, expect, it } from 'vitest';
+import Delta, { isOffsetOnTokenBoundary } from '../Delta';
 
 describe( 'Delta.diffWithCursor', () => {
 	describe( 'insertions', () => {
@@ -272,6 +265,136 @@ describe( 'Delta.diffWithCursor', () => {
 				{ retain: 3 },
 				{ insert: 'l', attributes: { bold: true } },
 			] );
+		} );
+	} );
+
+	describe( 'tokenized diffing via DiffOptions', () => {
+		it( 'should keep tokens whole when tokenizer is provided', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const newDelta = new Delta().insert(
+				'the [custom-token]quick[/custom-token] brown fox'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '[custom-token]' },
+				{ retain: 5 },
+				{ insert: '[/custom-token]' },
+			] );
+		} );
+
+		it( 'should refine replacements part by part when splitToken is provided and first parts match', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /<[^>]+>|[\s\S]/gu ) ?? [];
+			const splitToken = ( token: string ) =>
+				token.match( /^<[a-z]+|\s+[^\s>]+|>/gu ) ?? [ token ];
+
+			const oldDelta = new Delta().insert(
+				'see <tag foo="1">link</tag>'
+			);
+			const newDelta = new Delta().insert(
+				'see <tag foo="2">link</tag>'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer,
+				splitToken,
+			} );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 8 }, // 'see ' (4) + '<tag' (4)
+				{ insert: ' foo="2"' },
+				{ delete: 8 }, // ' foo="1"'
+			] );
+		} );
+
+		it( 'should not move insertion into the middle of a token even if characters match', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			// '[token]' is at index 6..13. 'o' is at index 8.
+			// Preceding character at index 8 is 'o', matching the inserted 'o'.
+			const oldDelta = new Delta().insert( 'hello [token] world' );
+			const newDelta = new Delta().insert( 'hello [token] worldo' );
+			const cursorAfterChange = 9;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursorAfterChange, {
+				tokenizer,
+			} );
+
+			// Insertion must not be moved into the middle of '[token]'.
+			expect( diff.ops ).toEqual( [ { retain: 19 }, { insert: 'o' } ] );
+		} );
+
+		it( 'should not move deletion into the middle of a token even if characters match', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			// '[token]' is at index 6..13. Character at index 8 is 'o'.
+			const oldDelta = new Delta().insert( 'hello [token] worldo' );
+			const newDelta = new Delta().insert( 'hello [token] world' );
+			const cursorAfterChange = 8;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursorAfterChange, {
+				tokenizer,
+			} );
+
+			// Deletion must not be moved into the middle of '[token]'.
+			expect( diff.ops ).toEqual( [ { retain: 19 }, { delete: 1 } ] );
+		} );
+
+		it( 'should not move deletion when deletion end falls inside a token', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			// Old: '[token]' (length 7). If we delete 2 characters '[t' elsewhere,
+			// cursor at 0 starts at token boundary but ends inside '[token]' at offset 2.
+			const oldDelta = new Delta().insert( '[token] and [t' );
+			const newDelta = new Delta().insert( '[token] and ' );
+			const cursorAfterChange = 0;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursorAfterChange, {
+				tokenizer,
+			} );
+
+			// Deletion must not slice into '[token]'.
+			expect( diff.ops ).toEqual( [ { retain: 12 }, { delete: 2 } ] );
+		} );
+
+		it( 'should move insertion to cursor when candidate offset is on a token boundary', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			const oldDelta = new Delta().insert( '[token][token]' );
+			const newDelta = new Delta().insert( '[token][token][token]' );
+			const cursorAfterChange = 7;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursorAfterChange, {
+				tokenizer,
+			} );
+
+			expect( diff.ops ).toEqual( [ { insert: '[token]' } ] );
+		} );
+
+		it( 'should move deletion to cursor when candidate offset is on a token boundary', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			const oldDelta = new Delta().insert( '[token][token]' );
+			const newDelta = new Delta().insert( '[token]' );
+			const cursorAfterChange = 0;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursorAfterChange, {
+				tokenizer,
+			} );
+
+			expect( diff.ops ).toEqual( [ { delete: 7 } ] );
 		} );
 	} );
 
@@ -688,5 +811,59 @@ describe( 'Delta.diffWithCursor', () => {
 			// a(1) + 𓀀(2) = 3 code units to retain
 			expect( diff.ops ).toEqual( [ { retain: 3 }, { insert: 'x' } ] );
 		} );
+	} );
+} );
+
+describe( 'isOffsetOnTokenBoundary', () => {
+	const tokenizer = ( str: string ) => str.match( /<[^>]+>|[\s\S]/gu ) ?? [];
+
+	it( 'should return true when no tokenizer is provided', () => {
+		expect( isOffsetOnTokenBoundary( 'hello world', 5 ) ).toBe( true );
+	} );
+
+	it( 'should return true for start, end, and out-of-bound offsets', () => {
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 0, tokenizer )
+		).toBe( true );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', -1, tokenizer )
+		).toBe( true );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 15, tokenizer )
+		).toBe( true );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 20, tokenizer )
+		).toBe( true );
+	} );
+
+	it( 'should return true on token boundaries', () => {
+		// '<tag>' length 5, 't', 'e', 'x', 't', '</tag>' length 6
+		// Total length 15. Boundaries at: 0, 5, 6, 7, 8, 9, 15
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 5, tokenizer )
+		).toBe( true );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 9, tokenizer )
+		).toBe( true );
+	} );
+
+	it( 'should return false inside multi-character tokens', () => {
+		// Indices 1, 2, 3, 4 are inside '<tag>'
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 1, tokenizer )
+		).toBe( false );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 2, tokenizer )
+		).toBe( false );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 4, tokenizer )
+		).toBe( false );
+		// Indices 10, 11, 12, 13, 14 are inside '</tag>'
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 10, tokenizer )
+		).toBe( false );
+		expect(
+			isOffsetOnTokenBoundary( '<tag>text</tag>', 14, tokenizer )
+		).toBe( false );
 	} );
 } );

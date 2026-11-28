@@ -23,16 +23,19 @@
  * @param string $text Text to count elements in.
  * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  *
- * @return string The rendered word count.
+ * @return int The number of words or characters in the text.
+ *
+ * @phpstan-param 'words'|'characters_excluding_spaces'|'characters_including_spaces' $type
+ * @phpstan-return int<0, max>
  */
 function block_core_post_time_to_read_word_count( $text, $type ) {
 	$settings = array(
 		'html_regexp'                        => '/<\/?[a-z][^>]*?>/i',
 		'html_comment_regexp'                => '/<!--[\s\S]*?-->/',
-		'space_regexp'                       => '/&nbsp;|&#160;/i',
+		'space_regexp'                       => "/&nbsp;|&#160;|[\x{00A0}\x{2000}-\x{200A}\x{202F}\x{205F}]/iu",
 		'html_entity_regexp'                 => '/&\S+?;/',
 		'connector_regexp'                   => "/--|\x{2014}/u",
-		'remove_regexp'                      => "/[\x{0021}-\x{0040}\x{005B}-\x{0060}\x{007B}-\x{007E}\x{0080}-\x{00BF}\x{00D7}\x{00F7}\x{2000}-\x{2BFF}\x{2E00}-\x{2E7F}]/u",
+		'remove_regexp'                      => "/[\x{0021}-\x{002F}\x{003A}-\x{0040}\x{005B}-\x{0060}\x{007B}-\x{007E}\x{0080}-\x{00BF}\x{00D7}\x{00F7}\x{2000}-\x{2BFF}\x{2E00}-\x{2E7F}]/u",
 		'astral_regexp'                      => "/[\x{010000}-\x{10FFFF}]/u",
 		'words_regexp'                       => '/\S\s+/u',
 		'characters_excluding_spaces_regexp' => '/\S/u',
@@ -57,11 +60,6 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
 
 	// Remove all HTML comments.
 	$text = preg_replace( $settings['html_comment_regexp'], '', $text );
-
-	// If a shortcode regular expression has been provided use it to remove shortcodes.
-	if ( ! empty( $settings['shortcodes_regexp'] ) ) {
-		$text = preg_replace( $settings['shortcodes_regexp'], "\n", $text );
-	}
 
 	// Normalize non-breaking space to a normal space.
 	$text = preg_replace( $settings['space_regexp'], ' ', $text );
@@ -92,9 +90,9 @@ function block_core_post_time_to_read_word_count( $text, $type ) {
  *
  * @since 6.9.0
  *
- * @param  array    $attributes Block attributes.
- * @param  string   $content    Block default content.
- * @param  WP_Block $block      Block instance.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {

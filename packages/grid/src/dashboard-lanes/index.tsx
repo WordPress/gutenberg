@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -10,16 +7,11 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,14 +23,13 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
+import { resolveColumnCount } from '../shared/column-policy';
 import { GridOverlay } from '../shared/grid-overlay';
-import { gridSpanToPixelSize } from '../shared/resize-snap';
+import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
+import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -50,7 +41,13 @@ import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
-import styles from './lanes.module.css';
+import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
+import styles from './lanes.module.scss';
+
+const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles[ 'drag-preview-frame' ],
+	styles[ 'is-exiting' ]
+);
 
 // Fallback gap in pixels for math that runs before the computed gap
 // can be read from the DOM. Matches the `'xl'` step the surface
@@ -104,7 +101,7 @@ const NO_SORT_STRATEGY = () => null;
  * @param ref   Forwarded to the surface's root `<div>`.
  */
 export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
-	function DashboardLanes( props, ref ) {
+	function UnforwardedDashboardLanes( props, ref ) {
 		const {
 			layout,
 			columns,
@@ -114,6 +111,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
+			itemLimits,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -134,7 +132,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} | null >( null );
 		const latestLayoutRef = useRef<
 			DashboardLanesLayoutItem[] | undefined
-		>();
+		>( undefined );
 		const lastReorderCursorRef = useRef< {
 			x: number;
 			y: number;
@@ -180,17 +178,16 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				setGapPx( parsed );
 			}
 		}, [ container ] );
-		const effectiveColumns = useMemo( () => {
-			if ( ! minColumnWidth ) {
-				return columns ?? DEFAULT_COLUMNS;
-			}
-			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxFit = Math.max(
-				1,
-				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
-			);
-			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
-		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
+		const effectiveColumns = useMemo(
+			() =>
+				resolveColumnCount(
+					{ columns, minColumnWidth },
+					containerWidth,
+					gapPx,
+					DEFAULT_COLUMNS
+				),
+			[ minColumnWidth, gapPx, containerWidth, columns ]
+		);
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
@@ -201,6 +198,21 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			gapPx,
 			null
 		).widthPx;
+
+		// Height limits do not apply: lane heights are content-driven.
+		const widthBoundsByKey = useSpanBounds(
+			itemLimits,
+			columnWidth,
+			gapPx,
+			null,
+			effectiveColumns
+		);
+		const resizeLimitsByKey = useResizePixelLimits(
+			widthBoundsByKey,
+			columnWidth,
+			gapPx,
+			null
+		);
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
@@ -230,21 +242,42 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		);
 		const items = sortedItems;
 
-		// Placement input for the hook: each item with its clamped span
+		// Span each item renders at: the stored width clamped to the lane
+		// count and to the item's width bounds. Placement, the resize
+		// baseline, and the commit check all read it, so a gesture starts
+		// from the span on screen and commits nothing until it leaves it.
+		const renderedSpanByKey = useMemo( () => {
+			const map = new Map< string, number >();
+			for ( const [ key, item ] of layoutMap ) {
+				const span =
+					typeof item.width === 'number'
+						? Math.max(
+								1,
+								Math.min( item.width, effectiveColumns )
+							)
+						: 1;
+				const bounds = widthBoundsByKey.get( key );
+				map.set(
+					key,
+					bounds
+						? clampSpan( span, bounds.minWidth, bounds.maxWidth )
+						: span
+				);
+			}
+			return map;
+		}, [ layoutMap, effectiveColumns, widthBoundsByKey ] );
+
+		// Placement input for the hook: each item with its rendered span
 		// in source (sorted) order. `lane` forwards the optional explicit
 		// pin from the layout item; the algorithm clamps out-of-range
 		// values, so no surface-level guard is needed.
 		const placementItems = useMemo( () => {
-			return items.map( ( key ) => {
-				const item = layoutMap.get( key );
-				const width = item?.width;
-				const span =
-					typeof width === 'number'
-						? Math.max( 1, Math.min( width, effectiveColumns ) )
-						: 1;
-				return { key, span, lane: item?.lane };
-			} );
-		}, [ items, layoutMap, effectiveColumns ] );
+			return items.map( ( key ) => ( {
+				key,
+				span: renderedSpanByKey.get( key ) ?? 1,
+				lane: layoutMap.get( key )?.lane,
+			} ) );
+		}, [ items, layoutMap, renderedSpanByKey ] );
 
 		const { itemStyles } = useLanePlacement( container, {
 			items: placementItems,
@@ -284,7 +317,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 										actionableArea?: React.ReactNode;
 									} >,
 									{ actionableArea: undefined }
-							  )
+								)
 							: ( child as React.ReactElement );
 
 					byKey.set( key, stripped );
@@ -371,7 +404,19 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
 			// Build a key→index lookup so the .map below is O(n)
 			// instead of O(n²) from per-item `indexOf` calls.
 			const orderByKey = new Map< string, number >();
@@ -421,15 +466,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			if ( resizeBaselineRef.current === null ) {
-				const baseItem = layoutMap.get( id );
-				const baseWidth =
-					typeof baseItem?.width === 'number' ? baseItem.width : 1;
-				resizeBaselineRef.current = baseWidth;
+				resizeBaselineRef.current = renderedSpanByKey.get( id ) ?? 1;
 			}
 			const baseline = resizeBaselineRef.current;
-			const newWidth = Math.max(
-				1,
-				Math.min( baseline + relativeDelta, effectiveColumns )
+			const bounds = widthBoundsByKey.get( id );
+			const newWidth = clampSpan(
+				baseline + relativeDelta,
+				bounds?.minWidth ?? 1,
+				bounds?.maxWidth ?? effectiveColumns
 			);
 
 			setResizeSnapPreview( {
@@ -443,11 +487,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				),
 			} );
 
+			// Bail when the snap target matches the span staged for commit,
+			// or the rendered span while nothing is staged.
 			const pendingItem = latestLayoutRef.current?.find(
 				( item ) => item.key === id
 			);
-			const currentItem = pendingItem ?? layoutMap.get( id );
-			if ( currentItem && currentItem.width === newWidth ) {
+			const currentWidth =
+				pendingItem?.width ?? renderedSpanByKey.get( id );
+			if ( currentWidth === newWidth ) {
 				return;
 			}
 
@@ -474,23 +521,22 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const dragOverlayContent =
 			activeId && activeClone ? (
 				<div className={ styles[ 'drag-preview-frame' ] }>
-					{ DragPreview ? (
-						<DragPreview itemId={ activeId }>
-							{ activeClone }
-						</DragPreview>
-					) : (
-						activeClone
-					) }
+					<div className={ styles[ 'drag-preview-frame__lift' ] }>
+						{ DragPreview ? (
+							<DragPreview itemId={ activeId }>
+								{ activeClone }
+							</DragPreview>
+						) : (
+							activeClone
+						) }
+					</div>
 				</div>
 			) : null;
 
-		// Edit-mode background visual. Lanes are content-driven
-		// vertically, so the overlay only mirrors columns; the default
-		// can be replaced wholesale via `renderGridOverlay`. Rendered
-		// unconditionally so the overlay can cross-fade on edit-mode
-		// toggles; `isActive` drives the opacity transition inside the
-		// overlay. Memoized so drag/resize re-renders skip
-		// reconciliation while inputs are stable.
+		// Edit-mode background. Lanes are content-driven vertically, so
+		// the overlay mirrors columns only. Rendered unconditionally so
+		// it can cross-fade on edit-mode toggles (`isActive` drives the
+		// transition); memoized so drag/resize re-renders skip it.
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const gridOverlay = useMemo(
 			() => (
@@ -533,8 +579,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				onDragMove={ handleDragMove }
 				onDragEnd={ () => {
 					persistTemporaryLayout();
-					setActiveId( null );
 					lastReorderCursorRef.current = null;
+					setActiveId( null );
 				} }
 			>
 				<SortableContext items={ items } strategy={ NO_SORT_STRATEGY }>
@@ -554,7 +600,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								...style,
 								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 								// `column-gap` and `row-gap` are set in
-								// `lanes.module.css` from the
+								// `lanes.module.scss` from the
 								// design-system gap token, with an
 								// `@supports` block that zeroes `row-gap`
 								// in polyfill mode (the skyline already
@@ -575,6 +621,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							if ( ! child ) {
 								return null;
 							}
+							const limitsPx = resizeLimitsByKey.get( id );
 							return (
 								<LanesItem
 									key={ id }
@@ -583,6 +630,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 										itemStyles.get( id ) ?? {}
 									}
 									disabled={ ! editMode }
+									draggable={
+										layoutMap.get( id )?.draggable !== false
+									}
+									resizable={
+										layoutMap.get( id )?.resizable !== false
+									}
 									interacting={ interacting }
 									dragging={ activeId !== null }
 									onResize={ handleResize }
@@ -592,7 +645,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											? resizeSnapPreview.snap
 											: null
 									}
-									minResizeWidthPx={ minResizeWidthPx }
+									minResizeWidthPx={
+										limitsPx?.minWidthPx ?? minResizeWidthPx
+									}
+									maxResizeWidthPx={ limitsPx?.maxWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }
@@ -615,7 +671,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						) ) }
 					</div>
 				</SortableContext>
-				<DragOverlay>{ dragOverlayContent }</DragOverlay>
+				<DragOverlay dropAnimation={ dashboardDragDropAnimation }>
+					{ dragOverlayContent }
+				</DragOverlay>
 			</DndContext>
 		);
 	}

@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import normalizeForm from '../normalize-form';
 import type { Form } from '../../../types';
 
@@ -140,6 +138,7 @@ describe( 'normalizeFormFields', () => {
 					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
+					showPlaceholderIfEmpty: false,
 				},
 				fields: [
 					{
@@ -150,6 +149,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],
@@ -169,6 +169,7 @@ describe( 'normalizeFormFields', () => {
 					openAs: { type: 'dropdown' },
 					summary: [],
 					editVisibility: 'on-hover',
+					showPlaceholderIfEmpty: false,
 				},
 				fields: [
 					{
@@ -179,6 +180,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],
@@ -201,6 +203,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -227,6 +230,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -249,6 +253,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -275,6 +280,7 @@ describe( 'normalizeFormFields', () => {
 				},
 				summary: [],
 				editVisibility: 'on-hover',
+				showPlaceholderIfEmpty: false,
 			} );
 		} );
 
@@ -307,18 +313,32 @@ describe( 'normalizeFormFields', () => {
 			} );
 		} );
 
-		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
+		it( 'card: keeps headingLevel when withHeader=true', () => {
 			const form: Form = {
-				// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
+				layout: { type: 'card', headingLevel: 3 },
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'card',
+				isCollapsible: true,
+				isOpened: true,
+				summary: [],
+				withHeader: true,
+				headingLevel: 3,
+			} );
+		} );
+
+		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
+			const form = {
 				layout: {
 					type: 'card',
 					withHeader: false,
-					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
 					isOpened: false,
 					summary: [ { id: 'field1', visibility: 'always' } ],
 				},
 				fields: [ 'field1' ],
-			};
+			} as unknown as Form;
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
 				layout: {
@@ -456,6 +476,7 @@ describe( 'normalizeFormFields', () => {
 							openAs: { type: 'dropdown' },
 							summary: [],
 							editVisibility: 'on-hover',
+							showPlaceholderIfEmpty: false,
 						},
 					},
 				],

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -9,20 +6,27 @@ import {
 	shortcutAriaLabel,
 	type WPKeycodeModifier,
 } from '@wordpress/keycodes';
+import { VisuallyHidden } from '@wordpress/ui';
 
-interface KeyCombination {
-	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
-	modifier?: WPKeycodeModifier;
-	/** The key character(s) to display. Pass an array to render each as its own key. */
-	character: string | string[];
-	/** Optional aria-label override (used when character is a symbol). */
-	ariaLabel?: string;
-}
+type KeyCombinationDisplayProps =
+	| {
+			keyCombination: {
+				character: string;
+				modifier?: WPKeycodeModifier | null;
+			};
+			label?: string;
+	  }
+	| {
+			keyCombination: {
+				character: string[];
+				modifier?: WPKeycodeModifier | null;
+			};
+			label: string;
+	  };
 
-interface ShortcutEntry {
+type ShortcutEntry = KeyCombinationDisplayProps & {
 	description: string;
-	keyCombination: KeyCombination;
-}
+};
 
 const SHORTCUTS: ShortcutEntry[] = [
 	{
@@ -37,8 +41,8 @@ const SHORTCUTS: ShortcutEntry[] = [
 		description: __( 'Pan' ),
 		keyCombination: {
 			character: [ '↑', '↓', '←', '→' ],
-			ariaLabel: __( 'Arrow keys' ),
 		},
+		label: __( 'Arrow keys' ),
 	},
 	{
 		description: __( 'Zoom in' ),
@@ -69,63 +73,51 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: {
 			modifier: 'shift',
 			character: [ '↑', '↓', '←', '→' ],
-			ariaLabel: __( 'Shift + Arrow keys' ),
 		},
+		label: __( 'Shift + Arrow keys' ),
 	},
 ];
 
 function KeyCombinationDisplay( {
 	keyCombination,
-}: {
-	keyCombination: KeyCombination;
-} ) {
-	const { modifier, character, ariaLabel } = keyCombination;
-
-	let keys: string[];
-	if ( Array.isArray( character ) ) {
-		if ( modifier ) {
-			// Get the modifier prefix (e.g. ['⇧', '+']) from the first char,
-			// then replace the last element with all the individual chars.
-			const sample = displayShortcutList[ modifier ]( character[ 0 ] );
-			keys = [ ...sample.slice( 0, -1 ), ...character ];
-		} else {
-			keys = character;
-		}
-	} else {
-		keys = modifier
-			? displayShortcutList[ modifier ]( character )
-			: [ character ];
-	}
-
-	const charString = Array.isArray( character )
-		? character.join( '' )
-		: character;
-	let label: string;
-	if ( ariaLabel ) {
-		label = ariaLabel;
-	} else if ( modifier ) {
-		label = shortcutAriaLabel[ modifier ]( charString );
-	} else {
-		label = charString;
-	}
+	label,
+}: KeyCombinationDisplayProps ) {
+	const { character, modifier } = keyCombination;
+	const normalizedModifier = modifier ?? 'undefined';
+	const characters = Array.isArray( character ) ? character : [ character ];
+	const formatted = displayShortcutList[ normalizedModifier ](
+		characters[ 0 ] ?? ''
+	);
+	const prefix = formatted.slice( 0, -1 );
+	const keys = Array.isArray( character )
+		? [ ...prefix, ...character ]
+		: formatted;
 
 	return (
 		<kbd
 			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
-			aria-label={ label }
+			dir="ltr"
 		>
-			{ keys.map( ( key, index ) =>
-				key === '+' && modifier ? (
-					<Fragment key={ index }>{ key }</Fragment>
-				) : (
-					<kbd
-						key={ index }
-						className="media-editor-keyboard-shortcuts-modal__shortcut-key"
-					>
-						{ key }
-					</kbd>
-				)
-			) }
+			<VisuallyHidden render={ <span /> }>
+				{ label ||
+					shortcutAriaLabel[ normalizedModifier ](
+						characters.join( '' )
+					) }
+			</VisuallyHidden>
+			<span aria-hidden="true">
+				{ keys.map( ( key, keyIndex ) =>
+					key === '+' && keyIndex < prefix.length ? (
+						<Fragment key={ keyIndex }>{ key }</Fragment>
+					) : (
+						<kbd
+							key={ keyIndex }
+							className="media-editor-keyboard-shortcuts-modal__shortcut-key"
+						>
+							{ key }
+						</kbd>
+					)
+				) }
+			</span>
 		</kbd>
 	);
 }
@@ -157,17 +149,15 @@ export default function MediaEditorKeyboardShortcutsModal( {
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map( ( { description, keyCombination }, index ) => (
+				{ SHORTCUTS.map( ( shortcut, index ) => (
 					<li
 						key={ index }
 						className="media-editor-keyboard-shortcuts-modal__shortcut"
 					>
 						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
-							{ description }
+							{ shortcut.description }
 						</span>
-						<KeyCombinationDisplay
-							keyCombination={ keyCombination }
-						/>
+						<KeyCombinationDisplay { ...shortcut } />
 					</li>
 				) ) }
 			</ul>

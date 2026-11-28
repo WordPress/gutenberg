@@ -1,10 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	Card,
+	Card as WCCard,
 	CardBody,
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
@@ -22,7 +19,7 @@ function GoogleFontsConfirmDialog() {
 
 	return (
 		<div className="font-library__google-fonts-confirm">
-			<Card>
+			<WCCard>
 				<CardBody>
 					<Heading level={ 2 }>
 						{ __( 'Connect to Google Fonts' ) }
@@ -48,7 +45,7 @@ function GoogleFontsConfirmDialog() {
 						{ __( 'Allow access to Google Fonts' ) }
 					</Button>
 				</CardBody>
-			</Card>
+			</WCCard>
 		</div>
 	);
 }

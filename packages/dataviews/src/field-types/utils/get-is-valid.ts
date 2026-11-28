@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Field, NormalizedRules } from '../../types';
 import type { FieldType } from '../../types/private';
 
@@ -8,8 +5,8 @@ function supportsNumericRangeConstraint( type?: string ) {
 	return type === 'integer' || type === 'number';
 }
 
-function supportsDateRangeConstraint( type?: string ) {
-	return type === 'date' || type === 'datetime';
+function supportsStringRangeConstraint( type?: string ) {
+	return type === 'date' || type === 'datetime' || type === 'time';
 }
 
 function normalizeRangeRule< Item >(
@@ -23,7 +20,7 @@ function normalizeRangeRule< Item >(
 		( ( typeof value === 'number' &&
 			supportsNumericRangeConstraint( fieldType.type ) ) ||
 			( typeof value === 'string' &&
-				supportsDateRangeConstraint( fieldType.type ) ) )
+				supportsStringRangeConstraint( fieldType.type ) ) )
 	) {
 		return { constraint: value, validate: validator } as NonNullable<
 			NormalizedRules< Item >[ typeof key ]

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
@@ -55,7 +48,8 @@ function PosterGrid( { items }: { items: typeof data } ) {
 							style={ {
 								margin: '0 0 4px',
 								fontSize: '18px',
-								fontWeight: 600,
+								fontWeight:
+									'var(--wpds-typography-font-weight-emphasis)',
 								textShadow: '0 1px 2px rgba(0,0,0,0.5)',
 							} }
 						>

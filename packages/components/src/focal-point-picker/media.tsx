@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * Internal dependencies
- */
-import { MediaPlaceholder } from './styles/focal-point-picker-style';
+import clsx from 'clsx';
+import styles from './style.module.scss';
 import { isVideoType } from './utils';
 import type { FocalPointPickerMediaProps } from './types';
 
@@ -23,8 +17,11 @@ export default function Media( {
 }: FocalPointPickerMediaProps ) {
 	if ( ! src ) {
 		return (
-			<MediaPlaceholder
-				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
+			<div
+				className={ clsx(
+					styles[ 'media-placeholder' ],
+					'components-focal-point-picker__media components-focal-point-picker__media--placeholder'
+				) }
 				ref={ mediaRef as Ref< HTMLDivElement > }
 				{ ...props }
 			/>

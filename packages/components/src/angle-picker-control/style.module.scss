@@ -3,12 +3,17 @@
 
 .circle-root {
 	border-radius: $radius-round;
-	border: $border-width solid $components-color-border;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
 	box-sizing: border-box;
 	cursor: grab;
 	height: 32px;
 	overflow: hidden;
 	width: 32px;
+
+	&:hover,
+	&:active {
+		border-color: var(--wpds-color-stroke-interactive-neutral-active);
+	}
 
 	&:active {
 		cursor: grabbing;
@@ -31,7 +36,7 @@
 	border-radius: $radius-round;
 	box-sizing: border-box;
 	display: block;
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Geometric centering */
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Geometric centering */
 	left: 50%;
 	top: 4px;
 	transform: translateX(-50%);

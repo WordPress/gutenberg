@@ -5,8 +5,10 @@ import type { ComponentProps } from '../utils/types';
 
 type _ButtonProps = ComponentProps< typeof _Button >;
 
-export interface ButtonProps
-	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
+export interface ButtonProps extends Omit<
+	_ButtonProps,
+	'disabled' | 'aria-pressed'
+> {
 	/**
 	 * The variant of the button. Variants describe the visual style treatment
 	 * of the button.
@@ -75,6 +77,10 @@ export interface ButtonProps
 export interface ButtonIconProps extends IconProps {
 	/**
 	 * The icon to display, from the `@wordpress/icons` package.
+	 *
+	 * When using `@wordpress/icons`, only version 15.0.0 or later is supported.
+	 * For custom SVGs, use `currentColor` for any fill or stroke that should
+	 * follow the button text color.
 	 */
 	icon: IconProps[ 'icon' ];
 }

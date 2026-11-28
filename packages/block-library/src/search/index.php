@@ -72,6 +72,7 @@ function render_block_core_search( $attributes ) {
 	if ( ! $show_button && ! empty( $color_classes ) ) {
 		$input_classes[] = $color_classes;
 	}
+	$is_expandable_searchfield = false;
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
@@ -191,8 +192,32 @@ function render_block_core_search( $attributes ) {
 		';
 	}
 
+	/*
+	 * The semantic <search> landmark wrapper is opt-in to preserve back
+	 * compatibility with themes targeting <form role="search">. The block
+	 * exposes a per-instance HTML element selector with three values:
+	 *
+	 *   - 'search' forces the <search> wrapper
+	 *   - 'form'   forces the original <form role="search"> markup
+	 *   - empty    defers to the 'search-element' html5 sub-feature
+	 *              ( add_theme_support( 'html5', array( 'search-element' ) ) ),
+	 *              matching the opt-in added to get_search_form() in core
+	 */
+	$tag_name           = $attributes['tagName'] ?? '';
+	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'html5', 'search-element' ) );
+
+	/*
+	 * Only the wrapper markup differs between the semantic <search> landmark
+	 * and the classic <form role="search">. Positional specifiers keep a
+	 * single argument list usable by both formats, since the action URL
+	 * precedes the wrapper attributes in the <search> variant.
+	 */
+	$format = $use_search_element
+		? '<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>'
+		: '<form role="search" method="get" action="%1$s" %2$s %3$s>%4$s</form>';
+
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		$format,
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
@@ -266,12 +291,15 @@ function classnames_for_block_core_search( $attributes ) {
  *
  * @since 6.1.0
  *
- * @param array  $attributes     The block attributes.
- * @param string $property       Border property to generate rule for e.g. width or color.
- * @param string $side           Optional side border. The dictates the value retrieved and final CSS property.
- * @param array  $wrapper_styles Current collection of wrapper styles.
- * @param array  $button_styles  Current collection of button styles.
- * @param array  $input_styles   Current collection of input styles.
+ * @param array       $attributes     The block attributes.
+ * @param string      $property       Border property to generate rule for e.g. width or color.
+ * @param string|null $side           Side of the border to style, or null for all sides. This dictates the value
+ *                                    retrieved and the final CSS property.
+ * @param array       $wrapper_styles Current collection of wrapper styles.
+ * @param array       $button_styles  Current collection of button styles.
+ * @param array       $input_styles   Current collection of input styles.
+ *
+ * @phpstan-param 'top'|'right'|'bottom'|'left'|null $side
  */
 function apply_block_core_search_border_style( $attributes, $property, $side, &$wrapper_styles, &$button_styles, &$input_styles ) {
 	$is_button_inside = isset( $attributes['buttonPosition'] ) && 'button-inside' === $attributes['buttonPosition'];
@@ -336,7 +364,7 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
  *
  * @since 5.8.0
  *
- * @param  array $attributes The block attributes.
+ * @param array $attributes The block attributes.
  *
  * @return array Style HTML attribute.
  */
@@ -358,6 +386,20 @@ function styles_for_block_core_search( $attributes ) {
 			esc_attr( $attributes['width'] ),
 			esc_attr( $attributes['widthUnit'] )
 		);
+	}
+
+	// Add minimum width and height styles.
+	$dimensions_styles = wp_style_engine_get_styles(
+		array(
+			'dimensions' => array(
+				'minWidth'  => $attributes['style']['dimensions']['minWidth'] ?? null,
+				'minHeight' => $attributes['style']['dimensions']['minHeight'] ?? null,
+			),
+		)
+	);
+
+	if ( ! empty( $dimensions_styles['css'] ) ) {
+		$wrapper_styles[] = $dimensions_styles['css'];
 	}
 
 	// Add border width and color styles.
@@ -433,6 +475,17 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	// Shadow lands on the same elements as the border.
+	$shadow_attributes = wp_get_shadow_classes_and_styles( $attributes );
+	if ( ! empty( $shadow_attributes['style'] ) ) {
+		if ( $is_button_inside ) {
+			$wrapper_styles[] = $shadow_attributes['style'];
+		} else {
+			$button_styles[] = $shadow_attributes['style'];
+			$input_styles[]  = $shadow_attributes['style'];
+		}
+	}
+
 	$use_input_for_colors = ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'];
 
 	// Add color styles.
@@ -463,6 +516,24 @@ function styles_for_block_core_search( $attributes ) {
 			$input_styles[] = $custom_gradient_style;
 		} else {
 			$button_styles[] = $custom_gradient_style;
+		}
+	}
+
+	// Background skips serialization, so it follows color onto the same element. Search only supports a gradient.
+	$background_styles = wp_get_background_classes_and_styles(
+		array(
+			'style' => array(
+				'background' => array(
+					'gradient' => $attributes['style']['background']['gradient'] ?? null,
+				),
+			),
+		)
+	);
+	if ( ! empty( $background_styles['style'] ) ) {
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $background_styles['style'];
+		} else {
+			$button_styles[] = $background_styles['style'];
 		}
 	}
 
@@ -622,11 +693,13 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
 	$has_named_gradient          = ! empty( $attributes['gradient'] );
 	$has_custom_gradient         = ! empty( $attributes['style']['color']['gradient'] );
+	$has_background_gradient     = ! empty( $attributes['style']['background']['gradient'] );
 	if (
 		$has_named_background_color ||
 		$has_custom_background_color ||
 		$has_named_gradient ||
-		$has_custom_gradient
+		$has_custom_gradient ||
+		$has_background_gradient
 	) {
 		$classnames[] = 'has-background';
 	}

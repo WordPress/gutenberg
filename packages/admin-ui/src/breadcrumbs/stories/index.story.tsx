@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Breadcrumbs from '..';
 import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Breadcrumbs > = {
 	component: Breadcrumbs,
-	title: 'Admin UI/Breadcrumbs',
+	id: 'admin-ui-breadcrumbs',
+	title: 'Design System/Admin UI/Breadcrumbs',
 	decorators: [ withRouter ],
 };
 

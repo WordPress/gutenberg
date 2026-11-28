@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Icon, Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './feature-highlight.module.css';
 
 type IconType = React.ComponentProps< typeof Icon >[ 'icon' ];
@@ -33,7 +22,7 @@ export function FeatureHighlight( {
 	return (
 		<Stack direction="row" gap="lg" align="start">
 			<Stack
-				className={ styles.iconBox }
+				className={ styles[ 'icon-box' ] }
 				direction="column"
 				align="center"
 				justify="center"

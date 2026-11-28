@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
-import focusStyles from '../utils/css/focus.module.css';
-import styles from './style.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
+import styles from './style.module.scss';
 import type { ContentProps } from './types';
 
 /**

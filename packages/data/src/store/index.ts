@@ -1,9 +1,11 @@
-/**
- * Internal dependencies
- */
-import type { DataRegistry, StoreDescriptor, AnyConfig } from '../types';
+import type {
+	DataRegistry,
+	CoreDataStoreDescriptor,
+	CoreDataStoreSelectors,
+	CoreDataStoreActions,
+} from '../types';
 
-const coreDataStore: StoreDescriptor< AnyConfig > = {
+const coreDataStore: CoreDataStoreDescriptor = {
 	name: 'core/data',
 	instantiate( registry: DataRegistry ) {
 		const getCoreDataSelector =
@@ -19,7 +21,7 @@ const coreDataStore: StoreDescriptor< AnyConfig > = {
 			};
 
 		return {
-			getSelectors(): Record< string, ( ...args: any[] ) => any > {
+			getSelectors(): CoreDataStoreSelectors {
 				return Object.fromEntries(
 					[
 						'getIsResolving',
@@ -31,10 +33,10 @@ const coreDataStore: StoreDescriptor< AnyConfig > = {
 						selectorName,
 						getCoreDataSelector( selectorName ),
 					] )
-				);
+				) as CoreDataStoreSelectors;
 			},
 
-			getActions(): Record< string, ( ...args: any[] ) => any > {
+			getActions(): CoreDataStoreActions {
 				return Object.fromEntries(
 					[
 						'startResolution',
@@ -46,7 +48,7 @@ const coreDataStore: StoreDescriptor< AnyConfig > = {
 						actionName,
 						getCoreDataAction( actionName ),
 					] )
-				);
+				) as CoreDataStoreActions;
 			},
 
 			subscribe() {

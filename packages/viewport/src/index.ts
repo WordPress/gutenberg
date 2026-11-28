@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import addDimensionsEventListener from './listener';
 import type { Breakpoints, Operators } from './types';
 

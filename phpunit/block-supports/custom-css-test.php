@@ -29,8 +29,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $block_name Name for the test block.
 	 * @param array  $supports   Array defining block support configuration.
-	 *
-	 * @return WP_Block_Type The block type for the newly registered test block.
 	 */
 	private function register_custom_css_block_with_support( $block_name, $supports = array() ) {
 		$this->test_block_name = $block_name;
@@ -75,6 +73,31 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added.' );
 		$this->assertMatchesRegularExpression( '/wp-custom-css-/', $result['attrs']['className'], 'className should contain wp-custom-css- prefix.' );
+	}
+
+	/**
+	 * Tests that custom CSS which produces no rules does not add a class name.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_does_not_add_class_name_when_processing_produces_no_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-empty-output',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-empty-output',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '&',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'] );
 	}
 
 	/**
@@ -453,6 +476,73 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS is correctly scoped for style states.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_style_state_entries() {
+		$entries = array(
+			array(
+				'css'         => 'color: red;',
+				'pseudo'      => null,
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: blue;',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: green;',
+				'pseudo'      => null,
+				'media_query' => '@media (width <= 480px)',
+			),
+			array(
+				'css'         => 'color: purple;',
+				'pseudo'      => ':focus',
+				'media_query' => '@media (width <= 480px)',
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertSame(
+			':root :where(.test-block){color: red;}' .
+			':root :where(.test-block:hover){color: blue;}' .
+			'@media (width <= 480px){:root :where(.test-block){color: green;}}' .
+			'@media (width <= 480px){:root :where(.test-block:focus){color: purple;}}',
+			$result
+		);
+	}
+
+	/**
+	 * Tests that valid CSS state entries are processed when another state contains HTML.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_valid_state_entries_when_another_state_contains_html() {
+		$valid_entry = array(
+			'css'         => 'color: red;',
+			'pseudo'      => null,
+			'media_query' => null,
+		);
+
+		$entries = array(
+			$valid_entry,
+			array(
+				'css'         => '<script>alert(1)</script>',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertStringContainsString( 'color: red', $result );
+		$this->assertStringNotContainsString( '<script>', $result );
+	}
+
+	/**
 	 * Tests that valid CSS without HTML markup is accepted.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
@@ -574,5 +664,133 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$blocks = parse_blocks( wp_unslash( $result ) );
 
 		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped even from slashed content.' );
+	}
+
+	/**
+	 * Returns the custom CSS class name found in a string of rendered markup.
+	 *
+	 * @param string $markup Rendered block markup.
+	 * @return string|null The custom CSS class name, or null if there is none.
+	 */
+	private function get_custom_css_class_name_from_markup( $markup ) {
+		return preg_match( '/\bwp-custom-css-[0-9a-f]+\b/', $markup, $matches ) ? $matches[0] : null;
+	}
+
+	/**
+	 * Returns the custom CSS rules currently attached to the custom CSS stylesheet.
+	 *
+	 * @return string The inline custom CSS.
+	 */
+	private function get_enqueued_custom_css() {
+		$after = wp_styles()->get_data( 'wp-block-custom-css', 'after' );
+
+		return is_array( $after ) ? implode( "\n", $after ) : '';
+	}
+
+	/**
+	 * Tests that the class name and stylesheet are still generated for blocks that
+	 * are rendered without the `render_block_data` filter running.
+	 *
+	 * Direct `WP_Block::render()` calls skip `render_block_data` for the block
+	 * itself, as when `core/navigation` renders a `wp_navigation` post's blocks.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_generates_class_when_render_block_data_skipped() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-skipped-block-data',
+			array( 'customCSS' => true )
+		);
+
+		$block = array(
+			'blockName' => 'test/custom-css-skipped-block-data',
+			'attrs'     => array(
+				'style' => array(
+					'css' => 'padding: 0;',
+				),
+			),
+		);
+
+		$result     = gutenberg_render_custom_css_class_name( '<li class="wp-block-navigation-item">Home</li>', $block );
+		$class_name = $this->get_custom_css_class_name_from_markup( $result );
+
+		$this->assertNotNull( $class_name, 'A custom CSS class should be added even though render_block_data did not run.' );
+		$this->assertStringContainsString( 'has-custom-css', $result, 'The has-custom-css class should be added.' );
+		$this->assertStringContainsString( 'wp-block-navigation-item', $result, 'Existing classes should be preserved.' );
+		$this->assertStringContainsString(
+			'.' . $class_name,
+			$this->get_enqueued_custom_css(),
+			'The custom CSS stylesheet should contain a rule for the generated class.'
+		);
+	}
+
+	/**
+	 * Tests that a block is not given a second class name when `render_block_data`
+	 * has already generated one.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_does_not_regenerate_existing_class() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-existing-class',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-existing-class',
+			'attrs'     => array(
+				'style' => array(
+					'css' => 'padding: 0;',
+				),
+			),
+		);
+
+		$filtered = gutenberg_render_custom_css_support_styles( $parsed_block );
+		$result   = gutenberg_render_custom_css_class_name( '<p>Test content</p>', $filtered );
+
+		$this->assertSame(
+			1,
+			preg_match_all( '/wp-custom-css-[0-9a-f]+/', $result ),
+			'Only the class name generated by render_block_data should be added.'
+		);
+		$this->assertStringContainsString(
+			$filtered['attrs']['className'],
+			$result,
+			'The class name generated by render_block_data should be the one added to the markup.'
+		);
+	}
+
+	/**
+	 * Tests that blocks inside a navigation menu get their custom CSS on the front end.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_custom_css_is_rendered_for_blocks_inside_a_navigation_menu() {
+		/*
+		 * Custom CSS is stripped on save for users without the `edit_css` capability,
+		 * which the default test user does not have. Hooks are restored on tear down.
+		 */
+		remove_filter( 'content_save_pre', 'gutenberg_strip_custom_css_from_blocks', 8 );
+		remove_filter( 'content_save_pre', 'wp_strip_custom_css_from_blocks', 8 );
+
+		$navigation_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_title'   => 'Custom CSS Menu',
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom","isTopLevelLink":true,"style":{"css":"padding: 0;"}} /-->',
+			)
+		);
+
+		$rendered = do_blocks( '<!-- wp:navigation {"ref":' . $navigation_id . '} /-->' );
+
+		$class_name = $this->get_custom_css_class_name_from_markup( $rendered );
+
+		$this->assertNotNull( $class_name, 'The navigation link should be given a custom CSS class.' );
+		$this->assertStringContainsString(
+			'.' . $class_name,
+			$this->get_enqueued_custom_css(),
+			'The custom CSS stylesheet should contain a rule for the navigation link.'
+		);
 	}
 }

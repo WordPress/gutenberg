@@ -54,6 +54,8 @@ The `NavigableMenu` by default has a `menu` role and therefore, in order to func
 
 ### TabbableContainer
 
+<p class="callout callout-alert">This component is deprecated. For focus trapping, consider the <code>useConstrainedTabbing</code> hook from <code>@wordpress/compose</code>.</p>
+
 A `TabbableContainer` will only be navigated using the `tab` key. Every intended tabstop must have a tabIndex `0`.
 
 ### Usage

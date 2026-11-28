@@ -1,30 +1,23 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useMemo,
 	forwardRef,
 	useCallback,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { Context } from './context';
 
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
+>( function UnforwardedPopover(
+	{ gutter, shift, modal = true, ...otherProps },
+	ref
+) {
 	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.
@@ -69,19 +62,27 @@ export const Popover = forwardRef<
 
 	const renderMenu = useCallback(
 		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
-			<Styled.MenuMotionRoot>
-				<Styled.MenuSurface
+			<div className={ styles[ 'menu-motion-root' ] }>
+				<div
 					{ ...htmlProps }
-					variant={ menuContext.variant }
+					className={ clsx(
+						styles[ 'menu-surface' ],
+						htmlProps.className,
+						{
+							[ styles[ 'is-toolbar' ] ]:
+								menuContext.variant === 'toolbar',
+						}
+					) }
 				/>
-			</Styled.MenuMotionRoot>
+			</div>
 		),
 		[ menuContext.variant ]
 	);
 
 	return (
-		<Styled.Menu
+		<Ariakit.Menu
 			{ ...otherProps }
+			className={ clsx( styles.menu, otherProps.className ) }
 			ref={ ref }
 			modal={ modal }
 			store={ menuContext.store }

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from './context';
 
 interface GlobalStylesProviderProps {

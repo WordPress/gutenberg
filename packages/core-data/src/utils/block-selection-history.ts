@@ -1,14 +1,4 @@
-/**
- * External dependencies
- */
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asRichTextOffset,
 	findBlockByClientIdInDoc,
@@ -51,7 +41,9 @@ export interface YSelectionHistory {
 }
 
 export interface BlockSelectionHistory {
+	addSelection: ( selection: YFullSelection ) => void;
 	getSelectionHistory: () => YFullSelection[];
+	resolveSelection: ( newSelection: WPSelection ) => YFullSelection | null;
 	updateSelection: ( newSelection: WPSelection ) => void;
 }
 
@@ -78,15 +70,18 @@ export function createBlockSelectionHistory(
 	};
 
 	/**
-	 * Update the selection history with a new selection.
+	 * Convert a selection to positions in the document as it is now. The
+	 * positions stay correct when the text around them changes later.
 	 * @param newSelection
 	 */
-	const updateSelection = ( newSelection: WPSelection ): void => {
+	const resolveSelection = (
+		newSelection: WPSelection
+	): YFullSelection | null => {
 		if (
 			! newSelection?.selectionStart?.clientId ||
 			! newSelection?.selectionEnd?.clientId
 		) {
-			return;
+			return null;
 		}
 
 		const { selectionStart, selectionEnd } = newSelection;
@@ -96,7 +91,19 @@ export function createBlockSelectionHistory(
 		);
 		const end = convertWPBlockSelectionToSelection( selectionEnd, ydoc );
 
-		addToHistory( { start, end } );
+		return { start, end };
+	};
+
+	/**
+	 * Update the selection history with a new selection.
+	 * @param newSelection
+	 */
+	const updateSelection = ( newSelection: WPSelection ): void => {
+		const selection = resolveSelection( newSelection );
+
+		if ( selection ) {
+			addToHistory( selection );
+		}
 	};
 
 	/**
@@ -128,7 +135,9 @@ export function createBlockSelectionHistory(
 	};
 
 	return {
+		addSelection: addToHistory,
 		getSelectionHistory,
+		resolveSelection,
 		updateSelection,
 	};
 }

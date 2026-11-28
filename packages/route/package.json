@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/route",
-	"version": "0.12.0",
+	"version": "0.26.0",
 	"description": "Routing utilities for WordPress admin interfaces.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,15 +18,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -38,17 +36,27 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@tanstack/history": "^1.133.28",
-		"@tanstack/react-router": "^1.120.5",
+		"@tanstack/history": "^1.162.5",
+		"@tanstack/react-router": "^1.170.46",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

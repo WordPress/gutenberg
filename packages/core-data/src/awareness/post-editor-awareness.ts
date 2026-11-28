@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
+import { isCollaboratorInfo } from './utils';
 import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
@@ -30,13 +23,13 @@ import {
 	SelectionType,
 	SelectionDirection,
 } from '../utils/crdt-user-selections';
-
 import type {
 	ResolvedSelection,
 	SelectionState,
 	WPBlockSelection,
 } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
+import type { EditorStoreBlock } from './block-lookup';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -78,8 +71,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
+		// An empty selection is `{}`, which the selection helpers check for.
+		let selectionStart = getSelectionStart() as WPBlockSelection;
+		let selectionEnd = getSelectionEnd() as WPBlockSelection;
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
 		// During rapid selection changes (e.g. undo restoring content and
@@ -95,8 +89,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		} | null = null;
 
 		subscribe( () => {
-			const newSelectionStart = getSelectionStart();
-			const newSelectionEnd = getSelectionEnd();
+			// An empty selection is `{}`, see above.
+			const newSelectionStart = getSelectionStart() as WPBlockSelection;
+			const newSelectionEnd = getSelectionEnd() as WPBlockSelection;
 
 			if (
 				newSelectionStart === selectionStart &&
@@ -181,7 +176,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	private async updateSelectionInEntityRecord(
 		selectionStart: WPBlockSelection,
 		selectionEnd: WPBlockSelection,
-		initialPosition: number | null
+		initialPosition: number | null | undefined
 	): Promise< void > {
 		// Send an entityRecord `selection` update if we have a selection.
 		//
@@ -199,7 +194,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			undoIgnore: true,
 		};
 
-		// @ts-ignore Types are not provided when using store name instead of store instance.
+		// @ts-expect-error Types are not provided when using the store name instead of the store instance.
 		dispatch( coreStore ).editEntityRecord(
 			this.kind,
 			this.name,
@@ -245,10 +240,12 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
+	 * @param blocks    - The tree of block-editor store post content blocks.
 	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
 	public convertSelectionStateToAbsolute(
-		selection: SelectionState
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
 	): ResolvedSelection {
 		if ( selection.type === SelectionType.None ) {
 			return {
@@ -273,7 +270,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				if ( block instanceof Y.Map ) {
 					const path = getBlockPathInYdoc( block );
 					localClientId = path
-						? resolveBlockClientIdByPath( path )
+						? resolveBlockClientIdByPath( path, blocks )
 						: null;
 				}
 			}
@@ -285,7 +282,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			};
 		}
 
+		// SelectionInMultipleBlocks is decomposed by the caller into per-endpoint
+		// Cursor / WholeBlock calls and should never arrive here directly.
+		if ( selection.type === SelectionType.SelectionInMultipleBlocks ) {
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
+		}
+
 		// Text-based selections: resolve cursor position and navigate up.
+		// SelectionCursor → cursorPosition; SelectionInOneBlock → cursorStartPosition.
 		const cursorPos =
 			'cursorPosition' in selection
 				? selection.cursorPosition
@@ -306,7 +314,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		const yType = getContainingBlockYMap( absolutePosition.type );
 		const path = yType ? getBlockPathInYdoc( yType ) : null;
-		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
+		const localClientId = path
+			? resolveBlockClientIdByPath( path, blocks )
+			: null;
 
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(
@@ -345,15 +355,17 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Build collaboratorMap from awareness store (all collaborators seen this session)
 		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
-			Array.from( this.getSeenStates().entries() ).map(
-				( [ clientId, collaboratorState ] ) => [
+			Array.from( this.getSeenStates().entries() )
+				.filter( ( [ , collaboratorState ] ) =>
+					isCollaboratorInfo( collaboratorState.collaboratorInfo )
+				)
+				.map( ( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
 					{
 						name: collaboratorState.collaboratorInfo.name,
 						wpUserId: collaboratorState.collaboratorInfo.id,
 					},
-				]
-			)
+				] )
 		);
 
 		// Serialize Yjs client items to avoid deep nesting
@@ -377,7 +389,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 								length: left.length,
 								origin: left.origin,
 								content: left.content,
-						  }
+							}
 						: null,
 					right: right
 						? {
@@ -385,7 +397,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 								length: right.length,
 								origin: right.origin,
 								content: right.content,
-						  }
+							}
 						: null,
 				};
 			} );

@@ -1,17 +1,91 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
 
 test.use( {
 	previewUtils: async ( { page }, use ) => {
 		await use( new PreviewUtils( { page } ) );
+	},
+	enableCollaboration: async ( { requestUtils }, use ) => {
+		await use( () => setCollaboration( requestUtils, true ) );
+		await setCollaboration( requestUtils, false );
 	},
 } );
 
 test.describe( 'Preview', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test( 'hides viewport dimensions when space is limited and restores them when space returns', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.setViewportSize( { width: 1600, height: 900 } );
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await page.keyboard.press( 'Escape' );
+		const footer = page.getByRole( 'region', { name: 'Editor footer' } );
+		await expect( footer ).toContainText( /Tablet \(781 × \d+\)/ );
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		await expect
+			.poll( async () =>
+				Math.round( ( await canvas.boundingBox() ).width )
+			)
+			.toBe( 781 );
+
+		await page.setViewportSize( { width: 900, height: 900 } );
+		// Keep the footer present while the settings sidebar reduces the
+		// space available to the canvas.
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			footer.getByText( 'Tablet', { exact: true } )
+		).toBeVisible();
+		await expect( footer ).not.toContainText( /Tablet \(781 × \d+\)/ );
+		await expect
+			.poll( async () => ( await canvas.boundingBox() ).width )
+			.toBeLessThan( 780 );
+
+		await page.setViewportSize( { width: 1600, height: 900 } );
+		await expect( footer ).toContainText( /Tablet \(781 × \d+\)/ );
+		await expect
+			.poll( async () =>
+				Math.round( ( await canvas.boundingBox() ).width )
+			)
+			.toBe( 781 );
+	} );
+
+	test( 'preserves responsive editing when switching through the default viewport', async ( {
+		page,
+	} ) => {
+		const view = page.getByRole( 'button', { name: 'View', exact: true } );
+		await view.click();
+		const responsiveStyles = page.getByRole( 'menuitemcheckbox', {
+			name: 'Responsive styles',
+		} );
+		await expect( responsiveStyles ).toBeDisabled();
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await expect( responsiveStyles ).toBeEnabled();
+		await responsiveStyles.click();
+		await expect( responsiveStyles ).toBeChecked();
+		await expect( view ).toHaveClass( /is-responsive-editing/ );
+
+		await page.getByRole( 'menuitemradio', { name: 'Desktop' } ).click();
+		await expect( responsiveStyles ).toBeDisabled();
+		await expect( responsiveStyles ).toBeChecked();
+		await expect( view ).not.toHaveClass( /is-responsive-editing/ );
+
+		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
+		await expect( responsiveStyles ).toBeEnabled();
+		await expect( responsiveStyles ).toBeChecked();
+		await expect( view ).toHaveClass( /is-responsive-editing/ );
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor footer' } )
+				.getByText( 'Responsive styles', { exact: true } )
+		).toBeVisible();
 	} );
 
 	test( 'should open a preview window for a new post', async ( {
@@ -62,7 +136,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
@@ -110,7 +184,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save the post as a draft.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -132,7 +206,7 @@ test.describe( 'Preview', () => {
 		await editorPage.keyboard.press( 'Tab' );
 
 		// Save draft and open the preview page right after.
-		await editorPage.click( 'role=button[name="Save draft"i]' );
+		await editorPage.getByRole( 'button', { name: 'Save draft' } ).click();
 		await editorPage.waitForSelector(
 			'role=button[name="Dismiss this notice"] >> text=Draft saved'
 		);
@@ -147,9 +221,19 @@ test.describe( 'Preview', () => {
 	// See: https://github.com/WordPress/gutenberg/issues/33758.
 	test( 'should not use stale autosave data after reverting title', async ( {
 		editor,
+		enableCollaboration,
 		page,
 		previewUtils,
 	} ) => {
+		await enableCollaboration();
+		await Promise.all( [
+			page.waitForResponse(
+				( response ) =>
+					response.url().includes( 'wp-sync' ) &&
+					response.status() === 200
+			),
+			page.reload(),
+		] );
 		const editorPage = page;
 
 		// Create and publish a post.
@@ -163,7 +247,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Change the title and preview to trigger an autosave.
 		await editor.canvas
@@ -212,7 +296,7 @@ test.describe( 'Preview', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Change the title and preview again.
 		await editor.canvas
@@ -225,7 +309,7 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -303,7 +387,7 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		await editor.publishPost();
 
 		// Close the panel.
-		await page.click( 'role=button[name="Close panel"i]' );
+		await page.getByRole( 'button', { name: 'Close panel' } ).click();
 
 		// Open the preview page.
 		const previewPage = await editor.openPreviewPage();
@@ -357,10 +441,12 @@ test.describe( 'Preview with private custom post type', () => {
 		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="View"i]' );
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 
 		await expect(
-			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
+			page.getByRole( 'menuitem', {
+				name: 'Preview (opens in a new tab)',
+			} )
 		).toBeHidden();
 	} );
 } );
@@ -379,7 +465,9 @@ class PreviewUtils {
 			await previewToggle.click();
 		}
 
-		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preview (opens in a new tab)' } )
+			.click();
 		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
@@ -387,15 +475,19 @@ class PreviewUtils {
 	async toggleCustomFieldsOption( shouldBeChecked ) {
 		// Open preferences dialog.
 
-		await this.page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-		);
-		await this.page.click( 'role=menuitem[name="Preferences"i]' );
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+		await this.page
+			.getByRole( 'menuitem', { name: 'Preferences' } )
+			.click();
 
 		// Navigate to general section.
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'tab', { name: 'General' } )
+			.click();
 
 		// Find custom fields checkbox.
 		const customFieldsCheckbox = this.page.locator(
@@ -420,8 +512,9 @@ class PreviewUtils {
 			return;
 		}
 
-		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
-		);
+		await this.page
+			.getByRole( 'dialog', { name: 'Preferences' } )
+			.getByRole( 'button', { name: 'Close' } )
+			.click();
 	}
 }

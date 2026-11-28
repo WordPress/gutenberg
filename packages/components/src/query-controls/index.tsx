@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import AuthorSelect from './author-select';
 import CategorySelect from './category-select';
+import OrderBySelect from './order-by-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
 import type {
 	QueryControlsProps,
@@ -101,45 +94,22 @@ export function QueryControls( {
 	return (
 		<VStack spacing="4" className="components-query-controls">
 			{ [
-				onOrderChange && onOrderByChange && (
-					<SelectControl
-						__next40pxDefaultSize
-						key="query-controls-order-select"
-						label={ __( 'Order by' ) }
-						value={
-							orderBy === undefined || order === undefined
-								? undefined
-								: `${ orderBy }/${ order }`
-						}
-						options={ orderByOptions }
-						onChange={ ( value ) => {
-							if ( typeof value !== 'string' ) {
-								return;
-							}
-
-							const [ newOrderBy, newOrder ] = value.split( '/' );
-							if ( newOrder !== order ) {
-								onOrderChange(
-									newOrder as NonNullable<
-										QueryControlsProps[ 'order' ]
-									>
-								);
-							}
-							if ( newOrderBy !== orderBy ) {
-								onOrderByChange(
-									newOrderBy as NonNullable<
-										QueryControlsProps[ 'orderBy' ]
-									>
-								);
-							}
-						} }
-					/>
-				),
+				onOrderChange &&
+					onOrderByChange &&
+					!! orderByOptions?.length && (
+						<OrderBySelect
+							key="query-controls-order-select"
+							order={ order }
+							orderBy={ orderBy }
+							orderByOptions={ orderByOptions }
+							onOrderChange={ onOrderChange }
+							onOrderByChange={ onOrderByChange }
+						/>
+					),
 				isSingleCategorySelection( props ) &&
 					props.categoriesList &&
 					props.onCategoryChange && (
 						<CategorySelect
-							__next40pxDefaultSize
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
@@ -152,7 +122,6 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
-							__next40pxDefaultSize
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -162,7 +131,7 @@ export function QueryControls( {
 									// Keeping the fallback to `item.value` for legacy reasons,
 									// even if items of `selectedCategories` should not have a
 									// `value` property.
-									// @ts-expect-error
+									// @ts-expect-error `value` does not exist on `Category`.
 									value: item.name || item.value,
 								} ) )
 							}
@@ -175,7 +144,6 @@ export function QueryControls( {
 					),
 				onAuthorChange && (
 					<AuthorSelect
-						__next40pxDefaultSize
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
@@ -186,7 +154,6 @@ export function QueryControls( {
 				),
 				onNumberOfItemsChange && (
 					<RangeControl
-						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }

@@ -1,0 +1,30 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-upload-progress-snackbar__spinner,
+.editor-upload-progress-snackbar__check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	// Size the slot to $icon-size to match the icon dimensions the Snackbar's
+	// absolute positioning is tuned for, so the spinner and checkmark sit
+	// vertically centered against the notice text.
+	width: $icon-size;
+	height: $icon-size;
+}
+
+.editor-upload-progress-snackbar__spinner .components-spinner {
+	// The Spinner ships with an asymmetric default margin (top, not bottom),
+	// which offsets it within the centered icon slot. Reset it so the flex
+	// centering above keeps the spinner vertically centered against the text.
+	margin: 0;
+}
+
+.editor-upload-progress-snackbar__check svg {
+	// Render at the full icon size: the check glyph only occupies the center of
+	// its viewBox, so a smaller size makes the mark look faint next to the text.
+	width: $icon-size;
+	height: $icon-size;
+	// The icon ships without a fill, which renders black and disappears against
+	// the dark snackbar. Inherit the snackbar's white text color instead.
+	fill: currentColor;
+}

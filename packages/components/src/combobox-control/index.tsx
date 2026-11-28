@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Component,
@@ -17,25 +10,19 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { InputWrapperFlex } from './styles';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { FlexBlock } from '../flex';
+import { Flex, FlexBlock } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 import Spinner from '../spinner';
+import styles from './style.module.scss';
 
 const noop = () => {};
 
@@ -94,7 +81,6 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
- * 			__next40pxDefaultSize
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -115,7 +101,6 @@ const getIndexOfMatchingSuggestion = (
  */
 function ComboboxControl( props: ComboboxControlProps ) {
 	const {
-		__next40pxDefaultSize = false,
 		value: valueProp,
 		label,
 		options,
@@ -132,7 +117,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		__experimentalRenderItem,
 		expandOnFocus = true,
 		placeholder,
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 
 	const [ value, setValue ] = useControlledValue( {
 		value: valueProp,
@@ -222,9 +207,20 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					preventDefault = true;
 					break;
 				case 'Escape':
+					// Only consume Escape while the control is expanded (the
+					// suggestions list is shown, or results are loading), so
+					// that a parent dialog (e.g. `Modal`, `Popover`) can close
+					// when the control is already collapsed. The first Escape
+					// always ends the search and restores the selected label,
+					// whether or not the results have arrived. Also stop
+					// propagation then, because some dialogs (e.g. the
+					// `@wordpress/ui` `Dialog`) do not check `defaultPrevented`.
+					if ( isExpanded ) {
+						preventDefault = true;
+						event.stopPropagation();
+					}
 					setIsExpanded( false );
 					setSelectedSuggestion( null );
-					preventDefault = true;
 					break;
 				default:
 					break;
@@ -273,10 +269,14 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	// Stop propagation of the keydown event when pressing Enter on the Reset
 	// button to prevent calling the onKeydown callback on the container div
-	// element which actually sets the selected suggestion.
+	// element which actually sets the selected suggestion. Let Escape
+	// propagate, so that a parent dialog (e.g. `Modal`) can close.
 	const handleResetStopPropagation: React.KeyboardEventHandler<
 		HTMLButtonElement
 	> = ( event ) => {
+		if ( event.code === 'Escape' ) {
+			return;
+		}
 		event.stopPropagation();
 	};
 
@@ -308,18 +308,14 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							matchingSuggestions.length
 						),
 						matchingSuggestions.length
-				  )
+					)
 				: __( 'No results.' );
 
 			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'ComboboxControl',
-		__next40pxDefaultSize,
-		size: undefined,
-	} );
+	const isSuggestionsListVisible = isExpanded && ! isLoading;
 
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
@@ -339,9 +335,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }
 				>
-					<InputWrapperFlex
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-					>
+					<Flex className={ styles[ 'input-wrapper' ] }>
 						<FlexBlock>
 							<TokenInput
 								className="components-combobox-control__input"
@@ -352,7 +346,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								onClick={ onClick }
-								isExpanded={ isExpanded }
+								isExpanded={ isSuggestionsListVisible }
 								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
 									selectedSuggestion,
 									matchingSuggestions
@@ -361,7 +355,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								aria-describedby={
 									help
 										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
-										  `components-form-token-input-${ instanceId }__help`
+											`components-form-token-input-${ instanceId }__help`
 										: undefined
 								}
 							/>
@@ -376,8 +370,8 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								label={ __( 'Reset' ) }
 							/>
 						) }
-					</InputWrapperFlex>
-					{ isExpanded && ! isLoading && (
+					</Flex>
+					{ isSuggestionsListVisible && (
 						<SuggestionsList
 							instanceId={ instanceId }
 							// The empty string for `value` here is not actually used, but is

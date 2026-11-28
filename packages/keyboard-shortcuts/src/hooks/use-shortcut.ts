@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useShortcutEventMatch from './use-shortcut-event-match';
 import { context } from '../context';
 
@@ -28,7 +21,9 @@ export default function useShortcut(
 ) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
-	const callbackRef = useRef< ( event: KeyboardEvent ) => void >();
+	const callbackRef = useRef<
+		( ( event: KeyboardEvent ) => void ) | undefined
+	>( undefined );
 
 	useEffect( () => {
 		callbackRef.current = callback;

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type RadioControlProps = Pick<
@@ -34,6 +31,12 @@ export type RadioControlProps = Pick<
 		 * Optional help text to be shown in addition the label.
 		 */
 		description?: string;
+		/**
+		 * Whether the option should be disabled.
+		 *
+		 * @default false
+		 */
+		disabled?: boolean;
 	}[];
 	/**
 	 * The value property of the currently selected option.

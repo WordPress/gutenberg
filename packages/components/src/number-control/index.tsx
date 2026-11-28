@@ -1,33 +1,21 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { plus as plusIcon, reset as resetIcon } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
-import { Input, SpinButton, styles } from './styles/number-control-styles';
+import InputControl from '../input-control';
+import Button from '../button';
+import styles from './style.module.scss';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
 import type { StateReducer } from '../input-control/reducer/state';
-import { add, subtract, clamp, ensureValidStep } from '../utils/math';
+import { add, subtract, multiply, clamp, ensureValidStep } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { NumberControlProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
-import { useCx } from '../utils';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const noop = () => {};
 
@@ -55,16 +43,8 @@ function UnforwardedNumberControl(
 		size = 'default',
 		suffix,
 		onChange = noop,
-		__shouldNotWarnDeprecated36pxSize,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
-
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'NumberControl',
-		size,
-		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
+	} = props;
 
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
@@ -78,7 +58,7 @@ function UnforwardedNumberControl(
 
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
-	const baseSpin = ensureNumber( spinFactor ) * baseStep;
+	const baseSpin = multiply( ensureNumber( spinFactor ), baseStep );
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
@@ -93,9 +73,12 @@ function UnforwardedNumberControl(
 	const baseValue = constrainValue( 0 );
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
-	const classes = clsx( 'components-number-control', className );
-	const cx = useCx();
-	const spinButtonClasses = cx( size === 'small' && styles.smallSpinButtons );
+	const classes = clsx( 'components-number-control', className, {
+		[ styles[ 'hide-html-arrows' ] ]: spinControls !== 'native',
+	} );
+	const spinButtonClasses = clsx( styles[ 'spin-button' ], {
+		[ styles[ 'is-small' ] ]: size === 'small',
+	} );
 
 	const spinValue = (
 		value: string | number | undefined,
@@ -104,7 +87,9 @@ function UnforwardedNumberControl(
 	) => {
 		event?.preventDefault();
 		const shift = event?.shiftKey && isShiftStepEnabled;
-		const delta = shift ? ensureNumber( shiftStep ) * baseSpin : baseSpin;
+		const delta = shift
+			? multiply( ensureNumber( shiftStep ), baseSpin )
+			: baseSpin;
 		let nextValue = isValueEmpty( value ) ? baseValue : value;
 		if ( direction === 'up' ) {
 			nextValue = add( nextValue, delta );
@@ -149,7 +134,7 @@ function UnforwardedNumberControl(
 			const [ x, y ] = payload.delta;
 			const enableShift = payload.shiftKey && isShiftStepEnabled;
 			const modifier = enableShift
-				? ensureNumber( shiftStep ) * baseSpin
+				? multiply( ensureNumber( shiftStep ), baseSpin )
 				: baseSpin;
 
 			let directionModifier;
@@ -179,7 +164,7 @@ function UnforwardedNumberControl(
 
 			if ( delta !== 0 ) {
 				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
-				const distance = delta * modifier * directionModifier;
+				const distance = multiply( delta, modifier, directionModifier );
 
 				nextState.value = constrainValue(
 					// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
@@ -201,7 +186,7 @@ function UnforwardedNumberControl(
 			nextState.value = applyEmptyValue
 				? currentValue
 				: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
-				  constrainValue( currentValue );
+					constrainValue( currentValue );
 		}
 
 		return stateReducerProp?.( nextState, action ) ?? nextState;
@@ -220,13 +205,12 @@ function UnforwardedNumberControl(
 			} );
 
 	return (
-		<Input
+		<InputControl
 			autoComplete={ autoComplete }
 			inputMode="numeric"
 			{ ...restProps }
 			className={ classes }
 			dragDirection={ dragDirection }
-			hideHTMLArrows={ spinControls !== 'native' }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
 			max={ max === Infinity ? undefined : max }
@@ -239,14 +223,13 @@ function UnforwardedNumberControl(
 			value={ valueProp }
 			__unstableStateReducer={ numberControlStateReducer }
 			size={ size }
-			__shouldNotWarnDeprecated36pxSize
 			suffix={
 				spinControls === 'custom' ? (
 					<>
 						{ suffix }
 						<Spacer marginBottom={ 0 } marginRight={ 2 }>
 							<HStack spacing={ 1 }>
-								<SpinButton
+								<Button
 									className={ spinButtonClasses }
 									icon={ plusIcon }
 									size="small"
@@ -255,7 +238,7 @@ function UnforwardedNumberControl(
 										'up'
 									) }
 								/>
-								<SpinButton
+								<Button
 									className={ spinButtonClasses }
 									icon={ resetIcon }
 									size="small"
@@ -276,6 +259,10 @@ function UnforwardedNumberControl(
 	);
 }
 
+/**
+ * `NumberControl` is a text input control that lets users enter and adjust a
+ * numeric value.
+ */
 export const NumberControl = forwardRef( UnforwardedNumberControl );
 NumberControl.displayName = 'NumberControl';
 

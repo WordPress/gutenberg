@@ -1,20 +1,18 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { ViewGridProps } from '../../../types';
+import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import {
+	BulkActionToolbar,
+	hasAPossibleBulkAction,
+	useSomeItemHasAPossibleBulkAction,
+} from '../../dataviews-bulk-actions';
 import CompositeGrid from './composite-grid';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 
@@ -33,6 +31,14 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
+	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
+	const selectionCheckboxRef = useRef< HTMLSpanElement >( null );
+	// The toolbar keeps its selection checkbox but removes the controls
+	// that act on the selection, so move focus to the checkbox when an
+	// interaction in the toolbar removes them.
+	const focusAfterToggle = useBulkActionsFocus( {
+		isShown: selection.length > 0 || isActionInProgress,
+	} );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -40,7 +46,24 @@ function ViewGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	if ( ! hasData ) {
+	// The selection hook must see every selectable item in render order so a
+	// Shift+Click range can span groups and share a single anchor. Each
+	// CompositeGrid renders one group, so derive it here from the flattened
+	// group order rather than inside CompositeGrid.
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		selection,
+		onChangeSelection,
+		selectionMode: 'multi',
+		shouldSelectOnClick: false,
+	} );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	if ( ! hasData && ! isActionInProgress ) {
 		return (
 			<div
 				className={ clsx( 'dataviews-no-results', {
@@ -55,7 +78,7 @@ function ViewGrid< Item >( {
 		className: clsx( className, {
 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: ! isInfiniteScroll && !! isLoading,
 		isLoading,
 		view,
 		fields,
@@ -66,9 +89,24 @@ function ViewGrid< Item >( {
 		renderItemLink,
 		getItemId,
 		actions,
+		getSelectionProps,
 	};
 	return (
 		<>
+			{ ( hasBulkActions || isActionInProgress ) && (
+				<div
+					className="dataviews-view-grid__bulk-actions-header"
+					inert={ inertValue( !! isLoading ) }
+				>
+					<BulkActionToolbar
+						selectionCheckboxRef={ selectionCheckboxRef }
+						onActionInProgressChange={ setIsActionInProgress }
+						onClearSelection={ () =>
+							focusAfterToggle( selectionCheckboxRef )
+						}
+					/>
+				</div>
+			) }
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (
@@ -88,7 +126,7 @@ function ViewGrid< Item >( {
 													__( '%1$s: %2$s' ),
 													groupField.label,
 													groupName
-											  ) }
+												) }
 									</h3>
 									<CompositeGrid
 										{ ...gridProps }
@@ -113,7 +151,7 @@ function ViewGrid< Item >( {
 			}
 			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

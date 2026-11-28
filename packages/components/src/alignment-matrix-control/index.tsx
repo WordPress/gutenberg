@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Tooltip, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import Cell from './cell';
 import { Composite } from '../composite';
 import AlignmentMatrixControlIcon from './icon';
@@ -31,6 +21,8 @@ function UnforwardedAlignmentMatrixControl( {
 	width = 92,
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+	useEnableWpCompatOverlaySlot();
+
 	const baseId = useInstanceId(
 		UnforwardedAlignmentMatrixControl,
 		'alignment-matrix-control',
@@ -56,39 +48,44 @@ function UnforwardedAlignmentMatrixControl( {
 	);
 
 	return (
-		<Composite
-			defaultActiveId={ getItemId( baseId, defaultValue ) }
-			activeId={ getItemId( baseId, value ) }
-			setActiveId={ setActiveId }
-			rtl={ isRTL() }
-			render={
-				<div
-					{ ...props }
-					className={ classes }
-					aria-label={ label }
-					id={ baseId }
-					role="grid"
-					style={ { width: `${ width }px` } }
-				/>
-			}
-		>
-			{ GRID.map( ( cells, index ) => (
-				<Composite.Row
-					render={
-						<div className={ styles[ 'grid-row' ] } role="row" />
-					}
-					key={ index }
-				>
-					{ cells.map( ( cell ) => (
-						<Cell
-							id={ getItemId( baseId, cell ) }
-							key={ cell }
-							value={ cell }
-						/>
-					) ) }
-				</Composite.Row>
-			) ) }
-		</Composite>
+		<Tooltip.Provider>
+			<Composite
+				defaultActiveId={ getItemId( baseId, defaultValue ) }
+				activeId={ getItemId( baseId, value ) }
+				setActiveId={ setActiveId }
+				rtl={ isRTL() }
+				render={
+					<div
+						{ ...props }
+						className={ classes }
+						aria-label={ label }
+						id={ baseId }
+						role="grid"
+						style={ { width: `${ width }px` } }
+					/>
+				}
+			>
+				{ GRID.map( ( cells, index ) => (
+					<Composite.Row
+						render={
+							<div
+								className={ styles[ 'grid-row' ] }
+								role="row"
+							/>
+						}
+						key={ index }
+					>
+						{ cells.map( ( cell ) => (
+							<Cell
+								id={ getItemId( baseId, cell ) }
+								key={ cell }
+								value={ cell }
+							/>
+						) ) }
+					</Composite.Row>
+				) ) }
+			</Composite>
+		</Tooltip.Provider>
 	);
 }
 

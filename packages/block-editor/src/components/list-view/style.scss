@@ -31,6 +31,14 @@
 	// when rows later receive the is-displacement-up or is-displacement-down class.
 	transform: translateY(0);
 
+	// The transform above makes each row its own stacking context, so the focus
+	// ring cannot escape it. Lift the focused row above the siblings that would
+	// otherwise paint over it.
+	&:focus-within,
+	&.is-nesting {
+		z-index: 1;
+	}
+
 	&.is-draggable,
 	&.is-draggable .block-editor-list-view-block-contents {
 		cursor: grab;
@@ -49,11 +57,6 @@
 
 		svg {
 			fill: currentColor;
-			// Optimize for high contrast modes.
-			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
-			@media (forced-colors: active) {
-				fill: CanvasText;
-			}
 		}
 	}
 
@@ -68,12 +71,18 @@
 		}
 	}
 
-	// The background has to be applied to the td, not tr, or border-radius won't work.
-	&.is-selected td {
-		background: var(--wp-admin-theme-color);
+	&.is-selected {
+		--list-view-selected-background: var(--wpds-color-background-interactive-brand-strong);
+		--list-view-selected-color: var(--wpds-color-foreground-interactive-brand-strong);
+
+		// Border radius only works when the cells paint the background.
+		td {
+			background: var(--list-view-selected-background);
+		}
 	}
-	&.is-selected.is-synced td {
-		background: var(--wp-block-synced-color);
+	&.is-selected.is-synced {
+		--list-view-selected-background: var(--wp-block-synced-color);
+		--list-view-selected-color: #{$white};
 	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
 		&:hover,
@@ -81,33 +90,53 @@
 		.block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
-
-		&:focus::after {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
-		}
+	}
+	&.is-synced .block-editor-list-view-block-contents:focus::after {
+		--focus-color: var(--wp-block-synced-color);
+	}
+	&.is-synced:not(.is-selected) .block-editor-list-view-block__menu:focus {
+		--focus-color: var(--wp-block-synced-color);
+		@include outset-ring__focus();
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
-		color: $white;
+		color: var(--list-view-selected-color);
 	}
-	&.is-selected .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+	&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
+		--focus-color: currentColor;
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+	@media (forced-colors: active) {
+		&.is-selected td {
+			background: Highlight;
 		}
-	}
-	&.is-selected.is-synced .block-editor-list-view-block-contents:focus {
-		&::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
+
+		&.is-selected .block-editor-list-view-block-contents,
+		&.is-selected .components-button.has-icon {
+			color: HighlightText;
 		}
-	}
-	&.is-selected .block-editor-list-view-block__menu:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+
+		&.is-selected svg,
+		&.is-selected .block-editor-block-icon.has-colors svg {
+			fill: HighlightText;
+		}
+
+		// Prevent backplate with same color as text in dark mode.
+		// Opt-out scoped to only the row title.
+		&.is-selected .block-editor-list-view-block-select-button__title {
+			forced-color-adjust: none;
+		}
+
+		// The row-wide ring sits outside the selected background.
+		&.is-selected .block-editor-list-view-block-contents:focus::after {
+			--focus-color: CanvasText;
+		}
+
+		// The action buttons' rings are inset over the selected background.
+		&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
+			--focus-color: HighlightText;
+		}
 	}
 
 	// Border radius for corners of the selected item.
@@ -229,7 +258,7 @@
 	}
 
 	// List View renders a fixed number of items and relies on each item having a fixed height of 32px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
+	// If this value changes, we should also change BLOCK_LIST_ITEM_HEIGHT.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	.block-editor-list-view-block-contents {
 		display: flex;
@@ -261,18 +290,21 @@
 	&.is-nesting .block-editor-list-view-block-contents,
 	.block-editor-list-view-block-contents:focus {
 		box-shadow: none;
+		outline: none;
 
 		&::after {
 			content: "";
 			position: absolute;
 			top: 0;
-			right: -(24px + 5px); // Icon size + padding.
+			right: -(24px + 4px); // Icon size + padding.
 			bottom: 0;
 			left: 0;
 			border-radius: inherit;
+			@include outset-ring__focus();
+			outline-offset: 1px;
 			box-shadow:
-				inset 0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-admin-theme-color);
+				0 0 0 calc(var(--wpds-border-width-focus) + 2px)
+				var(--wpds-color-background-surface-neutral-strong);
 			z-index: 2;
 			pointer-events: none;
 		}
@@ -281,14 +313,6 @@
 	// Fix focus styling width when one row has fewer cells.
 	&.has-single-cell .block-editor-list-view-block-contents:focus::after {
 		right: 0;
-	}
-
-	&.is-nesting .block-editor-list-view__menu,
-	.block-editor-list-view-block__menu:focus {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
-		z-index: 1;
 	}
 
 	&.is-visible .block-editor-list-view-block-contents {
@@ -334,7 +358,7 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large but the focus target small.
+	// Keep the tap target large.
 	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
@@ -361,14 +385,6 @@
 				top: -$grid-unit-05;
 			}
 		}
-
-		// Tweak size and position of focus ring.
-		&::before {
-			height: 16px;
-			min-width: 100%;
-			left: 0;
-			right: 0;
-		}
 	}
 
 	.block-editor-inserter__toggle {
@@ -383,10 +399,18 @@
 		}
 	}
 
-	// Style lock and position icons in line with image previews.
-	.block-editor-list-view-block-select-button__label-wrapper svg {
-		left: $grid-unit-05 * 0.5; // 2px.
-		position: relative;
+	.block-editor-list-view-block-select-button__label-wrapper {
+		width: 100%;
+
+		> * {
+			min-width: 0;
+		}
+
+		// Style lock and position icons in line with image previews.
+		svg {
+			left: $grid-unit-05 * 0.5; // 2px.
+			position: relative;
+		}
 	}
 
 	.block-editor-list-view-block-select-button__title {
@@ -410,11 +434,24 @@
 		position: absolute;
 		right: 0;
 		transform: translateY(-50%);
+		box-sizing: border-box;
+		max-width: 100%;
+		padding: 2px $grid-unit-10;
+		border-radius: $radius-small;
+		background: $gray-100;
+		color: $gray-800;
+		font-size: var(--wpds-typography-font-size-sm);
+		line-height: var(--wpds-typography-line-height-sm);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
+	// Invert the brand colors so the badge stands out from the selected row.
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: rgba($black, 0.3);
-		color: $white;
+		background: var(--wpds-color-foreground-interactive-brand-strong);
+		/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Without design tokens the badge is white, and the admin color can be too light for text. */
+		color: var(--wpds-color-background-interactive-brand-strong, $gray-800);
 	}
 
 	.block-editor-list-view-block-select-button__block-visibility,
@@ -434,7 +471,7 @@
 		border-radius: $radius-x-small;
 
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small $white;
+			box-shadow: 0 0 0 $radius-small var(--list-view-selected-background, #{$white});
 		}
 
 		&:not(:first-child) {
@@ -442,9 +479,22 @@
 		}
 	}
 
-	&.is-selected .block-editor-list-view-block-select-button__image {
-		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
+	&.is-disabled {
+		opacity: 0.2;
+		@media not ( prefers-reduced-motion ) {
+			transition: opacity 0.1s linear;
+		}
+
+		&:hover {
+			opacity: 0.2;
+		}
+
+		.block-editor-list-view__expander {
+			cursor: default;
+		}
+
+		.block-editor-list-view-block-select-button:hover {
+			color: inherit;
 		}
 	}
 }
@@ -550,6 +600,7 @@ svg {
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;
+	// One row. Spacers standing in for several rows set their height inline.
 	height: 32px;
 }
 

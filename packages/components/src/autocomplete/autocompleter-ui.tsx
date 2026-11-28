@@ -1,35 +1,51 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
-
-/**
- * WordPress dependencies
- */
-import {
-	useLayoutEffect,
-	useRef,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
-import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useDebounce,
+	useEvent,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import type { AutocompleterUIProps, KeyedOption } from './types';
 
+function getAnnouncement( count: number, filterValue: string ) {
+	if ( ! count ) {
+		return __( 'No results.' );
+	}
+	if ( filterValue ) {
+		return sprintf(
+			/* translators: %d: number of results. */
+			_n(
+				'%d result found, use up and down arrow keys to navigate.',
+				'%d results found, use up and down arrow keys to navigate.',
+				count
+			),
+			count
+		);
+	}
+	return sprintf(
+		/* translators: %d: number of results. */
+		_n(
+			'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+			'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+			count
+		),
+		count
+	);
+}
+
 type ListBoxProps = {
 	items: KeyedOption[];
 	onSelect: ( option: KeyedOption ) => void;
+	onHover: ( index: number ) => void;
 	selectedIndex: number;
 	instanceId: number;
 	listBoxId: string | undefined;
@@ -40,6 +56,7 @@ type ListBoxProps = {
 function ListBox( {
 	items,
 	onSelect,
+	onHover,
 	selectedIndex,
 	instanceId,
 	listBoxId,
@@ -65,12 +82,15 @@ function ListBox( {
 						'components-autocomplete__result',
 						className,
 						{
-							// Unused, for backwards compatibility.
 							'is-selected': index === selectedIndex,
 						}
 					) }
-					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
+					onMouseMove={ () => {
+						if ( index !== selectedIndex ) {
+							onHover( index );
+						}
+					} }
 				>
 					{ option.label }
 				</Button>
@@ -88,6 +108,7 @@ export function AutocompleterUI( {
 	selectedIndex,
 	onChangeOptions,
 	onSelect,
+	onHover,
 	reset,
 	contentRef,
 }: AutocompleterUIProps ) {
@@ -101,79 +122,68 @@ export function AutocompleterUI( {
 		editableContentElement: contentRef.current,
 	} );
 
-	const [ needsA11yCompat, setNeedsA11yCompat ] = useState( false );
-	const popoverRef = useRef< HTMLElement >( null );
+	const [ a11yCompatTarget, setA11yCompatTarget ] =
+		useState< HTMLElement | null >( null );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	const onClickOutside = useEvent( reset );
+	const onItemsChange = useEvent( ( nextItems: KeyedOption[] ) => {
+		onChangeOptions( nextItems );
+		debouncedSpeak(
+			getAnnouncement( nextItems.length, filterValue ),
+			'assertive'
+		);
+	} );
+
 	const popoverRefs = useMergeRefs( [
-		popoverRef,
 		useRefEffect(
-			( node ) => {
-				if ( ! contentRef.current ) {
-					return;
-				}
+			( node: HTMLElement ) => {
+				const contentDocument = contentRef.current?.ownerDocument;
 
 				// If the popover is rendered in a different document than
 				// the content, we need to duplicate the options list in the
 				// content document so that it's available to the screen
 				// readers, which check the DOM ID based aria-* attributes.
-				setNeedsA11yCompat(
-					node.ownerDocument !== contentRef.current.ownerDocument
+				setA11yCompatTarget(
+					contentDocument && node.ownerDocument !== contentDocument
+						? contentDocument.body
+						: null
 				);
 			},
 			[ contentRef ]
 		),
+		useRefEffect( ( node: HTMLElement ) => {
+			const { ownerDocument } = node;
+			const listener = ( event: MouseEvent | TouchEvent ) => {
+				if ( ! node.contains( event.target as Node ) ) {
+					onClickOutside( event );
+				}
+			};
+			ownerDocument.addEventListener( 'mousedown', listener );
+			ownerDocument.addEventListener( 'touchstart', listener );
+			return () => {
+				ownerDocument.removeEventListener( 'mousedown', listener );
+				ownerDocument.removeEventListener( 'touchstart', listener );
+			};
+		}, [] ),
 	] );
 
-	useOnClickOutside( popoverRef, reset );
-
-	const debouncedSpeak = useDebounce( speak, 500 );
-
-	function announce( options: Array< KeyedOption > ) {
-		if ( ! debouncedSpeak ) {
-			return;
-		}
-		if ( !! options.length ) {
-			if ( filterValue ) {
-				debouncedSpeak(
-					sprintf(
-						/* translators: %d: number of results. */
-						_n(
-							'%d result found, use up and down arrow keys to navigate.',
-							'%d results found, use up and down arrow keys to navigate.',
-							options.length
-						),
-						options.length
-					),
-					'assertive'
-				);
-			} else {
-				debouncedSpeak(
-					sprintf(
-						/* translators: %d: number of results. */
-						_n(
-							'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
-							'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
-							options.length
-						),
-						options.length
-					),
-					'assertive'
-				);
-			}
-		} else {
-			debouncedSpeak( __( 'No results.' ), 'assertive' );
-		}
-	}
-
 	useLayoutEffect( () => {
-		onChangeOptions( items );
-		announce( items );
-		// We want to avoid introducing unexpected side effects.
-		// See https://github.com/WordPress/gutenberg/pull/41820
-	}, [ items ] );
+		onItemsChange( items );
+	}, [ items, onItemsChange ] );
 
 	if ( items.length === 0 ) {
 		return null;
 	}
+
+	const listBoxProps = {
+		items,
+		onSelect,
+		onHover,
+		selectedIndex,
+		instanceId,
+		listBoxId,
+		className,
+	};
 
 	return (
 		<>
@@ -185,53 +195,16 @@ export function AutocompleterUI( {
 				anchor={ popoverAnchor }
 				ref={ popoverRefs }
 			>
-				<ListBox
-					items={ items }
-					onSelect={ onSelect }
-					selectedIndex={ selectedIndex }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					className={ className }
-				/>
+				<ListBox { ...listBoxProps } />
 			</Popover>
-			{ contentRef.current &&
-				needsA11yCompat &&
+			{ a11yCompatTarget &&
 				createPortal(
 					<ListBox
-						items={ items }
-						onSelect={ onSelect }
-						selectedIndex={ selectedIndex }
-						instanceId={ instanceId }
-						listBoxId={ listBoxId }
-						className={ className }
+						{ ...listBoxProps }
 						Component={ VisuallyHidden }
 					/>,
-					contentRef.current.ownerDocument.body
+					a11yCompatTarget
 				) }
 		</>
 	);
-}
-
-function useOnClickOutside(
-	ref: React.RefObject< HTMLElement | null >,
-	handler: AutocompleterUIProps[ 'reset' ]
-) {
-	useEffect( () => {
-		const listener = ( event: MouseEvent | TouchEvent ) => {
-			// Do nothing if clicking ref's element or descendent elements, or if the ref is not referencing an element
-			if (
-				! ref.current ||
-				ref.current.contains( event.target as Node )
-			) {
-				return;
-			}
-			handler( event );
-		};
-		document.addEventListener( 'mousedown', listener );
-		document.addEventListener( 'touchstart', listener );
-		return () => {
-			document.removeEventListener( 'mousedown', listener );
-			document.removeEventListener( 'touchstart', listener );
-		};
-	}, [ handler, ref ] );
 }

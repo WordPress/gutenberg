@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createSelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { Ability, AbilityCategory, AbilitiesQueryArgs } from '../types';
 import type { AbilitiesState } from './types';
 

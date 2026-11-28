@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ViewportQuery, ViewportState } from '../types';
 
 /**

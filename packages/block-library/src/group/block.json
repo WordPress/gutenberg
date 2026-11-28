@@ -19,7 +19,6 @@
 	},
 	"supports": {
 		"__experimentalOnEnter": true,
-		"__experimentalOnMerge": true,
 		"__experimentalSettings": true,
 		"align": [ "wide", "full" ],
 		"anchor": true,
@@ -45,10 +44,15 @@
 			}
 		},
 		"shadow": true,
+		"transform": {
+			"rotate": true,
+			"translate": true,
+			"scale": true
+		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
-			"blockGap": true,
+			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"blockGap": true
@@ -76,6 +80,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textColumns": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

@@ -1,0 +1,5 @@
+/* Full width with a centred label, as the previous publish panel's button. */
+.reset {
+	justify-content: center;
+	width: 100%;
+}

@@ -1,31 +1,36 @@
-/**
- * WordPress dependencies
- */
-
 import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	hasBlockSupport,
-	store as blocksStore,
-	// @ts-expect-error - No type declarations available for @wordpress/blocks
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
-};
+} as const;
 
 export default function LeafMoreMenu( {
-	block,
+	clientId,
+	updateExpansion,
+	setInsertedBlockClientId,
 	...props
 }: {
-	block: { clientId: string; name: string };
+	clientId: string;
+	updateExpansion: ( action: {
+		type: 'expand' | 'collapse';
+		clientIds: string[];
+	} ) => void;
+	setInsertedBlockClientId: ( clientId: string ) => void;
 } ) {
-	const { clientId } = block;
+	// Read from the global rather than imported, for the reason given in
+	// `content.tsx`: `@wordpress/block-library` loads with the lazily loaded
+	// editor assets, after this bundle initializes.
+	const { AddSubmenuItem } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
+
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -38,7 +43,8 @@ export default function LeafMoreMenu( {
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
 		__( 'Remove %s' ),
-		BlockTitle( { clientId, maximumLength: 25 } )
+		// The menu is for an existing block, which has a title.
+		BlockTitle( { clientId, maximumLength: 25 } ) as string
 	);
 
 	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
@@ -46,6 +52,7 @@ export default function LeafMoreMenu( {
 			( select ) => {
 				const {
 					getBlockRootClientId,
+					getBlockName,
 					canInsertBlockType,
 					getDirectInsertBlock,
 					getBlockIndex,
@@ -54,6 +61,7 @@ export default function LeafMoreMenu( {
 				const { getDefaultBlockName } = select( blocksStore );
 
 				const _rootClientId = getBlockRootClientId( clientId );
+				const _blockName = getBlockName( clientId );
 				const canInsertDefaultBlock = canInsertBlockType(
 					getDefaultBlockName(),
 					_rootClientId
@@ -65,20 +73,22 @@ export default function LeafMoreMenu( {
 				return {
 					rootClientId: _rootClientId,
 					canDuplicate:
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, _rootClientId ),
+						// The menu is for an existing block, which has a name.
+						hasBlockSupport(
+							_blockName as string,
+							'multiple',
+							true
+						) && canInsertBlockType( _blockName, _rootClientId ),
 					canInsertBlock:
 						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						!! block &&
-						canInsertBlockType( block.name, _rootClientId ),
+						canInsertBlockType( _blockName, _rootClientId ),
 					isFirst: getBlockIndex( clientId ) === 0,
 					isLast:
 						getBlockIndex( clientId ) ===
 						getBlockCount( _rootClientId ) - 1,
 				};
 			},
-			[ clientId, block ]
+			[ clientId ]
 		);
 
 	return (
@@ -96,7 +106,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronUp }
 							disabled={ isFirst }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -107,7 +116,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronDown }
 							disabled={ isLast }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();
@@ -115,6 +123,14 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
+						<AddSubmenuItem
+							clientId={ clientId }
+							onClose={ onClose }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
+						/>
 						{ canDuplicate && (
 							<MenuItem
 								onClick={ () => {

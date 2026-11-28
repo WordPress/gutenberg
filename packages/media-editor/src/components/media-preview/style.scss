@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/animations" as *;
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .media-editor-preview {
@@ -48,42 +47,36 @@
 		max-width: 100%;
 	}
 
-	&--file {
-		text-align: center;
+	&--pdf {
+		align-items: stretch;
+		width: 100%;
+		max-width: $wide-content-width;
+		margin-inline: auto;
 	}
 
-	&__file-info {
-		background: $gray-100;
-		padding: $grid-unit-30;
-		border-radius: 2px;
+	&__pdf {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+		border: 0;
+		border-radius: $radius-small;
 	}
 
+	// Long filenames often have no spaces to break on.
 	&__file-name {
-		font-weight: 600;
-		margin-bottom: $grid-unit-10;
+		overflow-wrap: anywhere;
 	}
 
-	&__mime-type {
-		color: $gray-700;
-		font-size: 0.9em;
-		margin-bottom: $grid-unit-20;
-	}
-
-	&__download-link {
-		display: inline-block;
-		margin-top: $grid-unit-10;
-	}
-
-	&--error,
-	&--empty {
-		color: $gray-700;
-		text-align: center;
-	}
-
-	&__url {
-		font-size: 0.9em;
-		color: $gray-600;
-		word-break: break-all;
-		margin-top: $grid-unit-10;
+	// EmptyState.Actions switches between a column and a row on the viewport
+	// width, and the row doesn't wrap. The canvas can be narrow on a wide
+	// viewport, e.g. with the Details panel open, so wrap a row instead. Also
+	// widen its 4px gap between buttons.
+	&__actions {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--wpds-dimension-gap-sm);
 	}
 }

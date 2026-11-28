@@ -1,12 +1,6 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { memo, useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Filter from './filter';
 import { default as AddFilter } from './add-filter';
 import ResetFilters from './reset-filters';
@@ -63,9 +57,8 @@ function Filters( { className }: { className?: string } ) {
 			direction="row"
 			justify="flex-start"
 			gap="sm"
-			style={ { width: 'fit-content' } }
 			wrap="wrap"
-			className={ className }
+			className={ clsx( 'dataviews-filters__summary', className ) }
 		>
 			{ filterComponents }
 		</Stack>

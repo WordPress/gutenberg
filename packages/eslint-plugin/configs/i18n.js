@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const wpRules = require( '../rules' );
 
 const wpPlugin = { rules: wpRules };
@@ -20,6 +17,7 @@ module.exports = [
 			'@wordpress/i18n-ellipsis': 'error',
 			'@wordpress/i18n-no-flanking-whitespace': 'error',
 			'@wordpress/i18n-hyphenated-range': 'error',
+			'@wordpress/i18n-plural-placeholder': 'error',
 		},
 	},
 ];
