@@ -87,7 +87,21 @@ export const LAYOUT_DEFINITIONS = {
 					' > :where(:not(.alignleft):not(.alignright):not(.alignfull))',
 				rules: {
 					'max-width': 'var(--wp--style--global--content-size)',
+				},
+			},
+			// Children with their own horizontal margin (set inline by the
+			// margin block support) keep it instead of being centered.
+			{
+				selector:
+					' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))',
+				rules: {
 					'margin-left': 'auto !important',
+				},
+			},
+			{
+				selector:
+					' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))',
+				rules: {
 					'margin-right': 'auto !important',
 				},
 			},

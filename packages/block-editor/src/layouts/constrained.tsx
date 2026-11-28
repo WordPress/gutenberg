@@ -327,25 +327,33 @@ export default {
 			( contentSize && ! hasWideSizeOverride
 				? contentSize
 				: GLOBAL_WIDE_SIZE );
-		const constrainedSizeDeclarations = [
-			`max-width: ${ contentMaxWidth }`,
-		];
-		if ( ! hasViewportOverrides || hasJustificationOverride ) {
-			constrainedSizeDeclarations.push(
-				`margin-left: ${ marginLeft }`,
-				`margin-right: ${ marginRight }`
-			);
-		}
+		// Children with their own horizontal margin (set inline by the margin
+		// block support) keep it instead of having it overridden by the
+		// layout's alignment margins.
+		const childSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+		);
+		const marginLeftSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))'
+		);
+		const marginRightSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))'
+		);
+		const marginStyles = `
+			${ marginLeftSelector } { margin-left: ${ marginLeft }; }
+			${ marginRightSelector } { margin-right: ${ marginRight }; }
+		`;
 		let output =
 			shouldOutputConstrainedSizes &&
 			( !! contentSize || !! wideSize || isResettingConstrainedSizes )
 				? `
-						${ appendSelectors(
-							selector,
-							'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-						) } {
-						${ constrainedSizeDeclarations.join( '; ' ) };
+					${ childSelector } {
+						max-width: ${ contentMaxWidth };
 					}
+					${ ! hasViewportOverrides || hasJustificationOverride ? marginStyles : '' }
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideMaxWidth };
 					}
@@ -356,24 +364,12 @@ export default {
 				: '';
 
 		if ( hasJustificationOverride && ! shouldOutputConstrainedSizes ) {
-			output += `${ appendSelectors(
-				selector,
-				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-			) }
-				{ margin-left: ${ marginLeft }; margin-right: ${ marginRight }; }`;
+			output += marginStyles;
 		} else if ( ! hasViewportOverrides ) {
 			if ( justifyContent === 'left' ) {
-				output += `${ appendSelectors(
-					selector,
-					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-				) }
-			{ margin-left: ${ marginLeft }; }`;
+				output += `${ marginLeftSelector } { margin-left: ${ marginLeft }; }`;
 			} else if ( justifyContent === 'right' ) {
-				output += `${ appendSelectors(
-					selector,
-					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-				) }
-			{ margin-right: ${ marginRight }; }`;
+				output += `${ marginRightSelector } { margin-right: ${ marginRight }; }`;
 			}
 		}
 

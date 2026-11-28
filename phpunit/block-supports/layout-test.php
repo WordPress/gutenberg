@@ -289,7 +289,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'wideSize'    => '1200px',
 					),
 				),
-				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}',
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:auto !important;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])){margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with sizes and block spacing' => array(
 				'args'            => array(
@@ -306,7 +306,17 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:auto !important;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])){margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'constrained layout with left justification'   => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'constrained',
+						'justifyContent' => 'left',
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:0 !important;}',
 			),
 			'constrained layout with content size unset in viewport' => array(
 				'args'            => array(
