@@ -161,6 +161,129 @@ function shouldEnableHeicCanvasProcessing(): boolean {
 	return true;
 }
 
+type AttachmentRecord = Record< string, unknown >;
+
+/**
+ * Coordinates slot-based `onFileChange` and `onBatchSuccess` callbacks across a
+ * batch of files uploaded individually through `@wordpress/upload-media`.
+ *
+ * Each file receives a fixed slot index so `onFileChange` always receives all
+ * active attachments in original file order, failed files clear their slot and
+ * trigger `onFileChange`, and `onBatchSuccess` fires once after all files have
+ * settled (provided at least one succeeded).
+ *
+ * @param totalFiles     Number of files in the batch.
+ * @param onFileChange   Callback invoked with active attachments in file order.
+ * @param onBatchSuccess Callback invoked once after the batch settles.
+ * @return Slot update and settlement helpers.
+ */
+function createBatchUploadTracker(
+	totalFiles: number,
+	onFileChange?: ( attachments: Array< AttachmentRecord > ) => void,
+	onBatchSuccess?: () => void
+) {
+	const slots: Array< AttachmentRecord | null > = new Array(
+		totalFiles
+	).fill( null );
+	const settled: boolean[] = new Array( totalFiles ).fill( false );
+	let remaining = totalFiles;
+	let hasSuccess = false;
+
+	const updateSlot = ( index: number, value: AttachmentRecord | null ) => {
+		slots[ index ] = value;
+		onFileChange?.(
+			slots.filter(
+				( attachment ): attachment is AttachmentRecord =>
+					attachment !== null
+			)
+		);
+	};
+
+	const settleSlot = ( index: number, succeeded: boolean ) => {
+		if ( settled[ index ] ) {
+			return;
+		}
+		settled[ index ] = true;
+		if ( succeeded ) {
+			hasSuccess = true;
+		}
+		remaining--;
+		if ( remaining === 0 && hasSuccess ) {
+			onBatchSuccess?.();
+		}
+	};
+
+	return {
+		updateSlot,
+		settleSlot,
+	};
+}
+
+/**
+ * Enqueues a single file into the `@wordpress/upload-media` store while updating
+ * its corresponding batch slot.
+ *
+ * @param registry          The data registry.
+ * @param settings          Block editor settings.
+ * @param $3                Upload item parameters.
+ * @param $3.file           File to upload.
+ * @param $3.index          Slot index in the original batch.
+ * @param $3.tracker        Batch upload tracker.
+ * @param $3.allowedTypes   Allowed media types.
+ * @param $3.additionalData Additional request data.
+ * @param $3.onError        Error callback.
+ * @param $3.onSuccess      Per-file success callback.
+ */
+function enqueueUploadItem(
+	registry: DataRegistry,
+	settings: Settings,
+	{
+		file,
+		index,
+		tracker,
+		allowedTypes,
+		additionalData,
+		onError,
+		onSuccess,
+	}: {
+		file: File;
+		index: number;
+		tracker: ReturnType< typeof createBatchUploadTracker >;
+		allowedTypes?: string[];
+		additionalData: Record< string, unknown >;
+		onError: ( message: string ) => void;
+		onSuccess?: ( attachments: Array< AttachmentRecord > ) => void;
+	}
+) {
+	void registry.dispatch( uploadStore ).addItems( {
+		files: [ file ],
+		onChange: ( [ attachment ] ) => {
+			tracker.updateSlot(
+				index,
+				( attachment as AttachmentRecord ) ?? null
+			);
+		},
+		onSuccess: ( attachments ) => {
+			// The private success callback takes the attachments.
+			(
+				settings?.[ mediaUploadOnSuccessKey ] as
+					( ( attachments: unknown ) => void ) | undefined
+			 )?.( attachments );
+			onSuccess?.( attachments as Array< AttachmentRecord > );
+		},
+		onBatchSuccess: () => tracker.settleSlot( index, true ),
+		onError: ( error ) => {
+			tracker.updateSlot( index, null );
+			onError(
+				typeof error === 'string' ? error : ( error?.message ?? '' )
+			);
+			tracker.settleSlot( index, false );
+		},
+		additionalData,
+		allowedTypes,
+	} );
+}
+
 /**
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
@@ -177,7 +300,7 @@ function shouldEnableHeicCanvasProcessing(): boolean {
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param $3.multiple       Whether the caller accepts more than one file.
  */
-function mediaUpload(
+export function mediaUpload(
 	registry: DataRegistry,
 	settings: Settings,
 	{
@@ -195,24 +318,27 @@ function mediaUpload(
 		return;
 	}
 
-	void registry.dispatch( uploadStore ).addItems( {
-		files: Array.from( filesList ),
-		onChange: onFileChange,
-		onSuccess: ( attachments ) => {
-			// The private success callback takes the attachments.
-			(
-				settings?.[ mediaUploadOnSuccessKey ] as
-					( ( attachments: unknown ) => void ) | undefined
-			 )?.( attachments );
-			onSuccess?.( attachments );
-		},
-		onBatchSuccess,
-		onError: ( error ) =>
-			onError(
-				typeof error === 'string' ? error : ( error?.message ?? '' )
-			),
-		additionalData,
-		allowedTypes,
+	const files = Array.from( filesList );
+	if ( files.length === 0 ) {
+		return;
+	}
+
+	const tracker = createBatchUploadTracker(
+		files.length,
+		onFileChange,
+		onBatchSuccess
+	);
+
+	files.forEach( ( file, index ) => {
+		enqueueUploadItem( registry, settings, {
+			file,
+			index,
+			tracker,
+			allowedTypes,
+			additionalData,
+			onError,
+			onSuccess,
+		} );
 	} );
 }
 
@@ -235,7 +361,7 @@ function mediaUpload(
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
  * @param $3.multiple       Whether the caller accepts more than one file.
  */
-async function heicMediaUpload(
+export async function heicMediaUpload(
 	registry: DataRegistry,
 	settings: Settings,
 	{
@@ -254,67 +380,85 @@ async function heicMediaUpload(
 	}
 
 	const files = Array.from( filesList );
+	if ( files.length === 0 ) {
+		return;
+	}
 
 	/*
 	 * Sorted by content rather than by `File.type`, which a browser derives
 	 * from the file extension: a HEIC photo saved as .jpg would otherwise be
 	 * handed to the server-side path, which cannot convert it either.
 	 */
-	const heicFiles: File[] = [];
-	const otherFiles: File[] = [];
-	for ( const file of files ) {
-		( ( await isHeicFile( file ) ) ? heicFiles : otherFiles ).push( file );
-	}
-
-	// When the batch contains both HEIC and non-HEIC files, coordinate
-	// onBatchSuccess so it fires only after *both* paths have completed.
-	const hasBothPaths =
-		heicFiles.length > 0 && otherFiles.length > 0 && settings?.mediaUpload;
-	let pathsRemaining = hasBothPaths ? 2 : 1;
-	const coordinatedBatchSuccess = hasBothPaths
-		? () => {
-				pathsRemaining--;
-				if ( pathsRemaining <= 0 ) {
-					onBatchSuccess?.();
-				}
-			}
-		: onBatchSuccess;
-
-	// Route HEIC files through the upload-media pipeline.
-	if ( heicFiles.length > 0 ) {
-		void registry.dispatch( uploadStore ).addItems( {
-			files: heicFiles,
-			onChange: onFileChange,
-			onSuccess: ( attachments ) => {
-				// The private success callback takes the attachments.
-				(
-					settings?.[ mediaUploadOnSuccessKey ] as
-						( ( attachments: unknown ) => void ) | undefined
-				 )?.( attachments );
-				onSuccess?.( attachments );
-			},
-			onBatchSuccess: coordinatedBatchSuccess,
-			onError: ( error ) =>
-				onError(
-					typeof error === 'string' ? error : ( error?.message ?? '' )
-				),
-			additionalData,
-			allowedTypes,
+	const heicEntries: Array< { file: File; index: number } > = [];
+	const otherEntries: Array< { file: File; index: number } > = [];
+	for ( let index = 0; index < files.length; index++ ) {
+		const file = files[ index ];
+		( ( await isHeicFile( file ) ) ? heicEntries : otherEntries ).push( {
+			file,
+			index,
 		} );
 	}
 
-	// Pass non-HEIC files to the original server-side upload function.
-	if ( otherFiles.length > 0 && settings?.mediaUpload ) {
-		// The setting is the server-side upload function.
+	if ( heicEntries.length === 0 && settings?.mediaUpload ) {
 		( settings.mediaUpload as MediaUploadFunction )( {
 			allowedTypes,
 			additionalData,
-			filesList: otherFiles,
+			filesList,
 			onError,
 			onFileChange,
 			onSuccess,
-			onBatchSuccess: coordinatedBatchSuccess,
+			onBatchSuccess,
 			multiple,
+		} );
+		return;
+	}
+
+	const totalFiles =
+		heicEntries.length +
+		( settings?.mediaUpload ? otherEntries.length : 0 );
+	const tracker = createBatchUploadTracker(
+		totalFiles,
+		onFileChange,
+		onBatchSuccess
+	);
+
+	// Route HEIC files through the upload-media pipeline.
+	heicEntries.forEach( ( { file, index }, heicPosition ) => {
+		const slotIndex = settings?.mediaUpload ? index : heicPosition;
+		enqueueUploadItem( registry, settings, {
+			file,
+			index: slotIndex,
+			tracker,
+			allowedTypes,
+			additionalData,
+			onError,
+			onSuccess,
+		} );
+	} );
+
+	// Pass non-HEIC files to the original server-side upload function.
+	if ( otherEntries.length > 0 && settings?.mediaUpload ) {
+		const originalMediaUpload = settings.mediaUpload as MediaUploadFunction;
+		otherEntries.forEach( ( { file, index } ) => {
+			originalMediaUpload( {
+				allowedTypes,
+				additionalData,
+				filesList: [ file ],
+				onError: ( error ) => {
+					tracker.updateSlot( index, null );
+					onError( error );
+					tracker.settleSlot( index, false );
+				},
+				onFileChange: ( [ attachment ] ) => {
+					tracker.updateSlot( index, attachment ?? null );
+				},
+				onSuccess: ( attachments ) => {
+					onSuccess?.( attachments );
+					tracker.settleSlot( index, true );
+				},
+				onBatchSuccess: () => tracker.settleSlot( index, true ),
+				multiple,
+			} );
 		} );
 	}
 }
