@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Documentation
-
--   `ComplementaryArea`: Document the `render` prop in the README ([#87588](https://github.com/WordPress/gutenberg/pull/87588)).
-
 ### Bug Fixes
 
 -   `InterfaceSkeleton`: Keep the open save panel visible when the window loses focus. ([#87519](https://github.com/WordPress/gutenberg/pull/87519)).
@@ -13,6 +9,10 @@
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+### Documentation
+
+-   `ComplementaryArea`: Document the `render` prop in the README ([#87588](https://github.com/WordPress/gutenberg/pull/87588)).
 
 ## 11.2.0 (2026-11-18)
 
