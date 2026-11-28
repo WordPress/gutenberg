@@ -5,10 +5,7 @@ export interface QueryPaginationPreviousAttributes extends Record<
 	label?: string;
 }
 
-export interface QueryPaginationPreviousBlockContext extends Record<
-	string,
-	unknown
-> {
+export interface QueryPaginationPreviousBlockContext {
 	paginationArrow?: 'none' | 'arrow' | 'chevron';
 	showLabel?: boolean;
 }
