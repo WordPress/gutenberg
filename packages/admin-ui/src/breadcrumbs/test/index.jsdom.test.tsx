@@ -1,39 +1,41 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { Breadcrumbs } from '..';
-
-vi.mock( import( '@wordpress/route' ), async ( importOriginal ) => {
-	const original = await importOriginal();
-
-	return {
-		...original,
-		Link: ( ( { to, children }: { to: string; children: ReactNode } ) => (
-			<a href={ to }>{ children }</a>
-		) ) as typeof original.Link,
-	};
-} );
 
 describe( 'Breadcrumbs', () => {
 	describe( 'validation', () => {
-		it( 'should throw when a preceding item is missing `to`', () => {
+		it( 'should throw when a preceding item is missing `href`', () => {
 			expect( () =>
 				render(
 					<Breadcrumbs
+						headingLevel={ 1 }
 						items={ [
 							{ label: 'Home' },
-							{ label: 'Settings', to: '/settings' },
+							{ label: 'Settings', href: '/settings' },
 							{ label: 'General' },
 						] }
 					/>
 				)
-			).toThrow( /item "Home" is missing a `to` prop/ );
-		} );
+			).toThrow( /item "Home" is missing an `href` prop/ );
 
-		it( 'should throw for the first preceding item missing `to`', () => {
 			expect( () =>
 				render(
 					<Breadcrumbs
+						headingLevel={ 1 }
+						items={ [
+							{ label: 'Home', href: '' },
+							{ label: 'General' },
+						] }
+					/>
+				)
+			).toThrow( /item "Home" is missing an `href` prop/ );
+		} );
+
+		it( 'should throw for the first preceding item missing `href`', () => {
+			expect( () =>
+				render(
+					<Breadcrumbs
+						headingLevel={ 1 }
 						items={ [
 							{ label: 'Home' },
 							{ label: 'Settings' },
@@ -41,16 +43,17 @@ describe( 'Breadcrumbs', () => {
 						] }
 					/>
 				)
-			).toThrow( /item "Home" is missing a `to` prop/ );
+			).toThrow( /item "Home" is missing an `href` prop/ );
 		} );
 
-		it( 'should not throw when all preceding items have `to`', () => {
+		it( 'should not throw when all preceding items have `href`', () => {
 			expect( () =>
 				render(
 					<Breadcrumbs
+						headingLevel={ 1 }
 						items={ [
-							{ label: 'Home', to: '/' },
-							{ label: 'Settings', to: '/settings' },
+							{ label: 'Home', href: '/' },
+							{ label: 'Settings', href: '/settings' },
 							{ label: 'General' },
 						] }
 					/>
@@ -58,30 +61,38 @@ describe( 'Breadcrumbs', () => {
 			).not.toThrow();
 		} );
 
-		it( 'should not throw when there is only one item without `to`', () => {
+		it( 'should not throw when there is only one item without `href`', () => {
 			expect( () =>
-				render( <Breadcrumbs items={ [ { label: 'Dashboard' } ] } /> )
+				render(
+					<Breadcrumbs
+						headingLevel={ 1 }
+						items={ [ { label: 'Dashboard' } ] }
+					/>
+				)
 			).not.toThrow();
 		} );
 
 		it( 'should not throw when items is empty', () => {
 			expect( () =>
-				render( <Breadcrumbs items={ [] } /> )
+				render( <Breadcrumbs headingLevel={ 1 } items={ [] } /> )
 			).not.toThrow();
 		} );
 	} );
 
 	describe( 'rendering', () => {
 		it( 'should render nothing when items is empty', () => {
-			const { container } = render( <Breadcrumbs items={ [] } /> );
+			const { container } = render(
+				<Breadcrumbs headingLevel={ 1 } items={ [] } />
+			);
 			expect( container ).toBeEmptyDOMElement();
 		} );
 
-		it( 'should render the last item as an h1 when it has no `to`', () => {
+		it( 'should render the last item as an h1', () => {
 			render(
 				<Breadcrumbs
+					headingLevel={ 1 }
 					items={ [
-						{ label: 'Home', to: '/' },
+						{ label: 'Home', href: '/' },
 						{ label: 'Current Page' },
 					] }
 				/>
@@ -92,32 +103,13 @@ describe( 'Breadcrumbs', () => {
 			).toHaveTextContent( 'Current Page' );
 		} );
 
-		it( 'should render the last item as a link when it has `to`', () => {
-			render(
-				<Breadcrumbs
-					items={ [
-						{ label: 'Home', to: '/' },
-						{ label: 'Settings', to: '/settings' },
-					] }
-				/>
-			);
-
-			expect(
-				screen.queryByRole( 'heading', { level: 1 } )
-			).not.toBeInTheDocument();
-
-			const links = screen.getAllByRole( 'link' );
-			expect( links ).toHaveLength( 2 );
-			expect( links[ 1 ] ).toHaveTextContent( 'Settings' );
-			expect( links[ 1 ] ).toHaveAttribute( 'href', '/settings' );
-		} );
-
 		it( 'should render preceding items as links', () => {
 			render(
 				<Breadcrumbs
+					headingLevel={ 1 }
 					items={ [
-						{ label: 'Home', to: '/' },
-						{ label: 'Settings', to: '/settings' },
+						{ label: 'Home', href: '/' },
+						{ label: 'Settings', href: '/settings' },
 						{ label: 'General' },
 					] }
 				/>
@@ -134,9 +126,10 @@ describe( 'Breadcrumbs', () => {
 		it( 'should never render preceding items as headings', () => {
 			render(
 				<Breadcrumbs
+					headingLevel={ 1 }
 					items={ [
-						{ label: 'Home', to: '/' },
-						{ label: 'Settings', to: '/settings' },
+						{ label: 'Home', href: '/' },
+						{ label: 'Settings', href: '/settings' },
 						{ label: 'General' },
 					] }
 				/>
@@ -147,8 +140,13 @@ describe( 'Breadcrumbs', () => {
 			expect( headings[ 0 ] ).toHaveTextContent( 'General' );
 		} );
 
-		it( 'should render a single item without `to` as an h1', () => {
-			render( <Breadcrumbs items={ [ { label: 'Dashboard' } ] } /> );
+		it( 'should render a single item without `href` as an h1', () => {
+			render(
+				<Breadcrumbs
+					headingLevel={ 1 }
+					items={ [ { label: 'Dashboard' } ] }
+				/>
+			);
 
 			expect(
 				screen.getByRole( 'heading', { level: 1 } )
@@ -157,7 +155,12 @@ describe( 'Breadcrumbs', () => {
 		} );
 
 		it( 'should render inside a nav with an accessible label', () => {
-			render( <Breadcrumbs items={ [ { label: 'Home', to: '/' } ] } /> );
+			render(
+				<Breadcrumbs
+					headingLevel={ 1 }
+					items={ [ { label: 'Home', href: '/' } ] }
+				/>
+			);
 
 			expect(
 				screen.getByRole( 'navigation', { name: 'Breadcrumbs' } )

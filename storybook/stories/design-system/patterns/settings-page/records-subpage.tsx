@@ -1,11 +1,11 @@
-import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import type { Action, View } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
 import { pencil } from '@wordpress/icons';
 import { Link as RouterLink, useNavigate } from '@wordpress/route';
 import type { ApiKey } from './api-keys';
 import { defaultKeysView, KeyForm, KeysTable, useKeys } from './api-keys';
-import { SettingsRouter, useSettingsPath } from './router';
+import { RouterNavLink, SettingsRouter, useSettingsPath } from './router';
 import {
 	SettingsContent,
 	SettingsExample,
@@ -72,15 +72,11 @@ function RecordsSubpageScreen() {
 	return (
 		<SettingsFormPage
 			key={ path }
-			breadcrumbs={
-				<Breadcrumbs
-					items={ [
-						{ label: 'API keys', to: '/' },
-						{ label: key.name },
-					] }
-				/>
-			}
-			ariaLabel={ key.name }
+			breadcrumbs={ [
+				{ label: 'API keys', href: '/' },
+				{ label: key.name },
+			] }
+			components={ { link: RouterNavLink } }
 			saved={ key }
 			onSave={ saveKey }
 		>

@@ -1,3 +1,6 @@
+import { type ComponentType } from 'react';
+import type { NavigationLinkProps } from '../navigation/types';
+
 export interface BreadcrumbItem {
 	/**
 	 * The label text for the breadcrumb item.
@@ -5,24 +8,27 @@ export interface BreadcrumbItem {
 	label: string;
 
 	/**
-	 * The router path that the breadcrumb item should link to.
-	 * It is optional for the last item (the current page).
-	 * All preceding items should provide a `to` prop.
+	 * The URL the item links to. All items except the last one must have it.
+	 * The last item is the current page, so it does not link.
 	 */
-	to?: string;
+	href?: string;
 }
 
-export interface BreadcrumbsProps extends React.HTMLAttributes< HTMLElement > {
+export interface BreadcrumbsProps {
 	/**
-	 * An array of items to display in the breadcrumb trail.
-	 * The last item is considered the current item and has an optional `to` prop.
-	 * All preceding items must have a `to` prop — in development mode,
-	 * an error is thrown when this requirement is not met.
+	 * The breadcrumb items to display. The last item is the page heading.
 	 */
-	items: BreadcrumbItem[];
+	items: readonly BreadcrumbItem[];
+
 	/**
-	 * A boolean to show/hide the current item in the trail.
-	 * Note that when `false` the current item is only visually hidden.
+	 * The heading level of the last item.
 	 */
-	showCurrentItem?: boolean;
+	headingLevel: 1 | 2 | 3 | 4 | 5 | 6;
+
+	/**
+	 * Component rendered in place of the default `<a>` for each link.
+	 *
+	 * @default 'a'
+	 */
+	linkComponent?: ComponentType< NavigationLinkProps >;
 }

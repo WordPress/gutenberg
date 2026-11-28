@@ -203,8 +203,8 @@ function createSettingsRouter( initialPath: string ) {
 }
 
 /**
- * Gives an example an in-memory router, so `Breadcrumbs`, `Page` navigation
- * and subpage links navigate inside the canvas without touching the URL.
+ * Gives an example an in-memory router, so the links in the `Page` header
+ * and the subpage links navigate inside the canvas without touching the URL.
  */
 export function SettingsRouter( {
 	initialPath = '/',

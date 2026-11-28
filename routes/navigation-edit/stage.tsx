@@ -1,5 +1,6 @@
-import { useParams } from '@wordpress/route';
-import { Page, Breadcrumbs } from '@wordpress/admin-ui';
+import type { ComponentPropsWithoutRef } from 'react';
+import { Link, useParams } from '@wordpress/route';
+import { Page } from '@wordpress/admin-ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -8,6 +9,16 @@ import NavigationMenuEditor from './editor';
 import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
+
+/**
+ * Renders `Page` links with the router, which takes the path as `to`.
+ */
+function RouterLink( {
+	href,
+	...props
+}: ComponentPropsWithoutRef< 'a' > & { href: string } ) {
+	return <Link to={ href } { ...props } />;
+}
 
 function NavigationEditStage() {
 	const { id } = useParams( { from: '/navigation/edit/$id' } );
@@ -36,21 +47,17 @@ function NavigationEditStage() {
 
 	return (
 		<Page
-			ariaLabel={ decodeEntities( menuTitle ) }
 			headingLevel={ 2 }
-			breadcrumbs={
-				<Breadcrumbs
-					items={ [
-						{
-							label: __( 'Navigation' ),
-							to: '/navigation/list',
-						},
-						{
-							label: decodeEntities( menuTitle ),
-						},
-					] }
-				/>
-			}
+			breadcrumbs={ [
+				{
+					label: __( 'Navigation' ),
+					href: '/navigation/list',
+				},
+				{
+					label: decodeEntities( menuTitle ),
+				},
+			] }
+			components={ { link: RouterLink } }
 		>
 			<div className={ styles.content }>
 				<NavigationMenuEditor id={ navigationId } />

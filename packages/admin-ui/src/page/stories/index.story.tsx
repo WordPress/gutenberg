@@ -9,8 +9,6 @@ import {
 } from '@wordpress/ui';
 import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
-import Breadcrumbs from '../../breadcrumbs';
-import { withRouter } from '../../stories/with-router';
 
 const meta: Meta< typeof Page > = {
 	component: Page,
@@ -53,17 +51,12 @@ export const WithSubtitle: Story = {
 };
 
 export const WithBreadcrumbs: Story = {
-	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
+		breadcrumbs: [
+			{ label: 'Root breadcrumb', href: '#' },
+			{ label: 'Level 1 breadcrumb' },
+		],
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -80,18 +73,13 @@ export const WithVisual: Story = {
 };
 
 export const WithVisualAndBreadcrumbs: Story = {
-	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		showSidebarToggle: false,
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
+		breadcrumbs: [
+			{ label: 'Root breadcrumb', href: '#' },
+			{ label: 'Level 1 breadcrumb' },
+		],
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -119,18 +107,13 @@ export const WithImageVisual: Story = {
 };
 
 export const WithBreadcrumbsAndSubtitle: Story = {
-	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
 		subTitle: 'All of the subtitle text you need goes here.',
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
+		breadcrumbs: [
+			{ label: 'Root breadcrumb', href: '#' },
+			{ label: 'Level 1 breadcrumb' },
+		],
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -155,17 +138,12 @@ export const WithTitleAndBadges: Story = {
 };
 
 export const WithBreadcrumbsAndBadges: Story = {
-	decorators: [ withRouter ],
 	args: {
 		showSidebarToggle: false,
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
+		breadcrumbs: [
+			{ label: 'Root breadcrumb', href: '#' },
+			{ label: 'Level 1 breadcrumb' },
+		],
 		badges: <Badge intent="none">Published</Badge>,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
@@ -269,18 +247,13 @@ export const WithNavigationAndActions: Story = {
 };
 
 export const FullHeader: Story = {
-	decorators: [ withRouter ],
 	args: {
 		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
-		breadcrumbs: (
-			<Breadcrumbs
-				items={ [
-					{ label: 'Root breadcrumb', to: '/connectors' },
-					{ label: 'Level 1 breadcrumb' },
-				] }
-			/>
-		),
+		breadcrumbs: [
+			{ label: 'Root breadcrumb', href: '#' },
+			{ label: 'Level 1 breadcrumb' },
+		],
 		badges: <Badge intent="informational">Status</Badge>,
 		navigation: {
 			items: [

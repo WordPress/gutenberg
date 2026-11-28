@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useArgs, useState } from 'storybook/preview-api';
-import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import { wordpress } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
@@ -18,7 +18,6 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-import { withRouter } from '../../decorators/with-router';
 import { getDesignSystemThemeSettings } from '../../decorators/with-design-system-theme';
 
 const SIDEBAR_THEME_PRESETS = [
@@ -313,17 +312,13 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 									<Icon icon={ wordpress } size={ 24 } />
 								}
 								subTitle="All of the subtitle text you need goes here."
-								breadcrumbs={
-									<Breadcrumbs
-										items={ [
-											{
-												label: 'Root breadcrumb',
-												to: '/connectors',
-											},
-											{ label: 'Level 1 breadcrumb' },
-										] }
-									/>
-								}
+								breadcrumbs={ [
+									{
+										label: 'Root breadcrumb',
+										href: '#',
+									},
+									{ label: 'Level 1 breadcrumb' },
+								] }
 								badges={
 									<Badge intent="informational">Status</Badge>
 								}
@@ -507,7 +502,6 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 			</div>
 		);
 	},
-	decorators: [ withRouter ],
 	parameters: {
 		controls: { disable: true },
 	},
