@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-import { useState, useRef } from '@wordpress/element';
+import { memo, useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
@@ -26,7 +26,7 @@ function getItemCursor(
 	return 'grab';
 }
 
-export function GridItem( {
+function GridItemImpl( {
 	item,
 	maxColumns,
 	disabled = false,
@@ -195,6 +195,13 @@ export function GridItem( {
 		</div>
 	);
 }
+
+/**
+ * Memoized so a drag or resize frame re-renders only the tile whose
+ * props changed, not every tile in the grid. See the README's
+ * Performance section.
+ */
+export const GridItem = memo( GridItemImpl );
 
 function SnapPreviewOverlay( { snap }: { snap: ResizeSnapSize } ) {
 	return (
