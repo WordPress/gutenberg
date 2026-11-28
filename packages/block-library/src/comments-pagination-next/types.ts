@@ -5,9 +5,6 @@ export interface CommentsPaginationNextAttributes extends Record<
 	label?: string;
 }
 
-export interface CommentsPaginationNextBlockContext extends Record<
-	string,
-	unknown
-> {
+export interface CommentsPaginationNextBlockContext {
 	'comments/paginationArrow'?: 'none' | 'arrow' | 'chevron';
 }
