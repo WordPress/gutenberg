@@ -299,6 +299,46 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	for ( const key of [ 'Tab', 'Escape' ] ) {
+		test( `should return focus to the heading with ${ key } after changing its level from the block toolbar`, async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.canvas
+				.locator( 'role=document[name="Add default block"i]' )
+				.click();
+			await page.keyboard.type( '## Heading' );
+
+			// Move focus to the block toolbar and change the level from the
+			// block switcher, which replaces the heading's element.
+			await pageUtils.pressKeys( 'shift+Tab' );
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Heading 2' } )
+			).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await page.getByRole( 'menuitem', { name: 'Heading 3' } ).click();
+
+			await page.keyboard.press( key );
+
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading 3',
+				} )
+			).toBeFocused();
+
+			await page.keyboard.type( ' level' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/heading',
+					attributes: { content: 'Heading level', level: 3 },
+				},
+			] );
+		} );
+	}
+
 	test( 'should be converted from a paragraph to a heading with keyboard shortcuts', async ( {
 		editor,
 		page,

@@ -50,7 +50,7 @@ describe( 'editMediaEntity', () => {
 		__unstableAcquireStoreLock: Mock;
 		__unstableReleaseStoreLock: Mock;
 	};
-	let resolveSelect: { getEntitiesConfig: Mock };
+	let resolveSelect: { getEntityConfig: Mock };
 
 	beforeEach( () => {
 		apiFetchMock.mockReset();
@@ -60,13 +60,11 @@ describe( 'editMediaEntity', () => {
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
 		resolveSelect = {
-			getEntitiesConfig: vi.fn( () => [
-				{
-					kind: 'postType',
-					name: 'attachment',
-					baseURL: '/wp/v2/media',
-				},
-			] ),
+			getEntityConfig: vi.fn( () => ( {
+				kind: 'postType',
+				name: 'attachment',
+				baseURL: '/wp/v2/media',
+			} ) ),
 		};
 	} );
 
@@ -87,7 +85,7 @@ describe( 'editMediaEntity', () => {
 	} );
 
 	it( 'should return early when entity config is not found', async () => {
-		resolveSelect.getEntitiesConfig.mockReturnValue( [] );
+		resolveSelect.getEntityConfig.mockReturnValue( undefined );
 
 		const result = await editMediaEntity( 123 )(
 			thunkArgs( {
