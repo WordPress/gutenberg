@@ -94,8 +94,7 @@ export const init = () => {
 
 	return initBlock( {
 		name,
-		metadata:
-			metadata as BlockModule< TemplatePartAttributes >[ 'metadata' ],
+		metadata,
 		settings,
 	} );
 };

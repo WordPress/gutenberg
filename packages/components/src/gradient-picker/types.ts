@@ -6,7 +6,14 @@ export type GradientObject = {
 	name: string;
 	slug: string;
 };
-export type OriginObject = { name: string; gradients: GradientObject[] };
+export type OriginObject = {
+	/**
+	 * A stable identifier, unique among origins, that keeps focus on the origin when origins are reordered or removed.
+	 */
+	slug?: string;
+	name: string;
+	gradients: GradientObject[];
+};
 export type GradientsProp = GradientObject[] | OriginObject[];
 
 type GradientPickerBaseProps = {
@@ -122,6 +129,8 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * selector. Alternatively, if there are multiple sets (or 'origins') of
 	 * gradients, you can pass an array of objects each with a `name` and a
 	 * `gradients` array which will in turn contain the predefined gradient objects.
+	 * Give each origin a stable, unique `slug` to keep focus on it when origins
+	 * are reordered or removed.
 	 *
 	 * @default []
 	 */
