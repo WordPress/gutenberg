@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Polish the header: move the Options menu out of the document tools toolbar so its popover matches the other editors, and remove the side gaps around the fixed block toolbar ([#87504](https://github.com/WordPress/gutenberg/pull/87504)).
 -   Keep the widget inserter open when Escape is pressed during IME composition ([#87353](https://github.com/WordPress/gutenberg/pull/87353)).
 -   Use `Highlight` and `HighlightText` for the pressed header buttons in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
 -   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).

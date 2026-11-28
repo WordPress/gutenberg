@@ -661,7 +661,6 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( welcomeGuideHeading ).toBeHidden();
 
 		await page
-			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Options', exact: true } )
 			.click();
 		// The welcome guide is not a preference, so the item is a plain menu
@@ -721,8 +720,9 @@ test.describe( 'Widgets Customizer', () => {
 		const inserterToggle = documentTools.getByRole( 'button', {
 			name: 'Add block',
 		} );
-		const optionsToggle = documentTools.getByRole( 'button', {
+		const optionsToggle = page.getByRole( 'button', {
 			name: 'Options',
+			exact: true,
 		} );
 
 		await undoButton.focus();
@@ -735,19 +735,19 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await expect( inserterToggle ).toBeFocused();
 		await page.keyboard.press( 'ArrowRight' );
-		await expect( optionsToggle ).toBeFocused();
-		await page.keyboard.press( 'ArrowRight' );
 		await expect( undoButton ).toBeFocused();
 		await page.keyboard.press( 'ArrowLeft' );
-		await expect( optionsToggle ).toBeFocused();
+		await expect( inserterToggle ).toBeFocused();
 		await page.keyboard.press( 'Home' );
 		await expect( undoButton ).toBeFocused();
 		await page.keyboard.press( 'End' );
-		await expect( optionsToggle ).toBeFocused();
+		await expect( inserterToggle ).toBeFocused();
 
-		// The toolbar is a single tab stop.
+		// The toolbar is a single tab stop, followed by the options menu
+		// toggle, like in the other editors.
 		await page.keyboard.press( 'Tab' );
 		await expect( documentTools.locator( ':focus' ) ).toHaveCount( 0 );
+		await expect( optionsToggle ).toBeFocused();
 	} );
 
 	test( 'should undo and redo changes from the document tools', async ( {

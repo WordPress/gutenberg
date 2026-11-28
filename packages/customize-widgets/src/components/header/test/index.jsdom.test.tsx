@@ -70,6 +70,11 @@ describe( 'Header', () => {
 			screen.getByRole( 'button', { name: 'Add block' } )
 		).toHaveFocus();
 		await user.keyboard( '{ArrowRight}' );
+		expect( undoButton ).toHaveFocus();
+
+		// The options menu toggle is outside the toolbar, and is the next
+		// tab stop.
+		await user.tab();
 		expect(
 			screen.getByRole( 'button', { name: 'Options' } )
 		).toHaveFocus();

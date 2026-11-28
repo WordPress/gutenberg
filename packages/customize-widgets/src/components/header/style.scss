@@ -15,7 +15,11 @@
 	}
 
 	display: flex;
-	justify-content: flex-end;
+	align-items: center;
+	gap: $grid-unit-10;
+	// Keep the focus ring of the options menu toggle within the customizer
+	// sidebar, which clips its overflow.
+	padding-inline-end: $grid-unit-15;
 
 	// Offset the customizer's sidebar padding.
 	// Zero bottom margin so that the fixed toolbar is right under the header.
@@ -29,20 +33,19 @@
 
 .customize-widgets-header-toolbar {
 	display: flex;
+	flex: 1;
 	border: none;
-	width: 100%;
 	align-items: center;
 	gap: $grid-unit-10;
-	// Keep the outset focus ring of the first and last buttons within the
-	// customizer sidebar, which clips its overflow.
-	padding: 0 $grid-unit-15;
+	// Keep the outset focus ring of the first button within the customizer
+	// sidebar, which clips its overflow.
+	padding-inline-start: $grid-unit-15;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles, consistent with the document tools
 	// of the other editors.
 	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
-	> .components-button.has-icon.has-icon.has-icon,
-	> .components-dropdown > .components-button.has-icon.has-icon {
+	> .components-button.has-icon.has-icon.has-icon {
 		height: $button-size-compact;
 		min-width: $button-size-compact;
 		padding: 4px;
@@ -75,7 +78,7 @@
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: $radius-small;
-		// Push the inserter toggle and the buttons after it to the end.
+		// Push the inserter toggle to the end.
 		margin: $grid-unit-15 0 $grid-unit-15 auto;
 
 		svg {
