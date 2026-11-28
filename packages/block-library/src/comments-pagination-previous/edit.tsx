@@ -1,5 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, PlainText } from '@wordpress/block-editor';
+import type { BlockEditProps } from '@wordpress/blocks';
+import type {
+	CommentsPaginationPreviousAttributes,
+	CommentsPaginationPreviousBlockContext,
+} from './types';
 
 const arrowMap = {
 	none: '',
@@ -11,8 +16,10 @@ export default function CommentsPaginationPreviousEdit( {
 	attributes: { label },
 	setAttributes,
 	context: { 'comments/paginationArrow': paginationArrow },
+}: BlockEditProps< CommentsPaginationPreviousAttributes > & {
+	context: CommentsPaginationPreviousBlockContext;
 } ) {
-	const displayArrow = arrowMap[ paginationArrow ];
+	const displayArrow = arrowMap[ paginationArrow! ];
 	return (
 		<a
 			href="#comments-pagination-previous-pseudo-link"
