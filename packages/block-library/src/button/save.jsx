@@ -9,6 +9,7 @@ import {
 	__experimentalGetElementClassName,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
+import { getSafeButtonUrl } from './utils';
 
 export default function save( { attributes } ) {
 	const {
@@ -62,7 +63,7 @@ export default function save( { attributes } ) {
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }
 				className={ buttonClasses }
-				href={ isButtonTag ? null : url }
+				href={ isButtonTag ? null : getSafeButtonUrl( url ) }
 				title={ title }
 				style={ buttonStyle }
 				value={ text }
