@@ -6,6 +6,10 @@ import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
 import { colord } from 'colord';
 import { getContrastWarning } from '../components/contrast-checker';
+import type {
+	ContrastCheckerProps,
+	ContrastWarning,
+} from '../components/contrast-checker/types';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import {
 	getGradientStopColors,
@@ -126,18 +130,196 @@ export function getBlockElementColors(
 	};
 }
 
+/**
+ * Computes the rendered font size in pixels for the block element whose
+ * foreground color is evaluated by contrast checking.
+ *
+ * @param blockEl                Rendered block element.
+ * @param blockType              Block type definition.
+ * @param options                Evaluation options matching the contrast check.
+ * @param options.checkTextColor Whether block text contrast is evaluated.
+ * @param options.checkLinkColor Whether link contrast is evaluated.
+ * @return Computed font size in pixels, if measurable.
+ */
+export function getBlockElementFontSize(
+	blockEl: Element | null,
+	blockType: BlockType | null | undefined,
+	{
+		checkTextColor = true,
+		checkLinkColor = true,
+	}: Pick<
+		UseBlockColorContrastWarningOptions,
+		'checkTextColor' | 'checkLinkColor'
+	> = {}
+): number | undefined {
+	if ( ! blockEl || ! blockType ) {
+		return undefined;
+	}
+
+	let targetElement: Element | null = null;
+	if ( ! checkTextColor && checkLinkColor ) {
+		const linkElement = blockEl.querySelector( 'a' );
+		if ( linkElement && linkElement.textContent ) {
+			targetElement = linkElement;
+		}
+	}
+
+	if ( ! targetElement ) {
+		const candidates = [
+			getBlockSelector( blockType, 'typography.fontSize' ),
+			getBlockSelector( blockType, 'typography.root' ),
+			getBlockSelector( blockType, 'typography' ),
+			getBlockSelector( blockType, 'color.text', {
+				fallback: true,
+			} ),
+		];
+		const fontSizeSelector = candidates.find(
+			( selector ): selector is string =>
+				typeof selector === 'string' && selector.length > 0
+		);
+		targetElement =
+			( fontSizeSelector && blockEl.querySelector( fontSizeSelector ) ) ||
+			blockEl;
+	}
+
+	const fontSize = Number.parseFloat(
+		getComputedValue( targetElement, 'font-size' )
+	);
+	return Number.isFinite( fontSize ) ? fontSize : undefined;
+}
+
+export interface ContrastMeasurements extends BlockElementColors {
+	textFontSize?: number;
+	linkFontSize?: number;
+}
+
+const MEASUREMENT_KEYS = [
+	'textColor',
+	'backgroundColor',
+	'linkColor',
+	'textFontSize',
+	'linkFontSize',
+] as const;
+
+const TEXT_FONT_SIZE_OPTIONS = {
+	checkTextColor: true,
+	checkLinkColor: false,
+} as const;
+
+const LINK_FONT_SIZE_OPTIONS = {
+	checkTextColor: false,
+	checkLinkColor: true,
+} as const;
+
+/**
+ * Computes the rendered colors and font sizes evaluated for block contrast
+ * checking.
+ *
+ * @param blockEl        Rendered block element.
+ * @param blockType      Block type definition.
+ * @param checkTextColor Whether block text contrast is evaluated.
+ * @param checkLinkColor Whether link contrast is evaluated.
+ * @return Measured block colors and font sizes.
+ */
+export function getBlockContrastMeasurements(
+	blockEl: Element | null,
+	blockType: BlockType | null | undefined,
+	checkTextColor = true,
+	checkLinkColor = true
+): ContrastMeasurements {
+	const measurements: ContrastMeasurements = {
+		...getBlockElementColors( blockEl, blockType ),
+	};
+	if ( checkTextColor ) {
+		measurements.textFontSize = getBlockElementFontSize(
+			blockEl,
+			blockType,
+			TEXT_FONT_SIZE_OPTIONS
+		);
+	}
+	if ( checkLinkColor ) {
+		measurements.linkFontSize = getBlockElementFontSize(
+			blockEl,
+			blockType,
+			LINK_FONT_SIZE_OPTIONS
+		);
+	}
+	return measurements;
+}
+
+/**
+ * Computes a contrast warning for measured block colors, evaluating text
+ * and link pairs against their own measured font sizes.
+ *
+ * @param measurements            Measured block colors and font sizes.
+ * @param options                 Evaluation options.
+ * @param options.checkTextColor  Whether to evaluate text contrast.
+ * @param options.checkLinkColor  Whether to evaluate link contrast.
+ * @param options.messageOverride Custom copy replacing generic guidance.
+ * @return Warning object when contrast is insufficient, otherwise `null`.
+ */
+export function getBlockContrastWarning(
+	measurements: ContrastMeasurements,
+	{
+		checkTextColor = true,
+		checkLinkColor = true,
+		messageOverride,
+	}: Pick<
+		UseBlockColorContrastWarningOptions,
+		'checkTextColor' | 'checkLinkColor' | 'messageOverride'
+	> = {}
+): ContrastWarning | null {
+	if ( ! measurements.backgroundColor ) {
+		return null;
+	}
+
+	const pairs: Partial< ContrastCheckerProps >[] = [];
+	if ( checkTextColor && measurements.textColor ) {
+		pairs.push( {
+			textColor: measurements.textColor,
+			fontSize: measurements.textFontSize,
+		} );
+	}
+	if ( checkLinkColor && measurements.linkColor ) {
+		pairs.push( {
+			linkColor: measurements.linkColor,
+			fontSize: measurements.linkFontSize,
+		} );
+	}
+
+	if ( ! pairs.length ) {
+		return null;
+	}
+
+	// Evaluate contrast failures across text and link before alpha warnings
+	// so insufficient contrast always takes precedence over transparency.
+	for ( const enableAlphaChecker of [ false, true ] ) {
+		for ( const pair of pairs ) {
+			const warning = getContrastWarning( {
+				backgroundColor: measurements.backgroundColor,
+				...pair,
+				messageOverride,
+				enableAlphaChecker,
+			} );
+			if ( warning ) {
+				return warning;
+			}
+		}
+	}
+
+	return null;
+}
+
 function reducer(
-	prevColors: BlockElementColors,
-	newColors: BlockElementColors
-): BlockElementColors {
-	const hasChanged = Object.keys( newColors ).some(
-		( key ) =>
-			prevColors[ key as keyof BlockElementColors ] !==
-			newColors[ key as keyof BlockElementColors ]
+	prevState: ContrastMeasurements,
+	newState: ContrastMeasurements
+): ContrastMeasurements {
+	const hasChanged = MEASUREMENT_KEYS.some(
+		( key ) => prevState[ key ] !== newState[ key ]
 	);
 
-	// Do not re-render if the colors have not changed.
-	return hasChanged ? newColors : prevColors;
+	// Do not re-render if the measurements have not changed.
+	return hasChanged ? newState : prevState;
 }
 
 /**
@@ -166,7 +348,7 @@ export default function useBlockColorContrastWarning( {
 	messageOverride,
 }: UseBlockColorContrastWarningOptions ) {
 	const blockEl = useBlockElement( clientId );
-	const [ colors, setColors ] = useReducer( reducer, {} );
+	const [ measurements, setMeasurements ] = useReducer( reducer, {} );
 
 	const blockType = useSelect(
 		( select ) => {
@@ -188,7 +370,14 @@ export default function useBlockColorContrastWarning( {
 		// after the current paint but before the next paint.
 		window.requestAnimationFrame( () =>
 			window.requestAnimationFrame( () =>
-				setColors( getBlockElementColors( blockEl, blockType ) )
+				setMeasurements(
+					getBlockContrastMeasurements(
+						blockEl,
+						blockType,
+						checkTextColor,
+						checkLinkColor
+					)
+				)
 			)
 		);
 	} );
@@ -201,7 +390,14 @@ export default function useBlockColorContrastWarning( {
 		}
 
 		const observer = new window.MutationObserver( () => {
-			setColors( getBlockElementColors( blockEl, blockType ) );
+			setMeasurements(
+				getBlockContrastMeasurements(
+					blockEl,
+					blockType,
+					checkTextColor,
+					checkLinkColor
+				)
+			);
 		} );
 
 		observer.observe( blockEl, {
@@ -213,15 +409,13 @@ export default function useBlockColorContrastWarning( {
 		return () => {
 			observer.disconnect();
 		};
-	}, [ enabled, blockEl, blockType ] );
+	}, [ enabled, blockEl, blockType, checkTextColor, checkLinkColor ] );
 
 	const warning = enabled
-		? getContrastWarning( {
-				backgroundColor: colors.backgroundColor,
-				textColor: checkTextColor ? colors.textColor : undefined,
-				linkColor: checkLinkColor ? colors.linkColor : undefined,
+		? getBlockContrastWarning( measurements, {
+				checkTextColor,
+				checkLinkColor,
 				messageOverride,
-				enableAlphaChecker: true,
 			} )
 		: null;
 
