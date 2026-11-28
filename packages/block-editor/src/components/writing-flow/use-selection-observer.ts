@@ -40,15 +40,17 @@ function extractSelectionStartNode( selection: Selection ): Node {
  * a text node, the selection offset is the index of a child node. The selection
  * reaches up to but excluding that child node.
  *
- * @param selection     The selection.
- * @param isTripleClick Whether the selection comes from a triple
- *                      click.
+ * @param selection                The selection.
+ * @param shouldCorrectEndBoundary Whether the selection comes from a gesture
+ *                                 (triple click or context menu / right-click)
+ *                                 where browsers overshoot into the next
+ *                                 element at offset 0.
  *
- * @return The selection start node.
+ * @return The selection end node.
  */
 function extractSelectionEndNode(
 	selection: Selection,
-	isTripleClick: boolean
+	shouldCorrectEndBoundary: boolean
 ): Node {
 	// Callers only read a selection with a range.
 	const { focusNode, focusOffset } = selection;
@@ -61,17 +63,18 @@ function extractSelectionEndNode(
 		return focusNode!;
 	}
 
-	// A triple click selects the paragraph, but the browser extends the
-	// forward selection into the next element at an offset of 0. This may
-	// trigger multi selection even though the selection does not visually end
-	// in the next block. Keyboard selections that legitimately extend to the
-	// same boundary (e.g. Shift+ArrowDown into a focusable block, where the
-	// browser reports the boundary at the element instead of its first text
-	// position) must not be corrected, so only do this for triple clicks.
+	// A triple click selects the paragraph, and right-clicking an empty
+	// paragraph in Blink/WebKit extends the forward selection into the next
+	// element at an offset of 0. This may trigger multi selection even though
+	// the selection does not visually end in the next block. Keyboard
+	// selections that legitimately extend to the same boundary (e.g.
+	// Shift+ArrowDown into a focusable block, where the browser reports the
+	// boundary at the element instead of its first text position) must not be
+	// corrected, so only do this for triple clicks and context menu gestures.
 	if (
 		focusOffset === 0 &&
 		isSelectionForward( selection ) &&
-		isTripleClick
+		shouldCorrectEndBoundary
 	) {
 		// Return the node before the focus node. Its parent may still be in
 		// the next block (e.g. a list item's rich text), so walk up.
@@ -130,9 +133,11 @@ export default function useSelectionObserver() {
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
+			let isContextMenu = false;
 
 			function onMouseDown( event: MouseEvent ) {
 				isTripleClick = event.detail === 3;
+				isContextMenu = event.button === 2;
 				// A shift+click makes a multi-selection: mark the gesture as
 				// in progress so the clicked block's focus handler does not
 				// select it (collapsing the native range being made), and so
@@ -150,8 +155,13 @@ export default function useSelectionObserver() {
 				}
 			}
 
+			function onContextMenu() {
+				isContextMenu = true;
+			}
+
 			function onKeyDown() {
 				isTripleClick = false;
+				isContextMenu = false;
 			}
 
 			function onSelectionChange( event: Event | MouseEvent ) {
@@ -172,7 +182,7 @@ export default function useSelectionObserver() {
 				const startNode = extractSelectionStartNode( selection );
 				const endNode = extractSelectionEndNode(
 					selection,
-					isTripleClick
+					isTripleClick || isContextMenu
 				);
 
 				if (
@@ -501,7 +511,10 @@ export default function useSelectionObserver() {
 					extractSelectionStartNode( selection )
 				);
 				const endClientId = getBlockClientId(
-					extractSelectionEndNode( selection, isTripleClick )
+					extractSelectionEndNode(
+						selection,
+						isTripleClick || isContextMenu
+					)
 				);
 
 				if ( startClientId === endClientId ) {
@@ -533,6 +546,7 @@ export default function useSelectionObserver() {
 
 			defaultView!.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
+			node.addEventListener( 'contextmenu', onContextMenu );
 			node.addEventListener( 'keydown', onKeyDown );
 			// On the window, so it runs before any document listener that
 			// reads the store on keydown, whatever order they were added in.
@@ -563,6 +577,7 @@ export default function useSelectionObserver() {
 				);
 				defaultView!.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'contextmenu', onContextMenu );
 				node.removeEventListener( 'keydown', onKeyDown );
 				defaultView!.removeEventListener(
 					'keydown',
