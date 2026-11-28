@@ -5,7 +5,9 @@ const EXIT_ERROR_CODE = 1;
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 
-const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
-	stdio: 'inherit',
-} );
+const { status } = spawn(
+	process.execPath,
+	[ resolveBin( 'webpack' ), ...getWebpackArgs() ],
+	{ stdio: 'inherit' }
+);
 process.exit( status === null ? EXIT_ERROR_CODE : status );
