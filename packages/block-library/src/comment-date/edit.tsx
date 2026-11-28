@@ -32,7 +32,7 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let [ date ] = useEntityProp< string | Date >(
+	let [ date ] = useEntityProp< string >(
 		'root',
 		'comment',
 		'date',
@@ -63,7 +63,7 @@ export default function Edit( {
 						format={ format }
 						defaultFormat={ siteFormat }
 						onChange={ ( nextFormat ) =>
-							setAttributes( { format: nextFormat! } )
+							setAttributes( { format: nextFormat } )
 						}
 					/>
 				</ToolsPanelItem>
@@ -89,6 +89,7 @@ export default function Edit( {
 	}
 
 	let commentDate =
+		// @ts-expect-error Bug: the comment date is a string, so it is never a `Date`.
 		date instanceof Date ? (
 			<time dateTime={ dateI18n( 'c', date ) }>
 				{ format === 'human-diff'
