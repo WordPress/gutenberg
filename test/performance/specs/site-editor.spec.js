@@ -459,7 +459,11 @@ test.describe( 'Site Editor Performance', () => {
 				await Promise.all(
 					Array.from( { length: perPage }, async ( el, index ) => {
 						return await page
-							.getByLabel( `Page (${ index })` )
+							.getByRole( 'button', {
+								name: `Page (${ index })`,
+								exact: true,
+							} )
+							.first()
 							.waitFor( { state: 'attached' } );
 					} )
 				);

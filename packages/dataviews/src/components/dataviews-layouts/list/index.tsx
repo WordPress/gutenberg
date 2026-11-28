@@ -149,6 +149,7 @@ function ListItem< Item >( {
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
+	const descriptionFieldId = `${ idPrefix }-description-field`;
 
 	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -284,6 +285,11 @@ function ListItem< Item >( {
 				/>
 			}
 			role={ infiniteScrollEnabled ? 'article' : 'row' }
+			// Otherwise the row is named after all of its content: the title,
+			// the actions and every field. The description and the other fields
+			// stay available as the description of the item inside it. Without
+			// a title, the content is all there is to name it by.
+			aria-labelledby={ renderedTitleField ? labelId : undefined }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
@@ -300,7 +306,11 @@ function ListItem< Item >( {
 						id={ generateItemWrapperCompositeId( idPrefix ) }
 						aria-pressed={ isSelected }
 						aria-labelledby={ labelId }
-						aria-describedby={ descriptionId }
+						aria-describedby={
+							renderDescription
+								? `${ descriptionFieldId } ${ descriptionId }`
+								: descriptionId
+						}
 						className="dataviews-view-list__item"
 						{ ...selectionProps }
 					/>
@@ -328,7 +338,10 @@ function ListItem< Item >( {
 							{ usedActions }
 						</Stack>
 						{ renderDescription && (
-							<div className="dataviews-view-list__field">
+							<div
+								className="dataviews-view-list__field"
+								id={ descriptionFieldId }
+							>
 								<descriptionField.render
 									item={ item }
 									field={ descriptionField }
