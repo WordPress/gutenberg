@@ -10,7 +10,7 @@ import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
 import { serializeRawBlock } from './serialize-raw-block';
-import { getBlockAttributes } from './get-block-attributes';
+import { getBlockAttributes, parseHtml } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import type { Block, BlockType, RawBlock, ParseOptions } from '../../types';
@@ -122,30 +122,36 @@ function createMissingBlockType( rawBlock: RawBlock ): RawBlock {
  *
  * @param unvalidatedBlock
  * @param blockType
+ * @param parsedBody       Pre-parsed body element of the block's
+ *                         originalContent, if available. Threaded down to the
+ *                         built-in fixes so they don't have to re-parse.
  * @return validated block, with auto-fixes if initially invalid
  */
 function applyBlockValidation(
 	unvalidatedBlock: Block,
-	blockType: BlockType
+	blockType: BlockType,
+	parsedBody?: Element | null
 ): Block {
 	// Attempt to validate the block.
-	const [ isValid ] = validateBlock( unvalidatedBlock, blockType );
+	const validation = validateBlock( unvalidatedBlock, blockType );
 
-	if ( isValid ) {
-		return { ...unvalidatedBlock, isValid, validationIssues: [] };
+	if ( validation[ 0 ] ) {
+		return { ...unvalidatedBlock, isValid: true, validationIssues: [] };
 	}
 
 	// If the block is invalid, attempt some built-in fixes
 	// like custom classNames handling.
 	const fixedBlock = applyBuiltInValidationFixes(
 		unvalidatedBlock,
-		blockType
+		blockType,
+		parsedBody
 	);
-	// Attempt to validate the block once again after the built-in fixes.
-	const [ isFixedValid, validationIssues ] = validateBlock(
-		fixedBlock,
-		blockType
-	);
+	// Attempt to validate the block once again after the built-in fixes,
+	// unless they changed nothing.
+	const [ isFixedValid, validationIssues ] =
+		fixedBlock === unvalidatedBlock
+			? validation
+			: validateBlock( fixedBlock, blockType );
 
 	return { ...fixedBlock, isValid: isFixedValid, validationIssues };
 }
@@ -196,17 +202,23 @@ export function parseRawBlock(
 		// See https://github.com/WordPress/gutenberg/pull/17164.
 		.filter( ( innerBlock ) => !! innerBlock );
 
+	// Parse this block's innerHTML once and share the result with attribute
+	// extraction, validation fixes, and deprecation handling.
+	const innerHTML = normalizedBlock.innerHTML;
+	const parsedBody = parseHtml( innerHTML );
+
 	// Get the fully parsed block.
 	const parsedBlock = createBlock(
 		normalizedBlock.blockName!,
 		getBlockAttributes(
 			blockType,
-			normalizedBlock.innerHTML,
-			normalizedBlock.attrs
+			innerHTML,
+			normalizedBlock.attrs,
+			parsedBody
 		),
 		parsedInnerBlocks
 	);
-	parsedBlock.originalContent = normalizedBlock.innerHTML;
+	parsedBlock.originalContent = innerHTML;
 
 	// The Custom HTML block keeps the interleaved static HTML fragments as
 	// the canonical source of its own markup, so the `save`-based validation
@@ -221,7 +233,11 @@ export function parseRawBlock(
 		return parsedBlock;
 	}
 
-	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
+	const validatedBlock = applyBlockValidation(
+		parsedBlock,
+		blockType,
+		parsedBody
+	);
 	const { validationIssues } = validatedBlock;
 
 	// Run the block deprecation and migrations.
@@ -231,7 +247,8 @@ export function parseRawBlock(
 	const updatedBlock = applyBlockDeprecatedVersions(
 		validatedBlock,
 		normalizedBlock,
-		blockType
+		blockType,
+		parsedBody
 	);
 
 	if ( ! updatedBlock.isValid ) {

@@ -19,18 +19,24 @@ function stubFalse(): boolean {
  * deprecated migrations applied, or the original block if it was both valid
  * and no eligible migrations exist.
  *
- * @param block     Parsed and invalid block object.
- * @param rawBlock  Raw block object.
- * @param blockType Block type. This is normalize not necessary and
- *                  can be inferred from the block name,
- *                  but it's here for performance reasons.
+ * @param block      Parsed and invalid block object.
+ * @param rawBlock   Raw block object.
+ * @param blockType  Block type. This is normalize not necessary and
+ *                   can be inferred from the block name,
+ *                   but it's here for performance reasons.
+ * @param parsedBody Pre-parsed DOM body for `block.originalContent`, if
+ *                   available. Shared across loop iterations (passed to
+ *                   `getBlockAttributes` to skip re-parsing, and to
+ *                   `applyBuiltInValidationFixes` which extracts the root
+ *                   element from it for the per-fix attribute reads).
  *
  * @return Migrated block object.
  */
 export function applyBlockDeprecatedVersions(
 	block: Block,
 	rawBlock: RawBlock,
-	blockType: BlockType
+	blockType: BlockType,
+	parsedBody?: Element | null
 ): Block {
 	const parsedAttributes = rawBlock.attrs ?? {};
 	const { deprecated: deprecatedDefinitions } = blockType;
@@ -76,7 +82,8 @@ export function applyBlockDeprecatedVersions(
 			attributes: getBlockAttributes(
 				deprecatedBlockType,
 				block.originalContent ?? '',
-				parsedAttributes
+				parsedAttributes,
+				parsedBody
 			),
 		};
 
@@ -85,11 +92,19 @@ export function applyBlockDeprecatedVersions(
 
 		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValid ) {
-			migratedBlock = applyBuiltInValidationFixes(
+			const fixedBlock = applyBuiltInValidationFixes(
 				migratedBlock,
-				deprecatedBlockType
+				deprecatedBlockType,
+				parsedBody
 			);
-			[ isValid ] = validateBlock( migratedBlock, deprecatedBlockType );
+			// Validating again only helps when the fixes changed something.
+			if ( fixedBlock !== migratedBlock ) {
+				migratedBlock = fixedBlock;
+				[ isValid ] = validateBlock(
+					migratedBlock,
+					deprecatedBlockType
+				);
+			}
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
