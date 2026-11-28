@@ -32,7 +32,7 @@
 	}
 }
 
-@media (max-width: $break-small) {
+@media screen and (max-width: $break-small) {
 	// Temporary specificity bump until "wp-container" layout specificity is revisited.
 	.wp-block-post-template-is-layout-grid[class*="columns-"]:not(.has-native-responsive-grid) {
 		grid-template-columns: 1fr;

@@ -9,7 +9,9 @@
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap !important;
 
-	@include break-medium() {
+	// The printed page can be narrower than the breakpoint, but the columns
+	// should keep their wide layout on it.
+	@media (min-width: #{ $break-medium }), print {
 		flex-wrap: nowrap !important;
 	}
 
@@ -33,14 +35,14 @@
 	}
 
 	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
-		@media (max-width: #{ ($break-medium - 1) }) {
+		@media screen and (max-width: #{ ($break-medium - 1) }) {
 			// Responsiveness: Show at most one columns on mobile. This must be
 			// important since the Column assigns its own width as an inline style.
 			flex-basis: 100% !important;
 		}
 
-		// At large viewports, show all columns horizontally.
-		@include break-medium() {
+		// At large viewports, and in print, show all columns horizontally.
+		@media (min-width: #{ $break-medium }), print {
 			// Available space should be divided equally amongst columns without an
 			// assigned width. This is achieved by assigning a flex basis that is
 			// consistent (equal), would not cause the sum total of column widths to
