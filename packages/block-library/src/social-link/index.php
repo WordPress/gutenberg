@@ -53,9 +53,9 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 
 	/*
 	 * Prepend URL with https:// if it doesn't appear to contain a scheme
-	 * and it's not a relative link or a fragment.
+	 * and it's not a relative link, a query or a fragment.
 	 */
-	if ( ! parse_url( $url, PHP_URL_SCHEME ) && ! str_starts_with( $url, '//' ) && ! str_starts_with( $url, '#' ) ) {
+	if ( ! parse_url( $url, PHP_URL_SCHEME ) && ! in_array( $url[0], array( '/', '?', '#' ), true ) ) {
 		$url = 'https://' . $url;
 	}
 
