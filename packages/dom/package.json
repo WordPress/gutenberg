@@ -42,7 +42,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
 		"vitest": "^5.1.1"

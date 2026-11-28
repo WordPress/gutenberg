@@ -1,4 +1,11 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import {
+	act,
+	isInaccessible,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
@@ -938,6 +945,52 @@ describe( 'DataForm component', () => {
 
 			expect( screen.getByText( 'Account connected' ) ).toBeVisible();
 			expect( screen.getAllByText( 'Account status' ) ).toHaveLength( 1 );
+		} );
+
+		it( 'renders the header summary of a card that cannot be collapsed', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						...fields,
+						{
+							id: 'status',
+							label: 'Status',
+							readOnly: true,
+							render: () => <span>Published</span>,
+						},
+					] }
+					form={ {
+						fields: [
+							{
+								id: 'details',
+								label: 'Details',
+								layout: {
+									type: 'card',
+									isCollapsible: false,
+									summary: [
+										{ id: 'status', visibility: 'always' },
+									],
+								},
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			const summary = screen.getByText( 'Published' );
+			expect( summary ).toBeVisible();
+			// No toggle describes it, so it mustn't be hidden from assistive
+			// technology.
+			expect( isInaccessible( summary ) ).toBe( false );
+			// The summary is a div, which a span can't contain.
+			// eslint-disable-next-line testing-library/no-node-access
+			const summaryList = summary.closest(
+				'.dataforms-layouts-card__field-summary'
+			);
+			expect( summaryList?.parentElement?.tagName ).toBe( 'DIV' );
 		} );
 
 		it( 'does not render an empty card for an editable field without an edit control', () => {

@@ -115,8 +115,6 @@ export default function KeyboardShortcutHelpModal( {
 						description: __(
 							'Change the block type after adding a new paragraph.'
 						),
-						/* translators: The forward-slash character. e.g. '/'. */
-						ariaLabel: __( 'Forward-slash' ),
 					},
 				] }
 			/>

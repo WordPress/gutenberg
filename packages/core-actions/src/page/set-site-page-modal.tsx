@@ -12,6 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getItemTitle } from '../shared/utils';
 import type { BasePost, CoreDataError } from '../shared/types';
 import { refetchPages } from './refetch-pages';
+import { syncSiteBase } from './sync-site-base';
 
 export interface SetSitePageModalProps {
 	/**
@@ -93,10 +94,11 @@ export function SetSitePageModal( {
 		event.preventDefault();
 		const previousId = siteSettings?.[ setting ];
 
+		let savedSettings: Record< string, unknown > | undefined;
 		try {
 			// Without `throwOnError`, a failed save resolves with `undefined`
 			// and the success notice would show.
-			await saveEntityRecord(
+			savedSettings = await saveEntityRecord(
 				'root',
 				'site',
 				{ [ setting ]: item.id, show_on_front: 'page' },
@@ -113,6 +115,9 @@ export function SetSitePageModal( {
 			return;
 		}
 
+		// `getHomePage()` and `getPostsPageId()` read the base data of the
+		// site, which the save doesn't update.
+		syncSiteBase( registry, savedSettings );
 		createSuccessNotice( successNotice, { type: 'snackbar' } );
 		closeModal?.();
 
