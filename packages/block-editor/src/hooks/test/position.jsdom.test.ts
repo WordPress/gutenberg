@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getResponsivePositionCSS } from '../position';
+import { getPositionOptions, getResponsivePositionCSS } from '../position';
 
 const selector = '.wp-container-test.wp-container-test';
 const viewportSettings = {
@@ -72,5 +72,52 @@ describe( 'getResponsivePositionCSS', () => {
 		).toBe(
 			'@media (width <= 640px){.wp-container-test.wp-container-test{position: static;}}'
 		);
+	} );
+} );
+
+describe( 'getPositionOptions', () => {
+	const getValues = (
+		options: Parameters< typeof getPositionOptions >[ 0 ]
+	) => getPositionOptions( options ).map( ( option ) => option.value );
+
+	it( 'offers sticky when the block supports it', () => {
+		expect(
+			getValues( {
+				allowFixed: false,
+				allowSticky: true,
+				isInTemplatePart: false,
+			} )
+		).toEqual( [ '__default', 'sticky' ] );
+	} );
+
+	it( 'hides sticky inside a template part', () => {
+		expect(
+			getValues( {
+				allowFixed: false,
+				allowSticky: true,
+				isInTemplatePart: true,
+			} )
+		).toEqual( [ '__default' ] );
+	} );
+
+	it( 'keeps sticky inside a template part when it is already set', () => {
+		expect(
+			getValues( {
+				allowFixed: false,
+				allowSticky: true,
+				isInTemplatePart: true,
+				value: 'sticky',
+			} )
+		).toEqual( [ '__default', 'sticky' ] );
+	} );
+
+	it( 'keeps fixed inside a template part', () => {
+		expect(
+			getValues( {
+				allowFixed: true,
+				allowSticky: true,
+				isInTemplatePart: true,
+			} )
+		).toEqual( [ '__default', 'fixed' ] );
 	} );
 } );
