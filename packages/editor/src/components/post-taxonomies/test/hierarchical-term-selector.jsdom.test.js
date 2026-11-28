@@ -118,6 +118,12 @@ describe( 'findTerm', () => {
 
 		expect( findTerm( input, 2249, 'child1' ) ).toEqual( undefined );
 	} );
+
+	test( 'should match term names containing HTML entities', () => {
+		const input = [ { id: 2232, parent: 0, name: 'Food &amp; Drink' } ];
+
+		expect( findTerm( input, 0, 'Food & Drink' ) ).toEqual( input[ 0 ] );
+	} );
 } );
 
 describe( 'getFilterMatcher', () => {
@@ -161,5 +167,15 @@ describe( 'getFilterMatcher', () => {
 		};
 		const matcher = getFilterMatcher( 'parent' );
 		expect( matcher( input ) ).toEqual( output );
+	} );
+
+	test( 'should match term names containing HTML entities', () => {
+		const input = {
+			id: 2232,
+			parent: 0,
+			name: 'Food &amp; Drink',
+			children: [],
+		};
+		expect( getFilterMatcher( 'Food & ' )( input ) ).toEqual( input );
 	} );
 } );
