@@ -259,6 +259,7 @@ Properties:
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
 | `aspectRatio`  | ✓       |               | ✓      |              |        |            |
 | `mediaFit`     |         |               | ✓      | ✓            |        |            |
+| `narrow`       |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
@@ -277,6 +278,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `previewSize`: a `number` representing the size of the preview.
 -   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
 -   `mediaFit`: how the media field fills the preview box, either `'cover'` (crop it to fill) or `'contain'` (fit the whole media inside, letterboxing it so its own aspect ratio stays visible). The box keeps the shape set by `aspectRatio` either way, so rows stay aligned, and takes a neutral background under `'contain'` so a letterboxed preview still reads as a single item. Defaults to `'cover'`. To let users switch this themselves, pass `config={ { mediaFitControl: true } }` to `DataViews` or `DataViewsPicker`, which adds an "Original aspect ratio" toggle to the view options.
+-   `narrow`: `true`, or `{ tabsField?: string, showSort?: boolean }`. Renders the UI for narrow containers in place of the default UI, with a single settings button in place of the filters and the view options buttons. See [Narrow UI](#narrow-ui).
 
 `list` layout:
 
@@ -563,6 +565,8 @@ The following components are available directly under `DataViews`:
 -   `DataViews.Pagination`
 -   `DataViews.BulkActionToolbar` (deprecated)
 -   `DataViews.ViewConfig`
+-   `DataViews.ViewMenu`
+-   `DataViews.FilterTabs`
 
 Bulk actions are now rendered within the built-in table and grid layouts ([#82730](https://github.com/WordPress/gutenberg/pull/82730)). `DataViews.BulkActionToolbar` remains available for compatibility but renders nothing, so you can remove it from custom compositions.
 
@@ -596,6 +600,69 @@ const CustomLayout = () => {
 ```
 
 > You can render only the pieces you need, rearrange them freely, or combine them with custom components.
+
+### Narrow UI
+
+The grid layout has a `narrow` option: an alternative to the default UI for narrow, single-purpose containers, such as a sidebar. DataViews takes the same `data`, `fields` and `view`, and renders them in an opinionated layout with a single settings button in place of the filters and the view options buttons. `header` is not rendered.
+
+Its rows, from top to bottom:
+
+1. Search and the settings button.
+2. Optionally, one field as tabs: the main way to browse the content, such as a category or a type.
+3. The grid.
+4. The footer, with the pagination.
+
+It is set in the `layout` of the view, by the consumer:
+
+```jsx
+const view = {
+	type: 'grid',
+	layout: { narrow: { tabsField: 'type' } },
+	// ...
+};
+```
+
+`narrow` is `true`, or an object to adjust it:
+
+-   `tabsField`: the id of a field to show as tabs above the content. That field is left out of the settings menu.
+-   `showSort`: whether the settings menu offers sorting. Defaults to `true`.
+
+The `pickerGrid` layout of `DataViewsPicker` has the same option. There, the footer keeps the selection, the pagination and the actions, with the actions on a line of their own.
+
+The option is ignored in free composition. The narrow UI is made of two subcomponents, which are also available there, for a container that needs its own search, footer or spacing.
+
+#### `DataViews.ViewMenu`
+
+A single settings button that opens a menu built from the fields and the view. It renders nothing when the menu would be empty. The menu holds:
+
+-   **Filters.** Each filter that is set by picking among a fixed list of options, shown as the field defines it: radio items with an "All" item when it takes one value (the `is` operator), or checkboxes when it takes several (`isAny`). The length of the list doesn't count, so a list that plugins add to never drops out of the menu. A filter is left out when it needs another kind of control (a date, a number, free text), loads its options with `getElements`, or is locked.
+-   **Sort.** The field to sort by and the order, when `showSort` is set. It lists the fields with sorting enabled, as the view options do.
+-   **Extra items.** The `children`, such as a link to a help page.
+
+When the groups hold more than 10 options in all, each group moves to a submenu. A long list scrolls, and a group on its own stays in the menu, where a submenu would only add a step.
+
+The menu has no "Reset view" item. `onReset` is meant for saved views and comes with the "modified" indicator of the view options button, which the settings button doesn't have. A consumer that needs one can add it through `children`.
+
+Properties:
+
+-   `excludeFields`: `string[]`. Ids of fields to leave out of the menu, such as the one shown with `DataViews.FilterTabs`.
+-   `requiredFields`: `string[]`. Ids of single-choice fields that always filter by one value. Their group has no "All" item, and the view is expected to start with a filter for each of them.
+-   `showSort`: `boolean`. Whether the menu offers sorting. Defaults to `false`.
+-   `size`: `'compact' | 'default'`. The size of the settings button: `compact` to sit next to `DataViews.Search`, or `default` to sit next to a 40px control. Defaults to `compact`.
+-   `children`: React node. Extra menu items, rendered at the end of the menu.
+
+#### `DataViews.FilterTabs`
+
+Shows one filter as a row of minimal tabs, which scrolls sideways when the tabs don't fit. Choosing a tab filters the view by that option and goes back to the first page; the "All" tab removes the filter. The field needs a fixed list of `elements` and to support the `is` operator, or `isAny` when its value is a list.
+
+It renders the content inside its tab panel, so don't render `DataViews.Layout` next to it.
+
+Properties:
+
+-   `field`: `string`. The id of the field to show as tabs.
+-   `allLabel`: `string`. The label of the tab that shows every item. Defaults to "All".
+-   `showAll`: `boolean`. Whether to add the "All" tab. Defaults to `true`. Without it, the view is expected to always filter by the field.
+-   `children`: React node. The content the tabs switch. Defaults to `<DataViews.Layout />`.
 
 ### Accessibility considerations
 

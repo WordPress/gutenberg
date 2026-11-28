@@ -476,7 +476,7 @@ $media-grid-loading-min-height: 500px;
 
 		// A tab bar below supplies its own separation, so the field sits
 		// closer to it than it would to the grid.
-		&:has(+ .block-editor-inserter__media-grid__tabs) {
+		&:has(+ .dataviews-filter-tabs) {
 			padding-bottom: 0;
 		}
 
@@ -487,28 +487,11 @@ $media-grid-loading-min-height: 500px;
 		}
 	}
 
-	.block-editor-inserter__media-grid__tabs {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
-	}
-
-	// `Tabs.List` is only as wide as its tabs, so this wrapper carries the
-	// column gutter and the space beneath.
-	.block-editor-inserter__media-grid__tablist {
-		flex-shrink: 0;
+	// The media-type tabs take the sidebar's gutter, like the search field
+	// above and the grid below, rather than the wider one DataViews uses on
+	// full pages.
+	.dataviews-filter-tabs__list {
 		padding: 0 $grid-unit-20;
-		margin-bottom: $grid-unit-15;
-	}
-
-	// The selected tab panel is the grid, so it carries the same fill as
-	// the untabbed layout would.
-	.block-editor-inserter__media-grid__tabs [role="tabpanel"] {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
 	}
 
 	.dataviews-view-grid {
@@ -613,6 +596,36 @@ $media-grid-loading-min-height: 500px;
 
 // The "Detach" action's confirmation, rendered inside the DataViews action
 // modal.
+// The Patterns tab shares the panel styles of the Media tab above, so the two
+// tabs browse alike. What follows is only what differs for patterns.
+.block-editor-inserter__patterns-panel {
+	// A page of patterns is taller than the sidebar, unlike a page of media.
+	// The panel takes the height of the tab and the patterns scroll inside
+	// it, so the search, the tabs and the footer stay in place.
+	flex: 1 1 0;
+
+	// Pattern previews keep their own height: boxing them into one shape, as
+	// the grid does for media, would crop or shrink what they show.
+	.dataviews-view-grid .dataviews-view-grid__media {
+		aspect-ratio: auto;
+	}
+
+	.block-editor-inserter__patterns-grid__preview {
+		width: 100%;
+	}
+
+	// Holds the place of a preview until it renders.
+	.block-editor-inserter__patterns-grid__placeholder {
+		min-height: $grid-unit-80 + $grid-unit-40;
+		background-color: $gray-100;
+	}
+
+	// The footer already spaces the button from the pager.
+	.block-editor-inserter__patterns-explore-button.components-button {
+		margin-top: 0;
+	}
+}
+
 .block-editor-inserter__media-panel-detach-actions {
 	display: flex;
 	justify-content: flex-end;

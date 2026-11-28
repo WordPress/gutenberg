@@ -1,0 +1,27 @@
+// The tabs and the content they switch fill the room the layout would take.
+.dataviews-filter-tabs,
+.dataviews-filter-tabs__panel {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	background-color: inherit;
+}
+
+.dataviews-filter-tabs {
+	gap: var(--wpds-dimension-gap-lg);
+}
+
+// `Tabs.List` is only as wide as its tabs, so this wrapper carries the gutter
+// and the line the tabs sit on.
+.dataviews-filter-tabs__list {
+	box-sizing: border-box;
+	flex-shrink: 0;
+	padding: 0 var(--wpds-dimension-padding-2xl);
+	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+// Kept within the panel, so the tabs scroll sideways when they don't fit.
+.dataviews-filter-tabs__tablist {
+	max-width: 100%;
+}

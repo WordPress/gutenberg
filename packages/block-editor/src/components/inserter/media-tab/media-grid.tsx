@@ -4,11 +4,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import { Spinner as WCSpinner } from '@wordpress/components';
-import { Stack, Tabs } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
-import type { MediaItem, MediaType } from './types';
+import type { MediaItem, MediaSource, MediaType } from './types';
 
 type MediaGridProps = {
 	// Results.
@@ -25,10 +25,15 @@ type MediaGridProps = {
 	search: string;
 	onChangeSearch: ( search: string ) => void;
 	searchLabel: string;
+
+	// Source, chosen in the menu beside the search input.
 	/**
-	 * Rendered beside the search input (the source menu).
+	 * Fewer than two offers no choice, since there is nothing to switch
+	 * between.
 	 */
-	sourceMenu?: ReactNode;
+	sources?: MediaSource[];
+	source?: string;
+	onChangeSource?: ( source: string ) => void;
 
 	// Media-type tabs.
 	/**
@@ -78,6 +83,11 @@ const GRID_LAYOUT = {
 	mediaFit: 'contain',
 } as const;
 const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
+
+// The media type is shown as tabs, so the menu leaves it out. A source is
+// always selected, so its group in the menu has no "All" option.
+const MENU_EXCLUDED_FIELDS = [ 'mediaType' ];
+const MENU_REQUIRED_FIELDS = [ 'source' ];
 
 const getTitle = ( item: MediaItem ) =>
 	typeof item.title === 'string'
@@ -163,7 +173,9 @@ export default function MediaGrid( {
 	search,
 	onChangeSearch,
 	searchLabel,
-	sourceMenu,
+	sources,
+	source,
+	onChangeSource,
 	mediaTypes,
 	mediaType,
 	onChangeMediaType,
@@ -176,6 +188,9 @@ export default function MediaGrid( {
 	onChangePage,
 	footer,
 }: MediaGridProps ) {
+	const hasTabs = !! mediaTypes && mediaTypes.length > 1;
+	const hasSources = !! sources && sources.length > 1 && !! source;
+
 	const fields: Field< MediaItem >[] = useMemo(
 		() => [
 			{
@@ -198,9 +213,47 @@ export default function MediaGrid( {
 				getValue: ( { item } ) => getTitle( item ),
 				enableSorting: false,
 				enableGlobalSearch: false,
+				filterBy: false,
+			},
+			// The source and the media type decide what the panel fetches,
+			// rather than narrowing down what is already on screen. They are
+			// modelled as filters so they live in the view, where the menu
+			// and the tabs read and change them.
+			{
+				id: 'source',
+				label: __( 'Source' ),
+				type: 'text',
+				getValue: () => source,
+				elements: hasSources
+					? sources.map( ( { name, label } ) => ( {
+							value: name,
+							label,
+						} ) )
+					: undefined,
+				filterBy: hasSources ? { operators: [ 'is' ] } : false,
+				enableSorting: false,
+				enableGlobalSearch: false,
+			},
+			{
+				id: 'mediaType',
+				label: __( 'Media type' ),
+				type: 'text',
+				getValue: () => mediaType,
+				elements: hasTabs ? mediaTypes : undefined,
+				filterBy: hasTabs ? { operators: [ 'is' ] } : false,
+				enableSorting: false,
+				enableGlobalSearch: false,
 			},
 		],
-		[ mediaType, insertingId ]
+		[
+			mediaType,
+			insertingId,
+			hasSources,
+			sources,
+			source,
+			hasTabs,
+			mediaTypes,
+		]
 	);
 
 	const view: View = useMemo(
@@ -215,21 +268,59 @@ export default function MediaGrid( {
 			showTitle: false,
 			showMedia: true,
 			layout: GRID_LAYOUT,
+			filters: [
+				...( hasSources
+					? [
+							{
+								field: 'source',
+								operator: 'is' as const,
+								value: source,
+							},
+						]
+					: [] ),
+				...( hasTabs
+					? [
+							{
+								field: 'mediaType',
+								operator: 'is' as const,
+								value: mediaType,
+							},
+						]
+					: [] ),
+			],
 		} ),
-		[ page, perPage, search ]
+		[ page, perPage, search, hasSources, source, hasTabs, mediaType ]
 	);
 
-	// The panel owns the page, so changes are forwarded to it rather than
-	// stored here. Search comes in through `MediaSearch`, not the view, so
-	// paging is the only thing `DataViews` changes.
+	// The tab and the panel own the source, the media type and the page, so
+	// changes are forwarded to them rather than stored here. Search comes in
+	// through `MediaSearch`, not the view.
 	const onChangeView = useCallback(
 		( nextView: View ) => {
+			const getFilterValue = ( field: string ) =>
+				nextView.filters?.find( ( filter ) => filter.field === field )
+					?.value;
+			const nextSource = getFilterValue( 'source' );
+			if ( nextSource !== undefined && nextSource !== source ) {
+				onChangeSource?.( nextSource );
+			}
+			const nextMediaType = getFilterValue( 'mediaType' );
+			if ( nextMediaType !== undefined && nextMediaType !== mediaType ) {
+				onChangeMediaType?.( nextMediaType );
+			}
 			const nextPage = nextView.page ?? 1;
 			if ( nextPage !== page ) {
 				onChangePage( nextPage );
 			}
 		},
-		[ page, onChangePage ]
+		[
+			source,
+			onChangeSource,
+			mediaType,
+			onChangeMediaType,
+			page,
+			onChangePage,
+		]
 	);
 
 	const paginationInfo = useMemo(
@@ -240,7 +331,6 @@ export default function MediaGrid( {
 		[ totalItems, totalPages ]
 	);
 	const showPagination = paginationInfo.totalPages > 1;
-	const hasTabs = !! mediaTypes && mediaTypes.length > 1;
 	const hasFooter = showPagination || !! footer;
 	const itemRange = getItemRange( {
 		page,
@@ -273,37 +363,16 @@ export default function MediaGrid( {
 					defaultValue={ search }
 					onChange={ onChangeSearch }
 				/>
-				{ sourceMenu }
+				<DataViews.ViewMenu
+					excludeFields={ MENU_EXCLUDED_FIELDS }
+					requiredFields={ MENU_REQUIRED_FIELDS }
+					size="default"
+				/>
 			</Stack>
-			{ hasTabs ? (
-				<Tabs.Root
-					value={ mediaType }
-					onValueChange={ onChangeMediaType }
-					className="block-editor-inserter__media-grid__tabs"
-				>
-					<div className="block-editor-inserter__media-grid__tablist">
-						<Tabs.List variant="minimal">
-							{ mediaTypes.map( ( type ) => (
-								<Tabs.Tab
-									key={ type.value }
-									value={ type.value }
-								>
-									{ type.label }
-								</Tabs.Tab>
-							) ) }
-						</Tabs.List>
-					</div>
-					{ /* One panel per tab, as `Tabs` requires the counts to match.
-					   Only the selected one mounts, so a single grid renders. */ }
-					{ mediaTypes.map( ( type ) => (
-						<Tabs.Panel key={ type.value } value={ type.value }>
-							<DataViews.Layout className="block-editor-inserter__media-grid" />
-						</Tabs.Panel>
-					) ) }
-				</Tabs.Root>
-			) : (
+			{ /* Without media types to switch between, this is the grid alone. */ }
+			<DataViews.FilterTabs field="mediaType" showAll={ false }>
 				<DataViews.Layout className="block-editor-inserter__media-grid" />
-			) }
+			</DataViews.FilterTabs>
 			{ hasFooter && (
 				<Stack
 					direction="column"

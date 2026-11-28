@@ -59,7 +59,9 @@ export function MediaCategoryPanel( {
 	mediaTypes,
 	mediaType,
 	onChangeMediaType,
-	sourceMenu,
+	sources,
+	source,
+	onChangeSource,
 	footer,
 }: MediaCategoryPanelProps ) {
 	const panelRef = useRef< HTMLDivElement >( null );
@@ -181,7 +183,9 @@ export function MediaCategoryPanel( {
 						<InserterNoResults>{ emptyMessage }</InserterNoResults>
 					)
 				}
-				sourceMenu={ sourceMenu }
+				sources={ sources }
+				source={ source }
+				onChangeSource={ onChangeSource }
 				mediaTypes={ mediaTypes }
 				mediaType={ mediaType }
 				onChangeMediaType={ onChangeMediaType }

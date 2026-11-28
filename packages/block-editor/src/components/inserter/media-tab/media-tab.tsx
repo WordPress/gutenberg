@@ -5,7 +5,6 @@ import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { MediaCategoryPanel } from './media-panel';
 import MediaLibraryButton from './media-library-button';
-import SourceMenu from './source-menu';
 import InserterNoResults from '../no-results';
 import type { MediaCategory, MediaType } from './types';
 
@@ -21,9 +20,10 @@ const BLOCK_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 // The categories that together make up the media library: one per media type,
 // shown as tabs rather than as separate sources. Everything else a category
-// can be — the post's attached images, Openverse, anything registered through
-// the public API — is a source of its own. So a source is not a category: this
-// set collapses into the one "Media library" source.
+// can be — the post's attached images, Openverse, anything a plugin registers
+// with `registerInserterMediaCategory` — is a source of its own, listed in the
+// menu in the order it was registered and however many there are. So a source
+// is not a category: this set collapses into the one "Media library" source.
 // TODO: `InserterMediaCategory` has no notion of grouping, so this matches by
 // name. A `group` property on the registration API would do this properly.
 const LIBRARY_CATEGORIES = [ 'images', 'videos', 'audio', 'files' ];
@@ -32,8 +32,8 @@ const LIBRARY_SOURCE = 'media-library';
 const DEFAULT_MEDIA_TYPE: MediaType = 'image';
 
 /**
- * The inserter's Media tab: one search, a source menu, and a tab per media
- * type when browsing the library. The selection resolves to a single
+ * The inserter's Media tab: one search, a menu to choose the source, and a tab
+ * per media type when browsing the library. The selection resolves to a single
  * registered category, which the panel below fetches and renders.
  */
 function MediaTab( {
@@ -131,12 +131,16 @@ function MediaTab( {
 		sources[ 0 ];
 	const isLibrary = activeSource?.name === LIBRARY_SOURCE;
 
-	const mediaTypes = isLibrary
-		? libraryCategories.map( ( category ) => ( {
-				value: category.mediaType,
-				label: category.label,
-			} ) )
-		: [];
+	const mediaTypes = useMemo(
+		() =>
+			isLibrary
+				? libraryCategories.map( ( category ) => ( {
+						value: category.mediaType,
+						label: category.label,
+					} ) )
+				: [],
+		[ isLibrary, libraryCategories ]
+	);
 
 	const category = isLibrary
 		? ( libraryCategories.find(
@@ -161,15 +165,9 @@ function MediaTab( {
 			mediaTypes={ mediaTypes }
 			mediaType={ category.mediaType }
 			onChangeMediaType={ setMediaType }
-			sourceMenu={
-				sources.length > 1 ? (
-					<SourceMenu
-						sources={ sources }
-						value={ activeSource.name }
-						onChange={ setSourceName }
-					/>
-				) : undefined
-			}
+			sources={ sources }
+			source={ activeSource.name }
+			onChangeSource={ setSourceName }
 			footer={
 				<MediaLibraryButton
 					label={ __( 'Open Media Library' ) }

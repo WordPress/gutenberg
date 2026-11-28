@@ -155,26 +155,6 @@ export interface BlockPatternsTabProps {
 	selectedCategory?: PatternCategory | null;
 	onInsert: InsertPattern;
 	rootClientId?: string | null;
-	children?: ReactNode;
-}
-
-export interface PatternCategoryPreviewsProps {
-	rootClientId?: string | null;
-	onInsert: InsertPattern;
-	onHover?: ( pattern: BlockPattern | null ) => void;
-	category: PatternCategory;
-	showTitlesAsTooltip?: boolean;
-}
-
-export interface PatternsFilterProps {
-	setPatternSyncFilter: ( value: string ) => void;
-	setPatternSourceFilter: ( value: string ) => void;
-	setPatternAuthorFilter: ( value: string ) => void;
-	patternSyncFilter: string;
-	patternSourceFilter: string;
-	patternAuthorFilter: string;
-	scrollContainerRef: PatternsScrollContainerRef;
-	category: PatternCategory;
 }
 
 export interface PatternsExplorerProps {

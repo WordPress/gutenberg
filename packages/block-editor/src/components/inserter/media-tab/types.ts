@@ -37,6 +37,15 @@ export type MediaItem = {
 	date?: string;
 };
 
+/**
+ * Where the tab's media comes from: the media library, the post's attached
+ * images, or any other registered category such as Openverse.
+ */
+export type MediaSource = {
+	name: string;
+	label: string;
+};
+
 export interface MediaCategoryPanelProps {
 	onInsert: ( block: import( '@wordpress/blocks' ).Block ) => void;
 	category: MediaCategory;
@@ -46,8 +55,11 @@ export interface MediaCategoryPanelProps {
 	mediaTypes?: { value: MediaType; label: string }[];
 	mediaType: MediaType;
 	onChangeMediaType?: ( mediaType: MediaType ) => void;
-	/** Rendered beside the search input. */
-	sourceMenu?: import( 'react' ).ReactNode;
+	/** Fewer than two offers no choice of source. */
+	sources?: MediaSource[];
+	/** The name of the source being browsed. */
+	source?: string;
+	onChangeSource?: ( source: string ) => void;
 	/** Rendered beneath the pager. */
 	footer?: import( 'react' ).ReactNode;
 }
