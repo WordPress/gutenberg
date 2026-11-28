@@ -9,7 +9,6 @@
 
 	a {
 		display: inline-block;
-		margin-right: 5px;
 	}
 
 	span {
@@ -17,6 +16,11 @@
 		margin-left: 5px;
 		text-decoration: none;
 	}
+}
+
+// Default link spacing uses 0-1-0 specificity so global styles can override it.
+:root :where(.wp-block-tag-cloud a) {
+	margin-right: 5px;
 }
 
 // Specificity is set to 0-1-0 to match global styles selectors.
