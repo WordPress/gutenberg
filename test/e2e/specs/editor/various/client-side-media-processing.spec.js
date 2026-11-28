@@ -551,12 +551,9 @@ test.describe( 'Client-side media processing', () => {
 				'200x150_e2e_test_image_opaque.png'
 			);
 
-			// CSM uploads the original full-size file unchanged: the
-			// image_editor_output_format filter only governs the generated
-			// sub-sizes, matching core, which keeps the full-size attachment's
-			// original MIME type. With no alpha channel, the sub-sizes are
-			// transcoded to JPEG.
-			expect( media.mime_type ).toBe( 'image/png' );
+			// With no alpha channel, the full-size image and the sub-sizes are
+			// transcoded to JPEG, and the attachment MIME type matches them.
+			expect( media.mime_type ).toBe( 'image/jpeg' );
 			expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
 				'image/jpeg'
 			);
@@ -620,10 +617,9 @@ test.describe( 'Client-side media processing', () => {
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
-			// As with PNG-to-JPEG, the filter governs only the generated
-			// sub-sizes; the full-size attachment keeps its original JPEG
-			// MIME type. The sub-sizes are transcoded to WebP.
-			expect( media.mime_type ).toBe( 'image/jpeg' );
+			// As with PNG-to-JPEG, the full-size image and the sub-sizes are
+			// transcoded to WebP, and the attachment MIME type matches them.
+			expect( media.mime_type ).toBe( 'image/webp' );
 			expect( media.media_details.sizes.medium.mime_type ).toBe(
 				'image/webp'
 			);

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Convert the main file of client side uploads in the browser instead of on the server when the output format is filtered. The uploaded file is no longer left on disk after a permanent delete ([#87135](https://github.com/WordPress/gutenberg/pull/87135)).
+
 ### Internal
 
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).

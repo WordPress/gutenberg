@@ -391,7 +391,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		// The client sideloads the converted main file. This is added after the upload is
+		// stored, so wp_unique_filename() still reserves the converted file names.
+		$disable_main_file_conversion = static function () {
+			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		};
+
 		if ( ! $request['generate_sub_sizes'] ) {
+			add_action( 'add_attachment', $disable_main_file_conversion );
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 			// Disable server-side EXIF rotation so the client can handle it.
@@ -424,6 +431,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
 		remove_filter( 'big_image_size_threshold', '__return_false', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		remove_action( 'add_attachment', $disable_main_file_conversion );
 
 		// Recompute image_output_format now that __return_empty_array is removed.
 		if ( ! is_wp_error( $response ) ) {
@@ -1261,6 +1269,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'rest_sideload_update_attached_file_failed',
 					__( 'Unable to update the attached file for this attachment.', 'gutenberg' ),
 					array( 'status' => 500 )
+				);
+			}
+
+			// Update the post mime type when the supplied image is in a different format.
+			if ( get_post_mime_type( $attachment_id ) !== $type ) {
+				wp_update_post(
+					array(
+						'ID'             => $attachment_id,
+						'post_mime_type' => $type,
+					)
 				);
 			}
 

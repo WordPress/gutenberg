@@ -907,8 +907,7 @@ export function prepareItem( id: QueueItemId ) {
 		// scaled-down full-size copy carries the `-scaled` suffix and the
 		// original is kept alongside it as `original_image`.
 		//
-		// Main-file format conversion is handled server-side via the
-		// image_editor_output_format filter during create_item.
+		// Main-file format conversion is handled by generateThumbnails.
 		// The response carries image_output_format so generateThumbnails
 		// can transcode sub-sizes to the same target format.
 		if ( isImage && isVipsSupported && ! tooLargeForClient ) {
@@ -1598,7 +1597,8 @@ export function transcodeGifItem(
  * Adds thumbnail versions to the queue for sideloading.
  *
  * Also handles image rotation for images that need EXIF-based rotation
- * but weren't scaled down (and thus weren't auto-rotated by vips).
+ * but weren't scaled down (and thus weren't auto-rotated by vips), and
+ * converts their main file when a format conversion is configured.
  *
  * @param id Item ID.
  */
@@ -1729,31 +1729,12 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 				}
 			}
-
-			// Sideload the rotated file as the "original" to set
-			// original_image metadata; the server stores it in
-			// $metadata['original_image'].
-			if ( needsRotation && rotatedSource && attachment.id ) {
-				dispatch.addSideloadItem( {
-					file: rotatedSource,
-					batchId: uuidv4(),
-					parentId: item.id,
-					additionalData: {
-						post: attachment.id,
-						image_size: 'original',
-						convert_format: false,
-					},
-					operations: [ OperationType.Upload ],
-				} );
-			}
 		}
 
-		// Client-side thumbnail generation for images.
-		if (
-			! item.parentId &&
-			attachment.missing_image_sizes &&
-			attachment.missing_image_sizes.length > 0
-		) {
+		// Client-side thumbnail generation for images. This also runs when
+		// no sub-sizes are missing, so the main file of a small image is
+		// still converted.
+		if ( ! item.parentId && attachment.missing_image_sizes ) {
 			const allImageSizes = settings.allImageSizes || {};
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
@@ -1894,9 +1875,15 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 
 			// Create and sideload the scaled version if it exceeds the threshold.
+			// When the server generated the sub-sizes, it also handled the main file.
+			let needsScaling = false;
 			{
 				const { bigImageSizeThreshold } = settings;
-				if ( bigImageSizeThreshold && attachment.id ) {
+				if (
+					bigImageSizeThreshold &&
+					attachment.id &&
+					! item.additionalData.generate_sub_sizes
+				) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
@@ -1908,7 +1895,6 @@ export function generateThumbnails( id: QueueItemId ) {
 					// finishOperation() below, which would otherwise leave the item
 					// stuck in THUMBNAIL_GENERATION and cause it to be reprocessed
 					// (and its sub-sizes re-queued) indefinitely.
-					let needsScaling = false;
 					try {
 						const bitmap =
 							await createImageBitmap( thumbnailSource );
@@ -1967,6 +1953,48 @@ export function generateThumbnails( id: QueueItemId ) {
 							operations: scaledOperations,
 						} );
 					}
+				}
+			}
+
+			// Otherwise sideload the converted or rotated main file.
+			if (
+				! needsScaling &&
+				attachment.id &&
+				! item.additionalData.generate_sub_sizes
+			) {
+				if ( thumbnailTranscodeOperation ) {
+					const source = rotatedSource ?? thumbnailSource;
+					dispatch.addSideloadItem( {
+						file: attachment.filename
+							? renameFile( source, attachment.filename )
+							: source,
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: 'original',
+							convert_format: false,
+						},
+						operations: [
+							thumbnailTranscodeOperation,
+							OperationType.Upload,
+						],
+					} );
+				} else if ( rotatedSource ) {
+					// Sideload the rotated file as the "original" to set
+					// original_image metadata; the server stores it in
+					// $metadata['original_image'].
+					dispatch.addSideloadItem( {
+						file: rotatedSource,
+						batchId: uuidv4(),
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: 'original',
+							convert_format: false,
+						},
+						operations: [ OperationType.Upload ],
+					} );
 				}
 			}
 		}

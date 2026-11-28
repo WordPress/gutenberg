@@ -1259,6 +1259,7 @@ describe( 'private actions', () => {
 				exif_orientation: 1,
 				...attachmentOverrides,
 			},
+			additionalData: { generate_sub_sizes: false },
 		} );
 
 		const makeHarness = (
@@ -1452,6 +1453,7 @@ describe( 'private actions', () => {
 				exif_orientation: 1,
 				...attachmentOverrides,
 			},
+			additionalData: { generate_sub_sizes: false },
 			...itemOverrides,
 		} );
 
@@ -1631,6 +1633,159 @@ describe( 'private actions', () => {
 			expect(
 				sideloadedSize( addSideloadItem, 'thumbnail' )
 			).toBeDefined();
+		} );
+	} );
+
+	describe( 'generateThumbnails main file', () => {
+		const originalCreateImageBitmap = global.createImageBitmap;
+
+		const makeItem = ( attachmentOverrides = {}, itemOverrides = {} ) => ( {
+			id: 'main-parent',
+			file: new File( [ 'fake' ], 'photo.jpg', { type: 'image/jpeg' } ),
+			sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} ),
+			attachment: {
+				id: 7,
+				filename: 'photo.jpg',
+				missing_image_sizes: [],
+				exif_orientation: 1,
+				image_output_format: 'image/webp',
+				...attachmentOverrides,
+			},
+			additionalData: { generate_sub_sizes: false },
+			...itemOverrides,
+		} );
+
+		const makeHarness = ( item: ReturnType< typeof makeItem > ) => {
+			const addSideloadItem = vi.fn();
+			const dispatch = {
+				addSideloadItem,
+				finishOperation: vi.fn(),
+				addItem: vi.fn(),
+			};
+			const select = {
+				getItem: () => item,
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+					},
+					bigImageSizeThreshold: 2560,
+				} ),
+			};
+			return { select, dispatch, addSideloadItem };
+		};
+
+		const sideloadedSizes = ( addSideloadItem: Mock ) =>
+			addSideloadItem.mock.calls.map(
+				( [ args ] ) => args.additionalData.image_size
+			);
+
+		const operationTypes = ( sideloadArgs: { operations: unknown[] } ) =>
+			sideloadArgs.operations.map( ( op ) =>
+				Array.isArray( op ) ? op[ 0 ] : op
+			);
+
+		const mockImageSize = ( width: number, height: number ) => {
+			global.createImageBitmap = vi.fn( async () => ( {
+				width,
+				height,
+				close: vi.fn(),
+			} ) ) as unknown as typeof createImageBitmap;
+		};
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+			mockImageSize( 1024, 768 );
+			vi.mocked( vipsRotateImage ).mockResolvedValue(
+				new File( [ 'rotated' ], 'photo-rotated.jpg', {
+					type: 'image/jpeg',
+				} )
+			);
+		} );
+
+		afterEach( () => {
+			global.createImageBitmap = originalCreateImageBitmap;
+		} );
+
+		it( 'sideloads the converted main file of an image with no missing sub-sizes', async () => {
+			const item = makeItem();
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( sideloadedSizes( addSideloadItem ) ).toEqual( [
+				'original',
+			] );
+			const [ args ] = addSideloadItem.mock.calls[ 0 ];
+			expect( args.file.name ).toBe( 'photo.jpg' );
+			expect( operationTypes( args ) ).toEqual( [
+				OperationType.TranscodeImage,
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'sideloads only the scaled version when the image exceeds the threshold', async () => {
+			mockImageSize( 5000, 4000 );
+			const item = makeItem();
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( sideloadedSizes( addSideloadItem ) ).toEqual( [
+				'scaled',
+			] );
+		} );
+
+		it( 'sends a single original sideload for a rotated and converted image', async () => {
+			const item = makeItem( { exif_orientation: 6 } );
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( sideloadedSizes( addSideloadItem ) ).toEqual( [
+				'original',
+			] );
+			const [ args ] = addSideloadItem.mock.calls[ 0 ];
+			expect( await args.file.text() ).toBe( 'rotated' );
+			expect( operationTypes( args ) ).toEqual( [
+				OperationType.TranscodeImage,
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'does not sideload the main file when the server generated the sub-sizes', async () => {
+			// The HEIC canvas fallback uploads with generate_sub_sizes, so the
+			// server already scaled and converted the main file.
+			mockImageSize( 5000, 4000 );
+			const item = makeItem(
+				{},
+				{
+					originalHeicFile: new File( [ 'heic' ], 'photo.heic', {
+						type: 'image/heic',
+					} ),
+					additionalData: { generate_sub_sizes: true },
+				}
+			);
+			const { select, dispatch, addSideloadItem } = makeHarness( item );
+
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( sideloadedSizes( addSideloadItem ) ).toEqual( [
+				'source_original',
+			] );
 		} );
 	} );
 
