@@ -19,6 +19,9 @@ import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import type { CommentDateAttributes, CommentDateBlockContext } from './types';
 
+/**
+ * Renders the `core/comment-date` block on the editor.
+ */
 export default function Edit( {
 	attributes: { format, isLink },
 	context: { commentId },
