@@ -2,7 +2,7 @@ import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComboboxListProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 export const List = forwardRef< HTMLDivElement, ComboboxListProps >(
 	function UnforwardedList( { className, ...restProps }, ref ) {

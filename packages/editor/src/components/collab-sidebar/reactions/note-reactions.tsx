@@ -106,7 +106,8 @@ function ReactionButton( {
 					post: select( editorStore ).getCurrentPostId(),
 					parent: noteId,
 					type: 'reaction',
-					status: 'all',
+					// Match `reaction_summary`, which counts approved rows only.
+					status: 'approve',
 					per_page: -1,
 					_fields: 'id,author_name,content',
 				}

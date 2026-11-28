@@ -9,6 +9,7 @@ export { default as withWeakMapCache } from './with-weak-map-cache';
 export { default as setNestedValue } from './set-nested-value';
 export { default as getNestedValue } from './get-nested-value';
 export { default as isNumericID } from './is-numeric-id';
+export { default as isSafeEntityKey } from './is-safe-entity-key';
 export {
 	getUserPermissionCacheKey,
 	getUserPermissionsFromAllowHeader,

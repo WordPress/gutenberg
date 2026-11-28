@@ -5,8 +5,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	InspectorControls,
 	RichText,
@@ -81,22 +81,20 @@ export default function PostNavigationLinkEdit( {
 		},
 		[ postType ]
 	);
-	const getTaxonomyOptions = () => {
-		const selectOption = {
+	const taxonomyOptions = [
+		{
 			label: __( 'Unfiltered' ),
 			value: '',
-		};
-		const taxonomyOptions = ( taxonomies ?? [] )
+		},
+		...( taxonomies ?? [] )
 			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
 			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			} );
-
-		return [ selectOption, ...taxonomyOptions ];
-	};
+			} ),
+	];
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -202,16 +200,22 @@ export default function PostNavigationLinkEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<WCSelectControl
+				<SelectControl
 					label={ __( 'Filter by taxonomy' ) }
-					value={ taxonomy }
-					options={ getTaxonomyOptions() }
-					onChange={ ( value ) =>
+					items={ taxonomyOptions }
+					itemToStringValue={ ( item ) => `taxonomy:${ item.value }` }
+					value={
+						taxonomyOptions.find(
+							( item ) => item.value === taxonomy
+						) ?? taxonomyOptions[ 0 ]
+					}
+					onValueChange={ ( item ) =>
+						item &&
 						setAttributes( {
-							taxonomy: value,
+							taxonomy: item.value,
 						} )
 					}
-					help={ __(
+					description={ __(
 						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
 					) }
 				/>

@@ -90,6 +90,10 @@ jobs:
             - name: Check peer dependencies of published packages
               run: npm run lint:peer-deps
 
+            - name: Check workspace peer dependency ranges
+              if: ${{ github.ref != 'refs/heads/wp/next' && github.base_ref != 'wp/next' }}
+              run: npm run lint:peer-ranges
+
             - name: Check root dependencies
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
               run: |
@@ -108,8 +112,11 @@ jobs:
               # `--prune-suppressions` ensures `suppressions.json` stays in sync.
               run: npm run lint:js -- --format compact --quiet --prune-suppressions
 
-            - name: Test agent skill setup
-              run: npm run test:unit:vitest -- --project=node tools/agents/test/setup-skills.test.js
+            - name: Validate agent skills
+              run: npm run lint:skills
+
+            - name: Test agent skill tools
+              run: npm run test:unit:vitest -- --project=node tools/agents/test
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}

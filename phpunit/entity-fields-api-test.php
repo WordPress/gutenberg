@@ -29,7 +29,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status', 'template' );
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'publish_date', 'scheduled_date', 'status', 'template' );
 
 	/**
 	 * The ids of the default fields the design post types exclude: those
@@ -37,7 +37,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' );
+	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'publish_date', 'scheduled_date', 'slug', 'status', 'template' );
 
 	/**
 	 * The callbacks a test hooked to `wp_entity_fields_api_init`, as callback and
@@ -545,7 +545,6 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		return array(
 			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
 			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
-			'parent'            => array( 'parent', array( 'page-attributes' ) ),
 			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
 			'title'             => array( 'title', array( 'title' ) ),
 			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
@@ -564,6 +563,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			'date'             => array( 'date', true ),
 			'last_edited_date' => array( 'last_edited_date', false ),
 			'password'         => array( 'password', true ),
+			'publish_date'     => array( 'publish_date', true ),
 			'scheduled_date'   => array( 'scheduled_date', true ),
 			'status'           => array( 'status', true ),
 			'template'         => array( 'template', true ),
@@ -618,6 +618,49 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			$this->assertContains( $field_id, array_column( wp_get_registered_entity_fields( 'postType', $post_type ), 'id' ), "$post_type gets the field." );
 		}
 		$this->assertNotContains( $field_id, array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_without' ), 'id' ) );
+	}
+
+	/**
+	 * The parent field requires both hierarchy and page attributes support.
+	 *
+	 * @dataProvider data_parent_field_requirements
+	 *
+	 * @param bool $hierarchical   Whether the post type is hierarchical.
+	 * @param bool $has_attributes Whether the post type supports page attributes.
+	 * @param bool $has_parent     Whether the parent field should be registered.
+	 */
+	public function test_the_parent_field_requires_hierarchy_and_page_attributes( $hierarchical, $has_attributes, $has_parent ) {
+		register_post_type(
+			'gutenberg_parent',
+			array(
+				'show_in_rest' => true,
+				'hierarchical' => $hierarchical,
+				'supports'     => $has_attributes ? array( 'page-attributes' ) : array(),
+			)
+		);
+
+		try {
+			self::reset_registry();
+			$ids = array_column( wp_get_registered_entity_fields( 'postType', 'gutenberg_parent' ), 'id' );
+		} finally {
+			unregister_post_type( 'gutenberg_parent' );
+		}
+
+		$this->assertSame( $has_parent, in_array( 'parent', $ids, true ) );
+	}
+
+	/**
+	 * Hierarchy and page attributes support are independent post type settings.
+	 *
+	 * @return array[] Post type settings and expected parent field registration.
+	 */
+	public function data_parent_field_requirements() {
+		return array(
+			'hierarchical with attributes'        => array( true, true, true ),
+			'hierarchical without attributes'     => array( true, false, false ),
+			'non-hierarchical with attributes'    => array( false, true, false ),
+			'non-hierarchical without attributes' => array( false, false, false ),
+		);
 	}
 
 	/**
@@ -698,6 +741,51 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_a_missing_collection_has_no_fields() {
 		$this->assertSame( array(), wp_get_entity_field_collection_fields( __DIR__ . '/data/core-fields/missing' ) );
+	}
+
+	/**
+	 * Firing the action again once the registry has been read does not reopen
+	 * it: the registrations, updates, and unregistrations made then are
+	 * refused, and so are the core collections, which register again on it.
+	 */
+	public function test_firing_the_action_again_does_not_reopen_the_registry() {
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::register_collection' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::update' );
+		$this->setExpectedIncorrectUsage( 'WP_Entity_Fields_Registry::unregister' );
+		$fields   = wp_get_registered_entity_fields( 'postType', 'page' );
+		$callback = static function () {
+			wp_register_entity_fields(
+				'test-plugin',
+				'postType',
+				'page',
+				array(
+					array(
+						'id'    => 'late',
+						'type'  => 'text',
+						'label' => 'Late',
+					),
+				)
+			);
+			wp_update_entity_fields(
+				'test-plugin',
+				'postType',
+				'page',
+				array(
+					array(
+						'id'    => 'author',
+						'label' => 'Late',
+					),
+				)
+			);
+			wp_unregister_entity_fields( 'postType', 'page', array( 'date' ) );
+		};
+		add_action( 'wp_entity_fields_api_init', $callback );
+		$this->callbacks[] = array( $callback, 10 );
+
+		do_action( 'wp_entity_fields_api_init' );
+
+		$this->assertSame( $fields, wp_get_registered_entity_fields( 'postType', 'page' ) );
 	}
 
 	/**

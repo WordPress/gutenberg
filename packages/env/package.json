@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "12.0.0",
+	"version": "12.2.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,14 +50,14 @@
 		"cross-spawn": "^7.0.6",
 		"docker-compose": "^0.24.3",
 		"got": "^11.8.5",
-		"js-yaml": "^3.15.2",
+		"js-yaml": "^5.5.0",
 		"ora": "^4.0.2",
 		"rimraf": "^5.0.10",
 		"simple-git": "^4.0.2",
 		"yargs": "^17.3.0"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

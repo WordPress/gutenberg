@@ -404,12 +404,16 @@ function VisualEditor( {
 		? getCanvasHeight( canvasWidth, containerSize )
 		: '100%';
 
+	// Resizable post types center their content vertically without filling
+	// the canvas, so the visible canvas height follows the content.
+	const publishedCanvasHeight =
+		typeof canvasHeight === 'number' && ! isResizablePostType
+			? canvasHeight
+			: undefined;
 	const { setCanvasHeight } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
-		setCanvasHeight(
-			typeof canvasHeight === 'number' ? canvasHeight : undefined
-		);
-	}, [ canvasHeight, setCanvasHeight ] );
+		setCanvasHeight( publishedCanvasHeight );
+	}, [ publishedCanvasHeight, setCanvasHeight ] );
 	// The store must not retain dimensions for a canvas that is no longer mounted.
 	useEffect( () => () => setCanvasHeight( undefined ), [ setCanvasHeight ] );
 
@@ -491,11 +495,13 @@ function VisualEditor( {
 				className,
 				{
 					// Vertical padding frames a width-constrained canvas
-					// (device preview or after a resize) as a centered preview.
-					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
+					// (device preview or after a resize) or a resizable
+					// focused entity as a centered preview.
+					'has-vertical-padding':
+						( isFocusedEntity && enableResizing ) || hasCanvasWidth,
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
-					'has-horizontal-padding': isFocusedEntity || enableResizing,
+					'has-horizontal-padding': enableResizing,
 				}
 			) }
 		>

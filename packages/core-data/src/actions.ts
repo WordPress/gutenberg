@@ -3,7 +3,12 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import type { ActionCreatorWithCustomDispatchSignature } from '@wordpress/data';
-import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
+import {
+	clearUnchangedEdits,
+	getNestedValue,
+	setNestedValue,
+	isSafeEntityKey,
+} from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -326,11 +331,8 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		let error: unknown;
 		let deletedRecord: unknown = false;
 		if ( ! entityConfig ) {
@@ -354,6 +356,9 @@ export const deleteEntityRecord =
 			let hasError = false;
 			const { baseURL } = entityConfig;
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				let path = `${ baseURL }/${ recordId }`;
 
 				if ( query ) {
@@ -639,11 +644,8 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -695,6 +697,9 @@ export const saveEntityRecord =
 			let hasError = false;
 			const { baseURL } = entityConfig;
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = (
@@ -970,11 +975,8 @@ export const saveEditedEntityRecord =
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -1026,11 +1028,8 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
 
@@ -1197,11 +1196,8 @@ export const receiveRevisions =
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'receiveRevisions' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 
 		dispatch( {

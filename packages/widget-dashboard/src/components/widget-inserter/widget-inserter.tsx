@@ -43,6 +43,8 @@ export function WidgetInserter() {
 				size="full"
 				portal={
 					<Dialog.Portal
+						// Legacy popovers opened inside, like the DataViews view config, render below the compat overlay slot.
+						container={ document.body }
 						style={
 							{
 								'--wp-ui-dialog-z-index': 99999,

@@ -14,14 +14,15 @@ export default [
 					isRepeated: false,
 					dimRatio: 100,
 					backgroundType: 'image',
-					minHeight: 66,
-					minHeightUnit: 'vh',
 					customGradient:
 						'linear-gradient(90deg,rgb(35,74,20) 50%,rgb(225,137,116) 50%)',
 					isDark: false,
 					tagName: 'div',
 					align: 'full',
 					style: {
+						dimensions: {
+							minHeight: '66vh',
+						},
 						spacing: {
 							padding: {
 								top: '5vw',
@@ -77,7 +78,8 @@ export default [
 								name: 'core/image',
 								isValid: true,
 								attributes: {
-									url: 'https://pd.w.org/2022/03/3866241b433db4ee2.96648572.jpeg',
+									// Served from `storybook/static`.
+									url: 'landscape.svg',
 									alt: '',
 									caption: '',
 									sizeSlug: 'large',
@@ -90,7 +92,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<figure class="wp-block-image size-large is-style-default"><img src="https://pd.w.org/2022/03/3866241b433db4ee2.96648572.jpeg" alt="" /></figure>',
+									'<figure class="wp-block-image size-large is-style-default"><img src="landscape.svg" alt="" /></figure>',
 								validationIssues: [],
 							},
 							{
@@ -672,14 +674,15 @@ export default [
 					dimRatio: 100,
 					customOverlayColor: '#ffb43c',
 					backgroundType: 'image',
-					minHeight: 66,
-					minHeightUnit: 'vh',
 					isDark: false,
 					useFeaturedImage: false,
 					tagName: 'div',
 					align: 'full',
 					textColor: 'black',
 					style: {
+						dimensions: {
+							minHeight: '66vh',
+						},
 						spacing: {
 							padding: {
 								top: '48px',

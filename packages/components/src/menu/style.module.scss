@@ -104,7 +104,7 @@
 		grid-template-columns: subgrid;
 	}
 
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	font-family: inherit;
 	font-weight: 400;
 	line-height: 20px;
@@ -127,7 +127,7 @@
 	&[aria-disabled="true"] {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
-		&:is(:focus, [data-focus]) {
+		&:focus-visible {
 			@include outset-ring__focus;
 			outline-offset: 0;
 		}
@@ -271,7 +271,7 @@
 }
 
 .item-label {
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: 20px;
 	color: inherit;
 }

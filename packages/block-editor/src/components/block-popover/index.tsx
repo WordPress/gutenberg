@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { useMergeRefs } from '@wordpress/compose';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import {
 	forwardRef,
 	useMemo,
@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
-import { rectUnion, getElementBounds } from '../../utils/dom';
+import { rectUnion, extendRectToTop, getElementBounds } from '../../utils/dom';
 import type { BlockPopoverProps, PrivateBlockPopoverProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
@@ -19,6 +19,7 @@ function BlockPopover(
 	{
 		clientId,
 		bottomClientId,
+		topEdgeClientId,
 		children,
 		__unstablePopoverSlot,
 		__unstableContentRef,
@@ -29,6 +30,7 @@ function BlockPopover(
 ) {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( bottomClientId ?? clientId );
+	const topEdgeElement = useBlockElement( topEdgeClientId ?? clientId );
 	const mergedRefs = useMergeRefs( [
 		ref,
 		usePopoverScroll( __unstableContentRef ),
@@ -89,12 +91,18 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				return lastSelectedElement
+				const bounds = lastSelectedElement
 					? rectUnion(
 							getElementBounds( selectedElement ),
 							getElementBounds( lastSelectedElement )
 						)
 					: getElementBounds( selectedElement );
+				return topEdgeClientId && topEdgeElement
+					? extendRectToTop(
+							bounds,
+							getElementBounds( topEdgeElement ).top
+						)
+					: bounds;
 			},
 			contextElement: selectedElement,
 		};
@@ -103,6 +111,8 @@ function BlockPopover(
 		selectedElement,
 		bottomClientId,
 		lastSelectedElement,
+		topEdgeClientId,
+		topEdgeElement,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
@@ -110,7 +120,7 @@ function BlockPopover(
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			ref={ mergedRefs }
 			animate={ false }
 			focusOnMount={ false }
@@ -128,7 +138,7 @@ function BlockPopover(
 			variant="unstyled"
 		>
 			{ children }
-		</Popover>
+		</WCPopover>
 	);
 }
 

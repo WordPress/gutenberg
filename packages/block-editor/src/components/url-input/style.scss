@@ -60,7 +60,7 @@ $input-size: 300px;
 	height: auto;
 	color: var(--wpds-color-foreground-interactive-neutral);
 	display: block;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	cursor: var(--wpds-cursor-control);
 	width: 100%;
 	border: none;

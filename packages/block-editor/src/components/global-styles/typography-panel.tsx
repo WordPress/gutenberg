@@ -932,7 +932,7 @@ export default function TypographyPanel( {
 					background,
 				};
 			}
-			return {
+			const resetValue = {
 				...previousValue,
 				typography: {},
 				background,
@@ -941,6 +941,21 @@ export default function TypographyPanel( {
 					text: undefined,
 				},
 			};
+			// Setting the text color also sets the link color while the two match,
+			// so clear that link color too, as resetting the Color item does. A link
+			// color that differs was set on purpose and stays.
+			const linkColor = previousValue?.elements?.link?.color?.text;
+			if (
+				linkColor !== undefined &&
+				linkColor === previousValue?.color?.text
+			) {
+				return setImmutably(
+					resetValue,
+					[ 'elements', 'link', 'color', 'text' ],
+					undefined
+				);
+			}
+			return resetValue;
 		},
 		[ baseClip, hasTextColorEnabled, hasTextGradientEnabled ]
 	);
@@ -959,7 +974,9 @@ export default function TypographyPanel( {
 					resetValue={ resetTextColor }
 					isShownByDefault={ defaultControls.textColor }
 					indicators={ [ userTextColor ?? textColor ] }
-					contrastWarning={ contrastWarning }
+					contrastWarning={
+						isTextGradient ? undefined : contrastWarning
+					}
 					tabs={ [
 						{
 							key: 'text',
@@ -994,6 +1011,9 @@ export default function TypographyPanel( {
 					resetValue={ resetTextGradient }
 					isShownByDefault={ defaultControls.textGradient }
 					indicators={ [ userTextGradient ?? inheritedTextGradient ] }
+					contrastWarning={
+						isTextGradient ? contrastWarning : undefined
+					}
 					tabs={ [
 						{
 							key: 'text-gradient',

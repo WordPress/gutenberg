@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Fragment } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
+import { Avatar } from '../../../../avatar';
 import {
 	GROUPED_ITEMS,
 	type FixtureGroup,
@@ -19,6 +20,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.LoadingIndicator':
+			SearchableChipSelect.LoadingIndicator,
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
@@ -83,11 +86,7 @@ export const WithCustomChipsAndItems: Story = {
 				<SearchableChipSelect.ChipWithRemove
 					key={ item.value }
 					prefix={
-						<img
-							src={ `https://gravatar.com/avatar/?d=initials&initials=${ item.label }` }
-							alt=""
-							style={ { width: '100%' } }
-						/>
+						<Avatar name={ item.label } size="xs" aria-hidden />
 					}
 				>
 					{ item.label }

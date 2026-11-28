@@ -217,6 +217,7 @@ const UnforwardedFontSizePicker = (
 								} }
 								units={ hasUnits ? units : [] }
 								min={ 0 }
+								step={ hasUnits ? undefined : 1 }
 							/>
 						</FlexItem>
 						{ withSlider && (

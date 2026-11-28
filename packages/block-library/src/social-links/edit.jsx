@@ -13,16 +13,16 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const sizeOptions = [
-	{ label: __( 'Default' ), value: '' },
+const sizeItems = [
+	{ label: __( 'Default' ), value: null },
 	{ label: __( 'Small' ), value: 'has-small-icon-size' },
 	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
 	{ label: __( 'Large' ), value: 'has-large-icon-size' },
@@ -73,27 +73,48 @@ export function SocialLinksEdit( props ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
 	useEffect( () => {
-		if ( logosOnly ) {
-			let restore;
-			setAttributes( ( prev ) => {
-				restore = {
-					iconBackgroundColor: prev.iconBackgroundColor,
-					iconBackgroundColorValue: prev.iconBackgroundColorValue,
-					customIconBackgroundColor: prev.customIconBackgroundColor,
-				};
-				return {
-					iconBackgroundColor: undefined,
-					iconBackgroundColorValue: undefined,
-					customIconBackgroundColor: undefined,
-				};
-			} );
-
-			return () => setAttributes( { ...restore } );
+		if ( ! logosOnly ) {
+			return;
 		}
-	}, [ logosOnly, setAttributes ] );
+
+		let restore;
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( ( prev ) => {
+			// Redo replays an already cleared background. Keep nothing to
+			// restore then, so a later Undo isn't overwritten.
+			const {
+				iconBackgroundColor: bg,
+				iconBackgroundColorValue: bgValue,
+				customIconBackgroundColor: customBg,
+			} = prev;
+			if ( bg || bgValue || customBg ) {
+				restore = {
+					iconBackgroundColor: bg,
+					iconBackgroundColorValue: bgValue,
+					customIconBackgroundColor: customBg,
+				};
+			}
+			return {
+				iconBackgroundColor: undefined,
+				iconBackgroundColorValue: undefined,
+				customIconBackgroundColor: undefined,
+			};
+		} );
+
+		return () => {
+			if ( ! restore ) {
+				return;
+			}
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( restore );
+		};
+	}, [ logosOnly, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
@@ -177,15 +198,20 @@ export function SocialLinksEdit( props ) {
 							setAttributes( { size: undefined } )
 						}
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Icon size' ) }
-							onChange={ ( newSize ) => {
+							onValueChange={ ( item ) =>
+								item &&
 								setAttributes( {
-									size: newSize === '' ? undefined : newSize,
-								} );
-							} }
-							value={ size ?? '' }
-							options={ sizeOptions }
+									size: item.value ?? undefined,
+								} )
+							}
+							value={
+								sizeItems.find(
+									( item ) => item.value === ( size || null )
+								) ?? sizeItems[ 0 ]
+							}
+							items={ sizeItems }
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem

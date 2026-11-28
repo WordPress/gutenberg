@@ -1,7 +1,8 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import DataViews from '../index';
 import {
 	LAYOUT_ACTIVITY,
@@ -15,6 +16,12 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+
 type Data = {
 	id: number;
 	title: string;
@@ -202,6 +209,64 @@ describe( 'DataViews component', () => {
 		}
 	);
 
+	it( 'marks the triggers of modal actions as opening a dialog', async () => {
+		render(
+			<DataViewWrapper
+				actions={ [
+					{ ...actions[ 0 ], isPrimary: true },
+					{
+						id: 'duplicate',
+						label: 'Duplicate',
+						isPrimary: true,
+						callback: vi.fn(),
+					},
+					{ id: 'view', label: 'View', callback: vi.fn() },
+				] }
+				data={ [ data[ 0 ] ] }
+			/>
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Duplicate' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+		const user = userEvent.setup();
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'View' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Delete…' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+	} );
+
+	it( 'marks the bulk triggers of modal actions as opening a dialog', () => {
+		render(
+			<DataViewWrapper
+				view={ { ...DEFAULT_VIEW, type: LAYOUT_TABLE } }
+				actions={ [
+					...actions,
+					{
+						id: 'archive',
+						label: 'Archive',
+						supportsBulk: true,
+						callback: vi.fn(),
+					},
+				] }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			/>
+		);
+		// Neither is primary, so their only buttons are in the toolbar.
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toHaveAttribute( 'aria-haspopup', 'dialog' );
+		expect(
+			screen.getByRole( 'button', { name: 'Archive' } )
+		).not.toHaveAttribute( 'aria-haspopup' );
+	} );
+
 	it( 'renders header bulk actions once in a custom table composition', () => {
 		render(
 			<DataViewWrapper
@@ -281,7 +346,8 @@ describe( 'DataViews component', () => {
 			);
 			expect(
 				screen.getByRole( 'button', { name: 'Process' } )
-			).toHaveClass( 'is-busy' );
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
 			expect( screen.getByText( '1 item selected' ) ).toBeVisible();
 			finishAction!();
 			await waitFor( () =>
@@ -790,16 +856,22 @@ describe( 'DataViews component', () => {
 
 			// First item should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			await user.click( thirdItemElement );
 
 			// Both items should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Don't keep the modifier pressed down, that's just mean.
@@ -824,7 +896,9 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 0 ].title ) );
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click selects everything between the anchor and the
@@ -833,7 +907,9 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 2 ].title ) );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 
@@ -856,10 +932,14 @@ describe( 'DataViews component', () => {
 			// Checkbox clicks select the first and third items; the third
 			// becomes the anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift+Click applies the anchor's state to the range without
@@ -870,7 +950,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -893,7 +975,9 @@ describe( 'DataViews component', () => {
 			);
 			// Unchecking the third item makes it the anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the selected second item selects the range
@@ -903,7 +987,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -924,10 +1010,14 @@ describe( 'DataViews component', () => {
 			// Selecting and deselecting the first item leaves it as the
 			// anchor with nothing selected.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the unselected third item selects the whole
@@ -937,7 +1027,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -958,7 +1050,9 @@ describe( 'DataViews component', () => {
 			// The checkbox click selects the third item and makes it the
 			// anchor.
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			);
 
 			// Shift-clicking the first item's checkbox selects the whole
@@ -967,12 +1061,16 @@ describe( 'DataViews component', () => {
 			// toggle after React re-renders, leaving it visually unchecked.
 			await user.keyboard( '{Shift>}' );
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -1007,14 +1105,18 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 1 ].title ) );
 			expect( onClickItem ).not.toHaveBeenCalled();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			).not.toBeChecked();
 
 			// Selectable items still respond and become the anchor.
 			await user.click( screen.getByText( data[ 0 ].title ) );
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click ranges skip the non-selectable item.
@@ -1022,13 +1124,19 @@ describe( 'DataViews component', () => {
 			await user.click( screen.getByText( data[ 2 ].title ) );
 			await user.keyboard( '{/Shift}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			).not.toBeChecked();
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 2 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 2 ].title }`,
+				} )
 			).toBeChecked();
 			expect( onClickItem ).not.toHaveBeenCalled();
 		} );
@@ -1065,10 +1173,14 @@ describe( 'DataViews component', () => {
 			);
 			const user = userEvent.setup();
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			);
 			await user.click(
-				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 1 ].title }`,
+				} )
 			);
 
 			await user.click(
@@ -1233,7 +1345,7 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			const firstCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 0 ].title,
+				name: `Select ${ data[ 0 ].title }`,
 			} );
 			const user = userEvent.setup();
 			await user.click( firstCheckbox );
@@ -1241,7 +1353,7 @@ describe( 'DataViews component', () => {
 			// First item should be selected.
 			expect( firstCheckbox ).toBeChecked();
 			const thirdCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 2 ].title,
+				name: `Select ${ data[ 2 ].title }`,
 			} );
 			await user.click( thirdCheckbox );
 
@@ -1275,7 +1387,9 @@ describe( 'DataViews component', () => {
 
 			// First item should be selected.
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			await user.keyboard( '{/Control}' );
@@ -1304,7 +1418,9 @@ describe( 'DataViews component', () => {
 			);
 			await user.keyboard( '{/Control}' );
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toBeChecked();
 
 			// Shift+Click selects everything between the anchor and the
@@ -1316,7 +1432,9 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Shift}' );
 			for ( const item of data ) {
 				expect(
-					screen.getByRole( 'checkbox', { name: item.title } )
+					screen.getByRole( 'checkbox', {
+						name: `Select ${ item.title }`,
+					} )
 				).toBeChecked();
 			}
 		} );
@@ -1358,7 +1476,9 @@ describe( 'DataViews component', () => {
 			await user.tab();
 
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toHaveFocus();
 
 			await user.tab();
@@ -1407,7 +1527,9 @@ describe( 'DataViews component', () => {
 			await user.tab();
 
 			expect(
-				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+				screen.getByRole( 'checkbox', {
+					name: `Select ${ data[ 0 ].title }`,
+				} )
 			).toHaveFocus();
 
 			await user.tab();
@@ -1565,6 +1687,33 @@ describe( 'DataViews component', () => {
 			).toEqual( 3 );
 		} );
 
+		it( 'should move focus to the adjacent row when an item id is a prefix of another item id', async () => {
+			const user = userEvent.setup();
+			const items: Data[] = [
+				{ id: 1, title: 'One' },
+				{ id: 12, title: 'Twelve' },
+				{ id: 13, title: 'Thirteen' },
+			];
+			render(
+				<DataViewWrapper
+					view={ { type: 'list' } }
+					data={ items }
+					paginationInfo={ { totalItems: 3, totalPages: 1 } }
+					actions={ actions }
+				/>
+			);
+			const triggers = await screen.findAllByRole( 'button', {
+				name: 'Actions',
+			} );
+
+			act( () => triggers[ 2 ].focus() );
+			await user.keyboard( '{ArrowUp}' );
+			expect( triggers[ 1 ] ).toHaveFocus();
+
+			await user.keyboard( '{ArrowDown}' );
+			expect( triggers[ 2 ] ).toHaveFocus();
+		} );
+
 		describe.each( [
 			[ 'ungrouped', undefined ],
 			[ 'grouped', { field: 'author', direction: 'asc' as const } ],
@@ -1631,6 +1780,44 @@ describe( 'DataViews component', () => {
 
 		afterEach( () => {
 			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'keeps the bulk actions menu trigger focusable while an action runs', async () => {
+			let finishAction: () => void;
+			const pending = new Promise< void >( ( resolve ) => {
+				finishAction = resolve;
+			} );
+			render(
+				<DataViewWrapper
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'process',
+							label: 'Process',
+							supportsBulk: true,
+							callback: () => pending,
+						},
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			const trigger = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
+			);
+			await user.click( trigger );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Process' } )
+			);
+			expect( trigger ).toHaveFocus();
+			expect( trigger ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
+
+			finishAction!();
+			await waitFor( () =>
+				expect( trigger ).toHaveAttribute( 'aria-disabled', 'false' )
+			);
 		} );
 
 		it( 'supports iconless and disabled grid bulk actions without losing modal focus', async () => {

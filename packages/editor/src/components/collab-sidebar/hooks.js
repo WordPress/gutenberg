@@ -24,19 +24,27 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
-	calculateNotePositions,
-	findNoteInBlock,
-	focusNoteThread,
-	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
-	getNoteAtCaret,
-	pickNoteForCaret,
-	readInlineSelection,
-	removeInlineNote,
 	removeNoteIdFromMetadata,
+} from './utils/metadata';
+import { getTextAttributeKey, toRecord } from './utils/rich-text';
+import {
+	findNoteInBlock,
+	getBlockLevelClientIds,
+	getInlineMarkerStart,
+	getNoteRanges,
+	removeInlineNote,
 	wrapInlineNote,
-} from './utils';
+} from './utils/note-anchor';
+import {
+	getCaretChange,
+	getNoteAtCaret,
+	hasBlockDraft,
+	pickNoteForCaret,
+} from './utils/note-selection';
+import { focusNoteThread } from './utils/dom';
+import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -80,15 +88,21 @@ export function useNoteThreads( postId ) {
 		 * types returned by the comments REST endpoint.
 		 */
 		const blocksWithNotes = {};
-		const clientIdByNoteId = new Map();
+		// Duplicating or splitting a block copies its notes, so a note can
+		// belong to several blocks.
+		const clientIdsByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
-			if ( noteIds.length > 0 ) {
-				blocksWithNotes[ clientId ] = noteIds;
-				for ( const noteId of noteIds ) {
-					clientIdByNoteId.set( noteId, clientId );
+			if ( noteIds.length === 0 ) {
+				continue;
+			}
+			blocksWithNotes[ clientId ] = noteIds;
+			for ( const noteId of noteIds ) {
+				if ( ! clientIdsByNoteId.has( noteId ) ) {
+					clientIdsByNoteId.set( noteId, [] );
 				}
+				clientIdsByNoteId.get( noteId ).push( clientId );
 			}
 		}
 
@@ -97,13 +111,13 @@ export function useNoteThreads( postId ) {
 		const threadsById = new Map();
 		const rootThreads = [];
 		for ( const item of threads ) {
+			const blockClientIds =
+				( item.parent === 0 && clientIdsByNoteId.get( item.id ) ) || [];
 			const thread = {
 				...item,
 				reply: [],
-				blockClientId:
-					item.parent === 0
-						? ( clientIdByNoteId.get( item.id ) ?? null )
-						: null,
+				blockClientIds,
+				blockClientId: blockClientIds[ 0 ] ?? null,
 			};
 			threadsById.set( item.id, thread );
 			if ( item.parent === 0 ) {
@@ -136,7 +150,7 @@ export function useNoteThreads( postId ) {
 			const orderedThreads = noteIds
 				.map( ( noteId ) => {
 					const thread = threadsById.get( noteId );
-					if ( ! thread ) {
+					if ( ! thread || thread.blockClientId !== clientId ) {
 						return null;
 					}
 					return {
@@ -185,10 +199,13 @@ export function useNoteActions() {
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
+		getBlockCount,
 		getBlockName,
-		getSelectedBlockClientId,
+		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
+		__unstableIsFullySelected: isFullySelected,
+		__unstableIsSelectionCollapsed: isSelectionCollapsed,
 	} = useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
@@ -231,57 +248,120 @@ export function useNoteActions() {
 	 * note back with it. The last call flags the post as changed, so "Save
 	 * draft" turns on.
 	 */
-	const updateNoteAnchor = ( clientId, attributes ) => {
+	const updateNoteAnchor = ( clientIds, attributes, options ) => {
 		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
-		updateBlockAttributes( clientId, attributes );
+		updateBlockAttributes( clientIds, attributes, options );
 		__unstableMarkLastChangeAsPersistent();
 	};
 
-	const removeNoteMarker = ( clientId, noteId ) => {
-		const removed = removeInlineNote(
-			getNoteAttributes( clientId ),
-			noteId
-		);
-		if ( removed ) {
-			updateNoteAnchor( clientId, {
-				[ removed.attributeKey ]: removed.value,
+	const updateNoteAnchors = ( clientIds, getNewAttributes ) => {
+		const attributesByClientId = {};
+		for ( const clientId of clientIds ) {
+			const attributes = getNoteAttributes( clientId );
+			if ( ! attributes ) {
+				continue;
+			}
+			const newAttributes = getNewAttributes( attributes, clientId );
+			if ( newAttributes && Object.keys( newAttributes ).length > 0 ) {
+				attributesByClientId[ clientId ] = newAttributes;
+			}
+		}
+		const updatedClientIds = Object.keys( attributesByClientId );
+		if ( updatedClientIds.length > 0 ) {
+			updateNoteAnchor( updatedClientIds, attributesByClientId, {
+				uniqueByBlock: true,
 			} );
 		}
+	};
+
+	const removeNoteMarker = ( clientIds, noteId ) =>
+		updateNoteAnchors( clientIds, ( attributes ) => {
+			const removed = removeInlineNote( attributes, noteId );
+			return removed && { [ removed.attributeKey ]: removed.value };
+		} );
+
+	// A caret or whole blocks select no text.
+	const getSelectedNoteRanges = ( clientIds ) =>
+		isFullySelected() || isSelectionCollapsed()
+			? new Map()
+			: getNoteRanges( {
+					blocks: clientIds.map( ( clientId ) => ( {
+						clientId,
+						attributes: getNoteAttributes( clientId ),
+						attributeKey: getTextAttributeKey(
+							clientId,
+							getBlockName,
+							getBlockCount
+						),
+					} ) ),
+					selectionStart: getSelectionStart(),
+					selectionEnd: getSelectionEnd(),
+				} );
+
+	// A text block the selection gives no text, like the block a selection
+	// starts at the end of, isn't part of a new note, unless no block has any:
+	// the note then takes them all as whole blocks.
+	const getNoteClientIds = () => {
+		const clientIds = getSelectedBlockClientIds();
+		const ranges = getSelectedNoteRanges( clientIds );
+		const textClientIds = clientIds.filter( ( clientId ) => {
+			const range = ranges.get( clientId );
+			return ! range || range.start < range.end;
+		} );
+		return textClientIds.length ? textClientIds : clientIds;
 	};
 
 	// The draft marker (id `new`) wraps the text an unsent note is about, so
 	// the anchor follows edits until the note is sent.
-	const onDiscard = ( clientId ) => removeNoteMarker( clientId, 'new' );
+	const onDiscard = ( clientIds ) => removeNoteMarker( clientIds, 'new' );
 
-	// Starting again from another selection moves the marker; a collapsed
-	// selection keeps it.
-	const onStart = ( clientId ) => {
-		const selection = readInlineSelection(
-			getSelectionStart,
-			getSelectionEnd
-		);
-		if ( selection?.clientId !== clientId ) {
+	// Starting again from another selection moves the marker. A caret or the
+	// whole block keeps it, so a block's unsent draft keeps its text; across
+	// blocks, a marker left by one block's draft isn't this note's.
+	const onStart = ( clientIds ) => {
+		const selectedClientIds = getSelectedBlockClientIds();
+		if (
+			clientIds[ 0 ] !== selectedClientIds[ 0 ] ||
+			clientIds.length !== selectedClientIds.length
+		) {
 			return;
 		}
-		onDiscard( clientId );
-		const wrapped = wrapInlineNote(
-			getNoteAttributes( clientId )?.[ selection.attributeKey ],
-			'new',
-			selection.start,
-			selection.end
-		);
-		if ( wrapped ) {
-			updateNoteAnchor( clientId, {
-				[ selection.attributeKey ]: wrapped,
-			} );
+		const ranges = getSelectedNoteRanges( clientIds );
+		if ( ! ranges.size && clientIds.length === 1 ) {
+			return;
 		}
+		updateNoteAnchors( clientIds, ( attributes, clientId ) => {
+			const newAttributes = {};
+			const removed = removeInlineNote( attributes, 'new' );
+			if ( removed ) {
+				newAttributes[ removed.attributeKey ] = removed.value;
+			}
+			const range = ranges.get( clientId );
+			const bindings = attributes.metadata?.bindings;
+			// Selection offsets are in the bound value, not the stored one.
+			if (
+				range &&
+				! bindings?.[ range.attributeKey ] &&
+				! bindings?.__default
+			) {
+				const { attributeKey, start, end } = range;
+				const value =
+					newAttributes[ attributeKey ] ?? attributes[ attributeKey ];
+				const wrapped =
+					start < end && wrapInlineNote( value, 'new', start, end );
+				if ( wrapped ) {
+					newAttributes[ attributeKey ] = wrapped;
+				}
+			}
+			return newAttributes;
+		} );
 	};
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
-			// Capture the target block *before* the async save: selection may
+			// Capture the target blocks *before* the async save: selection may
 			// shift during the round-trip, attaching the note to the wrong block.
-			const clientId = ! parent ? getSelectedBlockClientId() : null;
+			const clientIds = ! parent ? getNoteClientIds() : [];
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -304,29 +384,29 @@ export function useNoteActions() {
 			 * other id. Tracking issue:
 			 * https://github.com/WordPress/gutenberg/issues/74751.
 			 */
-			if ( ! parent && savedRecord?.id && clientId ) {
-				const attributes = getNoteAttributes( clientId );
-				const metadata = attributes?.metadata;
-				const updatedMetadata = addNoteIdToMetadata(
-					metadata,
-					savedRecord.id
-				);
-				const newAttributes = {
-					metadata: cleanEmptyObject( updatedMetadata ),
-				};
+			if ( ! parent && savedRecord?.id ) {
+				updateNoteAnchors( clientIds, ( attributes ) => {
+					const newAttributes = {
+						metadata: cleanEmptyObject(
+							addNoteIdToMetadata(
+								attributes.metadata,
+								savedRecord.id
+							)
+						),
+					};
 
-				// Inline path: the draft marker becomes the note's marker.
-				const draft = removeInlineNote( attributes, 'new' );
-				if ( draft ) {
-					newAttributes[ draft.attributeKey ] = wrapInlineNote(
-						draft.value,
-						savedRecord.id,
-						draft.start,
-						draft.end
-					);
-				}
-
-				updateNoteAnchor( clientId, newAttributes );
+					// Inline path: the draft marker becomes the note's marker.
+					const draft = removeInlineNote( attributes, 'new' );
+					if ( draft ) {
+						newAttributes[ draft.attributeKey ] = wrapInlineNote(
+							draft.value,
+							savedRecord.id,
+							draft.start,
+							draft.end
+						);
+					}
+					return newAttributes;
+				} );
 			}
 
 			createNotice(
@@ -385,8 +465,8 @@ export function useNoteActions() {
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
-				if ( status === 'approved' && note.blockClientId ) {
-					removeNoteMarker( note.blockClientId, id );
+				if ( status === 'approved' ) {
+					removeNoteMarker( note.blockClientIds, id );
 				}
 
 				// The note visibly updates in place, so there is no snackbar,
@@ -426,7 +506,7 @@ export function useNoteActions() {
 		}
 	};
 
-	const restoreNote = async ( noteId, anchor ) => {
+	const restoreNote = async ( noteId, anchors ) => {
 		try {
 			// Untrash first, so a failure doesn't leave an anchor without a note.
 			await saveEntityRecord(
@@ -436,12 +516,9 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// No anchor (a reply or an orphan), or its block is gone: the
-			// note comes back on its own.
-			const attributes = anchor
-				? getNoteAttributes( anchor.clientId )
-				: null;
-			if ( attributes ) {
+			// No anchors (a reply or an orphan), or their blocks are gone:
+			// the note comes back on its own.
+			updateNoteAnchors( anchors.keys(), ( attributes, clientId ) => {
 				const newAttributes = {};
 				// The editor's undo may have brought the anchor back already.
 				if (
@@ -454,14 +531,14 @@ export function useNoteActions() {
 						noteId
 					);
 				}
-				const { inline } = anchor;
+				const inline = anchors.get( clientId );
 				const value = inline && attributes[ inline.attributeKey ];
 				// Re-wrap only text that hasn't changed since the delete;
 				// otherwise the note comes back as a block-level note.
 				if (
 					inline &&
 					! findNoteInBlock( attributes, noteId ) &&
-					value?.text?.slice( inline.start, inline.end ) ===
+					toRecord( value ).text.slice( inline.start, inline.end ) ===
 						inline.text
 				) {
 					const wrapped = wrapInlineNote(
@@ -474,10 +551,8 @@ export function useNoteActions() {
 						newAttributes[ inline.attributeKey ] = wrapped;
 					}
 				}
-				if ( Object.keys( newAttributes ).length > 0 ) {
-					updateNoteAnchor( anchor.clientId, newAttributes );
-				}
-			}
+				return newAttributes;
+			} );
 
 			createNotice( 'snackbar', __( 'Note restored.' ), {
 				type: 'snackbar',
@@ -490,11 +565,6 @@ export function useNoteActions() {
 
 	const onDelete = async ( note ) => {
 		try {
-			// Capture the target block *before* the async delete: selection may
-			// shift during the round-trip, pointing the attribute cleanup at the
-			// wrong block.
-			const clientId = ! note.parent ? note.blockClientId : null;
-
 			// Without the trash, the note can only be deleted permanently,
 			// and there's nothing for Undo to bring back.
 			const canMoveToTrash = !! note._links?.[ 'wp:action-trash' ];
@@ -506,35 +576,39 @@ export function useNoteActions() {
 				{ throwOnError: true }
 			);
 
-			// What Undo needs to re-attach the note to its block.
-			let anchor = null;
-			const attributes = clientId ? getNoteAttributes( clientId ) : null;
-			if (
-				getNoteIdsFromMetadata( attributes?.metadata ).includes(
-					note.id
-				)
-			) {
-				anchor = { clientId };
-				const newAttributes = {
-					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata( attributes.metadata, note.id )
-					),
-				};
-				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content.
-				const removed = removeInlineNote( attributes, note.id );
-				if ( removed ) {
-					const { attributeKey, start, end, value } = removed;
-					newAttributes[ attributeKey ] = value;
-					anchor.inline = {
-						attributeKey,
-						start,
-						end,
-						text: value.text.slice( start, end ),
+			// What Undo needs to re-attach the note to its blocks.
+			const anchors = new Map();
+			updateNoteAnchors(
+				note.blockClientIds,
+				( attributes, clientId ) => {
+					if (
+						! getNoteIdsFromMetadata(
+							attributes.metadata
+						).includes( note.id )
+					) {
+						return null;
+					}
+					const newAttributes = {
+						metadata: cleanEmptyObject(
+							removeNoteIdFromMetadata(
+								attributes.metadata,
+								note.id
+							)
+						),
 					};
+					// Strip the inline marker too (if any) so the deleted note's
+					// highlight doesn't linger in the content.
+					let inline = null;
+					const removed = removeInlineNote( attributes, note.id );
+					if ( removed ) {
+						const { value, ...anchor } = removed;
+						newAttributes[ anchor.attributeKey ] = value;
+						inline = anchor;
+					}
+					anchors.set( clientId, inline );
+					return newAttributes;
 				}
-				updateNoteAnchor( clientId, newAttributes );
-			}
+			);
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
@@ -543,7 +617,7 @@ export function useNoteActions() {
 					? [
 							{
 								label: __( 'Undo' ),
-								onClick: () => restoreNote( note.id, anchor ),
+								onClick: () => restoreNote( note.id, anchors ),
 							},
 						]
 					: [],
@@ -579,11 +653,10 @@ export function useNoteDraft( key ) {
 }
 
 /**
- * Calls back when the caret moves. Skips typing: a selection change batched
- * with a content change moves the caret with the text, never across a marker.
- * A store subscription, not `useSelect`: nothing renders from it.
+ * Calls back when the caret moves, see `getCaretChange`. A store
+ * subscription, not `useSelect`: nothing renders from it.
  *
- * @param {(caret: Object) => void} onChange Receives `{ clientId, previousClientId, isBlockChange, attributes, noteAtCaret }`.
+ * @param {(caret: Object) => void} onChange Receives `{ clientIds, previousClientIds, isBlockChange, attributes, noteAtCaret }`; `attributes` only while one block is selected.
  */
 function useCaretChange( onChange ) {
 	const registry = useRegistry();
@@ -591,37 +664,37 @@ function useCaretChange( onChange ) {
 	useEffect( () => {
 		const {
 			getBlockAttributes,
-			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			getSelectionStart,
 			getSelectionEnd,
 		} = registry.select( blockEditorStore );
-		let clientId = getSelectedBlockClientId();
-		let attributes = getBlockAttributes( clientId );
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
+		const getSnapshot = () => {
+			const clientIds = getSelectedBlockClientIds();
+			return {
+				clientIds,
+				// The caret rules read one block's markers.
+				attributes:
+					clientIds.length === 1
+						? getBlockAttributes( clientIds[ 0 ] )
+						: undefined,
+				selectionStart: getSelectionStart(),
+				selectionEnd: getSelectionEnd(),
+			};
+		};
+		let snapshot = getSnapshot();
 		return registry.subscribe( () => {
-			const previousClientId = clientId;
-			const previousAttributes = attributes;
-			clientId = getSelectedBlockClientId();
-			attributes = getBlockAttributes( clientId );
-			if (
-				getSelectionStart() === selectionStart &&
-				getSelectionEnd() === selectionEnd
-			) {
+			const previous = snapshot;
+			snapshot = getSnapshot();
+			const change = getCaretChange( previous, snapshot );
+			if ( ! change ) {
 				return;
 			}
-			selectionStart = getSelectionStart();
-			selectionEnd = getSelectionEnd();
-			if (
-				clientId === previousClientId &&
-				attributes !== previousAttributes
-			) {
-				return;
-			}
+			const { clientIds, attributes, selectionStart, selectionEnd } =
+				snapshot;
 			handleChange( {
-				clientId,
-				previousClientId,
-				isBlockChange: clientId !== previousClientId,
+				clientIds,
+				previousClientIds: previous.clientIds,
+				isBlockChange: change.isBlockChange,
 				attributes,
 				noteAtCaret: getNoteAtCaret(
 					attributes,
@@ -636,26 +709,41 @@ function useCaretChange( onChange ) {
 /**
  * Syncs the selected note with the caret; see "Note selection" in the README.
  *
- * @param {Object}                     props
- * @param {Array}                      props.notes     Threads shown in the sidebar.
- * @param {Map}                        props.drafts    Unsent note drafts, see `NoteDraftsContext`.
- * @param {(clientId: string) => void} props.onDiscard Drops a block's draft marker.
+ * @param {Object}                        props
+ * @param {Array}                         props.notes     Threads shown in the sidebar.
+ * @param {Map}                           props.drafts    Unsent note drafts, see `NoteDraftsContext`.
+ * @param {(clientIds: string[]) => void} props.onDiscard Drops the draft marker of a form's blocks.
  */
 export function useNoteSelection( { notes, drafts, onDiscard } ) {
+	const { getBlockAttributes, getBlockCount, getBlockName } =
+		useSelect( blockEditorStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 
 	useCaretChange( ( caret ) => {
 		const selectedNoteId = getSelectedNote();
+		// Duplicating or splitting selects the new block before `notes`
+		// re-renders with it, so read the block's notes from the store and
+		// count it among each note's blocks.
+		const [ clientId ] = caret.clientIds;
+		const blockNoteIds = getNoteIdsFromMetadata(
+			caret.attributes?.metadata
+		);
+		const isTextBlock = ( id ) =>
+			!! getTextAttributeKey( id, getBlockName, getBlockCount );
 		const noteId = pickNoteForCaret( {
 			...caret,
-			// Without a block, `null` would match orphaned threads.
-			blockThreads: caret.clientId
-				? notes.filter(
-						( thread ) => thread.blockClientId === caret.clientId
-					)
-				: [],
-			hasDraft: drafts.has( caret.clientId ),
+			blockThreads: notes.filter(
+				( thread ) =>
+					blockNoteIds.includes( thread.id ) &&
+					getBlockLevelClientIds(
+						thread.id,
+						[ ...thread.blockClientIds, clientId ],
+						getBlockAttributes,
+						isTextBlock
+					).includes( clientId )
+			),
+			hasDraft: hasBlockDraft( drafts, caret.clientIds ),
 			selectedNoteId,
 		} );
 
@@ -663,8 +751,11 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
 		const isLeavingForm =
 			selectedNoteId === 'new' &&
 			( caret.isBlockChange || noteId !== 'new' );
-		if ( isLeavingForm && ! drafts.has( caret.previousClientId ) ) {
-			onDiscard( caret.previousClientId );
+		if (
+			isLeavingForm &&
+			! hasBlockDraft( drafts, caret.previousClientIds )
+		) {
+			onDiscard( caret.previousClientIds );
 		}
 
 		if ( noteId !== selectedNoteId ) {
@@ -677,34 +768,36 @@ export function useNoteSelection( { notes, drafts, onDiscard } ) {
  * Selects a note from an explicit action. Selects its block first, so the
  * caret events for the block change run before the note is set.
  *
- * @param {Object}                     props
- * @param {Map}                        props.drafts    Unsent note drafts, see `NoteDraftsContext`.
- * @param {(clientId: string) => void} props.onDiscard Drops a block's draft marker.
+ * @param {Object}                        props
+ * @param {Map}                           props.drafts    Unsent note drafts, see `NoteDraftsContext`.
+ * @param {(clientIds: string[]) => void} props.onDiscard Drops the draft marker of a form's blocks.
  *
  * @return {(noteId: number|string, clientId: ?string, options?: Object) => void} Picks a note, see `selectNote` for the options.
  */
 export function usePickNote( { drafts, onDiscard } ) {
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const { selectBlock, toggleBlockHighlight } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	return ( noteId, clientId, options ) => {
+		const formClientIds = getSelectedBlockClientIds();
 		if ( clientId ) {
-			// `null`: don't move focus to the block.
-			selectBlock( clientId, null );
+			// A new note keeps the blocks it's added to selected.
+			if ( noteId !== 'new' || ! formClientIds.includes( clientId ) ) {
+				// `null`: don't move focus to the block.
+				selectBlock( clientId, null );
+			}
 			toggleBlockHighlight( clientId, true );
 		}
 
 		// No caret event strips the marker here, and the form unmounts before its focus-out runs.
-		const formClientId = getSelectedBlockClientId();
 		if (
 			getSelectedNote() === 'new' &&
 			noteId !== 'new' &&
-			! drafts.has( formClientId )
+			! hasBlockDraft( drafts, formClientIds )
 		) {
-			onDiscard( formClientId );
+			onDiscard( formClientIds );
 		}
 		selectNote( noteId, options );
 	};
@@ -940,7 +1033,7 @@ export function useFloatingBoard( {
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(
 		() =>
-			calculateNotePositions( {
+			getThreadLayout( {
 				threads,
 				selectedNoteId,
 				blockRects: anchorRects,

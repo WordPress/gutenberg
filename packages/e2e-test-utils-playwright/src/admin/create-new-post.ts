@@ -41,4 +41,11 @@ export async function createNewPost(
 		welcomeGuide: options.showWelcomeGuide ?? false,
 		fullscreenMode: options.fullscreenMode ?? false,
 	} );
+
+	// Key presses don't wait for the canvas like locators do, so wait until
+	// the editor renders into it.
+	await this.editor.canvas
+		.locator( 'body > *' )
+		.first()
+		.waitFor( { state: 'attached' } );
 }

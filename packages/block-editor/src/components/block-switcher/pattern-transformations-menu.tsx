@@ -2,7 +2,12 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-import { Composite, MenuGroup, MenuItem, Popover } from '@wordpress/components';
+import {
+	Composite,
+	MenuGroup,
+	MenuItem,
+	Popover as WCPopover,
+} from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
@@ -53,7 +58,7 @@ function PreviewPatternsPopover( {
 
 	return (
 		<div className="block-editor-block-switcher__popover-preview-container">
-			<Popover
+			<WCPopover
 				className="block-editor-block-switcher__popover-preview"
 				placement={ isMobile ? 'bottom' : 'right-start' }
 				offset={ 16 }
@@ -64,7 +69,7 @@ function PreviewPatternsPopover( {
 						onSelect={ onSelect }
 					/>
 				</div>
-			</Popover>
+			</WCPopover>
 		</div>
 	);
 }

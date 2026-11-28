@@ -161,10 +161,6 @@ export type AutocompleterUIProps = {
 	contentRef: ContentRef;
 };
 
-export type CancelablePromise< T = void > = Promise< T > & {
-	canceled?: boolean;
-};
-
 export type UseAutocompleteProps< TReplacement = RichTextValue > = {
 	/**
 	 * The rich text value object the autocompleter is being applied to.

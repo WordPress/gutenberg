@@ -4,11 +4,10 @@ import {
 	useStyleOverride,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	findNoteInBlock,
-	getAvatarBorderColor,
-	getNoteMarkerSelector,
-} from './utils';
+import { getAvatarBorderColor } from './utils/display';
+import { getTextAttributeKey } from './utils/rich-text';
+import { getBlockLevelClientIds } from './utils/note-anchor';
+import { getNoteMarkerSelector } from './utils/dom';
 
 // Hex alpha (~25%) for the note tint, kept low to preserve text contrast.
 const TINT_ALPHA = '40';
@@ -72,24 +71,33 @@ export function buildHighlightCss( threads, selectedId = null ) {
  * Builds CSS that covers each block with a block-level note in a tinted,
  * bordered overlay in its author's color.
  *
- * A thread is block-level when its block contains no `core/note` marker with
- * its id. When a block has several, the first one supplies the color.
+ * Block-level is per block, see `getBlockLevelClientIds`. When a block has
+ * several, the first one supplies the color.
  *
- * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
+ * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
+ * @param {(clientId: string) => boolean} isTextBlock        Whether the block is only one rich text field, see `getTextAttributeKey`.
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
-export function buildBlockHighlightCss( threads, getBlockAttributes ) {
+export function buildBlockHighlightCss(
+	threads,
+	getBlockAttributes,
+	isTextBlock
+) {
 	const rules = [];
 	const highlightedBlocks = new Set();
-	for ( const thread of threads ?? [] ) {
-		const clientId = thread?.blockClientId;
-		if (
-			! thread?.id ||
-			! clientId ||
-			highlightedBlocks.has( clientId ) ||
-			findNoteInBlock( getBlockAttributes( clientId ), thread.id )
-		) {
+	const anchors = ( threads ?? [] ).flatMap( ( thread ) =>
+		thread?.id
+			? getBlockLevelClientIds(
+					thread.id,
+					thread.blockClientIds,
+					getBlockAttributes,
+					isTextBlock
+				).map( ( clientId ) => ( { thread, clientId } ) )
+			: []
+	);
+	for ( const { thread, clientId } of anchors ) {
+		if ( highlightedBlocks.has( clientId ) ) {
 			continue;
 		}
 		highlightedBlocks.add( clientId );
@@ -135,13 +143,23 @@ export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 	 * block-level. Returning a string avoids re-renders when nothing changed.
 	 */
 	const blockCss = useSelect(
-		( select ) =>
-			isHidden
-				? ''
-				: buildBlockHighlightCss(
-						threads,
-						select( blockEditorStore ).getBlockAttributes
-					),
+		( select ) => {
+			if ( isHidden ) {
+				return '';
+			}
+			const { getBlockAttributes, getBlockCount, getBlockName } =
+				select( blockEditorStore );
+			return buildBlockHighlightCss(
+				threads,
+				getBlockAttributes,
+				( clientId ) =>
+					!! getTextAttributeKey(
+						clientId,
+						getBlockName,
+						getBlockCount
+					)
+			);
+		},
 		[ threads, isHidden ]
 	);
 	// Tints the unsent draft marker in the current user's color.

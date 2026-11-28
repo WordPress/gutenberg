@@ -6,6 +6,7 @@ import {
 	getNodesWithSettings,
 	generateCustomProperties,
 	transformToStyles,
+	transformToStylesWithTextClipBase,
 	getBlockSelectors,
 	generateGlobalStyles,
 } from '../core/render';
@@ -167,6 +168,7 @@ describe( 'global styles renderer', () => {
 					},
 					selector: '.my-heading1, .my-heading2',
 					name: 'core/heading',
+					sourceStyles: tree.styles.blocks[ 'core/heading' ],
 				},
 				{
 					styles: {
@@ -214,6 +216,7 @@ describe( 'global styles renderer', () => {
 					selector: '.my-image',
 					name: 'core/image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
+					sourceStyles: tree.styles.blocks[ 'core/image' ],
 				},
 			] );
 		} );
@@ -318,6 +321,24 @@ describe( 'global styles renderer', () => {
 		it( 'should return a ruleset', () => {
 			const tree: GlobalStylesConfig = {
 				settings: {
+					dimensions: {
+						aspectRatios: {
+							default: [
+								{
+									name: 'Square - 1:1',
+									slug: 'square',
+									ratio: '1',
+								},
+							],
+							theme: [
+								{
+									name: 'Wide - 16:9',
+									slug: '16-9',
+									ratio: '16/9',
+								},
+							],
+						},
+					},
 					color: {
 						palette: {
 							custom: [
@@ -377,7 +398,7 @@ describe( 'global styles renderer', () => {
 			};
 
 			expect( generateCustomProperties( tree, blockSelectors ) ).toEqual(
-				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
+				':root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
 	} );
@@ -1027,6 +1048,39 @@ describe( 'global styles renderer', () => {
 				);
 			} );
 
+			it( 'restores the fill on the color feature selector', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/search': {
+									...textGradient,
+									'@mobile': { color: { text: '#00ff00' } },
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/search': {
+							selector: '.wp-block-search',
+							featureSelectors: {
+								color: '.wp-block-search__button',
+								background: '.wp-block-search__button',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-search__button){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
 			it( 'adds nothing when the breakpoint keeps the text clip', () => {
 				const result = render( {
 					...textGradient,
@@ -1190,6 +1244,173 @@ describe( 'global styles renderer', () => {
 				// The breakpoint already escaped the clip, so no fill is needed.
 				expect( result ).toContain(
 					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
+				);
+			} );
+
+			it( 'reads the default pseudo state clip for a breakpoint pseudo state', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									':hover': textGradient,
+									'@mobile': {
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+		} );
+
+		describe( 'block style variation instances over a block type text clip', () => {
+			const textGradient = {
+				background: {
+					gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+					backgroundClip: 'text',
+				},
+			};
+			const blockSelectors = {
+				'core/paragraph': {
+					selector: '.wp-block-paragraph',
+					styleVariationSelectors: {
+						'hl-1': '.is-style-hl-1.wp-block-paragraph',
+					},
+				},
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						'section-2': '.is-style-section-2.wp-block-group',
+					},
+				},
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						'hover-3': '.is-style-hover-3.wp-block-button',
+					},
+				},
+			};
+			// The instance-only config shape the editor passes.
+			const renderInstance = (
+				blockName: string,
+				variation: string,
+				variationStyles: Record< string, unknown >,
+				textClipBaseBlocks?: Record< string, unknown >
+			) =>
+				transformToStylesWithTextClipBase(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								[ blockName ]: {
+									variations: {
+										[ variation ]: variationStyles,
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true },
+					textClipBaseBlocks
+				);
+
+			it( 'refills the letters for a variation text color', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{ color: { text: '#00aa00' } },
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-hl-1.wp-block-paragraph){color: #00aa00;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'refills the letters for an inner block color', () => {
+				expect(
+					renderInstance(
+						'core/group',
+						'section-2',
+						{
+							blocks: {
+								'core/paragraph': {
+									color: { text: '#aa00aa' },
+								},
+							},
+						},
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-section-2.wp-block-group .wp-block-paragraph){color: #aa00aa;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'refills the letters for a variation breakpoint color', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{ '@mobile': { color: { text: '#0000aa' } } },
+						{ 'core/paragraph': textGradient }
+					)
+				).toEqual(
+					'@media (width <= 480px){:root :where(.is-style-hl-1.wp-block-paragraph){color: #0000aa;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'refills the letters for a variation pseudo state color', () => {
+				expect(
+					renderInstance(
+						'core/button',
+						'hover-3',
+						{ ':hover': { color: { text: '#aa0000' } } },
+						{ 'core/button': textGradient }
+					)
+				).toEqual(
+					':root :where(.is-style-hover-3.wp-block-button:hover){color: #aa0000;-webkit-text-fill-color: currentColor;}'
+				);
+			} );
+
+			it( 'adds nothing when the block type has no text clip', () => {
+				expect(
+					renderInstance(
+						'core/paragraph',
+						'hl-1',
+						{
+							color: { text: '#00aa00' },
+							'@mobile': {
+								background: { backgroundClip: 'border-box' },
+							},
+						},
+						{
+							'core/paragraph': {
+								background: {
+									gradient: textGradient.background.gradient,
+								},
+							},
+						}
+					)
+				).toEqual(
+					':root :where(.is-style-hl-1.wp-block-paragraph){color: #00aa00;}@media (width <= 480px){:root :where(.is-style-hl-1.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;}}'
 				);
 			} );
 		} );
@@ -1678,6 +1899,167 @@ describe( 'global styles renderer', () => {
 			expect( result ).toEqual(
 				'@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.wp-block-button:hover){color: orange;}}'
 			);
+		} );
+
+		it( 'outputs a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							transform: {
+								rotate: '0.25turn',
+							},
+							'@mobile': {
+								transform: {
+									rotate: '-15deg',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					featureSelectors: {
+						transform: '.wp-block-button .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){rotate: -15deg;}}'
+			);
+		} );
+
+		it( 'outputs a translation with a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							transform: {
+								rotate: '5deg',
+								translate: { x: '10px', y: '-50%' },
+							},
+							'@mobile': {
+								transform: {
+									translate: { y: '1rem' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					featureSelectors: {
+						transform: '.wp-block-button .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}'
+			);
+		} );
+
+		it( 'outputs a scale with a rotation on the block', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: {
+								rotate: '5deg',
+								scale: 1.2,
+							},
+							'@mobile': {
+								transform: {
+									scale: '90%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': {
+					selector: '.wp-block-heading',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-heading){rotate: 5deg;scale: 1.2;}@media (width <= 480px){:root :where(.wp-block-heading){scale: 90%;}}'
+			);
+		} );
+
+		it( 'outputs no scale that is not a single non-negative number or percentage', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: { scale: 'calc(1 + 1)' },
+						},
+						'core/group': {
+							transform: { scale: -1 },
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': { selector: '.wp-block-heading' },
+				'core/group': { selector: '.wp-block-group' },
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).not.toContain( 'scale' );
 		} );
 
 		it( 'handles responsive feature selector styles', () => {

@@ -1,5 +1,5 @@
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl as WCTextareaControl,
@@ -94,7 +94,7 @@ function InlineUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -111,6 +111,8 @@ function InlineUI( {
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
+						// Keep attributes the format doesn't register, like `loading`.
+						...value.replacements[ value.start ],
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
@@ -175,7 +177,7 @@ function InlineUI( {
 					</Stack>
 				</Stack>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 
@@ -203,24 +205,37 @@ function Edit( {
 					alt: string;
 					width: number;
 				} ) => {
-					onChange(
-						insertObject( value, {
-							type: name,
-							attributes: {
-								className: `wp-image-${ id }`,
-								style: `width: ${ Math.min(
-									imgWidth,
-									150
-								) }px;`,
-								url,
-								alt,
-							},
-						} )
-					);
+					const newImage = {
+						type: name,
+						attributes: {
+							className: `wp-image-${ id }`,
+							style: `width: ${ Math.min( imgWidth, 150 ) }px;`,
+							url,
+							alt,
+						},
+					};
+
+					let newValue: RichTextValue;
+					// Swap the image in place, so its formats, like a link, stay.
+					if ( isObjectActive && value.start !== undefined ) {
+						const replacements = value.replacements.slice();
+						replacements[ value.start ] = newImage;
+						newValue = {
+							...value,
+							replacements,
+							start: value.end,
+							end: value.end,
+						};
+					} else {
+						newValue = insertObject( value, newImage );
+					}
+
+					onChange( newValue );
 					onFocus();
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
+						name="image"
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

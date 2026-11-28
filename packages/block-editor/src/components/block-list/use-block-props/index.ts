@@ -6,7 +6,6 @@ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
-import type { RefCallback } from 'react';
 import type { Block } from '@wordpress/blocks';
 import useMovingAnimation from '../../use-moving-animation';
 import { store as blockEditorStore } from '../../../store';
@@ -25,7 +24,6 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
-import { useBlockVisibility } from '../../block-visibility/';
 import type {
 	UseBlockPropsOptions,
 	UseBlockPropsProps,
@@ -48,7 +46,8 @@ function useGhostMaterialize(
 	rootClientId: string | null | undefined,
 	ghostBlock: Block | undefined
 ) {
-	const { insertBlocks } = useDispatch( blockEditorStore );
+	const { insertBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect< HTMLElement >(
 		( element ) => {
@@ -62,8 +61,11 @@ function useGhostMaterialize(
 			function materialize() {
 				// One gesture fires both events; insert once.
 				remove();
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} );
 				// Update the selection: the ghost is empty, so the caret
-				// can only be at its start, and the undo level records it.
+				// can only be at its start.
 				insertBlocks(
 					// The listeners are only added for a ghost block.
 					[ ghostBlock! ],
@@ -77,7 +79,12 @@ function useGhostMaterialize(
 			element.addEventListener( 'focusin', materialize, true );
 			return remove;
 		},
-		[ ghostBlock, rootClientId, insertBlocks ]
+		[
+			ghostBlock,
+			rootClientId,
+			insertBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
 	);
 }
 
@@ -158,9 +165,7 @@ export function useBlockProps<
 		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
-		blockVisibility,
-		deviceType,
-		viewportSettings,
+		isBlockCurrentlyHidden,
 		ariaLabel,
 		ghostBlock,
 		rootClientId,
@@ -171,16 +176,6 @@ export function useBlockProps<
 	const ghostRef = useGhostMaterialize( rootClientId, ghostBlock );
 
 	useRegisterBlockEventHandlers( clientId, wrapperProps );
-
-	// The ref also stores the window of the block element.
-	const defaultViewRef = useRefEffect( ( element: HTMLElement ) => {
-		if ( element ) {
-			const { ownerDocument } = element;
-			// A rendered element's document has a window.
-			const defaultView = ownerDocument.defaultView!;
-			defaultViewRef.current = defaultView;
-		}
-	}, [] ) as RefCallback< HTMLElement > & { current?: Window };
 
 	const blockLabel = sprintf(
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -194,7 +189,6 @@ export function useBlockProps<
 	const mergedRefs = useMergeRefs< HTMLElement >( [
 		props.ref,
 		ghostRef,
-		defaultViewRef,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
@@ -220,14 +214,6 @@ export function useBlockProps<
 					'var(--wp-block-synced-color--rgb)',
 			}
 		: {};
-
-	// Use block visibility hook with data from context to avoid extra subscription.
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
-		blockVisibility,
-		deviceType,
-		viewportSettings,
-		view: defaultViewRef.current,
-	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	// A missing version compares false.
