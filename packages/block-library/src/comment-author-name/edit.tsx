@@ -2,28 +2,32 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Comment, User } from '@wordpress/core-data';
 import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import type {
+	CommentAuthorNameAttributes,
+	CommentAuthorNameBlockContext,
+} from './types';
 
 /**
  * Renders the `core/comment-author-name` block on the editor.
  *
- * @param {Object} props                       React props.
- * @param {Object} props.setAttributes         Callback for updating block attributes.
- * @param {Object} props.attributes            Block attributes.
- * @param {string} props.attributes.isLink     Whether the author name should be linked.
- * @param {string} props.attributes.linkTarget Target of the link.
- * @param {Object} props.context               Inherited context.
- * @param {string} props.context.commentId     The comment ID.
+ * @param props React props.
  *
- * @return {React.JSX.Element} React element.
+ * @return React element.
  */
-export default function Edit( props ) {
+export default function Edit(
+	props: BlockEditProps< CommentAuthorNameAttributes > & {
+		context: CommentAuthorNameBlockContext;
+	}
+) {
 	const {
 		attributes: { isLink, linkTarget },
 		context: { commentId },
@@ -36,11 +40,19 @@ export default function Edit( props ) {
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 
-			const comment = getEntityRecord( 'root', 'comment', commentId );
+			const comment = getEntityRecord< Comment >(
+				'root',
+				'comment',
+				commentId
+			);
 			const authorName = comment?.author_name;
 
 			if ( comment && ! authorName ) {
-				const user = getEntityRecord( 'root', 'user', comment.author );
+				const user = getEntityRecord< User >(
+					'root',
+					'user',
+					comment.author
+				);
 				return user?.name ?? __( 'Anonymous' );
 			}
 			return authorName ?? '';

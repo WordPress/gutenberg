@@ -1,7 +1,12 @@
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { CommentEditLinkAttributes } from './types';
 
 const v1 = {
 	attributes: {
+		linkTarget: {
+			type: 'string',
+			default: '_self',
+		},
 		textAlign: {
 			type: 'string',
 		},
@@ -9,9 +14,10 @@ const v1 = {
 	usesContext: [ 'commentId' ],
 	supports: {
 		anchor: true,
+		html: false,
 		color: {
-			gradients: true,
 			link: true,
+			gradients: true,
 			text: false,
 		},
 		spacing: {
@@ -28,19 +34,21 @@ const v1 = {
 			__experimentalTextDecoration: true,
 			__experimentalLetterSpacing: true,
 		},
+		interactivity: {
+			clientNavigation: true,
+		},
 		__experimentalBorder: {
 			radius: true,
 			color: true,
 			width: true,
 			style: true,
 		},
-		html: false,
 	},
 	save() {
 		return null;
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
+	isEligible( attributes: CommentEditLinkAttributes ) {
 		return (
 			!! attributes.textAlign ||
 			!! attributes.className?.match(

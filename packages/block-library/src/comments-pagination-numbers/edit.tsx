@@ -1,6 +1,11 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import type { PaginationItemProps } from './types';
 
-const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) =>
+const PaginationItem = ( {
+	content,
+	tag: Tag = 'a',
+	extraClass = '',
+}: PaginationItemProps ) =>
 	Tag === 'a' ? (
 		<Tag
 			className={ `page-numbers ${ extraClass }` }
