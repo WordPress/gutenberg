@@ -77,6 +77,13 @@ A className passed to the panel that contains the contents of the sidebar.
 -   Required: No
 -   Default: `null`
 
+### render
+
+An element that replaces the default `div` container of the complementary area. Its `className` and `style` are merged with the container's own, so it can be used, for example, to add a class name to the container: `render={ <div className="my-sidebar" /> }`.
+
+-   Type: `Element`
+-   Required: No
+
 ### scope
 
 The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",

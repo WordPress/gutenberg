@@ -923,8 +923,10 @@ _Parameters_
 - _props_ `Object`: Element props.
 - _props.name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
 - _props.children_ `[React.ReactNode]`: Children to be rendered.
-- _props.className_ `[string]`: An optional class name added to the sidebar body.
+- _props.className_ `[string]`: An optional class name added to the panel that wraps the sidebar contents. To add a class name to the sidebar's root element, use `render` instead.
 - _props.title_ `string`: Title displayed at the top of the sidebar.
+- _props.header_ `[React.ReactNode]`: A custom header that replaces the default title and pin button.
+- _props.render_ `[React.ReactElement]`: An element that replaces the sidebar's default `div` root element. Its `className` and `style` are merged with the root element's own, e.g. `render={ <div className="my-sidebar" /> }` adds a class name to the root element.
 - _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
 - _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
