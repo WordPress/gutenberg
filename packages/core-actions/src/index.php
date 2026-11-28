@@ -5,8 +5,9 @@
  *
  * The folders next to this file are the script modules of the actions:
  * `post_type_supports` for the actions of every post type, `page` for the
- * actions of pages, `wp_block` for the actions of patterns, and
- * `wp_template_part` for the actions of template parts. Each action has a
+ * actions of pages, `wp_block` for the actions of patterns, `wp_template`
+ * for the actions of templates, and `wp_template_part` for the actions of
+ * template parts. Each action has a
  * folder named after its id, whose `action.php` returns the serializable
  * part of the action, and whose `action.tsx` holds its JavaScript parts.
  *
@@ -21,6 +22,8 @@
  * - `view-post-revisions`, for the post types supporting `revisions`.
  * - `duplicate-post`, for the post types the user can create, except
  *   patterns, templates, and template parts. Only in the Gutenberg plugin.
+ * - `duplicate-template`, for templates, when the user can create them and
+ *   the theme is a block theme. It applies to the custom templates.
  * - `duplicate-template-part`, for template parts, when the user can create
  *   them and the theme is a block theme.
  * - `duplicate-pattern`, for patterns, when the user can create them.
@@ -73,6 +76,7 @@ function register_core_entity_actions() {
 			'post_type_supports/view-post'             => is_post_type_viewable( $post_type ),
 			'post_type_supports/view-post-revisions'   => post_type_supports( $name, 'revisions' ),
 			'post_type_supports/duplicate-post'        => $is_gutenberg && $can_create && ! in_array( $name, $design_types, true ),
+			'wp_template/duplicate-template'           => 'wp_template' === $name && $can_create && $is_block_theme,
 			'wp_template_part/duplicate-template-part' => 'wp_template_part' === $name && $can_create && $is_block_theme,
 			'wp_block/duplicate-pattern'               => 'wp_block' === $name && $can_create,
 			'post_type_supports/rename-post'           => post_type_supports( $name, 'title' ),
