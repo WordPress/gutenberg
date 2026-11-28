@@ -25,12 +25,24 @@ import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
+	featuredImageSelectKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
 	userPatternCategoriesSelectKey,
 } from './private-keys';
+
+/**
+ * The featured image of the post in a block's context.
+ */
+export interface FeaturedImage {
+	/** Whether the post type supports featured images. */
+	isSupported: boolean;
+	id?: number;
+	url?: string;
+	title?: string;
+}
 
 export interface BlockAttributes {
 	metadata?: Record< string, unknown > & {
@@ -454,6 +466,14 @@ export type Settings = Record< string | symbol, unknown > & {
 	) => number | undefined;
 	/** The device the editor previews, such as `Desktop`. */
 	[ deviceTypeKey ]?: string;
+	/**
+	 * Looks up the featured image of the post in a block's context. Blocks
+	 * offer the featured image as a background image only when it is set.
+	 */
+	[ featuredImageSelectKey ]?: (
+		select: typeof globalSelect,
+		context: { postId?: number; postType?: string }
+	) => FeaturedImage;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect

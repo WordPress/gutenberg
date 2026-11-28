@@ -391,6 +391,20 @@ export interface ColorPanelProps {
 	additionalElements?: ColorPanelElement[];
 }
 
+/**
+ * The post's featured image, offered as a block's background image.
+ */
+export interface FeaturedImageBackground {
+	/** Whether the background shows the featured image. */
+	isActive: boolean;
+	/** URL of the featured image, when the post has one. */
+	url?: string;
+	/** Title of the featured image. */
+	title?: string;
+	/** Turns the featured image background on or off. */
+	onToggle: () => void;
+}
+
 export interface BackgroundPanelProps {
 	/** The tools panel the controls render in. */
 	as?: ComponentType< StyleToolsPanelProps >;
@@ -414,6 +428,8 @@ export interface BackgroundPanelProps {
 	headerLabel?: string;
 	/** Warning about the contrast of the background color. */
 	contrastWarning?: ReactNode;
+	/** Offers the post's featured image as the background image. */
+	featuredImage?: FeaturedImageBackground;
 }
 
 export interface AdvancedPanelProps {

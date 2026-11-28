@@ -22,6 +22,11 @@ import {
 	useBlockStyleState,
 } from './block-style-state';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import {
+	FEATURED_IMAGE_SOURCE,
+	isFeaturedImageBackground,
+	useFeaturedImage,
+} from './use-featured-image-background';
 import type {
 	PanelBackgroundStyle,
 	PanelResetAllFilter,
@@ -80,9 +85,11 @@ export function setBackgroundStyleDefaults(
 ) {
 	if (
 		! backgroundStyle ||
-		// The string form has no URL property.
-		! ( backgroundStyle?.backgroundImage as { url?: string } | undefined )
-			?.url
+		( ! isFeaturedImageBackground( backgroundStyle?.backgroundImage ) &&
+			// The string form has no URL property.
+			! (
+				backgroundStyle?.backgroundImage as { url?: string } | undefined
+			 )?.url )
 	) {
 		return;
 	}
@@ -256,6 +263,8 @@ export function BackgroundImagePanel( {
 		},
 		[ clientId ]
 	);
+
+	const featuredImage = useFeaturedImage();
 
 	const { value: inheritedValue } = useResolvedStyle(
 		name,
@@ -450,6 +459,25 @@ export function BackgroundImagePanel( {
 
 	const Wrapper = asWrapper || BackgroundInspectorControl;
 
+	const isUsingFeaturedImage = isFeaturedImageBackground(
+		value?.background?.backgroundImage
+	);
+
+	// Turning the featured image off clears the image, as resetting it would.
+	const onToggleFeaturedImage = () =>
+		onChange( {
+			...value,
+			background: isUsingFeaturedImage
+				? { ...value?.background, backgroundImage: undefined }
+				: {
+						...value?.background,
+						backgroundImage: { source: FEATURED_IMAGE_SOURCE },
+						backgroundSize:
+							value?.background?.backgroundSize ??
+							BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundSize,
+					},
+		} );
+
 	return (
 		<StylesBackgroundPanel
 			as={ Wrapper }
@@ -468,6 +496,17 @@ export function BackgroundImagePanel( {
 			baseValue={ isStateSelected ? styleValue : undefined }
 			contrastWarning={ contrastWarning }
 			inheritedValue={ inheritedValue }
+			featuredImage={
+				// State styles share the block's image, so they don't offer it.
+				featuredImage.isSupported && ! isStateSelected
+					? {
+							isActive: isUsingFeaturedImage,
+							url: featuredImage.url,
+							title: featuredImage.title,
+							onToggle: onToggleFeaturedImage,
+						}
+					: undefined
+			}
 		/>
 	);
 }

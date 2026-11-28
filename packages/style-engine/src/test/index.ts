@@ -587,6 +587,29 @@ describe( 'getCSSRules', () => {
 		] );
 	} );
 
+	it( 'should output no background image for an image without a URL', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage: { source: 'featured-image' },
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(65,88,208) 100%)',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(65,88,208) 100%)',
+			},
+		] );
+	} );
+
 	it( 'should output only gradient as background-image when no background image is set', () => {
 		expect(
 			getCSSRules(

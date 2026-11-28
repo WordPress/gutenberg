@@ -31,6 +31,36 @@ function gutenberg_register_background_support( $block_type ) {
 }
 
 /**
+ * Returns the featured image of the current post as a background image value.
+ *
+ * A block's background image can show the featured image of the post it renders
+ * in. The block stores a reference to it, which is looked up for each post.
+ *
+ * @since 7.3.0
+ *
+ * @return array|null Background image value, or null when the post has no featured image.
+ */
+function gutenberg_get_featured_image_background() {
+	$featured_image_id = get_post_thumbnail_id();
+
+	if ( ! $featured_image_id ) {
+		return null;
+	}
+
+	$featured_image_url = wp_get_attachment_image_url( $featured_image_id, 'full' );
+
+	if ( ! $featured_image_url ) {
+		return null;
+	}
+
+	return array(
+		'url'    => $featured_image_url,
+		'id'     => $featured_image_id,
+		'source' => 'featured-image',
+	);
+}
+
+/**
  * Returns background classes and inline styles for block attributes, like the JS
  * `getBackgroundClassesAndStyles()`. Does not check block support or skipped
  * serialization.
@@ -54,8 +84,15 @@ function gutenberg_get_background_classes_and_styles( $block_attributes ) {
 		return array();
 	}
 
+	$background_image = $background['backgroundImage'] ?? null;
+
+	// The featured image is stored as a reference and looked up for the current post.
+	if ( is_array( $background_image ) && 'featured-image' === ( $background_image['source'] ?? null ) ) {
+		$background_image = gutenberg_get_featured_image_background();
+	}
+
 	$background_styles = array(
-		'backgroundImage'      => $background['backgroundImage'] ?? null,
+		'backgroundImage'      => $background_image,
 		'backgroundSize'       => $background['backgroundSize'] ?? null,
 		'backgroundPosition'   => $background['backgroundPosition'] ?? null,
 		'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,

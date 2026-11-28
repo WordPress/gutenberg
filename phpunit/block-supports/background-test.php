@@ -500,6 +500,67 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a featured image background shows the current post's featured image.
+	 *
+	 * @covers ::gutenberg_get_background_classes_and_styles
+	 * @covers ::gutenberg_get_featured_image_background
+	 */
+	public function test_featured_image_background_uses_current_post_featured_image() {
+		$post_id       = self::factory()->post->create();
+		$attachment_id = self::factory()->attachment->create_object(
+			'featured.jpg',
+			$post_id,
+			array( 'post_mime_type' => 'image/jpeg' )
+		);
+		update_post_meta( $post_id, '_thumbnail_id', $attachment_id );
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$actual = gutenberg_get_background_classes_and_styles(
+			array(
+				'style' => array(
+					'background' => array(
+						'backgroundImage' => array( 'source' => 'featured-image' ),
+					),
+				),
+			)
+		);
+
+		unset( $GLOBALS['post'] );
+
+		$this->assertSame(
+			array(
+				'class' => 'has-background',
+				'style' => "background-image:url('" . wp_get_attachment_image_url( $attachment_id, 'full' ) . "');background-size:cover;",
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that a featured image background renders nothing when the post has no featured image.
+	 *
+	 * @covers ::gutenberg_get_background_classes_and_styles
+	 * @covers ::gutenberg_get_featured_image_background
+	 */
+	public function test_featured_image_background_without_featured_image() {
+		$GLOBALS['post'] = get_post( self::factory()->post->create() );
+
+		$actual = gutenberg_get_background_classes_and_styles(
+			array(
+				'style' => array(
+					'background' => array(
+						'backgroundImage' => array( 'source' => 'featured-image' ),
+					),
+				),
+			)
+		);
+
+		unset( $GLOBALS['post'] );
+
+		$this->assertSame( array(), $actual );
+	}
+
+	/**
 	 * Tests that background gradients using functions beyond rgb()/rgba(), and
 	 * gradients combined with a url() image, survive KSES sanitization.
 	 *

@@ -22,6 +22,7 @@ import {
 } from '@wordpress/style-engine';
 import type { Style } from '@wordpress/style-engine';
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
+import { useFeaturedImageBackgroundStyle } from './use-featured-image-background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY } from './color';
 import { ElementsEdit } from './elements';
@@ -1516,10 +1517,13 @@ function useBlockProps( {
 
 	usePrivateStyleOverride( { css: styles, clientId } );
 
+	// The saved style holds a reference to the featured image, not its URL.
+	const inlineStyle = useFeaturedImageBackgroundStyle( style );
+
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },
 		name,
-		{ style },
+		{ style: inlineStyle },
 		skipSerializationPathsEdit
 	);
 }

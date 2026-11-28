@@ -7,6 +7,7 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -68,6 +69,47 @@ function __experimentalUserPatternCategoriesSelect( select ) {
 
 function currentUserIdSelect( select ) {
 	return select( coreStore ).getCurrentUser()?.id;
+}
+
+/**
+ * Looks up the featured image of the post in a block's context, so blocks can
+ * preview it as their background image.
+ *
+ * @param {(store: Object) => Object} select           Registry select.
+ * @param {Object}                    context          Block context.
+ * @param {number}                    context.postId   Post ID.
+ * @param {string}                    context.postType Post type.
+ * @return {Object} Whether the post type supports featured images, and the
+ *                  image when one is set.
+ */
+function featuredImageSelect( select, { postId, postType } = {} ) {
+	const { getPostType, getEditedEntityRecord, getMedia } =
+		select( coreStore );
+
+	// Templates and patterns have no post type in context, but render inside a
+	// post, so only a loaded post type without featured images rules it out.
+	const postTypeObject = postType ? getPostType( postType ) : undefined;
+	if ( postTypeObject && ! postTypeObject.supports?.thumbnail ) {
+		return { isSupported: false };
+	}
+
+	const featuredMediaId =
+		postId && postType
+			? getEditedEntityRecord( 'postType', postType, postId )
+					?.featured_media
+			: undefined;
+	const media = featuredMediaId
+		? getMedia( featuredMediaId, { context: 'view' } )
+		: undefined;
+
+	return {
+		isSupported: true,
+		id: media?.id,
+		url: media?.source_url,
+		title: media?.title?.rendered
+			? decodeEntities( media.title.rendered )
+			: undefined,
+	};
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -135,6 +177,7 @@ const {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
+	featuredImageSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
 	isNavigationOverlayContextKey,
@@ -412,6 +455,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					attachmentId
 				);
 			},
+			[ featuredImageSelectKey ]: featuredImageSelect,
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,

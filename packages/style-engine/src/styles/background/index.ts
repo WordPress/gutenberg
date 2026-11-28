@@ -12,12 +12,16 @@ const backgroundImage = {
 			return [];
 		}
 
-		const backgroundImageValue =
-			typeof _backgroundImage === 'object' && _backgroundImage?.url
-				? `url( '${ encodeURI(
-						safeDecodeURI( _backgroundImage.url )
-					) }' )`
-				: getCSSValueFromRawStyle( _backgroundImage );
+		// An image without a URL, like a reference to the featured image, is
+		// resolved before it reaches the style engine, so it generates nothing.
+		let backgroundImageValue;
+		if ( typeof _backgroundImage === 'string' ) {
+			backgroundImageValue = getCSSValueFromRawStyle( _backgroundImage );
+		} else if ( _backgroundImage?.url ) {
+			backgroundImageValue = `url( '${ encodeURI(
+				safeDecodeURI( _backgroundImage.url )
+			) }' )`;
+		}
 		const cssValue = [ gradient, backgroundImageValue ]
 			.filter( Boolean )
 			.join( ', ' );
