@@ -8,6 +8,10 @@ import styles from './style.module.css';
 const LIST_SELECTOR = '[data-wp-ui-notice-list]';
 const CONTENT_BOUNDARY = `.${ styles.notice }, .${ styles.actions }, ${ LIST_SELECTOR }`;
 const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
+// Elements that start a new line with default styles. Text alone would join
+// the words on either side, such as `Retry<br>later`.
+const LINE_BREAKING =
+	'address, article, aside, blockquote, br, caption, dd, details, div, dl, dt, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, legend, li, main, menu, nav, ol, p, pre, search, section, summary, table, td, th, tr, ul';
 
 type Announcement = {
 	id: number;
@@ -42,6 +46,10 @@ function isHidden( element: Element, root: Element ) {
 	return false;
 }
 
+// Best-effort fallback for notices without `spokenMessage`. Keep it limited to
+// plain text and default HTML structure, such as the line breaks below. Content
+// this can't read correctly should set `spokenMessage`, so don't add CSS or
+// layout handling here.
 function readMessage( root: HTMLElement ) {
 	function readText( kind: 'title' | 'description' ) {
 		return Array.from(
@@ -53,22 +61,40 @@ function readMessage( root: HTMLElement ) {
 					! isHidden( element, root )
 			)
 			.map( ( element ) => {
-				const walker = element.ownerDocument.createTreeWalker(
-					element,
-					NodeFilter.SHOW_TEXT,
-					{
-						acceptNode( node ) {
-							return node.parentElement &&
-								isHidden( node.parentElement, root )
-								? NodeFilter.FILTER_REJECT
-								: NodeFilter.FILTER_ACCEPT;
-						},
-					}
-				);
 				let text = '';
-				while ( walker.nextNode() ) {
-					text += walker.currentNode.textContent;
+				let needsSpace = false;
+				function read( node: Node ) {
+					if ( node.nodeType === Node.TEXT_NODE ) {
+						const value = node.textContent ?? '';
+						if ( ! value ) {
+							return;
+						}
+						// Keep words apart across line breaks and block elements.
+						if (
+							needsSpace &&
+							/\S$/.test( text ) &&
+							/^\S/.test( value )
+						) {
+							text += ' ';
+						}
+						needsSpace = false;
+						text += value;
+						return;
+					}
+					if (
+						node.nodeType !== Node.ELEMENT_NODE ||
+						( node as Element ).matches( HIDDEN_CONTENT )
+					) {
+						return;
+					}
+					const breaksLine = ( node as Element ).matches(
+						LINE_BREAKING
+					);
+					needsSpace ||= breaksLine;
+					node.childNodes.forEach( read );
+					needsSpace ||= breaksLine;
 				}
+				element.childNodes.forEach( read );
 				return text.trim();
 			} )
 			.filter( Boolean )

@@ -6,6 +6,10 @@
 
 -   Add `applyImageEdit( state, edit, options? )`, which turns an `ImageEdit` into an editor state, fitting the crop to the image as the editor does unless `strict` is set ([#86665](https://github.com/WordPress/gutenberg/pull/86665)).
 
+### Bug Fixes
+
+-   `getImageEdit` and `getOutputSize` return a value within a millionth of a whole number as that number, instead of floating-point noise such as `1439.9999999999998` ([#87376](https://github.com/WordPress/gutenberg/pull/87376)).
+
 ### Internal
 
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
