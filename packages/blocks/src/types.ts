@@ -142,7 +142,7 @@ export interface BlockVariation<
 	/**
 	 * Values which override block attributes.
 	 */
-	attributes?: Attributes;
+	attributes?: Partial< Attributes >;
 	/**
 	 * Initial configuration of nested blocks.
 	 */
