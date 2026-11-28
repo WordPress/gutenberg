@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"url": "#volunteer",
+			"text": "Apply to Volunteer →",
+			"ariaLabel": "Apply to volunteer with Harbor Steps"
+		},
+		"innerBlocks": []
+	}
+]
