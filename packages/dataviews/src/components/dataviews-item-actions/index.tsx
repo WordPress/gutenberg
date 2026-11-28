@@ -69,6 +69,7 @@ function ButtonTrigger< Item >( {
 			size="compact"
 			variant={ variant }
 			onClick={ onClick }
+			aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
 		>
 			{ label }
 		</Button>
@@ -82,7 +83,11 @@ function MenuItemTrigger< Item >( {
 }: ActionTriggerProps< Item > ) {
 	const label = getActionLabel( action, items, 'menu' );
 	return (
-		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
+		<Menu.Item
+			disabled={ action.disabled }
+			onClick={ onClick }
+			aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
+		>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
