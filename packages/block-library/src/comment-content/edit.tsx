@@ -3,15 +3,24 @@ import { RawHTML } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { useBlockProps } from '@wordpress/block-editor';
+import type { BlockEditProps } from '@wordpress/blocks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import type {
+	CommentContentAttributes,
+	CommentContentBlockContext,
+} from './types';
 
-export default function Edit( props ) {
+export default function Edit(
+	props: BlockEditProps< CommentContentAttributes > & {
+		context: CommentContentBlockContext;
+	}
+) {
 	const {
 		context: { commentId },
 	} = props;
 	useDeprecatedTextAlign( props );
 	const blockProps = useBlockProps();
-	const [ content ] = useEntityProp(
+	const [ content ] = useEntityProp< { rendered: string } >(
 		'root',
 		'comment',
 		'content',

@@ -1,4 +1,6 @@
+import type { CSSDirection } from '@wordpress/blocks';
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { CommentContentAttributes } from './types';
 
 const v1 = {
 	attributes: {
@@ -30,7 +32,7 @@ const v1 = {
 			style: true,
 		},
 		spacing: {
-			padding: [ 'horizontal', 'vertical' ],
+			padding: [ 'horizontal', 'vertical' ] as CSSDirection[],
 		},
 		html: false,
 	},
@@ -38,7 +40,7 @@ const v1 = {
 		return null;
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
+	isEligible( attributes: CommentContentAttributes ) {
 		return (
 			!! attributes.textAlign ||
 			!! attributes.className?.match(

@@ -946,7 +946,8 @@ export type AxialDirection = 'horizontal' | 'vertical';
  *
  * @see BlockSupports.spacing
  */
-export type CSSDirection = 'top' | 'right' | 'bottom' | 'left';
+export type CSSDirection =
+	'top' | 'right' | 'bottom' | 'left' | 'horizontal' | 'vertical';
 
 /**
  * Control type used to indicate block's alignment.
