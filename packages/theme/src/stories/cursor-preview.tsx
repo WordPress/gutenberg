@@ -1,13 +1,7 @@
 import type { CSSProperties } from 'react';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
-import {
-	descriptionStyle,
-	itemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
+import { TokenText, tokenCardProps } from './token-item';
+import { itemStyle, listStyle, previewStyle } from './token-preview-styles';
 
 const cursorTokens = groups.cursor.tokens;
 
@@ -34,6 +28,7 @@ export function CursorTokenPreview() {
 				{ cursorTokens.map( ( name ) => (
 					<div
 						key={ name }
+						{ ...tokenCardProps( name ) }
 						style={ {
 							...itemStyle,
 							gridTemplateColumns: 'minmax(96px, 160px) 1fr',
@@ -44,12 +39,7 @@ export function CursorTokenPreview() {
 								Hover me
 							</button>
 						</dd>
-						<dt style={ textStyle }>
-							<code style={ tokenNameStyle }>{ name }</code>
-							<span style={ descriptionStyle }>
-								{ tokens[ name ].$description }
-							</span>
-						</dt>
+						<TokenText name={ name } />
 					</div>
 				) ) }
 			</dl>
