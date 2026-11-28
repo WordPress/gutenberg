@@ -32,7 +32,7 @@ const v1 = {
 			style: true,
 		},
 		spacing: {
-			padding: [ 'horizontal', 'vertical' ] as CSSDirection[],
+			padding: [ 'horizontal', 'vertical' ] as AxialDirection[],
 		},
 		html: false,
 	},
