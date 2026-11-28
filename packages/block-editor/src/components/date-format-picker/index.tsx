@@ -1,6 +1,10 @@
 import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 import {
 	Fieldset,
 	InputControl,
@@ -10,16 +14,6 @@ import {
 	SwitchControl,
 } from '@wordpress/ui';
 import type { DateFormatPickerProps, NonDefaultControlsProps } from './types';
-
-// So that we illustrate the different formats in the dropdown properly, show a date that is
-// somewhat recent, has a day greater than 12, and a month with more than three letters.
-const exampleDate = new Date();
-exampleDate.setDate( 20 );
-exampleDate.setMonth( exampleDate.getMonth() - 3 );
-if ( exampleDate.getMonth() === 4 ) {
-	// May has three letters, so use March.
-	exampleDate.setMonth( 3 );
-}
 
 /**
  * The `DateFormatPicker` component renders controls that let the user choose a
@@ -37,6 +31,8 @@ export default function DateFormatPicker( {
 	defaultFormat,
 	onChange,
 }: DateFormatPickerProps ) {
+	const currentDate = useMemo( () => new Date(), [] );
+
 	return (
 		<Stack
 			render={ <Fieldset.Root /> }
@@ -51,7 +47,7 @@ export default function DateFormatPicker( {
 				label={ __( 'Default format' ) }
 				description={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
-					exampleDate
+					currentDate
 				) }` }
 				checked={ ! format }
 				onCheckedChange={ ( checked ) =>
@@ -59,13 +55,21 @@ export default function DateFormatPicker( {
 				}
 			/>
 			{ format && (
-				<NonDefaultControls format={ format } onChange={ onChange } />
+				<NonDefaultControls
+					format={ format }
+					onChange={ onChange }
+					currentDate={ currentDate }
+				/>
 			) }
 		</Stack>
 	);
 }
 
-function NonDefaultControls( { format, onChange }: NonDefaultControlsProps ) {
+function NonDefaultControls( {
+	format,
+	onChange,
+	currentDate,
+}: NonDefaultControlsProps ) {
 	// Suggest a short format, medium format, long format, and a standardised
 	// (YYYY-MM-DD) format. The short, medium, and long formats are localised as
 	// different languages have different ways of writing these. For example, 'F
@@ -92,14 +96,20 @@ function NonDefaultControls( { format, onChange }: NonDefaultControlsProps ) {
 		] ),
 	];
 
-	const suggestedOptions = [
+	const suggestedOptions: Array< {
+		value: string;
+		label: string;
+		description?: string;
+	} > = [
 		...suggestedFormats.map( ( suggestedFormat ) => ( {
 			value: suggestedFormat,
-			label: dateI18n( suggestedFormat, exampleDate ),
+			label: dateI18n( suggestedFormat, currentDate ),
+			description: suggestedFormat,
 		} ) ),
 		{
 			value: 'human-diff',
-			label: humanTimeDiff( exampleDate ),
+			label: humanTimeDiff( currentDate ),
+			description: _x( 'Time difference', 'Date format description' ),
 		},
 	];
 
@@ -144,6 +154,11 @@ function NonDefaultControls( { format, onChange }: NonDefaultControlsProps ) {
 						<SelectControl.ItemLabel>
 							{ option.label }
 						</SelectControl.ItemLabel>
+						{ option.description ? (
+							<SelectControl.ItemDescription>
+								{ option.description }
+							</SelectControl.ItemDescription>
+						) : null }
 					</SelectControl.Item>
 				) ) }
 				<SelectControl.Separator />
