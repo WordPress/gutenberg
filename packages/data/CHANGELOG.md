@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `waitForTransition`, which returns a Promise that resolves once a store-derived predicate goes from `true` to `false`, such as when a post finishes saving ([#41169](https://github.com/WordPress/gutenberg/pull/41169)).
+
 ### Bug Fixes
 
 -   `coreDataStore`: Type the `core/data` store descriptor with its runtime selectors and actions, allowing selectors such as `hasFinishedResolution` to accept `storeName` without casts ([#87190](https://github.com/WordPress/gutenberg/pull/87190)).
