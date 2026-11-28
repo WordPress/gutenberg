@@ -157,6 +157,13 @@ jobs:
                   urls=$( test/e2e/wp-env-instances.sh )
                   echo "WP_BASE_URLS=$urls" >> "$GITHUB_ENV"
 
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
+
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -223,6 +230,13 @@ jobs:
             - name: Install WordPress and start the server
               run: |
                   npm run wp-env-test start
+
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
 
             - name: Run the tests
               env:
@@ -297,6 +311,13 @@ jobs:
             - name: Install WordPress and start the server
               run: |
                   npm run wp-env-test start
+
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
 
             - name: Run the tests
               env:
