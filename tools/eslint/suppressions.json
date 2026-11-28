@@ -1111,29 +1111,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comment-reply-link/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comment-reply-link/init.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/comment-template/edit.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
