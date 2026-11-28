@@ -2654,6 +2654,450 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-shadow-xs': {
+		$description:
+			'Shadow for small controls raised slightly above their surface, such as a switch thumb.',
+		$type: 'shadow',
+		group: 'shadow',
+		fallback:
+			'0px 1px 1px #00000008, 0px 1px 2px #00000005, 0px 3px 3px #00000005, 0px 4px 4px #00000003',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.03,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 1,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.02,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 2,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.02,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 3,
+							unit: 'px',
+						},
+						blur: {
+							value: 3,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.01,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 4,
+							unit: 'px',
+						},
+						blur: {
+							value: 4,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+				],
+				css: '0px 1px 1px #00000008, 0px 1px 2px #00000005, 0px 3px 3px #00000005, 0px 4px 4px #00000003',
+			},
+		},
+	},
+	'--wpds-shadow-sm': {
+		$description:
+			'Shadow for small transient surfaces close to their trigger, such as tooltips.',
+		$type: 'shadow',
+		group: 'shadow',
+		fallback:
+			'0px 1px 2px #0000000d, 0px 2px 3px #0000000a, 0px 6px 6px #00000008, 0px 8px 8px #00000005',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.05,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 2,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.04,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 2,
+							unit: 'px',
+						},
+						blur: {
+							value: 3,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.03,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 6,
+							unit: 'px',
+						},
+						blur: {
+							value: 6,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.02,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 8,
+							unit: 'px',
+						},
+						blur: {
+							value: 8,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+				],
+				css: '0px 1px 2px #0000000d, 0px 2px 3px #0000000a, 0px 6px 6px #00000008, 0px 8px 8px #00000005',
+			},
+		},
+	},
+	'--wpds-shadow-md': {
+		$description:
+			'Shadow for floating surfaces anchored to a trigger, such as popovers and menus.',
+		$type: 'shadow',
+		group: 'shadow',
+		fallback:
+			'0px 2px 3px #0000000d, 0px 4px 5px #0000000a, 0px 12px 12px #00000008, 0px 16px 16px #00000005',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.05,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 2,
+							unit: 'px',
+						},
+						blur: {
+							value: 3,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.04,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 4,
+							unit: 'px',
+						},
+						blur: {
+							value: 5,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.03,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 12,
+							unit: 'px',
+						},
+						blur: {
+							value: 12,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.02,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 16,
+							unit: 'px',
+						},
+						blur: {
+							value: 16,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+				],
+				css: '0px 2px 3px #0000000d, 0px 4px 5px #0000000a, 0px 12px 12px #00000008, 0px 16px 16px #00000005',
+			},
+		},
+	},
+	'--wpds-shadow-lg': {
+		$description:
+			'Shadow for surfaces that sit above the whole page, such as dialogs and drawers.',
+		$type: 'shadow',
+		group: 'shadow',
+		fallback:
+			'0px 5px 15px #00000014, 0px 15px 27px #00000012, 0px 30px 36px #0000000a, 0px 50px 43px #00000005',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.08,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 5,
+							unit: 'px',
+						},
+						blur: {
+							value: 15,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.07,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 15,
+							unit: 'px',
+						},
+						blur: {
+							value: 27,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.04,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 30,
+							unit: 'px',
+						},
+						blur: {
+							value: 36,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.02,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 50,
+							unit: 'px',
+						},
+						blur: {
+							value: 43,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+				],
+				css: '0px 5px 15px #00000014, 0px 15px 27px #00000012, 0px 30px 36px #0000000a, 0px 50px 43px #00000005',
+			},
+		},
+	},
 	'--wpds-motion-duration-xs': {
 		$description: 'Micro-delays and transition offsets',
 		$type: 'duration',
@@ -3306,6 +3750,15 @@ export const groups = /** @type {const} */ ( {
 					'Widths for surfaces such as popovers, dialogs, and panels.',
 			},
 		},
+	},
+	shadow: {
+		tokens: [
+			'--wpds-shadow-xs',
+			'--wpds-shadow-sm',
+			'--wpds-shadow-md',
+			'--wpds-shadow-lg',
+		],
+		groups: {},
 	},
 	motion: {
 		tokens: [],

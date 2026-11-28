@@ -87,7 +87,7 @@ $transition-duration: 0.2s;
 		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		border-radius: math.div($toggle-height, 2);
 		background-color: var(--wpds-color-background-thumb-neutral);
-		box-shadow: $elevation-x-small;
+		box-shadow: var(--wpds-shadow-xs);
 
 		@media not (prefers-reduced-motion) {
 			transition:

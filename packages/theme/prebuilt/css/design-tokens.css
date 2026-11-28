@@ -327,6 +327,22 @@
 	--wpds-motion-easing-expressive: cubic-bezier(0.25, 0, 0, 1);
 	/* Nearly imperceptible easing for hover, color, and background transitions */
 	--wpds-motion-easing-subtle: cubic-bezier(0.15, 0, 0.15, 1);
+	/* Shadow for surfaces that sit above the whole page, such as dialogs and drawers. */
+	--wpds-shadow-lg:
+		0px 5px 15px #00000014, 0px 15px 27px #00000012,
+		0px 30px 36px #0000000a, 0px 50px 43px #00000005;
+	/* Shadow for floating surfaces anchored to a trigger, such as popovers and menus. */
+	--wpds-shadow-md:
+		0px 2px 3px #0000000d, 0px 4px 5px #0000000a, 0px 12px 12px #00000008,
+		0px 16px 16px #00000005;
+	/* Shadow for small transient surfaces close to their trigger, such as tooltips. */
+	--wpds-shadow-sm:
+		0px 1px 2px #0000000d, 0px 2px 3px #0000000a, 0px 6px 6px #00000008,
+		0px 8px 8px #00000005;
+	/* Shadow for small controls raised slightly above their surface, such as a switch thumb. */
+	--wpds-shadow-xs:
+		0px 1px 1px #00000008, 0px 1px 2px #00000005, 0px 3px 3px #00000005,
+		0px 4px 4px #00000003;
 	/* Body font family */
 	--wpds-typography-font-family-body:
 		-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu",

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-shadow-xs`, `--wpds-shadow-sm`, `--wpds-shadow-md`, and `--wpds-shadow-lg` tokens. On white they match the `$elevation-*` shadows in `@wordpress/base-styles`. `ThemeProvider` strengthens them on darker background seeds so they look about equally strong on any background, up to 5× on the darkest backgrounds ([#87287](https://github.com/WordPress/gutenberg/pull/87287)).
+
 ### Enhancements
 
 -   Swap the values of `--wpds-color-background-interactive-neutral-strong` and `--wpds-color-background-interactive-neutral-strong-active`, so solid neutral controls have a stronger resting fill and a softer fill wherever the active token is used ([#87429](https://github.com/WordPress/gutenberg/pull/87429)).

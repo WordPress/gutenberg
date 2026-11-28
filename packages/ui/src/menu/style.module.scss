@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables";
-
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -33,7 +31,7 @@
 			scroll-padding: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: variables.$elevation-medium;
+			box-shadow: var(--wpds-shadow-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
 

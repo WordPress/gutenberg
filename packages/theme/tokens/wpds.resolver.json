@@ -9,6 +9,7 @@
 				{ "$ref": "color.json" },
 				{ "$ref": "cursor.json" },
 				{ "$ref": "dimension.json" },
+				{ "$ref": "shadow.json" },
 				{ "$ref": "motion.json" },
 				{ "$ref": "typography.json" }
 			]

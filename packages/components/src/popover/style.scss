@@ -27,7 +27,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 .components-popover__content {
 	background: var(--wpds-color-background-surface-neutral-strong);
 	// The stroke stays on the box-shadow, since consumers override it there.
-	box-shadow: $shadow-popover-border-default, $elevation-medium;
+	box-shadow: $shadow-popover-border-default, var(--wpds-shadow-md);
 	border-radius: var(--wpds-border-radius-md);
 	box-sizing: border-box;
 	width: min-content;

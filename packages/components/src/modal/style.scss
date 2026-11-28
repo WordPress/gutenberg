@@ -42,7 +42,7 @@ body.modal-open {
 	width: 100%;
 	max-height: calc(100% - var(--wpds-dimension-gap-3xl));
 	background: var(--wpds-color-background-surface-neutral-strong);
-	box-shadow: variables.$elevation-large;
+	box-shadow: var(--wpds-shadow-lg);
 
 	// Keep the window boundary visible when forced-colors mode removes its shadow.
 	@media (forced-colors: active) {

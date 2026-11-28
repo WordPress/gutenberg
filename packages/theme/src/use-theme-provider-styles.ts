@@ -20,6 +20,7 @@ import {
 } from './color-ramps/index.ts';
 import { getColorString, getContrast } from './color-ramps/lib/color-utils.ts';
 import { MINIMUM_TEXT_CONTRAST } from './semantic-color-contrast-pairs.ts';
+import { shadowTokensCSS } from './shadow.ts';
 import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
@@ -178,15 +179,19 @@ function colorTokensCSS(
 
 function generateStyles( {
 	primary,
+	background,
 	colorEntries,
 }: {
 	primary: string;
+	background: string;
 	colorEntries: Entry[];
 } ): CSSProperties {
 	const styles = Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorEntries,
+			// Shadow tokens, whose shadow opacity follows the background
+			shadowTokensCSS( background ),
 			// Legacy overrides
 			legacyWpAdminThemeOverridesCSS( primary ),
 			legacyWpComponentsOverridesCSS,
@@ -237,6 +242,7 @@ function generateThemeProviderColors(
 	return {
 		styles: generateStyles( {
 			primary: seeds.primary,
+			background: seeds.background,
 			colorEntries,
 		} ),
 		warnings: collectThemeProviderColorWarnings(
