@@ -6,7 +6,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/ui';
 import { getItemTitle } from '../../shared/title/get-item-title';
-import { unlock } from '../../lock-unlock';
+import { isTemplateSwitchable } from './is-template-switchable';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import type { PostWithTemplate } from './types';
 
@@ -35,30 +35,12 @@ function fromItemValue( itemValue: string | null | undefined ) {
 	return ! itemValue || itemValue === DEFAULT_TEMPLATE_VALUE ? '' : itemValue;
 }
 
-/**
- * Whether the post is the front page or the posts page, which are assigned
- * a template by the reading settings rather than by this field.
- *
- * @param postType The post type.
- * @param postId   The post id.
- * @return Whether the template can be switched.
- */
 function useCanSwitchTemplate(
 	postType: string,
 	postId: number | string
 ): boolean {
 	return useSelect(
-		( select ) => {
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreStore )
-			);
-			const singlePostId = String( postId );
-			const isPostsPage = getPostsPageId() === singlePostId;
-			const isFrontPage =
-				postType === 'page' && getHomePage()?.postId === singlePostId;
-
-			return ! isPostsPage && ! isFrontPage;
-		},
+		( select ) => isTemplateSwitchable( select, postType, postId ),
 		[ postId, postType ]
 	);
 }

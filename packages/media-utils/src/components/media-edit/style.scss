@@ -44,6 +44,12 @@ fieldset.media-edit {
 
 		&.is-single {
 			border-radius: $radius-small;
+
+			.media-edit__picker-button {
+				// The group's border wraps the button, so a selected item stays
+				// as tall as the empty picker button, which has its own border.
+				min-height: $grid-unit-50 - 2 * $border-width;
+			}
 		}
 
 		.media-edit__picker-button {
@@ -103,6 +109,9 @@ fieldset.media-edit {
 		border: $border-width dashed $gray-600;
 		border-radius: $radius-small;
 		padding: $grid-unit-05 $grid-unit-10;
+		// Count the border and padding in the height, whatever box sizing the
+		// page defaults to.
+		box-sizing: border-box;
 		min-height: $grid-unit-50;
 		cursor: var(--wpds-cursor-control);
 		min-width: 0;

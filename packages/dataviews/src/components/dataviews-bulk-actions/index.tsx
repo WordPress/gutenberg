@@ -167,6 +167,7 @@ function ActionTrigger< Item >( {
 			disabled={ !! action.disabled || isBusy }
 			loading={ isBusy }
 			onClick={ onClick }
+			aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
 		>
 			{ label }
 		</Button>
@@ -198,6 +199,7 @@ function ActionButton< Item >( {
 			<Menu.Item
 				onClick={ onClick }
 				disabled={ !! action.disabled || isBusy }
+				aria-haspopup={ 'RenderModal' in action ? 'dialog' : undefined }
 			>
 				<Menu.ItemLabel>
 					{ getActionLabel( action, selectedEligibleItems, 'menu' ) }

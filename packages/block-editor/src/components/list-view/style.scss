@@ -109,17 +109,17 @@
 	}
 	@media (forced-colors: active) {
 		&.is-selected td {
-			background: SelectedItem;
+			background: Highlight;
 		}
 
 		&.is-selected .block-editor-list-view-block-contents,
 		&.is-selected .components-button.has-icon {
-			color: SelectedItemText;
+			color: HighlightText;
 		}
 
 		&.is-selected svg,
 		&.is-selected .block-editor-block-icon.has-colors svg {
-			fill: SelectedItemText;
+			fill: HighlightText;
 		}
 
 		// Prevent backplate with same color as text in dark mode.
@@ -135,7 +135,7 @@
 
 		// The action buttons' rings are inset over the selected background.
 		&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
-			--focus-color: SelectedItemText;
+			--focus-color: HighlightText;
 		}
 	}
 

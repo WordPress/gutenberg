@@ -331,11 +331,8 @@ export const deleteEntityRecord =
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		let error: unknown;
 		let deletedRecord: unknown = false;
 		if ( ! entityConfig ) {
@@ -647,11 +644,8 @@ export const saveEntityRecord =
 	) =>
 	async ( { select, resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -981,11 +975,8 @@ export const saveEditedEntityRecord =
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -1037,11 +1028,8 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
 
@@ -1208,11 +1196,8 @@ export const receiveRevisions =
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'receiveRevisions' );
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 
 		dispatch( {
