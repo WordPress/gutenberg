@@ -18,6 +18,7 @@ runs:
           id: npm
           env:
               WORKING_DIRECTORY: ${{ inputs.working-directory }}
+              CACHE: ${{ inputs.cache }}
           run: |
               NPM_VERSION="$(jq -r '.devEngines.packageManager.version // empty' package.json)"
               if [ -n "$NPM_VERSION" ]; then
@@ -47,7 +48,14 @@ runs:
               # and fails the devEngines check under the bundled npm.
               # Consumer jobs may test Node versions below the repository's
               # devEngines floor. A global lookup does not enforce that floor.
-              echo "cache-dir=$(npm config get cache --global | tr -d '\r')" >> "$GITHUB_OUTPUT"
+              if [ "$CACHE" = 'true' ]; then
+                  CACHE_DIR="$(npm config get cache --global | tr -d '\r')"
+                  if [ -z "$CACHE_DIR" ]; then
+                      echo "::error::npm config get cache printed no directory."
+                      exit 1
+                  fi
+                  echo "cache-dir=$CACHE_DIR" >> "$GITHUB_OUTPUT"
+              fi
 
               # Keep the hashFiles patterns workspace-relative and free of a "./"
               # prefix, so they match the same files as every other cache key.
