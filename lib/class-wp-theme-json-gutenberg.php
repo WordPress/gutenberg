@@ -2171,7 +2171,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
-		$root_settings_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
+		$root_settings_key = array_search( static::ROOT_CSS_PROPERTIES_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
 
 		if ( ! empty( $options['scope'] ) ) {
 			foreach ( $setting_nodes as &$node ) {

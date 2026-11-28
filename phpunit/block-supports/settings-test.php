@@ -103,5 +103,7 @@ class WP_Block_Supports_Settings_Test extends WP_UnitTestCase {
 
 		$this->assertNotEmpty( $selectors[1], 'The block-level presets stylesheet should be printed.' );
 		$this->assertContains( $matches[0], $selectors[1], 'The stylesheet selector should use the same class as the block.' );
+		$this->assertStringNotContainsString( ':root', $styles, 'Scoped presets should not target `:root`.' );
+		$this->assertStringContainsString( ':where(.' . $matches[0] . ',.' . $matches[0] . ' *).has-scratch-background-color', $styles, 'Preset classes should apply inside the block.' );
 	}
 }
