@@ -77,11 +77,31 @@ declare module './base-entity-records' {
 			/**
 			 * Theme file exists.
 			 */
-			has_theme_file: Record< string, string >;
+			has_theme_file: boolean;
 			/**
 			 * The ID for the author of the template.
 			 */
 			author: number;
+			/**
+			 * The display name for the author of the template.
+			 */
+			author_text: string;
+			/**
+			 * Where the template originally comes from.
+			 */
+			original_source: 'theme' | 'plugin' | 'site' | 'user';
+			/**
+			 * Plugin that registered the template.
+			 */
+			plugin?: string;
+			/**
+			 * Whether a template is a custom template.
+			 */
+			is_custom: boolean;
+			/**
+			 * The date the template was last modified, in the site's timezone.
+			 */
+			modified: ContextualField< string | null, 'view' | 'edit', C >;
 			/**
 			 * Where the template part is intended for use (header, footer, etc.)
 			 */

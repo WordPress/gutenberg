@@ -23,7 +23,9 @@ const UPLOAD_TAB = {
 	title: _x( 'Upload', 'noun' ),
 };
 
-const tabsFromCollections = ( collections: FontCollectionType[] ) =>
+const tabsFromCollections = (
+	collections: Pick< FontCollectionType, 'slug' | 'name' >[]
+) =>
 	collections.map( ( { slug, name } ) => ( {
 		id: slug,
 		title:
@@ -39,10 +41,13 @@ function FontLibraryModal( {
 	onRequestClose: () => void;
 	defaultTabId?: string;
 } ) {
-	const { records: collections = [] } =
-		useEntityRecords< FontCollectionType >( 'root', 'fontCollection', {
+	const { records: collections = [] } = useEntityRecords(
+		'root',
+		'fontCollection',
+		{
 			_fields: 'slug,name,description',
-		} );
+		}
+	);
 	const canUserCreate = useSelect( ( select ) => {
 		return select( coreStore ).canUser( 'create', {
 			kind: 'postType',

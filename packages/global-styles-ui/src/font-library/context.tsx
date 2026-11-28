@@ -11,16 +11,11 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import type {
-	FontFamilyPreset,
-	GlobalStylesConfig,
-} from '@wordpress/global-styles-engine';
+import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import type {
 	CollectionFontFace,
-	CollectionFontFamily,
 	FontFace,
 	FontFamily,
-	WpFontFamily,
 } from '@wordpress/core-data';
 import { fetchInstallFontFamily } from './api';
 import {
@@ -52,7 +47,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		return { globalStylesId: __experimentalGetCurrentGlobalStylesId() };
 	}, [] );
 
-	const globalStyles = useEntityRecord< GlobalStylesConfig >(
+	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
 		globalStylesId ?? 0,
@@ -62,14 +57,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const [ isInstalling, setIsInstalling ] = useState( false );
 
 	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
-		useEntityRecords< CollectionFontFamily >(
-			'postType',
-			'wp_font_family',
-			{
-				_embed: true,
-				per_page: -1,
-			}
-		);
+		useEntityRecords( 'postType', 'wp_font_family', {
+			_embed: true,
+			per_page: -1,
+		} );
 
 	const libraryFonts: FontFamilyPreset[] =
 		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
@@ -240,15 +231,11 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				// Get the font family if it already exists.
 				const fontFamilyRecords = await resolveSelect(
 					coreStore
-				).getEntityRecords< WpFontFamily >(
-					'postType',
-					'wp_font_family',
-					{
-						slug: fontFamilyToInstall.slug,
-						per_page: 1,
-						_embed: true,
-					}
-				);
+				).getEntityRecords( 'postType', 'wp_font_family', {
+					slug: fontFamilyToInstall.slug,
+					per_page: 1,
+					_embed: true,
+				} );
 
 				const fontFamilyPost =
 					fontFamilyRecords && fontFamilyRecords.length > 0
@@ -315,7 +302,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				}[] = [];
 				if ( fontFamilyToInstall?.fontFace?.length ?? 0 > 0 ) {
 					const response = await batchInstallFontFaces(
-						// @ts-expect-error - Type mismatch: WpFontFamily.id can be number | string, but batchInstallFontFaces expects only string.
+						// @ts-expect-error - Type mismatch: an existing font family's ID is a number, but batchInstallFontFaces expects a string.
 						installedFontFamily.id,
 						makeFontFacesFormData(
 							fontFamilyToInstall as FontFamily

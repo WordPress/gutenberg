@@ -2,7 +2,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as coreDataStore, type Attachment } from '@wordpress/core-data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -365,7 +365,7 @@ export function useLinkPreview( {
 			const { getEntityRecord } = select( coreDataStore );
 
 			// Get the media entity to fetch the image URL
-			const media = getEntityRecord< Attachment >(
+			const media = getEntityRecord(
 				'postType',
 				'attachment',
 				entityRecord.featured_media

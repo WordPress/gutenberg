@@ -3,6 +3,8 @@ import deprecated from '@wordpress/deprecated';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '../';
+import type * as ET from '../entity-types';
+import type { GetRecordsHttpQuery } from '../selectors';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
 import { getResolutionStatus } from './utils';
@@ -96,6 +98,27 @@ const EMPTY_ARRAY = [];
  * @return Entity records data.
  * @template RecordType
  */
+export default function useEntityRecords<
+	Kind extends ET.EntityKind,
+	Name extends ET.EntityNameOf< Kind >,
+	const Query extends GetRecordsHttpQuery | undefined = undefined,
+>(
+	kind: Kind,
+	name: Name,
+	queryArgs?: Query,
+	options?: Options
+): EntityRecordsResolution< ET.EntityRecordOfQuery< Kind, Name, Query > >;
+
+/*
+ * Retained so call sites that name the record type explicitly, and pairs
+ * absent from the map, continue to compile.
+ */
+export default function useEntityRecords< RecordType >(
+	kind: string,
+	name: string,
+	queryArgs?: Record< string, unknown >,
+	options?: Options
+): EntityRecordsResolution< RecordType >;
 export default function useEntityRecords< RecordType >(
 	kind: string,
 	name: string,
@@ -169,6 +192,24 @@ export function useDeprecatedEntityRecords(
 	return useEntityRecords( kind, name, queryArgs, options );
 }
 
+export function useEntityRecordsWithPermissions<
+	Kind extends ET.EntityKind,
+	Name extends ET.EntityNameOf< Kind >,
+	const Query extends GetRecordsHttpQuery | undefined = undefined,
+>(
+	kind: Kind,
+	name: Name,
+	queryArgs?: Query,
+	options?: Options
+): EntityRecordsWithPermissionsResolution<
+	ET.EntityRecordOfQuery< Kind, Name, Query >
+>;
+export function useEntityRecordsWithPermissions< RecordType >(
+	kind: string,
+	name: string,
+	queryArgs?: Record< string, unknown >,
+	options?: Options
+): EntityRecordsWithPermissionsResolution< RecordType >;
 export function useEntityRecordsWithPermissions< RecordType >(
 	kind: string,
 	name: string,

@@ -33,10 +33,6 @@ declare module './base-entity-records' {
 			 */
 			locations: ContextualField< string[], 'view' | 'edit', C >;
 			/**
-			 * The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories.
-			 */
-			object_id: number;
-			/**
 			 * Whether to automatically add top level pages to this menu.
 			 */
 			auto_add: ContextualField< boolean, 'view' | 'edit', C >;

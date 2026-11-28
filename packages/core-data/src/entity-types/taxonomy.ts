@@ -51,7 +51,7 @@ declare module './base-entity-records' {
 			/**
 			 * The visibility settings for the taxonomy.
 			 */
-			visibility: TaxonomyVisibility;
+			visibility: ContextualField< TaxonomyVisibility, 'edit', C >;
 		}
 
 		export interface TaxonomyVisibility {

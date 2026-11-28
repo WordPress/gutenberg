@@ -81,7 +81,7 @@ declare module './base-entity-records' {
 			/**
 			 * Theme file exists.
 			 */
-			has_theme_file: Record< string, string >;
+			has_theme_file: boolean;
 			/**
 			 * The ID for the author of the template.
 			 */
@@ -91,13 +91,17 @@ declare module './base-entity-records' {
 			 */
 			author_text: string;
 			/**
+			 * Where the template originally comes from.
+			 */
+			original_source: 'theme' | 'plugin' | 'site' | 'user';
+			/**
 			 * Whether a template is a custom template.
 			 */
-			is_custom: Record< string, string >;
+			is_custom: boolean;
 			/**
 			 * The date the template was last modified, in the site's timezone.
 			 */
-			modified: ContextualField< string, 'view' | 'edit', C >;
+			modified: ContextualField< string | null, 'view' | 'edit', C >;
 		}
 	}
 }
