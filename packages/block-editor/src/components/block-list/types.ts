@@ -206,6 +206,8 @@ export interface BlockListBlockProviderProps {
 	rootClientId?: string | null;
 	/** The default block shown before the user inserts it. */
 	ghostBlock?: Block;
+	/** The attributes the ghost block renders with. */
+	ghostAttributes?: Block[ 'attributes' ];
 }
 
 /**

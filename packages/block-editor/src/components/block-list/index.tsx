@@ -15,6 +15,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
@@ -224,6 +225,7 @@ function Items( {
 		visibleBlocks,
 		ghostBlockName,
 		ghostBlockAttributes,
+		bodyPlaceholder,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -309,6 +311,7 @@ function Items( {
 				// whether or not the block is selected.
 				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
 				ghostBlockAttributes: _ghostBlockAttributes,
+				bodyPlaceholder: getSettings().bodyPlaceholder,
 				shouldRenderAppender:
 					appenderAllowed &&
 					( hasCustomAppender ||
@@ -322,13 +325,21 @@ function Items( {
 	// One ghost per empty period: regenerated when the list empties again
 	// or the default block changes, stable in between so the client ID,
 	// and with it the DOM, survives materialization.
-	const ghostBlock = useMemo(
-		() =>
-			ghostBlockName
-				? createBlock( ghostBlockName, ghostBlockAttributes )
-				: null,
-		[ ghostBlockName, ghostBlockAttributes ]
-	);
+	// The ghost shows the empty post placeholder only while it renders: the
+	// block it inserts keeps its own attributes, so the text is never saved.
+	const { ghostBlock, ghostAttributes } = useMemo( () => {
+		const block = ghostBlockName
+			? createBlock( ghostBlockName, ghostBlockAttributes )
+			: undefined;
+		return {
+			ghostBlock: block,
+			ghostAttributes: block && {
+				placeholder:
+					bodyPlaceholder && decodeEntities( bodyPlaceholder ),
+				...block.attributes,
+			},
+		};
+	}, [ ghostBlockName, ghostBlockAttributes, bodyPlaceholder ] );
 	const showGhost = !! ghostBlock;
 
 	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
@@ -359,6 +370,11 @@ function Items( {
 						ghostBlock={
 							clientId === ghostBlock?.clientId
 								? ghostBlock
+								: undefined
+						}
+						ghostAttributes={
+							clientId === ghostBlock?.clientId
+								? ghostAttributes
 								: undefined
 						}
 					/>

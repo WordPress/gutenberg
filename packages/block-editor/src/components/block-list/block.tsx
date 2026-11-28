@@ -681,7 +681,7 @@ const FilteredBlockListBlock = withFilters( 'editor.BlockListBlock' )(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
-	const { clientId, rootClientId, ghostBlock } = props;
+	const { clientId, rootClientId, ghostBlock, ghostAttributes } = props;
 	const registry = useRegistry();
 	const dispatchProps = useMemo(
 		() =>
@@ -760,7 +760,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				getAllBlockBindingsSources,
 			} = unlock( select( blocksStore ) );
 			const attributes =
-				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
+				getBlockAttributes( clientId ) ?? ghostAttributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
 			const settings = getSettings();
@@ -900,7 +900,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				),
 			};
 		},
-		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
+		[ clientId, rootClientId, ghostAttributes, ghostBlockWithoutAttributes ]
 	);
 
 	const currentViewport = useContext( CurrentViewport );
