@@ -1,57 +1,12 @@
-import { __ } from '@wordpress/i18n';
-import { useId, useMemo } from '@wordpress/element';
-import { BlockPreview, BlockEditorProvider } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { parse } from '@wordpress/blocks';
+import { lazy, Suspense, useMemo } from '@wordpress/element';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 import './style.scss';
-import { unlock } from '../../lock-unlock';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useStylesId } from '../../hooks/use-styles-id';
 
-const { useStyle } = unlock( editorPrivateApis );
-
-function PreviewContent( {
-	blocks,
-	content,
-	description,
-}: {
-	blocks?: any[];
-	content?: string;
-	description: string;
-} ) {
-	const descriptionId = useId();
-	const backgroundColor = useStyle( 'color.background' );
-	const actualBlocks = useMemo( () => {
-		return (
-			blocks ??
-			parse( content!, {
-				__unstableSkipMigrationLogs: true,
-			} )
-		);
-	}, [ content, blocks ] );
-	const isEmpty = ! actualBlocks?.length;
-
-	return (
-		<div
-			className="lazy-editor-block-preview__container"
-			style={ { backgroundColor } }
-			aria-describedby={ !! description ? descriptionId : undefined }
-		>
-			{ isEmpty && __( 'Empty.' ) }
-			{ ! isEmpty && (
-				<BlockPreview.Async>
-					<BlockPreview blocks={ actualBlocks } />
-				</BlockPreview.Async>
-			) }
-			{ !! description && (
-				<div hidden id={ descriptionId }>
-					{ description }
-				</div>
-			) }
-		</div>
-	);
-}
+// Reads `wp.editor` when it loads, so it is loaded once the editor assets are.
+const PreviewContent = lazy( () => import( './preview-content' ) );
 
 export function Preview( {
 	blocks,
@@ -82,11 +37,13 @@ export function Preview( {
 	}
 	return (
 		<BlockEditorProvider settings={ finalSettings }>
-			<PreviewContent
-				blocks={ blocks }
-				content={ content }
-				description={ description }
-			/>
+			<Suspense fallback={ null }>
+				<PreviewContent
+					blocks={ blocks }
+					content={ content }
+					description={ description }
+				/>
+			</Suspense>
 		</BlockEditorProvider>
 	);
 }

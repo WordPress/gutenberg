@@ -418,7 +418,11 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'after'
 			);
 
-			// Enqueue editor assets.
+			/*
+			 * Enqueue editor assets. `wp-editor` comes first: the inline script
+			 * of `wp-block-library` above calls it.
+			 */
+			wp_enqueue_script( 'wp-editor' );
 			wp_enqueue_script( 'wp-format-library' );
 			wp_enqueue_script( 'wp-block-library' );
 			wp_enqueue_style( 'wp-editor' );
