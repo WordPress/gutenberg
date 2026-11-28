@@ -28,6 +28,7 @@ import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getResponsiveMediaQueries } from '../utils/viewport';
+import { isZeroRotation } from '../utils/transform';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
 
@@ -1760,6 +1761,43 @@ export const generateCustomProperties = (
 };
 
 /**
+ * Returns a ruleset that fits a rotated block to its content, like the
+ * `.has-rotation` rule in the block library common styles. Flex and grid
+ * children keep their layout's size. Mirror of
+ * `get_rotation_fit_content_ruleset()` in PHP.
+ *
+ * @param selector     Block or block style variation selector.
+ * @param declarations The node's declarations.
+ * @param nodes        Nodes whose `dimensions.width` takes precedence.
+ * @param blockName    Block name, whose `transform.fitContent` support opts in.
+ * @return The ruleset, or an empty string.
+ */
+function getRotationFitContentRuleset(
+	selector: string,
+	declarations: string[],
+	nodes: any[],
+	blockName: string
+): string {
+	const rotate = declarations
+		.find( ( declaration ) => declaration.startsWith( 'rotate:' ) )
+		?.slice( 'rotate:'.length )
+		.trim();
+	if (
+		! rotate ||
+		isZeroRotation( rotate ) ||
+		nodes.some( ( node ) => node?.dimensions?.width !== undefined ) ||
+		! getBlockSupport( blockName, 'transform.fitContent', false )
+	) {
+		return '';
+	}
+
+	return `:root :where(${ appendToSelector(
+		selector,
+		':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)'
+	) }){width: fit-content;}`;
+}
+
+/**
  * Renders CSS rules for a single style node.
  *
  * The node renderer handles feature-level selectors, duotone declarations,
@@ -1809,6 +1847,7 @@ function renderStylesNode(
 		layoutHasBlockGapSupport,
 		skipSelectorWrapper,
 		name,
+		elementName,
 		variationName,
 	} = node;
 	let ruleset = '';
@@ -1939,6 +1978,14 @@ function renderStylesNode(
 			generalSelector = getPseudoRuleSelector( selector, selectorSuffix );
 		}
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
+	}
+	if ( name && ! elementName && ! selectorSuffix ) {
+		ruleset += getRotationFitContentRuleset(
+			effectiveSelector,
+			declarations,
+			[ sourceStyles ?? styles, ...( baseStyles ?? [] ) ],
+			name
+		);
 	}
 	if ( styles?.css ) {
 		// A block can declare a dedicated selector for custom CSS (e.g. to

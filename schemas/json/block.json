@@ -691,6 +691,11 @@
 							"description": "Allow blocks to define a uniform scale.",
 							"type": "boolean",
 							"default": false
+						},
+						"fitContent": {
+							"description": "Whether a rotated block shrinks to fit its content, so the turn stays close to where it sits. Suits a text block such as Heading. A container or a block that fills its box, such as Group or Video, leaves it off to keep its width.",
+							"type": "boolean",
+							"default": false
 						}
 					}
 				},

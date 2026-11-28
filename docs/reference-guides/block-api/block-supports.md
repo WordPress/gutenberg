@@ -1090,6 +1090,7 @@ _**Note:** Since WordPress 7.3._
     -   `rotate`: type `boolean`, default value `false`
     -   `translate`: type `boolean`, default value `false`
     -   `scale`: type `boolean`, default value `false`
+    -   `fitContent`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, `settings.transform.translate`, `settings.transform.scale` or `settings.appearanceTools`.
 
@@ -1101,6 +1102,7 @@ supports: {
 		rotate: true, // Enable the rotation control.
 		translate: true, // Enable the X and Y offset controls.
 		scale: true, // Enable the scale control.
+		fitContent: true, // Fit a rotated block to its content.
 	}
 }
 ```
@@ -1109,7 +1111,9 @@ An offset moves the block visually without changing the layout around it, so it 
 
 Each axis is set on its own, like margin sides. An offset outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each axis it sets, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. An axis left out comes from the styles below it, such as Global Styles, a block style variation or the block's default offset under a state, and is `0` when none sets it. When a user changes one axis in the block editor, only that axis is saved. The two custom properties are registered with `@property` and do not inherit, so a nested block does not take its parent's offset.
 
-Transforms are saved as an inline style on the block wrapper. To apply them to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`, and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
+A rotation turns the block around the center of its box. A text block such as Heading sets `fitContent` to `true` so the turn stays close to where it sits: when rotated, it gets a `has-rotation` class and a shared rule gives it `width: fit-content`. Wide and full aligned blocks and flex or grid children keep their width, and a width set on the block still wins. Global Styles output the same rule next to a rotation. A rotation of zero, such as `0deg`, turns nothing, so it adds neither the class nor the rule. Containers such as Group, and blocks that fill their box such as Video, leave `fitContent` off and keep their width.
+
+Transforms are saved as an inline style on the block wrapper, with the `has-rotation` class for a rotation that fits its content. To apply them to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`, and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 

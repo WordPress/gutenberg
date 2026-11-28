@@ -32,6 +32,13 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 const mockedSelect = vi.mocked( select ) as Mock;
 const mockedGetBlockSupport = vi.mocked( getBlockSupport ) as Mock;
 
+const mockFitContent = ( blockName: string ) =>
+	mockedGetBlockSupport.mockImplementation( ( name, path, defaultValue ) =>
+		name === blockName && path === 'transform.fitContent'
+			? true
+			: defaultValue
+	);
+
 // Mock WordPress elements (minimal, no mocking of complex APIs)
 const ELEMENTS = {
 	link: 'a:where(:not(.wp-element-button))',
@@ -1988,6 +1995,150 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'fits a rotated block or block style variation to its content', () => {
+			mockFitContent( 'core/heading' );
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: { rotate: '15deg' },
+							'@mobile': {
+								transform: { rotate: '5deg' },
+							},
+							variations: {
+								tilted: {
+									transform: { rotate: '-5deg' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': {
+					selector: '.wp-block-heading',
+					styleVariationSelectors: {
+						tilted: '.wp-block-heading.is-style-tilted',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{ ...minimalStyleOptions, variationStyles: true }
+			);
+			mockedGetBlockSupport.mockReset();
+
+			const fitContent =
+				':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)){width: fit-content;}';
+			expect( result ).toEqual(
+				':root :where(.wp-block-heading){rotate: 15deg;}' +
+					`:root :where(.wp-block-heading${ fitContent }` +
+					'@media (width <= 480px){:root :where(.wp-block-heading){rotate: 5deg;}' +
+					`:root :where(.wp-block-heading${ fitContent }}` +
+					':root :where(.wp-block-heading.is-style-tilted){rotate: -5deg;}' +
+					`:root :where(.wp-block-heading.is-style-tilted${ fitContent }`
+			);
+		} );
+
+		it.each( [ '0', '0deg', '-0deg', '+0.0rad', '.0grad', '0TURN' ] )(
+			'does not fit a block with a %s rotation',
+			( rotate ) => {
+				mockFitContent( 'core/heading' );
+				const tree = {
+					settings: {},
+					styles: {
+						blocks: {
+							'core/heading': { transform: { rotate } },
+						},
+					},
+				} as unknown as GlobalStylesConfig;
+
+				const result = transformToStyles(
+					Object.freeze( tree ),
+					{ 'core/heading': { selector: '.wp-block-heading' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+				mockedGetBlockSupport.mockReset();
+
+				expect( result ).toEqual(
+					`:root :where(.wp-block-heading){rotate: ${ rotate };}`
+				);
+			}
+		);
+
+		it.each( [
+			[
+				'block',
+				{ dimensions: { width: '20rem' } },
+				{},
+				'.wp-block-heading:not',
+			],
+			[
+				'variation',
+				{},
+				{ dimensions: { width: '20rem' } },
+				'.is-style-tilted:not',
+			],
+		] )(
+			'leaves a rotated block to a width set on the %s',
+			( _label, blockStyles, variationStyles, unfitSelector ) => {
+				mockFitContent( 'core/heading' );
+				const tree = {
+					settings: {},
+					styles: {
+						blocks: {
+							'core/heading': {
+								...blockStyles,
+								transform: { rotate: '15deg' },
+								variations: {
+									tilted: {
+										...variationStyles,
+										transform: { rotate: '-5deg' },
+									},
+								},
+							},
+						},
+					},
+				} as unknown as GlobalStylesConfig;
+
+				const blockSelectors = {
+					'core/heading': {
+						selector: '.wp-block-heading',
+						styleVariationSelectors: {
+							tilted: '.wp-block-heading.is-style-tilted',
+						},
+					},
+				};
+
+				const result = transformToStyles(
+					Object.freeze( tree ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+				mockedGetBlockSupport.mockReset();
+
+				expect( result ).toContain( 'rotate: -5deg' );
+				expect( result ).not.toContain( unfitSelector );
+				expect( result ).not.toContain( '.is-style-tilted:not' );
+			}
+		);
+
 		it( 'outputs a scale with a rotation on the block', () => {
 			const tree = {
 				settings: {},
@@ -2060,6 +2211,52 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).not.toContain( 'scale' );
+		} );
+
+		it( 'keeps the width of a rotated block that does not opt in to fitting', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/group': {
+							transform: { rotate: '4deg' },
+							'@mobile': {
+								transform: { rotate: '2deg' },
+							},
+							variations: {
+								tilted: {
+									transform: { rotate: '-4deg' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						tilted: '.wp-block-group.is-style-tilted',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{ ...minimalStyleOptions, variationStyles: true }
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-group){rotate: 4deg;}' +
+					'@media (width <= 480px){:root :where(.wp-block-group){rotate: 2deg;}}' +
+					':root :where(.wp-block-group.is-style-tilted){rotate: -4deg;}'
+			);
 		} );
 
 		it( 'handles responsive feature selector styles', () => {

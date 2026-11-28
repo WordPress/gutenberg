@@ -43,7 +43,7 @@ class WP_Block_Supports_Utils_Test extends WP_UnitTestCase {
 				'block_attributes' => $block_attributes,
 				'supports'         => null,
 				'expected'         => array(
-					'class' => 'has-background has-contrast-background-color has-border-color has-accent-2-border-color',
+					'class' => 'has-background has-contrast-background-color has-border-color has-accent-2-border-color has-rotation',
 					'style' => 'background-image:linear-gradient(#000,#fff);border-width:2px;box-shadow:1px 1px 1px #000;padding-top:10px;rotate:15deg;',
 				),
 			),

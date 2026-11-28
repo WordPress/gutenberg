@@ -23,6 +23,7 @@ import textAlign from './text-align';
 import textShadow from './text-shadow';
 import fitText from './fit-text';
 import border from './border';
+import transform from './transform';
 import customCSS from './custom-css';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
@@ -69,6 +70,7 @@ createBlockListBlockFilter( [
 	textShadow,
 	fitText,
 	border,
+	transform,
 	customCSS,
 	position,
 	blockStyleVariation,
@@ -81,6 +83,7 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	transform,
 	customCSS,
 	fitText,
 	color,

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { addSaveProps } from '../style';
-import { getStateInheritedValue } from '../transform';
+import transformSupport, { getStateInheritedValue } from '../transform';
 import { getTransformClassesAndStyles } from '../use-transform-props';
 
 const registerTransformBlock = ( transform: Record< string, unknown > ) =>
@@ -16,12 +16,12 @@ const registerTransformBlock = ( transform: Record< string, unknown > ) =>
 	} );
 
 describe( 'getTransformClassesAndStyles', () => {
-	it( 'returns a rotation as an inline style', () => {
+	it( 'returns a rotation as a class and an inline style', () => {
 		expect(
 			getTransformClassesAndStyles( {
 				style: { transform: { rotate: '15deg' } },
 			} )
-		).toEqual( { style: { rotate: '15deg' } } );
+		).toEqual( { className: 'has-rotation', style: { rotate: '15deg' } } );
 	} );
 
 	it( 'returns an offset as the axis it sets', () => {
@@ -50,16 +50,30 @@ describe( 'getTransformClassesAndStyles', () => {
 		).toEqual( { style: { scale: expected } } );
 	} );
 
+	it.each( [ '0', '0deg', '-0deg', '+0.0rad', '.0grad', '0TURN' ] )(
+		'returns a %s rotation as an inline style without a class',
+		( rotate ) => {
+			expect(
+				getTransformClassesAndStyles( {
+					style: { transform: { rotate } },
+				} )
+			).toEqual( { className: undefined, style: { rotate } } );
+		}
+	);
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
 				style: { transform: { rotate: 'calc(10deg + 5deg)' } },
 			} )
-		).toEqual( { style: {} } );
+		).toEqual( { className: undefined, style: {} } );
 	} );
 
 	it( 'returns no styles without a transform', () => {
-		expect( getTransformClassesAndStyles( {} ) ).toEqual( { style: {} } );
+		expect( getTransformClassesAndStyles( {} ) ).toEqual( {
+			className: undefined,
+			style: {},
+		} );
 	} );
 } );
 
@@ -78,6 +92,57 @@ describe( 'transform serialization', () => {
 		).toEqual( { rotate: '15deg' } );
 	} );
 
+	it( 'saves a has-rotation class next to the existing classes', () => {
+		registerTransformBlock( { rotate: true, fitContent: true } );
+
+		expect(
+			transformSupport.addSaveProps(
+				{ className: 'is-style-a' },
+				'test/transform',
+				{ style: { transform: { rotate: '15deg' } } }
+			).className
+		).toBe( 'is-style-a has-rotation' );
+	} );
+
+	it.each( [
+		[ 'leaves out fitContent', { rotate: true } ],
+		[ 'turns fitContent off', { rotate: true, fitContent: false } ],
+	] )(
+		'saves no has-rotation class for a block that %s',
+		( _label, supports ) => {
+			registerTransformBlock( supports );
+
+			expect(
+				transformSupport.addSaveProps( {}, 'test/transform', {
+					style: { transform: { rotate: '15deg' } },
+				} ).className
+			).toBeUndefined();
+		}
+	);
+
+	it.each( [ '0deg', '-0turn' ] )(
+		'saves no has-rotation class for a %s rotation',
+		( rotate ) => {
+			registerTransformBlock( { rotate: true, fitContent: true } );
+
+			expect(
+				transformSupport.addSaveProps( {}, 'test/transform', {
+					style: { transform: { rotate } },
+				} ).className
+			).toBeUndefined();
+		}
+	);
+
+	it( 'saves no has-rotation class for an invalid rotation', () => {
+		registerTransformBlock( { rotate: true, fitContent: true } );
+
+		expect(
+			transformSupport.addSaveProps( {}, 'test/transform', {
+				style: { transform: { rotate: 'calc(10deg + 5deg)' } },
+			} ).className
+		).toBeUndefined();
+	} );
+
 	it.each( [
 		[ 'the whole support', true ],
 		[ 'the rotation', [ 'rotate' ] ],
@@ -86,14 +151,23 @@ describe( 'transform serialization', () => {
 		( _label, skipSerialization ) => {
 			registerTransformBlock( {
 				rotate: true,
+				fitContent: true,
 				__experimentalSkipSerialization: skipSerialization,
 			} );
+			const attributes = {
+				style: { transform: { rotate: '15deg' } },
+			};
 
 			expect(
-				addSaveProps( {}, 'test/transform', {
-					style: { transform: { rotate: '15deg' } },
-				} ).style
+				addSaveProps( {}, 'test/transform', attributes ).style
 			).toEqual( {} );
+			expect(
+				transformSupport.addSaveProps(
+					{},
+					'test/transform',
+					attributes
+				).className
+			).toBeUndefined();
 		}
 	);
 } );

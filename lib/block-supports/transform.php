@@ -31,12 +31,13 @@ function gutenberg_register_transform_support( $block_type ) {
 }
 
 /**
- * Adds inline styles for transform features to the incoming attributes array.
+ * Adds classes and inline styles for transform features to the incoming
+ * attributes array.
  * This will be applied to the block markup in the front-end.
  *
  * @param WP_Block_Type $block_type       Block type.
  * @param array         $block_attributes Block attributes.
- * @return array Transform inline styles.
+ * @return array Transform classes and inline styles.
  */
 function gutenberg_apply_transform_support( $block_type, $block_attributes ) {
 	if (
@@ -60,18 +61,25 @@ function gutenberg_apply_transform_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	return gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
+	$classes_and_styles = gutenberg_get_transform_classes_and_styles( array( 'style' => array( 'transform' => $transform ) ) );
+
+	// Only a block that opts in fits its content when rotated.
+	if ( ! block_has_support( $block_type, array( 'transform', 'fitContent' ), false ) ) {
+		unset( $classes_and_styles['class'] );
+	}
+
+	return $classes_and_styles;
 }
 
 /**
- * Returns transform inline styles for block attributes, like the JS
- * `getTransformClassesAndStyles()`. Does not check block support or skipped
+ * Returns transform classes and inline styles for block attributes, like the
+ * JS `getTransformClassesAndStyles()`. Does not check block support or skipped
  * serialization.
  *
  * @since 7.3.0
  *
  * @param array $block_attributes Block attributes.
- * @return array Array with a `style` key, present only when non-empty.
+ * @return array Array with `style` and `class` keys, each present only when non-empty.
  */
 function gutenberg_get_transform_classes_and_styles( $block_attributes ) {
 	if ( ! is_array( $block_attributes ) ) {
@@ -84,8 +92,34 @@ function gutenberg_get_transform_classes_and_styles( $block_attributes ) {
 	}
 
 	$styles = gutenberg_style_engine_get_styles( array( 'transform' => $transform ) );
+	if ( empty( $styles['css'] ) ) {
+		return array();
+	}
 
-	return empty( $styles['css'] ) ? array() : array( 'style' => $styles['css'] );
+	$classes_and_styles = array( 'style' => $styles['css'] );
+
+	// Lets the shared stylesheet fit a rotated block to its content.
+	if (
+		isset( $styles['declarations']['rotate'] ) &&
+		! gutenberg_is_zero_rotation( $styles['declarations']['rotate'] )
+	) {
+		$classes_and_styles['class'] = 'has-rotation';
+	}
+
+	return $classes_and_styles;
+}
+
+/**
+ * Checks whether a rotation is a zero angle, such as `0`, `0deg` or `-0turn`,
+ * which turns nothing. Mirror of `isZeroRotation()` in the global styles engine.
+ *
+ * @since 7.3.0
+ *
+ * @param mixed $rotate Rotation value.
+ * @return bool Whether the rotation is a zero angle.
+ */
+function gutenberg_is_zero_rotation( $rotate ) {
+	return is_string( $rotate ) && 1 === preg_match( '/^[+-]?(?:0+(?:\.0+)?|\.0+)(?:deg|grad|rad|turn)?$/iD', $rotate );
 }
 
 // Register the block support.

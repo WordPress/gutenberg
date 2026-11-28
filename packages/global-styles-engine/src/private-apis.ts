@@ -11,6 +11,7 @@ import {
 import { transformToStylesWithTextClipBase } from './core/render';
 import { resolveStyle } from './resolve-style';
 import { getVariationStyle } from './variation';
+import { isZeroRotation } from './utils/transform';
 import { lock } from './lock-unlock';
 
 export const privateApis = {};
@@ -24,4 +25,5 @@ lock( privateApis, {
 	resolveStyle,
 	getVariationStyle,
 	transformToStylesWithTextClipBase,
+	isZeroRotation,
 } );

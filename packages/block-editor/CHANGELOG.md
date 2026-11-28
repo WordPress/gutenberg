@@ -8,6 +8,7 @@
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add an Offset control with X and Y axes to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 -   Add a Scale control to the Transform panel, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+-   Add the `transform.fitContent` block support. A rotated block that sets it to `true` gets a `has-rotation` class and fits its content. `getTransformClassesAndStyles()` also returns the class. A zero rotation adds no class ([#86891](https://github.com/WordPress/gutenberg/pull/86891)).
 
 ### Enhancements
 

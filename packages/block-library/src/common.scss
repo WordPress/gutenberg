@@ -65,6 +65,13 @@
 	white-space: nowrap !important;
 }
 
+// A rotation turns a block around the center of its box, so a box that fits
+// the content keeps the turn in place. Any width set on the block still wins.
+// Flex and grid children keep the size their layout gives them.
+:root :where(.has-rotation:not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)) {
+	width: fit-content;
+}
+
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;

@@ -3389,11 +3389,190 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		unregister_block_style( 'core/group', 'tilted' );
 
 		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 0.25turn;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 0;}}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 0;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
+	}
+
+	public function test_get_stylesheet_keeps_the_width_of_a_rotated_video() {
+		register_block_style(
+			'core/video',
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/video' => array(
+							'transform'  => array( 'rotate' => '4deg' ),
+							'@mobile'    => array(
+								'transform' => array( 'rotate' => '2deg' ),
+							),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-4deg' ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/video', 'tilted' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-video){rotate: 4deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-video.is-style-tilted){rotate: -4deg;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-video){rotate: 2deg;}}', $css );
+		$this->assertStringNotContainsString( 'fit-content', $css );
+	}
+
+	public function test_get_stylesheet_fits_rotated_blocks_to_their_content() {
+		register_block_style(
+			array( 'core/group', 'core/heading', 'core/paragraph' ),
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading'   => array(
+							'transform'  => array( 'rotate' => '15deg' ),
+							'@mobile'    => array(
+								'transform' => array( 'rotate' => '5deg' ),
+							),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-5deg' ),
+								),
+							),
+						),
+						'core/group'     => array(
+							'transform'  => array( 'rotate' => '15deg' ),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-5deg' ),
+								),
+							),
+						),
+						'core/paragraph' => array(
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-5deg' ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/group', 'tilted' );
+		unregister_block_style( 'core/heading', 'tilted' );
+		unregister_block_style( 'core/paragraph', 'tilted' );
+
+		$fit_content = ':not(.alignwide):not(.alignfull):not(.is-layout-flex > *):not(.is-layout-grid > *)){width: fit-content;}';
+		$this->assertStringContainsString( ':root :where(.wp-block-heading){rotate: 15deg;}:root :where(.wp-block-heading' . $fit_content, $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-heading){rotate: 5deg;}:root :where(.wp-block-heading' . $fit_content . '}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-heading.is-style-tilted){rotate: -5deg;}:root :where(.wp-block-heading.is-style-tilted' . $fit_content, $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 15deg;}', $css );
+		$this->assertStringContainsString( ':root :where(p.is-style-tilted){rotate: -5deg;}', $css );
+		$this->assertStringNotContainsString( '.wp-block-group:not', $css );
+		$this->assertStringNotContainsString( '.wp-block-group.is-style-tilted:not', $css );
+		$this->assertStringNotContainsString( 'p.is-style-tilted:not', $css );
+	}
+
+	public function test_get_stylesheet_leaves_a_rotated_block_to_its_width() {
+		register_block_style(
+			'core/heading',
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'dimensions' => array( 'width' => '20rem' ),
+							'transform'  => array( 'rotate' => '15deg' ),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-5deg' ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/heading', 'tilted' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-heading.is-style-tilted){rotate: -5deg;}', $css );
+		$this->assertStringNotContainsString( 'fit-content', $css );
+	}
+
+	/**
+	 * Tests that a zero rotation does not fit the block to its content.
+	 *
+	 * @dataProvider data_zero_rotate_values
+	 *
+	 * @param string $rotate Rotation value.
+	 */
+	public function test_get_stylesheet_does_not_fit_a_zero_rotation( $rotate ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array( 'rotate' => $rotate ),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-heading){rotate: ' . $rotate . ';}', $css );
+		$this->assertStringNotContainsString( 'fit-content', $css );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_zero_rotate_values() {
+		return array(
+			'unitless zero'       => array( '0' ),
+			'zero degrees'        => array( '0deg' ),
+			'negative zero'       => array( '-0deg' ),
+			'signed zero radians' => array( '+0.0rad' ),
+			'zero gradians'       => array( '.0grad' ),
+			'zero turns'          => array( '0TURN' ),
+		);
 	}
 
 	/**
