@@ -142,7 +142,7 @@ export interface BlockVariation<
 	/**
 	 * Values which override block attributes.
 	 */
-	attributes?: Attributes;
+	attributes?: Partial< Attributes >;
 	/**
 	 * Initial configuration of nested blocks.
 	 */
@@ -450,8 +450,11 @@ export type NormalizedBlockTransform<
  *
  * @see BlockType.example
  */
-export type BlockExampleInnerBlock = Partial< BlockType > &
-	Pick< BlockType, 'name' | 'attributes' > & {
+export type BlockExampleInnerBlock = Partial<
+	Omit< BlockType, 'attributes' >
+> &
+	Pick< BlockType, 'name' > & {
+		attributes: Record< string, unknown >;
 		innerBlocks?: BlockExampleInnerBlock[];
 	};
 
@@ -512,7 +515,11 @@ export interface BlockType<
 	 *
 	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#example
 	 */
-	example?: Partial< BlockType > & {
+	example?: Partial< Omit< BlockType, 'attributes' > > & {
+		/**
+		 * Attribute values for the block preview.
+		 */
+		attributes?: Partial< Attributes >;
 		innerBlocks?: BlockExampleInnerBlock[];
 		/**
 		 * Static HTML fragments interleaved with inner blocks, where `null`
@@ -1512,6 +1519,10 @@ export interface BlockSaveProps<
 export interface BlockEditProps<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 > extends BlockSaveProps< Attributes > {
+	/**
+	 * The block's name.
+	 */
+	name: string;
 	/**
 	 * The block's client ID.
 	 */

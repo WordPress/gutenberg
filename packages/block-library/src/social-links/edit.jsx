@@ -17,7 +17,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -73,27 +73,48 @@ export function SocialLinksEdit( props ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
 	useEffect( () => {
-		if ( logosOnly ) {
-			let restore;
-			setAttributes( ( prev ) => {
-				restore = {
-					iconBackgroundColor: prev.iconBackgroundColor,
-					iconBackgroundColorValue: prev.iconBackgroundColorValue,
-					customIconBackgroundColor: prev.customIconBackgroundColor,
-				};
-				return {
-					iconBackgroundColor: undefined,
-					iconBackgroundColorValue: undefined,
-					customIconBackgroundColor: undefined,
-				};
-			} );
-
-			return () => setAttributes( { ...restore } );
+		if ( ! logosOnly ) {
+			return;
 		}
-	}, [ logosOnly, setAttributes ] );
+
+		let restore;
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( ( prev ) => {
+			// Redo replays an already cleared background. Keep nothing to
+			// restore then, so a later Undo isn't overwritten.
+			const {
+				iconBackgroundColor: bg,
+				iconBackgroundColorValue: bgValue,
+				customIconBackgroundColor: customBg,
+			} = prev;
+			if ( bg || bgValue || customBg ) {
+				restore = {
+					iconBackgroundColor: bg,
+					iconBackgroundColorValue: bgValue,
+					customIconBackgroundColor: customBg,
+				};
+			}
+			return {
+				iconBackgroundColor: undefined,
+				iconBackgroundColorValue: undefined,
+				customIconBackgroundColor: undefined,
+			};
+		} );
+
+		return () => {
+			if ( ! restore ) {
+				return;
+			}
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( restore );
+		};
+	}, [ logosOnly, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.

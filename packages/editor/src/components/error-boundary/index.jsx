@@ -144,6 +144,7 @@ class ErrorBoundary extends Component {
 		this.state = {
 			error: null,
 			componentStack: null,
+			content: undefined,
 		};
 	}
 
@@ -155,11 +156,14 @@ class ErrorBoundary extends Component {
 	}
 
 	static getDerivedStateFromError( error ) {
-		return { error };
+		// Read the content now, while rendering. Once the crashed tree
+		// unmounts, the editor provider clears the current post, so
+		// `componentDidCatch` would be too late.
+		return { error, content: getContent() };
 	}
 
 	render() {
-		const { error, componentStack } = this.state;
+		const { error, componentStack, content } = this.state;
 		const { canCopyContent = false } = this.props;
 		if ( ! error ) {
 			return this.props.children;
@@ -178,7 +182,7 @@ class ErrorBoundary extends Component {
 					<Notice.Description>{ description }</Notice.Description>
 					<Notice.Actions>
 						{ canCopyContent && (
-							<CopyButton text={ getContent }>
+							<CopyButton text={ content }>
 								{ __( 'Copy contents' ) }
 							</CopyButton>
 						) }

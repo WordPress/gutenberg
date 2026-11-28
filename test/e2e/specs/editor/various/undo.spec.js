@@ -427,27 +427,10 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
-
-		await expect.poll( editor.getEditedPostContent ).toBe( '' );
-		await expect.poll( undoUtils.getSelection ).toEqual( {} );
 		// After undoing every action, there should be no more undo history.
 		await expect(
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeDisabled();
-
-		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st block.
-
-		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
-		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
-		} );
-		// After redoing one change, the undo button should be enabled again.
-		await expect(
-			page.locator( 'role=button[name="Undo"]' )
-		).toBeEnabled();
 
 		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st paragraph text.
 
@@ -457,6 +440,10 @@ test.describe( 'undo', () => {
 			startOffset: 'This'.length,
 			endOffset: 'This'.length,
 		} );
+		// After redoing one change, the undo button should be enabled again.
+		await expect(
+			page.locator( 'role=button[name="Undo"]' )
+		).toBeEnabled();
 
 		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 2nd block.
 
@@ -567,6 +554,69 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	test( 'should not create an undo level when placing the caret in an empty post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/block-editor' ).getBlockCount()
+				)
+			)
+			.toBe( 1 );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
+	test( 'should not create an undo level when clicking below the content of an empty post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		const canvasRect = await canvas.boundingBox();
+		await page.mouse.click(
+			canvasRect.x + canvasRect.width / 2,
+			canvasRect.y + canvasRect.height - 20
+		);
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/block-editor' ).getBlockCount()
+				)
+			)
+			.toBe( 1 );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
 	test( 'should immediately create an undo level on typing', async ( {
 		editor,
 		page,
@@ -648,16 +698,13 @@ test.describe( 'undo', () => {
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
-			.click(); // third step.
+			.click();
 
 		// Title should be empty
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
 
-		// First undo removes the block.
-		// Second undo restores the title.
-		await pageUtils.pressKeys( 'primary+z' );
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
@@ -696,8 +743,7 @@ test.describe( 'undo', () => {
 				.getByRole( 'button', { name: 'Save' } )
 		).toBeEnabled();
 
-		// Undo new block and content addition.
-		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// This cleanup runs through `withMultiEntityRecordEdits`, which
 		// real-time collaboration bypasses in favor of its own undo manager.

@@ -10,9 +10,9 @@ import type { BlockModule } from './types';
  * @return The block, if it has been successfully registered;
  *                        otherwise `undefined`.
  */
-export default function initBlock(
-	block: BlockModule | undefined
-): BlockType | undefined {
+export default function initBlock<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+>( block: BlockModule< Attributes > | undefined ): BlockType | undefined {
 	if ( ! block ) {
 		return;
 	}
