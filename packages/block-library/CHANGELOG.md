@@ -2,17 +2,297 @@
 
 ## Unreleased
 
-### Internal
+### Enhancements
 
--   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+-   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
+-   Post Title: Add text shadow support ([#87377](https://github.com/WordPress/gutenberg/pull/87377)).
 
 ### Bug Fixes
 
+-   Social Icons: Revert a Logos Only style change with a single Undo, including the icon background it removed or restored ([#87528](https://github.com/WordPress/gutenberg/pull/87528)).
+-   Read More: Strip HTML from the post title in the link's screen-reader text, so a title with a link no longer nests a link inside the Read More link ([#87560](https://github.com/WordPress/gutenberg/pull/87560)).
+-   Social Icon: Show the current Last.fm, SoundCloud and TikTok icons on the front end, matching the editor ([#87509](https://github.com/WordPress/gutenberg/pull/87509)).
+-   Icon: Mark the icon the block uses as the current one in the Icon library, so screen readers can tell which icon is selected ([#87461](https://github.com/WordPress/gutenberg/pull/87461)).
+-   Comments Title: Handle a comment count returned as an integer by the `get_comments_number` filter, so the title stays hidden when there are no comments and uses the singular wording for one comment ([#66357](https://github.com/WordPress/gutenberg/pull/66357)).
+-   Classic: Keep the Classic Editor modal open when Escape is pressed in the TinyMCE toolbar, so focus returns to the editor and unsaved changes aren't lost ([#87449](https://github.com/WordPress/gutenberg/pull/87449)).
+-   Paragraph: Keep the drop cap while the paragraph has focus, so the caret lands where you click ([#87422](https://github.com/WordPress/gutenberg/pull/87422)).
+-   Avatar: Output nothing when there's no avatar to show, such as when avatars are turned off or for pingbacks, instead of an empty link or wrapper ([#87128](https://github.com/WordPress/gutenberg/pull/87128)).
+-   Accordion: Don't throw an error when an Accordion Heading is clicked before its item is initialized on page load ([#87325](https://github.com/WordPress/gutenberg/pull/87325)).
+-   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
+-   Breadcrumbs: Render HTML in the posts page title, as for other post titles, instead of showing the tags as text ([#87125](https://github.com/WordPress/gutenberg/pull/87125)).
+-   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#87087](https://github.com/WordPress/gutenberg/pull/87087)).
+-   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
+-   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Breadcrumbs, auto-registered PHP-only blocks: Don't pass `post_id` to the block-renderer endpoint when the current user can't edit the post referenced by the `postId` block context, which made the request fail with a 403 error; render without post context instead ([#80604](https://github.com/WordPress/gutenberg/pull/80604)).
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
+-   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
+-   Table of Contents: Count a locked or renamed Page Break as one page on the front end, so heading links open the right page and "Only include current page" lists that page's headings ([#86231](https://github.com/WordPress/gutenberg/pull/86231)).
+-   Gallery: In a multiselection, hide the settings that only apply to the first gallery, such as Link, Detach, Source, Order by, Resolution, Open images in new tab, and Aspect ratio ([#87374](https://github.com/WordPress/gutenberg/pull/87374)).
+-   Search: Don't close the expandable search field when Escape is pressed to cancel an IME composition ([#87357](https://github.com/WordPress/gutenberg/pull/87357)).
+-   Navigation: Don't close the overlay menu when Escape is pressed to cancel an IME composition ([#87363](https://github.com/WordPress/gutenberg/pull/87363)).
+-   Table: Account for merged cells (`colspan` and `rowspan`) when inserting or deleting a row, or adding a header or footer, so the table keeps the right number of cells per row ([#77952](https://github.com/WordPress/gutenberg/pull/77952)).
+-   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
+-   Post Excerpt: Add the post title to the "Read more" link for screen readers, as the Read More block does ([#80454](https://github.com/WordPress/gutenberg/pull/80454)).
+-   Table: Account for merged cells (`colspan` and `rowspan`) when inserting, deleting or aligning a column, so the action applies to the right cells and the table stays aligned ([#86811](https://github.com/WordPress/gutenberg/pull/86811)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 12.2.0 (2026-11-18)
+
+### Enhancements
+
+-   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
+-   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
+-   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).
+-   Post Navigation Link: Use the UI SelectControl for the Filter by taxonomy setting ([#86557](https://github.com/WordPress/gutenberg/pull/86557)).
+-   Navigation: Use the UI SelectControl for the Overlay template setting ([#86619](https://github.com/WordPress/gutenberg/pull/86619)).
+-   Terms Query: Use the UI SelectControl for the Taxonomy and Order by settings ([#86558](https://github.com/WordPress/gutenberg/pull/86558)).
+-   Query Loop: Use the UI SelectControl for the Post type, Order by, and Sticky posts settings ([#86560](https://github.com/WordPress/gutenberg/pull/86560)).
+-   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
+-   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
+-   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
+-   Cover: Remove the `data-object-fit` and `data-object-position` attributes from the saved markup; they were only read by the `object-fit-polyfill` removed in [#34536](https://github.com/WordPress/gutenberg/pull/34536) ([#86895](https://github.com/WordPress/gutenberg/pull/86895)).
+
+### Bug Fixes
+
+-   Embed: Keep the Amazon Kindle title and icon after a URL is embedded, and stop the provider slug changing on each save ([#87016](https://github.com/WordPress/gutenberg/pull/87016)).
+-   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
+-   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
+-   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing ([#86656](https://github.com/WordPress/gutenberg/pull/86656)).
+-   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
+-   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
+-   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
+-   Template Part: Show each template part's own description in the inserter, instead of discarding it ([#86102](https://github.com/WordPress/gutenberg/pull/86102)).
+-   Social Link: Stop automatically adding `noopener` to links ([#86494](https://github.com/WordPress/gutenberg/pull/86494)).
+-   Template Part: Allow a template part to be inserted inside a Post Template, keeping the restriction for Post Content ([#86377](https://github.com/WordPress/gutenberg/pull/86377)).
+-   Gallery: Stop automatically adding `noopener` to links ([#86489](https://github.com/WordPress/gutenberg/pull/86489)).
+-   Image, Audio, Video: Keep the block's media and its details when a Replace upload fails, instead of returning to the placeholder ([#86290](https://github.com/WordPress/gutenberg/pull/86290)).
+-   Tabs: Keep the arrow keys moving between tabs when the Tabs block has an HTML anchor, and stop the Arrow, Home and End keys from moving focus out of fields inside a tab panel ([#86373](https://github.com/WordPress/gutenberg/pull/86373)).
+-   Post Author: Lowercase the "(no author)" option of the author selector, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Tabs: Open the tab panels when an HTML anchor on the Tabs block or a Tab Panel contains a character such as `&` or `'`, instead of leaving them hidden ([#86415](https://github.com/WordPress/gutenberg/pull/86415)).
+-   Tabs: Keep the default tab on the same tab when tabs are added, removed or reordered, and show the first tab when the saved default tab no longer exists, instead of hiding every panel ([#86362](https://github.com/WordPress/gutenberg/pull/86362)).
+-   Tabs: Swap the Left and Right arrow keys on RTL sites, so each key moves focus to the tab it points to ([#86429](https://github.com/WordPress/gutenberg/pull/86429)).
+-   Post Date: Show today's date instead of "Invalid date" in the editor when the block is bound to the post's publish or modified date and there is no post to read it from, such as when editing a template ([#86465](https://github.com/WordPress/gutenberg/pull/86465)).
+-   Paragraph: Float the drop cap to the start of the paragraph's own text direction, so it drops again on RTL sites and drops on the correct side when a paragraph's direction differs from the site's ([#86464](https://github.com/WordPress/gutenberg/pull/86464)).
+-   Latest Posts: Stop automatically adding `noopener` to links ([#86491](https://github.com/WordPress/gutenberg/pull/86491)).
+-   Table of Contents, Heading: Leave the LaTeX source of inline math out of Table of Contents entries and auto-generated heading anchors, so a heading such as "Solving x²" no longer lists as "Solving x2x^2" ([#86043](https://github.com/WordPress/gutenberg/pull/86043)).
+-   Button: Fix 100% width buttons saved before the width block support shrinking to fit their text in vertical Buttons blocks ([#86536](https://github.com/WordPress/gutenberg/pull/86536)).
+-   Accordion: Rename the Icon Position options from Left and Right to Start and End, so the labels are correct on RTL sites, where the heading mirrors ([#86586](https://github.com/WordPress/gutenberg/pull/86586)).
+-   RSS: Show the correct date and time for feed items published in the other daylight saving period, instead of an hour off, which could also show the wrong day ([#86639](https://github.com/WordPress/gutenberg/pull/86639)).
+-   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
+-   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
+-   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
+-   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
+-   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
+-   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#86728](https://github.com/WordPress/gutenberg/pull/86728)).
+-   Separator: Show the Default and Wide styles inside Row and Stack blocks, where they collapsed to a width of zero, by filling the free space of the Row or the width of the Stack ([#80308](https://github.com/WordPress/gutenberg/pull/80308)).
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 12.1.0 (2026-11-04)
+
+### Enhancements
+
+-   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
+-   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
+-   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).
+-   Audio: Use the UI SelectControl for the Preload setting ([#86194](https://github.com/WordPress/gutenberg/pull/86194)).
+-   List: Use the UI SelectControl for the List style setting ([#86141](https://github.com/WordPress/gutenberg/pull/86141)).
+-   Latest Comments: Use the UI SelectControl for the Display content setting ([#86138](https://github.com/WordPress/gutenberg/pull/86138)).
+-   Post Author: Use the UI SelectControl for the Avatar size setting ([#86160](https://github.com/WordPress/gutenberg/pull/86160)).
+-   Archives: Use the UI SelectControl for the Group by setting ([#86137](https://github.com/WordPress/gutenberg/pull/86137)).
+-   Separator, Table of Contents: Migrate SelectControl consumers to @wordpress/ui ([#86047](https://github.com/WordPress/gutenberg/pull/86047)).
+-   Playlist: Use the UI SelectControl for the Order and Shape settings ([#86161](https://github.com/WordPress/gutenberg/pull/86161)).
+-   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Social Icon: Add Link to and View controls to inspector Content tab ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
+
+### Bug Fixes
+
+-   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
+-   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
+-   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).
+-   Paragraph: Allow removal of saved drop caps when the active theme disables the feature ([#84839](https://github.com/WordPress/gutenberg/pull/84839)).
+-   Playlist, Playlist Track: Allow tracks without an attachment ID to render on the front end if they have a source URL ([#83880](https://github.com/WordPress/gutenberg/pull/83880)).
+-   Playlist Track: Keep the track's title, artist, album, image and length when a Replace upload fails ([#86018](https://github.com/WordPress/gutenberg/pull/86018)).
+-   Math: Let keyboard users move focus out of the LaTeX field when the formula has an error, instead of sending focus back to the field ([#86027](https://github.com/WordPress/gutenberg/pull/86027)).
+-   Navigation Link, Navigation Submenu: Keep the bold, italic, and other formatting of the text when editing it in the sidebar's Text field ([#85223](https://github.com/WordPress/gutenberg/pull/85223)).
+-   Playlist: Keep `&` intact in track audio and image URLs on the front end, so URLs with several query parameters, such as signed CDN or S3 links, load instead of being cut off at the first `&` ([#85931](https://github.com/WordPress/gutenberg/pull/85931)).
+-   Paragraph: Don't show an empty group in the block toolbar when the theme offers neither text alignment nor wide alignment ([#85796](https://github.com/WordPress/gutenberg/pull/85796)).
+-   Image: Position the lightbox trigger button against the `.wp-lightbox-container` figure instead of the image's parent element, so the button stays over the image when a plugin wraps the `img` in a `picture` element ([#82312](https://github.com/WordPress/gutenberg/pull/82312)).
+-   Page List: Keep page items visible in the Navigation sidebar during content-only editing ([#85357](https://github.com/WordPress/gutenberg/pull/85357)).
+-   Template Part: Show the "Default based on area" HTML element as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Comments Next Page: Remove the link attributes filter after rendering, so it no longer stays attached to `next_comments_link_attributes` for the rest of the page load ([#85244](https://github.com/WordPress/gutenberg/pull/85244)).
+-   Navigation: Apply a block's Additional CSS only to its outer wrapper, so borders and padding do not appear twice on its inner list ([#84881](https://github.com/WordPress/gutenberg/pull/84881)).
+-   Navigation: Apply Additional CSS set in Global Styles only to the block's outer wrapper, so borders and padding do not appear twice on its inner list ([#85366](https://github.com/WordPress/gutenberg/pull/85366)).
+-   Heading: Generate anchors with `cleanForSlug`, so headings in scripts like Devanagari, Tamil and Bengali keep their vowel signs, and anchors follow the same rules as post slugs ([#85096](https://github.com/WordPress/gutenberg/pull/85096)).
+-   Media & Text: Restore the content area's default padding in classic themes whose CSS reset sets `padding: 0` on `div`, which overrode it on the front end since the padding's specificity was lowered. Theme overrides keep working ([#85200](https://github.com/WordPress/gutenberg/pull/85200)).
+-   Image: Only use own properties when looking up view script state by an ID from the context. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Image, Playlist: Use the HTML API to insert the lightbox button and the waveform player. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
+-   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
+-   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
+
+## 12.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Term Count: Reuse filtered terms from Term Template so changes made through the `get_terms` filter appear on the front end without a separate query for each count ([#84119](https://github.com/WordPress/gutenberg/pull/84119)).
+-   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
+-   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).
+-   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
+-   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
+-   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
+-   Post Navigation Link: Add background image, size, and gradient support, withheld from the empty wrapper the same way as border, shadow and spacing ([#83940](https://github.com/WordPress/gutenberg/pull/83940)).
+-   Post Title: Add Fit text support, so the title can resize to fill its container ([#83036](https://github.com/WordPress/gutenberg/pull/83036)).
+
+### Bug Fixes
+
+-   Media & Text: Replace deprecated `word-break: break-word` and prevent long content from widening the text column. Nested blocks that only override `word-break` can now wrap long unbroken text mid-word ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
+-   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
+-   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
+-   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
+-   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
+-   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
+-   Navigation Link: Apply the "Open in new tab" setting from the link popover. Clicking Apply dropped the change, so the setting could only be changed from the block settings sidebar. The Submenu block had the same problem ([#83506](https://github.com/WordPress/gutenberg/pull/83506)).
+
+## 11.2.0 (2026-10-07)
+
+### Enhancements
+
+-   Icon: Group the "All" tab of the icon library by collection, under a heading that stays at the top while scrolling, when more than one collection is registered.
+-   Navigation Link: Search every entity type from the link UI instead of only the link's own type; so a category, tag or post can be added without needing to add that specific type's navigation link block ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
+-   Navigation Link: List the blocks a Navigation allows in the link UI search results, so typing "Home" finds the Home Link block ([#83652](https://github.com/WordPress/gutenberg/pull/83652)).
+-   Cover: Don't autoplay an embedded background video on the front end when the visitor prefers reduced motion. A new view module swaps the iframe source for one without the autoplay parameters ([#83452](https://github.com/WordPress/gutenberg/pull/83452)).
+-   Columns: Remove the column count slider from the block settings ([#83262](https://github.com/WordPress/gutenberg/pull/83262)).
+-   Avatar: Explain in the block settings that avatars use the Gravatar service, and link users who can manage settings to the Discussion settings where the default avatar is chosen ([#83567](https://github.com/WordPress/gutenberg/pull/83567)).
+-   Media & Text: Lower the specificity of the content area's default padding so themes can override it, including through the block's custom CSS in `theme.json` ([#83563](https://github.com/WordPress/gutenberg/pull/83563)).
+-   Gallery: Add an "Order by" sorting control to the static gallery mode, and consolidate sorting control for static and dynamic modes in the Settings panel ([#83438](https://github.com/WordPress/gutenberg/pull/83438)).
+-   Icon: Match an icon's keywords as well as its name and label when searching the icon library ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
+-   Button: Only open the link popover from the toolbar button or keyboard shortcut instead of whenever a linked button is selected. The toolbar button now shows a pressed state when a link is set ([#30166](https://github.com/WordPress/gutenberg/pull/30166)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+-   Image, Cover: Restore the previous attachment with snackbar Undo, including attachment-derived Image attributes while preserving Cover settings ([#81805](https://github.com/WordPress/gutenberg/pull/81805)).
+
+### Bug Fixes
+
+-   Custom HTML: Keep a block whose markup renders nothing in the editor, such as a script or an empty container a third-party script fills in, selectable. The block takes no space, as on the front end, and a marker floats next to it that selects the block when clicked ([#84150](https://github.com/WordPress/gutenberg/pull/84150)).
+-   Tag Cloud: Space the tags of the Outline style evenly. The base link margin outranked the style's own reset, so each tag carried that margin on top of the container's gap and the horizontal spacing did not match the spacing between rows ([#70224](https://github.com/WordPress/gutenberg/pull/70224)).
+-   Image: Stop a click on the enlarged image from closing the lightbox, so tapping the image to inspect it, or mis-tapping while reaching for Previous or Next, no longer dismisses it. The Close button, Escape and the area around the image still close the lightbox ([#78898](https://github.com/WordPress/gutenberg/pull/78898)).
+-   Math: Align the cells of `aligned` and `cases`, and draw `\overline` and `\underline`, in Chromium, in the Math block and in inline math. The rules key on the MathML attributes and only apply where the engine does not render them natively ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).
+-   Image: Fix the lightbox being impossible to close when its overlay is not a direct child of `<body>` ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Stop the lightbox from removing `inert` that a theme set on elements outside the overlay ([#83480](https://github.com/WordPress/gutenberg/pull/83480)).
+-   Image: Show the original image proportions in the lightbox and animate the thumbnail crop during zooming ([#79058](https://github.com/WordPress/gutenberg/pull/79058)).
+-   Template Part: Fall back to the theme's template part file and report the error with `wp_trigger_error()` when the customized template part can't be loaded, instead of rendering nothing and logging an `Undefined property: WP_Error::$content` warning ([#83809](https://github.com/WordPress/gutenberg/pull/83809)).
+-   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81584](https://github.com/WordPress/gutenberg/pull/81584)).
+-   Image: Percent-encode the inline SVG in the circle-mask style's `mask-image`, and drop the malformed `;utf8` media type parameter, so audit tools no longer report the data URI as an invalid `url()` value ([#82333](https://github.com/WordPress/gutenberg/pull/82333)).
+
+### Internal
+
+-   Playlist: Update `@arraypress/waveform-player` to `^1.27.0` and import its `no-autoinit` entry, replacing the dependency patch ([#83132](https://github.com/WordPress/gutenberg/pull/83132)).
+
+## 11.1.0 (2026-09-23)
+
+### Enhancements
+
+-   Site Tagline: Add Fit text support ([#83034](https://github.com/WordPress/gutenberg/pull/83034)).
+-   Post Navigation Link: Add border and spacing support. The block renders an empty wrapper when there is no adjacent post, so both supports skip serialization and the styles are applied only when a link renders ([#83122](https://github.com/WordPress/gutenberg/pull/83122)).
+-   Post Navigation Link: Add shadow support, withheld from the empty wrapper the same way ([#83058](https://github.com/WordPress/gutenberg/pull/83058)).
+-   Icon: Don't render icons from non-public icon collections on the front end, since they aren't available in the editor anyway ([#82774](https://github.com/WordPress/gutenberg/pull/82774)).
+
+### Bug Fixes
+
+-   Image: The resize box no longer takes the pointer from the image while the block is selected, so the image has its context menu and is the source of a drag by it; the resize handles are unaffected ([#72983](https://github.com/WordPress/gutenberg/pull/72983)).
+-   Navigation: Stop the flyout `min-width` from applying to always-open submenus. Hovering, focusing or selecting an item in a vertical menu with submenus set to always show forced its inline submenu to at least 200px and made the menu re-wrap ([#83142](https://github.com/WordPress/gutenberg/pull/83142)).
+-   Math: Read the LaTeX source from the `<annotation>` inside the saved `<math>` instead of the block comment, so `&` and `<` survive `wp_kses` for users without `unfiltered_html`. Input that cannot be rendered is saved as an annotation-only `<semantics>`, which browsers display as the source text ([#82987](https://github.com/WordPress/gutenberg/pull/82987)).
+-   Image: Inject the lightbox trigger with a literal string replacement instead of `preg_replace`, so `$` and `\` sequences in author-controlled image attributes (such as a price in the alt text) are no longer interpreted as regex backreferences and silently removed ([#79369](https://github.com/WordPress/gutenberg/pull/79369)).
+-   Cover: Grow the block with its content in Safari when an aspect ratio is set, instead of clipping the overflow. WebKit locks the box to the ratio where other engines let content expand it ([#70152](https://github.com/WordPress/gutenberg/pull/70152)).
+-   Query Pagination: Remove the editor-only `margin: 0` override on the block wrapper so the parent layout's block gap applies in the canvas as it does on the front end ([#82399](https://github.com/WordPress/gutenberg/pull/82399)).
+-   Navigation: Reset the submenu detection for each rendered block. Once a Navigation with a submenu rendered, every Navigation rendered afterwards in the same request was treated as having one and loaded the navigation view module it does not need ([#82366](https://github.com/WordPress/gutenberg/pull/82366)).
+-   Gallery: Skip the generated gap styles, and the unique classname that scopes them, for themes opting out of layout styles via `add_theme_support( 'disable-layout-styles' )` ([#81633](https://github.com/WordPress/gutenberg/pull/81633)).
+-   Term Name: Apply the term name display filters when rendering, so adjustments plugins make to term names take effect and the name is escaped in the heading and link markup ([#82365](https://github.com/WordPress/gutenberg/pull/82365)).
+
+### Internal
+
+-   Button: Replace deprecated `word-break: break-word` with `word-break: normal` and `overflow-wrap: anywhere` to clear the Stylelint suppression ([#82854](https://github.com/WordPress/gutenberg/pull/82854)).
+
+## 11.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
+
+### Enhancements
+
+-   Navigation Link: emit `@wordpress/ui` `Badge` intents for the link preview badges, replacing the private `@wordpress/components` `Badge` vocabulary. Draft, Scheduled and Pending previously shared one `warning` intent; Draft and Pending now read as `low` and Scheduled as `informational` ([#82684](https://github.com/WordPress/gutenberg/pull/82684)).
+-   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
+-   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
+-   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
+-   Gallery: Support viewport-specific aspect ratios, in every Gallery layout and in dynamic galleries. ([#82233](https://github.com/WordPress/gutenberg/pull/82233))
+
+### Bug Fixes
+
+-   Navigation: Give the block appender an explicit width so it renders square, matching the appender in other container blocks ([#82718](https://github.com/WordPress/gutenberg/pull/82718)).
+-   Footnotes: Prefix newly created footnote IDs with `fn-` so they always start with a letter. A bare UUID often starts with a digit, and an ID that does is not a valid CSS identifier, so `querySelector( '#' + id )` threw and `#id` style rules never matched. Existing footnotes keep their IDs ([#82398](https://github.com/WordPress/gutenberg/pull/82398)).
+-   Navigation: Restore `flex-grow` on the menu container in the editor, where the visually hidden menu description breaks the `:only-child` selector the front end relies on, so the "Space between" and other justification settings apply in the canvas as they do on the front end ([#78447](https://github.com/WordPress/gutenberg/pull/78447)).
+-   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
+-   Tabs: Activate the tab that a URL hash points into, so an anchor set on a block inside a tab panel can be reached. Anchor links followed after the page has loaded are handled too, matching the Accordion block ([#81744](https://github.com/WordPress/gutenberg/pull/81744)).
+-   Accordion Panel: Reset padding-block when panel is hidden ([#81782](https://github.com/WordPress/gutenberg/pull/81782)).
+-   Query: Stop writing `excludeCurrent: null` into the `query` attribute of blocks that never had the key. The mount effect that clears a stale exclusion treated the absent key as stale, changing the serialized markup of every pre-existing Query block as soon as the editor opened it ([#82147](https://github.com/WordPress/gutenberg/pull/82147)).
+-   Icon: Preserve intrinsic SVG styles when applying block styles or rotation, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
+-   Image: Keep the selected image size, and re-point a media file or attachment page link, when an edit in the media editor saves to a new attachment. Cropping, rotating or flipping left the block rendering the full-size file while the size control still reported the size the user had chosen, and left the link pointing at the pre-edit image ([#82316](https://github.com/WordPress/gutenberg/pull/82316)).
+-   Query, Post Template: Treat a `query` attribute that omits `postType` as querying posts, matching `build_query_vars_from_query_block()` ([#82465](https://github.com/WordPress/gutenberg/pull/82465)).
+
+### Internal
+
+-   Search: Keep the editor's button icon fill-based and separate from `@wordpress/icons` so it matches the PHP renderer and existing theme `fill` styles. ([#82338](https://github.com/WordPress/gutenberg/pull/82338))
+-   Remove unused dependencies `@wordpress/keyboard-shortcuts`, `@wordpress/reusable-blocks` and `@wordpress/viewport` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 10.5.0 (2026-08-26)
+
+### Enhancements
+
+-   Gallery: Support viewport-specific column counts and image cropping in the Flex layout.
+-   `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+-   Site Title: Add Fit text support, so the title can resize to fill its container as it already can in the Heading and Paragraph blocks ([#82074](https://github.com/WordPress/gutenberg/pull/82074)).
+
+### Internal
+
+-   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+-   Math: Use `ValidatedTextareaControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedTextareaControl` from the `@wordpress/components` private APIs ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
+
+### Enhancements
+
+-   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.([#81909](https://github.com/WordPress/gutenberg/pull/81909)).
+
+### Bug Fixes
+
+-   Audio: Explain in the Autoplay help text that browsers block audio until a visitor interacts with the page ([#69978](https://github.com/WordPress/gutenberg/pull/69978)).
+-   Cover: Use the new toggle-button presentation for the placeholder overlay color palette ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
+-   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
+-   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Playlist: Prevent track selector fallback values from triggering `useSelect` stability warnings.
+-   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
+-   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
 -   Tabs: Number the generated tab IDs from 1 and keep them sequential, so IDs generated by other blocks on the page no longer shift the numbering ([#81781](https://github.com/WordPress/gutenberg/pull/81781)).
+-   Playlist: Stop sharing the parent "Add track" toolbar control with selected Playlist Track child blocks ([#81432](https://github.com/WordPress/gutenberg/pull/81432)).
+-   Tabs: Hide inactive tab panels with `until-found` so the browser's find-in-page can reach their content, and activate the matching tab when the browser reveals a panel. Panels are also taken out of the tab sequence while hidden, since a panel hidden with `until-found` keeps a layout box ([#81712](https://github.com/WordPress/gutenberg/issues/81712)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
+-   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   Accordion Heading: Declare the spacing selector in the block's `selectors` map, so padding set in `theme.json` or Global Styles applies to the toggle button the block writes its own padding to, rather than to the heading wrapper where it could not lower the default ([#81976](https://github.com/WordPress/gutenberg/pull/81976)).
 
 ## 10.4.0 (2026-08-12)
 
@@ -136,6 +416,23 @@
 
 ## 9.34.0 (2025-10-29)
 
+## 9.33.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 9.33.12 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.33.11 (2026-08-06)
 
 ### Bug Fixes
@@ -179,6 +476,23 @@
 
 -   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
 
+## 9.19.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 9.19.8 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.19.7 (2026-08-06)
 
 ### Bug Fixes
@@ -207,6 +521,23 @@
 
 ## 9.9.0 (2024-10-03)
 
+## 9.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 9.8.19 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+-   Image: Only use own properties when looking up view script state by an ID from the context.
+-   Categories: Don't run the dropdown label through `sprintf()`.
+
 ## 9.8.18 (2026-08-06)
 
 ### Bug Fixes
@@ -232,6 +563,21 @@
 ## 9.2.0 (2024-06-26)
 
 ## 9.1.0 (2024-06-15)
+
+## 9.0.11 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 9.0.10 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
 
 ## 9.0.9 (2026-08-06)
 
@@ -264,6 +610,21 @@
 
 ## 8.29.0 (2024-02-21)
 
+## 8.28.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 8.28.14 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 8.28.13 (2026-08-06)
 
 ### Bug Fixes
@@ -292,6 +653,21 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 8.19.20 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+-   Image: Use the HTML API to insert the lightbox button.
+
 ## 8.19.19 (2026-08-06)
 
 ### Bug Fixes
@@ -311,6 +687,20 @@
 ## 8.14.0 (2023-07-05)
 
 ## 8.13.0 (2023-06-23)
+
+## 8.12.23 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 8.12.22 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 8.12.21 (2026-08-06)
 
@@ -335,6 +725,20 @@
 ## 8.5.0 (2023-03-01)
 
 ## 8.4.0 (2023-02-15)
+
+## 8.3.19 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 8.3.18 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 8.3.17 (2026-08-06)
 
@@ -363,6 +767,20 @@
 ## 7.16.0 (2022-10-05)
 
 ## 7.15.0 (2022-09-21)
+
+## 7.14.18 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 7.14.17 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
 
 ## 7.14.16 (2026-08-06)
 
@@ -404,6 +822,20 @@
 
 ## 7.4.0 (2022-04-21)
 
+## 7.3.22 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 7.3.21 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link, Comments Pagination: Escape the link labels before rendering.
+
 ## 7.3.20 (2026-08-06)
 
 ### Bug Fixes
@@ -439,6 +871,19 @@
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
 
+## 6.0.34 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
+## 6.0.33 (2026-10-28)
+
+### Bug Fixes
+
+-   Post Navigation Link: Escape the link label before rendering.
+
 ## 6.0.32 (2026-08-06)
 
 ### Bug Fixes
@@ -467,6 +912,12 @@
 
 -   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
 
+## 3.2.23 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 3.2.22 (2026-08-06)
 
 ### Bug Fixes
@@ -493,6 +944,12 @@
 ### Bug Fixes
 
 -   Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))
+
+## 2.28.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.28.0 (2021-02-01)
 
@@ -522,6 +979,12 @@
 
 -   File Block: Copy url button is moved to Block toolbar.
 
+## 2.26.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.23.0 (2020-09-03)
 
 ### Enhancements
@@ -532,12 +995,30 @@
 
 -   Add heading level controls to Site Title block.
 
+## 2.22.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
+## 2.14.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.12.0 (2020-01-13)
 
 ### Bug Fixes
 
 -   Fixes a regression published in version 2.9.2 that would prevent some build tools from including
     styles provided in the packages build-styles directory.
+
+## 2.9.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.7.0 (2019-08-05)
 
@@ -569,6 +1050,12 @@
 
 -   fix uncaught error in `columns` block due to accessing a property on an object that might be undefined [#14605](https://github.com/WordPress/gutenberg/pull/14605)
 
+## 2.4.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.3.0 (2019-03-06)
 
 ### New Features
@@ -576,6 +1063,12 @@
 -   Add background color controls for the table block.
 -   Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).
 -   Add new `Search` block ([#13583](https://github.com/WordPress/gutenberg/pull/13583)).
+
+## 2.2.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.2.12 (2019-01-03)
 

@@ -5,10 +5,9 @@ import { useMergeRefs } from '@wordpress/compose';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
-import { ThemeProvider } from '../utils/theme-provider';
 import { DialogValidationProvider, useDialogModal } from './context';
 import { Portal } from './portal';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { PopupProps } from './types';
 
 const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
@@ -51,24 +50,22 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					data-testid="dialog-backdrop"
 				/>
 			) }
-			<ThemeProvider>
-				<_Dialog.Popup
-					ref={ mergedRef }
-					className={ clsx(
-						styles.popup,
-						className,
-						styles[ `is-${ size }` ]
-					) }
-					initialFocus={ resolvedInitialFocus }
-					finalFocus={ finalFocus }
-					{ ...props }
-					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
-				>
-					<DialogValidationProvider>
-						{ children }
-					</DialogValidationProvider>
-				</_Dialog.Popup>
-			</ThemeProvider>
+			<_Dialog.Popup
+				ref={ mergedRef }
+				className={ clsx(
+					styles.popup,
+					className,
+					styles[ `is-${ size }` ]
+				) }
+				initialFocus={ resolvedInitialFocus }
+				finalFocus={ finalFocus }
+				{ ...props }
+				data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
+			>
+				<DialogValidationProvider>
+					{ children }
+				</DialogValidationProvider>
+			</_Dialog.Popup>
 		</>
 	);
 

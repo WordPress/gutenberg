@@ -56,7 +56,7 @@ export function generateRule(
 					key: ruleKey,
 					value: getCSSValueFromRawStyle( styleValue ),
 				},
-		  ]
+			]
 		: [];
 }
 

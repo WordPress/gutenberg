@@ -2,13 +2,13 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import {
 	FlexBlock,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import RouterLinkItem from '../router-link-item';
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
-import './style.scss';
+import styles from './style.module.scss';
 
 interface NavigationItemProps {
 	/**
@@ -55,21 +55,18 @@ export default function NavigationItem( {
 	if ( isExternal ) {
 		// Render as a regular anchor tag for external URLs
 		return (
-			<Item
+			<WCItem
 				as="a"
 				href={ to }
-				className={ clsx( 'boot-navigation-item', className ) }
+				className={ clsx( styles.item, className ) }
 			>
 				{ content }
-			</Item>
+			</WCItem>
 		);
 	}
 
 	return (
-		<RouterLinkItem
-			to={ to }
-			className={ clsx( 'boot-navigation-item', className ) }
-		>
+		<RouterLinkItem to={ to } className={ clsx( styles.item, className ) }>
 			{ content }
 		</RouterLinkItem>
 	);

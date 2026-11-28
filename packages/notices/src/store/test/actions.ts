@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import {
 	createNotice,
 	createSuccessNotice,
@@ -109,6 +110,7 @@ describe( 'actions', () => {
 					onDismiss: undefined,
 				},
 			} );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

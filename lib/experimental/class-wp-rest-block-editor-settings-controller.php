@@ -92,19 +92,34 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		public function get_items( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis
 			// Simplified context handling: mobile vs default.
 			// Only 'mobile' context is special; everything else uses the default editor context.
-			$context_param       = $request->get_param( 'context' );
-			$editor_context_name = 'mobile' === $context_param ? 'core/mobile' : 'core/edit-post';
+			$is_mobile           = 'mobile' === $request->get_param( 'context' );
+			$editor_context_name = $is_mobile ? 'core/mobile' : 'core/edit-post';
 
-			// Apply mobile-specific settings filter only for mobile context.
-			if ( 'mobile' === $context_param ) {
+			/*
+			 * The default settings serve the site editor, but they are built for
+			 * core/edit-post without a post, where Core never grants
+			 * edit_block_binding. Check it with the site editor context, as
+			 * site-editor.php does. It runs before any other filter, so plugins
+			 * can still change the value.
+			 */
+			$set_can_update_block_bindings = static function ( $settings ) {
+				$settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) ) );
+				return $settings;
+			};
+
+			if ( $is_mobile ) {
 				add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+			} else {
+				add_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
 			$settings       = get_block_editor_settings( array(), $editor_context );
 
-			if ( 'mobile' === $context_param ) {
+			if ( $is_mobile ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+			} else {
+				remove_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			return rest_ensure_response( $settings );
@@ -357,6 +372,13 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 			remove_action( 'admin_print_styles', 'print_emoji_styles' );
 
+			// Before block registration: `registerBlockType()` drops an unknown `category`.
+			wp_add_inline_script(
+				'wp-block-library',
+				'wp.blocks.setCategories(' . wp_json_encode( get_block_categories( new WP_Block_Editor_Context() ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');',
+				'before'
+			);
+
 			// Preload blocks - this creates inline scripts.
 			$server_block_settings = get_block_editor_server_block_settings();
 			wp_add_inline_script(
@@ -384,7 +406,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				);
 			}
 
-			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) );';
+			/*
+			 * The experimental blocks are registered as the classic site editor
+			 * registers them, so that both site editors offer the same blocks.
+			 * The function is only defined in the Gutenberg plugin.
+			 */
+			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.blockLibrary.__experimentalRegisterExperimentalCoreBlocks?.( { enableFSEBlocks: true } ); wp.editor.registerCoreBlockBindingsSources();';
 			wp_add_inline_script(
 				'wp-block-library',
 				$load_blocks_scripts,
@@ -396,8 +423,20 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_enqueue_script( 'wp-block-library' );
 			wp_enqueue_style( 'wp-editor' );
 			wp_enqueue_style( 'wp-block-library' );
+			// Block editor UI outside the canvas, such as inspector controls.
+			wp_enqueue_style( 'wp-block-library-editor' );
 			wp_enqueue_style( 'wp-format-library' );
 			wp_enqueue_media();
+
+			/*
+			 * Block style variations provided by the theme's theme.json
+			 * partials are registered lazily, when the theme JSON resolver
+			 * first runs in a request. Nothing has run it in this REST
+			 * request yet, so prime it — otherwise the block styles registry
+			 * is still empty when `enqueue_editor_block_styles_assets()`
+			 * serializes it into the `wp-block-styles` inline script below.
+			 */
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
 			do_action( 'enqueue_block_editor_assets' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 

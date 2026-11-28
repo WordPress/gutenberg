@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Count words separated by a non-breaking space or another Unicode space as separate words ([#87026](https://github.com/WordPress/gutenberg/pull/87026)).
+
+## 5.2.0 (2026-11-18)
+
+## 5.1.0 (2026-11-04)
+
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+## 4.54.0 (2026-08-26)
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

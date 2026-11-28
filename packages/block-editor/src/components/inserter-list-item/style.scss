@@ -37,14 +37,15 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	color: $gray-900;
 	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
 	cursor: var(--wpds-cursor-control);
 	background: transparent;
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: break-word;
 	@media not ( prefers-reduced-motion ) {
 		transition: all 0.05s ease-in-out;
 	}

@@ -1,18 +1,21 @@
 import { useState, useMemo } from '@wordpress/element';
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Icon, Stack } from '@wordpress/ui';
 import { starFilled } from '@wordpress/icons';
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
+import { spaceImage } from '../../dataviews/stories/fixtures';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
-	title: 'DataViews/FieldTypes',
+	parameters: {
+		// FIXME: Helper text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
+	id: 'dataviews-fieldtypes',
+	title: 'Design System/DataViews/FieldTypes',
 	component: DataForm,
 	argTypes: {
 		type: {
@@ -75,26 +78,7 @@ const meta = {
 };
 export default meta;
 
-const DollarPrefix = () => (
-	<InputControlPrefixWrapper>
-		<span>$</span>
-	</InputControlPrefixWrapper>
-);
-const StarIconPrefix = () => (
-	<InputControlPrefixWrapper variant="icon">
-		<WCIcon icon={ starFilled } />
-	</InputControlPrefixWrapper>
-);
-const PercentSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>%</span>
-	</InputControlSuffixWrapper>
-);
-const USDSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>USD</span>
-	</InputControlSuffixWrapper>
-);
+const StarIconPrefix = () => <Icon icon={ starFilled } />;
 type DataType = {
 	id: number;
 	text: string;
@@ -170,9 +154,8 @@ const data: DataType[] = [
 		urlWithElements: 'https://example.com',
 		password: 'secretpassword123',
 		passwordWithElements: 'secretpassword123',
-		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
-		mediaWithElements:
-			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+		media: spaceImage( 'moon' ),
+		mediaWithElements: spaceImage( 'moon' ),
 		array: [ 'item1', 'item2', 'item3' ],
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
@@ -495,15 +478,15 @@ const fields: Field< DataType >[] = [
 		description: 'Help for media with elements.',
 		elements: [
 			{
-				value: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+				value: spaceImage( 'moon' ),
 				label: 'Moon',
 			},
 			{
-				value: 'https://live.staticflickr.com/8151/7651156426_e047f4d219_z.jpg',
+				value: spaceImage( 'mars' ),
 				label: 'Mars',
 			},
 			{
-				value: 'https://live.staticflickr.com/3762/9460163562_964fe6af07_z.jpg',
+				value: spaceImage( 'earth' ),
 				label: 'Earth',
 			},
 		],
@@ -556,7 +539,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with dollar sign prefix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
+			prefix: '$',
 		},
 	},
 	{
@@ -567,6 +550,7 @@ const fields: Field< DataType >[] = [
 		Edit: {
 			control: 'text',
 			prefix: StarIconPrefix,
+			prefixPadding: 'minimal',
 		},
 	},
 	{
@@ -576,7 +560,7 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with percent sign suffix.',
 		Edit: {
 			control: 'text',
-			suffix: PercentSuffix,
+			suffix: '%',
 		},
 	},
 	{
@@ -586,8 +570,8 @@ const fields: Field< DataType >[] = [
 		description: 'Text field with both dollar prefix and USD suffix.',
 		Edit: {
 			control: 'text',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
+			prefix: '$',
+			suffix: 'USD',
 		},
 	},
 ];

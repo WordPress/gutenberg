@@ -91,6 +91,9 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"filter": {
+			"duotone": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -100,7 +103,36 @@
 			}
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
+		"transform": {
+			"rotate": true,
+			"translate": true,
+			"scale": true
+		},
+		"dimensions": {
+			"minWidth": true,
+			"minHeight": true,
+			"__experimentalSkipSerialization": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true
+		}
+	},
+	"selectors": {
+		"dimensions": ".wp-block-video video",
+		"border": ".wp-block-video video, .wp-block-video .components-placeholder",
+		"shadow": ".wp-block-video video",
+		"filter": {
+			"duotone": ".wp-block-video video"
 		}
 	},
 	"editorStyle": "wp-block-video-editor",

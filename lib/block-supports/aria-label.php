@@ -31,7 +31,7 @@ function gutenberg_register_aria_label_support( $block_type ) {
 /**
  * Add the aria-label to the output.
  *
- * @param WP_Block_Type $block_type Block Type.
+ * @param WP_Block_Type $block_type       Block Type.
  * @param array         $block_attributes Block attributes.
  *
  * @return array Block aria-label.

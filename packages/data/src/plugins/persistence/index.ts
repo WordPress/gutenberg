@@ -1,4 +1,3 @@
-// @ts-expect-error -- is-plain-object types don't resolve with package.json "exports".
 import { isPlainObject } from 'is-plain-object';
 import deepmerge from 'deepmerge';
 import defaultStorage from './storage/default';
@@ -65,7 +64,7 @@ export const withLazySameState =
  * @return Persistence interface.
  */
 export function createPersistenceInterface(
-	options: PersistencePluginOptions
+	options: PersistencePluginOptions = {}
 ): PersistenceInterface {
 	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
 		options;
@@ -125,7 +124,7 @@ export function createPersistenceInterface(
  */
 function persistencePlugin(
 	registry: DataRegistry,
-	pluginOptions: PersistencePluginOptions
+	pluginOptions: PersistencePluginOptions = {}
 ): Partial< DataRegistry > {
 	const persistence = createPersistenceInterface( pluginOptions );
 

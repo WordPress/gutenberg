@@ -9,7 +9,7 @@ import type { ComboboxInputGroupProps } from './types';
  * instead of the full control. Also adds `role="group"`.
  */
 export const InputGroup = forwardRef< HTMLDivElement, ComboboxInputGroupProps >(
-	function InputGroup( props, ref ) {
+	function UnforwardedInputGroup( props, ref ) {
 		return <_Combobox.InputGroup ref={ ref } { ...props } />;
 	}
 );

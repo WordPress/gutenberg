@@ -1,4 +1,7 @@
-import { getNextMajorVersion } from '../version';
+import { createRequire } from 'node:module';
+import { describe, expect, it } from 'vitest';
+const require = createRequire( import.meta.url );
+const { getNextMajorVersion } = require( '../version' );
 
 describe( 'getNextMajorVersion', () => {
 	it( 'increases the minor number by default', () => {

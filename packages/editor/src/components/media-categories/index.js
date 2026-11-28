@@ -14,11 +14,54 @@ import { store as coreStore } from '@wordpress/core-data';
 /** @typedef {import('@wordpress/block-editor').InserterMediaItem} InserterMediaItem */
 /** @typedef {import('@wordpress/block-editor').InserterMediaCategory} InserterMediaCategory */
 
-const getExternalLink = ( url, text ) =>
-	`<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`;
+/*
+ * `escapeAttribute()` and `escapeEditableHTML()` and their helpers are copied
+ * from `@wordpress/escape-html`, which `@wordpress/editor` doesn't depend on.
+ */
+const escapeAmpersand = ( value ) =>
+	value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
+const escapeQuotationMark = ( value ) => value.replace( /"/g, '&quot;' );
+const escapeLessThan = ( value ) => value.replace( /</g, '&lt;' );
+const escapeGreaterThan = ( value ) => value.replace( />/g, '&gt;' );
+const escapeAttribute = ( value ) =>
+	escapeGreaterThan(
+		escapeLessThan( escapeQuotationMark( escapeAmpersand( value ) ) )
+	);
+const escapeEditableHTML = ( value ) =>
+	escapeLessThan( value.replace( /&/g, '&amp;' ) );
 
+/**
+ * Returns whether a URL is an http or https URL.
+ *
+ * @param {string} url The URL to check.
+ * @return {boolean} Whether the URL can be linked to.
+ */
+const isHttpURL = ( url ) => /^https?:/.test( url );
+
+/**
+ * Returns a link to an external URL. Returns only the text when the URL
+ * isn't an http or https URL.
+ *
+ * @param {string} url  The URL to link to.
+ * @param {string} text The link text, already escaped.
+ * @return {string} The link markup.
+ */
+const getExternalLink = ( url, text ) =>
+	isHttpURL( url )
+		? `<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`
+		: text;
+
+/**
+ * Returns the attributes of a link to an external URL. Returns an empty
+ * `href` when the URL isn't an http or https URL.
+ *
+ * @param {string} url The URL to link to.
+ * @return {string} The link attributes.
+ */
 const getExternalLinkAttributes = ( url ) =>
-	`href="${ url }" target="_blank" rel="noopener"`;
+	`href="${
+		isHttpURL( url ) ? escapeAttribute( url ) : ''
+	}" target="_blank"`;
 
 const getOpenverseLicense = ( license, licenseVersion ) => {
 	let licenseName = license.trim();
@@ -49,8 +92,14 @@ const getOpenverseCaption = ( item ) => {
 		license_version: licenseVersion,
 		license_url: licenseUrl,
 	} = item;
-	const fullLicense = getOpenverseLicense( license, licenseVersion );
-	const _creator = decodeEntities( creator );
+	// The Openverse fields are untrusted: decode them to plain text, then
+	// escape them before building the caption markup.
+	const fullLicense = escapeEditableHTML(
+		getOpenverseLicense( license, licenseVersion )
+	);
+	const _creator = creator
+		? escapeEditableHTML( decodeEntities( creator ) )
+		: '';
 	let _caption;
 	if ( _creator ) {
 		_caption = title
@@ -59,7 +108,7 @@ const getOpenverseCaption = ( item ) => {
 					_x( '"%1$s" by %2$s/ %3$s', 'caption' ),
 					getExternalLink(
 						foreignLandingUrl,
-						decodeEntities( title )
+						escapeEditableHTML( decodeEntities( title ) )
 					),
 					creatorUrl
 						? getExternalLink( creatorUrl, _creator )
@@ -68,9 +117,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  )
+				)
 			: sprintf(
 					// translators: %1s: Link attributes for a given Openverse media work; %2s: Name of the work's creator; %3s: Works's licence e.g: "CC0 1.0".
 					_x( '<a %1$s>Work</a> by %2$s/ %3$s', 'caption' ),
@@ -82,9 +131,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  );
+				);
 	} else {
 		_caption = title
 			? sprintf(
@@ -92,15 +141,15 @@ const getOpenverseCaption = ( item ) => {
 					_x( '"%1$s"/ %2$s', 'caption' ),
 					getExternalLink(
 						foreignLandingUrl,
-						decodeEntities( title )
+						escapeEditableHTML( decodeEntities( title ) )
 					),
 					licenseUrl
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  )
+				)
 			: sprintf(
 					// translators: %1s: Link attributes for a given Openverse media work; %2s: Works's licence e.g: "CC0 1.0".
 					_x( '<a %1$s>Work</a>/ %2$s', 'caption' ),
@@ -109,9 +158,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  );
+				);
 	}
 	return _caption.replace( /\s{2}/g, ' ' );
 };
@@ -299,7 +348,7 @@ const getAttachedImagesCategory = ( postId, typeLabel ) =>
 					// translators: %s: Name of the post type e.g: "Page".
 					__( 'No images attached to this %s.' ),
 					typeLabel
-			  )
+				)
 			: __( 'No images attached to this post.' ),
 		async attach( mediaItems ) {
 			const attachmentIds = getImageAttachmentIds( mediaItems );
@@ -348,6 +397,19 @@ const inserterMediaCategories = [
 		},
 		mediaType: 'audio',
 		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
+	} ),
+	// Documents, archives and other non-media files, inserted as File blocks.
+	createCoreMediaCategory( {
+		name: 'files',
+		labels: {
+			name: __( 'Files' ),
+			search_items: __( 'Search files' ),
+		},
+		mediaType: 'file',
+		getQuery: ( query ) => ( {
+			...query,
+			media_type: [ 'application', 'text' ],
+		} ),
 	} ),
 	{
 		name: 'openverse',

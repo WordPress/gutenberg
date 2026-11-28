@@ -181,6 +181,36 @@ if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
 	}
 }
 
+/**
+ * Disables real-time collaboration for post types that cannot persist the
+ * CRDT document.
+ *
+ * Collaboration stores its CRDT document in post meta. The REST API only
+ * exposes post meta for post types that support custom fields, so enabling
+ * collaboration for other post types can cause stale sync updates to replace
+ * newer entity content.
+ *
+ * @param bool   $disabled  Whether real-time collaboration is disabled for the post type.
+ * @param string $post_type Post type name.
+ * @return bool Whether real-time collaboration is disabled for the post type.
+ */
+function gutenberg_disable_collaboration_for_post_types_without_custom_fields( $disabled, $post_type ) {
+	if ( $disabled ) {
+		return $disabled;
+	}
+
+	/*
+	 * The attachments REST controller always exposes meta, regardless of
+	 * whether the attachment post type supports custom fields.
+	 */
+	if ( 'attachment' === $post_type ) {
+		return false;
+	}
+
+	return ! post_type_supports( $post_type, 'custom-fields' );
+}
+add_filter( 'wp_is_post_type_collaboration_disabled', 'gutenberg_disable_collaboration_for_post_types_without_custom_fields', 10, 2 );
+
 if ( ! function_exists( 'gutenberg_get_active_edit_lock_user' ) ) {
 	/**
 	 * Returns the user ID recorded in a fresh edit lock.

@@ -2,14 +2,23 @@ import { type PlainColorObject } from 'colorjs.io/fn';
 import {
 	WHITE,
 	BLACK,
-	UNIVERSAL_CONTRAST_TOPUP,
+	CONTRAST_ROUNDING_MARGIN,
 	WHITE_TEXT_CONTRAST_MARGIN,
 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
-} from './constants';
-import type { Ramp, RampConfig, RampDirection } from './types';
-import { getContrast } from './color-utils';
+} from './constants.ts';
+import type {
+	ContrastRequirement,
+	Ramp,
+	RampConfig,
+	RampDirection,
+} from './types.ts';
+import { getContrast } from './color-utils.ts';
+
+export function getContrastReferences( contrast: ContrastRequirement ) {
+	return [ contrast, ...( contrast.additionalReferences ?? [] ) ];
+}
 
 /**
  * Build a dependency graph from the steps configuration
@@ -34,10 +43,15 @@ function buildDependencyGraph( config: RampConfig ): {
 	// Build the graph
 	Object.entries( config ).forEach( ( [ stepName, stepConfig ] ) => {
 		const step = stepName as keyof Ramp;
-		const reference = stepConfig.contrast.reference;
-
-		dependencies.get( step )!.push( reference );
-		dependents.get( reference )!.push( step );
+		for ( const { reference } of getContrastReferences(
+			stepConfig.contrast
+		) ) {
+			if ( reference === 'neutralSurface' ) {
+				continue;
+			}
+			dependencies.get( step )!.push( reference );
+			dependents.get( reference )!.push( step );
+		}
 
 		// Add dependency for sameAsIfPossible
 		if ( stepConfig.sameAsIfPossible ) {
@@ -104,8 +118,12 @@ export function stepsForStep(
 	config: RampConfig
 ): ( keyof Ramp )[] {
 	const result = new Set< keyof Ramp >();
-	function visit( step: keyof Ramp | 'seed' ) {
-		if ( step === 'seed' || result.has( step ) ) {
+	function visit( step: keyof Ramp | 'seed' | 'neutralSurface' ) {
+		if (
+			step === 'neutralSurface' ||
+			step === 'seed' ||
+			result.has( step )
+		) {
 			return;
 		}
 
@@ -114,7 +132,11 @@ export function stepsForStep(
 			return;
 		}
 
-		visit( stepConfig.contrast.reference );
+		for ( const { reference } of getContrastReferences(
+			stepConfig.contrast
+		) ) {
+			visit( reference );
+		}
 		if ( stepConfig.sameAsIfPossible ) {
 			visit( stepConfig.sameAsIfPossible );
 		}
@@ -127,21 +149,32 @@ export function stepsForStep(
 
 /**
  * Finds out whether a lighter or a darker foreground color achieves a better
- * contrast against the seed
- * @param seed
+ * contrast against every reference color
+ * @param references
  * @param preferLighter Whether the check should favor white foreground color
  * @return An object with "better" and "worse" properties, each holding a
  * ramp direction value.
  */
 export function computeBetterFgColorDirection(
-	seed: string | PlainColorObject,
+	references: string | PlainColorObject | readonly PlainColorObject[],
 	preferLighter?: boolean
 ): {
 	better: RampDirection;
 	worse: RampDirection;
 } {
-	const contrastAgainstBlack = getContrast( seed, BLACK );
-	const contrastAgainstWhite = getContrast( seed, WHITE );
+	const referenceColors = Array.isArray( references )
+		? references
+		: [ references ];
+	const contrastAgainstBlack = Math.min(
+		...referenceColors.map( ( reference ) =>
+			getContrast( reference, BLACK )
+		)
+	);
+	const contrastAgainstWhite = Math.min(
+		...referenceColors.map( ( reference ) =>
+			getContrast( reference, WHITE )
+		)
+	);
 
 	return contrastAgainstBlack >
 		contrastAgainstWhite +
@@ -155,8 +188,11 @@ export function adjustContrastTarget( target: number ) {
 		return 1;
 	}
 
-	// Add a little top up to take into account any rounding error and algo imprecisions.
-	return target + UNIVERSAL_CONTRAST_TOPUP;
+	// The search can undershoot by a factor of exp(CONTRAST_EPSILON).
+	// Leave room for that error and for rounding both emitted colors.
+	return (
+		target * ( 1 + CONTRAST_ROUNDING_MARGIN ) * Math.exp( CONTRAST_EPSILON )
+	);
 }
 
 /**
@@ -176,7 +212,7 @@ export function clampAccentScaleReferenceLightness(
 }
 
 /**
- * Find the value of of `L` (luminance) that produces a `C` (color) that has a
+ * Find the value of `L` (luminance) that produces a `C` (color) that has a
  * `value` (contrast delta) equal to zero.
  * @param calculateC     Calculate `C` from a given `L`.
  * @param calculateValue Calculate value (delta) for a given `C`.

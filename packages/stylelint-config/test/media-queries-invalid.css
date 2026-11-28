@@ -33,11 +33,13 @@
 	/* Your selectors */
 }
 
-@media screen and (color) , projection and (color) {
-	top: 0.2em;
+@media screen and (color) , print and (color) {
+
+	/* Your selectors */
 }
 
 @media screen and (color) ,
-	projection and (color) {
-	top: 0.2em;
+	print and (color) {
+
+	/* Your selectors */
 }

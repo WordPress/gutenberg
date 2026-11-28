@@ -5,7 +5,8 @@ import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	title: 'Components/Icon',
+	id: 'components-icon',
+	title: 'Components/@wordpress-components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },
@@ -36,7 +37,7 @@ WithAFunction.args = {
 		<img
 			width={ size }
 			height={ size }
-			src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+			src="wordpress-wmark.svg"
 			alt="WordPress"
 		/>
 	),
@@ -50,7 +51,7 @@ WithAFunction.parameters = {
     <img
       width={ size }
       height={ size }
-      src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+      src="wordpress-wmark.svg"
       alt="WordPress"
     />
   ) }

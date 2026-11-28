@@ -1,13 +1,19 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { forwardRef, useMemo, useState } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
 import { Icon } from '../icon';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.scss';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
 
@@ -18,9 +24,12 @@ import type { HeaderProps } from './types';
  *
  * Defaults to a `<div>` wrapper around the trigger. Since the right heading
  * level depends on the surrounding document outline, the consumer is
- * expected to opt in to heading semantics. Pass `render` to wrap the
- * trigger in a heading (e.g. `render={ <h2 /> }`), following the W3C APG
- * accordion pattern (heading wraps button).
+ * expected to opt in to heading semantics. Pass `role="heading"` and
+ * `aria-level` (e.g. `role="heading" aria-level={ 2 }`) to expose the
+ * wrapper as a heading around the trigger, following the W3C APG accordion
+ * pattern (heading wraps button). Avoid rendering the wrapper as a native
+ * `<h1>`–`<h6>` element: the trigger is a `<div>`, which a native heading
+ * can't contain.
  *
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
@@ -30,15 +39,78 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, render, ...restProps },
+		{
+			children,
+			className,
+			render,
+			'aria-describedby': ariaDescribedByProp,
+			...restProps
+		},
 		ref
 	) {
-		const [ descriptionId, setDescriptionId ] = useState< string >();
+		const [ descriptionIds, setDescriptionIds ] = useState< string[] >(
+			[]
+		);
+		const [ orderedDescriptionIds, setOrderedDescriptionIds ] = useState<
+			string[]
+		>( [] );
+		const headerContentRef = useRef< HTMLDivElement >( null );
+
+		const registerDescriptionId = useCallback( ( id: string ) => {
+			setDescriptionIds( ( currentDescriptionIds ) => {
+				if ( currentDescriptionIds.includes( id ) ) {
+					return currentDescriptionIds;
+				}
+
+				return [ ...currentDescriptionIds, id ];
+			} );
+
+			return () => {
+				setDescriptionIds( ( currentDescriptionIds ) =>
+					currentDescriptionIds.filter(
+						( descriptionId ) => descriptionId !== id
+					)
+				);
+			};
+		}, [] );
 
 		const contextValue = useMemo(
-			() => ( { setDescriptionId } ),
-			[ setDescriptionId ]
+			() => ( { registerDescriptionId } ),
+			[ registerDescriptionId ]
 		);
+
+		useIsomorphicLayoutEffect( () => {
+			const registeredDescriptionIds = new Set( descriptionIds );
+			const nextDescriptionIds = Array.from(
+				headerContentRef.current?.querySelectorAll( '[id]' ) ?? []
+			)
+				.map( ( element ) => element.id )
+				.filter( ( id ) => registeredDescriptionIds.has( id ) );
+
+			setOrderedDescriptionIds( ( currentDescriptionIds ) => {
+				if (
+					currentDescriptionIds.length ===
+						nextDescriptionIds.length &&
+					currentDescriptionIds.every(
+						( id, index ) => id === nextDescriptionIds[ index ]
+					)
+				) {
+					return currentDescriptionIds;
+				}
+
+				return nextDescriptionIds;
+			} );
+		} );
+
+		const ariaDescribedBy =
+			Array.from(
+				new Set( [
+					...( ariaDescribedByProp
+						?.split( /\s+/ )
+						.filter( Boolean ) ?? [] ),
+					...orderedDescriptionIds,
+				] )
+			).join( ' ' ) || undefined;
 
 		return useRender( {
 			defaultTagName: 'div',
@@ -56,9 +128,12 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 							className={ styles.header }
 							render={ <Card.Header /> }
 							nativeButton={ false }
-							aria-describedby={ descriptionId }
+							aria-describedby={ ariaDescribedBy }
 						>
-							<div className={ styles[ 'header-content' ] }>
+							<div
+								ref={ headerContentRef }
+								className={ styles[ 'header-content' ] }
+							>
 								{ children }
 							</div>
 							<div
@@ -69,13 +144,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 								<div
 									className={ clsx(
 										styles[ 'header-trigger-wrapper' ],
-										defenseStyles.div,
-										// While the interactive trigger element is the whole header,
-										// the focus ring will be displayed only on the icon to visually
-										// emulate it being the button.
-										focusStyles[
-											'outset-ring--focus-parent-visible'
-										]
+										defenseStyles.div
 									) }
 								>
 									<Icon

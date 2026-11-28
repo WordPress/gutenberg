@@ -21,7 +21,7 @@ export function useArchiveLabel() {
 					'postType',
 					'wp_template',
 					templateId
-			  )?.slug
+				)?.slug
 			: null;
 	}, [] );
 	const taxonomyMatches = templateSlug?.match(

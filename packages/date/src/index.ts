@@ -426,9 +426,13 @@ export function format(
 		char = dateFormat[ i ];
 		// Is this an escape?
 		if ( '\\' === char ) {
-			// Add next character, then move on.
+			// Add next character, then move on. A final backslash is
+			// ignored to align with PHP:
+			// `var_dump( date( 'Y\\', 0 ) );` prints `string(5) "1970"`
 			i++;
-			newFormat.push( '[' + dateFormat[ i ] + ']' );
+			if ( i < dateFormat.length ) {
+				newFormat.push( '[' + dateFormat[ i ] + ']' );
+			}
 			continue;
 		}
 		if ( char in formatMap ) {
@@ -624,7 +628,7 @@ function buildMoment(
 		return isUTCOffset( timezone )
 			? dateMoment.utcOffset( timezone )
 			: // A false isUTCOffset() guarantees that timezone is a string.
-			  dateMoment.tz( timezone as string );
+				dateMoment.tz( timezone as string );
 	}
 
 	if ( settings.timezone.string ) {

@@ -181,7 +181,7 @@ program
 									],
 									variant,
 									optionsValues
-							  )
+								)
 							: {};
 
 					await scaffold( projectTemplate, {

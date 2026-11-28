@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
 import { ValidatedFormTokenField } from '../validated-form-controls';
@@ -32,7 +32,7 @@ export default function ArrayControl< Item >( {
 							( suggestion ) => suggestion.value === token
 						);
 						return element || { value: token, label: token };
-				  } )
+					} )
 				: [],
 		[ value, elements ]
 	);
@@ -53,7 +53,7 @@ export default function ArrayControl< Item >( {
 	);
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	return (

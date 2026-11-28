@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { capitalCase } from 'change-case';
 import { getStyleLabel, STYLE_LABELS } from '../style-labels';
 

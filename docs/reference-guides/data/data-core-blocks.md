@@ -45,15 +45,15 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Name of block (example: "core/columns").
--   _attributes_ `Record< string, unknown >`: Block attributes used to determine active variation.
--   _scope_ `BlockVariationScope`: Block variation scope name.
--   _innerContent_ `Array< string | null >`: Block inner content used to determine the active variation for blocks (such as the Custom HTML block) whose variations declare static inner content.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Name of block (example: "core/columns").
+- _attributes_ `Record< string, unknown >`: Block attributes used to determine active variation.
+- _scope_ `BlockVariationScope`: Block variation scope name.
+- _innerContent_ `Array< string | null >`: Block inner content used to determine the active variation for blocks (such as the Custom HTML block) whose variations declare static inner content.
 
 _Returns_
 
--   `BlockVariation | undefined`: Active block variation.
+- `BlockVariation | undefined`: Active block variation.
 
 ### getBlockStyles
 
@@ -84,12 +84,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _name_ `string`: Block type name.
+- _state_ `BlockStoreState`: Data state.
+- _name_ `string`: Block type name.
 
 _Returns_
 
--   `BlockStyle[]`: Block Styles.
+- `BlockStyle[]`: Block Styles.
 
 ### getBlockSupport
 
@@ -122,14 +122,14 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _nameOrType_ `string | BlockType`: Block name or type object
--   _feature_ `string | string[]`: Feature to retrieve
--   _defaultSupports_ `unknown`: Default value to return if not explicitly defined
+- _state_ `BlockStoreState`: Data state.
+- _nameOrType_ `string | BlockType`: Block name or type object
+- _feature_ `string | string[]`: Feature to retrieve
+- _defaultSupports_ `unknown`: Default value to return if not explicitly defined
 
 _Returns_
 
--   `unknown`: Block support value
+- `unknown`: Block support value
 
 ### getBlockType
 
@@ -168,12 +168,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _name_ `string`: Block type name.
+- _state_ `BlockStoreState`: Data state.
+- _name_ `string`: Block type name.
 
 _Returns_
 
--   `BlockType | undefined`: Block Type.
+- `BlockType | undefined`: Block Type.
 
 ### getBlockTypes
 
@@ -203,11 +203,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `BlockType[]`: Block Types.
+- `BlockType[]`: Block Types.
 
 ### getBlockVariations
 
@@ -239,13 +239,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Block type name.
--   _scope_ `BlockVariationScope`: Block variation scope name.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Block type name.
+- _scope_ `BlockVariationScope`: Block variation scope name.
 
 _Returns_
 
--   `BlockVariation[] | undefined`: Block variations.
+- `BlockVariation[] | undefined`: Block variations.
 
 ### getCategories
 
@@ -275,11 +275,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `BlockCategory[]`: Categories list.
+- `BlockCategory[]`: Categories list.
 
 ### getChildBlockNames
 
@@ -311,12 +311,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Block type name.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Block type name.
 
 _Returns_
 
--   `string[]`: Array of child block names.
+- `string[]`: Array of child block names.
 
 ### getCollections
 
@@ -347,11 +347,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `Record< string, BlockCollection >`: Collections list.
+- `Record< string, BlockCollection >`: Collections list.
 
 ### getDefaultBlockName
 
@@ -382,11 +382,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string | null`: Default block name.
+- `string | null`: Default block name.
 
 ### getDefaultBlockVariation
 
@@ -421,13 +421,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Block type name.
--   _scope_ `BlockVariationScope`: Block variation scope name.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Block type name.
+- _scope_ `BlockVariationScope`: Block variation scope name.
 
 _Returns_
 
--   `BlockVariation | undefined`: The default block variation.
+- `BlockVariation | undefined`: The default block variation.
 
 ### getFreeformFallbackBlockName
 
@@ -461,11 +461,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string | null`: Name of the block for handling non-block content.
+- `string | null`: Name of the block for handling non-block content.
 
 ### getGroupingBlockName
 
@@ -499,11 +499,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string | null`: Name of the block for handling the grouping of blocks.
+- `string | null`: Name of the block for handling the grouping of blocks.
 
 ### getUnregisteredFallbackBlockName
 
@@ -537,11 +537,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
+- _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string | null`: Name of the block for handling unregistered blocks.
+- `string | null`: Name of the block for handling unregistered blocks.
 
 ### hasBlockSupport
 
@@ -573,14 +573,14 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _nameOrType_ `string | BlockType`: Block name or type object.
--   _feature_ `string | string[]`: Feature to test.
--   _defaultSupports_ `unknown`: Whether feature is supported by default if not explicitly defined.
+- _state_ `BlockStoreState`: Data state.
+- _nameOrType_ `string | BlockType`: Block name or type object.
+- _feature_ `string | string[]`: Feature to test.
+- _defaultSupports_ `unknown`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
 
--   `boolean`: Whether block supports feature.
+- `boolean`: Whether block supports feature.
 
 ### hasChildBlocks
 
@@ -612,12 +612,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Block type name.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Block type name.
 
 _Returns_
 
--   `boolean`: True if a block contains child blocks and false otherwise.
+- `boolean`: True if a block contains child blocks and false otherwise.
 
 ### hasChildBlocksWithInserterSupport
 
@@ -654,12 +654,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Data state.
--   _blockName_ `string`: Block type name.
+- _state_ `BlockStoreState`: Data state.
+- _blockName_ `string`: Block type name.
 
 _Returns_
 
--   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
+- `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
 ### isMatchingSearchTerm
 
@@ -697,13 +697,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `BlockStoreState`: Blocks state.
--   _nameOrType_ `string | BlockType`: Block name or type object.
--   _searchTerm_ `string`: Search term by which to filter.
+- _state_ `BlockStoreState`: Blocks state.
+- _nameOrType_ `string | BlockType`: Block name or type object.
+- _searchTerm_ `string`: Search term by which to filter.
 
 _Returns_
 
--   `boolean`: Whether block type matches search term.
+- `boolean`: Whether block type matches search term.
 
 <!-- END TOKEN(Autogenerated selectors|../../../packages/blocks/src/store/selectors.ts) -->
 

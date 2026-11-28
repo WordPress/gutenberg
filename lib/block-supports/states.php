@@ -32,8 +32,21 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 		return $value;
 	}
 
-	$unwrapped_name = str_replace( '|', '--', substr( $value, strlen( 'var:' ) ) );
-	return "var(--wp--$unwrapped_name)";
+	$parts = explode( '|', substr( $value, strlen( 'var:' ) ) );
+
+	/*
+	 * The slug is kebab-cased when the preset's custom property is generated,
+	 * so a reference has to be converted the same way or it points at a
+	 * property that does not exist (`--wp--preset--font-size--3xl` for a preset
+	 * generated as `--wp--preset--font-size--3-xl`). Mirrors
+	 * `WP_Theme_JSON_Gutenberg::convert_custom_properties()` and the JS style
+	 * engine's `getCSSValueFromRawStyle()`.
+	 */
+	if ( 3 === count( $parts ) ) {
+		$parts[2] = _wp_to_kebab_case( $parts[2] );
+	}
+
+	return 'var(--wp--' . implode( '--', $parts ) . ')';
 }
 
 /**
@@ -126,6 +139,89 @@ function gutenberg_get_state_declarations_with_background_resets( $declarations 
 }
 
 /**
+ * Merges one state style object over another.
+ *
+ * Mirror of `mergeStyleObjects` in packages/block-editor/src/hooks/style.jsx.
+ *
+ * @param array<string, mixed> $target Styles underneath.
+ * @param array<string, mixed> $source Styles layered over them.
+ * @return array<string, mixed> Merged style object.
+ */
+function gutenberg_merge_state_style_objects( $target, $source ) {
+	$target = is_array( $target ) ? $target : array();
+	$source = is_array( $source ) ? $source : array();
+	$merged = $target;
+
+	foreach ( $source as $key => $value ) {
+		$merged[ $key ] = is_array( $value ) && isset( $merged[ $key ] ) && is_array( $merged[ $key ] )
+			? gutenberg_merge_state_style_objects( $merged[ $key ], $value )
+			: $value;
+	}
+
+	return $merged;
+}
+
+/**
+ * Checks whether a state paints its own background.
+ *
+ * @access private
+ *
+ * @param array<string, mixed> $state_style State style object.
+ * @return bool Whether the state sets a gradient or background image.
+ */
+function gutenberg_state_paints_own_background( array $state_style ): bool {
+	return ! empty( $state_style['background']['gradient'] ) ||
+		! empty( $state_style['background']['backgroundImage'] ) ||
+		! empty( $state_style['color']['gradient'] );
+}
+
+/**
+ * Returns the declarations that unclip a text clip when a state sets a different clip.
+ *
+ * Mirror of `getStateTextClipEscapeCSS` in packages/block-editor/src/hooks/style.jsx.
+ *
+ * @param array<string, mixed> $state_style State style object.
+ * @param string               $base_clip   Background clip of the styles the state layers over.
+ * @return array<string, string> CSS declarations, empty when no escape is needed.
+ *
+ * @phpstan-return array{ 'background-image'?: 'unset' }
+ */
+function gutenberg_get_state_text_clip_escape( array $state_style, string $base_clip ): array {
+	$state_clip = $state_style['background']['backgroundClip'] ?? '';
+	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
+		$state_clip = '';
+	}
+	if ( empty( $state_clip ) || 'text' === $state_clip || 'text' !== $base_clip || gutenberg_state_paints_own_background( $state_style ) ) {
+		return array();
+	}
+	return array( 'background-image' => 'unset' );
+}
+
+/**
+ * Returns the declarations that refill the letters when a state sets a text color but no clip.
+ *
+ * The fill is added even without a known text clip, since a block instance
+ * cannot see a clip set in global styles. It does nothing when no clip applies.
+ *
+ * Mirror of `getStateTextFillResetCSS` in packages/block-editor/src/hooks/style.jsx.
+ *
+ * @param array<string, mixed> $state_style State style object.
+ * @return array<string, string> CSS declarations, empty when no reset is needed.
+ *
+ * @phpstan-return array{ '-webkit-text-fill-color'?: 'currentColor' }
+ */
+function gutenberg_get_state_text_fill_reset( array $state_style ): array {
+	$state_clip = $state_style['background']['backgroundClip'] ?? '';
+	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
+		$state_clip = '';
+	}
+	if ( ! empty( $state_clip ) || empty( $state_style['color']['text'] ) || gutenberg_state_paints_own_background( $state_style ) ) {
+		return array();
+	}
+	return array( '-webkit-text-fill-color' => 'currentColor' );
+}
+
+/**
  * Adds fallback dimension styles for aspectRatio and height block-support values.
  *
  * @param array $state_style State style object.
@@ -196,9 +292,11 @@ function gutenberg_add_state_style_group( &$groups, $selector, $style ) {
 /**
  * Splits a state style object into groups based on block feature selectors.
  *
- * @param array $state_style     State style object.
- * @param array $block_selectors Block selectors metadata.
+ * @param array<string, mixed>                        $state_style     State style object.
+ * @param array<string, string|array<string, string>> $block_selectors Block selectors metadata.
  * @return array[] Selector/style groups.
+ *
+ * @phpstan-param array{ root?: string, ...<string, string|array<string, string>> } $block_selectors
  */
 function gutenberg_get_state_style_groups( $state_style, $block_selectors ) {
 	$groups = array();
@@ -280,6 +378,68 @@ function gutenberg_get_root_state_style( $state_style, $nested_keys ) {
 }
 
 /**
+ * Returns the Global Styles a block instance state layers over: its block
+ * type's, then those of the block style variation applied to it.
+ *
+ * Each includes the Global Styles for the same state, so a state only
+ * escapes a text clip that applies there. A breakpoint pseudo-state layers
+ * over the root, the breakpoint, the pseudo-state, then both, as output.
+ *
+ * Mirror of `getGlobalBlockBaseStyle` in packages/block-editor/src/hooks/style.tsx.
+ *
+ * @param string      $block_name Block name.
+ * @param string|null $class_name Block class name, which names any applied variation.
+ * @param string[]    $state_keys Pseudo-state and breakpoint keys to leave out.
+ * @param string[]    $state_path Optional state the styles are for, e.g. `array( '@mobile', ':hover' )`.
+ * @return array<string, mixed> Root-only style object.
+ */
+function gutenberg_get_block_state_global_base_style( $block_name, $class_name, $state_keys, $state_path = array() ) {
+	$global_styles = gutenberg_get_global_styles();
+	$block_styles  = $global_styles['blocks'][ $block_name ] ?? array();
+	if ( ! is_array( $block_styles ) ) {
+		return array();
+	}
+
+	$nested_keys = array_merge( array( 'elements', 'blocks', 'variations' ), $state_keys );
+	$layer_paths = array( array() );
+	foreach ( $state_path as $state ) {
+		$layer_paths[] = array( $state );
+	}
+	if ( count( $state_path ) > 1 ) {
+		$layer_paths[] = $state_path;
+	}
+
+	$get_layers = static function ( $styles ) use ( $layer_paths, $nested_keys ) {
+		$merged = array();
+		foreach ( $layer_paths as $layer_path ) {
+			$layer = empty( $layer_path ) ? $styles : _wp_array_get( $styles, $layer_path, null );
+			if ( is_array( $layer ) ) {
+				$merged = gutenberg_merge_state_style_objects(
+					$merged,
+					gutenberg_get_root_state_style( $layer, $nested_keys )
+				);
+			}
+		}
+		return $merged;
+	};
+
+	$base_style = $get_layers( $block_styles );
+
+	// Only the first block style variation with data applies, as in the variation support.
+	foreach ( gutenberg_get_block_style_variation_name_from_class( $class_name ) ?? array() as $variation ) {
+		$variation_styles = $block_styles['variations'][ $variation ] ?? null;
+		if ( ! empty( $variation_styles ) && is_array( $variation_styles ) ) {
+			return gutenberg_merge_state_style_objects(
+				$base_style,
+				$get_layers( $variation_styles )
+			);
+		}
+	}
+
+	return $base_style;
+}
+
+/**
  * Generates all element selectors for a block root selector.
  *
  * @param string $root_selector The block root CSS selector.
@@ -331,13 +491,14 @@ function gutenberg_get_block_state_element_selectors( $root_selector ) {
 /**
  * Adds a compiled state style rule to a rule list.
  *
- * @param array       $css_rules   Style rules.
- * @param string      $state       Pseudo-state selector.
- * @param string|null $selector    Block, feature, or element selector.
- * @param array       $style       Style object.
- * @param string|null $rules_group Optional CSS grouping rule, e.g. a media query.
+ * @param array[]                   $css_rules   Style rules.
+ * @param string                    $state       Pseudo-state selector.
+ * @param string|null               $selector    Block, feature, or element selector.
+ * @param array<string, mixed>      $style       Style object.
+ * @param string|null               $rules_group Optional CSS grouping rule, e.g. a media query.
+ * @param array<string, mixed>|null $base_style  Optional styles the state layers over.
  */
-function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null ) {
+function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $style, $rules_group = null, $base_style = null ) {
 	if ( empty( $style ) || ! is_array( $style ) ) {
 		return;
 	}
@@ -352,6 +513,16 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 	// Base text alignment is class-based, so state styles need a declaration.
 	if ( is_string( $text_align ) && '' !== trim( $text_align ) ) {
 		$declarations['text-align'] = $text_align;
+	}
+
+	// Only block states pass a base; element states match the editor and skip it.
+	if ( null !== $base_style ) {
+		$base_clip    = $base_style['background']['backgroundClip'] ?? '';
+		$declarations = array_merge(
+			$declarations,
+			gutenberg_get_state_text_clip_escape( $style, is_string( $base_clip ) ? $base_clip : '' ),
+			gutenberg_get_state_text_fill_reset( $style )
+		);
 	}
 
 	if ( empty( $declarations ) ) {
@@ -371,14 +542,20 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 /**
  * Builds compiled state style rules, preserving the selector each rule targets.
  *
- * @param array         $state_styles Map of state to style array.
- * @param WP_Block_Type $block_type   Block type.
- * @param string|null   $rules_group  Optional CSS grouping rule, e.g. a media query.
+ * @param array<string, mixed>      $state_styles Map of state to style array.
+ * @param WP_Block_Type             $block_type   Block type.
+ * @param string|null               $rules_group  Optional CSS grouping rule, e.g. a media query.
+ * @param array<string, mixed>|null $base_style   Optional styles the state layers over.
  * @return array[] State style rules.
  */
-function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null ) {
+function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rules_group = null, $base_style = null ) {
+	// Only a block that supports the clip can sit under a text clip to escape.
+	if ( ! block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) ) {
+		$base_style = null;
+	}
+
 	$css_rules       = array();
-	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
+	$block_selectors = is_array( $block_type->selectors )
 		? $block_type->selectors
 		: array();
 
@@ -393,7 +570,8 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 				$state,
 				$group['selector'],
 				$group['style'],
-				$rules_group
+				$rules_group,
+				$base_style
 			);
 		}
 	}
@@ -461,14 +639,68 @@ function gutenberg_split_selector_list( $selector ) {
 }
 
 /**
+ * Returns the ancestor part of a block selector whose leading compound names
+ * a different block, e.g. `.wp-block-list > ` in List Item's `.wp-block-list > li`.
+ *
+ * The block-instance class is on the block's own wrapper, so a leading compound
+ * naming another block must be kept rather than swapped for that class. When the
+ * next compound carries a `wp-block-*` class (`.wp-block-button .wp-block-button__link`),
+ * the selector describes a nested element and keeps the leading swap.
+ *
+ * @param string      $selector   A single block or feature selector.
+ * @param string|null $block_name Name of the block being scoped.
+ * @return string The leading compound and its combinator, or an empty string.
+ */
+function gutenberg_get_state_selector_ancestor( $selector, $block_name ) {
+	if (
+		! is_string( $block_name ) ||
+		'' === $block_name ||
+		! preg_match( '/^\.(wp-block-[-_a-zA-Z0-9]+)/', $selector, $matches ) ||
+		wp_get_block_default_classname( $block_name ) === $matches[1]
+	) {
+		return '';
+	}
+
+	$ancestor_length = 0;
+	$next_compound   = '';
+	$depth           = 0;
+	$selector_length = strlen( $selector );
+
+	for ( $i = 0; $i < $selector_length; $i++ ) {
+		$char = $selector[ $i ];
+
+		if ( '(' === $char || '[' === $char ) {
+			++$depth;
+		} elseif ( ( ')' === $char || ']' === $char ) && $depth > 0 ) {
+			--$depth;
+		} elseif ( 0 === $depth && str_contains( " \t\n\r\f>+~", $char ) ) {
+			if ( $ancestor_length ) {
+				break;
+			}
+			$ancestor_length = $i + strspn( $selector, " \t\n\r\f>+~", $i );
+			$i               = $ancestor_length - 1;
+		} elseif ( 0 === $depth && $ancestor_length ) {
+			$next_compound .= $char;
+		}
+	}
+
+	if ( '' === $next_compound || str_contains( $next_compound, '.wp-block-' ) ) {
+		return '';
+	}
+
+	return substr( $selector, 0, $ancestor_length );
+}
+
+/**
  * Builds a scoped selector from a block selector and optional pseudo-state.
  *
  * @param string      $base_selector  Block-instance scoping selector.
  * @param string|null $block_selector Block or feature selector from metadata.
  * @param string      $state          Pseudo-state selector.
+ * @param string|null $block_name     Optional. Name of the block being scoped.
  * @return string Scoped selector.
  */
-function gutenberg_build_state_selector( $base_selector, $block_selector, $state ) {
+function gutenberg_build_state_selector( $base_selector, $block_selector, $state, $block_name = null ) {
 	if ( ! is_string( $block_selector ) || '' === trim( $block_selector ) ) {
 		return $base_selector . $state;
 	}
@@ -482,6 +714,9 @@ function gutenberg_build_state_selector( $base_selector, $block_selector, $state
 			continue;
 		}
 
+		$ancestor = gutenberg_get_state_selector_ancestor( $selector, $block_name );
+		$selector = substr( $selector, strlen( $ancestor ) );
+
 		/*
 		 * Replace only the leading block selector part (e.g. class name,
 		 * attribute selector, ID, or tag name) with the block instance selector.
@@ -489,11 +724,11 @@ function gutenberg_build_state_selector( $base_selector, $block_selector, $state
 		 * same element and combinators without spaces.
 		 */
 		if ( preg_match( '/^([.#]?[-_a-zA-Z0-9]+|\[[^\]]+\])/', $selector, $matches ) ) {
-			$scoped_selectors[] = $base_selector . substr( $selector, strlen( $matches[0] ) ) . $state;
+			$scoped_selectors[] = $ancestor . $base_selector . substr( $selector, strlen( $matches[0] ) ) . $state;
 			continue;
 		}
 
-		$scoped_selectors[] = $base_selector . $state;
+		$scoped_selectors[] = $ancestor . $base_selector . $state;
 	}
 
 	return empty( $scoped_selectors )
@@ -514,19 +749,45 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$block_name = $block['blockName'];
+
+	/*
+	 * Every CSS rule this function can produce is keyed off the block's `style`
+	 * attribute. Without it there is nothing to generate, so bail before doing
+	 * any of the lookups below — this runs for every block on every request.
+	 */
+	$style = $block['attrs']['style'] ?? array();
+	if ( empty( $style ) || ! is_array( $style ) ) {
+		return $block_content;
+	}
+
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
 		return $block_content;
 	}
 
 	$supported_pseudo_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
-	$style                    = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block_name
-	);
 	$css_rules                = array();
+	$default_root_style       = gutenberg_get_root_state_style(
+		$style,
+		array_merge( array( 'elements' ), $supported_pseudo_states )
+	);
 	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
+	$state_keys               = array_merge( $supported_pseudo_states, array_keys( $responsive_media_queries ) );
+
+	// Global Styles only matter for the clip escapes, so skip the lookup when no state could need one.
+	$has_global_base = array_intersect( $state_keys, array_keys( $style ) ) &&
+		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false );
+	$class_name      = $block['attrs']['className'] ?? null;
+	$get_base_style  = static function ( $state_path ) use ( $has_global_base, $block_name, $class_name, $state_keys, $default_root_style ) {
+		if ( ! $has_global_base ) {
+			return $default_root_style;
+		}
+		return gutenberg_merge_state_style_objects(
+			gutenberg_get_block_state_global_base_style( $block_name, $class_name, $state_keys, $state_path ),
+			$default_root_style
+		);
+	};
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -537,7 +798,9 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			$css_rules,
 			gutenberg_get_block_state_style_rules(
 				array( $pseudo_state => $style[ $pseudo_state ] ),
-				$block_type
+				$block_type,
+				null,
+				$get_base_style( array( $pseudo_state ) )
 			)
 		);
 	}
@@ -558,7 +821,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				gutenberg_get_block_state_style_rules(
 					array( '' => $root_state_style ),
 					$block_type,
-					$media_query
+					$media_query,
+					$get_base_style( array( $breakpoint ) )
 				)
 			);
 		}
@@ -581,6 +845,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				) {
 					continue;
 				}
+
+				$element_style = gutenberg_remove_element_transform_styles( $element_style );
 
 				$element_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ]
 					?? array();
@@ -626,7 +892,15 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				gutenberg_get_block_state_style_rules(
 					array( $pseudo_state => $style[ $breakpoint ][ $pseudo_state ] ),
 					$block_type,
-					$media_query
+					$media_query,
+					// Cascade order: default, breakpoint, then the default pseudo-state.
+					gutenberg_merge_state_style_objects(
+						gutenberg_merge_state_style_objects(
+							$get_base_style( array( $breakpoint, $pseudo_state ) ),
+							$root_state_style
+						),
+						$style[ $pseudo_state ] ?? array()
+					)
 				)
 			);
 		}
@@ -669,7 +943,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		$selector             = gutenberg_build_state_selector(
 			".$unique_class",
 			$rule['selector'],
-			$rule['state']
+			$rule['state'],
+			$block_name
 		);
 		$important_style_rule = array(
 			'selector'     => $selector,

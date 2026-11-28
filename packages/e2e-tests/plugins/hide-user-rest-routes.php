@@ -26,8 +26,8 @@ function gutenberg_test_hide_user_rest_routes( $endpoints ) {
 
 	foreach ( array_keys( $endpoints ) as $route ) {
 		if (
-			0 === strpos( $route, '/wp/v2/users' ) &&
-			false === strpos( $route, '/application-passwords' )
+			str_starts_with( $route, '/wp/v2/users' ) &&
+			! str_contains( $route, '/application-passwords' )
 		) {
 			unset( $endpoints[ $route ] );
 		}

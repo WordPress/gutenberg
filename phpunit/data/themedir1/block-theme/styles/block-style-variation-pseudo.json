@@ -1,0 +1,26 @@
+{
+	"version": 3,
+	"blockTypes": [ "core/navigation-link" ],
+	"slug": "pseudo-variation",
+	"title": "Pseudo Variation",
+	"styles": {
+		"color": {
+			"text": "red"
+		},
+		":hover": {
+			"color": {
+				"text": "blue"
+			}
+		},
+		"@tablet": {
+			"color": {
+				"text": "green"
+			},
+			":hover": {
+				"color": {
+					"text": "purple"
+				}
+			}
+		}
+	}
+}

@@ -178,20 +178,27 @@ _**Note:** Since WordPress 6.5._
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
     -   `backgroundSize`: type `boolean`, default value `false`
+    -   `backgroundClip`: type `boolean`, default value `false` _(since WordPress 7.2)_
 
 This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 `backgroundImage` adds UI controls which allow the user to select a background image.
 `backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
+`backgroundClip` sets which box the background is painted into, and can clip it to the block's text.
 
 ```js
 supports: {
 	background: {
 		backgroundImage: true // Enable background image control.
-		backgroundSize: true // Enable background image + size control.
+		backgroundSize: true, // Enable background image + size control.
+		backgroundClip: true // Enable background clip.
 	}
 }
 ```
+
+Declaring `backgroundClip` alongside `gradient` gives the block a text gradient. The Typography panel then offers a Gradient control that fills the text, storing the gradient in `style.background.gradient` and `text` in `style.background.backgroundClip`. A block with a text gradient is not given the `has-background` class, because the gradient paints the text rather than the block's background.
+
+Which clip values may be used is a theme's decision, through `settings.background.backgroundClip`. It takes `true` for every value, `false` for none, or an array naming the ones to allow, for example `[ "border-box", "text" ]`. A block declaring the support only stands in where a theme has not set it. The clip control appears only when a value other than `text` is allowed, since the Typography panel's Gradient control already expresses the text value.
 
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
@@ -208,6 +215,7 @@ When a background images is selected and its position or size are changed, the b
             - `title`: type `string`, title of the media attachment
         - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        - `backgroundClip`: an attribute of `string` type, defining the CSS [`background-clip`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-clip) value. One of `border-box`, `padding-box`, `content-box` or `text`.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
 
@@ -401,7 +409,7 @@ supports: {
 
 _**Note:** Deprecated since WordPress 6.3._
 
-This property has been replaced by [`filter.duotone`](#filterduotone).
+This property has been replaced by [`filter.duotone`](#filter-duotone).
 
 ### color.gradients
 
@@ -681,19 +689,6 @@ attributes: {
     }
 }
 ```
-
-## editableRoot
-
--   Type: `boolean`
--   Default value: `false`
-
-When set to `true`, the block declares that it keeps working when an ancestor
-element (the editor canvas) is the `contenteditable` editing host, with focus
-and the native selection residing there instead of on the block's own editable
-elements. The editor uses this to keep the canvas editable while such a block
-is selected, enabling native partial selection across blocks. Blocks that rely
-on `event.target` or DOM focus pointing at their own elements should not
-declare this support.
 
 ## filter
 
@@ -1042,7 +1037,7 @@ When the block declares support for `shadow`, the attributes definition is exten
     -   `padding`: type `boolean` or `array`, default value `false`
     -   `blockGap`: type `boolean` or `array`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#spacing-control).
 
 ```js
 supports: {
@@ -1085,6 +1080,56 @@ supports: {
 }
 ```
 
+## transform
+
+_**Note:** Since WordPress 7.3._
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties:
+    -   `rotate`: type `boolean`, default value `false`
+    -   `translate`: type `boolean`, default value `false`
+    -   `scale`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, `settings.transform.translate`, `settings.transform.scale` or `settings.appearanceTools`.
+
+Each feature is output as its own CSS property, such as `rotate`, `translate` or `scale`, and never as the `transform` shorthand. This way a rotation, an offset and a scale combine with each other and with any `transform` a theme or block already applies.
+
+```js
+supports: {
+	transform: {
+		rotate: true, // Enable the rotation control.
+		translate: true, // Enable the X and Y offset controls.
+		scale: true, // Enable the scale control.
+	}
+}
+```
+
+An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen. A scale does the same: it grows or shrinks the block around its center without changing the layout around it.
+
+Each axis is set on its own, like margin sides. An offset outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each axis it sets, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. An axis left out comes from the styles below it, such as Global Styles, a block style variation or the block's default offset under a state, and is `0` when none sets it. When a user changes one axis in the block editor, only that axis is saved. The two custom properties are registered with `@property` and do not inherit, so a nested block does not take its parent's offset.
+
+Transforms are saved as an inline style on the block wrapper. To apply them to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`, and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
+
+When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
+
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate`, `translate` or `scale` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. An axis can be left out. A scale is a single non-negative number, such as `1.2`, or percentage, such as `"120%"`, that scales both axes. For example:
+
+```js
+attributes: {
+    style: {
+        transform: {
+            rotate: "15deg",
+            translate: {
+                x: "10px",
+                y: "-50%",
+            },
+            scale: 1.2,
+        }
+    }
+}
+```
+
 ## typography
 
 -   Type: `Object`
@@ -1093,6 +1138,7 @@ supports: {
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
     -   `textAlign`: type `boolean` or `array`, default value `false`
+    -   `textShadow`: type `boolean`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -1224,6 +1270,50 @@ attributes: {
         default: {
             typography: {
                 textAlign: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.textShadow
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This value signals that a block supports the text-shadow CSS style property. When it does, the block editor will show a UI control for the user to set its value if the theme declares support.
+
+```js
+supports: {
+    typography: {
+        // Enable support and UI control for text-shadow.
+        textShadow: true,
+    },
+}
+```
+
+When the block declares support for `textShadow`, the attributes definition is extended to include two new attributes: `textShadow` and `style`:
+
+-   `textShadow`: an attribute of `string` type with no default assigned. It stores any preset value selected by the user. The block can apply a default preset text shadow by specifying its own `textShadow` attribute with a default. For example:
+
+```js
+attributes: {
+    textShadow: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+-   `style`: an attribute of `object` type with no default assigned. It stores the custom value set by the user and is shared with other block supports such as color. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textShadow: 'value'
             }
         }
     }

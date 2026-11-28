@@ -45,7 +45,4 @@ export type DragEventAction = DragStartAction | DragEndAction | DragAction;
 export type KeyEventAction = PressDownAction | PressUpAction | PressEnterAction;
 
 export type InputAction =
-	| ChangeEventAction
-	| KeyEventAction
-	| DragEventAction
-	| InvalidateAction;
+	ChangeEventAction | KeyEventAction | DragEventAction | InvalidateAction;

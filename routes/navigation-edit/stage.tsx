@@ -4,8 +4,8 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import type { Post } from '@wordpress/core-data';
 import NavigationMenuEditor from './editor';
+import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -21,7 +21,7 @@ function NavigationEditStage() {
 					'postType',
 					NAVIGATION_POST_TYPE,
 					navigationId
-				) as Post,
+				),
 			};
 		},
 		[ navigationId ]
@@ -51,9 +51,10 @@ function NavigationEditStage() {
 					] }
 				/>
 			}
-			hasPadding
 		>
-			<NavigationMenuEditor id={ navigationId } />
+			<div className={ styles.content }>
+				<NavigationMenuEditor id={ navigationId } />
+			</div>
 		</Page>
 	);
 }

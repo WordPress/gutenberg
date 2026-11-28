@@ -1,5 +1,6 @@
-@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "../utils/composite-item";
 
 .components-autocomplete__popover .components-popover__content {
 	padding: $grid-unit-10;
@@ -13,8 +14,14 @@
 	text-align: left;
 	width: 100%;
 	font-weight: var(--wpds-typography-font-weight-default);
+	position: relative;
 
-	&:focus:not(:disabled) {
-		@include block-toolbar-button-style__focus();
+	&:is(:focus, .is-selected):not(:disabled, [aria-disabled="true"]) {
+		@include composite-item.highlight;
+	}
+
+	&[aria-disabled="true"]:is(:focus, .is-selected) {
+		@include outset-ring__focus;
+		outline-offset: 0;
 	}
 }

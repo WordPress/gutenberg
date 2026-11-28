@@ -164,6 +164,158 @@ test.describe( 'undo', () => {
 		} );
 	} );
 
+	test( 'should undo formatting separately from typing', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'one two' );
+		await editor.page.waitForTimeout( 1000 );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ' three' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong> three</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one <strong>two</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>one two</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe( '' );
+
+		// Undo inserting the paragraph.
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+	} );
+
+	test( 'should not end the undo level when leaving a format with the arrow key', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a<strong>b</strong>' },
+		} );
+		await page.keyboard.press( 'End' );
+		// At the end of a format, the arrow keys enter and leave it without
+		// moving the caret.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong></p>
+<!-- /wp:paragraph -->`
+		);
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'y' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>bx</strong>y</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
+	test( 'should undo each format change across blocks separately', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// The same text on both lines, so the caret lands between the same
+		// letters one line up.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientIds()
+				)
+			)
+			.toHaveLength( 2 );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+i' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong><em>b</em></strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong><em>a</em></strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>a<strong>b</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>a</strong>b</p>
+<!-- /wp:paragraph -->`
+		);
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ab</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
@@ -275,27 +427,10 @@ test.describe( 'undo', () => {
 			endOffset: 0,
 		} );
 
-		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.
-
-		await expect.poll( editor.getEditedPostContent ).toBe( '' );
-		await expect.poll( undoUtils.getSelection ).toEqual( {} );
 		// After undoing every action, there should be no more undo history.
 		await expect(
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeDisabled();
-
-		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st block.
-
-		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
-		await expect.poll( undoUtils.getSelection ).toEqual( {
-			blockIndex: 0,
-			startOffset: 0,
-			endOffset: 0,
-		} );
-		// After redoing one change, the undo button should be enabled again.
-		await expect(
-			page.locator( 'role=button[name="Undo"]' )
-		).toBeEnabled();
 
 		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 1st paragraph text.
 
@@ -305,6 +440,10 @@ test.describe( 'undo', () => {
 			startOffset: 'This'.length,
 			endOffset: 'This'.length,
 		} );
+		// After redoing one change, the undo button should be enabled again.
+		await expect(
+			page.locator( 'role=button[name="Undo"]' )
+		).toBeEnabled();
 
 		await pageUtils.pressKeys( 'primaryShift+z' ); // Redo 2nd block.
 
@@ -415,6 +554,69 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	test( 'should not create an undo level when placing the caret in an empty post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/block-editor' ).getBlockCount()
+				)
+			)
+			.toBe( 1 );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
+	test( 'should not create an undo level when clicking below the content of an empty post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		const canvas = page.locator( 'iframe[name="editor-canvas"]' );
+		const canvasRect = await canvas.boundingBox();
+		await page.mouse.click(
+			canvasRect.x + canvasRect.width / 2,
+			canvasRect.y + canvasRect.height - 20
+		);
+
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/block-editor' ).getBlockCount()
+				)
+			)
+			.toBe( 1 );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Undo', exact: true } )
+		).toBeDisabled();
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
 	test( 'should immediately create an undo level on typing', async ( {
 		editor,
 		page,
@@ -496,16 +698,13 @@ test.describe( 'undo', () => {
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Add default block' } )
-			.click(); // third step.
+			.click();
 
 		// Title should be empty
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toHaveText( '' );
 
-		// First undo removes the block.
-		// Second undo restores the title.
-		await pageUtils.pressKeys( 'primary+z' );
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
@@ -544,8 +743,7 @@ test.describe( 'undo', () => {
 				.getByRole( 'button', { name: 'Save' } )
 		).toBeEnabled();
 
-		// Undo new block and content addition.
-		await pageUtils.pressKeys( 'primary+z', { times: 2 } );
+		await pageUtils.pressKeys( 'primary+z' );
 
 		// This cleanup runs through `withMultiEntityRecordEdits`, which
 		// real-time collaboration bypasses in favor of its own undo manager.

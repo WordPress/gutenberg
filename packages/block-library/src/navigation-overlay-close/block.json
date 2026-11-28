@@ -25,8 +25,20 @@
 				"text": true
 			}
 		},
+		"shadow": true,
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"spacing": {
 			"padding": true,
+			"margin": true,
 			"__experimentalDefaultControls": {
 				"padding": true
 			}

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { _x, sprintf } from '@wordpress/i18n';
 
 /**

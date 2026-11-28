@@ -6,8 +6,8 @@ import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
 	buildAccentRamp,
-} from '../../src/color-ramps/index';
-import { getColorString } from '../../src/color-ramps/lib/color-utils';
+} from '../../src/color-ramps/index.ts';
+import { getColorString } from '../../src/color-ramps/lib/color-utils.ts';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );
@@ -50,7 +50,7 @@ function generatePrimitiveColorTokens() {
 			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
-				ramp: buildAccentRamp( seed, bgRamp ),
+				ramp: buildAccentRamp( scaleName, seed, bgRamp ),
 			} ) );
 
 		// Convert the ramp values in a DTCG compatible format.

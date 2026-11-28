@@ -83,7 +83,11 @@ test.describe( 'Widgets screen', () => {
 			{ name: /^Empty block/ }
 		);
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		// Click rather than focus programmatically: once the widget area has
+		// a sibling, the block's editable is an inert part of the editing
+		// host and cannot hold focus; the click places the caret through the
+		// host like a real interaction.
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'First Paragraph' );
 
 		await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );
@@ -91,7 +95,7 @@ test.describe( 'Widgets screen', () => {
 		// TODO: We can add a test for the insertion indicator here.
 		await addParagraphBlock.click();
 
-		await addedParagraphBlockInFirstWidgetArea.focus();
+		await addedParagraphBlockInFirstWidgetArea.click();
 		await page.keyboard.type( 'Second Paragraph' );
 
 		const addShortCodeBlock =
@@ -116,10 +120,10 @@ test.describe( 'Widgets screen', () => {
 			secondWidgetArea.getByRole( 'document', {
 				name: /^Empty block/,
 			} );
-		await addedParagraphBlockInSecondWidgetArea.focus();
+		await addedParagraphBlockInSecondWidgetArea.click();
 		await page.keyboard.type( 'Third Paragraph' );
 
-		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+		const expectedWidgetAreas = {
 			'sidebar-1': [
 				{
 					name: 'core/paragraph',
@@ -142,10 +146,25 @@ test.describe( 'Widgets screen', () => {
 					attributes: { content: 'Third Paragraph' },
 				},
 			],
+		};
+		await expect
+			.poll( widgetsScreen.getWidgetAreaBlocks )
+			.toMatchObject( expectedWidgetAreas );
+
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+		await page.reload();
+
+		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
+			...expectedWidgetAreas,
+			wp_inactive_widgets: [],
 		} );
 	} );
 
 	test( 'Should insert content using the inline inserter', async ( {
+		editor,
 		page,
 		widgetsScreen,
 	} ) => {
@@ -218,11 +237,15 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
-		await expect(
-			firstWidgetArea.getByRole( 'document', {
-				name: 'Block: Heading',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					firstWidgetArea.getByRole( 'document', {
+						name: 'Block: Heading',
+					} )
+				)
+			)
+			.toBe( true );
 		await page.keyboard.type( 'My Heading' );
 
 		await widgetsScreen.saveWidgets();
@@ -541,6 +564,45 @@ test.describe( 'Widgets screen', () => {
 		} );
 	} );
 
+	test( 'keeps a moved widget in the destination area after saving and reloading', async ( {
+		page,
+		editor,
+		requestUtils,
+		widgetsScreen,
+	} ) => {
+		await requestUtils.addWidgetBlock(
+			'<!-- wp:paragraph --><p>Moved paragraph</p><!-- /wp:paragraph -->',
+			'sidebar-1'
+		);
+		const {
+			widgets: [ widgetId ],
+		} = await requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-1' } );
+		await page.reload();
+
+		await page.getByText( 'Moved paragraph', { exact: true } ).click();
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'Move to widget area' );
+		await page
+			.getByRole( 'menu', { name: 'Move to widget area' } )
+			.getByRole( 'menuitemradio', { name: 'Footer #2' } )
+			.click();
+
+		await widgetsScreen.saveWidgetsAndWaitForSidebars( [
+			'sidebar-1',
+			'sidebar-2',
+		] );
+		await page.reload();
+
+		const [ destination, inactive ] = await Promise.all( [
+			requestUtils.rest( { path: '/wp/v2/sidebars/sidebar-2' } ),
+			requestUtils.rest( {
+				path: '/wp/v2/sidebars/wp_inactive_widgets',
+			} ),
+		] );
+		expect( destination.widgets ).toContain( widgetId );
+		expect( inactive.widgets ).not.toContain( widgetId );
+	} );
+
 	test( 'Allows widget deletion to be undone', async ( {
 		page,
 		editor,
@@ -570,10 +632,14 @@ test.describe( 'Widgets screen', () => {
 		await widgetsScreen.saveWidgets();
 
 		// Delete the last block and save again.
+		// Click rather than focus programmatically: the block is still
+		// selected from its insertion, so its editable is an inert part of
+		// the editing host and cannot hold focus; the click places the caret
+		// through the host like a real interaction.
 		await firstWidgetArea
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.filter( { hasText: 'Second Paragraph' } )
-			.focus();
+			.click();
 		await pageUtils.pressKeys( 'access+z' );
 		await widgetsScreen.saveWidgets();
 
@@ -656,6 +722,34 @@ test.describe( 'Widgets screen', () => {
 			],
 		} );
 	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/52328.
+	test( 'should open the welcome guide from the Options menu', async ( {
+		page,
+	} ) => {
+		const welcomeGuide = page.getByRole( 'dialog', {
+			name: 'Welcome to block Widgets',
+		} );
+		await expect( welcomeGuide ).toBeHidden();
+
+		await page
+			.getByRole( 'region', { name: 'Widgets top bar' } )
+			.getByRole( 'button', { name: 'Options', exact: true } )
+			.click();
+
+		// The item opens a dialog, so it is a plain menu item rather than a
+		// preference toggle (`menuitemcheckbox`).
+		const welcomeGuideMenuItem = page.getByRole( 'menuitem', {
+			name: 'Welcome Guide',
+		} );
+		await expect( welcomeGuideMenuItem ).toHaveAttribute(
+			'aria-haspopup',
+			'dialog'
+		);
+		await welcomeGuideMenuItem.click();
+
+		await expect( welcomeGuide ).toBeVisible();
+	} );
 } );
 
 class WidgetsScreen {
@@ -726,5 +820,25 @@ class WidgetsScreen {
 			},
 			{ box: true }
 		);
+	};
+
+	/**
+	 * Let the requested writes finish so a reload doesn't interrupt them.
+	 *
+	 * @param {string[]} sidebarIds Sidebar writes to wait for.
+	 */
+	saveWidgetsAndWaitForSidebars = async ( sidebarIds ) => {
+		await Promise.all( [
+			...sidebarIds.map( ( id ) =>
+				this.#page.waitForResponse(
+					( response ) =>
+						response.request().method() === 'POST' &&
+						new URL( response.url() ).pathname.endsWith(
+							`/wp/v2/sidebars/${ id }`
+						)
+				)
+			),
+			this.saveWidgets(),
+		] );
 	};
 }

@@ -1,11 +1,16 @@
 import Ajv from 'ajv';
+import { beforeEach, describe, expect, test } from 'vitest';
 import wpEnvSchema from '../../schemas/json/wp-env.json';
 import wpEnvJsonFile from '../../.wp-env.json';
 
 describe( '.wp-env.json schema', () => {
-	const ajv = new Ajv( {
-		allowMatchingProperties: true,
-		allowUnionTypes: true,
+	let ajv;
+
+	beforeEach( () => {
+		ajv = new Ajv( {
+			allowMatchingProperties: true,
+			allowUnionTypes: true,
+		} );
 	} );
 
 	test( 'strictly adheres to the draft-07 meta schema', () => {
@@ -29,4 +34,27 @@ describe( '.wp-env.json schema', () => {
 
 		expect( result ).toBe( true );
 	} );
+
+	test.each( [ 'lts', 'latest', '10', '10.11', '10.3.39', null ] )(
+		'accepts mariadbVersion %j at the root and in an environment',
+		( mariadbVersion ) => {
+			expect( ajv.validate( wpEnvSchema, { mariadbVersion } ) ).toBe(
+				true
+			);
+			expect(
+				ajv.validate( wpEnvSchema, {
+					env: { tests: { mariadbVersion } },
+				} )
+			).toBe( true );
+		}
+	);
+
+	test.each( [ 'LTS', 'lts-10', '11-noble', '', 10.11 ] )(
+		'rejects mariadbVersion %j',
+		( mariadbVersion ) => {
+			expect( ajv.validate( wpEnvSchema, { mariadbVersion } ) ).toBe(
+				false
+			);
+		}
+	);
 } );

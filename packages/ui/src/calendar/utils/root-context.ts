@@ -5,6 +5,8 @@ import type { ComponentProps } from '../../utils/types';
 export type RootContextValue = {
 	render?: ComponentProps< 'div' >[ 'render' ];
 	ref?: Ref< HTMLDivElement >;
+	role?: ComponentProps< 'div' >[ 'role' ];
+	defaultAriaLabel?: string;
 };
 
 /**
@@ -13,7 +15,6 @@ export type RootContextValue = {
  * type would remount the whole calendar on every render, losing focus.
  *
  * The `Root` override is therefore declared once at module scope, and reads the
- * per-instance `render` and `ref` from this context instead of closing over
- * them.
+ * per-instance root props from this context instead of closing over them.
  */
 export const RootContext = createContext< RootContextValue >( {} );

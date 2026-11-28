@@ -294,8 +294,72 @@ class Tests_REST_View_Config_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertSame( $config['default_view'], $data['default_view'] );
 		$this->assertSame( $config['default_layouts'], $data['default_layouts'] );
-		$this->assertSame( $config['view_list'], $data['view_list'] );
+		// The 7.3 controller adds item counts to the `page` view list; they are
+		// covered by its own tests, so leave them out of this comparison.
+		$view_list = array_map(
+			static function ( $entry ) {
+				unset( $entry['count'] );
+				return $entry;
+			},
+			$data['view_list']
+		);
+		$this->assertSame( $config['view_list'], $view_list );
 		$this->assertSame( $config['form'], $data['form'] );
+	}
+
+	/**
+	 * The `wp_navigation` post type provides its own list-based default view.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_wp_navigation_default_view() {
+		// Admin: reading wp_navigation config requires `edit_theme_options`.
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'postType', 'wp_navigation' );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = json_decode( wp_json_encode( $response->get_data() ), true );
+
+		$this->assertSame( 'list', $data['default_view']['type'] );
+		$this->assertSame(
+			array(
+				'field'     => 'date',
+				'direction' => 'desc',
+			),
+			$data['default_view']['sort']
+		);
+		$this->assertSame( 'title', $data['default_view']['titleField'] );
+		$this->assertSame( array( 'list' ), array_keys( $data['default_layouts'] ) );
+		$this->assertCount( 1, $data['view_list'] );
+		$this->assertSame( 'all', $data['view_list'][0]['slug'] );
+	}
+
+	/**
+	 * The `root`/`site` entity provides the form of the site identity screen.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_root_site_form() {
+		// Admin: reading root config requires `manage_options`.
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->dispatch_request( 'root', 'site' );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = json_decode( wp_json_encode( $response->get_data() ), true );
+
+		$this->assertSame(
+			array(
+				'type'          => 'regular',
+				'labelPosition' => 'top',
+			),
+			$data['form']['layout']
+		);
+		$this->assertSame(
+			array( 'title', 'description', 'site_logo', 'site_icon' ),
+			$data['form']['fields']
+		);
 	}
 
 	/**

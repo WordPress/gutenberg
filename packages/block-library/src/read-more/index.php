@@ -13,7 +13,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string  Returns the post link.
+ * @return string Returns the post link.
  */
 function render_block_core_read_more( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
@@ -43,7 +43,7 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 		esc_url( get_the_permalink( $post_ID ) ),
 		esc_attr( $attributes['linkTarget'] ),
 		$more_text,
-		$screen_reader_text
+		wp_kses( $screen_reader_text, array() )
 	);
 }
 

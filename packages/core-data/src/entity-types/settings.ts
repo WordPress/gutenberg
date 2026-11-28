@@ -23,6 +23,10 @@ declare module './base-entity-records' {
 			 */
 			page_for_posts: number;
 			/**
+			 * The ID of the page that should be displayed as the privacy policy page
+			 */
+			page_for_privacy_policy: number;
+			/**
 			 * Site title.
 			 */
 			title: string;

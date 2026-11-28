@@ -5,7 +5,8 @@ import { Stack } from '../../stack';
 import * as Drawer from '../index';
 
 const meta: Meta< typeof Drawer.Root > = {
-	title: 'Design System/Components/Drawer',
+	title: 'Components/@wordpress-ui/Drawer',
+	id: 'design-system-components-drawer',
 	component: Drawer.Root,
 	subcomponents: {
 		'Drawer.Trigger': Drawer.Trigger,
@@ -15,7 +16,7 @@ const meta: Meta< typeof Drawer.Root > = {
 		'Drawer.Title': Drawer.Title,
 		'Drawer.Description': Drawer.Description,
 		'Drawer.Content': Drawer.Content,
-		'Drawer.CloseIcon': Drawer.CloseIcon,
+		'Drawer.CloseIconButton': Drawer.CloseIconButton,
 		'Drawer.Action': Drawer.Action,
 		'Drawer.Footer': Drawer.Footer,
 	},
@@ -48,7 +49,7 @@ export const _Default: Story = {
 			<Drawer.Popup key="popup">
 				<Drawer.Header>
 					<Drawer.Title>Navigation</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 				<Drawer.Content>
 					<Drawer.Description>
@@ -95,7 +96,7 @@ export const AllSides: Story = {
 						<Drawer.Popup>
 							<Drawer.Header>
 								<Drawer.Title>{ title }</Drawer.Title>
-								<Drawer.CloseIcon />
+								<Drawer.CloseIconButton />
 							</Drawer.Header>
 							<Drawer.Content>
 								<Drawer.Description>
@@ -138,7 +139,7 @@ export const Controlled: Story = {
 			<Drawer.Popup key="popup">
 				<Drawer.Header>
 					<Drawer.Title>Controlled Drawer</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 				<Drawer.Content>
 					<Drawer.Description>
@@ -175,7 +176,7 @@ export const NonModal: Story = {
 			<Drawer.Popup key="popup">
 				<Drawer.Header>
 					<Drawer.Title>Non-Modal</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 				<Drawer.Content>
 					<Drawer.Description>
@@ -296,7 +297,7 @@ export const WithCustomZIndex: Story = {
 			>
 				<Drawer.Header>
 					<Drawer.Title>Custom z-index</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 				<Drawer.Content>
 					<Drawer.Description>
@@ -346,7 +347,7 @@ export const SizePlayground: Story = {
 				<Drawer.Popup size={ size }>
 					<Drawer.Header>
 						<Drawer.Title>Size Playground</Drawer.Title>
-						<Drawer.CloseIcon />
+						<Drawer.CloseIconButton />
 					</Drawer.Header>
 					<Drawer.Content>
 						<Stack direction="column" gap="lg">
@@ -502,7 +503,7 @@ export const Scrollable: Story = {
 		const header = (
 			<Drawer.Header>
 				<Drawer.Title>Terms of service</Drawer.Title>
-				<Drawer.CloseIcon />
+				<Drawer.CloseIconButton />
 			</Drawer.Header>
 		);
 

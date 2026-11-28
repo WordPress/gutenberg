@@ -8,11 +8,13 @@ const LayoutCardComponent = ( {
 	withSummary,
 	isCollapsible,
 	isOpened,
+	headingLevel,
 }: {
 	withHeader: boolean;
 	withSummary: boolean;
 	isCollapsible: boolean;
 	isOpened?: boolean;
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
 	type Customer = {
 		name: string;
@@ -28,6 +30,9 @@ const LayoutCardComponent = ( {
 		hasVat: boolean;
 		vat: number;
 		commission: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 		dueDate: string;
 	};
 
@@ -74,9 +79,27 @@ const LayoutCardComponent = ( {
 			type: 'boolean',
 		},
 		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field rendered as its own card.
 			id: 'payments',
 			label: 'Payments',
-			type: 'text',
 			readOnly: true, // Triggers using the render method instead of Edit.
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
@@ -128,6 +151,9 @@ const LayoutCardComponent = ( {
 		displayPayments: true,
 		totalOrders: 2,
 		totalRevenue: 1430,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 		averageOrderValue: 715,
 		hasVat: true,
 		vat: 10,
@@ -141,12 +167,14 @@ const LayoutCardComponent = ( {
 		withHeader: header,
 		isCollapsible: collapsible,
 		isOpened: opened,
+		headingLevel: level,
 	}: {
 		summary?: string | string[] | { id: string; visibility: 'always' }[];
 		withSummary?: boolean;
 		withHeader?: boolean;
 		isCollapsible?: boolean;
 		isOpened?: boolean;
+		headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	} ) => {
 		return {
 			type: 'card' as const,
@@ -157,7 +185,8 @@ const LayoutCardComponent = ( {
 						withHeader: true as const,
 						isCollapsible: collapsible,
 						isOpened: opened,
-				  } ),
+						headingLevel: level,
+					} ),
 		};
 	};
 
@@ -173,6 +202,7 @@ const LayoutCardComponent = ( {
 						withSummary,
 						isCollapsible,
 						isOpened,
+						headingLevel,
 					} ),
 					label: 'Customer',
 					description:
@@ -231,6 +261,18 @@ const LayoutCardComponent = ( {
 					} ),
 				},
 				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getCardLayoutFromStoryArgs( {
+						withHeader,
+						withSummary,
+						isCollapsible,
+						isOpened,
+						headingLevel,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
+				},
+				{
 					id: 'taxConfiguration',
 					label: 'Taxes',
 					layout: getCardLayoutFromStoryArgs( {
@@ -239,12 +281,13 @@ const LayoutCardComponent = ( {
 						withSummary,
 						isCollapsible,
 						isOpened: isOpened ?? false,
+						headingLevel,
 					} ),
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader, withSummary, isCollapsible, isOpened ]
+		[ withHeader, withSummary, isCollapsible, isOpened, headingLevel ]
 	);
 
 	return (

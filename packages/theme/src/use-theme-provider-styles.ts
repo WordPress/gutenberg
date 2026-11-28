@@ -10,21 +10,23 @@ import {
 } from 'colorjs.io/fn';
 import memoize from 'memize';
 import { useMemo, useContext } from '@wordpress/element';
-import { ThemeContext } from './context';
-import colorTokens from './prebuilt/ts/color-tokens';
+import { ThemeContext } from './context.ts';
+import colorTokens from './prebuilt/ts/color-tokens.ts';
 import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
 	type RampResult,
-} from './color-ramps';
-import { getColorString } from './color-ramps/lib/color-utils';
-import type { ThemeProviderProps } from './types';
+} from './color-ramps/index.ts';
+import { getColorString, getContrast } from './color-ramps/lib/color-utils.ts';
+import { MINIMUM_TEXT_CONTRAST } from './semantic-color-contrast-pairs.ts';
+import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
+import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
 	type ThemeProviderColorRampName,
 	type ThemeProviderColorWarning,
-} from './theme-provider-color-warnings';
+} from './theme-provider-color-warnings.ts';
 
 type Entry = [ string, string ];
 
@@ -32,6 +34,31 @@ type Entry = [ string, string ];
 // Without memoizing background ramps, accent ramp memoization would not work at all.
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+
+/*
+ * Building a ramp is costly, and the ramps of the default seeds are prebuilt,
+ * so use them when a seed is the default: with the default background, and
+ * the default admin color scheme, no ramp is built at all.
+ */
+function getBgRamp( seed: string ): RampResult {
+	return seed === DEFAULT_SEED_COLORS.background
+		? DEFAULT_RAMPS.background
+		: getCachedBgRamp( seed );
+}
+
+function getAccentRamp(
+	rampName: Exclude< ThemeProviderColorRampName, 'background' >,
+	seed: string,
+	bgRamp: RampResult
+): RampResult {
+	if (
+		bgRamp === DEFAULT_RAMPS.background &&
+		seed === DEFAULT_SEED_COLORS[ rampName ]
+	) {
+		return DEFAULT_RAMPS[ rampName ];
+	}
+	return getCachedAccentRamp( rampName, seed, bgRamp );
+}
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
@@ -156,7 +183,7 @@ function generateStyles( {
 	primary: string;
 	colorEntries: Entry[];
 } ): CSSProperties {
-	return Object.fromEntries(
+	const styles = Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorEntries,
@@ -165,6 +192,17 @@ function generateStyles( {
 			legacyWpComponentsOverridesCSS,
 		].flat()
 	);
+	// The legacy accent keeps the seed even when the semantic brand fill moves.
+	// Prefer white: the darker legacy accent states only increase its contrast.
+	const accent = styles[ '--wp-admin-theme-color' ];
+	const onFill = styles[ '--wpds-color-foreground-interactive-brand-strong' ];
+	if ( getContrast( accent, onFill ) < MINIMUM_TEXT_CONTRAST ) {
+		styles[ '--wp-components-color-accent-inverted' ] =
+			getContrast( accent, '#fff' ) >= MINIMUM_TEXT_CONTRAST
+				? '#fff'
+				: '#000';
+	}
+	return styles;
 }
 
 function generateThemeProviderColors(
@@ -183,7 +221,7 @@ function generateThemeProviderColors(
 		ThemeProviderColorRampName,
 		RampResult
 	>();
-	const bgRamp = getCachedBgRamp( seeds.background );
+	const bgRamp = getBgRamp( seeds.background );
 
 	for ( const [ rawRampName, seed ] of Object.entries( seeds ) ) {
 		const rampName = rawRampName as ThemeProviderColorRampName;
@@ -191,7 +229,7 @@ function generateThemeProviderColors(
 			rampName,
 			rampName === 'background'
 				? bgRamp
-				: getCachedAccentRamp( seed, bgRamp )
+				: getAccentRamp( rampName, seed, bgRamp )
 		);
 	}
 	const colorEntries = colorTokensCSS( computedColorRamps );
@@ -235,14 +273,14 @@ export function useThemeProviderStyles( {
 	// - otherwise, if a parent instance exists, use its inherited value or default;
 	// - otherwise, omit.
 	const primary = hasColor
-		? color.primary ??
-		  inheritedSettings.color?.primary ??
-		  DEFAULT_SEED_COLORS.primary
+		? ( color.primary ??
+			inheritedSettings.color?.primary ??
+			DEFAULT_SEED_COLORS.primary )
 		: undefined;
 	const background = hasColor
-		? color.background ??
-		  inheritedSettings.color?.background ??
-		  DEFAULT_SEED_COLORS.background
+		? ( color.background ??
+			inheritedSettings.color?.background ??
+			DEFAULT_SEED_COLORS.background )
 		: undefined;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 	const cornerRadiusPreset =

@@ -10,6 +10,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllMenus();
 	} );
@@ -80,11 +81,118 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( openMenuButton ).toBeFocused();
 		} );
 
+		test.describe( 'Fade out', () => {
+			// Slow the animation down, so the fade can be observed.
+			const slowFadeStyles = `
+				.wp-block-navigation__responsive-container.is-menu-open,
+				.wp-block-navigation__responsive-container.is-menu-open.is-menu-closing {
+					animation-duration: 1s !important;
+				}
+			`;
+
+			test.beforeEach( async ( { page } ) => {
+				await page.emulateMedia( { reducedMotion: 'no-preference' } );
+			} );
+
+			test( 'keeps the overlay displayed until it has faded out', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( { content: slowFadeStyles } );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+				const root = page.locator( 'html' );
+
+				await page.getByRole( 'button', { name: 'Open menu' } ).click();
+				await expect( overlay ).toBeVisible();
+
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+
+				// The overlay is still displayed, and the page still can't scroll.
+				await expect( overlay ).toHaveClass( /is-menu-closing/ );
+				await expect( overlay ).toBeVisible();
+				await expect( root ).toHaveClass( /has-modal-open/ );
+
+				// Once the fade is over, the overlay is removed.
+				await expect( overlay ).toBeHidden();
+				await expect( root ).not.toHaveClass( /has-modal-open/ );
+			} );
+
+			test( 'cancels the fade when the menu is reopened', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( { content: slowFadeStyles } );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+				const root = page.locator( 'html' );
+				const openMenuButton = page.getByRole( 'button', {
+					name: 'Open menu',
+				} );
+
+				await openMenuButton.click();
+				await expect( overlay ).toBeVisible();
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+				await expect( overlay ).toHaveClass( /is-menu-closing/ );
+
+				// Reopen while the overlay is still fading out.
+				await openMenuButton.click();
+				await expect( overlay ).not.toHaveClass( /is-menu-closing/ );
+
+				// The overlay is still open after the fade would have ended.
+				await page.evaluate(
+					() =>
+						new Promise( ( resolve ) =>
+							setTimeout( resolve, 1300 )
+						)
+				);
+				await expect( overlay ).toBeVisible();
+				await expect( root ).toHaveClass( /has-modal-open/ );
+				await expect(
+					page.getByRole( 'link', { name: 'Item 1' } )
+				).toBeVisible();
+			} );
+
+			test( 'closes right away when the overlay has no animation', async ( {
+				page,
+			} ) => {
+				await page.goto( '/' );
+				await page.addStyleTag( {
+					content:
+						'.wp-block-navigation__responsive-container.is-menu-open { animation: none !important; }',
+				} );
+				const overlay = page.locator(
+					'.wp-block-navigation__responsive-container.is-menu-open'
+				);
+
+				await page.getByRole( 'button', { name: 'Open menu' } ).click();
+				await expect( overlay ).toBeVisible();
+				await page
+					.getByRole( 'button', { name: 'Close menu' } )
+					.click();
+
+				// There is no fade to wait for.
+				await expect( page.locator( '.is-menu-closing' ) ).toHaveCount(
+					0
+				);
+				await expect( overlay ).toBeHidden();
+				await expect( page.locator( 'html' ) ).not.toHaveClass(
+					/has-modal-open/
+				);
+			} );
+		} );
+
 		/**
 		 * These are already tested within the Overlay Interactions test above, but Safari is flakey on the Tab
 		 * keypresses (passes 50 - 70% of the time). Tab keypresses are testing fine manually in Safari, but not
 		 * in the test. Once we figure out why the Tab keypresses are flakey in the test, we can
-		 * remove this test and only rely on the Overlay Interactions test above and add a (@firefox, @webkit)
+		 * remove this test and only rely on the Overlay Interactions test above and add a (`@firefox`, `@webkit`)
 		 * directive to the describe() statement. https://github.com/WordPress/gutenberg/pull/55198
 		 */
 		test( 'Overlay menu interactions in Safari (@webkit)', async ( {
@@ -127,6 +235,124 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await pageUtils.pressKeys( 'Escape' );
 			await expect( overlayMenuFirstElement ).toBeHidden();
 			await expect( openMenuButton ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Submenus inside an overlay', () => {
+		const submenuMenuContent = `
+			<!-- wp:navigation-submenu {"label":"Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+				<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+			<!-- /wp:navigation-submenu -->
+			`;
+
+		test( 'submenus in a custom overlay set to open on click, do not display until clicked', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			// The menu shown in the overlay. The header navigation uses a
+			// separate menu so that the overlay's submenu is the only one in
+			// the page.
+			const overlayMenu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+			const headerMenu = await requestUtils.createNavigationMenu( {
+				title: 'Header menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Header Item","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'navigation-overlay',
+				title: 'Navigation Overlay',
+				area: 'navigation-overlay',
+				content: `
+					<!-- wp:navigation-overlay-close /-->
+					<!-- wp:navigation {"ref":${ overlayMenu.id },"submenuVisibility":"click","showSubmenuIcon":false,"layout":{"type":"flex","orientation":"vertical"}} /-->
+					`,
+			} );
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ headerMenu.id },"overlayMenu":"always","overlay":"navigation-overlay"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await openMenuButton.click();
+
+			// A custom overlay does not display its submenus, so opening the
+			// overlay must leave the submenu closed.
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+
+			// The submenu opens and closes on click, as configured.
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect( submenuLink ).toBeVisible();
+
+			await submenuButton.click();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'false'
+			);
+			await expect( submenuLink ).toBeHidden();
+		} );
+
+		test( 'submenus report themselves as expanded with the default overlay', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+
+			// The same submenu setting as the test above, so that the overlay
+			// is the only difference between the two. The arrow toggle is not
+			// used here because the default overlay hides it with
+			// `display: none`, which takes it out of the accessibility tree.
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always","submenuVisibility":"click"} /-->`,
+			} );
+
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Submenu submenu',
+			} );
+			const submenuLink = page.getByRole( 'link', {
+				name: 'Submenu Link',
+			} );
+
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			// The default overlay expands every submenu it contains, so the
+			// toggle has to report that without waiting for an interaction.
+			await expect( submenuLink ).toBeVisible();
+			await expect( submenuButton ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
 		} );
 	} );
 
@@ -268,7 +494,7 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		 * These are already tested within the Submenu Interactions test above, but Safari is flakey on the
 		 * Tab keypresses (passes 50 - 70% of the time). Tab keypresses are testing fine manually in Safari,
 		 * but not in the test. Once we figure out why the Tab keypresses are flakey in the test, we can
-		 * remove this test and only rely on the Submenu interactions test above and add a (@firefox, @webkit)
+		 * remove this test and only rely on the Submenu interactions test above and add a (`@firefox`, `@webkit`)
 		 * directive to the describe() statement. https://github.com/WordPress/gutenberg/pull/55198
 		 */
 		test( 'Submenu interactions on Safari (@webkit)', async ( {

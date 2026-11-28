@@ -4,7 +4,7 @@ import type { ReactNode, ComponentType } from 'react';
  * Icon type supporting multiple formats:
  * - Dashicon strings (e.g., "dashicons-admin-generic")
  * - JSX elements
- * - SVG icons from @wordpress/icons
+ * - SVG icons from `@wordpress/icons`
  * - Data URLs for images
  */
 export type IconType = string | React.JSX.Element | ReactNode;
@@ -53,6 +53,13 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+
+	/**
+	 * The rendering mode the canvas stays in, for routes that show the site
+	 * rather than one piece of content. Resolved from the post type and the
+	 * user's preference when omitted.
+	 */
+	renderingMode?: 'post-only' | 'template-locked';
 }
 
 /**

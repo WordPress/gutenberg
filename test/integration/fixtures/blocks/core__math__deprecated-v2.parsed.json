@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/math",
+		"attrs": {
+			"latex": "\\frac{"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-math\"><math display=\"block\"></math></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-math\"><math display=\"block\"></math></div>\n"
+		]
+	}
+]

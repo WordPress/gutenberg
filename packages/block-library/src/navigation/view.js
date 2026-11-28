@@ -42,6 +42,50 @@ function getFocusableElements( ref ) {
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
+// Extra time on top of the overlay's animation duration, in case
+// `animationend` never fires, e.g. when a theme overrides the animation.
+const FADE_OUT_BUFFER_MS = 100;
+
+function prefersReducedMotion() {
+	return window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+}
+
+/**
+ * Returns the length of the overlay's animation in milliseconds, or 0 when the
+ * overlay has no animation, e.g. when a theme sets `animation: none`. The
+ * fade-out uses the same duration as the fade-in.
+ *
+ * @param {Element} modal The overlay element.
+ * @return {number} The animation duration in milliseconds.
+ */
+function getOverlayAnimationDuration( modal ) {
+	const { animationName, animationDuration } =
+		window.getComputedStyle( modal );
+	if ( animationName === 'none' ) {
+		return 0;
+	}
+	// Several animations are comma separated, e.g. `0.1s, 200ms`.
+	return Math.max(
+		...animationDuration.split( ',' ).map( ( duration ) => {
+			const value = parseFloat( duration );
+			return duration.trim().endsWith( 'ms' ) ? value : value * 1000;
+		} )
+	);
+}
+
+/**
+ * Ends the overlay fade-out: stops displaying the overlay and releases the
+ * page scroll lock.
+ *
+ * @param {Object} ctx The navigation overlay context.
+ */
+function finishClosingOverlay( ctx ) {
+	clearTimeout( ctx.closingTimeout );
+	ctx.closingTimeout = null;
+	ctx.isClosing = false;
+	document.documentElement.classList.remove( 'has-modal-open' );
+}
+
 const { state, actions } = store(
 	'core/navigation',
 	{
@@ -71,6 +115,13 @@ const { state, actions } = store(
 						.length > 0
 				);
 			},
+			get isMenuClosing() {
+				return !! getContext().isClosing;
+			},
+			get isMenuVisible() {
+				// The overlay stays visible while it fades out.
+				return state.isMenuOpen || state.isMenuClosing;
+			},
 			get menuOpenedBy() {
 				const ctx = getContext();
 				return ctx.type === 'overlay'
@@ -79,14 +130,17 @@ const { state, actions } = store(
 			},
 			get isSubmenuOpen() {
 				const ctx = getContext();
-				// Once the overlay itself is open, its styles always expand
-				// every submenu regardless of hover/click/focus state, so the
-				// toggle's `aria-expanded` should reflect that immediately
-				// instead of waiting for a hover/click/focus interaction.
-				const isOverlayOpen =
+				const isDefaultOverlayOpen =
+					! ctx.hasCustomOverlay &&
 					Object.values( ctx.overlayOpenedBy || {} ).filter( Boolean )
 						.length > 0;
-				return isOverlayOpen || state.isMenuOpen;
+
+				// A submenu can be opened by user interaction or by being in a default overlay.
+				// If it is a regular navigation or within a custom overlay, it is opened by user interaction.
+				// If it's in a default overlay, it is forced opened via CSS.
+				// Because default overlays always force submenus open, we return true
+				// if the default overlay is open.
+				return isDefaultOverlayOpen || state.isMenuOpen;
 			},
 		},
 		actions: {
@@ -149,6 +203,13 @@ const { state, actions } = store(
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
 					if ( event.key === 'Escape' ) {
+						// Ignore an Escape during IME composition, meant to cancel
+						// unconfirmed CJK text. On Safari, the final key of a
+						// composition can have `isComposing: false`, so also check
+						// `keyCode === 229`.
+						if ( event.isComposing || event.keyCode === 229 ) {
+							return;
+						}
 						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );
@@ -197,8 +258,13 @@ const { state, actions } = store(
 			} ),
 
 			openMenu( menuOpenedOn = 'click' ) {
-				const { type } = getContext();
+				const ctx = getContext();
+				const { type } = ctx;
 				state.menuOpenedBy[ menuOpenedOn ] = true;
+				// Reopening while the overlay is still fading out cancels the fade.
+				if ( ctx.isClosing ) {
+					finishClosingOverlay( ctx );
+				}
 				if ( type === 'overlay' ) {
 					// Add a `has-modal-open` class to the <html> root.
 					document.documentElement.classList.add( 'has-modal-open' );
@@ -215,13 +281,43 @@ const { state, actions } = store(
 					) {
 						ctx.previousFocus?.focus();
 					}
+					const modal = ctx.modal;
 					ctx.modal = null;
 					ctx.previousFocus = null;
 					if ( ctx.type === 'overlay' ) {
-						document.documentElement.classList.remove(
-							'has-modal-open'
-						);
+						// Already fading out, e.g. closing for both `click` and `focus`.
+						if ( ctx.isClosing ) {
+							return;
+						}
+						const animationDuration =
+							modal && ! prefersReducedMotion()
+								? getOverlayAnimationDuration( modal )
+								: 0;
+						if ( animationDuration ) {
+							// Keep the overlay displayed until its fade-out ends.
+							ctx.isClosing = true;
+							// Safety net in case `animationend` never fires.
+							ctx.closingTimeout = setTimeout(
+								() => finishClosingOverlay( ctx ),
+								animationDuration + FADE_OUT_BUFFER_MS
+							);
+						} else {
+							document.documentElement.classList.remove(
+								'has-modal-open'
+							);
+						}
 					}
+				}
+			},
+
+			handleOverlayAnimationEnd( event ) {
+				const ctx = getContext();
+				if (
+					ctx.isClosing &&
+					event.target === event.currentTarget &&
+					event.animationName === 'overlay-menu__fade-out-animation'
+				) {
+					finishClosingOverlay( ctx );
 				}
 			},
 		},

@@ -9,6 +9,7 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import Root from '../root';
+import styles from '../root/style.module.scss';
 import ErrorBoundary from '../error-boundary';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
@@ -27,7 +28,7 @@ const {
 // Not found component
 function NotFoundComponent() {
 	return (
-		<div className="boot-layout__stage">
+		<div className={ styles.stage }>
 			<Page title={ __( 'Route not found' ) } hasPadding>
 				{ __( "The page you're looking for does not exist" ) }
 			</Page>
@@ -129,14 +130,14 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				return (
 					<>
 						{ Stage && showStage && (
-							<div className="boot-layout__stage">
+							<div className={ styles.stage }>
 								<ErrorBoundary>
 									<Stage />
 								</ErrorBoundary>
 							</div>
 						) }
 						{ Inspector && showInspector && (
-							<div className="boot-layout__inspector">
+							<div className={ styles.inspector }>
 								<ErrorBoundary>
 									<Inspector />
 								</ErrorBoundary>

@@ -1,6 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Site editor command palette', () => {
+// The extensible site editor deliberately ships no command palette outside the
+// editor canvas, so this suite only applies to the classic site editor.
+test.describe( 'Site editor command palette @site-editor-v1-only', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );

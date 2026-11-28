@@ -18,7 +18,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 	} );
 
 	test.describe( 'Quick Inserter', () => {
-		test( 'uses defaulting ordering if prioritzed blocks setting was not set', async ( {
+		test( 'uses defaulting ordering if prioritized blocks setting was not set', async ( {
 			editor,
 			page,
 		} ) => {
@@ -43,7 +43,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			await expect( blockListBox.getByRole( 'option' ) ).toHaveCount( 6 );
 		} );
 
-		test( 'uses the priority ordering if prioritzed blocks setting is set', async ( {
+		test( 'uses the priority ordering if prioritized blocks setting is set', async ( {
 			editor,
 			page,
 		} ) => {
@@ -75,7 +75,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 			] );
 		} );
 
-		test( 'obeys allowed blocks over prioritzed blocks setting if conflicted', async ( {
+		test( 'obeys allowed blocks over prioritized blocks setting if conflicted', async ( {
 			editor,
 			page,
 		} ) => {
@@ -110,7 +110,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 	} );
 
 	test.describe( 'Slash inserter', () => {
-		test( 'uses the priority ordering if prioritzed blocks setting is set', async ( {
+		test( 'uses the priority ordering if prioritized blocks setting is set', async ( {
 			editor,
 			page,
 		} ) => {

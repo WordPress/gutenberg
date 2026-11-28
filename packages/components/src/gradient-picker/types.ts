@@ -1,11 +1,19 @@
 import type { HeadingSize } from '../heading/types';
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
 
 export type GradientObject = {
 	gradient: string;
 	name: string;
 	slug: string;
 };
-export type OriginObject = { name: string; gradients: GradientObject[] };
+export type OriginObject = {
+	/**
+	 * A stable identifier, unique among origins, that keeps focus on the origin when origins are reordered or removed.
+	 */
+	slug?: string;
+	name: string;
+	gradients: GradientObject[];
+};
 export type GradientsProp = GradientObject[] | OriginObject[];
 
 type GradientPickerBaseProps = {
@@ -59,15 +67,33 @@ type GradientPickerBaseProps = {
 	 */
 	headingLevel?: HeadingSize;
 	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
+	 * How predefined gradient swatches behave and are exposed to assistive
+	 * technology.
 	 *
+	 * - `listbox` uses one tab stop and arrow-key navigation, and exposes
+	 *   selection with `aria-selected`.
+	 * - `toggle-buttons` gives each swatch a tab stop and exposes selection with
+	 *   `aria-pressed`.
+	 * - `command-buttons` gives each swatch a tab stop and exposes no selection
+	 *   state. `value` and `selectedSlug` do not mark predefined swatches as
+	 *   selected, and activating a swatch always calls `onChange` with that
+	 *   swatch. `value` still controls the custom gradient picker.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
+	/**
+	 * Whether the control should present as toggle buttons.
+	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead. An explicit
+	 * `presentation` takes precedence.
 	 * @default false
+	 * @ignore
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
+	 * Only used with the `listbox` presentation.
 	 *
 	 * @default true
 	 */
@@ -103,6 +129,8 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
 	 * selector. Alternatively, if there are multiple sets (or 'origins') of
 	 * gradients, you can pass an array of objects each with a `name` and a
 	 * `gradients` array which will in turn contain the predefined gradient objects.
+	 * Give each origin a stable, unique `slug` to keep focus on it when origins
+	 * are reordered or removed.
 	 *
 	 * @default []
 	 */

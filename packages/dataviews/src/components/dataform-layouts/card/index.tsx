@@ -8,9 +8,10 @@ import {
 } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
-import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
+import { Card, CollapsibleCard, Stack, Text } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -30,7 +31,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -101,6 +102,29 @@ function HeaderContent< Item >( {
 
 	const hasBadge = touched && layout.isCollapsible;
 	const hasSummary = visibleSummaryFields.length > 0 && layout.withHeader;
+	// A collapsible card's heading wraps its toggle, so only a static card
+	// renders its title as the heading.
+	const HeadingTag =
+		layout.withHeader && ! layout.isCollapsible && layout.headingLevel
+			? ( `h${ layout.headingLevel }` as const )
+			: undefined;
+
+	const description = ( hasBadge || hasSummary ) && (
+		<>
+			{ hasBadge && <ValidationBadge validity={ validity } /> }
+			{ hasSummary && (
+				<div className="dataforms-layouts-card__field-summary">
+					{ visibleSummaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) ) }
+				</div>
+			) }
+		</>
+	);
 
 	return (
 		<Stack
@@ -108,23 +132,27 @@ function HeaderContent< Item >( {
 			justify="space-between"
 			className="dataforms-layouts-card__field-header-content"
 		>
-			<Card.Title>{ label }</Card.Title>
-			{ ( hasBadge || hasSummary ) && (
-				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
-					{ hasBadge && <ValidationBadge validity={ validity } /> }
-					{ hasSummary && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CollapsibleCard.HeaderDescription>
-			) }
+			<Card.Title render={ HeadingTag && <HeadingTag /> }>
+				{ label }
+			</Card.Title>
+			{ description &&
+				( layout.isCollapsible ? (
+					<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
+						{ description }
+					</CollapsibleCard.HeaderDescription>
+				) : (
+					// A static card has no toggle for the description to
+					// describe, so it is plain, readable text instead. It renders
+					// as a div because the summary is a div, which a span can't
+					// contain.
+					<Text
+						render={ <div /> }
+						variant="body-md"
+						className="dataforms-layouts-card__field-header-content-description"
+					>
+						{ description }
+					</Text>
+				) ) }
 		</Stack>
 	);
 }
@@ -233,10 +261,10 @@ export default function FormCardField< Item >( {
 		hasFocusedContentRef.current = true;
 	}, [] );
 
-	// Reveal the errors of every field in the card once focus leaves the card,
-	// replicating at the card level how validated controls show errors on
-	// their first blur. Moving focus between fields within the card doesn't
-	// count, so the natural tab sequence is preserved.
+	// Reveal the errors of every field in the card once focus leaves the card.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within the card doesn't count,
+	// so the natural tab sequence is preserved.
 	const handleFocusOutside = useCallback( () => {
 		// Leaving without ever entering the fields — for instance tabbing past
 		// the header of a collapsed card — isn't an interaction to report on.
@@ -272,7 +300,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+		if ( ! canRenderField( fieldDefinition ) ) {
 			return null;
 		}
 
@@ -292,6 +320,14 @@ export default function FormCardField< Item >( {
 			withHeader={ withHeader }
 		/>
 	);
+
+	const headingLevel = layout.withHeader ? layout.headingLevel : undefined;
+	// A native heading only allows phrasing content, so the collapsible
+	// header's wrapper, which contains the toggle, takes heading semantics
+	// through ARIA instead.
+	const collapsibleHeadingProps = headingLevel
+		? { role: 'heading', 'aria-level': headingLevel }
+		: {};
 
 	const headerContent = (
 		<HeaderContent
@@ -313,7 +349,7 @@ export default function FormCardField< Item >( {
 				onOpenChange={ handleOpenChange }
 				{ ...focusOutsideProps }
 			>
-				<CollapsibleCard.Header>
+				<CollapsibleCard.Header { ...collapsibleHeadingProps }>
 					{ headerContent }
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content

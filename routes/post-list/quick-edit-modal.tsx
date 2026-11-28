@@ -6,13 +6,53 @@ import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
+	Popover as WCPopover,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { loadEditorAssets } from '@wordpress/lazy-editor';
+import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+
+/*
+ * The featured image field opens the WordPress media modal, which needs the
+ * media assets (`wp.media` and friends) that the editor canvas loads but this
+ * screen never does — without them, opening the field crashes the route.
+ * Wrap the field's edit component so the shared editor assets are loaded
+ * first.
+ *
+ * This is a stopgap owned by the route because the route is what knows the
+ * screen is asset-less. Ultimately a field should be able to declare this
+ * kind of asset dependency itself so every DataForm consumer gets it for
+ * free; once that exists, remove this wrapper.
+ */
+function withEditorAssets( FieldEdit: any ) {
+	return function EditWithEditorAssets( props: any ) {
+		const [ isReady, setIsReady ] = useState(
+			() => !! ( window as any ).wp?.media
+		);
+		useEffect( () => {
+			if ( ! isReady ) {
+				loadEditorAssets().then( () => setIsReady( true ) );
+			}
+		}, [ isReady ] );
+
+		// Render the field right away — only opening the modal needs the
+		// assets — and keep it inert until they have loaded.
+		return (
+			<div
+				aria-busy={ ! isReady || undefined }
+				style={ ! isReady ? { opacity: 0.6 } : undefined }
+				inert={ inertValue( ! isReady ) }
+			>
+				<FieldEdit { ...props } />
+			</div>
+		);
+	};
+}
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
@@ -20,19 +60,27 @@ interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
 	closeModal: () => void;
+	/** Called once the edits are saved, before the modal closes. */
+	onSave?: () => void;
+	quickEditForm: Form | undefined;
 }
 
 export function QuickEditModal( {
 	postType,
 	postId,
 	closeModal,
+	onSave: onSaved,
+	quickEditForm,
 }: QuickEditModalProps ) {
 	const isBulk = postId.length > 1;
 
+	const [ modalElement, setModalElement ] = useState< HTMLDivElement | null >(
+		null
+	);
 	const [ localEdits, setLocalEdits ] = useState< Record< string, any > >(
 		{}
 	);
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const store = select( coreDataStore );
 			const { getEditedEntityRecord } = store;
@@ -46,24 +94,12 @@ export function QuickEditModal( {
 
 			const args = [ 'postType', postType, postId[ 0 ] ] as const;
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: ( store as any ).hasFinishedResolution(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -75,103 +111,36 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
-				if ( field.id === 'status' ) {
+				if ( field.id === 'featured_media' && field.Edit ) {
 					return {
 						...field,
-						elements: field.elements.filter(
-							( element: { value: string } ) =>
-								element.value !== 'trash'
-						),
-					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
+						Edit: withEditorAssets( field.Edit ),
 					};
 				}
 
 				return field;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields ]
 	);
 
-	const form = useMemo( () => {
-		const allFields: Form[ 'fields' ] = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'status',
-				label: __( 'Status' ),
-				children: [
-					{
-						id: 'status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'scheduled_date',
-					'password',
-				],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				children: [
-					{
-						id: 'comment_status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'ping_status',
-				],
-			},
-			'template',
-		];
-
+	const form = useMemo( (): Form => {
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel' as const,
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
-		const currentData: Record< string, any > = {
-			...record,
-			...localEdits,
-		};
-
-		if (
-			edits.status &&
-			edits.status !== 'future' &&
-			currentData?.status === 'future' &&
-			new Date( currentData.date ) > new Date()
-		) {
-			edits.date = null;
-		}
-		if (
-			edits.status &&
-			edits.status === 'private' &&
-			currentData?.password
-		) {
-			edits.password = '';
-		}
-
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
@@ -192,11 +161,14 @@ export function QuickEditModal( {
 		} else {
 			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
+		onSaved?.();
 		closeModal?.();
 	};
 
 	return (
 		<Modal
+			ref={ setModalElement }
+			size="small"
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			onRequestClose={ closeModal }
@@ -235,6 +207,9 @@ export function QuickEditModal( {
 					{ __( 'Done' ) }
 				</Button>
 			</HStack>
+			{ modalElement &&
+				// Keep popovers inside modal isolation but outside the clipped frame.
+				createPortal( <WCPopover.Slot />, modalElement ) }
 		</Modal>
 	);
 }

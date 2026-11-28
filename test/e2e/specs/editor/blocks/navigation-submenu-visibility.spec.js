@@ -52,6 +52,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		// Wait for navigation block to be visible
 		const navBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 		await expect( navBlock ).toBeVisible();
 		await editor.selectBlocks( navBlock );
@@ -146,6 +147,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 	} ) => {
 		const navBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
+			exact: true,
 		} );
 		const pageListBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Page List',

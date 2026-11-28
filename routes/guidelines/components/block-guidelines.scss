@@ -19,11 +19,6 @@
 			min-height: 20px;
 			max-width: 24px;
 			max-height: 24px;
-
-			// Optimize for high contrast modes.
-			@media (forced-colors: active) {
-				fill: CanvasText;
-			}
 		}
 	}
 

@@ -82,16 +82,16 @@ There is also `recommended-with-formatting` ruleset for projects that want to en
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
--   `custom` – custom rules for WordPress development.
--   `es5` – rules for legacy ES5 environments.
--   `esnext` – rules for ES2015+ environments.
--   `i18n` – rules for internationalization.
--   `jsdoc` – rules for JSDoc comments.
--   `jsx-a11y` – rules for accessibility in JSX.
--   `react` – rules for React components.
--   `test-e2e` – rules for end-to-end tests written in Puppeteer.
--   `test-unit`– rules for unit tests written in Jest.
--   `test-playwright` – rules for end-to-end tests written in Playwright.
+- `custom` – custom rules for WordPress development.
+- `es5` – rules for legacy ES5 environments.
+- `esnext` – rules for ES2015+ environments.
+- `i18n` – rules for internationalization.
+- `jsdoc` – rules for JSDoc comments.
+- `jsx-a11y` – rules for accessibility in JSX.
+- `react` – rules for React components.
+- `test-e2e` – rules for end-to-end tests written in Puppeteer.
+- `test-unit` – recommended rules for Vitest tests with explicit imports, allowing titles passed through variables. This changes from Jest at the 27.0.0 major release boundary. Jest consumers can configure `eslint-plugin-jest` directly. See the [migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md).
+- `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could use only the ESNext rules:
 
@@ -118,6 +118,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [i18n-no-flanking-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md)                     | Disallow leading or trailing whitespace in translatable strings.                                |             |
 | [i18n-no-placeholders-only](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)                         | Prevent using only placeholders in translatable strings.                                        | ✓           |
 | [i18n-no-variables](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-variables.md)                                         | Enforce string literals as translation function arguments.                                      | ✓           |
+| [i18n-plural-placeholder](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-plural-placeholder.md)                             | Require a number placeholder in plural translatable strings.                                    | ✓           |
 | [i18n-text-domain](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains.                                                             | ✓           |
 | [i18n-translator-comments](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments.                                                             | ✓           |
 | [no-base-control-with-label-without-id](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property. | ✓           |
@@ -126,8 +127,8 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [no-dom-globals-in-react-cc-render](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-cc-render.md)         | Disallow use of DOM globals in React class component render methods.                            |             |
 | [no-dom-globals-in-react-fc](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md)                       | Disallow use of DOM globals in the render cycle of a React function component.                  |             |
 | [no-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md)                                                   | Disallow any usage of `--wpds-*` CSS custom properties.                                         |             |
-| `no-global-active-element`                                                                                                                              | Disallow accessing the active element via `document.activeElement`.                             | ✓           |
-| `no-global-get-selection`                                                                                                                               | Disallow accessing the selection via `window.getSelection`.                                     | ✓           |
+| `no-global-active-element`                                                                                                                                           | Disallow accessing the active element via `document.activeElement`.                             | ✓           |
+| `no-global-get-selection`                                                                                                                                            | Disallow accessing the selection via `window.getSelection`.                                     | ✓           |
 | [no-setting-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md)                                   | Disallow setting any CSS custom property beginning with `--wpds-`.                              | ✓           |
 | [no-unknown-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md)                                   | Prevent use of non-existing `--wpds-*` variables.                                               | ✓           |
 | [components-no-missing-40px-size-prop](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md)   | Disallow missing `__next40pxDefaultSize` prop on `@wordpress/components` components.            | ✓           |

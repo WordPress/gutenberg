@@ -4,6 +4,71 @@ function generateRandomNumber() {
 	return Math.round( 1 + Math.random() * ( Number.MAX_SAFE_INTEGER - 1 ) );
 }
 
+function defer() {
+	let resolve;
+	const deferred = new Promise( ( res ) => {
+		resolve = res;
+	} );
+	deferred.resolve = resolve;
+	return deferred;
+}
+
+async function openTaxonomyPanel( page, name ) {
+	await test.step( `open the ${ name } panel`, async () => {
+		const panelToggle = page.getByRole( 'button', { name } );
+
+		if (
+			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await panelToggle.click();
+		}
+	} );
+}
+
+// Selected tags are chips. The remove button is named Remove and described by
+// the tag.
+function getTagChip( page, name ) {
+	return page.getByRole( 'button', {
+		name: 'Remove',
+		description: name,
+		exact: true,
+	} );
+}
+
+async function createTag( page, name ) {
+	await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( name );
+	await page.getByRole( 'option', { name: `Create: ${ name }` } ).click();
+}
+
+function getAssignedTags( page ) {
+	return page.evaluate( () =>
+		window.wp.data.select( 'core/editor' ).getEditedPostAttribute( 'tags' )
+	);
+}
+
+// Lets other tag requests through, so the handler only deals with creates.
+async function routeTagCreateRequests( page, handler ) {
+	await page.route( '**/wp/v2/tags**', async ( route ) => {
+		if ( route.request().method() !== 'POST' ) {
+			await route.continue();
+			return;
+		}
+
+		await handler( route );
+	} );
+}
+
+async function failRequest( route ) {
+	await route.fulfill( {
+		status: 500,
+		contentType: 'application/json',
+		body: JSON.stringify( {
+			code: 'internal_server_error',
+			message: 'The tag could not be created.',
+		} ),
+	} );
+}
+
 test.describe( 'Taxonomies', () => {
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
@@ -14,16 +79,7 @@ test.describe( 'Taxonomies', () => {
 		editor,
 		page,
 	} ) => {
-		// Open the Document -> Categories panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Categories',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openTaxonomyPanel( page, 'Categories' );
 
 		await page
 			.getByRole( 'button', {
@@ -58,29 +114,97 @@ test.describe( 'Taxonomies', () => {
 		await expect( newCategory ).toBeChecked();
 	} );
 
+	test( 'should be able to add a category again after a failed attempt', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Categories' );
+
+		let createRequestCount = 0;
+		await page.route( '**/wp/v2/categories**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				await route.continue();
+				return;
+			}
+
+			createRequestCount++;
+			if ( createRequestCount === 1 ) {
+				await failRequest( route );
+				return;
+			}
+
+			await route.continue();
+		} );
+
+		const categoryName = 'category-' + generateRandomNumber();
+		await page
+			.getByRole( 'button', { name: 'Add Category', expanded: false } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'New Category Name' } )
+			.fill( categoryName );
+		await page.keyboard.press( 'Enter' );
+
+		await expect( page.getByTestId( 'snackbar' ) ).toBeVisible();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			page
+				.getByRole( 'group', { name: 'Categories' } )
+				.getByRole( 'checkbox', { name: categoryName } )
+		).toBeChecked();
+	} );
+
+	test( 'should keep a category checked while another one is being created', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Categories' );
+
+		const heldCreateRequest = defer();
+		await page.route( '**/wp/v2/categories**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				await route.continue();
+				return;
+			}
+
+			await heldCreateRequest;
+			await route.continue();
+		} );
+
+		const categoryName = 'category-' + generateRandomNumber();
+		await page
+			.getByRole( 'button', { name: 'Add Category', expanded: false } )
+			.click();
+		await page
+			.getByRole( 'textbox', { name: 'New Category Name' } )
+			.fill( categoryName );
+		await page.keyboard.press( 'Enter' );
+
+		const categories = page.getByRole( 'group', { name: 'Categories' } );
+		const uncategorized = categories.getByRole( 'checkbox', {
+			name: 'Uncategorized',
+		} );
+		await uncategorized.check();
+
+		heldCreateRequest.resolve();
+
+		await expect(
+			categories.getByRole( 'checkbox', { name: categoryName } )
+		).toBeChecked();
+		await expect( uncategorized ).toBeChecked();
+	} );
+
 	test( 'should be able to open the tags panel and create a new tag', async ( {
 		editor,
 		page,
 	} ) => {
-		// Open the Document -> Tags panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Tags',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openTaxonomyPanel( page, 'Tags' );
 
 		const tagName = 'tag-' + generateRandomNumber();
-		const tags = page.locator( '.components-form-token-field__token-text' );
+		const tagChip = getTagChip( page, tagName );
 
-		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
-		await page.keyboard.press( 'Enter' );
-
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await createTag( page, tagName );
+		await expect( tagChip ).toBeVisible();
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
@@ -88,8 +212,7 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
 	} );
 
 	// See: https://github.com/WordPress/gutenberg/pull/21693.
@@ -97,25 +220,14 @@ test.describe( 'Taxonomies', () => {
 		editor,
 		page,
 	} ) => {
-		// Open the Document -> Tags panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Tags',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openTaxonomyPanel( page, 'Tags' );
 
 		const tagName = "tag'-" + generateRandomNumber();
-		const tags = page.locator( '.components-form-token-field__token-text' );
+		// The chip label is unescaped, so it matches the typed name.
+		const tagChip = getTagChip( page, tagName );
 
-		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
-		await page.keyboard.press( 'Enter' );
-
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await createTag( page, tagName );
+		await expect( tagChip ).toBeVisible();
 
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
@@ -123,7 +235,317 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
-		await expect( tags ).toHaveCount( 1 );
-		await expect( tags ).toContainText( tagName );
+		await expect( tagChip ).toBeVisible();
+	} );
+
+	test( 'should show a new tag while it is being created and remove it when the request fails', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		// Hold the create request so the tag can be checked while it is still
+		// in flight, then fail it.
+		const heldCreateRequest = defer();
+		await routeTagCreateRequests( page, async ( route ) => {
+			await heldCreateRequest;
+			await failRequest( route );
+		} );
+
+		const tagName = 'tag-' + generateRandomNumber();
+		const tagChip = getTagChip( page, tagName );
+
+		await createTag( page, tagName );
+
+		// The tag shows before the request resolves.
+		await expect( tagChip ).toBeVisible();
+
+		heldCreateRequest.resolve();
+
+		await expect( tagChip ).toBeHidden();
+		await expect( page.getByTestId( 'snackbar' ) ).toContainText(
+			'The tag could not be created.'
+		);
+	} );
+
+	test( 'should not assign a tag that was removed while it was being created', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		// Hold the create request so the tag can be removed while it is still
+		// in flight.
+		const heldCreateRequest = defer();
+		await routeTagCreateRequests( page, async ( route ) => {
+			await heldCreateRequest;
+			await route.continue();
+		} );
+
+		const tagName = 'tag-' + generateRandomNumber();
+		const tagChip = getTagChip( page, tagName );
+
+		await createTag( page, tagName );
+		await expect( tagChip ).toBeVisible();
+
+		await tagChip.click();
+		await expect( tagChip ).toBeHidden();
+
+		const createResponse = page.waitForResponse(
+			( response ) =>
+				response.request().method() === 'POST' &&
+				/\/wp\/v2\/tags/.test( response.url() )
+		);
+		heldCreateRequest.resolve();
+		await createResponse;
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		const postId = await editor.publishPost();
+
+		// The created tag is not assigned back to the post.
+		await expect( tagChip ).toBeHidden();
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.tags ).toEqual( [] );
+	} );
+
+	test( 'should assign a tag created again when the removed attempt fails', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		// Hold both create requests, so the first one fails while the second
+		// one is still in flight.
+		const heldFirstCreateRequest = defer();
+		const heldSecondCreateRequest = defer();
+		let createRequestCount = 0;
+		await routeTagCreateRequests( page, async ( route ) => {
+			createRequestCount++;
+			if ( createRequestCount === 1 ) {
+				await heldFirstCreateRequest;
+				await failRequest( route );
+				return;
+			}
+
+			await heldSecondCreateRequest;
+			await route.continue();
+		} );
+
+		const tagName = 'tag-' + generateRandomNumber();
+		const tagChip = getTagChip( page, tagName );
+
+		await createTag( page, tagName );
+		await expect( tagChip ).toBeVisible();
+
+		await tagChip.click();
+		await expect( tagChip ).toBeHidden();
+
+		// The earlier search is cached, so the tag can be created again while
+		// the first request is still in flight.
+		await createTag( page, tagName );
+		await expect( tagChip ).toBeVisible();
+
+		heldFirstCreateRequest.resolve();
+		await expect( page.getByTestId( 'snackbar' ) ).toContainText(
+			'The tag could not be created.'
+		);
+		await expect( tagChip ).toBeVisible();
+
+		const createResponse = page.waitForResponse(
+			( response ) =>
+				response.request().method() === 'POST' &&
+				/\/wp\/v2\/tags/.test( response.url() ) &&
+				response.ok()
+		);
+		heldSecondCreateRequest.resolve();
+		const { id: tagId } = await ( await createResponse ).json();
+
+		await expect.poll( () => getAssignedTags( page ) ).toEqual( [ tagId ] );
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		const postId = await editor.publishPost();
+
+		await expect( tagChip ).toBeVisible();
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.tags ).toEqual( [ tagId ] );
+	} );
+
+	test( 'should assign every tag created in succession', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const firstTagName = 'tag-a-' + generateRandomNumber();
+		const secondTagName = 'tag-b-' + generateRandomNumber();
+		const firstTagChip = getTagChip( page, firstTagName );
+		const secondTagChip = getTagChip( page, secondTagName );
+
+		await createTag( page, firstTagName );
+		await expect( firstTagChip ).toBeVisible();
+
+		await createTag( page, secondTagName );
+		await expect( secondTagChip ).toBeVisible();
+
+		// Neither tag is dropped by the one created after it. The chips are
+		// shown before the tags exist, so the assignment is what to wait for:
+		// it only happens once a create request resolves.
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
+		await expect( firstTagChip ).toBeVisible();
+		await expect( secondTagChip ).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		const postId = await editor.publishPost();
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.tags ).toHaveLength( 2 );
+	} );
+
+	test( 'should not allow publishing until every new tag is assigned', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+
+		const firstTagName = 'tag-a-' + generateRandomNumber();
+		const secondTagName = 'tag-b-' + generateRandomNumber();
+		const tagNames = `${ firstTagName }, ${ secondTagName }`;
+
+		// Hold the second create so it's still in flight
+		// after the first is assigned.
+		const heldCreateRequest = defer();
+		await routeTagCreateRequests( page, async ( route ) => {
+			if ( route.request().postDataJSON()?.name === secondTagName ) {
+				await heldCreateRequest;
+			}
+			await route.continue();
+		} );
+
+		await page
+			.getByRole( 'combobox', { name: 'Add tag' } )
+			.fill( tagNames );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagNames }` } )
+			.click();
+
+		const publishButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
+
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 1 );
+		await expect( publishButton ).toBeDisabled();
+
+		heldCreateRequest.resolve();
+
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
+
+		const postId = await editor.publishPost();
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.tags ).toHaveLength( 2 );
+	} );
+
+	test( 'should create a tag when pressing Enter', async ( { page } ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const tagName = 'tag-' + generateRandomNumber();
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+
+		await tagInput.fill( tagName );
+		await tagInput.press( 'Enter' );
+
+		await expect( getTagChip( page, tagName ) ).toBeVisible();
+		await expect( tagInput ).toHaveValue( '' );
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 1 );
+	} );
+
+	test( 'should create a tag for each comma-separated name', async ( {
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const firstTagName = 'tag-a-' + generateRandomNumber();
+		const secondTagName = 'tag-b-' + generateRandomNumber();
+		const tagNames = `${ firstTagName }, ${ secondTagName }`;
+
+		await page
+			.getByRole( 'combobox', { name: 'Add tag' } )
+			.fill( tagNames );
+		await page
+			.getByRole( 'option', { name: `Create: ${ tagNames }` } )
+			.click();
+
+		await expect( getTagChip( page, firstTagName ) ).toBeVisible();
+		await expect( getTagChip( page, secondTagName ) ).toBeVisible();
+		await expect.poll( () => getAssignedTags( page ) ).toHaveLength( 2 );
+	} );
+
+	test( 'should pick the highlighted tag over the typed one when pressing Enter', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const tagName = 'tag-' + generateRandomNumber();
+		const { id: tagId } = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/tags',
+			data: { name: tagName },
+		} );
+
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const typedName = tagName.slice( 0, -1 );
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+
+		await tagInput.fill( typedName );
+		await expect(
+			page.getByRole( 'option', { name: tagName, exact: true } )
+		).toBeVisible();
+		await tagInput.press( 'ArrowDown' );
+		await tagInput.press( 'Enter' );
+
+		await expect( getTagChip( page, tagName ) ).toBeVisible();
+		await expect( getTagChip( page, typedName ) ).toBeHidden();
+		await expect.poll( () => getAssignedTags( page ) ).toEqual( [ tagId ] );
+	} );
+
+	test( 'closes the tags suggestions popup when the editor canvas is clicked', async ( {
+		editor,
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+		await tagInput.fill( 'tag-' + generateRandomNumber() );
+
+		const suggestions = page.getByRole( 'listbox' );
+		await expect( suggestions ).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		await expect( suggestions ).toBeHidden();
 	} );
 } );

@@ -3,10 +3,13 @@ import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	getOptionGroupKeys,
+	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
-import { ColorHeading } from '../color-palette/styles';
+import { Heading } from '../heading';
+import colorPaletteStyles from '../color-palette/style.module.scss';
 import type {
 	GradientPickerComponentProps,
 	PickerProps,
@@ -35,6 +38,7 @@ function SingleOrigin( {
 	onChange,
 	value,
 	selectedSlug,
+	presentation,
 	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
@@ -43,9 +47,9 @@ function SingleOrigin( {
 			// strictly by slug, which keeps two entries with the same gradient
 			// value apart. Otherwise selection falls back to matching the
 			// gradient value.
-			const isSelected = selectedSlug
-				? slug === selectedSlug
-				: value === gradient;
+			const isSelected =
+				presentation !== 'command-buttons' &&
+				( selectedSlug ? slug === selectedSlug : value === gradient );
 			return (
 				<CircularOptionPicker.Option
 					key={ slug }
@@ -68,14 +72,21 @@ function SingleOrigin( {
 					aria-label={
 						name
 							? // translators: %s: The name of the gradient e.g: "Angular red to blue".
-							  sprintf( __( 'Gradient: %s' ), name )
+								sprintf( __( 'Gradient: %s' ), name )
 							: // translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
-							  sprintf( __( 'Gradient code: %s' ), gradient )
+								sprintf( __( 'Gradient code: %s' ), gradient )
 					}
 				/>
 			);
 		} );
-	}, [ gradients, value, onChange, clearGradient, selectedSlug ] );
+	}, [
+		gradients,
+		value,
+		onChange,
+		clearGradient,
+		selectedSlug,
+		presentation,
+	] );
 	return (
 		<CircularOptionPicker.OptionGroup
 			className={ className }
@@ -93,18 +104,24 @@ function MultipleOrigin( {
 	value,
 	selectedSlug,
 	headingLevel,
+	presentation,
 }: PickerProps< OriginObject > ) {
 	const instanceId = useInstanceId( MultipleOrigin );
+	const keys = getOptionGroupKeys( gradients );
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
 				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
-					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel } id={ id }>
+					<VStack spacing={ 2 } key={ keys[ index ] }>
+						<Heading
+							className={ colorPaletteStyles[ 'color-heading' ] }
+							level={ headingLevel }
+							id={ id }
+						>
 							{ name }
-						</ColorHeading>
+						</Heading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
@@ -113,6 +130,7 @@ function MultipleOrigin( {
 							}
 							value={ value }
 							selectedSlug={ selectedSlug }
+							presentation={ presentation }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -125,6 +143,7 @@ function MultipleOrigin( {
 function Component( props: PickerProps< any > ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		actions,
 		headingLevel,
@@ -132,17 +151,27 @@ function Component( props: PickerProps< any > ) {
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
-	const options = isMultipleOriginArray( props.gradients ) ? (
-		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
-	) : (
-		<SingleOrigin { ...additionalProps } />
-	);
+	warnIfCircularOptionPickerAsButtonsIsSet( 'GradientPicker', asButtons );
 
-	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
-		asButtons,
-		loop,
-		ariaLabel,
-		ariaLabelledby
+	const { metaProps, labelProps, resolvedPresentation } =
+		getComputeCircularOptionPickerCommonProps(
+			asButtons,
+			loop,
+			ariaLabel,
+			ariaLabelledby,
+			presentation
+		);
+	const options = isMultipleOriginArray( props.gradients ) ? (
+		<MultipleOrigin
+			headingLevel={ headingLevel }
+			{ ...additionalProps }
+			presentation={ resolvedPresentation }
+		/>
+	) : (
+		<SingleOrigin
+			{ ...additionalProps }
+			presentation={ resolvedPresentation }
+		/>
 	);
 
 	return (

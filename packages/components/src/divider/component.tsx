@@ -7,7 +7,7 @@ import { space } from '../utils/space';
 import type { DividerProps } from './types';
 import styles from './style.module.scss';
 
-function UnconnectedDivider(
+export function UnconnectedDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >,
 	forwardedRef: ForwardedRef< any >
 ) {

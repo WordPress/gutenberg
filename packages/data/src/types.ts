@@ -12,7 +12,7 @@ import type {
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = ( ...args: any[] ) => any | Generator;
-export type Resolver = Function | Generator;
+export type Resolver = Function | Generator | NormalizedResolver;
 export type Selector = Function;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
@@ -35,6 +35,44 @@ export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	instantiate: ( registry: DataRegistry ) => StoreInstance< Config >;
 }
 
+// The `core/data` store prepends the store name to each metadata selector and action.
+type WithStoreName< T > = {
+	[ K in keyof T ]: T[ K ] extends ( ...args: infer Args ) => infer Return
+		? ( storeName: string, ...args: Args ) => Return
+		: never;
+};
+
+export type CoreDataStoreSelectors = WithStoreName<
+	Pick<
+		MetadataSelectors,
+		| 'getIsResolving'
+		| 'hasStartedResolution'
+		| 'hasFinishedResolution'
+		| 'isResolving'
+		| 'getCachedResolvers'
+	>
+>;
+
+export type CoreDataStoreActions = WithStoreName<
+	Pick<
+		MetadataActions,
+		| 'startResolution'
+		| 'finishResolution'
+		| 'invalidateResolution'
+		| 'invalidateResolutionForStore'
+		| 'invalidateResolutionForStoreSelector'
+	>
+>;
+
+export interface CoreDataStoreDescriptor extends StoreDescriptor {
+	name: 'core/data';
+	instantiate: ( registry: DataRegistry ) => {
+		getSelectors: () => CoreDataStoreSelectors;
+		getActions: () => CoreDataStoreActions;
+		subscribe: ( listener: () => void ) => () => void;
+	};
+}
+
 export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
@@ -49,16 +87,16 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 	F extends MapSelect
 		? ReturnType< F >
 		: F extends StoreDescriptor< any >
-		? CurriedSelectorsOf< F >
-		: never;
+			? CurriedSelectorsOf< F >
+			: never;
 
 // Return type for the useDispatch() hook.
 export type UseDispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
 		? ActionCreatorsOf< StoreNameOrDescriptor >
 		: StoreNameOrDescriptor extends undefined
-		? DispatchFunction
-		: any;
+			? DispatchFunction
+			: any;
 
 export type DispatchFunction = < StoreNameOrDescriptor >(
 	store: StoreNameOrDescriptor
@@ -82,13 +120,13 @@ export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
  */
 export type ListenerFunction = () => void;
 
-export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
-	ReduxStoreConfig< any, any, infer Selectors >
->
-	? {
-			[ key in keyof Selectors ]: CurriedState< Selectors[ key ] >;
-	  } & MetadataSelectors< S >
-	: never;
+export type CurriedSelectorsOf< S > = S extends CoreDataStoreDescriptor
+	? CoreDataStoreSelectors
+	: S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
+		? {
+				[ key in keyof Selectors ]: CurriedState< Selectors[ key ] >;
+			} & MetadataSelectors< S >
+		: never;
 
 /**
  * Like CurriedState but wraps the return type in a Promise.
@@ -104,26 +142,26 @@ type CurriedStateWithPromise< F > =
 	}
 		? S
 		: F extends SelectorWithCustomCurrySignature & {
-				CurriedSignature: ( ...args: infer P ) => infer R;
-		  }
-		? ( ...args: P ) => Promise< R >
-		: F extends ( state: any, ...args: infer P ) => infer R
-		? ( ...args: P ) => Promise< R >
-		: F;
+					CurriedSignature: ( ...args: infer P ) => infer R;
+			  }
+			? ( ...args: P ) => Promise< R >
+			: F extends ( state: any, ...args: infer P ) => infer R
+				? ( ...args: P ) => Promise< R >
+				: F;
 
 /**
  * Like CurriedSelectorsOf but each selector returns a Promise.
  * Used for resolveSelect.
  */
-export type CurriedSelectorsResolveOf< S > = S extends StoreDescriptor<
-	ReduxStoreConfig< any, any, infer Selectors >
->
-	? {
-			[ key in keyof Selectors ]: CurriedStateWithPromise<
-				Selectors[ key ]
-			>;
-	  }
-	: never;
+export type CurriedSelectorsResolveOf< S > = S extends CoreDataStoreDescriptor
+	? never
+	: S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
+		? {
+				[ key in keyof Selectors ]: CurriedStateWithPromise<
+					Selectors[ key ]
+				>;
+			}
+		: never;
 
 /**
  * Removes the first argument from a function.
@@ -149,8 +187,8 @@ export type CurriedSelectorsResolveOf< S > = S extends StoreDescriptor<
 type CurriedState< F > = F extends SelectorWithCustomCurrySignature
 	? F[ 'CurriedSignature' ]
 	: F extends ( state: any, ...args: infer P ) => infer R
-	? ( ...args: P ) => R
-	: F;
+		? ( ...args: P ) => R
+		: F;
 
 /**
  * Utility to manually specify curried selector signatures.
@@ -301,6 +339,11 @@ export interface NormalizedResolver {
 	 * Optional function to check if the resolver should be invalidated.
 	 */
 	shouldInvalidate?: ( action: any, ...args: any[] ) => boolean;
+	/**
+	 * Optional. Derives the cache key from the selector arguments, so several
+	 * selector calls can share a single resolver run.
+	 */
+	getResolutionArgs?: ( ...args: any[] ) => any[];
 }
 
 /**
@@ -315,7 +358,7 @@ export interface BoundSelector {
 	/**
 	 * Optional function to normalize the arguments.
 	 */
-	__unstableNormalizeArgs?: ( args: any[] ) => any[];
+	normalizeArgs?: ( args: any[] ) => any[];
 	/**
 	 * Whether this selector is a registry selector.
 	 */
@@ -330,8 +373,9 @@ export interface BoundSelector {
  * The shape of a store instance as seen internally by the registry.
  * Extends the public StoreInstance with additional internal properties.
  */
-export interface InternalStoreInstance< Config extends AnyConfig = AnyConfig >
-	extends StoreInstance< Config > {
+export interface InternalStoreInstance<
+	Config extends AnyConfig = AnyConfig,
+> extends StoreInstance< Config > {
 	/**
 	 * The Redux store instance (only for Redux-based stores).
 	 */
@@ -409,22 +453,36 @@ export interface StorageInterface {
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
-export type ActionCreatorsOf< T > = T extends StoreDescriptor<
-	ReduxStoreConfig< any, infer ActionCreators, any >
->
-	? PromisifiedActionCreators< ActionCreators > & MetadataActions< T >
-	: T extends ReduxStoreConfig< any, infer ActionCreators, any >
-	? PromisifiedActionCreators< ActionCreators >
-	: never;
+export type ActionCreatorsOf< T > = T extends CoreDataStoreDescriptor
+	? CoreDataStoreActions
+	: T extends StoreDescriptor<
+				ReduxStoreConfig< any, infer ActionCreators, any >
+		  >
+		? PromisifiedActionCreators< ActionCreators > & MetadataActions< T >
+		: T extends ReduxStoreConfig< any, infer ActionCreators, any >
+			? PromisifiedActionCreators< ActionCreators >
+			: never;
 
 // Takes an object containing all action creators for a store and updates the
 // return type of each action creator to account for internal registry details --
 // for example, dispatched actions are wrapped with a Promise.
 export type PromisifiedActionCreators< ActionCreators > = {
-	[ Action in keyof ActionCreators ]: ActionCreators[ Action ] extends ActionCreator
-		? PromisifyActionCreator< ActionCreators[ Action ] >
-		: ActionCreators[ Action ];
+	[
+		Action in keyof ActionCreators
+	]: ActionCreators[ Action ] extends ActionCreatorWithCustomDispatchSignature
+		? ActionCreators[ Action ][ 'DispatchSignature' ]
+		: ActionCreators[ Action ] extends ActionCreator
+			? PromisifyActionCreator< ActionCreators[ Action ] >
+			: ActionCreators[ Action ];
 };
+
+/**
+ * Lets a generic action creator declare its dispatched signature, whose type
+ * parameters `PromisifyActionCreator` would erase.
+ */
+export interface ActionCreatorWithCustomDispatchSignature {
+	DispatchSignature: Function;
+}
 
 // Wraps action creator return types with a Promise and handles thunks and generators.
 export type PromisifyActionCreator< Action extends ActionCreator > = (
@@ -433,8 +491,8 @@ export type PromisifyActionCreator< Action extends ActionCreator > = (
 	ReturnType< Action > extends ( ..._args: any[] ) => any
 		? ThunkReturnType< Action >
 		: ReturnType< Action > extends Generator< any, infer TReturn, any >
-		? TReturn
-		: ReturnType< Action >
+			? TReturn
+			: ReturnType< Action >
 >;
 
 // A thunk is an action creator which returns a function, which can optionally
@@ -445,13 +503,10 @@ export type ThunkReturnType< Action extends ActionCreator > = Awaited<
 	ReturnType< ReturnType< Action > >
 >;
 
-type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
-	any,
-	any,
-	infer Selectors
->
-	? { [ name in keyof Selectors ]: Function }
-	: never;
+type SelectorsOf< Config extends AnyConfig > =
+	Config extends ReduxStoreConfig< any, any, infer Selectors >
+		? { [ name in keyof Selectors ]: Function }
+		: never;
 
 /**
  * The argument object passed to every thunk function. When parameterized with

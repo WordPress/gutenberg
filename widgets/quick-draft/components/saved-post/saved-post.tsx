@@ -2,7 +2,7 @@ import { createInterpolateElement } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { Button, EmptyState, Link, Stack } from '@wordpress/ui';
+import { Button, ButtonLink, EmptyState, Stack } from '@wordpress/ui';
 import styles from './saved-post.module.css';
 
 type SavedPostProps = {
@@ -46,20 +46,14 @@ export function SavedPost( {
 					) }
 				</EmptyState.Description>
 				<EmptyState.Actions>
-					<Button
+					<ButtonLink
 						variant="solid"
 						size="compact"
-						nativeButton={ false }
-						render={
-							<Link
-								href={ editUrl }
-								openInNewTab
-								className={ styles.continueLink }
-							/>
-						}
+						href={ editUrl }
+						openInNewTab
 					>
 						{ __( 'Continue editing' ) }
-					</Button>
+					</ButtonLink>
 					<Button
 						variant="minimal"
 						size="compact"

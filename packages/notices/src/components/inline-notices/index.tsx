@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { NoticeList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Children, useState } from '@wordpress/element';
+import { Notice } from '@wordpress/ui';
 import { store as noticesStore } from '../../store';
+import type { Notice as NoticeType } from '../../store/types';
+import InlineNotice from './inline-notice';
 
 type InlineNoticesProps = {
 	children?: ReactNode;
@@ -12,13 +15,38 @@ type InlineNoticesProps = {
 	context?: string;
 };
 
-function hasRenderableChildren( children: ReactNode ): boolean {
+type NoticeListProps = {
+	notices: NoticeType[];
+	announceOnMount: boolean;
+	className: string;
+	onRemove?: ( id: string ) => void;
+	children?: ReactNode;
+};
+
+function NoticeList( {
+	notices,
+	announceOnMount,
+	className,
+	onRemove,
+	children,
+}: NoticeListProps ) {
 	return (
-		children !== null &&
-		children !== undefined &&
-		children !== false &&
-		children !== ''
+		<div className={ clsx( 'notices-inline-notices__list', className ) }>
+			{ children }
+			{ [ ...notices ].reverse().map( ( notice ) => (
+				<InlineNotice
+					key={ notice.id }
+					notice={ notice }
+					announceOnMount={ announceOnMount }
+					onRemove={ () => onRemove?.( notice.id ) }
+				/>
+			) ) }
+		</div>
 	);
+}
+
+function hasRenderableChildren( children: ReactNode ): boolean {
+	return Children.toArray( children ).some( ( child ) => child !== '' );
 }
 
 export default function InlineNotices( {
@@ -33,6 +61,11 @@ export default function InlineNotices( {
 		[ context ]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
+	const [ noticeList, setNoticeList ] = useState< HTMLDivElement | null >(
+		null
+	);
+	// Notices already present when the live regions mount stay silent.
+	const announceOnMount = !! noticeList;
 	const dismissibleNotices = notices.filter(
 		( { isDismissible, type } ) => isDismissible && type === 'default'
 	);
@@ -44,33 +77,45 @@ export default function InlineNotices( {
 	const hasDismissibleNotices =
 		dismissibleNotices.length > 0 || hasRenderableChildren( children );
 
-	if ( ! hasPinnedNotices && ! hasDismissibleNotices ) {
-		return null;
-	}
-
 	return (
-		<div className={ clsx( 'notices-inline-notices-wrapper', className ) }>
-			{ hasPinnedNotices && (
-				<NoticeList
-					notices={ nonDismissibleNotices }
+		// Keep live regions mounted without adding a box to the notice layout.
+		<Notice.List
+			ref={ setNoticeList }
+			liveRegionContainer={ noticeList?.ownerDocument.body }
+			style={ { display: 'contents' } }
+		>
+			{ ( hasPinnedNotices || hasDismissibleNotices ) && (
+				<div
 					className={ clsx(
-						'components-notices__pinned',
-						pinnedNoticesClassName
+						'notices-inline-notices-wrapper',
+						className
 					) }
-				/>
-			) }
-			{ hasDismissibleNotices && (
-				<NoticeList
-					notices={ dismissibleNotices }
-					className={ clsx(
-						'components-notices__dismissible',
-						dismissibleNoticesClassName
-					) }
-					onRemove={ ( id ) => removeNotice( id, context ) }
 				>
-					{ children }
-				</NoticeList>
+					{ hasPinnedNotices && (
+						<NoticeList
+							notices={ nonDismissibleNotices }
+							announceOnMount={ announceOnMount }
+							className={ clsx(
+								'components-notices__pinned',
+								pinnedNoticesClassName
+							) }
+						/>
+					) }
+					{ hasDismissibleNotices && (
+						<NoticeList
+							notices={ dismissibleNotices }
+							announceOnMount={ announceOnMount }
+							className={ clsx(
+								'components-notices__dismissible',
+								dismissibleNoticesClassName
+							) }
+							onRemove={ ( id ) => removeNotice( id, context ) }
+						>
+							{ children }
+						</NoticeList>
+					) }
+				</div>
 			) }
-		</div>
+		</Notice.List>
 	);
 }

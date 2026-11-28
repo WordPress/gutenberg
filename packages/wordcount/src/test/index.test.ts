@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { count } from '../';
 import type { UserSettings, Strategy } from '../types';
 
@@ -44,6 +45,27 @@ describe( 'WordCounter', () => {
 			words: 3,
 			characters_excluding_spaces: 11,
 			characters_including_spaces: 13,
+		},
+		{
+			message: 'No-break space.',
+			string: 'one\u00A0two\u00A0three',
+			words: 3,
+			characters_excluding_spaces: 11,
+			characters_including_spaces: 13,
+		},
+		{
+			message: 'Unicode spaces.',
+			string: 'one\u2003two\u202Fthree',
+			words: 3,
+			characters_excluding_spaces: 11,
+			characters_including_spaces: 13,
+		},
+		{
+			message: 'Non-breaking space inside a number.',
+			string: 'Il a payé 10\u00A0000 euros',
+			words: 6,
+			characters_excluding_spaces: 17,
+			characters_including_spaces: 22,
 		},
 		{
 			message: 'Punctuation.',

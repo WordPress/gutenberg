@@ -11,8 +11,7 @@ test.describe( 'Templates', () => {
 
 	test( 'Create a custom template', async ( { admin, page } ) => {
 		const templateName = 'demo';
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
@@ -40,12 +39,54 @@ test.describe( 'Templates', () => {
 		).toBeVisible();
 	} );
 
+	test( 'Keeps accented letters in a custom template slug', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const templateName = 'Vyhľadávanie v portfóliu';
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
+		await page
+			.getByRole( 'button', { name: 'Add Template', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', {
+				name: 'Custom template A custom template can be manually applied to any post or page.',
+				exact: true,
+			} )
+			.click();
+		await expect(
+			page
+				.getByRole( 'dialog', {
+					name: 'Create custom template',
+					exact: true,
+				} )
+				.getByRole( 'textbox', { name: 'Name', exact: true } )
+		).toBeFocused();
+		await page.keyboard.type( templateName );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			page.getByRole( 'dialog', {
+				name: 'Choose a pattern',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		const templates = await requestUtils.rest( {
+			path: '/wp/v2/templates',
+			params: { context: 'edit' },
+		} );
+		const template = templates.find(
+			( { title } ) => title.raw === templateName
+		);
+		expect( template.slug ).toBe( 'vyhladavanie-v-portfoliu' );
+	} );
+
 	test( 'Persists filter/search when switching layout', async ( {
 		page,
 		admin,
 	} ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Templates' } ).click();
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Search templates
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'Index' );

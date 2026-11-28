@@ -1,10 +1,16 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { SelectControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Requires an HTMLSelectElement ref for native constraint validation.
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
-type SelectControlProps = React.ComponentProps< typeof SelectControl >;
+type SelectControlProps = React.ComponentProps< typeof WCSelectControl >;
 
 type ValidatedSelectControlProps = Omit<
 	SelectControlProps,
@@ -28,12 +34,13 @@ const UnforwardedValidatedSelectControl = (
 
 	return (
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<SelectControl
+			<WCSelectControl
 				ref={ mergedRefs }
 				{
 					// A runtime boolean cannot statically discriminate

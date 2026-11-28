@@ -23,7 +23,7 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 		$wp_scripts                     = wp_scripts();
 		$this->core_data_was_registered = isset( $wp_scripts->registered['wp-core-data'] );
 		if ( ! $this->core_data_was_registered ) {
-			wp_register_script( 'wp-core-data', '' );
+			wp_register_script( 'wp-core-data', false );
 		}
 
 		$core_data_script                        = $wp_scripts->registered['wp-core-data'];
@@ -115,6 +115,42 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 			'window.__experimentalEnableRealTimeCollaboration',
 			implode( "\n", $this->get_core_data_inline_scripts() )
 		);
+	}
+
+	public function test_collaboration_is_disabled_for_post_type_without_custom_fields() {
+		register_post_type(
+			'rtc_no_meta',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' ),
+			)
+		);
+
+		try {
+			$this->assertTrue( wp_is_post_type_collaboration_disabled( 'rtc_no_meta' ) );
+		} finally {
+			unregister_post_type( 'rtc_no_meta' );
+		}
+	}
+
+	public function test_collaboration_is_enabled_for_post_type_with_custom_fields() {
+		register_post_type(
+			'rtc_with_meta',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor', 'custom-fields' ),
+			)
+		);
+
+		try {
+			$this->assertFalse( wp_is_post_type_collaboration_disabled( 'rtc_with_meta' ) );
+		} finally {
+			unregister_post_type( 'rtc_with_meta' );
+		}
+	}
+
+	public function test_collaboration_is_enabled_for_attachments() {
+		$this->assertFalse( wp_is_post_type_collaboration_disabled( 'attachment' ) );
 	}
 
 	public function test_experiment_disables_collaboration_in_site_editor() {

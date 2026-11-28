@@ -10,9 +10,12 @@ test.describe( 'Site Editor Inserter', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//home',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -79,7 +82,7 @@ test.describe( 'Site Editor Inserter', () => {
 			},
 		} );
 
-		test( 'should intialize correct active tab based on zoom level', async ( {
+		test( 'should initialize correct active tab based on zoom level', async ( {
 			InserterUtils,
 			ZoomUtils,
 		} ) => {
@@ -270,6 +273,22 @@ test.describe( 'Site Editor Inserter', () => {
 			} );
 		} );
 	} );
+
+	// Both site editors register the experimental blocks of the Gutenberg
+	// plugin, so they offer the same blocks.
+	test( 'offers the experimental blocks', async ( { InserterUtils } ) => {
+		await InserterUtils.openBlockLibrary();
+		await InserterUtils.blockLibrary
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Table of Contents' );
+
+		await expect(
+			InserterUtils.blockLibrary.getByRole( 'option', {
+				name: 'Table of Contents',
+				exact: true,
+			} )
+		).toBeVisible();
+	} );
 } );
 
 class InserterUtils {
@@ -298,7 +317,7 @@ class InserterUtils {
 	}
 
 	getBlockLibraryTab( name ) {
-		// `exact` needed so 'Patterns' cannot also match the 'My patterns'
+		// `exact` needed so 'Patterns' cannot also match the 'Site patterns'
 		// tab, which renders whenever the site has user patterns (for
 		// example ones left behind by an earlier spec in the same run).
 		return this.page.getByRole( 'tab', { name, exact: true } );

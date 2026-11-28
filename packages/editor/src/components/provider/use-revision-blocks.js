@@ -25,8 +25,8 @@ export function useRevisionBlocks() {
 		const {
 			isRevisionsMode,
 			isShowingRevisionDiff,
-			getCurrentRevision,
-			getPreviousRevision,
+			getShownVersion,
+			getComparedVersion,
 		} = unlock( select( editorStore ) );
 		const { getCurrentPostType } = select( editorStore );
 
@@ -34,8 +34,8 @@ export function useRevisionBlocks() {
 		return {
 			isInRevisionsMode: inRevisions,
 			showDiff: isShowingRevisionDiff(),
-			revision: inRevisions ? getCurrentRevision() : undefined,
-			previousRevision: inRevisions ? getPreviousRevision() : undefined,
+			revision: inRevisions ? getShownVersion() : undefined,
+			previousRevision: inRevisions ? getComparedVersion() : undefined,
 			postType: getCurrentPostType(),
 		};
 	}, [] );

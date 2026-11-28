@@ -46,6 +46,6 @@ export const richText =
 		return target
 			? RichTextData.fromHTMLElement( target as HTMLElement, {
 					preserveWhiteSpace,
-			  } )
+				} )
 			: RichTextData.empty();
 	};

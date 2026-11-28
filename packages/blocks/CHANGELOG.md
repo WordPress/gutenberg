@@ -4,6 +4,92 @@
 
 ### New Features
 
+-   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add the `translate` style property, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
+-   Add the `scale` style property, for the `transform.scale` block support ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
+-   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
+
+### Bug Fixes
+
+-   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
+-   `BlockConfiguration`: Type `example.attributes` as `Partial< Attributes >` instead of the `BlockType` attribute schema ([#87543](https://github.com/WordPress/gutenberg/pull/87543)).
+-   `BlockVariation`: Type `attributes` as `Partial< Attributes >` ([#87551](https://github.com/WordPress/gutenberg/pull/87551)).
+-   `BlockExampleInnerBlock`: Type `attributes` as `Record< string, unknown >` instead of the `BlockType` attribute schema ([#87585](https://github.com/WordPress/gutenberg/pull/87585)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+## 17.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).
+-   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+
+## 17.1.0 (2026-11-04)
+
+### Enhancements
+
+-   The parser logs the "Updated Block" message for migrated blocks only when `SCRIPT_DEBUG` is on, which makes loading posts with many blocks to migrate faster ([#85736](https://github.com/WordPress/gutenberg/pull/85736)).
+
+### Bug Fixes
+
+-   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+-   `isReusableBlock`, `isTemplatePart`: Accept any object with a name ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
+-   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor, and pasting one keeps it again, as before WordPress 7.0 ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   Raw HTML conversion no longer copies the classes a block adds itself into `className`. `<ul class="wp-block-list fancy">` now converts to a List block with `className: "fancy"`, where before it got `"wp-block-list fancy"` ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
+-   `rawHandler`, `pasteHandler`: Keep shortcodes in text inline unless they're on their own line, or aligned at the start or end of a line ([#85795](https://github.com/WordPress/gutenberg/pull/85795)).
+
+### Internal
+
+-   Convert the `isInlineContent` test to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85534](https://github.com/WordPress/gutenberg/pull/85534)).
+
+## 17.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated responsive style state aliases while parsing blocks; saved style attributes must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
+
+### Bug Fixes
+
+-   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
+-   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
+-   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
+-   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
+
+## 16.2.0 (2026-10-07)
+
+### Bug Fixes
+
+-   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).
+-   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 16.1.0 (2026-09-23)
+
+### New Features
+
+-   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 16.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
+-   Removed the `transforms.supportedMobileTransforms` block type property, along with the `supportedMobileTransforms` and `usingMobileTransformations` properties of a block transform. They were only meaningful to the React Native implementation, removed in [#78747](https://github.com/WordPress/gutenberg/pull/78747), and nothing reads them any more. Note that the filter they drove was not platform-gated: a block type still declaring `supportedMobileTransforms` had its transforms filtered everywhere, and `getBlockTransforms` no longer filters them at all ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+### Bug Fixes
+
+-   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+## 15.27.0 (2026-08-26)
+
+### New Features
+
 -   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ## 15.26.0 (2026-08-12)

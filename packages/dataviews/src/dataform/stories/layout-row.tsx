@@ -30,6 +30,9 @@ const LayoutRowComponent = ( {
 		tax: number;
 		quantity: number;
 		total: number;
+		fileSize: number;
+		dimensions: string;
+		fileType: string;
 	};
 
 	const customerFields: Field< Customer >[] = [
@@ -156,6 +159,24 @@ const LayoutRowComponent = ( {
 			type: 'integer',
 			readOnly: true,
 		},
+		{
+			id: 'fileSize',
+			label: 'File size',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'dimensions',
+			label: 'Dimensions',
+			type: 'text',
+			readOnly: true,
+		},
+		{
+			// No type and no Edit: a read-only field without an edit control.
+			id: 'fileType',
+			label: 'File type',
+			readOnly: true,
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -181,6 +202,9 @@ const LayoutRowComponent = ( {
 		tax: 20,
 		quantity: 5,
 		total: 600,
+		fileSize: 1024,
+		dimensions: '1920x1080',
+		fileType: 'JPEG',
 	} );
 
 	const getRowLayoutFromStoryArgs = ( {
@@ -242,6 +266,15 @@ const LayoutRowComponent = ( {
 					],
 				},
 
+				{
+					id: 'fileDetails',
+					label: 'File details',
+					layout: getRowLayoutFromStoryArgs( {
+						alignment:
+							alignment === 'default' ? 'start' : alignment,
+					} ),
+					children: [ 'fileSize', 'dimensions', 'fileType' ],
+				},
 				{
 					id: 'planRow',
 					label: 'Subscription',

@@ -47,6 +47,20 @@ figure.wp-block-image:not(.wp-block) {
 		transform: translate(-50%, -50%);
 		margin: 0;
 	}
+
+	.components-resizable-box__container {
+		pointer-events: none;
+	}
+
+	.components-resizable-box__handle {
+		pointer-events: auto;
+	}
+}
+
+// The resize handles extend past the image, which adds a horizontal
+// scrollbar when the image spans the canvas.
+.is-root-container:has(.wp-block-image .components-resizable-box__container) {
+	overflow-x: clip;
 }
 
 // Shown while image is being uploaded but cannot be previewed.

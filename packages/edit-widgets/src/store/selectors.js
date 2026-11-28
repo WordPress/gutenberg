@@ -12,6 +12,8 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
+/** @typedef {import('@wordpress/blocks').Block} Block */
+
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
 	insertionIndex: undefined,
@@ -108,7 +110,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  *
  * @param {string} clientId The client id of a block in a widget area.
  *
- * @return {WPBlock} The widget area block.
+ * @return {Block | null} The widget area block.
+ * @type {(state: Record<string, unknown>, clientId: string) => Block | null}
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
@@ -287,6 +290,10 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		// widget area can be inserted into any widget area. Uses the first
 		// widget area for testing whether the block can be inserted.
 		const [ firstWidgetArea ] = widgetAreas;
+		if ( ! firstWidgetArea ) {
+			return false;
+		}
+
 		return select( blockEditorStore ).canInsertBlockType(
 			blockName,
 			firstWidgetArea.clientId

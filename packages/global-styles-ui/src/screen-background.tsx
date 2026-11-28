@@ -1,5 +1,4 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __experimentalText as WCText } from '@wordpress/components';
 import BackgroundPanel from './background-panel';

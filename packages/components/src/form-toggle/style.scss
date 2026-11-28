@@ -1,13 +1,19 @@
 @use "sass:math";
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 $toggle-width: $grid-unit-40;
 $toggle-height: $grid-unit-20;
+$toggle-thumb-width: $grid-unit-20 + $grid-unit-05;
 $toggle-border-width: 1px;
-$toggle-thumb-size:  $grid-unit-15;
+$toggle-label-size: $grid-unit-10;
+// How far the thumb, and the labels with it, travel between the two states.
+$toggle-travel: $toggle-width - $toggle-thumb-width;
+// Centers each label in the part of the track the thumb leaves exposed.
+$toggle-label-offset: math.div($toggle-travel - $toggle-label-size, 2);
+// Where the brand panel starts when the toggle is off. Its inline-end edge sits
+// under the middle of the thumb.
+$toggle-panel-offset: math.div($toggle-thumb-width, 2) - $toggle-width;
 
 $transition-duration: 0.2s;
 
@@ -19,93 +25,172 @@ $transition-duration: 0.2s;
 
 	// Unchecked state.
 	.components-form-toggle__track {
-		position: relative;
 		content: "";
 		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
-		background-color: $white;
-		border: $toggle-border-width solid $gray-600;
+		background-color: var(--wpds-color-background-track-neutral);
+		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: math.div($toggle-height, 2);
 
 		@media not (prefers-reduced-motion) {
-			transition:
-				$transition-duration background-color ease,
-				$transition-duration border-color ease;
-		}
-
-		overflow: hidden;
-
-		// Windows High Contrast Mode
-		&::after {
-			content: "";
-			position: absolute;
-			inset: 0;
-			box-sizing: border-box;
-			// Expand the border to fake a solid in Windows High Contrast Mode.
-			border-top: #{ $toggle-height } solid transparent;
-
-			@media not (prefers-reduced-motion) {
-				transition: $transition-duration opacity ease;
-			}
-
-			opacity: 0;
+			transition: $transition-duration border-color ease;
 		}
 	}
 
+	// Clips the brand panel and the labels as they slide in and out. It covers
+	// the track border, so the panel's rounded edge meets the page rather than
+	// the neutral track.
+	.components-form-toggle__labels {
+		position: absolute;
+		top: 0;
+		inset-inline-start: 0;
+		width: $toggle-width;
+		height: $toggle-height;
+		overflow: hidden;
+		border-radius: math.div($toggle-height, 2);
+		pointer-events: none;
+
+		// The brand half of the track. It slides with the thumb rather than
+		// changing color, and the thumb always covers the edge where it meets
+		// the neutral half.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			inset-inline-start: $toggle-panel-offset;
+			width: $toggle-width;
+			background-color: var(--wpds-color-background-interactive-brand-strong);
+
+			@media not (prefers-reduced-motion) {
+				transition: $transition-duration inset-inline-start ease;
+			}
+
+			@media ( forced-colors: active ) {
+				background-color: Highlight;
+			}
+		}
+	}
+
+	// The thumb covers the track border, so it spans the full toggle height.
 	.components-form-toggle__thumb {
 		display: block;
 		position: absolute;
 		box-sizing: border-box;
-		top: math.div($toggle-thumb-size, 6);
-		left: math.div($toggle-thumb-size, 6);
-		width: $toggle-thumb-size;
-		height: $toggle-thumb-size;
-		border-radius: $radius-round;
+		top: 0;
+		inset-inline-start: 0;
+		width: $toggle-thumb-width;
+		height: $toggle-height;
+		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
+		border-radius: math.div($toggle-height, 2);
+		background-color: var(--wpds-color-background-thumb-neutral);
+		box-shadow: $elevation-x-small;
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				$transition-duration transform ease,
-				$transition-duration background-color ease-out;
+				$transition-duration inset-inline-start ease,
+				$transition-duration border-color ease;
 		}
 
-		background-color: $gray-900;
-		box-shadow: $elevation-x-small;
-
-		// Transparent border acts as a fill in Windows High Contrast Mode.
-		border: math.div($toggle-thumb-size, 2) solid transparent;
+		@media ( forced-colors: active ) {
+			background-color: Canvas;
+			border-color: CanvasText;
+		}
 	}
 
-	// Checked state.
-	&.is-checked .components-form-toggle__track {
-		background-color: $components-color-accent;
-		border-color: $components-color-accent;
+	// The labels slide along with the thumb: the label for the current state
+	// sits in the exposed part of the track, and the other waits just outside
+	// the track's edge, where it is clipped.
+	svg.components-form-toggle__label {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin: auto 0;
+		width: $toggle-label-size;
+		height: $toggle-label-size;
+		// Override the browser's SVG default so the labels follow forced system colors.
+		forced-color-adjust: auto;
 
-		// Windows High Contrast Mode
-		&::after {
-			opacity: 1;
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration inset-inline-start ease,
+				$transition-duration inset-inline-end ease;
+		}
+	}
+
+	svg.components-form-toggle__on-label {
+		inset-inline-start: $toggle-label-offset + $toggle-border-width - $toggle-travel;
+		color: var(--wpds-color-foreground-interactive-brand-strong);
+
+		@media ( forced-colors: active ) {
+			color: HighlightText;
+		}
+	}
+
+	svg.components-form-toggle__off-label {
+		inset-inline-end: $toggle-label-offset + $toggle-border-width;
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
+
+		@media ( forced-colors: active ) {
+			color: CanvasText;
+		}
+	}
+
+	// The hover and checked states follow the input rather than the `checked`
+	// prop, so they also work when the toggle is uncontrolled. `:where()` keeps
+	// them at a lower specificity than the disabled state.
+	:where(.components-form-toggle__input:not(:checked, :disabled):hover) {
+		~ .components-form-toggle__track,
+		~ .components-form-toggle__thumb {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
 		}
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
-		@include button-style-outset__focus($components-color-accent);
+		@include outset-ring__focus();
 	}
 
-	&.is-checked {
-		.components-form-toggle__thumb {
-			background-color: $white;
-			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
-			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+	// Checked state.
+	:where(.components-form-toggle__input:checked) {
+		~ .components-form-toggle__track {
+			border-color: var(--wpds-color-background-interactive-brand-strong);
+
+			@media ( forced-colors: active ) {
+				border-color: Highlight;
+			}
+		}
+
+		~ .components-form-toggle__labels::before {
+			inset-inline-start: $toggle-panel-offset + $toggle-travel;
+		}
+
+		~ .components-form-toggle__thumb {
+			background-color: var(--wpds-color-background-thumb-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
+			inset-inline-start: $toggle-travel;
+
+			@media ( forced-colors: active ) {
+				border-color: Highlight;
+			}
+		}
+
+		~ .components-form-toggle__labels svg.components-form-toggle__on-label {
+			inset-inline-start: $toggle-label-offset + $toggle-border-width;
+		}
+
+		~ .components-form-toggle__labels svg.components-form-toggle__off-label {
+			inset-inline-end: $toggle-label-offset + $toggle-border-width - $toggle-travel;
 		}
 	}
 
 	// Disabled state:
 	&.is-disabled,
-	.components-disabled & {
+	[inert] & {
 		.components-form-toggle__track {
-			background-color: $components-color-gray-100;
+			background-color: var(--wpds-color-background-track-neutral-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 
 			@media ( forced-colors: active ) {
@@ -113,8 +198,14 @@ $transition-duration: 0.2s;
 			}
 		}
 
+		// Disabled toggles use the same track whether on or off.
+		.components-form-toggle__labels::before {
+			display: none;
+		}
+
 		.components-form-toggle__thumb {
-			background-color: $components-color-gray-400;
+			background-color: var(--wpds-color-background-thumb-neutral-disabled);
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 			box-shadow: none;
 
 			@media ( forced-colors: active ) {
@@ -122,21 +213,12 @@ $transition-duration: 0.2s;
 			}
 		}
 
-		&.is-checked .components-form-toggle__track {
-			background-color: $components-color-gray-400;
-			border-color: $components-color-gray-400;
+		svg.components-form-toggle__label {
+			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 			@media ( forced-colors: active ) {
-				border-color: GrayText;
-
-				&::after {
-					border-top-color: GrayText;
-				}
+				color: GrayText;
 			}
-		}
-
-		&.is-checked .components-form-toggle__thumb {
-			background-color: $white;
 		}
 	}
 }

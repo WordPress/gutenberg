@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { areBlocksDirty } from '../are-blocks-dirty';
 
 describe( 'areBlocksDirty', () => {

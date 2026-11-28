@@ -77,6 +77,7 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			openAs: normalizedOpenAs,
 			summary: normalizedSummary,
 			editVisibility: layout?.editVisibility ?? 'on-hover',
+			showPlaceholderIfEmpty: layout?.showPlaceholderIfEmpty ?? false,
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
@@ -104,6 +105,9 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					layout.isCollapsible === undefined
 						? true
 						: layout.isCollapsible,
+				...( layout.headingLevel && {
+					headingLevel: layout.headingLevel,
+				} ),
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

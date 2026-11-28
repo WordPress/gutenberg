@@ -1,21 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import { plus, reset, seen, unseen } from '@wordpress/icons';
+import {
+	envelope,
+	link,
+	lock,
+	mobile,
+	plus,
+	reset,
+	search,
+	seen,
+	unseen,
+} from '@wordpress/icons';
 import { InputControl } from '../';
+import { Icon } from '../../../icon';
 import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
 import {
-	WithPrefix,
-	WithSuffixControl,
+	WithPrefix as InputWithPrefix,
+	WithSuffixControl as InputWithSuffixControl,
 } from '../../primitives/input/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
 	DETAILS_EXAMPLE,
 } from '../../stories/shared';
+import styles from './style.module.css';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Design System/Components/Form/InputControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Form/InputControl',
+	id: 'design-system-components-form-inputcontrol',
 	component: InputControl,
 	argTypes: {
 		defaultValue: { control: false },
@@ -25,9 +39,8 @@ const meta: Meta< typeof InputControl > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -61,15 +74,24 @@ export const WithDetails: Story = {
 	},
 };
 
-WithPrefix.args = {
-	...WithPrefix.args,
-	...Default.args,
+export const WithPrefix: Story = {
+	args: {
+		...InputWithPrefix.args,
+		ref: undefined,
+		...Default.args,
+	},
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+
+export const WithSuffixControl: Story = {
+	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
+		...Default.args,
+	},
+	parameters: {
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {
@@ -79,6 +101,11 @@ export const Password: Story = {
 			<InputControl
 				{ ...args }
 				type={ show ? 'text' : 'password' }
+				prefix={
+					<InputLayout.Slot padding="minimal">
+						<Icon icon={ lock } />
+					</InputLayout.Slot>
+				}
 				suffix={
 					<InputLayout.Slot padding="minimal">
 						<IconButton
@@ -95,6 +122,10 @@ export const Password: Story = {
 	},
 	args: {
 		...Default.args,
+		label: 'Password',
+		description: undefined,
+		placeholder: undefined,
+		autoComplete: 'current-password',
 		defaultValue: 'password',
 	},
 };
@@ -152,9 +183,91 @@ export const NumberWithSteppers: Story = {
 	},
 };
 
+/**
+ * Common field types can show an icon in the prefix. The icon is decorative:
+ * the label already names the field, so `Icon` is hidden from assistive
+ * technologies.
+ *
+ * Set `type` by the kind of value, and choose `autoComplete` by the field's
+ * purpose. For example, an email address used to sign in can use
+ * `type="email"` with `autoComplete="username"`.
+ */
+export const WithPrefixIcon: Story = {
+	render: function Template( args ) {
+		return (
+			<Stack direction="column" gap="lg">
+				<InputControl
+					{ ...args }
+					label="Email"
+					placeholder="name@example.com"
+					type="email"
+					autoComplete="email"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ envelope } />
+						</InputLayout.Slot>
+					}
+				/>
+				<InputControl
+					{ ...args }
+					label="Phone number"
+					placeholder="+1 555 0100"
+					type="tel"
+					autoComplete="tel"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ mobile } />
+						</InputLayout.Slot>
+					}
+				/>
+				<InputControl
+					{ ...args }
+					label="Website"
+					placeholder="https://example.com"
+					type="url"
+					autoComplete="url"
+					prefix={
+						<InputLayout.Slot padding="minimal">
+							<Icon icon={ link } />
+						</InputLayout.Slot>
+					}
+				/>
+			</Stack>
+		);
+	},
+};
+
+/**
+ * A search field uses `type="search"`. Some browsers show a native button to
+ * clear the query, and clear it on Escape.
+ */
+export const Search: Story = {
+	args: {
+		label: 'Search',
+		hideLabelFromVision: true,
+		placeholder: 'Search',
+		type: 'search',
+		defaultValue: 'Pizza',
+		prefix: (
+			<InputLayout.Slot padding="minimal">
+				<Icon icon={ search } className={ styles[ 'search-icon' ] } />
+			</InputLayout.Slot>
+		),
+	},
+};
+
 export const Disabled: Story = {
 	args: {
 		...Default.args,
+		defaultValue: 'Disabled value',
 		disabled: true,
+	},
+};
+
+export const ReadOnly: Story = {
+	args: {
+		...Default.args,
+		defaultValue: 'Read-only value',
+		readOnly: true,
 	},
 };

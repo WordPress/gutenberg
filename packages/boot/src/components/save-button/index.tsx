@@ -1,14 +1,28 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
-import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
+import {
+	privateApis as coreDataPrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
+import {
+	ariaKeyShortcut,
+	displayShortcut,
+	shortcutAriaLabel,
+} from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
-import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
-import { Tooltip } from '@wordpress/ui';
-import './style.scss';
+import {
+	KeyboardShortcutDescription,
+	KeyboardShortcutDisplay,
+	Tooltip,
+	useKeyboardShortcutProps,
+} from '@wordpress/ui';
+import styles from './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
+import { unlock } from '../../lock-unlock';
+
+const { EntitiesSavedStates } = unlock( coreDataPrivateApis );
 
 export default function SaveButton() {
 	const [ isSaveViewOpen, setIsSaveViewOpened ] = useState( false );
@@ -53,6 +67,14 @@ export default function SaveButton() {
 	const shouldShowButton = hasChanges || showSavedState;
 
 	useSaveShortcut( { openSavePanel: () => setIsSaveViewOpened( true ) } );
+	const shortcut = {
+		displayShortcut: displayShortcut.primary( 's' ),
+		ariaKeyShortcut: ariaKeyShortcut.primary( 's' ),
+		label: shortcutAriaLabel.primary( 's' ),
+	};
+	const { descriptionId, targetProps } = useKeyboardShortcutProps( {
+		shortcut,
+	} );
 
 	if ( ! shouldShowButton ) {
 		return null;
@@ -76,12 +98,12 @@ export default function SaveButton() {
 		);
 	};
 	const label = getLabel();
-	const shortcut = displayShortcut.primary( 's' );
 
 	return (
 		<>
 			<Tooltip.Root>
 				<Tooltip.Trigger
+					{ ...targetProps }
 					render={
 						<Button
 							variant="primary"
@@ -91,20 +113,25 @@ export default function SaveButton() {
 							disabled={ disabled }
 							accessibleWhenDisabled
 							isBusy={ isSaving }
-							aria-keyshortcuts={ rawShortcut.primary( 's' ) }
-							className="boot-save-button"
+							className={ styles[ 'save-button' ] }
 							icon={ isInSavedState ? check : undefined }
-						>
-							{ label }
-						</Button>
+						/>
 					}
-				/>
+				>
+					{ label }
+					{ descriptionId && (
+						<KeyboardShortcutDescription
+							descriptionId={ descriptionId }
+							shortcut={ shortcut }
+						/>
+					) }
+				</Tooltip.Trigger>
 				<Tooltip.Popup>
 					{ hasChanges && <span>{ label }</span> }
-					{ /* TODO: replace with a future `@wordpress/ui` `Shortcut` primitive once available */ }
-					<span className="boot-save-button__shortcut">
-						{ shortcut }
-					</span>
+					<KeyboardShortcutDisplay
+						className={ styles.shortcut }
+						shortcut={ shortcut }
+					/>
 				</Tooltip.Popup>
 			</Tooltip.Root>
 			{ isSaveViewOpen && (

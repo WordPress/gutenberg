@@ -1,4 +1,5 @@
-const formatter = require( '../lib/markdown/formatter' );
+import { describe, expect, it } from 'vitest';
+import formatter from '../lib/markdown/formatter';
 
 describe( 'Formatter', () => {
 	it( 'returns markdown', () => {

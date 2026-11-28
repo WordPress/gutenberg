@@ -29,7 +29,20 @@ export default {
 			dependencies: [ 'react', 'react-dom' ],
 			dependencyTypes: [ 'prod', 'dev' ],
 			// Bump this literal when upgrading React.
-			pinVersion: '^18.3.1',
+			pinVersion: '^19.3.0',
+		},
+		{
+			label: 'Check published Node tools against the Node 22 APIs they support.',
+			dependencies: [ '@types/node' ],
+			dependencyTypes: [ 'dev' ],
+			packages: [
+				'@wordpress/build',
+				'@wordpress/design-system-mcp',
+				'@wordpress/e2e-test-utils-playwright',
+				'@wordpress/prettier-config',
+				'@wordpress/theme-build-tools',
+			],
+			pinVersion: '^22.20.5',
 		},
 		{
 			label: 'All dependencies must use the same version across the repo.',

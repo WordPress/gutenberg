@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/i18n-plural-placeholder */
+import { describe, expect, test } from 'vitest';
 import { addFilter } from '@wordpress/hooks';
 import { __, _x, _n, _nx } from '@wordpress/i18n';
 
@@ -37,3 +39,5 @@ describe( 'i18n filters', () => {
 		expect( _nx( 'hello', 'hellos', 2, 'context' ) ).toBe( 'goodbyes' );
 	} );
 } );
+
+/* eslint-enable @wordpress/i18n-plural-placeholder */

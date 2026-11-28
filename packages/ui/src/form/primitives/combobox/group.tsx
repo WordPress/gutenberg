@@ -2,7 +2,7 @@ import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComboboxGroupProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Groups related items together with an associated label rendered by
@@ -10,7 +10,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * `Combobox.Collection` components iterate over them.
  */
 export const Group = forwardRef< HTMLDivElement, ComboboxGroupProps >(
-	function Group( { className, children, ...restProps }, ref ) {
+	function UnforwardedGroup( { className, children, ...restProps }, ref ) {
 		return (
 			<_Combobox.Group
 				className={ clsx( itemPopupStyles.group, className ) }

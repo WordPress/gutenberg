@@ -136,6 +136,71 @@ test.describe( 'Toolbar roving tabindex', () => {
 	} );
 } );
 
+test.describe( 'Document tools roving tabindex', () => {
+	// Undo and redo aren't rendered below 782px.
+	test.use( { viewport: { width: 700, height: 700 } } );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'moves focus to the next visible tool when undo and redo are not displayed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Block Inserter' );
+
+		await page.keyboard.press( 'ArrowRight' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+
+	test( 'does not leave focus on an element removed from the tab order', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		for ( let i = 0; i < 4; i++ ) {
+			await page.keyboard.press( 'ArrowRight' );
+			await expect
+				.poll( () =>
+					page.evaluate( () => document.activeElement?.tabIndex )
+				)
+				.toBe( 0 );
+		}
+	} );
+
+	test( 'stays reachable with Shift+Tab and Alt+F10 after an arrow key press', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.not.toBe( 'Document Overview' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+
+		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+} );
+
 class ToolbarRovingTabindexUtils {
 	constructor( { editor, page, pageUtils } ) {
 		this.editor = editor;
@@ -162,6 +227,10 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
+		if ( label.startsWith( 'Block: ' ) ) {
+			await this.expectBlockToOwnFocus( label );
+			return;
+		}
 		let ariaLabel = await this.editor.getFocusOwnerLabel();
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
@@ -169,6 +238,32 @@ class ToolbarRovingTabindexUtils {
 			ariaLabel = await this.editor.getFocusOwnerLabel();
 		}
 		expect( ariaLabel ).toBe( label );
+	}
+
+	// The selected block is the labelled one, and it owns focus: it is
+	// focused itself, or the focused editing host contains it and the
+	// selection.
+	async expectBlockToOwnFocus( label ) {
+		const block = this.editor.canvas.locator(
+			`[data-block="${ await this.getSelectedBlockClientId() }"]`
+		);
+		await expect( block ).toHaveAttribute( 'aria-label', label );
+		if ( ! ( await this.editor.ownsSelection( block ) ) ) {
+			// Focus may be within a block without text (e.g. on an image
+			// placeholder button): ArrowUp moves it to the block wrapper.
+			await this.page.keyboard.press( 'ArrowUp' );
+		}
+		await expect
+			.poll( () => this.editor.ownsSelection( block ) )
+			.toBe( true );
+	}
+
+	async getSelectedBlockClientId() {
+		return this.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientId()
+		);
 	}
 
 	async wrapCurrentBlockWithGroup( currentBlockTitle ) {
@@ -196,9 +291,6 @@ class ToolbarRovingTabindexUtils {
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
-		await this.page.keyboard.press( 'ArrowRight' );
-		// The parent selector segment also hosts the inserter.
-		await this.expectLabelToHaveFocus( 'Add block' );
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}

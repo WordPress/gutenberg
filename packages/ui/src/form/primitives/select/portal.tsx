@@ -13,7 +13,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function SelectPortal(
 ) {
 	return (
 		<_Select.Portal
-			container={ container ?? getWpCompatOverlaySlot() }
+			container={
+				container === undefined ? getWpCompatOverlaySlot() : container
+			}
 			{ ...restProps }
 			ref={ ref }
 		/>

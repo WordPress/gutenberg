@@ -164,7 +164,7 @@ export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 								: `url(#${ strokeId(
 										glyphIndex,
 										strokeIndex
-								  ) })`
+									) })`
 						}
 					/>
 				) ) }

@@ -39,7 +39,7 @@ jobs:
     # dangerous triggers, credential leaks, and sophisticated security vulnerabilities.
     zizmor:
         name: Run Zizmor
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             security-events: write
             actions: read
@@ -51,7 +51,7 @@ jobs:
                   persist-credentials: false
 
             - name: Install the latest version of uv
-              uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+              uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
 
             - name: Run zizmor
               run: uvx zizmor@1.24.1 --persona=regular --format=sarif --strict-collection . > results.sarif
@@ -59,7 +59,7 @@ jobs:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Upload SARIF file
-              uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+              uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
               with:
                   sarif_file: results.sarif
                   category: zizmor

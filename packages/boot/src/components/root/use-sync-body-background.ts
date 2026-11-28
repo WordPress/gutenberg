@@ -10,7 +10,7 @@ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
  * hook can be replaced with a CSS rule on `<body>`.
  * See https://github.com/WordPress/gutenberg/pull/78587#discussion_r3481698286
  *
- * @return Ref to attach to the `.boot-layout` div.
+ * @return Ref to attach to the layout root element.
  */
 export default function useSyncBodyBackground() {
 	const layoutRef = useRef< HTMLDivElement | null >( null );
