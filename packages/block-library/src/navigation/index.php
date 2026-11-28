@@ -331,12 +331,39 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns whether a navigation post can be rendered.
+	 *
+	 * A published navigation post can always be rendered. A draft one can be
+	 * rendered in a preview, for users who can edit it, so that the preview
+	 * shows the menu that the editor shows. Importing a classic menu in the
+	 * editor, for example, creates a draft navigation post, which is only
+	 * published when the user saves it.
+	 *
+	 * The editor accepts the same statuses in `use-navigation-menu.js`. If this
+	 * is changed then a corresponding change must also be implemented there.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param WP_Post $navigation_post The navigation post.
+	 * @return bool Whether the navigation post can be rendered.
+	 */
+	private static function is_navigation_post_renderable( $navigation_post ) {
+		if ( 'publish' === $navigation_post->post_status ) {
+			return true;
+		}
+
+		return 'draft' === $navigation_post->post_status
+			&& is_preview()
+			&& current_user_can( 'edit_post', $navigation_post->ID );
+	}
+
+	/**
 	 * Gets the inner blocks for the navigation block from the navigation post.
 	 *
 	 * @since 6.5.0
 	 *
 	 * @param array $attributes The block attributes.
-	 * @return WP_Block_List|null Returns the inner blocks for the navigation block, or null if the navigation post is not published.
+	 * @return WP_Block_List|null Returns the inner blocks for the navigation block, or null if the navigation post can't be rendered.
 	 */
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
 		$navigation_post = get_post( $attributes['ref'] );
@@ -344,9 +371,7 @@ class WP_Navigation_Block_Renderer {
 			return new WP_Block_List( array(), $attributes );
 		}
 
-		// Only published posts are valid. If this is changed then a corresponding change
-		// must also be implemented in `use-navigation-menu.js`.
-		if ( 'publish' === $navigation_post->post_status ) {
+		if ( self::is_navigation_post_renderable( $navigation_post ) ) {
 			$parsed_blocks = parse_blocks( $navigation_post->post_content );
 
 			// 'parse_blocks' includes a null block with '\n\n' as the content when
@@ -613,9 +638,7 @@ class WP_Navigation_Block_Renderer {
 				return $navigation_name;
 			}
 
-			// Only published posts are valid. If this is changed then a corresponding change
-			// must also be implemented in `use-navigation-menu.js`.
-			if ( 'publish' === $navigation_post->post_status ) {
+			if ( self::is_navigation_post_renderable( $navigation_post ) ) {
 				return $navigation_post->post_title;
 			}
 		}

@@ -514,4 +514,94 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			$GLOBALS['wp_styles'] = $original_styles;
 		}
 	}
+
+	/**
+	 * Creates a draft navigation post, as importing a classic menu in the
+	 * editor does.
+	 *
+	 * @return int The navigation post ID.
+	 */
+	private function create_draft_navigation_post() {
+		return self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_status'  => 'draft',
+				'post_title'   => 'Draft Menu',
+				'post_content' => '<!-- wp:navigation-link {"label":"Draft Link","url":"https://example.org/draft"} /-->',
+			)
+		);
+	}
+
+	/**
+	 * Renders a navigation block that uses a navigation post.
+	 *
+	 * @param int $navigation_id The navigation post ID.
+	 * @return string The rendered block.
+	 */
+	private function render_navigation_block( $navigation_id ) {
+		return do_blocks( '<!-- wp:navigation {"overlayMenu":"never","ref":' . $navigation_id . '} /-->' );
+	}
+
+	/**
+	 * Tests that a draft navigation menu is rendered in a preview, for a user
+	 * who can edit it.
+	 *
+	 * @ticket 59684
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 */
+	public function test_draft_navigation_menu_is_rendered_in_preview_for_users_who_can_edit_it() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$navigation_id = $this->create_draft_navigation_post();
+		$post_id       = self::factory()->post->create();
+		$this->go_to( add_query_arg( 'preview', 'true', get_permalink( $post_id ) ) );
+
+		$html = $this->render_navigation_block( $navigation_id );
+
+		$this->assertTrue( is_preview(), 'The test should run in a preview.' );
+		$this->assertStringContainsString( 'Draft Link', $html );
+		$this->assertStringContainsString( 'aria-label="Draft Menu"', $html );
+	}
+
+	/**
+	 * Tests that a draft navigation menu is not rendered in a preview, for a
+	 * user who can't edit it.
+	 *
+	 * @ticket 59684
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 */
+	public function test_draft_navigation_menu_is_not_rendered_in_preview_for_users_who_cannot_edit_it() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'author' ) ) );
+		$navigation_id = $this->create_draft_navigation_post();
+		$post_id       = self::factory()->post->create();
+		$this->go_to( add_query_arg( 'preview', 'true', get_permalink( $post_id ) ) );
+
+		$html = $this->render_navigation_block( $navigation_id );
+
+		$this->assertTrue( is_preview(), 'The test should run in a preview.' );
+		$this->assertStringNotContainsString( 'Draft Link', $html );
+		$this->assertStringNotContainsString( 'Draft Menu', $html );
+	}
+
+	/**
+	 * Tests that a draft navigation menu is not rendered outside a preview,
+	 * even for a user who can edit it.
+	 *
+	 * @ticket 59684
+	 *
+	 * @covers WP_Navigation_Block_Renderer::render
+	 */
+	public function test_draft_navigation_menu_is_not_rendered_outside_a_preview() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$navigation_id = $this->create_draft_navigation_post();
+		$post_id       = self::factory()->post->create();
+		$this->go_to( get_permalink( $post_id ) );
+
+		$html = $this->render_navigation_block( $navigation_id );
+
+		$this->assertFalse( is_preview(), 'The test should not run in a preview.' );
+		$this->assertStringNotContainsString( 'Draft Link', $html );
+		$this->assertStringNotContainsString( 'Draft Menu', $html );
+	}
 }
