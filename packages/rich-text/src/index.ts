@@ -26,7 +26,7 @@ export { createElement as __unstableCreateElement } from './create-element';
 export { privateApis } from './private-apis';
 export { useAnchorRef } from './hook/use-anchor-ref';
 export { useAnchor } from './hook/use-anchor';
-export { __unstableUseRichText } from './hook';
+export { useDeprecatedRichText as __unstableUseRichText } from './hook';
 
 // Remnant that is left in an abundance of caution to ensure there's no errors.
 export function __experimentalRichText() {}
@@ -36,3 +36,26 @@ export function __experimentalRichText() {}
  * documentation for more information.
  */
 export type { RichTextValue } from './types';
+
+/**
+ * The text, formats and replacements of a `RichTextValue`, without the
+ * selection.
+ */
+export type { RichTextContent } from './types';
+
+/**
+ * A single format, such as `core/bold`, applied to a range of characters within
+ * a `RichTextValue`. See main `@wordpress/rich-text` documentation for more
+ * information.
+ */
+export type { RichTextFormat } from './types';
+
+/**
+ * The formats applied to a single character of a `RichTextValue`.
+ */
+export type { RichTextFormatList } from './types';
+
+/**
+ * A Set of callbacks that format types register for an event.
+ */
+export type { EventCallbacksSet } from './event-listeners';

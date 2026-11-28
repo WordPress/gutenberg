@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
@@ -83,6 +80,10 @@ export function useResizeLabel( {
 	 * both width and height values have changed at (roughly) the same time.
 	 */
 	const moveTimeoutRef = useRef< number >( undefined );
+
+	useEffect( () => {
+		return () => window.clearTimeout( moveTimeoutRef.current );
+	}, [] );
 
 	const debounceUnsetMoveXY = useCallback( () => {
 		const unsetMoveXY = () => {

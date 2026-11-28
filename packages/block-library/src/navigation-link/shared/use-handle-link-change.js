@@ -1,13 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { escapeHTML } from '@wordpress/escape-html';
 import { updateAttributes } from './update-attributes';
 import { useEntityBinding } from './use-entity-binding';
 
@@ -16,13 +11,19 @@ import { useEntityBinding } from './use-entity-binding';
  * Manages the transition between entity links and custom links,
  * including proper binding creation and cleanup.
  *
- * @param {Object}   options               - Configuration options
- * @param {string}   options.clientId      - Block client ID
- * @param {Object}   options.attributes    - Current block attributes
- * @param {Function} options.setAttributes - Standard setAttribute function
+ * @param {Object}   options                 - Configuration options
+ * @param {string}   options.clientId        - Block client ID
+ * @param {Object}   options.attributes      - Current block attributes
+ * @param {Function} options.setAttributes   - Standard setAttribute function
+ * @param {boolean}  options.allowTextUpdate - Whether this control can update the link text
  * @return {Function} Callback function to handle link changes
  */
-export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
+export function useHandleLinkChange( {
+	clientId,
+	attributes,
+	setAttributes,
+	allowTextUpdate = false,
+} ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { hasUrlBinding, createBinding, clearBinding } = useEntityBinding( {
 		clientId,
@@ -35,19 +36,40 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 				return;
 			}
 
+			// The sidebar link picker and the page creator send no link settings,
+			// so only apply the setting when the change includes it.
+			const settingsUpdateAttributes =
+				updatedLink.opensInNewTab !== undefined
+					? { opensInNewTab: updatedLink.opensInNewTab }
+					: {};
+
 			const attrs = {
 				url: updatedLink.url,
 				kind: updatedLink.kind,
 				type: updatedLink.type,
 				id: updatedLink.id,
+				...settingsUpdateAttributes,
 			};
 
-			// Only include title when there's no existing label
-			// This preserves user-customized labels when updating links
-			if ( ! attributes.label || attributes.label === '' ) {
+			const currentText = attributes.label
+				? stripHTML( attributes.label )
+				: '';
+			const updatedText = updatedLink.title ?? '';
+			const hasTextUpdate =
+				allowTextUpdate &&
+				updatedLink.title !== undefined &&
+				updatedText !== currentText;
+			const textUpdateAttributes = hasTextUpdate
+				? { label: escapeHTML( updatedText ) }
+				: {};
+
+			if (
+				! attributes.label ||
+				attributes.label === '' ||
+				hasTextUpdate
+			) {
 				attrs.title = updatedLink.title;
 			}
-
 			// Check if transitioning from entity to custom link
 			const willBeCustomLink = ! updatedLink.id && hasUrlBinding;
 
@@ -62,6 +84,8 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 					kind: 'custom',
 					type: 'custom',
 					id: undefined,
+					...settingsUpdateAttributes,
+					...textUpdateAttributes,
 				} );
 			} else {
 				// Normal flow for entity links or unbound custom links
@@ -76,10 +100,15 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 				} else {
 					clearBinding();
 				}
+
+				if ( Object.keys( textUpdateAttributes ).length ) {
+					updateBlockAttributes( clientId, textUpdateAttributes );
+				}
 			}
 		},
 		[
 			attributes,
+			allowTextUpdate,
 			clientId,
 			hasUrlBinding,
 			createBinding,

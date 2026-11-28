@@ -44,7 +44,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	if ( $is_home ) {
 		// These checks are explicitly nested in order not to execute the `else` branch.
 		if ( $page_for_posts ) {
-			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged() );
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged(), true );
 		}
 		if ( block_core_breadcrumbs_is_paged() ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
@@ -119,13 +119,16 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$post_type_object = get_post_type_object( $post_type );
 		$archive_link     = get_post_type_archive_link( $post_type );
 		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
-			$label = $post_type_object->labels->archives;
+			$label      = $post_type_object->labels->archives;
+			$allow_html = false;
 			if ( 'post' === $post_type && $page_for_posts ) {
-				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				$label      = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				$allow_html = true;
 			}
 			$breadcrumb_items[] = array(
-				'label' => $label,
-				'url'   => $archive_link,
+				'label'      => $label,
+				'url'        => $archive_link,
+				'allow_html' => $allow_html,
 			);
 		}
 		// Build breadcrumb trail based on hierarchical structure or taxonomy terms.
@@ -133,6 +136,15 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_hierarchical_post_type_breadcrumbs( $post_id ) );
 		} else {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
+		}
+
+		// Add parent post title if applicable.
+		if ( $parent_post && is_post_type_viewable( $parent_post->post_type ) ) {
+			$breadcrumb_items[] = array(
+				'label'      => block_core_breadcrumbs_get_post_title( $parent_post ),
+				'url'        => get_permalink( $parent_post ),
+				'allow_html' => true,
+			);
 		}
 
 		// Add post title: linked when viewing a paginated page, plain text otherwise.
@@ -183,10 +195,12 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$separator_attr     = $attributes['separator'] ?? null;
+	$separator          = is_string( $separator_attr ) ? addcslashes( $separator_attr, '\\"' ) : '';
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
-			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
-			'aria-label' => __( 'Breadcrumbs' ),
+			'style'      => '--separator: "' . $separator . '";',
+			'aria-label' => _x( 'Breadcrumbs', 'aria label' ),
 		)
 	);
 
@@ -263,11 +277,15 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
  *
  * @param string $text       The text content.
  * @param bool   $is_paged   Whether we're on a paginated view.
+ * @param bool   $allow_html Optional. Whether to allow HTML in the label. Default false.
  *
  * @return array The breadcrumb item data.
  */
-function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
-	$item = array( 'label' => $text );
+function block_core_breadcrumbs_create_item( $text, $is_paged = false, $allow_html = false ) {
+	$item = array(
+		'label'      => $text,
+		'allow_html' => $allow_html,
+	);
 	if ( $is_paged ) {
 		$item['url'] = get_pagenum_link( 1 );
 	}
@@ -296,7 +314,7 @@ function block_core_breadcrumbs_get_post_title( $post_id_or_object ) {
  *
  * @since 7.0.0
  *
- * @param int    $post_id   The post ID.
+ * @param int $post_id The post ID.
  *
  * @return array Array of breadcrumb item data.
  */
@@ -522,7 +540,7 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array  $settings {
+	 * @param array  $settings  {
 	 *     Array of breadcrumb settings. Default empty array.
 	 *
 	 *     @type string $taxonomy Optional. Taxonomy slug to use for breadcrumbs.

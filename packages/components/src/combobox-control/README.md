@@ -34,7 +34,6 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -91,9 +90,9 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
--   Type: `( value: string | null | undefined ) => void`
+-   Type: `( value: string | null ) => void`
 -   Required: No
 
 #### value
@@ -133,17 +132,9 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
-#### __next40pxDefaultSize
-
-Start opting into the larger default height that will become the default size in a future version.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-
 ## Related components
 
--   Like this component, but without a search input, the [`CustomSelectControl`](https://developer.wordpress.org/block-editor/reference-guides/components/custom-select-control/) component.
+-   For a select without a search input, use [`SelectControl`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui`.
 
 -   To select one option from a set, when you want to show all the available options at once, use the [`RadioControl`](https://developer.wordpress.org/block-editor/reference-guides/components/radio-control/) component.
 -   To select one or more items from a set, use the [`CheckboxControl`](https://developer.wordpress.org/block-editor/reference-guides/components/checkbox-control/) component.

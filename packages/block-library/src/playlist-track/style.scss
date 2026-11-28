@@ -33,6 +33,16 @@
 			opacity: 0.7;
 		}
 
+		.wp-block-playlist-track__image {
+			flex: 0 0 50px;
+			width: 50px;
+			height: 50px;
+			margin-right: var(--wp--preset--spacing--20, 0.5em);
+			border: 1px solid rgb(0 0 0 / 8%);
+			box-sizing: border-box;
+			object-fit: cover;
+		}
+
 		.wp-block-playlist-track__content {
 			flex: 1 1 0;
 			min-width: 0;

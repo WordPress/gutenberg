@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 
 const { callbacks } = store( 'test/generator-scope', {
@@ -23,7 +20,7 @@ const { callbacks } = store( 'test/generator-scope', {
 			let value = yield Promise.resolve( 1 );
 			try {
 				value = yield Promise.reject( 2 );
-			} catch ( e ) {
+			} catch {
 				value = yield Promise.resolve( 3 );
 			}
 			getContext().result = value;

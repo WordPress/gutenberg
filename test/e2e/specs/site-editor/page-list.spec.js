@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { setPublishDate } = require( '../editor/various/post-summary/utils' );
 
 const createPages = async ( requestUtils ) => {
 	await requestUtils.createPage( {
@@ -27,6 +20,11 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor( { postType: 'page' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
@@ -34,12 +32,6 @@ test.describe( 'Page List', () => {
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllMedia(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Persists filter/search when switching layout', async ( {
@@ -70,18 +62,25 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
-					const TEST_IMAGE_FILE_PATH = path.resolve(
-						__dirname,
-						'../../assets/10x10_e2e_test_image_z9T8jK.png'
-					);
+					const TEST_IMAGE_FILE_PATH =
+						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
+					// The media modal opens on the "Media Library" tab once
+					// the library has items (e.g. after a previous upload),
+					// so make sure the upload tab is the active one.
+					await mediaLibrary
+						.getByRole( 'tab', { name: 'Upload files' } )
+						.click();
+
+					const selectFiles =
+						mediaLibrary.getByText( 'Select files' );
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
-					await mediaLibrary.getByText( 'Select files' ).click();
+					await selectFiles.click();
 					const fileChooser = await fileChooserPromise;
 					await fileChooser.setFiles( TEST_IMAGE_FILE_PATH );
 					await mediaLibrary
@@ -91,30 +90,33 @@ test.describe( 'Page List', () => {
 						} );
 
 					await mediaLibrary
-						.getByRole( 'button', { name: 'Select', exact: true } )
+						.getByRole( 'button', {
+							name: 'Set featured image',
+							exact: true,
+						} )
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose file' );
+					const el = page.getByText( 'Set featured image' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator( '.fields__media-edit-thumbnail' );
+					const img = page.locator( '.media-edit__thumbnail' );
 					await expect( img ).toBeVisible();
 				},
 			},
 			statusVisibility: {
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
-						name: 'Edit Status & Visibility',
+						name: 'Edit Status',
 					} );
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
@@ -146,7 +148,7 @@ test.describe( 'Page List', () => {
 				assertInitialState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
@@ -156,7 +158,7 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
@@ -196,10 +198,10 @@ test.describe( 'Page List', () => {
 					const dateEl = page
 						.getByRole( 'button', { name: 'Edit Date' } )
 						.locator( '..' );
-					const date = new Date();
-					const yy = String( date.getFullYear() );
 
-					await expect( dateEl ).toContainText( yy );
+					// A recent date reads as "Today at 10:28 am" or "November
+					// 3 10:28 am", without the year, but always has the time.
+					await expect( dateEl ).toContainText( /\d{1,2}:\d{2}/ );
 				},
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
@@ -208,25 +210,14 @@ test.describe( 'Page List', () => {
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
 
-					// Wait for the datetime control to appear
-					const datetimeInput = page.locator(
-						'input[type="datetime-local"]'
-					);
-					await datetimeInput.waitFor( { state: 'visible' } );
-
-					// Get current datetime value and increment year
-					const currentValue = await datetimeInput.inputValue();
-					if ( currentValue ) {
-						const currentDate = new Date( currentValue );
-						const newDate = new Date( currentDate );
-						newDate.setFullYear( currentDate.getFullYear() + 1 );
-
-						// Format for datetime-local input (YYYY-MM-DDTHH:MM)
-						const formattedDate = newDate
-							.toISOString()
-							.slice( 0, 16 );
-						await datetimeInput.fill( formattedDate );
-					}
+					// Increment the year in the date and time picker.
+					const yearInput = page.getByRole( 'spinbutton', {
+						name: 'Year',
+					} );
+					await expect( yearInput ).not.toHaveValue( '' );
+					const currentYear = Number( await yearInput.inputValue() );
+					await yearInput.fill( String( currentYear + 1 ) );
+					await yearInput.press( 'Enter' );
 				},
 				assertEditedState: async ( page ) => {
 					const date = new Date();
@@ -252,7 +243,9 @@ test.describe( 'Page List', () => {
 					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
-							name: 'http://localhost:8889/?',
+							// The permalink preview, on whatever host the
+							// test site runs.
+							name: /^https?:\/\/[^/]+\//,
 						} )
 					).toBeVisible();
 				},
@@ -277,6 +270,7 @@ test.describe( 'Page List', () => {
 
 					await page
 						.getByRole( 'option', { name: 'Sample Page' } )
+						.first()
 						.click();
 				},
 				assertEditedState: async ( page ) => {
@@ -340,9 +334,6 @@ test.describe( 'Page List', () => {
 		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
-			] );
 			// Create a test user for `author` field testing.
 			await requestUtils.createUser( {
 				username: 'testauthor',
@@ -355,14 +346,24 @@ test.describe( 'Page List', () => {
 		} );
 
 		test.beforeEach( async ( { admin, page } ) => {
-			await admin.visitSiteEditor();
-			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await admin.visitSiteEditor( { postType: 'page' } );
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-			// Trigger Quick Edit action on Privacy Policy row
-			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			// Trigger Quick Edit action on Privacy Policy row.
+			const row = page
+				.getByRole( 'row', {
+					name: /Privacy Policy/,
+				} )
+				.filter( {
+					// Targets newly created pages which are published by default.
+					has: page.getByRole( 'cell', { name: 'Published' } ),
+				} );
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
 		} );
 
 		Object.entries( fields ).forEach(
@@ -404,9 +405,7 @@ test.describe( 'Page List', () => {
 			await expect( updatedStatus ).toBeVisible();
 
 			// Verify featured image placeholder is gone (image was set)
-			const imagePlaceholder = row.locator(
-				'.fields__media-edit-placeholder'
-			);
+			const imagePlaceholder = row.locator( '.media-edit__placeholder' );
 			await expect( imagePlaceholder ).toBeHidden();
 
 			// Reset the page to its original state
@@ -433,7 +432,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields__media-edit-placeholder',
+		// 		'.media-edit__placeholder',
 		// 		{ strict: false }
 		// 	);
 
@@ -476,9 +475,270 @@ test.describe( 'Page List', () => {
 		// 	}
 		// } );
 
+		test.describe( 'Field trigger', () => {
+			const getStatusField = async ( page ) => {
+				const editButton = page.getByRole( 'button', {
+					name: 'Edit Status',
+				} );
+				const row = editButton.locator( '..' );
+				// The raw mouse clicks below use the row's bounding box, so
+				// wait for it to stop moving first — the extensible site
+				// editor's quick edit surface animates in.
+				await row.hover();
+				return { editButton, row };
+			};
+
+			test( 'opens the flyout when clicking anywhere on the row', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = await getStatusField( page );
+				const box = await row.boundingBox();
+
+				// Click the value area, away from the edit button.
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+				await expect( editButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+
+			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = await getStatusField( page );
+				const box = await row.boundingBox();
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+				await expect( editButton ).toBeFocused();
+
+				// Focus landing back on the trigger is what lets the field be
+				// reopened from the keyboard.
+				await page.keyboard.press( 'Enter' );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+			} );
+
+			test( 'keeps the flyout usable after double-clicking a field row', async ( {
+				page,
+			} ) => {
+				const { row } = await getStatusField( page );
+				const box = await row.boundingBox();
+				const x = box.x + box.width * 0.5;
+				const y = box.y + box.height / 2;
+
+				// A double click used to leave a text selection behind, which
+				// made every later click on a row a no-op. See #79348. It now
+				// toggles the flyout twice, leaving it closed.
+				await page.mouse.dblclick( x, y );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+
+				const dateEditButton = page.getByRole( 'button', {
+					name: 'Edit Date',
+				} );
+				await dateEditButton.click();
+
+				await expect( dateEditButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+		} );
+	} );
+
+	test.describe( 'Bulk Quick Edit', () => {
+		test( 'keeps bulk-editable fields accessible after table sorting', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			const table = page.getByRole( 'table' );
+			await page.getByRole( 'button', { name: 'View options' } ).click();
+			await page.getByRole( 'combobox', { name: 'Sort by' } ).click();
+			await page
+				.getByRole( 'option', { name: 'Title', exact: true } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			// The extensible site editor keeps the selection in the URL, so
+			// the checkbox only flips once the route has re-rendered.
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Deselect all',
+					exact: true,
+				} )
+			).toBeChecked();
+			await page
+				.getByRole( 'button', { name: 'Bulk edit', exact: true } )
+				.click();
+
+			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			await expect( modal ).toContainText(
+				'Changes will be applied to all selected pages.'
+			);
+			for ( const name of [
+				'Edit Status',
+				'Edit Date',
+				'Edit Author',
+				'Edit Discussion',
+			] ) {
+				await expect(
+					modal.getByRole( 'button', { name } )
+				).toBeVisible();
+			}
+			await modal.getByRole( 'button', { name: 'Edit Status' } ).click();
+			const pending = page.getByRole( 'radio', {
+				name: 'Pending Review',
+			} );
+			await pending.check();
+			await expect( pending ).toBeChecked();
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				modal.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeFocused();
+		} );
+
+		test( 'keeps mobile grid selection visible and restores focus after cancelling', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 390, height: 844 } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Grid' } ).click();
+			await page.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			const selection = page.getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} );
+			await expect( selection ).toBeChecked();
+			const toolbar = page.locator( '.dataviews-bulk-actions' );
+			await toolbar.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Bulk edit' } )
+			).toBeVisible();
+			await expect( selection ).toBeInViewport( { ratio: 1 } );
+			await expect(
+				toolbar.getByText( /items selected/ )
+			).toBeInViewport( { ratio: 1 } );
+			await page.keyboard.press( 'Escape' );
+			await toolbar.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Quick Edit Date Timezone Consistency', () => {
+		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
+		const PAGE_TITLE = 'Timezone Test Page';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				timezone: 'Etc/GMT+5',
+			} );
+			await requestUtils.createPage( {
+				title: PAGE_TITLE,
+				status: 'publish',
+				date_gmt: PAGE_DATE_GMT,
+			} );
+		} );
+
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [] );
-			await requestUtils.deleteAllUsers();
+			await requestUtils.updateSiteSettings( {
+				timezone: '',
+			} );
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		test( 'should display and edit dates in the WP timezone', async ( {
+			admin,
+			page,
+		} ) => {
+			await admin.visitSiteEditor( { postType: 'page' } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			// Open Quick Edit for the timezone test page.
+			const row = page.getByRole( 'row', {
+				name: new RegExp( PAGE_TITLE ),
+			} );
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
+
+			// Open the date field for editing.
+			const editButton = page.getByRole( 'button', {
+				name: 'Edit Date',
+			} );
+			await editButton.locator( '..' ).hover();
+			await editButton.click();
+
+			const year = page.getByRole( 'spinbutton', { name: 'Year' } );
+			const month = page.getByRole( 'combobox', { name: 'Month' } );
+			const day = page.getByRole( 'spinbutton', { name: 'Day' } );
+			const hours = page.getByRole( 'spinbutton', { name: 'Hours' } );
+			const minutes = page.getByRole( 'spinbutton', {
+				name: 'Minutes',
+			} );
+			const pm = page.getByRole( 'radio', { name: 'PM' } );
+
+			// The picker should reflect the WP timezone (UTC-5), not the
+			// browser/system timezone.
+			await expect( year ).toHaveValue( '2026' );
+			await expect( month ).toHaveText( 'February' );
+			await expect( day ).toHaveValue( '15' );
+			await expect( hours ).toHaveValue( '12' );
+			await expect( minutes ).toHaveValue( '30' );
+			await expect( pm ).toBeChecked();
+
+			// Change only the date, preserving time.
+			await setPublishDate( page, {
+				year: 2026,
+				month: 3,
+				day: 20,
+				hours: 12,
+				minutes: 30,
+			} );
+			await expect( month ).toHaveText( 'March' );
+			await expect( day ).toHaveValue( '20' );
+			await expect( hours ).toHaveValue( '12' );
+			await expect( minutes ).toHaveValue( '30' );
+
+			// Change the time, verify it updates correctly.
+			await setPublishDate( page, {
+				year: 2026,
+				month: 3,
+				day: 20,
+				hours: 9,
+				minutes: 45,
+			} );
+			await expect( day ).toHaveValue( '20' );
+			await expect( hours ).toHaveValue( '09' );
+			await expect( minutes ).toHaveValue( '45' );
+			await expect(
+				page.getByRole( 'radio', { name: 'AM' } )
+			).toBeChecked();
 		} );
 	} );
 } );

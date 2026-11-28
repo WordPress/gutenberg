@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Editor } from './index';
 
 interface BlockRepresentation {
@@ -12,7 +9,6 @@ interface BlockRepresentation {
 /**
  * Insert a block.
  *
- * @param this
  * @param blockRepresentation Inserted block representation.
  * @param options
  * @param options.clientId    Client ID of the parent block to insert into.

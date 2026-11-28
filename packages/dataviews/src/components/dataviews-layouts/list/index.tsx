@@ -1,19 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-	Spinner,
-	VisuallyHidden,
-	Composite,
-} from '@wordpress/components';
+import { Button, Spinner as WCSpinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -25,14 +12,16 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import { inertValue } from '@wordpress/react-inert-value';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
 import type {
 	Action,
 	NormalizedField,
@@ -41,6 +30,9 @@ import type {
 	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
+import getActionLabel from '../../../utils/get-action-label';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -51,13 +43,11 @@ interface ListViewItemProps< Item > {
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
-	onSelect: ( item: Item ) => void;
+	selectionProps: SelectionProps;
 	otherFields: NormalizedField< Item >[];
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
 }
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -89,10 +79,7 @@ function PrimaryActionGridCell< Item >( {
 		primaryAction.id
 	);
 
-	const label =
-		typeof primaryAction.label === 'string'
-			? primaryAction.label
-			: primaryAction.label( [ item ] );
+	const label = getActionLabel( primaryAction, [ item ] );
 
 	return 'RenderModal' in primaryAction ? (
 		<div role="gridcell" key={ primaryAction.id }>
@@ -104,6 +91,7 @@ function PrimaryActionGridCell< Item >( {
 						accessibleWhenDisabled
 						text={ label }
 						size="small"
+						aria-haspopup="dialog"
 						onClick={ () => setIsModalOpen( true ) }
 					/>
 				}
@@ -147,7 +135,7 @@ function ListItem< Item >( {
 	titleField,
 	mediaField,
 	descriptionField,
-	onSelect,
+	selectionProps,
 	otherFields,
 	onDropdownTriggerKeyDown,
 	posinset,
@@ -216,6 +204,10 @@ function ListItem< Item >( {
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
+	const renderDescription = showDescription && descriptionField?.render;
+	// When we have only the media and title fields, we want to center them vertically in the list item.
+	const hasOnlyMediaAndTitle =
+		!! renderedMediaField && ! renderDescription && ! otherFields.length;
 	const usedActions = eligibleActions?.length > 0 && (
 		<Stack
 			direction="row"
@@ -231,21 +223,22 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					<Menu placement="bottom-end">
-						<Menu.TriggerButton
+					<Menu.Root>
+						<Menu.Trigger
+							disabled={ ! actions.length }
 							render={
 								<Composite.Item
 									id={ generateDropdownTriggerCompositeId(
 										idPrefix
 									) }
+									accessibleWhenDisabled
 									render={
 										<Button
 											size="small"
 											icon={ moreVertical }
 											label={ __( 'Actions' ) }
 											accessibleWhenDisabled
-											disabled={ ! actions.length }
-											onKeyDown={
+											onKeyDownCapture={
 												onDropdownTriggerKeyDown
 											}
 										/>
@@ -253,15 +246,17 @@ function ListItem< Item >( {
 								/>
 							}
 						/>
-						<Menu.Popover>
+						<Menu.Popup
+							positioner={ <Menu.Positioner align="end" /> }
+						>
 							<ActionsMenuGroup
 								actions={ eligibleActions }
 								item={ item }
 								registry={ registry }
 								setActiveModalAction={ setActiveModalAction }
 							/>
-						</Menu.Popover>
-					</Menu>
+						</Menu.Popup>
+					</Menu.Root>
 					{ !! activeModalAction && (
 						<ActionModal
 							action={ activeModalAction }
@@ -307,14 +302,14 @@ function ListItem< Item >( {
 						aria-labelledby={ labelId }
 						aria-describedby={ descriptionId }
 						className="dataviews-view-list__item"
-						onClick={ () => onSelect( item ) }
+						{ ...selectionProps }
 					/>
 				</div>
 				<Stack
 					direction="row"
 					gap="md"
 					justify="start"
-					align="flex-start"
+					align={ hasOnlyMediaAndTitle ? 'center' : 'flex-start' }
 					style={ { flex: 1, minWidth: 0 } }
 				>
 					{ renderedMediaField }
@@ -332,7 +327,7 @@ function ListItem< Item >( {
 							</div>
 							{ usedActions }
 						</Stack>
-						{ showDescription && descriptionField?.render && (
+						{ renderDescription && (
 							<div className="dataviews-view-list__field">
 								<descriptionField.render
 									item={ item }
@@ -350,8 +345,8 @@ function ListItem< Item >( {
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
-										as="span"
 										className="dataviews-view-list__field-label"
+										render={ <span /> }
 									>
 										{ field.label }
 									</VisuallyHidden>
@@ -389,6 +384,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
+	const isDelayedLoading = useDelayedLoading( !! isLoading );
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
@@ -402,8 +399,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
 		.filter( isDefined );
 
-	const onSelect = ( item: Item ) =>
-		onChangeSelection( [ getItemId( item ) ] );
+	const { getSelectionProps } = useSelectionProps( {
+		data,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: 'single-required',
+		shouldSelectOnClick: true,
+	} );
 
 	const generateCompositeItemIdPrefix = useCallback(
 		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
@@ -412,18 +416,29 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 
 	const isActiveCompositeItem = useCallback(
 		( item: Item, idToCheck: string ) => {
-			// All composite items use the same prefix in their IDs.
-			return idToCheck.startsWith(
-				generateCompositeItemIdPrefix( item )
+			// Compare against the exact composite item IDs of the row. A
+			// prefix check would also match other rows whose ID starts with
+			// this row's ID (e.g. `1` and `12`).
+			const idPrefix = generateCompositeItemIdPrefix( item );
+			return (
+				idToCheck === generateItemWrapperCompositeId( idPrefix ) ||
+				idToCheck === generateDropdownTriggerCompositeId( idPrefix ) ||
+				actions.some(
+					( action ) =>
+						idToCheck ===
+						generatePrimaryActionCompositeId( idPrefix, action.id )
+				)
 			);
 		},
-		[ generateCompositeItemIdPrefix ]
+		[ actions, generateCompositeItemIdPrefix ]
 	);
 
 	// Controlled state for the active composite item.
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
 	>( undefined );
+
+	const compositeRef = useRef< HTMLDivElement >( null );
 
 	// Update the active composite item when the selected item changes.
 	useEffect( () => {
@@ -463,7 +478,17 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
-			document.getElementById( targetCompositeItemId )?.focus();
+			// The active composite item is controlled state that
+			// can update without needing a focus move (e.g., searching
+			// can trigger an active ID update). Only move DOM focus
+			// when it's already within the list.
+			if (
+				compositeRef.current?.contains(
+					compositeRef.current.ownerDocument.activeElement
+				)
+			) {
+				document.getElementById( targetCompositeItemId )?.focus();
+			}
 		},
 		[ data, generateCompositeItemIdPrefix ]
 	);
@@ -487,13 +512,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	}, [ isActiveIdInList, selectCompositeItem, previousActiveItemIndex ] );
 
 	// Prevent the default behavior (open dropdown menu) and instead select the
-	// dropdown menu trigger on the previous/next row.
-	// https://github.com/ariakit/ariakit/issues/3768
+	// dropdown menu trigger on the previous/next row. Runs in the capture
+	// phase and stops propagation because the menu's open-on-arrow-key
+	// behavior doesn't check whether the event's default was prevented.
 	const onDropdownTriggerKeyDown = useCallback(
 		( event: React.KeyboardEvent< HTMLButtonElement > ) => {
 			if ( event.key === 'ArrowDown' ) {
 				// Select the dropdown menu trigger item in the next row.
 				event.preventDefault();
+				event.stopPropagation();
 				selectCompositeItem(
 					activeItemIndex + 1,
 					generateDropdownTriggerCompositeId
@@ -502,6 +529,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			if ( event.key === 'ArrowUp' ) {
 				// Select the dropdown menu trigger item in the previous row.
 				event.preventDefault();
+				event.stopPropagation();
 				selectCompositeItem(
 					activeItemIndex - 1,
 					generateDropdownTriggerCompositeId
@@ -511,55 +539,56 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		[ selectCompositeItem, activeItemIndex ]
 	);
 
-	const hasData = data?.length;
-	if ( ! hasData ) {
-		return (
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-			</div>
-		);
-	}
-
+	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup =
+		hasData && groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	// Whether the server has more rows beyond the current window.
+	const hasMoreItems =
+		isInfiniteScroll &&
+		( view.startPosition ?? 1 ) + ( view.perPage ?? 0 ) <
+			paginationInfo.totalItems;
+	const listClassName = clsx( 'dataviews-view-list', className, {
+		[ `has-${ view.layout?.density }-density` ]:
+			view.layout?.density &&
+			[ 'compact', 'comfortable' ].includes( view.layout.density ),
+		'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
+	} );
+	const compositeProps = {
+		ref: compositeRef,
+		id: baseId,
+		render: <div />,
+		activeId: activeCompositeId,
+		setActiveId: setActiveCompositeId,
+		inert: inertValue( ! isInfiniteScroll && isLoading ),
+	};
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( 'dataviews-no-results', {
+					'is-refreshing': isDelayedLoading,
+				} ) }
+			>
+				{ empty }
+			</div>
+		);
+	}
 
 	// Render data grouped by field
 	if ( hasData && groupField && dataByGroup ) {
 		return (
 			<Composite
-				id={ `${ baseId }` }
-				render={ <div /> }
+				{ ...compositeProps }
 				className="dataviews-view-list__group"
 				role="grid"
-				activeId={ activeCompositeId }
-				setActiveId={ setActiveCompositeId }
 			>
-				<Stack
-					direction="column"
-					gap="lg"
-					className={ clsx( 'dataviews-view-list', className ) }
-				>
+				<Stack direction="column" gap="lg" className={ listClassName }>
 					{ Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
-							<Stack
-								direction="column"
-								key={ groupName }
-								gap="sm"
-							>
+							<Stack direction="column" key={ groupName }>
 								<h3 className="dataviews-view-list__group-header">
 									{ view.groupBy?.showLabel === false
 										? groupName
@@ -568,7 +597,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 												__( '%1$s: %2$s' ),
 												groupField.label,
 												groupName
-										  ) }
+											) }
 								</h3>
 								{ groupItems.map( ( item ) => {
 									const id =
@@ -581,7 +610,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 											actions={ actions }
 											item={ item }
 											isSelected={ item === selectedItem }
-											onSelect={ onSelect }
+											selectionProps={ getSelectionProps(
+												getItemId( item )
+											) }
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -606,18 +637,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	return (
 		<>
 			<Composite
-				id={ baseId }
-				render={ <div /> }
-				className={ clsx( 'dataviews-view-list', className, {
-					[ `has-${ view.layout?.density }-density` ]:
-						view.layout?.density &&
-						[ 'compact', 'comfortable' ].includes(
-							view.layout.density
-						),
-				} ) }
+				{ ...compositeProps }
+				className={ listClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
-				activeId={ activeCompositeId }
-				setActiveId={ setActiveCompositeId }
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );
@@ -629,7 +651,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 							actions={ actions }
 							item={ item }
 							isSelected={ item === selectedItem }
-							onSelect={ onSelect }
+							selectionProps={ getSelectionProps(
+								getItemId( item )
+							) }
 							mediaField={ mediaField }
 							titleField={ titleField }
 							descriptionField={ descriptionField }
@@ -646,9 +670,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ hasData && isLoading && (
-				<p className="dataviews-loading-more">
-					<Spinner />
+			{ ( hasMoreItems || ( isInfiniteScroll && isLoading ) ) && (
+				// Keep the spinner's height reserved while loading more so the
+				// scroll position doesn't bounce. Hidden, and silent to a11y,
+				// while idle.
+				<p
+					className="dataviews-loading-more"
+					aria-hidden={ ! isLoading }
+				>
+					<WCSpinner />
 				</p>
 			) }
 		</>

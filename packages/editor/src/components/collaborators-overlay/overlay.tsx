@@ -1,62 +1,48 @@
-// @ts-expect-error No exported types
-import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
-
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import Avatar from '../collaborators-presence/avatar';
+import AvatarGroup from '../collaborators-presence/avatar-group';
+import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
+import {
+	MAX_BLOCK_LABEL_AVATARS,
+	OVERLAY_IFRAME_STYLES,
+} from './overlay-iframe-styles';
+import { setDelayedInterval } from './timing-utils';
 import { useBlockHighlighting } from './use-block-highlighting';
+import { useRecentlyTyped } from './use-recently-typed';
 import { useRenderCursors } from './use-render-cursors';
+import { type CursorRegistry } from './cursor-registry';
 
-const COLLABORATORS_OVERLAY_STYLES = `
-.block-canvas-cover {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	z-index: 20000;
-}
-.block-canvas-cover .collaborators-overlay-full {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-.block-canvas-cover .collaborators-overlay-fixed {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-}
-.collaborators-overlay-user {
-	position: absolute;
-}
-.collaborators-overlay-user-cursor {
-	position: absolute;
-	width: 2px;
-	animation: collaborators-overlay-cursor-blink 1s infinite;
-}
-.collaborators-overlay-user-label {
-	position: absolute;
-	font-size: 11px;
-	padding: 2px 6px;
-	border-radius: 4px;
-	transform: translateY(-100%);
-	margin-top: -2px;
-	background-color: var(--wp--preset--color--black);
-	color: var(--wp--preset--color--white);
-	white-space: nowrap;
-}
-@keyframes collaborators-overlay-cursor-blink {
-	0%, 100% { opacity: 1; }
-	50% { opacity: 0.5; }
-}
-`;
+// Milliseconds to wait after a change before recomputing cursor positions.
+const RERENDER_DELAY_MS = 500;
+
+// Periodically recompute cursor positions to account for DOM layout
+// changes that don't trigger awareness state updates (e.g. a collaborator
+// applying formatting shifts text but the cursor's logical position is
+// unchanged). Only active when remote cursors are visible.
+const CURSOR_REDRAW_INTERVAL_MS = 10_000;
+
+// How long after the last keystroke an avatar stays hidden. `isTyping` only
+// clears on pointer movement, so without this a keyboard-only user would
+// never see the avatar again. Long enough not to flicker between keystrokes,
+// short enough that a pause in writing brings the avatar back.
+const TYPING_PAUSE_MS = 1000;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
 	postId: number | null;
 	postType: string | null;
+	cursorRegistry?: CursorRegistry;
 }
 
 /**
@@ -66,71 +52,306 @@ interface OverlayProps {
  * @param props.blockEditorDocument - The block editor document.
  * @param props.postId              - The ID of the post.
  * @param props.postType            - The type of the post.
+ * @param props.cursorRegistry      - The shared cursor registry.
  * @return The Overlay component.
  */
 export function Overlay( {
 	blockEditorDocument,
 	postId,
 	postType,
+	cursorRegistry,
 }: OverlayProps ) {
-	useStyleOverride( {
-		id: 'collaborators-overlay',
-		css: COLLABORATORS_OVERLAY_STYLES,
-	} );
-
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
 
-	const { cursors, rerenderCursorsAfterDelay } = useRenderCursors(
+	// A cursor avatar sits above the line it annotates, so it covers the text
+	// while that text is being written. Hide it for as long as the local user
+	// is typing in the same block, matching how the block toolbar gets out of
+	// the way. An avatar in another block isn't covering anything the local
+	// user is writing, so it stays. Carets and selection highlights always
+	// stay put: they are what tells you where someone else is working, and
+	// they never overlap the text.
+	const { isTyping, selectedBlockClientId, highlightBlocks } = useSelect(
+		( select ) => {
+			const { isTyping: _isTyping, getSelectedBlockClientId } =
+				select( blockEditorStore );
+			return {
+				isTyping: _isTyping(),
+				selectedBlockClientId: getSelectedBlockClientId(),
+				// Whether every block a collaborator works in is outlined,
+				// with their avatar above the block rather than on their
+				// caret. Off, text blocks only get the caret.
+				highlightBlocks: !! select( preferencesStore ).get(
+					'core',
+					'showCollaborationBlockHighlight'
+				),
+			};
+		},
+		[]
+	);
+
+	const recentlyTyped = useRecentlyTyped(
+		blockEditorDocument ?? null,
+		TYPING_PAUSE_MS
+	);
+
+	// The block whose avatars would be sitting over the text the local user
+	// is writing right now, which is the only case worth hiding them for.
+	// Both signals matter: `isTyping` brings the avatar back as soon as the
+	// pointer moves, and `recentlyTyped` brings it back after a pause in
+	// writing even if the pointer never moves at all.
+	const blockClientIdBeingWritten =
+		isTyping && recentlyTyped ? selectedBlockClientId : null;
+
+	const { cursors, rerenderCursorsAfterDelay, rerenderCursorsOnResize } =
+		useRenderCursors(
+			overlayElement,
+			blockEditorDocument ?? null,
+			postId ?? null,
+			postType ?? null,
+			RERENDER_DELAY_MS
+		);
+
+	const {
+		highlights,
+		rerenderHighlightsAfterDelay,
+		rerenderHighlightsOnResize,
+	} = useBlockHighlighting(
 		overlayElement,
 		blockEditorDocument ?? null,
 		postId ?? null,
-		postType ?? null
+		postType ?? null,
+		RERENDER_DELAY_MS,
+		highlightBlocks
 	);
 
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
-	// resizes, and re-render the cursors.
-	const resizeObserverRef = useResizeObserver( rerenderCursorsAfterDelay );
-	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
+	// resizes, and re-render the cursors and block highlights.
+	// Use the RAF-based callback so positions are measured after the browser
+	// has finished layout, without an arbitrary fixed delay.
+	const onResize = useCallback( () => {
+		rerenderCursorsOnResize();
+		rerenderHighlightsOnResize();
+	}, [ rerenderCursorsOnResize, rerenderHighlightsOnResize ] );
+	const resizeObserverRef = useResizeObserver( onResize );
+
+	// Trigger the initial position computation on mount.
+	useEffect( () => {
+		const cleanupCursors = rerenderCursorsAfterDelay();
+		const cleanupHighlights = rerenderHighlightsAfterDelay();
+		return () => {
+			cleanupCursors();
+			cleanupHighlights();
+		};
+	}, [ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ] );
+
+	useEffect( () => {
+		if ( cursors.length === 0 ) {
+			return;
+		}
+
+		return setDelayedInterval(
+			rerenderCursorsAfterDelay,
+			CURSOR_REDRAW_INTERVAL_MS
+		);
+	}, [ cursors.length, rerenderCursorsAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
-	const mergedRef = useMergeRefs( [ setOverlayElement, resizeObserverRef ] );
+	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
+		setOverlayElement,
+		resizeObserverRef,
+	] );
 
-	useBlockHighlighting(
-		blockEditorDocument ?? null,
-		postId ?? null,
-		postType ?? null
+	// The sessions whose avatar is drawn above a block. A block label holds
+	// one avatar per user and a limited number of avatars, so a session can
+	// be left out: a second tab of the same user, or anyone past the limit.
+	const clientIdsWithBlockAvatar = useMemo(
+		() =>
+			new Set(
+				highlights.flatMap( ( highlight ) =>
+					highlight.collaborators
+						.slice( 0, MAX_BLOCK_LABEL_AVATARS )
+						.map( ( collaborator ) => collaborator.clientId )
+				)
+			),
+		[ highlights ]
 	);
+
+	// The sessions with a caret on screen. The caret is where "jump to
+	// collaborator" should land, so it owns the registry entry. A block
+	// label only registers for a session that has no caret, such as a
+	// selected image.
+	const clientIdsWithCaret = useMemo(
+		() =>
+			new Set(
+				cursors
+					.filter( ( cursor ) => cursor.x !== undefined )
+					.map( ( cursor ) => cursor.clientId )
+			),
+		[ cursors ]
+	);
+
+	// Track cursor and highlight avatar element refs for registry registration.
+	const cursorRefsMap = useRef< Map< number, HTMLElement > >( new Map() );
+
+	// Keep the registry in sync whenever cursors or highlights change.
+	useEffect( () => {
+		if ( ! cursorRegistry ) {
+			return;
+		}
+		const refs = cursorRefsMap.current;
+		const currentIds = new Set( [
+			...cursors.map( ( c ) => c.clientId ),
+			...highlights.flatMap( ( h ) =>
+				h.collaborators.map( ( c ) => c.clientId )
+			),
+		] );
+
+		// Unregister elements that are no longer rendered.
+		for ( const id of refs.keys() ) {
+			if ( ! currentIds.has( id ) ) {
+				cursorRegistry.unregisterCursor( id );
+				refs.delete( id );
+			}
+		}
+
+		// Register or update elements that are currently rendered.
+		for ( const [ id, el ] of refs.entries() ) {
+			cursorRegistry.registerCursor( id, el );
+		}
+
+		return () => cursorRegistry.removeAll();
+	}, [ cursors, highlights, cursorRegistry ] );
+
+	// Callback ref factory to capture each cursor's DOM element.
+	const setCursorRef = useCallback(
+		( clientId: number ) => ( el: HTMLDivElement | null ) => {
+			if ( el ) {
+				cursorRefsMap.current.set( clientId, el );
+			} else {
+				cursorRefsMap.current.delete( clientId );
+			}
+		},
+		[]
+	);
+
+	// A block label avatar only registers its element when the session has
+	// no caret to register instead.
+	const getBlockAvatarRef = ( clientId: number ) => {
+		if ( clientIdsWithCaret.has( clientId ) ) {
+			return undefined;
+		}
+
+		return setCursorRef( clientId );
+	};
 
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
 	return (
 		<div className="collaborators-overlay-full" ref={ mergedRef }>
+			<style>{ AVATAR_IFRAME_STYLES + OVERLAY_IFRAME_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
+				<div key={ cursor.clientId }>
+					{ ! cursor.isMe &&
+						cursor.selectionRects?.map( ( rect, index ) => (
+							<div
+								key={ `${ cursor.clientId }-sel-${ index }` }
+								className="collaborators-overlay-selection-rect"
+								style={ {
+									left: `${ rect.x }px`,
+									top: `${ rect.y }px`,
+									width: `${ rect.width }px`,
+									height: `${ rect.height }px`,
+									backgroundColor: cursor.color,
+								} }
+							/>
+						) ) }
+					{ cursor.x !== undefined && (
+						<div
+							ref={ setCursorRef( cursor.clientId ) }
+							className="collaborators-overlay-user"
+							style={ {
+								left: `${ cursor.x }px`,
+								top: `${ cursor.y }px`,
+							} }
+						>
+							{ ! cursor.isMe && (
+								<div
+									className="collaborators-overlay-user-cursor"
+									style={ {
+										backgroundColor: cursor.color,
+										height: `${ cursor.height }px`,
+									} }
+								/>
+							) }
+							{ /*
+							 * With block highlighting on, a collaborator's
+							 * avatar sits above their block instead, and the
+							 * caret stays bare. A caret only gives up its
+							 * avatar when that session's avatar is drawn
+							 * above a block, so nobody is left without a
+							 * name. The local user's own avatar (an opt-in)
+							 * stays on their caret: their block is never
+							 * outlined.
+							 */ }
+							{ ( cursor.isMe ||
+								! highlightBlocks ||
+								! clientIdsWithBlockAvatar.has(
+									cursor.clientId
+								) ) &&
+								cursor.blockClientId !==
+									blockClientIdBeingWritten && (
+									<Avatar
+										className="collaborators-overlay-user-label"
+										variant="badge"
+										size="small"
+										src={ cursor.avatarUrl }
+										name={ cursor.userName }
+										label={
+											cursor.isMe
+												? __( 'You' )
+												: undefined
+										}
+										borderColor={ cursor.color }
+									/>
+								) }
+						</div>
+					) }
+				</div>
+			) ) }
+			{ highlights.map( ( highlight ) => (
 				<div
-					key={ cursor.clientId }
-					className="collaborators-overlay-user"
+					key={ highlight.blockId }
+					className="collaborators-overlay-block-label-anchor"
 					style={ {
-						left: `${ cursor.x }px`,
-						top: `${ cursor.y }px`,
+						left: `${ highlight.x }px`,
+						top: `${ highlight.y }px`,
 					} }
 				>
-					<div
-						className="collaborators-overlay-user-cursor"
-						style={ {
-							backgroundColor: cursor.color,
-							height: `${ cursor.height }px`,
-						} }
-					/>
-					<div
-						className="collaborators-overlay-user-label"
-						style={ {
-							backgroundColor: cursor.color,
-						} }
+					<AvatarGroup
+						className="collaborators-overlay-block-label-group"
+						max={ MAX_BLOCK_LABEL_AVATARS }
 					>
-						{ cursor.userName }
-					</div>
+						{ highlight.collaborators.map( ( collaborator ) => (
+							<div
+								key={ collaborator.clientId }
+								ref={ getBlockAvatarRef(
+									collaborator.clientId
+								) }
+								className="collaborators-overlay-block-label-item"
+							>
+								<Avatar
+									className="collaborators-overlay-block-label"
+									variant="badge"
+									size="small"
+									src={ collaborator.avatarUrl }
+									name={ collaborator.userName }
+									borderColor={ collaborator.color }
+								/>
+							</div>
+						) ) }
+					</AvatarGroup>
 				</div>
 			) ) }
 		</div>

@@ -1,24 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { isRTL } from '@wordpress/i18n';
 import BaseControl from '../base-control';
-import { Select, StyledInputBase } from './styles/select-control-styles';
+import InputBase from '../input-control/input-base';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -48,6 +38,10 @@ function UnforwardedSelectControl< V extends string >(
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
+		// Prevent passing legacy props to internal components.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
 		className,
 		disabled = false,
 		help,
@@ -64,11 +58,8 @@ function UnforwardedSelectControl< V extends string >(
 		prefix,
 		suffix,
 		variant = 'default',
-		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
-		__shouldNotWarnDeprecated36pxSize,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
@@ -95,16 +86,9 @@ function UnforwardedSelectControl< V extends string >(
 
 	const classes = clsx( 'components-select-control', className );
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'SelectControl',
-		__next40pxDefaultSize,
-		size,
-		__shouldNotWarnDeprecated36pxSize,
-	} );
-
 	return (
 		<BaseControl help={ help } id={ id } className={ classes }>
-			<StyledInputBase
+			<InputBase
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
@@ -119,26 +103,36 @@ function UnforwardedSelectControl< V extends string >(
 				__unstableInputWidth={
 					variant === 'minimal' ? 'auto' : undefined
 				}
-				variant={ variant }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				className={ clsx( styles.root, {
+					[ styles[ 'is-disabled' ] ]: disabled,
+					[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+				} ) }
 			>
-				<Select
+				<PolymorphicElement
+					as="select"
 					{ ...restProps }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
 					aria-describedby={ helpId }
-					className="components-select-control__input"
+					className={ clsx(
+						'components-select-control__input',
+						styles.input,
+						{
+							[ styles[ 'is-small' ] ]: size === 'small',
+							[ styles[ 'is-compact' ] ]: size === 'compact',
+							[ styles[ 'is-multiple' ] ]: multiple,
+							[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+							[ styles[ 'is-rtl' ] ]: isRTL(),
+						}
+					) }
 					disabled={ disabled }
 					id={ id }
 					multiple={ multiple }
 					onChange={ handleOnChange }
 					ref={ ref }
-					selectSize={ size }
 					value={ valueProp }
-					variant={ variant }
 				>
 					{ children || <SelectOptions options={ options } /> }
-				</Select>
-			</StyledInputBase>
+				</PolymorphicElement>
+			</InputBase>
 		</BaseControl>
 	);
 }
@@ -156,7 +150,6 @@ function UnforwardedSelectControl< V extends string >(
  *
  *   return (
  *     <SelectControl
- *       __next40pxDefaultSize
  *       label="Size"
  *       value={ size }
  *       options={ [

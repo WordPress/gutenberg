@@ -20,7 +20,27 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
+	$more_text = '';
+	if ( ! empty( $attributes['moreText'] ) ) {
+		$post_id    = $block->context['postId'];
+		$post_title = get_the_title( $post_id );
+		if ( '' === $post_title ) {
+			$post_title = sprintf(
+				/* translators: %s is post ID to describe the link for screen readers. */
+				__( 'untitled post %s' ),
+				$post_id
+			);
+		}
+		$screen_reader_text = sprintf(
+			/* translators: %s is the post title. */
+			__( ': %s' ),
+			$post_title
+		);
+		$more_text = '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_id ) ) . '">'
+			. wp_kses_post( $attributes['moreText'] )
+			. '<span class="screen-reader-text">' . wp_kses( $screen_reader_text, array() ) . '</span>'
+			. '</a>';
+	}
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
@@ -73,8 +93,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	$show_more_on_new_line = ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'];
 	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
+	} elseif ( empty( $more_text ) ) {
+		$content .= '</p>';
 	} else {
-		$content .= " $more_text</p>";
+		$separator = '' === $excerpt ? '' : ' ';
+		$content  .= $separator . $more_text . '</p>';
 	}
 	remove_filter( 'excerpt_more', $filter_excerpt_more );
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );

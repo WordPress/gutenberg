@@ -1,0 +1,117 @@
+import clsx from 'clsx';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetElementClassName,
+	getBackgroundClassesAndStyles,
+} from '@wordpress/block-editor';
+
+export default function save( { attributes } ) {
+	const { hasFixedLayout, head, body, foot, caption, style } = attributes;
+	const isEmpty = ! head.length && ! body.length && ! foot.length;
+
+	if ( isEmpty ) {
+		return null;
+	}
+
+	// The colour block support puts `has-link-color` on the figure.
+	const colorProps = getColorClassesAndStyles( {
+		...attributes,
+		style: { ...style, elements: undefined },
+	} );
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const backgroundProps = getBackgroundClassesAndStyles( attributes );
+
+	const textAlign = style?.typography?.textAlign;
+
+	const classes = clsx(
+		colorProps.className,
+		borderProps.className,
+		backgroundProps.className,
+		{
+			'has-fixed-layout': hasFixedLayout,
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		}
+	);
+
+	const hasCaption = ! RichText.isEmpty( caption );
+
+	const Section = ( { type, rows } ) => {
+		if ( ! rows.length ) {
+			return null;
+		}
+
+		const Tag = `t${ type }`;
+
+		return (
+			<Tag>
+				{ rows.map( ( { cells }, rowIndex ) => (
+					<tr key={ rowIndex }>
+						{ cells.map(
+							(
+								{
+									content,
+									tag,
+									scope,
+									align,
+									colspan,
+									rowspan,
+								},
+								cellIndex
+							) => {
+								const cellClasses = clsx( {
+									[ `has-text-align-${ align }` ]: align,
+								} );
+
+								return (
+									<RichText.Content
+										className={
+											cellClasses
+												? cellClasses
+												: undefined
+										}
+										data-align={ align }
+										tagName={ tag }
+										value={ content }
+										key={ cellIndex }
+										scope={
+											tag === 'th' ? scope : undefined
+										}
+										colSpan={ colspan }
+										rowSpan={ rowspan }
+									/>
+								);
+							}
+						) }
+					</tr>
+				) ) }
+			</Tag>
+		);
+	};
+
+	return (
+		<figure { ...useBlockProps.save() }>
+			<table
+				className={ classes === '' ? undefined : classes }
+				style={ {
+					...colorProps.style,
+					...borderProps.style,
+					...backgroundProps.style,
+				} }
+			>
+				<Section type="head" rows={ head } />
+				<Section type="body" rows={ body } />
+				<Section type="foot" rows={ foot } />
+			</table>
+			{ hasCaption && (
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+					className={ __experimentalGetElementClassName( 'caption' ) }
+				/>
+			) }
+		</figure>
+	);
+}

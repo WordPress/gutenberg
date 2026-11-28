@@ -1,7 +1,10 @@
-/**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
+
+const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
 const ENDPOINT = [
 	'/wp/v2/block-renderer',
@@ -23,6 +26,7 @@ test.describe( 'Server-side rendered block', () => {
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'test/server-side-rendered-block' } );
@@ -112,20 +116,20 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
-	test( 'should register blocks with auto_register flag', async ( {
+	test( 'should register blocks with autoRegister flag', async ( {
 		editor,
 	} ) => {
-		// Block with auto_register flag should be insertable
+		// Block with autoRegister flag should be insertable
 		await editor.insertBlock( { name: 'test/auto-register-block' } );
 
 		const block = editor.canvas.getByText( 'Auto-register block content' );
@@ -138,7 +142,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		} );
 		expect( blockType.apiVersion ).toBe( 3 );
 
-		// Block without auto_register flag should NOT exist in registry
+		// Block without autoRegister flag should NOT exist in registry
 		const blockExists = await editor.page.evaluate( () => {
 			return (
 				window.wp.blocks.getBlockType(
@@ -212,13 +216,24 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await blockWrapper.click();
 		await editor.openDocumentSettingsSidebar();
 
-		const colorsButton = page.getByRole( 'button', { name: /Color/i } );
-		await colorsButton.click();
+		// Background color now lives in the Background panel and is hidden by
+		// default for this block, so reveal it via the panel options menu.
+		await page
+			.getByRole( 'button', { name: 'Background options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Color, show' } )
+			.click();
 
-		const backgroundButton = page.getByRole( 'button', {
-			name: /Background/i,
-		} );
-		await backgroundButton.click();
+		const backgroundColorButton = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
+		await backgroundColorButton.click();
+
 		const firstColor = page.getByRole( 'option' ).first();
 		const colorName = await firstColor.getAttribute( 'aria-label' );
 		await firstColor.click();
@@ -262,5 +277,206 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await expect(
 			page.getByLabel( 'Emoji', { exact: true } )
 		).toBeVisible();
+	} );
+
+	test.describe( 'with block bindings', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+		} );
+
+		test( 'generated inspector controls should reflect bound attribute values', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert the block with bindings on multiple attributes.
+			await editor.insertBlock( {
+				name: 'test/auto-register-with-controls',
+				attributes: {
+					metadata: {
+						bindings: {
+							title: {
+								source: 'core/post-meta',
+								args: { key: 'text_custom_field' },
+							},
+							count: {
+								source: 'core/post-meta',
+								args: { key: 'integer' },
+							},
+							spacing: {
+								source: 'core/post-meta',
+								args: { key: 'number_custom_field' },
+							},
+							showEmojis: {
+								source: 'core/post-meta',
+								args: { key: 'boolean' },
+							},
+						},
+					},
+				},
+			} );
+
+			await editor.openDocumentSettingsSidebar();
+
+			// Controls should show bound values from the source,
+			// not the block attribute defaults.
+			await expect( page.getByLabel( 'Title' ) ).toHaveValue(
+				'Value of the text custom field'
+			);
+			await expect( page.getByLabel( 'Count' ) ).toHaveValue( '3' );
+			await expect( page.getByLabel( 'Spacing' ) ).toHaveValue( '0.5' );
+			await expect( page.getByLabel( 'Show Emojis' ) ).toBeChecked();
+		} );
+	} );
+} );
+
+test.describe( 'Server-side render post_id permission handling', () => {
+	const AUTHOR = {
+		username: 'ssrpermissionauthor',
+		password: 'ssrpermissionauthorpassword',
+	};
+	let adminPostId;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		// Clean up leftovers from interrupted runs, so that the
+		// `createUser` call below can't collide with an existing user.
+		await requestUtils.deleteAllUsers();
+		await requestUtils.createUser( {
+			username: AUTHOR.username,
+			email: 'ssrpermissionauthor@example.com',
+			roles: [ 'author' ],
+			password: AUTHOR.password,
+		} );
+		const post = await requestUtils.createPost( {
+			title: 'Admin owned post',
+			status: 'publish',
+		} );
+		adminPostId = post.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-server-side-rendered-block'
+		);
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	// The block-renderer endpoint requires `edit_post` permissions for the
+	// post referenced by `post_id`, so server-side rendered previews used to
+	// fail when the `postId` block context referenced a post the current
+	// user can't edit. See https://github.com/WordPress/gutenberg/issues/79949.
+	test( 'renders without post context instead of erroring when the user cannot edit the post', async ( {
+		browser,
+	} ) => {
+		// Log in as an author: the bug only reproduces for users who can't
+		// edit the post referenced by the `postId` context.
+		const context = await browser.newContext( { baseURL: BASE_URL } );
+		try {
+			const page = await context.newPage();
+			await page.goto( '/wp-login.php' );
+			await page.locator( '#user_login' ).fill( AUTHOR.username );
+			await page.locator( '#user_pass' ).fill( AUTHOR.password );
+			await page.getByRole( 'button', { name: 'Log In' } ).click();
+			await page.waitForURL( '**/wp-admin/**' );
+
+			await page.goto( '/wp-admin/post-new.php' );
+			await page.waitForFunction(
+				() => window?.wp?.data && window?.wp?.blocks
+			);
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+			} );
+
+			const editor = new Editor( { page } );
+
+			// Wait until the editor is initialized before inserting blocks,
+			// so they aren't wiped out by the initial content reset.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.waitFor( { timeout: 15000 } );
+
+			await editor.insertBlock( {
+				name: 'test/post-context-provider',
+				attributes: { postId: adminPostId, postType: 'post' },
+				innerBlocks: [
+					{ name: 'test/auto-register-block' },
+					{ name: 'core/breadcrumbs' },
+				],
+			} );
+
+			// The auto-registered PHP-only block renders without post context
+			// instead of showing "Error loading block: Sorry, you are not
+			// allowed to read blocks of this post."
+			await expect(
+				editor.canvas.getByText( 'Auto-register block content' )
+			).toBeVisible();
+
+			// The Breadcrumbs block falls back to its placeholder instead of
+			// loading indefinitely or showing an error.
+			await expect(
+				editor.canvas
+					.locator( '[data-type="core/breadcrumbs"]' )
+					.locator( 'ol' )
+			).toBeVisible();
+
+			await expect(
+				editor.canvas.getByText( /Error loading block/ )
+			).toHaveCount( 0 );
+		} finally {
+			// Close the context even when an assertion throws, so a failure
+			// can't leak the extra browser context into other tests.
+			await context.close();
+		}
+	} );
+
+	// The `postId` and `postType` contexts can be provided by different
+	// blocks, so the pair may not designate an existing post — e.g. a block
+	// providing only `postId` while `postType` comes from the editor root. A
+	// permission check against the wrong post type can't tell whether the
+	// user can edit the referenced post, so `post_id` must keep being sent
+	// and the server decides, as it did before the permission check existed.
+	test( 'keeps sending post_id when the postId context does not match the postType context', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+
+		const renderedWithPostId = page.waitForRequest(
+			( request ) =>
+				ENDPOINT.some( ( u ) => request.url().includes( u ) ) &&
+				request.url().includes( `post_id=${ adminPostId }` )
+		);
+
+		// `postId` references a post, while `postType` claims it is a page.
+		await editor.insertBlock( {
+			name: 'test/post-context-provider',
+			attributes: { postId: adminPostId, postType: 'page' },
+			innerBlocks: [ { name: 'test/auto-register-block' } ],
+		} );
+
+		// The block-renderer request still carries the `post_id`...
+		await renderedWithPostId;
+
+		// ...and the block renders with it (an admin can edit the post).
+		await expect(
+			editor.canvas.getByText( 'Auto-register block content' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByText( /Error loading block/ )
+		).toHaveCount( 0 );
 	} );
 } );

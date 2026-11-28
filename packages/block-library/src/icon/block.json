@@ -3,7 +3,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"name": "core/icon",
 	"title": "Icon",
-	"__experimental": true,
 	"category": "media",
 	"description": "Insert an SVG icon.",
 	"keywords": [ "icon", "svg" ],
@@ -13,13 +12,17 @@
 			"type": "string",
 			"role": "content"
 		},
-		"style": {
-			"type": "object",
-			"default": {
-				"dimensions": {
-					"width": "24px"
-				}
-			}
+		"flipHorizontal": {
+			"type": "boolean",
+			"default": false
+		},
+		"flipVertical": {
+			"type": "boolean",
+			"default": false
+		},
+		"rotation": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"supports": {
@@ -28,19 +31,32 @@
 			"__experimentalSkipSerialization": true
 		},
 		"align": [ "left", "center", "right" ],
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalSkipSerialization": true
+		},
 		"html": false,
 		"color": {
-			"background": true,
-			"text": true
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"style": true,
 			"width": true,
+			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": false,
 				"radius": false,
@@ -51,13 +67,32 @@
 		"spacing": {
 			"padding": true,
 			"margin": true,
+			"__experimentalSkipSerialization": [ "padding" ],
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false
 			}
 		},
 		"dimensions": {
-			"width": true
+			"width": true,
+			"minWidth": true,
+			"minHeight": true,
+			"__experimentalSkipSerialization": [
+				"width",
+				"minWidth",
+				"minHeight"
+			],
+			"__experimentalDefaultControls": {
+				"width": true
+			}
+		}
+	},
+	"selectors": {
+		"root": ".wp-block-icon svg",
+		"css": ".wp-block-icon",
+		"shadow": ".wp-block-icon svg",
+		"spacing": {
+			"margin": ".wp-block-icon"
 		}
 	},
 	"style": "wp-block-icon",

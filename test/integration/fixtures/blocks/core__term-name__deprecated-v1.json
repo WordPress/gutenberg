@@ -1,0 +1,44 @@
+[
+	{
+		"name": "core/term-name",
+		"isValid": true,
+		"attributes": {
+			"level": 0,
+			"isLink": false,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/term-name",
+		"isValid": true,
+		"attributes": {
+			"level": 0,
+			"isLink": false,
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/term-name",
+		"isValid": true,
+		"attributes": {
+			"level": 0,
+			"isLink": false,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

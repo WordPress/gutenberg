@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { Button, Icon, Tooltip } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { error as errorIcon, pencil } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldValidity,
 	NormalizedField,
@@ -21,8 +10,45 @@ import type {
 	NormalizedPanelLayout,
 } from '../../../types';
 import getLabelClassName from './utils/get-label-classname';
-import getLabelContent from './utils/get-label-content';
+import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
+
+function SummaryValue< Item >( {
+	item,
+	field,
+	showPlaceholderIfEmpty,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+	showPlaceholderIfEmpty: boolean;
+} ) {
+	if ( ! showPlaceholderIfEmpty || ! field.placeholder ) {
+		return <field.render item={ item } field={ field } />;
+	}
+
+	const placeholder = (
+		<span className="dataforms-layouts-panel__field-placeholder">
+			{ field.placeholder }
+		</span>
+	);
+
+	// The same notion of empty as the `required` validator.
+	if ( [ undefined, null, '' ].includes( field.getValue( { item } ) ) ) {
+		return placeholder;
+	}
+
+	// A value can still render nothing, like an id matching no record, which
+	// the field may only learn after fetching it. The placeholder follows the
+	// render output, and the styles show it only when that output is empty.
+	return (
+		<>
+			<span className="dataforms-layouts-panel__field-value">
+				<field.render item={ item } field={ field } />
+			</span>
+			{ placeholder }
+		</>
+	);
+}
 
 export default function SummaryButton< Item >( {
 	data,
@@ -32,8 +58,8 @@ export default function SummaryButton< Item >( {
 	validity,
 	touched,
 	disabled,
+	isOpen,
 	onClick,
-	'aria-expanded': ariaExpanded,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -42,49 +68,61 @@ export default function SummaryButton< Item >( {
 	validity?: FieldValidity;
 	touched: boolean;
 	disabled?: boolean;
+	isOpen: boolean;
 	onClick: () => void;
-	'aria-expanded'?: boolean;
 } ) {
-	const labelPosition = ( field.layout as NormalizedPanelLayout )
-		.labelPosition;
+	const { labelPosition, editVisibility, showPlaceholderIfEmpty } =
+		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
+
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
-		{ 'is-disabled': disabled }
+		{
+			'is-disabled': disabled,
+			'dataforms-layouts-panel__field-trigger--edit-always':
+				editVisibility === 'always',
+		}
 	);
 
 	const controlId = useInstanceId(
 		SummaryButton,
 		'dataforms-layouts-panel__field-control'
 	);
+	const errorId = `${ controlId }-error`;
 
 	const ariaLabel = showError
 		? sprintf(
 				// translators: %s: Field name.
 				_x( 'Edit %s (has errors)', 'field' ),
 				fieldLabel || ''
-		  )
+			)
 		: sprintf(
 				// translators: %s: Field name.
 				_x( 'Edit %s', 'field' ),
 				fieldLabel || ''
-		  );
+			);
 
 	return (
 		<div className={ className }>
 			{ labelPosition !== 'none' && (
-				<span className={ labelClassName }>{ labelContent }</span>
+				<span className={ labelClassName }>
+					<FieldLabelContent
+						showError={ showError }
+						errorMessage={ errorMessage }
+						fieldLabel={ fieldLabel }
+						errorId={ errorId }
+					/>
+				</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-label-error-content">
-						<Icon icon={ errorIcon } size={ 16 } />
-					</span>
-				</Tooltip>
+				<FieldLabelContent
+					showError
+					errorMessage={ errorMessage }
+					errorId={ errorId }
+				/>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -105,19 +143,23 @@ export default function SummaryButton< Item >( {
 								key={ summaryField.id }
 								style={ { width: '100%' } }
 							>
-								<summaryField.render
+								<SummaryValue
 									item={ data }
 									field={ summaryField }
+									showPlaceholderIfEmpty={
+										showPlaceholderIfEmpty
+									}
 								/>
 							</span>
 						) ) }
 					</span>
 				) : (
 					summaryFields.map( ( summaryField ) => (
-						<summaryField.render
+						<SummaryValue
 							key={ summaryField.id }
 							item={ data }
 							field={ summaryField }
+							showPlaceholderIfEmpty={ showPlaceholderIfEmpty }
 						/>
 					) )
 				) }
@@ -126,12 +168,13 @@ export default function SummaryButton< Item >( {
 				<Button
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
-					showTooltip={ false }
 					icon={ pencil }
 					size="small"
-					aria-expanded={ ariaExpanded }
+					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
-					aria-describedby={ `${ controlId }` }
+					aria-describedby={
+						showError ? `${ controlId } ${ errorId }` : controlId
+					}
 					onClick={ onClick }
 				/>
 			) }

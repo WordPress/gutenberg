@@ -3,10 +3,10 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
-			"prefix": "",
-			"separator": ", ",
-			"suffix": "",
 			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
 			"style": {
 				"typography": {
 					"textAlign": "left"
@@ -19,10 +19,10 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
-			"prefix": "",
-			"separator": ", ",
-			"suffix": "",
 			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
 			"style": {
 				"typography": {
 					"textAlign": "center"
@@ -35,10 +35,10 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
-			"prefix": "",
-			"separator": ", ",
-			"suffix": "",
 			"term": "category",
+			"separator": ", ",
+			"prefix": "",
+			"suffix": "",
 			"style": {
 				"typography": {
 					"textAlign": "right"

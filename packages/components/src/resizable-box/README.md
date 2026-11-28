@@ -6,6 +6,8 @@ ResizableBox is a wrapper around the [re-resizable package](https://github.com/b
 
 Most options are passed directly through to [re-resizable](https://github.com/bokuweb/re-resizable) so you may wish to refer to their documentation. The primary differences in this component are that we set `handleClasses` (to use custom class names) and pass some null values to `handleStyles` (to unset some inline styles).
 
+When you pass `size`, include every dimension that can be resized. When a resize ends, a dimension missing from `size` is reset to `auto` instead of keeping its resized value.
+
 The example below shows how you might use `ResizableBox` to set a width and height inside a block's `edit` component.
 
 ```jsx

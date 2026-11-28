@@ -9,7 +9,7 @@
 export function safeDecodeURIComponent( uriComponent: string ): string {
 	try {
 		return decodeURIComponent( uriComponent );
-	} catch ( uriComponentError ) {
+	} catch {
 		return uriComponent;
 	}
 }

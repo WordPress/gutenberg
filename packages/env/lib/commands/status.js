@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { existsSync } = require( 'fs' );
 const chalk = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const { loadConfig } = require( '../config' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
 
@@ -33,7 +26,10 @@ function isEnvironmentInitialized( config ) {
 		return true;
 	}
 
-	return false;
+	// Check for the PHP runtime's site
+	return existsSync(
+		path.join( config.workDirectoryPath, 'php', 'wp-config.php' )
+	);
 }
 
 /**

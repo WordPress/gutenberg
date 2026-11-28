@@ -3,9 +3,12 @@
 This document lists the changes made between the different API versions.
 
 ## Version 3 (>= WordPress 6.3)
-- The post editor will be iframed if all registered blocks have a Block API version 3 or higher. Adding version 3 support means that the block should work inside an iframe, though the block may still be rendered outside the iframe if not all blocks support version 3.
-- **In WordPress 7.0, the post editor is planned to always work as an iframe, regardless of the `apiVersion` of registered blocks**.
- Please refer to [this migration guide](/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md) to test your blocks in the iframe editor beforehand.
+
+-   WordPress 6.3 introduced the iframed post editor when all registered blocks use Block API version 3 or higher and no traditional meta boxes are present.
+-   WordPress 7.0 evaluates the blocks in the post content instead of all registered blocks when deciding whether to use the iframe.
+-   Gutenberg 23.6 and WordPress 7.1 always use the iframe for the post editor, regardless of the `apiVersion` of the blocks in the post content.
+
+Adding version 3 support means that a block should work inside an iframe. Refer to the [iframe editor migration guide](/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md) for testing and migration guidance.
 
 ## Version 2 (>= WordPress 5.6)
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Heading', () => {
@@ -13,7 +10,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '### 3' );
 
@@ -30,7 +27,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -49,7 +46,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## 1. H' );
 
@@ -66,7 +63,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## `code`' );
 
@@ -148,6 +145,26 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'should not remove an empty heading on backspace when removal is locked', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { lock: { remove: true, move: false } },
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+		await page.keyboard.press( 'Backspace' );
+
+		// The locked heading cannot be removed, so it should still be there.
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/heading' } ] );
+	} );
+
 	test( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async ( {
 		editor,
 		page,
@@ -171,7 +188,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '### Heading' );
 		await editor.openDocumentSettingsSidebar();
@@ -180,7 +197,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text' } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 		await page
@@ -205,7 +226,7 @@ test.describe( 'Heading', () => {
 
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
@@ -214,7 +235,11 @@ test.describe( 'Heading', () => {
 			.getByRole( 'region', {
 				name: 'Editor settings',
 			} )
-			.getByRole( 'button', { name: 'Text', exact: true } );
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } );
 
 		await textColor.click();
 
@@ -245,7 +270,7 @@ test.describe( 'Heading', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 
@@ -274,13 +299,53 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	for ( const key of [ 'Tab', 'Escape' ] ) {
+		test( `should return focus to the heading with ${ key } after changing its level from the block toolbar`, async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.canvas
+				.locator( 'role=document[name="Add default block"i]' )
+				.click();
+			await page.keyboard.type( '## Heading' );
+
+			// Move focus to the block toolbar and change the level from the
+			// block switcher, which replaces the heading's element.
+			await pageUtils.pressKeys( 'shift+Tab' );
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Heading 2' } )
+			).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await page.getByRole( 'menuitem', { name: 'Heading 3' } ).click();
+
+			await page.keyboard.press( key );
+
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading 3',
+				} )
+			).toBeFocused();
+
+			await page.keyboard.type( ' level' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/heading',
+					attributes: { content: 'Heading level', level: 3 },
+				},
+			] );
+		} );
+	}
+
 	test( 'should be converted from a paragraph to a heading with keyboard shortcuts', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -315,7 +380,7 @@ test.describe( 'Heading', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 
@@ -397,6 +462,35 @@ test.describe( 'Heading', () => {
 			headingListViewItem,
 			'should show custom name'
 		).toHaveText( 'My new name' );
+	} );
+
+	test( 'Should leave inline objects out of the list view label', async ( {
+		editor,
+		page,
+	} ) => {
+		const imageSrc =
+			'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: `One<img src="${ imageSrc }">Two<img src="${ imageSrc }">Three`,
+			},
+		} );
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+
+		// Each inline image is one object replacement character in the
+		// value, and none of them should reach the plain text label.
+		await expect(
+			page
+				.getByRole( 'treegrid', {
+					name: 'Block navigation structure',
+				} )
+				.getByRole( 'link' )
+		).toHaveText( 'OneTwoThree' );
 	} );
 
 	test.describe( 'Block transforms', () => {

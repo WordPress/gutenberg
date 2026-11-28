@@ -1,0 +1,722 @@
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
+
+export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
+
+type ApplicationPasswordSettingValue = {
+	username: string;
+	password: string;
+};
+
+type ConnectorSettingValue = string | ApplicationPasswordSettingValue;
+
+interface UseConnectorPluginOptions {
+	file?: string;
+	settingName: string;
+	connectorName: string;
+	isInstalled?: boolean;
+	isActivated?: boolean;
+	keySource?: ApiKeySource;
+	initialIsConnected?: boolean;
+}
+
+interface WpUpdatesInstallPluginResponse {
+	slug: string;
+	plugin?: string;
+}
+
+interface WpUpdatesInstallPluginErrorResponse {
+	slug: string;
+	errorCode?: string;
+	errorMessage?: string;
+}
+
+interface WpUpdates {
+	installPlugin: ( args: { slug: string } ) => void;
+	maybeRequestFilesystemCredentials?: ( event: {
+		target: Element | null;
+	} ) => void;
+}
+
+type JQueryHandler = (
+	event: unknown,
+	response:
+		WpUpdatesInstallPluginResponse | WpUpdatesInstallPluginErrorResponse
+) => void;
+
+type JQueryAjaxCompleteHandler = (
+	event: unknown,
+	xhr: { status: number; responseJSON?: unknown },
+	settings: { data?: unknown }
+) => void;
+
+interface WpUpdatesGlobal {
+	wp?: {
+		updates?: WpUpdates;
+	};
+	jQuery?: ( target: Document ) => {
+		on: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
+		off: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
+	};
+}
+
+/**
+ * Whether a rejected REST plugin install failed because the filesystem
+ * requires credentials (`FS_METHOD` is not `direct` and none are stored).
+ *
+ * @param error Rejection from the REST plugin endpoint.
+ */
+export function isFilesystemUnavailableError( error: unknown ): boolean {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		( error as { code?: unknown } ).code === 'fs_unavailable'
+	);
+}
+
+/**
+ * Outcome of an install routed through `wp.updates.installPlugin()`.
+ *
+ * `canceled` is a normal control-flow result (the user closed the
+ * filesystem credentials modal), not an error. Genuine install
+ * failures reject the promise instead.
+ */
+export type WpUpdatesInstallOutcome = 'installed' | 'canceled';
+
+/**
+ * Click event of the button that starts an install.
+ */
+export type InstallButtonClickEvent = { currentTarget: Element };
+
+/**
+ * Installs a plugin via `wp.updates.installPlugin()`.
+ *
+ * @param slug    Plugin slug.
+ * @param trigger Element that started the install. Focus returns to it when
+ *                the filesystem credentials modal closes.
+ */
+export function installPluginViaWpUpdates(
+	slug: string,
+	trigger?: Element | null
+): Promise< WpUpdatesInstallOutcome > {
+	return new Promise( ( resolve, reject ) => {
+		const w = window as unknown as WpUpdatesGlobal;
+		const jq = w.jQuery;
+		const updates = w.wp?.updates;
+		if ( ! jq || ! updates?.installPlugin ) {
+			reject( new Error( 'wp.updates.installPlugin is not available.' ) );
+			return;
+		}
+
+		/*
+		 * Handlers are registered with on()/off() (not one()) and filtered
+		 * by slug. With one(), a concurrent install of a *different* plugin
+		 * firing first would consume the one-shot handler and leave this
+		 * promise pending forever. on() + explicit cleanup() only tears
+		 * down once the matching slug's event arrives.
+		 */
+		const cleanup = () => {
+			jq( document ).off( 'wp-plugin-install-success', onSuccess );
+			jq( document ).off( 'wp-plugin-install-error', onError );
+			jq( document ).off( 'credential-modal-cancel', onCancel );
+			jq( document ).off( 'ajaxComplete', onAjaxComplete );
+		};
+
+		const onSuccess: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginResponse ).slug !== slug
+			) {
+				return;
+			}
+			cleanup();
+			resolve( 'installed' );
+		};
+		const onError: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginErrorResponse ).slug !==
+				slug
+			) {
+				return;
+			}
+			cleanup();
+			const errResponse = response as WpUpdatesInstallPluginErrorResponse;
+			reject(
+				new Error( errResponse.errorMessage ?? 'Install failed.' )
+			);
+		};
+		const onCancel: JQueryHandler = () => {
+			cleanup();
+			resolve( 'canceled' );
+		};
+		/*
+		 * When the server returns an unexpected response (for example, an
+		 * expired nonce or a PHP fatal error), none of the events above
+		 * fire. Watch the install request itself so the install fails
+		 * instead of staying on "Installing…".
+		 */
+		const onAjaxComplete: JQueryAjaxCompleteHandler = (
+			_event,
+			xhr,
+			settings
+		) => {
+			if ( typeof settings.data !== 'string' ) {
+				return;
+			}
+			const params = new URLSearchParams( settings.data );
+			if (
+				params.get( 'action' ) !== 'install-plugin' ||
+				params.get( 'slug' ) !== slug
+			) {
+				return;
+			}
+			if (
+				xhr.status !== 200 ||
+				typeof xhr.responseJSON !== 'object' ||
+				xhr.responseJSON === null
+			) {
+				cleanup();
+				reject( new Error( 'Install failed.' ) );
+			}
+		};
+
+		jq( document ).on( 'wp-plugin-install-success', onSuccess );
+		jq( document ).on( 'wp-plugin-install-error', onError );
+		jq( document ).on( 'credential-modal-cancel', onCancel );
+		jq( document ).on( 'ajaxComplete', onAjaxComplete );
+
+		/*
+		 * Open the credentials modal before sending the request, as
+		 * Plugins > Add Plugin does. The modal then opens without an error,
+		 * and focus returns to the install button when it closes.
+		 */
+		updates.maybeRequestFilesystemCredentials?.( {
+			target: trigger ?? null,
+		} );
+		updates.installPlugin( { slug } );
+	} );
+}
+
+interface UseConnectorPluginReturn {
+	pluginStatus: PluginStatus;
+	canInstallPlugins: boolean | undefined;
+	canActivatePlugins: boolean | undefined;
+	isExpanded: boolean;
+	setIsExpanded: ( expanded: boolean ) => void;
+	isBusy: boolean;
+	isConnected: boolean;
+	currentApiKey: string;
+	currentUsername: string;
+	hasResolvedSettings: boolean;
+	keySource: ApiKeySource;
+	handleButtonClick: ( event?: InstallButtonClickEvent ) => void;
+	getButtonLabel: () => string;
+	saveApiKey: ( apiKey: string ) => Promise< void >;
+	removeApiKey: () => Promise< void >;
+	saveCredentials: ( credentials: {
+		username: string;
+		applicationPassword: string;
+	} ) => Promise< void >;
+	removeCredentials: () => Promise< void >;
+}
+
+export function useConnectorPlugin( {
+	file: pluginFileFromServer,
+	settingName,
+	connectorName,
+	isInstalled,
+	isActivated,
+	keySource = 'none',
+	initialIsConnected = false,
+}: UseConnectorPluginOptions ): UseConnectorPluginReturn {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ isBusy, setIsBusy ] = useState( false );
+	const [ connectedState, setConnectedState ] =
+		useState( initialIsConnected );
+	// Local override for immediate UI feedback after install/activate.
+	const [ pluginStatusOverride, setPluginStatusOverride ] =
+		useState< PluginStatus | null >( null );
+
+	const pluginBasename = pluginFileFromServer?.replace( /\.php$/, '' );
+	const pluginSlug = pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
+
+	const {
+		derivedPluginStatus,
+		canManagePlugins,
+		currentApiKey,
+		currentUsername,
+		hasStoredCredentials,
+		hasResolvedSettings,
+		canInstallPlugins,
+	} = useSelect(
+		( select ) => {
+			const store = select( coreStore );
+			const siteSettings = store.getEntityRecord( 'root', 'site' ) as
+				| Record<
+						string,
+						| string
+						| {
+								username?: string;
+								password?: string;
+						  }
+				  >
+				| undefined;
+			const settingValue = siteSettings?.[ settingName ];
+			const apiKey = typeof settingValue === 'string' ? settingValue : '';
+			const credentials =
+				typeof settingValue === 'object' && settingValue !== null
+					? settingValue
+					: undefined;
+			const credentialsExist =
+				credentials !== undefined
+					? !! credentials.username && !! credentials.password
+					: !! apiKey;
+			const settingsResolved = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'site' ]
+			);
+
+			const canCreate = !! store.canUser( 'create', {
+				kind: 'root',
+				name: 'plugin',
+			} );
+
+			const common = {
+				currentApiKey: apiKey,
+				currentUsername: credentials?.username ?? '',
+				hasStoredCredentials: credentialsExist,
+				hasResolvedSettings: settingsResolved,
+				canInstallPlugins: canCreate,
+			};
+
+			if ( ! pluginFileFromServer ) {
+				return {
+					...common,
+					derivedPluginStatus: ( settingsResolved
+						? 'active'
+						: 'checking' ) as PluginStatus,
+					canManagePlugins: undefined as boolean | undefined,
+				};
+			}
+
+			const plugin = store.getEntityRecord(
+				'root',
+				'plugin',
+				pluginBasename
+			) as { plugin: string; status: string } | undefined;
+
+			const hasFinished = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'plugin', pluginBasename ]
+			);
+
+			if ( ! hasFinished ) {
+				return {
+					...common,
+					derivedPluginStatus: 'checking' as PluginStatus,
+					canManagePlugins: undefined as boolean | undefined,
+				};
+			}
+
+			// Plugin data resolved — user has API permissions.
+			if ( plugin ) {
+				// Treat both single-site and network-active plugins as active.
+				const isPluginActive =
+					plugin.status === 'active' ||
+					plugin.status === 'network-active';
+				return {
+					...common,
+					derivedPluginStatus: ( isPluginActive
+						? 'active'
+						: 'inactive' ) as PluginStatus,
+					canManagePlugins: true,
+				};
+			}
+
+			// Resolution finished but plugin is undefined — either not
+			// installed or a 403 (no permissions). Fall back to the
+			// server-provided status.
+			let status: PluginStatus = 'not-installed';
+			if ( isActivated ) {
+				status = 'active';
+			} else if ( isInstalled ) {
+				status = 'inactive';
+			}
+			return {
+				...common,
+				derivedPluginStatus: status,
+				canManagePlugins: false,
+			};
+		},
+		[
+			pluginFileFromServer,
+			pluginBasename,
+			settingName,
+			isInstalled,
+			isActivated,
+		]
+	);
+
+	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
+
+	// Use canManagePlugins (from plugin entity resolution) for activation capability.
+	const canActivatePlugins = canManagePlugins;
+
+	const isConnected =
+		( pluginStatus === 'active' && connectedState ) ||
+		// After install/activate, if settings re-fetch reveals stored credentials,
+		// update connected state (mirrors what the server would report on page load).
+		( pluginStatusOverride === 'active' && hasStoredCredentials );
+
+	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
+	const saveConnectorSetting = ( value: ConnectorSettingValue ) =>
+		saveEntityRecord(
+			'root',
+			'site',
+			{ [ settingName ]: value },
+			{ throwOnError: true }
+		);
+
+	const createConnectedNotice = () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( '%s connected successfully.' ),
+				connectorName
+			),
+			{
+				id: 'connector-connect-success',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const createDisconnectedNotice = () => {
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( '%s disconnected.' ),
+				connectorName
+			),
+			{
+				id: 'connector-disconnect-success',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const createDisconnectErrorNotice = () => {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+				__( 'Failed to disconnect %s.' ),
+				connectorName
+			),
+			{
+				id: 'connector-disconnect-error',
+				type: 'snackbar',
+			}
+		);
+	};
+
+	const installPlugin = async ( event?: InstallButtonClickEvent ) => {
+		if ( ! pluginSlug ) {
+			return;
+		}
+		/*
+		 * `currentTarget` is only set while the event is being handled, so
+		 * read it before the first `await`.
+		 */
+		const trigger = event?.currentTarget;
+		setIsBusy( true );
+		try {
+			try {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: pluginSlug, status: 'active' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				/*
+				 * The REST plugin endpoint rejects installs up front with
+				 * `fs_unavailable` when FS_METHOD is not 'direct' and
+				 * credentials have not been stored. Fall back to
+				 * wp.updates.installPlugin() so the standard "Connection
+				 * Information" modal handles credential entry, then activate
+				 * via REST.
+				 */
+				if ( ! isFilesystemUnavailableError( error ) ) {
+					throw error;
+				}
+				const outcome = await installPluginViaWpUpdates(
+					pluginSlug,
+					trigger
+				);
+				if ( outcome === 'canceled' ) {
+					// User closed the credentials modal; abort silently.
+					return;
+				}
+				if ( pluginBasename ) {
+					await saveEntityRecord(
+						'root',
+						'plugin',
+						{ plugin: pluginBasename, status: 'active' },
+						{ throwOnError: true }
+					);
+				}
+				// Refresh plugin entity so derived state reflects install.
+				invalidateResolution( 'getEntityRecord', [
+					'root',
+					'plugin',
+					pluginBasename,
+				] );
+			}
+			setPluginStatusOverride( 'active' );
+			// Re-fetch settings since the new plugin may register new settings.
+			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
+			setIsExpanded( true );
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Plugin for %s installed and activated successfully.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-install-success',
+					type: 'snackbar',
+				}
+			);
+		} catch {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to install plugin for %s.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-install-error',
+					type: 'snackbar',
+				}
+			);
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	const activatePlugin = async () => {
+		if ( ! pluginFileFromServer ) {
+			return;
+		}
+		setIsBusy( true );
+		try {
+			await saveEntityRecord(
+				'root',
+				'plugin',
+				{
+					plugin: pluginBasename,
+					status: 'active',
+				},
+				{ throwOnError: true }
+			);
+			setPluginStatusOverride( 'active' );
+			// Re-fetch settings since the activated plugin may register new settings.
+			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
+			setIsExpanded( true );
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Plugin for %s activated successfully.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-activate-success',
+					type: 'snackbar',
+				}
+			);
+		} catch {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
+					__( 'Failed to activate plugin for %s.' ),
+					connectorName
+				),
+				{
+					id: 'connector-plugin-activate-error',
+					type: 'snackbar',
+				}
+			);
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	const handleButtonClick = ( event?: InstallButtonClickEvent ) => {
+		if ( pluginStatus === 'not-installed' ) {
+			if ( canInstallPlugins === false ) {
+				return;
+			}
+			installPlugin( event );
+		} else if ( pluginStatus === 'inactive' ) {
+			if ( canActivatePlugins === false ) {
+				return;
+			}
+			activatePlugin();
+		} else {
+			setIsExpanded( ! isExpanded );
+		}
+	};
+
+	const getButtonLabel = () => {
+		if ( isBusy ) {
+			return pluginStatus === 'not-installed'
+				? __( 'Installing…' )
+				: __( 'Activating…' );
+		}
+		if ( isExpanded ) {
+			return __( 'Cancel' );
+		}
+		if ( isConnected ) {
+			return __( 'Edit' );
+		}
+		switch ( pluginStatus ) {
+			case 'checking':
+				return __( 'Checking…' );
+			case 'not-installed':
+				return __( 'Install' );
+			case 'inactive':
+				return __( 'Activate' );
+			case 'active':
+				return __( 'Set up' );
+		}
+	};
+
+	const saveApiKey = async ( apiKey: string ) => {
+		const previousApiKey = currentApiKey;
+		try {
+			const updatedRecord = await saveConnectorSetting( apiKey );
+
+			// The server rejects invalid keys in two ways:
+			// 1. Returns the previous (unchanged) value
+			// 2. Returns an empty value
+			// In both cases, the key we sent was not accepted.
+			const record = updatedRecord as
+				Record< string, string > | undefined;
+			const returnedKey = record?.[ settingName ];
+			if (
+				apiKey &&
+				( returnedKey === previousApiKey || ! returnedKey )
+			) {
+				throw new Error(
+					'It was not possible to connect to the provider using this key.'
+				);
+			}
+
+			setConnectedState( true );
+			createConnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to save API key:', error );
+			// The error is rendered with role="alert" in the UI,
+			// which already announces it to screen readers.
+			throw error;
+		}
+	};
+
+	const saveCredentials = async ( {
+		username,
+		applicationPassword,
+	}: {
+		username: string;
+		applicationPassword: string;
+	} ) => {
+		try {
+			const updatedRecord = await saveConnectorSetting( {
+				username,
+				password: applicationPassword,
+			} );
+			const record = updatedRecord as
+				| Record< string, { username?: string; password?: string } >
+				| undefined;
+			const credentials = record?.[ settingName ];
+			// The server sanitizes the username, so verify persistence rather
+			// than exact equality.
+			if ( ! credentials?.username || ! credentials?.password ) {
+				throw new Error(
+					__( 'It was not possible to save these credentials.' )
+				);
+			}
+
+			setConnectedState( true );
+			createConnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to save credentials:', error );
+			// The error is rendered with role="alert" in the UI,
+			// which already announces it to screen readers.
+			throw error;
+		}
+	};
+
+	const removeApiKey = async () => {
+		try {
+			await saveConnectorSetting( '' );
+			// Store auto-updates; currentApiKey reactively becomes ''.
+			setConnectedState( false );
+			createDisconnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to remove API key:', error );
+			createDisconnectErrorNotice();
+		}
+	};
+
+	const removeCredentials = async () => {
+		try {
+			await saveConnectorSetting( {
+				username: '',
+				password: '',
+			} );
+			setConnectedState( false );
+			createDisconnectedNotice();
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Failed to remove credentials:', error );
+			createDisconnectErrorNotice();
+		}
+	};
+
+	return {
+		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
+		isExpanded,
+		setIsExpanded,
+		isBusy,
+		isConnected,
+		currentApiKey,
+		currentUsername,
+		hasResolvedSettings,
+		keySource,
+		handleButtonClick,
+		getButtonLabel,
+		saveApiKey,
+		removeApiKey,
+		saveCredentials,
+		removeCredentials,
+	};
+}

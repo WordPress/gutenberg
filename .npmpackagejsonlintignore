@@ -4,3 +4,5 @@ build
 vendor
 wordpress
 routes
+widgets
+tools/validation/fixtures/wp-build-consumer

@@ -1,0 +1,538 @@
+<?php
+/**
+ * Entity view configuration additions, layered on top of the base
+ * configurations in `lib/compat/wordpress-7.1/view-config-api.php`.
+ *
+ * @package gutenberg
+ */
+
+/**
+ * Adds the `reading_settings` field to the `wp_template` form configuration.
+ *
+ * The `fields` list is pinned rather than merged because a merged member is
+ * appended to the end of the list, and the link belongs above the last edited
+ * date. Keep it in sync with the list built in
+ * _gutenberg_get_entity_view_config_posttype_wp_template().
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_add_reading_settings_to_wp_template_view_config( $data ) {
+	return $data->replace(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'description',
+						'layout' => array(
+							'type'                   => 'panel',
+							'labelPosition'          => 'top',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+					array(
+						'id'     => 'description_readonly',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					array(
+						'id'     => 'reading_settings',
+						'layout' => array(
+							'type'          => 'regular',
+							'labelPosition' => 'none',
+						),
+					),
+					array(
+						'id'     => 'last_edited_date',
+						'layout' => array(
+							'type'          => 'panel',
+							'labelPosition' => 'none',
+						),
+					),
+					'revisions',
+					// The following fields are only meaningful in the `home`/`index`
+					// template summary. They edit other entities (`root/site` and the
+					// posts page); the editor merges those records into the form data
+					// under a namespace and controls when the fields are shown.
+					'posts_page_title',
+					'posts_per_page',
+					'default_comment_status',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Removes the `active`, `slug`, and `theme` fields from the `wp_template`
+ * default view.
+ *
+ * They were rendered by the template activation experiment, which has been
+ * removed. No field with those ids is registered for templates anymore.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_remove_stale_fields_from_wp_template_view_config( $data ) {
+	return $data->remove(
+		array(
+			'default_view' => array(
+				'fields' => array( 'active', 'slug', 'theme' ),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Updates the `wp_block` view configuration for the pattern author.
+ *
+ * Patterns support `author` since 7.2, so the "My patterns" view, which lists
+ * every user pattern regardless of its author, is renamed to "Site patterns".
+ * Its `my-patterns` slug is kept so existing links still work. The author
+ * column of the table layout is aligned to the start, like on pages, because
+ * the integer field would otherwise align its header to the end.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_wp_block_view_config_for_author( $data ) {
+	return $data->merge(
+		array(
+			'default_layouts' => array(
+				'table' => array(
+					'layout' => array(
+						'styles' => array(
+							'author' => array(
+								'align' => 'start',
+							),
+						),
+					),
+				),
+			),
+			'view_list'       => array(
+				array(
+					'title' => __( 'Site patterns', 'gutenberg' ),
+					'slug'  => 'my-patterns',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Provides the view configuration for the `wp_navigation` post type.
+ *
+ * Core has no callback for this post type, so this is a base definition
+ * rather than a layer on top of one.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_posttype_wp_navigation( $data ) {
+	$default_layouts = array(
+		'list' => array(),
+	);
+
+	$default_view = array(
+		'type'       => 'list',
+		'filters'    => array(),
+		'perPage'    => 20,
+		'sort'       => array(
+			'field'     => 'date',
+			'direction' => 'desc',
+		),
+		'titleField' => 'title',
+		'fields'     => array(),
+	);
+
+	// The base config already provides the "All" view titled with the post
+	// type's `all_items` label, so only the default view and layouts change.
+	$data->set(
+		array(
+			'default_view'    => $default_view,
+			'default_layouts' => $default_layouts,
+		),
+		1
+	);
+
+	return $data;
+}
+
+/**
+ * Provides the view configuration for the `root`/`site` entity.
+ *
+ * The site settings are a singleton record edited through a form (the site
+ * editor's Identity screen) rather than listed in a view, so only the `form`
+ * is defined here. The generic `default_view`, `default_layouts`, and
+ * `view_list` built by gutenberg_get_entity_view_config() are left untouched.
+ *
+ * Core has no callback for this entity, so this is a base definition rather
+ * than a layer on top of one.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_root_site( $data ) {
+	return $data->set(
+		array(
+			'form' => array(
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'top',
+				),
+				'fields' => array(
+					'title',
+					'description',
+					'site_logo',
+					'site_icon',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Provides the view configuration for the `attachment` post type.
+ *
+ * An attachment is edited through a form (the media editor) that shares
+ * nothing with the default post type form, so the `form` is replaced: the
+ * editable fields first, in a regular layout, then the metadata and the file
+ * information, in panels. The generic `default_view`, `default_layouts`, and
+ * `view_list` built by gutenberg_get_entity_view_config() are left untouched.
+ *
+ * Core has no callback for this entity, so this is a base definition rather
+ * than a layer on top of one.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_get_entity_view_config_posttype_attachment( $data ) {
+	$regular_layout = array(
+		'type'          => 'regular',
+		'labelPosition' => 'top',
+	);
+
+	return $data->set(
+		array(
+			'form' => array(
+				'layout' => array( 'type' => 'panel' ),
+				'fields' => array(
+					array(
+						'id'     => 'title',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'alt_text',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'caption',
+						'layout' => $regular_layout,
+					),
+					array(
+						'id'     => 'description',
+						'layout' => $regular_layout,
+					),
+					'date',
+					'author',
+					'filename',
+					'mime_type',
+					'filesize',
+					'media_dimensions',
+					'attached_to',
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Post types whose base definition provides its own `form`, without the
+ * `status` and `discussion` groups of the default post type form.
+ *
+ * @var string[]
+ */
+const GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM = array( 'attachment', 'wp_block', 'wp_template', 'wp_template_part' );
+
+/**
+ * Makes the panel summary of the `status` and `discussion` groups explicit in
+ * the default post type form.
+ *
+ * Both groups used to be summarized by the field sharing their id (`status`,
+ * and the composite `discussion` field). A combined form field no longer
+ * resolves its own id against the field definitions, so the summary field is
+ * declared through `layout.summary` instead. The patch merges into the existing
+ * group members by id, leaving the rest of the form untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_add_group_summaries_to_default_posttype_form( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'status',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'status',
+						),
+					),
+					array(
+						'id'     => 'discussion',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'discussion',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the group summaries on top of the view configuration of every post
+ * type that uses the default form, including custom post types registered at
+ * any point.
+ *
+ * The callback merges by member id, and a member that is absent would be
+ * appended instead, so post types whose base definition provides its own form
+ * are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_default_posttype_form_summaries_7_2( $post_type ) {
+	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_add_group_summaries_to_default_posttype_form',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_default_posttype_form_summaries_7_2' );
+
+/**
+ * Shows the placeholder of the `excerpt` field in its panel row when the
+ * excerpt is empty.
+ *
+ * The field renders nothing for an empty value, so DataViews lists stay empty,
+ * but the panel row then showed only its label. The patch merges into the
+ * existing `excerpt` member by id, leaving the rest of its layout untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_excerpt_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'excerpt',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `excerpt` layout on top of the view configuration of every post
+ * type whose form lists the `excerpt` field: those using the default form,
+ * including custom post types registered at any point, and patterns.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_excerpt_layout_7_2( $post_type ) {
+	if (
+		'wp_block' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_excerpt_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_excerpt_layout_7_2' );
+
+/**
+ * Shows the placeholder of the `author` field in its panel row when the post
+ * has no author, as the post summary did before it moved to the form.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_author_layout_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'author',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `author` layout on top of the view configuration of every post
+ * type whose form lists the `author` field at its top level: those using the
+ * default form, including custom post types registered at any point, and
+ * attachments.
+ *
+ * A member that is absent would be appended instead of merged, so the other
+ * post types providing their own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_author_layout_7_2( $post_type ) {
+	if (
+		'attachment' !== $post_type &&
+		in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true )
+	) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_author_layout_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_author_layout_7_2' );
+
+/**
+ * Summarizes the `date` panel of the post form with the `publish_date` field,
+ * which reads "Immediately" while the post has no date of its own, as the post
+ * summary did before it moved to the form.
+ *
+ * Only the form changes: lists keep showing the `date` field, which can't say
+ * "Immediately" since a floating date is still a date there. The patch merges
+ * into the existing `date` member by id, leaving the rest of the form untouched.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function _gutenberg_update_date_summary_in_view_config( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'date',
+						'layout' => array(
+							'type'    => 'panel',
+							'summary' => 'publish_date',
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+
+/**
+ * Layers the `date` summary on top of the view configuration of every post
+ * type that uses the default form, including custom post types registered at
+ * any point.
+ *
+ * A member that is absent would be appended instead of merged, so post types
+ * whose base definition provides its own form are skipped.
+ *
+ * @param string $post_type The post type being registered.
+ */
+function gutenberg_register_date_summary_7_2( $post_type ) {
+	if ( in_array( $post_type, GUTENBERG_VIEW_CONFIG_POST_TYPES_WITH_OWN_FORM, true ) ) {
+		return;
+	}
+
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', $post_type ),
+		'_gutenberg_update_date_summary_in_view_config',
+		6,
+		1
+	);
+}
+add_action( 'registered_post_type', 'gutenberg_register_date_summary_7_2' );
+
+/**
+ * Registers the entity view configuration filters that layer on top of the base
+ * definitions, at a priority between those (5) and third-party callbacks (10),
+ * and the base definitions for entities that gained one in 7.2, at the base
+ * priority (5).
+ */
+function gutenberg_register_entity_view_config_filters_7_2() {
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_navigation' ),
+		'_gutenberg_get_entity_view_config_posttype_wp_navigation',
+		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'attachment' ),
+		'_gutenberg_get_entity_view_config_posttype_attachment',
+		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'root', 'site' ),
+		'_gutenberg_get_entity_view_config_root_site',
+		5,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
+		'_gutenberg_add_reading_settings_to_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_template' ),
+		'_gutenberg_remove_stale_fields_from_wp_template_view_config',
+		6,
+		1
+	);
+	add_filter(
+		gutenberg_get_entity_view_config_hook_name( 'postType', 'wp_block' ),
+		'_gutenberg_update_wp_block_view_config_for_author',
+		6,
+		1
+	);
+}
+add_action( 'init', 'gutenberg_register_entity_view_config_filters_7_2' );

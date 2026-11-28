@@ -7,25 +7,27 @@
 		},
 		"innerBlocks": [
 			{
-				"name": "core/tabs-menu",
+				"name": "core/tab-list",
 				"isValid": true,
-				"attributes": {},
-				"innerBlocks": [
-					{
-						"name": "core/tabs-menu-item",
-						"isValid": true,
-						"attributes": {},
-						"innerBlocks": []
-					}
-				]
+				"attributes": {
+					"tabs": [
+						{
+							"label": "Tab 1"
+						},
+						{
+							"label": "Tab 2"
+						}
+					]
+				},
+				"innerBlocks": []
 			},
 			{
-				"name": "core/tab-panel",
+				"name": "core/tab-panels",
 				"isValid": true,
 				"attributes": {},
 				"innerBlocks": [
 					{
-						"name": "core/tab",
+						"name": "core/tab-panel",
 						"isValid": true,
 						"attributes": {
 							"label": "Tab 1"
@@ -35,7 +37,7 @@
 								"name": "core/paragraph",
 								"isValid": true,
 								"attributes": {
-									"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod.",
+									"content": "Panel 1",
 									"dropCap": false
 								},
 								"innerBlocks": []
@@ -43,20 +45,22 @@
 						]
 					},
 					{
-						"name": "core/tab",
+						"name": "core/tab-panel",
 						"isValid": true,
 						"attributes": {
 							"label": "Tab 2"
 						},
-						"innerBlocks": []
-					},
-					{
-						"name": "core/tab",
-						"isValid": true,
-						"attributes": {
-							"label": "Tab 3"
-						},
-						"innerBlocks": []
+						"innerBlocks": [
+							{
+								"name": "core/paragraph",
+								"isValid": true,
+								"attributes": {
+									"content": "Panel 2",
+									"dropCap": false
+								},
+								"innerBlocks": []
+							}
+						]
 					}
 				]
 			}

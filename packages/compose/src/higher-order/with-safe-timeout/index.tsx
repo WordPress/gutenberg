@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	WithInjectedProps,
 	WithoutInjectedProps,
@@ -66,7 +59,7 @@ const withSafeTimeout = createHigherOrderComponent(
 
 			render() {
 				return (
-					// @ts-ignore
+					// @ts-expect-error `LibraryManagedAttributes` cannot see the injected timeout props.
 					<OriginalComponent
 						{ ...this.props }
 						setTimeout={ this.setTimeout }
