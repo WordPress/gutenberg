@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useState } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useMergeRefs } from '@wordpress/compose';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { TabListProps } from './types';
 
 // Account for sub-pixel rounding errors.

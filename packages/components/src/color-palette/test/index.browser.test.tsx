@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
 import ColorPalette from '..';
+import '../../popover/style.scss';
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -245,6 +246,44 @@ describe( 'ColorPalette', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
+	it( 'keeps the color format selector above the ColorPalette popup and returns focus after dismissal', async () => {
+		const user = userEvent.setup();
+		delete (
+			window as Window & { __wpUiCompatOverlaySlotEnabled?: boolean }
+		 ).__wpUiCompatOverlaySlotEnabled;
+		await render( <ControlledColorPalette /> );
+		const pickerTrigger = screen.getByRole( 'button', {
+			name: /^Custom color picker/,
+		} );
+		await user.click( pickerTrigger );
+		const formatTrigger = screen.getByRole( 'combobox', {
+			name: 'Color format',
+		} );
+		await user.click( formatTrigger );
+		const hslOption = screen.getByRole( 'option', { name: 'HSL' } );
+		await waitFor( () => {
+			const { x, y, width, height } = hslOption.getBoundingClientRect();
+			expect(
+				hslOption.contains(
+					document.elementFromPoint( x + width / 2, y + height / 2 )
+				)
+			).toBe( true );
+		} );
+		await user.click( hslOption );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Hue (HSL H value)' } )
+		).toBeVisible();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		await user.click( formatTrigger );
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		expect(
+			screen.queryByRole( 'option', { name: 'HSL' } )
+		).not.toBeInTheDocument();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+	} );
+
 	it( 'should render dropdown and its content', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
@@ -375,6 +414,86 @@ describe( 'ColorPalette', () => {
 				name: /^Custom color picker$/,
 			} )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'multiple origins', () => {
+		const red = { slug: 'red', name: 'Red', color: '#f00' };
+		const blue = { slug: 'blue', name: 'Blue', color: '#00f' };
+		const theme = { slug: 'theme', name: 'Theme', colors: [ red ] };
+		const custom = { slug: 'custom', name: 'Custom', colors: [ blue ] };
+
+		it.each( [
+			[ 'moved', 'Red', [ custom, theme ], 1 ],
+			[ 'shifted by a removal', 'Blue', [ custom ], 0 ],
+		] as const )(
+			'keeps focus on a swatch whose origin is %s',
+			async ( _case, swatch, nextOrigins, nextIndex ) => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				const view = await render(
+					<ColorPalette
+						colors={ [ theme, custom ] }
+						onChange={ onChange }
+						disableCustomColors
+					/>
+				);
+				await user.click(
+					screen.getByRole( 'option', { name: swatch } )
+				);
+				onChange.mockClear();
+
+				await view.rerender(
+					<ColorPalette
+						colors={ [ ...nextOrigins ] }
+						onChange={ onChange }
+						disableCustomColors
+					/>
+				);
+
+				expect(
+					screen.getByRole( 'option', { name: swatch } )
+				).toHaveFocus();
+				await user.keyboard( '{Enter}' );
+				expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+					expect.any( String ),
+					nextIndex,
+					swatch.toLowerCase()
+				);
+			}
+		);
+
+		it( 'keeps focus on an origin that stays in place when other origins share its slug', async () => {
+			const user = userEvent.setup();
+			const green = { slug: 'green', name: 'Green', color: '#0f0' };
+			const first = { ...theme, slug: 'shared' };
+			const second = { ...custom, slug: 'shared' };
+			const third = { slug: 'extra', name: 'Extra', colors: [ green ] };
+			const view = await render(
+				<ColorPalette
+					colors={ [ first, second, third ] }
+					onChange={ vi.fn() }
+					disableCustomColors
+				/>
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Blue' } ) );
+
+			await view.rerender(
+				<ColorPalette
+					colors={ [ third, second, first ] }
+					onChange={ vi.fn() }
+					disableCustomColors
+				/>
+			);
+
+			expect(
+				within(
+					screen.getByRole( 'group', { name: 'Custom' } )
+				).getByRole( 'option', { name: 'Blue' } )
+			).toHaveFocus();
+			expect(
+				screen.getByRole( 'option', { name: 'Red' } )
+			).toBeVisible();
+		} );
 	} );
 
 	describe( 'duplicate colors in palette', () => {

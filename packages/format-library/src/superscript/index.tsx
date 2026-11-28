@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { superscript as superscriptIcon } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
@@ -25,6 +24,7 @@ export const superscript = {
 
 		return (
 			<RichTextToolbarButton
+				name="superscript"
 				icon={ superscriptIcon }
 				title={ title }
 				onClick={ onClick }

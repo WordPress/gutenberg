@@ -52,6 +52,44 @@ class WP_Entity_Actions_Registry_Gutenberg extends WP_Entity_Actions_Registry {
 
 		return self::$instance;
 	}
+
+	/**
+	 * Returns the script modules registered for an entity.
+	 *
+	 * It overrides the method of WordPress versions that ship the registry
+	 * before core#14716, which key the ids of the actions by module id, so the
+	 * plugin behaves the same whatever the WordPress version. It can be removed
+	 * once the plugin requires a WordPress version that includes it.
+	 *
+	 * @param string $kind The entity kind (e.g. `postType`).
+	 * @param string $name The entity name (e.g. `page`).
+	 * @return array[] {
+	 *     The script modules, in registration order. Empty when the entity
+	 *     is invalid.
+	 *
+	 *     @type array ...$0 {
+	 *         @type string   $id      The id of the script module.
+	 *         @type string[] $actions The ids of the actions the module
+	 *                                 applies to, in registration order.
+	 *     }
+	 * }
+	 */
+	public function get_registered_action_modules( $kind, $name ) {
+		// Reports the method of the core class, like the method it overrides.
+		if ( ! $this->validate_entity( 'WP_Entity_Actions_Registry::get_registered_action_modules', $kind, $name ) ) {
+			return array();
+		}
+		$this->initialize();
+		$modules = array();
+		foreach ( $this->action_modules[ $kind ][ $name ] ?? array() as $module => $action_ids ) {
+			$modules[] = array(
+				// A numeric module id is an integer as an array key.
+				'id'      => (string) $module,
+				'actions' => $action_ids,
+			);
+		}
+		return $modules;
+	}
 }
 
 /**

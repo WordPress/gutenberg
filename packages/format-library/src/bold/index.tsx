@@ -4,7 +4,6 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';

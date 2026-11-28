@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'preact/test-utils';
 import '../directives';
 import { hydrateRegions, initialVdom } from '../hydration';
 import { populateServerData, store } from '../store';
-import { getElement } from '../scopes';
+import { getContext, getElement, getServerContext } from '../scopes';
 import { asDangerousHTML } from '../html';
 
 /** Counter for store namespaces, whose registry persists between tests. */
@@ -21,6 +21,82 @@ function uniqueNamespace(): string {
 describe( 'hydrateRegions', () => {
 	beforeEach( () => {
 		document.body.innerHTML = '';
+	} );
+
+	afterEach( () => {
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'hydrates descendants of ignored HTML variants without evaluating their references', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', false );
+		const namespace = uniqueNamespace();
+		const nestedNamespace = uniqueNamespace();
+		const readHtml = vi.fn();
+		const renderHtml = vi.fn( () => asDangerousHTML( '<b>ignored</b>' ) );
+		const initialize = vi.fn();
+		const { state } = store( namespace, {
+			state: {
+				/** Text shared by the ordinary descendants and host bindings. */
+				label: 'hydrated',
+				/**
+				 * Records reference reads before returning an HTML function.
+				 *
+				 * @return The function that an ignored entry must never call.
+				 */
+				get html() {
+					readHtml();
+					return renderHtml;
+				},
+			},
+			actions: {
+				/** Updates descendants through their normal event handler. */
+				update() {
+					state.label = 'updated';
+				},
+			},
+		} );
+		store( nestedNamespace, {
+			actions: {
+				/** Records initialization within each ignored binding's content. */
+				initialize,
+			},
+		} );
+		const variants = [ '', '---id', '--suffix', '--suffix---id' ];
+		document.body.innerHTML = `<div data-wp-interactive="${ namespace }">${ variants
+			.map(
+				( variant ) =>
+					`<section ${ variant ? `data-wp-html${ variant }="state.html"` : '' } data-wp-bind--title="state.label"><button data-wp-on--click="actions.update">Update</button><span data-wp-text="state.label">static</span><div data-wp-interactive="${ nestedNamespace }" data-wp-init="actions.initialize"></div></section>`
+			)
+			.join( '' ) }<p data-wp-text="state.label">following</p></div>`;
+		const hosts = [ ...document.querySelectorAll( 'section' ) ];
+		const children = hosts.map( ( host ) => host.firstElementChild );
+
+		await act( () => hydrateRegions() );
+
+		expect(
+			hosts.map( ( host ) => host.querySelector( 'span' )!.textContent )
+		).toEqual( variants.map( () => 'hydrated' ) );
+		expect( initialize ).toHaveBeenCalledTimes( variants.length );
+		expect( readHtml ).not.toHaveBeenCalled();
+		expect( renderHtml ).not.toHaveBeenCalled();
+
+		await act( () => hosts[ 1 ].querySelector( 'button' )!.click() );
+
+		expect(
+			hosts.map( ( host ) => host.querySelector( 'span' )!.textContent )
+		).toEqual( variants.map( () => 'updated' ) );
+		expect( hosts.map( ( host ) => host.title ) ).toEqual(
+			variants.map( () => 'updated' )
+		);
+		expect( hosts.map( ( host ) => host.firstElementChild ) ).toEqual(
+			children
+		);
+		expect( document.querySelector( 'p' ) ).toHaveTextContent(
+			/^updated$/
+		);
+		expect( initialize ).toHaveBeenCalledTimes( variants.length );
+		expect( readHtml ).not.toHaveBeenCalled();
+		expect( renderHtml ).not.toHaveBeenCalled();
 	} );
 
 	it.each( [ false, true ] )(
@@ -219,5 +295,114 @@ describe( 'hydrateRegions', () => {
 		expect( document.querySelector( '#following span' ) ).toHaveTextContent(
 			/^updated$/
 		);
+	} );
+
+	it( 'keeps the server-rendered content of data-wp-each items whose value is the server representation', async () => {
+		const propertyNamespace = uniqueNamespace();
+		const itemNamespace = uniqueNamespace();
+		populateServerData( {
+			state: {
+				[ propertyNamespace ]: {
+					list: [
+						{ html: { wpServerHtml: true } },
+						{ html: { wpServerHtml: true } },
+					],
+				},
+				[ itemNamespace ]: { list: [ { wpServerHtml: true } ] },
+			},
+		} );
+		const { state } = store( propertyNamespace, { state: {} } );
+		const listState = state as { list: Array< { html: unknown } > };
+
+		document.body.innerHTML = `
+			<div id="property" data-wp-interactive="${ propertyNamespace }">
+				<template data-wp-each="state.list"><div><span data-wp-html="context.item.html"><i>Fallback</i></span></div></template>
+				<div data-wp-each-child="${ propertyNamespace }::state.list"><span data-wp-html="context.item.html"><b>one</b></span></div>
+				<div data-wp-each-child="${ propertyNamespace }::state.list"><span data-wp-html="context.item.html"><b>two</b></span></div>
+			</div>
+			<div id="item" data-wp-interactive="${ itemNamespace }">
+				<template data-wp-each="state.list"><div><span data-wp-html="context.item"><i>Fallback</i></span></div></template>
+				<div data-wp-each-child="${ itemNamespace }::state.list"><span data-wp-html="context.item"><b>item</b></span></div>
+			</div>
+		`;
+		const targets = [
+			...document.querySelectorAll< HTMLElement >( '[data-wp-html]' ),
+		];
+		const serverNodes = targets.map(
+			( target ) => target.firstElementChild
+		);
+
+		await act( () => hydrateRegions() );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		targets.forEach( ( target, index ) =>
+			expect( target.firstElementChild ).toBe( serverNodes[ index ] )
+		);
+
+		// An item added on the client shows the template's fallback.
+		await act( () => {
+			listState.list = [
+				...listState.list,
+				{ html: { wpServerHtml: true } },
+			];
+		} );
+		const items = [
+			...document.querySelectorAll< HTMLElement >(
+				'#property [data-wp-html]'
+			),
+		];
+		expect( items.map( ( item ) => item.innerHTML ) ).toEqual( [
+			'<b>one</b>',
+			'<b>two</b>',
+			'<i>Fallback</i>',
+		] );
+
+		// A token updates only its own item.
+		await act( () => {
+			listState.list[ 0 ].html = asDangerousHTML( '<b>new</b>' );
+		} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( items.map( ( item ) => item.innerHTML ) ).toEqual( [
+			'<b>new</b>',
+			'<b>two</b>',
+			'<i>Fallback</i>',
+		] );
+		expect( items[ 1 ].firstElementChild ).toBe( serverNodes[ 1 ] );
+	} );
+
+	it( 'leaves no scope behind when a directive throws during hydration', async () => {
+		const namespace = uniqueNamespace();
+		const failure = new Error( 'directive failure' );
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		store( namespace, {
+			actions: {
+				/** Throws while the element it is attached to renders. */
+				fail: () => {
+					throw failure;
+				},
+			},
+		} );
+		document.body.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-context='{ "value": "own" }' data-wp-run="actions.fail"></div>`;
+
+		await expect( act( () => hydrateRegions() ) ).rejects.toBe( failure );
+
+		// A callback scheduled after hydration runs without a scope.
+		const results = await new Promise< Array< { value?: unknown } > >(
+			( resolve ) => {
+				setTimeout( () => {
+					resolve(
+						[ getContext, getElement, getServerContext ].map(
+							( reader ) => {
+								try {
+									return { value: reader( namespace ) };
+								} catch {
+									return {};
+								}
+							}
+						)
+					);
+				}, 0 );
+			}
+		);
+		expect( results ).toEqual( [ {}, {}, {} ] );
 	} );
 } );

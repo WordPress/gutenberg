@@ -1,14 +1,21 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "../utils/composite-item";
 
 .components-dropdown-menu__toggle {
 	vertical-align: top;
 }
 
+// Match the popover padding of the `Menu` component in `@wordpress/ui` when
+// the menu has no groups. Groups set their own padding in `Dropdown`.
+.components-dropdown-menu__popover > .components-popover__content {
+	padding: var(--wpds-dimension-padding-xs);
+}
+
 .components-dropdown-menu__menu {
 	width: 100%;
 	font-family: $default-font;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	line-height: $default-line-height;
 
 	.components-dropdown-menu__menu-item,
@@ -20,8 +27,13 @@
 		white-space: nowrap;
 		font-weight: var(--wpds-typography-font-weight-default);
 
+		// Line text labels up with `MenuItem` and `MenuGroup` dividers.
+		&:not(.is-icon-only) {
+			padding-inline: var(--wpds-dimension-padding-sm);
+		}
+
 		&.has-separator {
-			margin-top: 6px;
+			margin-top: calc(2 * var(--wpds-dimension-gap-xs) + var(--wpds-border-width-xs));
 			position: relative;
 			overflow: visible;
 		}
@@ -30,12 +42,15 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: var(--wpds-color-stroke-surface-neutral);
+			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 			position: absolute;
-			top: -3px;
-			left: 0;
-			right: 0;
-			height: 1px;
+			top: calc(-1 * (var(--wpds-dimension-gap-xs) + var(--wpds-border-width-xs)));
+			inset-inline: var(--wpds-dimension-padding-sm);
+			height: var(--wpds-border-width-xs);
+
+			@media ( forced-colors: active ) {
+				background-color: CanvasText;
+			}
 		}
 
 		&.is-active {
@@ -46,6 +61,23 @@
 				background: $gray-900;
 				box-shadow: 0 0 0 $border-width $gray-900;
 				border-radius: $border-width;
+				// Dashicons fade their color in wp-admin, which would lag behind the background.
+				transition: none;
+			}
+
+			@include composite-item.when-highlighted {
+				svg,
+				.dashicon {
+					color: var(--wpds-color-background-interactive-brand-strong-active);
+					background: var(--wpds-color-foreground-interactive-brand-strong-active);
+					box-shadow: 0 0 0 $border-width var(--wpds-color-foreground-interactive-brand-strong-active);
+
+					@media ( forced-colors: active ) {
+						color: Highlight;
+						background: HighlightText;
+						box-shadow: 0 0 0 $border-width HighlightText;
+					}
+				}
 			}
 		}
 
@@ -62,6 +94,17 @@
 		text-align: left;
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
+
+		// Offset the 1px border reserved by Button, since the height here
+		// is determined by the content rather than fixed.
+		padding-top: $grid-unit-05 - $border-width;
+		padding-bottom: $grid-unit-05 - $border-width;
+
+		&.has-icon {
+			// Matches the `.has-icon` padding of Button.
+			padding-top: 6px - $border-width;
+			padding-bottom: 6px - $border-width;
+		}
 	}
 
 }

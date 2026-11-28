@@ -133,7 +133,7 @@ export type PanelLayout = {
 	/**
 	 * Whether the summary shows the field's `placeholder` instead of its
 	 * `render` output when the value is `undefined`, `null`, or an empty
-	 * string. `false` by default.
+	 * string, or when the `render` output is empty. `false` by default.
 	 */
 	showPlaceholderIfEmpty?: boolean;
 };
@@ -168,7 +168,8 @@ export type NormalizedPanelLayout = {
 	editVisibility: EditVisibility;
 
 	/**
-	 * Whether the summary shows the field's `placeholder` when the value is empty.
+	 * Whether the summary shows the field's `placeholder` when the value or its
+	 * `render` output is empty.
 	 */
 	showPlaceholderIfEmpty: boolean;
 };
@@ -262,6 +263,13 @@ export type CardLayout =
 			 * Whether the card's content can be collapsed. Defaults to `true`.
 			 */
 			isCollapsible?: boolean | undefined;
+
+			/**
+			 * The heading level of the card's title. When set, the title is
+			 * rendered as a heading of that level, so the card contributes to
+			 * the document outline. Without it, the title isn't a heading.
+			 */
+			headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	  };
 
 /**
@@ -324,6 +332,11 @@ export type NormalizedCardLayout =
 			 * Whether the card's content can be collapsed.
 			 */
 			isCollapsible: boolean;
+
+			/**
+			 * The heading level of the card's title, if any.
+			 */
+			headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	  };
 
 /**

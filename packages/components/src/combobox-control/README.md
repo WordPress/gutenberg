@@ -134,7 +134,7 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 
 ## Related components
 
--   Like this component, but without a search input, the [`CustomSelectControl`](https://developer.wordpress.org/block-editor/reference-guides/components/custom-select-control/) component.
+-   For a select without a search input, use [`SelectControl`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-form-selectcontrol--docs) from `@wordpress/ui`.
 
 -   To select one option from a set, when you want to show all the available options at once, use the [`RadioControl`](https://developer.wordpress.org/block-editor/reference-guides/components/radio-control/) component.
 -   To select one or more items from a set, use the [`CheckboxControl`](https://developer.wordpress.org/block-editor/reference-guides/components/checkbox-control/) component.

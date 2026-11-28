@@ -2,6 +2,75 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Swap the values of `--wpds-color-background-interactive-neutral-strong` and `--wpds-color-background-interactive-neutral-strong-active`, so solid neutral controls have a stronger resting fill and a softer fill wherever the active token is used ([#87429](https://github.com/WordPress/gutenberg/pull/87429)).
+-   Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
+-   Preserve saturated background colors in neighboring surfaces and neutral strokes, including page and menu dividers ([#87175](https://github.com/WordPress/gutenberg/pull/87175)).
+
+### Bug Fixes
+
+-   Use the WCAG sRGB luminance coefficients when checking generated colors against contrast thresholds ([#87174](https://github.com/WordPress/gutenberg/pull/87174)).
+
+### Internal
+
+-   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
+-   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 5.0.0 (2026-11-18)
+
+### Breaking Changes
+
+-   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   `--wpds-color-background-thumb-neutral` is now a light color for switch knobs in light and dark themes alike, where it was previously dark. Anything still using it for a progressbar or meter fill should move to `--wpds-color-background-indicator-neutral` ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
+
+### New Features
+
+-   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
+-   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` for the knob of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
+-   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
+### Enhancements
+
+-   Check `--wpds-color-foreground-content-neutral-weak` text on `--wpds-color-background-surface-neutral-weak` and `--wpds-color-background-surface-neutral-strong` for WCAG AA contrast in the token build and `ThemeProvider` color warnings ([#86750](https://github.com/WordPress/gutenberg/pull/86750)).
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
+### Bug Fixes
+
+-   `ThemeProvider`: Carry near-gray background tints into generated neutral surfaces and strokes with a smooth chroma ceiling that stays close to the seed for faint tints ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
+### Internal
+
+-   Update the PostCSS development dependency to `^8.5.33` ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+-   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 4.0.0 (2026-11-04)
+
+### Breaking Changes
+
+-   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
+### Enhancements
+
+-   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
+
+## 3.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -9,11 +78,22 @@
 ### New Features
 
 -   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+-   Export the `$description` of token groups on their `groups` nodes in `design-tokens.js`, and add descriptions for the dimension and border width groups ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
+### Enhancements
+
+-   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all ([#85182](https://github.com/WordPress/gutenberg/pull/85182)).
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for Theme tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
+-   Update Terrazzo token-generation tools to 2.9.0 ([#85067](https://github.com/WordPress/gutenberg/pull/85067)).
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
 -   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
+
+### Documentation
+
+-   Add Color, Border, Dimension, and Cursor pages to the Storybook design tokens docs, and show token descriptions on the Typography page ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
 
 ## 2.3.0 (2026-10-07)
 

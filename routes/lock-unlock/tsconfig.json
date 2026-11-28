@@ -9,7 +9,9 @@
 		"composite": false,
 		"types": []
 	},
-	"references": [ { "path": "../../packages/private-apis" } ],
+	"references": [
+		{ "path": "../../packages/private-apis/tsconfig.build.json" }
+	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]
 }

@@ -261,6 +261,11 @@ The settings section has the following structure:
 			},
 			"spacingSizes": []
 		},
+		"transform": {
+			"rotate": false,
+			"translate": false,
+			"scale": false
+		},
 		"typography": {
 			"customFontSize": true,
 			"dropCap": true,
@@ -308,6 +313,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
+- transform: rotate
 - typography: lineHeight
 
 #### Backward compatibility with add_theme_support
@@ -1042,7 +1048,11 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+Pseudo selectors are supported for these elements:
+
+- `link` and `button`: `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link`.
+- `textInput`: `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and the `::placeholder` pseudo-element.
+- `select`: `:hover`, `:focus`, `:focus-visible`, `:active`.
 
 ```json
 "elements": {
@@ -1053,6 +1063,25 @@ Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:
 			":hover": {
 				"color": {
 					"text": "hotpink"
+				}
+			}
+		}
+	}
+```
+
+`:user-valid` and `:user-invalid` only match after a visitor has interacted with the field, so empty required fields aren't marked as invalid when the page loads. `::placeholder` styles the placeholder text, not the field itself:
+
+```json
+"elements": {
+		"textInput": {
+			":user-invalid": {
+				"border": {
+					"color": "#d63638"
+				}
+			},
+			"::placeholder": {
+				"color": {
+					"text": "#757575"
 				}
 			}
 		}

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PluginArea` subscribes to plugin registration under a namespace for its scope, so unmounting an area no longer stops areas with other scopes from updating when a plugin is registered or unregistered ([#87510](https://github.com/WordPress/gutenberg/pull/87510)).
+
+## 8.2.0 (2026-11-18)
+
+## 8.1.0 (2026-11-04)
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85088](https://github.com/WordPress/gutenberg/pull/85088)).
+
+## 8.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

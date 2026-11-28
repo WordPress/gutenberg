@@ -52,6 +52,7 @@ import type {
 	State,
 	BlockListSettings,
 	BlockPattern,
+	ParsedBlockPattern,
 	TreeBlock,
 	UserPattern,
 } from './types';
@@ -1153,7 +1154,7 @@ export function __unstableSelectionHasUnmergeableBlock( state: State ) {
  */
 export function __unstableIsSelectionMergeable(
 	state: State,
-	isForward: boolean
+	isForward?: boolean
 ) {
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
@@ -2943,23 +2944,21 @@ export const getAllowedBlocks = createRegistrySelector( ( select ) =>
 	)
 );
 
-export const __experimentalGetAllowedBlocks = createSelector(
-	( state: State, rootClientId: string | null = null ) => {
-		deprecated(
-			'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
-			{
-				alternative:
-					'wp.data.select( "core/block-editor" ).getAllowedBlocks',
-				since: '6.2',
-				version: '6.4',
-			}
-		);
-		return getAllowedBlocks( state, rootClientId );
-	},
-	( state: State, rootClientId?: string | null ) =>
-		// @ts-expect-error A registry selector has no `getDependants`, so this throws.
-		getAllowedBlocks.getDependants( state, rootClientId )
-);
+export const __experimentalGetAllowedBlocks = (
+	state: State,
+	rootClientId: string | null = null
+) => {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
+		{
+			alternative:
+				'wp.data.select( "core/block-editor" ).getAllowedBlocks',
+			since: '6.2',
+			version: '6.4',
+		}
+	);
+	return getAllowedBlocks( state, rootClientId );
+};
 
 /**
  * Returns the block to be directly inserted by the block appender.
@@ -3021,8 +3020,13 @@ const getAllowedPatternsDependants =
 		...getInsertBlockTypeDependants( select )( state, rootClientId ),
 	];
 
-const patternsWithParsedBlocks = new WeakMap< BlockPattern, BlockPattern >();
-function enhancePatternWithParsedBlocks( pattern: BlockPattern ) {
+const patternsWithParsedBlocks = new WeakMap<
+	BlockPattern,
+	ParsedBlockPattern
+>();
+function enhancePatternWithParsedBlocks(
+	pattern: BlockPattern
+): ParsedBlockPattern {
 	let enhancedPattern = patternsWithParsedBlocks.get( pattern );
 	if ( ! enhancedPattern ) {
 		enhancedPattern = {
@@ -3051,7 +3055,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				state: State,
 				rootClientId: string | null = null,
 				options: InserterOptions = DEFAULT_INSERTER_OPTIONS
-			): BlockPattern[] => {
+			): Array< ParsedBlockPattern > => {
 				const { getAllPatterns } = unlock( select( STORE_NAME ) );
 				const patterns = getAllPatterns();
 				const { allowedBlockTypes } = getSettings( state );
@@ -3689,10 +3693,7 @@ export const isUngroupable = createRegistrySelector(
 			const _isUngroupable =
 				block &&
 				( block.name === groupingBlockName ||
-					(
-						getBlockType( block.name )?.transforms as
-							{ ungroup?: unknown } | undefined
-					 )?.ungroup ) &&
+					getBlockType( block.name )?.transforms?.ungroup ) &&
 				!! block.innerBlocks.length;
 
 			return _isUngroupable && canRemoveBlock( state, _clientId );

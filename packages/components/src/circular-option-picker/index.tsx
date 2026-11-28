@@ -8,6 +8,7 @@ export {
 } from './circular-option-picker-actions';
 export {
 	getComputeCircularOptionPickerCommonProps,
+	getOptionGroupKeys,
 	resolveCircularOptionPickerPresentation,
 	warnIfCircularOptionPickerAsButtonsIsSet,
 } from './utils';

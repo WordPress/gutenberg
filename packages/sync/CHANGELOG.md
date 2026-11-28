@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the `flushLocalUpdates` option for sync providers and the optional `supportsDeferredUpdates` result. A provider that applies local updates before each remote update lets the sync manager keep local updates off the typing hot path ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
+
+### Bug Fixes
+
+-   Apply a deferred local update before a remote change that arrives first, so the update does not overwrite the remote change ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
+
+## 3.2.0 (2026-11-18)
+
+## 3.1.0 (2026-11-04)
+
+## 3.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	insert,
 	insertObject,
@@ -8,9 +8,8 @@ import {
 	useAnchor,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	ValidatedInputControl,
@@ -47,7 +46,6 @@ function InlineUI( {
 		activeObjectAttributes[ 'data-latex' ] || ''
 	);
 	const [ error, setError ] = useState< string | null >( null );
-	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
 		// eslint-disable-next-line react-hooks/refs
@@ -95,18 +93,14 @@ function InlineUI( {
 	};
 
 	return (
-		<Popover
+		<WCPopover
 			placement="bottom-start"
 			offset={ 8 }
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
-			// Surface any parsing error before focus leaves the popover.
-			// An invalid field is refocused, keeping the popover open.
-			onFocusOutside={ () => formRef.current?.reportValidity() }
 			className="block-editor-format-toolbar__math-popover"
 		>
 			<form
-				ref={ formRef }
 				style={ { minWidth: '300px', padding: '16px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
@@ -131,7 +125,7 @@ function InlineUI( {
 					{ __( 'Learn more about LaTeX syntax' ) }
 				</Link>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 
@@ -195,6 +189,7 @@ function Edit( {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="math"
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }

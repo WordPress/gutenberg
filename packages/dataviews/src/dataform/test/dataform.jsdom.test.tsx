@@ -1,4 +1,11 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	isInaccessible,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
@@ -715,7 +722,7 @@ describe( 'DataForm component', () => {
 			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should show the value of a non-empty field instead of its placeholder', () => {
+		it( 'should show the value of a non-empty field before its placeholder', () => {
 			render(
 				<Dataform
 					onChange={ noop }
@@ -735,10 +742,35 @@ describe( 'DataForm component', () => {
 				/>
 			);
 
+			// The placeholder follows the value, and the styles hide it while
+			// the value renders something.
 			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
-			expect(
-				screen.queryByText( 'Add a title' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should follow an empty render output of a non-empty field with its placeholder', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'author',
+							label: 'Author',
+							type: 'integer',
+							placeholder: 'No author',
+							// Like an id matching no record.
+							render: () => null,
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'author' ],
+					} }
+					data={ { author: 99 } }
+				/>
+			);
+
+			expect( screen.getByText( 'No author' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should fall back to the render output when an empty field has no placeholder', () => {
@@ -915,6 +947,52 @@ describe( 'DataForm component', () => {
 			expect( screen.getAllByText( 'Account status' ) ).toHaveLength( 1 );
 		} );
 
+		it( 'renders the header summary of a card that cannot be collapsed', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						...fields,
+						{
+							id: 'status',
+							label: 'Status',
+							readOnly: true,
+							render: () => <span>Published</span>,
+						},
+					] }
+					form={ {
+						fields: [
+							{
+								id: 'details',
+								label: 'Details',
+								layout: {
+									type: 'card',
+									isCollapsible: false,
+									summary: [
+										{ id: 'status', visibility: 'always' },
+									],
+								},
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			const summary = screen.getByText( 'Published' );
+			expect( summary ).toBeVisible();
+			// No toggle describes it, so it mustn't be hidden from assistive
+			// technology.
+			expect( isInaccessible( summary ) ).toBe( false );
+			// The summary is a div, which a span can't contain.
+			// eslint-disable-next-line testing-library/no-node-access
+			const summaryList = summary.closest(
+				'.dataforms-layouts-card__field-summary'
+			);
+			expect( summaryList?.parentElement?.tagName ).toBe( 'DIV' );
+		} );
+
 		it( 'does not render an empty card for an editable field without an edit control', () => {
 			const { container } = render(
 				<Dataform
@@ -942,6 +1020,87 @@ describe( 'DataForm component', () => {
 				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 				container.querySelector( '.dataforms-layouts-card__field' )
 			).not.toBeInTheDocument();
+		} );
+
+		it( 'wraps the toggle of a collapsible card in a heading when headingLevel is set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: { type: 'card', headingLevel: 3 },
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			const heading = screen.getByRole( 'heading', {
+				level: 3,
+				name: /main card/i,
+			} );
+			// A native heading can't contain the toggle, so the wrapper takes
+			// heading semantics through ARIA.
+			expect( heading ).toHaveAttribute( 'role', 'heading' );
+			expect(
+				within( heading ).getByRole( 'button', { name: /main card/i } )
+			).toBeVisible();
+		} );
+
+		it( 'renders the title of a static card as a heading when headingLevel is set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: {
+							type: 'card',
+							isCollapsible: false,
+							headingLevel: 2,
+						},
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'heading', { level: 2, name: 'Main card' } )
+			).toBeVisible();
+		} );
+
+		it( 'does not render a heading when headingLevel is not set', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ {
+						layout: { type: 'card' },
+						fields: [
+							{
+								id: 'mainCard',
+								label: 'Main card',
+								children: [ 'title' ],
+							},
+						],
+					} }
+					data={ data }
+				/>
+			);
+
+			expect( screen.queryByRole( 'heading' ) ).not.toBeInTheDocument();
 		} );
 
 		const fieldsWithRequiredTitle = fields.map( ( field ) =>
