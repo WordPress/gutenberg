@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import ColorGradientControl from '../control';
 
@@ -221,6 +221,110 @@ describe( 'ColorPaletteControl', () => {
 			// Selecting a color must also clear the active gradient.
 			expect( onGradientChange ).toHaveBeenCalledTimes( 1 );
 			expect( onGradientChange ).toHaveBeenCalledWith();
+		} );
+	} );
+
+	describe( 'contrast notice container layout stability', () => {
+		it( 'does not render notice container when noticeProps is not provided', async () => {
+			const { container } = await render(
+				<ColorGradientControl
+					label="Link Color"
+					colorValue="#000"
+					colors={ [ { color: '#000', name: 'black' } ] }
+					gradients={ [] }
+					disableCustomColors={ false }
+					disableCustomGradients
+					onColorChange={ noop }
+					onGradientChange={ noop }
+				/>
+			);
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				container.querySelector(
+					'.block-editor-color-gradient-control__notice-container'
+				)
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'renders notice container when noticeProps is provided', async () => {
+			const { container } = await render(
+				<ColorGradientControl
+					label="Link Color"
+					colorValue="#000"
+					colors={ [ { color: '#000', name: 'black' } ] }
+					gradients={ [] }
+					disableCustomColors={ false }
+					disableCustomGradients
+					onColorChange={ noop }
+					onGradientChange={ noop }
+					noticeProps={ {
+						status: 'warning',
+						children: 'Notice with warning',
+					} }
+				/>
+			);
+
+			expect(
+				within( container ).getByText( 'Notice with warning' )
+			).toBeInTheDocument();
+
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				container.querySelector(
+					'.block-editor-color-gradient-control__notice-container'
+				)
+			).toBeInTheDocument();
+		} );
+
+		it( 'preserves notice container min-height when notice is cleared during an active session', async () => {
+			const { container, rerender } = await render(
+				<ColorGradientControl
+					label="Link Color"
+					colorValue="#fff"
+					colors={ [ { color: '#fff', name: 'white' } ] }
+					gradients={ [] }
+					disableCustomColors={ false }
+					disableCustomGradients
+					onColorChange={ noop }
+					onGradientChange={ noop }
+					noticeProps={ {
+						status: 'warning',
+						children: 'Notice cleared dynamically',
+					} }
+				/>
+			);
+
+			expect(
+				within( container ).getByText( 'Notice cleared dynamically' )
+			).toBeInTheDocument();
+
+			// Rerender as when user picks a good-contrast color:
+			await rerender(
+				<ColorGradientControl
+					label="Link Color"
+					colorValue="#000"
+					colors={ [ { color: '#000', name: 'black' } ] }
+					gradients={ [] }
+					disableCustomColors={ false }
+					disableCustomGradients
+					onColorChange={ noop }
+					onGradientChange={ noop }
+					noticeProps={ undefined }
+				/>
+			);
+
+			// The text is removed from accessibility tree & DOM.
+			expect(
+				within( container ).queryByText( 'Notice cleared dynamically' )
+			).not.toBeInTheDocument();
+
+			// But the container remains mounted so Floating UI won't jump.
+			// eslint-disable-next-line testing-library/no-node-access
+			const noticeContainer = container.querySelector(
+				'.block-editor-color-gradient-control__notice-container'
+			);
+			expect( noticeContainer ).toBeInTheDocument();
 		} );
 	} );
 } );
