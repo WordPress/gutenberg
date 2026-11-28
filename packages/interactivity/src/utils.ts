@@ -443,6 +443,29 @@ export const warn = ( message: string ): void => {
 };
 
 /**
+ * Warns about unsupported characters in an explicitly provided namespace.
+ *
+ * Null and undefined represent an inherited or absent namespace.
+ *
+ * @param namespace Namespace to check.
+ */
+export const warnIfInvalidNamespace = (
+	namespace: string | null | undefined
+): void => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if (
+			namespace !== undefined &&
+			namespace !== null &&
+			( namespace.length === 0 || /[^a-z0-9_/-]/i.test( namespace ) )
+		) {
+			warn(
+				`Invalid namespace "${ namespace }". Namespaces must be non-empty and contain only alphanumeric characters, hyphens, underscores, and forward slashes.`
+			);
+		}
+	}
+};
+
+/**
  * Checks whether a property key leads out of an object's own data:
  * `__proto__` to its prototype, `constructor` to its constructor, and
  * `prototype` to a function's prototype.
