@@ -12,6 +12,9 @@
 ### Bug Fixes
 
 -   `BlockEditProps`: Add the `name` prop passed to a block's `edit` component ([#87485](https://github.com/WordPress/gutenberg/pull/87485)).
+-   `BlockConfiguration`: Type `example.attributes` as `Partial< Attributes >` instead of the `BlockType` attribute schema ([#87543](https://github.com/WordPress/gutenberg/pull/87543)).
+-   `BlockVariation`: Type `attributes` as `Partial< Attributes >` ([#87551](https://github.com/WordPress/gutenberg/pull/87551)).
+-   `BlockExampleInnerBlock`: Type `attributes` as `Record< string, unknown >` instead of the `BlockType` attribute schema ([#87585](https://github.com/WordPress/gutenberg/pull/87585)).
 -   Validate registered direct-parent relationships for structural block wrapping ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
 
 ### Internal

@@ -15,7 +15,7 @@ import {
 	SearchControl,
 } from '@wordpress/components';
 import { InputControl, Spinner, Stack } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useDebounce, useEvent } from '@wordpress/compose';
 import {
 	store as coreStore,
@@ -143,7 +143,7 @@ export function findTerm( terms, parent, name ) {
 		return (
 			( ( ! term.parent && ! parent ) ||
 				parseInt( term.parent ) === parseInt( parent ) ) &&
-			term.name.toLowerCase() === name.toLowerCase()
+			decodeEntities( term.name ).toLowerCase() === name.toLowerCase()
 		);
 	} );
 }
@@ -178,7 +178,7 @@ export function getFilterMatcher( filterValue ) {
 		// (i.e. some child matched at some point in the tree) then return it.
 		if (
 			-1 !==
-				normalizeTextString( term.name ).indexOf(
+				normalizeTextString( decodeEntities( term.name ) ).indexOf(
 					normalizedFilterValue
 				) ||
 			term.children.length > 0
@@ -258,6 +258,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ slug ]
 	);
 
+	const registry = useRegistry();
 	const { editPost, lockPostSaving, unlockPostSaving } =
 		useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -397,10 +398,11 @@ export function HierarchicalTermSelector( { slug } ) {
 			speak( termAddedMessage, 'assertive' );
 			setFormName( '' );
 			setFormParent( '' );
-			onUpdateTerms( [ ...terms, newTerm.id ] );
+			const assignedTermIds = registry
+				.select( editorStore )
+				.getEditedPostAttribute( taxonomy.rest_base );
+			onUpdateTerms( [ ...assignedTermIds, newTerm.id ] );
 		} finally {
-			// Clear the flag whether or not the term was created, otherwise a
-			// failed request would block every later attempt.
 			setAdding( false );
 			unlockPostSaving( lockName );
 		}
