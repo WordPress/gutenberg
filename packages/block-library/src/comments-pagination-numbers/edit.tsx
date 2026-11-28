@@ -11,9 +11,7 @@ const PaginationItem = ( {
 		<Tag
 			className={ `page-numbers ${ extraClass }` }
 			href="#comments-pagination-numbers-pseudo-link"
-			onClick={ ( event: MouseEvent< HTMLAnchorElement > ) =>
-				event.preventDefault()
-			}
+			onClick={ ( event ) => event.preventDefault() }
 		>
 			{ content }
 		</Tag>
