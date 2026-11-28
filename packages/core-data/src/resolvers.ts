@@ -4,7 +4,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import type { Block } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
-import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
+import {
+	additionalEntityConfigLoaders,
+	DEFAULT_ENTITY_KEY,
+	findEntityConfigLoader,
+} from './entities';
 import { getEntitySyncManager } from './entity-sync';
 import type { EntitySyncRecord } from './entity-sync';
 import {
@@ -26,6 +30,7 @@ import type { QueriedMeta, Query } from './queried-data/types';
 import type { PermissionResource } from './utils/types';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import type { Action, CoreDataThunkArgs } from './private-types';
+import type { State } from './selectors';
 import type { EntityConfig, RestRecord, TransientEditConfig } from './types';
 
 /**
@@ -75,11 +80,8 @@ export const getEntityRecord =
 		registry,
 		resolveSelect,
 	}: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -314,11 +316,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords =
 	( kind: string, name: string, query: Query = {} ) =>
 	async ( { dispatch, registry, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -637,14 +636,11 @@ export const canUser =
 				return;
 			}
 
-			const configs = await resolveSelect.getEntitiesConfig(
-				resource.kind
-			);
-			const entityConfig = configs.find(
-				( config ) =>
-					config.name === resource.name &&
-					config.kind === resource.kind
-			);
+			const entityConfig: EntityConfig | undefined =
+				await resolveSelect.getEntityConfig(
+					resource.kind,
+					resource.name
+				);
 			if ( ! entityConfig ) {
 				return;
 			}
@@ -977,7 +973,7 @@ export const getDefaultTemplateId =
 		} );
 		// Wait for the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
-		await resolveSelect.getEntitiesConfig( 'postType' );
+		await resolveSelect.getEntityConfig( 'postType', 'wp_template' );
 		const id = template?.id;
 
 		registry.batch( () => {
@@ -1018,11 +1014,8 @@ export const getRevisions =
 		query: Query = {}
 	) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		if ( ! entityConfig || ! isSafeEntityKey( recordKey ) ) {
 			return;
@@ -1166,11 +1159,8 @@ export const getRevision =
 		query?: Query
 	) =>
 	async ( { select, dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+		const entityConfig: EntityConfig | undefined =
+			await resolveSelect.getEntityConfig( kind, name );
 
 		if (
 			! entityConfig ||
@@ -1300,17 +1290,16 @@ getRegisteredPostMeta.shouldInvalidate = (
 };
 
 /**
- * Requests entity configs for the given kind from the REST API.
+ * Requests the entity config for the given kind and name from the REST API,
+ * if a loader provides it.
  *
  * @param kind Entity kind.
+ * @param name Entity name.
  */
-export const getEntitiesConfig =
-	( kind: string ) =>
+export const getEntityConfig =
+	( kind: string, name: string ) =>
 	async ( { dispatch }: CoreDataThunkArgs ) => {
-		const loader = additionalEntityConfigLoaders.find(
-			( l ) => l.kind === kind
-		);
-
+		const loader = findEntityConfigLoader( kind, name );
 		if ( ! loader ) {
 			return;
 		}
@@ -1325,6 +1314,49 @@ export const getEntitiesConfig =
 		} catch {
 			// Do nothing if the request comes back with an API error.
 		}
+	};
+
+/**
+ * Resolves each loader once. A loader without a name loads every config of
+ * its kind, so all names of that kind share one resolution, keyed by an
+ * empty name.
+ *
+ * @param kind Entity kind.
+ * @param name Entity name.
+ *
+ * @return The resolution args.
+ */
+getEntityConfig.getResolutionArgs = (
+	kind: string,
+	name: string
+): [ string, string ] => {
+	const loader = findEntityConfigLoader( kind, name );
+	return [ kind, loader && ! loader.name ? '' : name ];
+};
+
+// Receives the resolution args, so it only skips names that have their own
+// resolution, such as statically configured `root` entities.
+getEntityConfig.isFulfilled = ( state: State, kind: string, name: string ) =>
+	state.entities.config.some(
+		( config ) => config.kind === kind && config.name === name
+	);
+
+/**
+ * Requests the entity configs for the given kind from the REST API.
+ *
+ * @param kind Entity kind.
+ */
+export const getEntitiesConfig =
+	( kind: string ) =>
+	async ( { resolveSelect }: CoreDataThunkArgs ) => {
+		// A kind can have several loaders, so resolve each of them.
+		await Promise.all(
+			additionalEntityConfigLoaders
+				.filter( ( loader ) => loader.kind === kind )
+				.map( ( loader ) =>
+					resolveSelect.getEntityConfig( kind, loader.name ?? '' )
+				)
+		);
 	};
 
 /**

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { getLocaleData, resetLocaleData, setLocaleData } from '@wordpress/i18n';
 import {
 	displayShortcutList,
 	displayShortcut,
@@ -165,6 +166,52 @@ describe( 'displayShortcut', () => {
 } );
 
 describe( 'shortcutAriaLabel', () => {
+	it.each( [
+		[ '\\', 'Backslash' ],
+		[ '/', 'Forward-slash' ],
+		[ '+', 'Plus' ],
+		[ '-', 'Minus' ],
+	] )(
+		'describes %s with and without modifiers on both platforms',
+		( key, label ) => {
+			expect( shortcutAriaLabel.undefined( key, isAppleOSFalse ) ).toBe(
+				label
+			);
+			expect( shortcutAriaLabel.undefined( key, isAppleOSTrue ) ).toBe(
+				label
+			);
+			expect(
+				shortcutAriaLabel.primaryShift( key, isAppleOSFalse )
+			).toBe( 'Control + Shift + ' + label );
+			expect( shortcutAriaLabel.primaryShift( key, isAppleOSTrue ) ).toBe(
+				'Shift Command ' + label
+			);
+		}
+	);
+
+	it( 'translates the readable standalone punctuation names', () => {
+		const previousLocale = getLocaleData();
+		setLocaleData( {
+			Backslash: [ 'Barra inversa' ],
+			'Forward-slash': [ 'Barra obliqua' ],
+			Plus: [ 'Più' ],
+			Minus: [ 'Meno' ],
+		} );
+
+		try {
+			expect( shortcutAriaLabel.undefined( '\\' ) ).toBe(
+				'Barra inversa'
+			);
+			expect( shortcutAriaLabel.undefined( '/' ) ).toBe(
+				'Barra obliqua'
+			);
+			expect( shortcutAriaLabel.undefined( '+' ) ).toBe( 'Più' );
+			expect( shortcutAriaLabel.undefined( '-' ) ).toBe( 'Meno' );
+		} finally {
+			resetLocaleData( previousLocale );
+		}
+	} );
+
 	describe( 'primary', () => {
 		it( 'should output "Control + Period" on Windows', () => {
 			const shortcut = shortcutAriaLabel.primary( '.', isAppleOSFalse );
