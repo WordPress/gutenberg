@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p><strong>t<a href="https://wordpress.org/gutenberg">es</a>t</strong></p>
-<!-- /wp:paragraph -->
