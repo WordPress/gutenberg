@@ -27,6 +27,28 @@ export function getDefaultBuildConcurrency(
 }
 
 /**
+ * Get the build concurrency: `WP_BUILD_CONCURRENCY` when set, otherwise the
+ * default.
+ *
+ * @param {string | undefined} value Value of `WP_BUILD_CONCURRENCY`.
+ * @return {number} Build concurrency.
+ */
+export function getBuildConcurrency(
+	value = process.env.WP_BUILD_CONCURRENCY
+) {
+	if ( ! value ) {
+		return getDefaultBuildConcurrency();
+	}
+	const concurrency = Number( value );
+	if ( ! Number.isInteger( concurrency ) || concurrency < 1 ) {
+		throw new Error(
+			`WP_BUILD_CONCURRENCY must be a whole number of 1 or more, not "${ value }".`
+		);
+	}
+	return concurrency;
+}
+
+/**
  * Set the maximum number of concurrent esbuild builds.
  *
  * @param {number} concurrency Build concurrency.

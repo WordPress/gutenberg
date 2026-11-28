@@ -71,6 +71,8 @@ Gutenberg's own build does not support the flag yet. Its `lib/client-assets.php`
 
 By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
 
+Set the `WP_BUILD_CONCURRENCY` environment variable to a whole number to use a different limit, for example `WP_BUILD_CONCURRENCY=4` on a machine with 4 cores and enough memory.
+
 ### Testing Generated Styles
 
 Generated CSS output skips automatic style injection in Node-based environments

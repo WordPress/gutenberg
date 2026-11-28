@@ -82,6 +82,8 @@ jobs:
 
             - name: Npm build
               run: npm run build
+              env:
+                  WP_BUILD_CONCURRENCY: 4
 
             # Wider than the `build*` directories, because the build also emits
             # generated files next to sources: the block parsers, the icon

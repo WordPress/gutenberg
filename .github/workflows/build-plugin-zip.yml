@@ -271,6 +271,7 @@ jobs:
                   NO_CHECKS: 'true'
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+                  WP_BUILD_CONCURRENCY: 4
 
             # When using archive: false to upload an artifact, the file name is used and the name input is ignored.
             # This ensures unique artifiact names for `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE`.
