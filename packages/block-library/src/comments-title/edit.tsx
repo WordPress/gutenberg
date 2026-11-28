@@ -38,7 +38,7 @@ export default function Edit(
 		levelOptions,
 	} = attributes;
 	const { postId, postType } = context;
-	const TagName = ( 'h' + level ) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+	const TagName = 'h' + level;
 	const [ rawTitle ] = useEntityProp< string >(
 		'postType',
 		postType!,

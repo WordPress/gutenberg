@@ -16,10 +16,4 @@ export const settings: BlockModule< CommentsTitleAttributes >[ 'settings' ] = {
 	example: {},
 };
 
-export const init = () =>
-	initBlock( {
-		name,
-		metadata:
-			metadata as BlockModule< CommentsTitleAttributes >[ 'metadata' ],
-		settings,
-	} );
+export const init = () => initBlock( { name, metadata, settings } );
