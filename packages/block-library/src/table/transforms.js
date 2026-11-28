@@ -19,9 +19,13 @@ const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {
 	},
 } );
 
-const tablePasteSchema = ( args ) => ( {
-	table: {
+const tablePasteSchema = ( args ) => {
+	const { phrasingContentSchema, isPaste } = args;
+	const table = {
 		children: {
+			caption: {
+				children: phrasingContentSchema,
+			},
 			thead: {
 				allowEmpty: true,
 				children: tableContentPasteSchema( args ),
@@ -35,19 +39,73 @@ const tablePasteSchema = ( args ) => ( {
 				children: tableContentPasteSchema( args ),
 			},
 		},
-	},
-} );
+	};
+
+	return {
+		table,
+		// Raw tables already match the transform without a figure wrapper.
+		...( isPaste && {
+			figure: {
+				require: [ 'table' ],
+				children: {
+					table,
+					figcaption: {
+						children: phrasingContentSchema,
+					},
+				},
+			},
+		} ),
+	};
+};
+
+function isTable( node ) {
+	if ( node.nodeName === 'TABLE' ) {
+		return true;
+	}
+
+	return (
+		node.nodeName === 'FIGURE' &&
+		node.querySelectorAll( 'table' ).length === 1 &&
+		node.querySelectorAll( 'figcaption' ).length <= 1 &&
+		! (
+			node.querySelector( 'figcaption' ) &&
+			node.querySelector( 'table > caption' )
+		) &&
+		Array.from( node.childNodes ).every(
+			( child ) =>
+				child.nodeName === 'TABLE' ||
+				child.nodeName === 'FIGCAPTION' ||
+				( child.nodeName === 'FIGURE' && isTable( child ) ) ||
+				( child.nodeType === child.TEXT_NODE &&
+					! child.textContent.trim() )
+		)
+	);
+}
 
 const transforms = {
 	from: [
 		{
 			type: 'raw',
-			selector: 'table',
+			isMatch: isTable,
 			schema: tablePasteSchema,
 			transform: ( node ) => {
-				const attributes = Array.from( node.children ).reduce(
+				const table =
+					node.nodeName === 'TABLE'
+						? node
+						: node.querySelector( 'table' );
+				const figureCaption =
+					node.nodeName === 'FIGURE'
+						? Array.from(
+								node.querySelectorAll( 'figcaption' )
+							).find( ( element ) => ! table.contains( element ) )
+						: null;
+				const caption = figureCaption || table.caption;
+				const attributes = Array.from( table.children ).reduce(
 					( sectionAcc, section ) => {
-						if ( ! section.children.length ) {
+						if (
+							section.nodeName === 'CAPTION' ||
+							! section.children.length
+						) {
 							return sectionAcc;
 						}
 
@@ -104,7 +162,7 @@ const transforms = {
 						sectionAcc[ sectionName ] = sectionAttributes;
 						return sectionAcc;
 					},
-					{}
+					{ caption: caption?.innerHTML }
 				);
 
 				return createBlock( 'core/table', attributes );
