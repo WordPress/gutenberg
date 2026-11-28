@@ -10,6 +10,8 @@ export type RawHTMLProps = {
 /**
  * Component used to render unescaped HTML.
  *
+ * RawHTML does not sanitize its children. Only pass trusted or sanitized HTML.
+ *
  * Note: The `renderElement` serializer will remove the `div` wrapper
  * unless non-children props are present; typically when preparing a block for saving.
  *
@@ -17,7 +19,8 @@ export type RawHTMLProps = {
  * ```jsx
  * import { RawHTML } from '@wordpress/element';
  *
- * const Component = () => <RawHTML><h3>Hello world</h3></RawHTML>;
+ * const html = '<h3>Hello world</h3>';
+ * const Component = () => <RawHTML>{ html }</RawHTML>;
  * // Edit: <div><h3>Hello world</h3></div>
  * // save: <h3>Hello world</h3>
  * ```
