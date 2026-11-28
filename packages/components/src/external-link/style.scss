@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/mixins";
 
 .components-external-link {
+	border-radius: var(--wpds-border-radius-sm);
 	color: var(--wpds-color-foreground-interactive-brand);
 	text-decoration: none;
 
@@ -16,7 +17,7 @@
 	&:focus {
 		// Override style from wp-admin common.css.
 		box-shadow: none;
-		border-radius: 0;
+		border-radius: var(--wpds-border-radius-sm);
 
 		&:not(:active) {
 			@include mixins.outset-ring__focus();

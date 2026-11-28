@@ -296,4 +296,14 @@ describe( 'UploadProgressSnackbar', () => {
 			} )
 		);
 	} );
+
+	it( 'removes the progress notice when it unmounts during an upload', () => {
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
+		const { unmount } = render( <UploadProgressSnackbar /> );
+		expect( mockRemoveNotice ).not.toHaveBeenCalled();
+
+		unmount();
+
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+	} );
 } );

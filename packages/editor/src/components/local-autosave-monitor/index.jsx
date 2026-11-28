@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { store as noticesStore } from '@wordpress/notices';
 import AutosaveMonitor from '../autosave-monitor';
 import {
@@ -11,6 +11,8 @@ import {
 	localAutosaveClear,
 } from '../../store/local-autosave';
 import { store as editorStore } from '../../store';
+import { BROWSER_BACKUP_NOTICE_ID } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 import useEntityContainsSnapshot from '../provider/use-entity-contains-snapshot';
 
 const requestIdleCallback = window.requestIdleCallback
@@ -129,31 +131,37 @@ function useAutosaveNotice() {
 			return;
 		}
 
-		const { createWarningNotice, removeNotice } =
-			registry.dispatch( noticesStore );
-		const { editPost, resetEditorBlocks } =
-			registry.dispatch( editorStore );
-
-		const id = 'wpEditorAutosaveRestore';
+		const { createWarningNotice } = registry.dispatch( noticesStore );
+		const { viewBrowserBackup } = unlock(
+			registry.dispatch( editorStore )
+		);
 
 		createWarningNotice(
-			__(
-				'The backup of this post in your browser is different from the version below.'
-			),
+			// Backups written before the time was recorded don't have one.
+			localAutosave.time
+				? sprintf(
+						/* translators: %s: Date and time the backup was made. */
+						__(
+							'The backup of this post in your browser from %s is different from the version below.'
+						),
+						dateI18n(
+							getDateSettings().formats.datetime,
+							localAutosave.time
+						)
+					)
+				: __(
+						'The backup of this post in your browser is different from the version below.'
+					),
 			{
-				id,
+				id: BROWSER_BACKUP_NOTICE_ID,
 				actions: [
 					{
-						label: __( 'Restore the backup' ),
-						onClick() {
-							const {
-								content: editsContent,
-								...editsWithoutContent
-							} = edits;
-							editPost( editsWithoutContent );
-							resetEditorBlocks( parse( edits.content ) );
-							removeNotice( id );
-						},
+						label: __( 'View the backup' ),
+						onClick: () =>
+							viewBrowserBackup( {
+								...edits,
+								time: localAutosave.time,
+							} ),
 					},
 				],
 			}

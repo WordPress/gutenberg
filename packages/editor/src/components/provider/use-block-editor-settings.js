@@ -30,17 +30,44 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
+/**
+ * The synced patterns the inserter offers: every pattern the user can read.
+ *
+ * They load in the `view` context. The `edit` context only includes the
+ * patterns the user can edit, and an author can still use an administrator's
+ * pattern. Every pattern the user can edit, they can also read.
+ *
+ * @param {(store: Object) => Object} select Registry select.
+ * @return {Object[]|null|undefined} Pattern records, undefined while loading,
+ *                                    or null if the request failed.
+ */
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
-	const { getEntityRecords } = select( coreStore );
-	return getEntityRecords( 'postType', 'wp_block', {
+	const { getEntityRecords, hasFinishedResolution } = select( coreStore );
+	const query = {
 		per_page: -1,
+		context: 'view',
 		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-	} );
+	};
+	const records = getEntityRecords( 'postType', 'wp_block', query );
+	if ( records ) {
+		return records;
+	}
+	return hasFinishedResolution( 'getEntityRecords', [
+		'postType',
+		'wp_block',
+		query,
+	] )
+		? null
+		: undefined;
 }
 
 function __experimentalUserPatternCategoriesSelect( select ) {
 	return select( coreStore ).getUserPatternCategories();
+}
+
+function currentUserIdSelect( select ) {
+	return select( coreStore ).getCurrentUser()?.id;
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -103,6 +130,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
@@ -133,6 +161,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -211,6 +240,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				bigImageSizeThreshold: baseData?.image_size_threshold,
 				imageStripMeta: baseData?.image_strip_meta,
 				imageMaxBitDepth: baseData?.image_max_bit_depth,
+				generateAnimatedImageSubsizes:
+					baseData?.generate_animated_image_subsizes,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -367,6 +398,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			bigImageSizeThreshold,
 			imageStripMeta,
 			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode,
@@ -409,6 +441,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
@@ -492,6 +525,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		bigImageSizeThreshold,
 		imageStripMeta,
 		imageMaxBitDepth,
+		generateAnimatedImageSubsizes,
 		isNavigationOverlayContext,
 	] );
 }

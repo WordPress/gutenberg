@@ -38,6 +38,18 @@ test.describe( 'Post revisions', () => {
 		// Save draft again to create second revision.
 		await editor.saveDraft();
 
+		// An autosave of the author's own draft updates the post without
+		// creating a revision. Reload so that the editor has no unsaved edits.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' - Autosaved' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		await page.reload();
+
 		// Open the post settings sidebar and click the Revisions button.
 		await editor.openDocumentSettingsSidebar();
 		const settingsSidebar = page.getByRole( 'region', {
@@ -77,11 +89,10 @@ test.describe( 'Post revisions', () => {
 		await restoreButton.click();
 
 		// Verify the success notice.
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Restored to revision' } )
-		).toBeVisible();
+		const restoredNotice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Restored to revision' } );
+		await expect( restoredNotice ).toBeVisible();
 
 		// Verify the original content is restored.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -90,6 +101,49 @@ test.describe( 'Post revisions', () => {
 				attributes: { content: 'Original content' },
 			},
 		] );
+
+		// The autosaved content that was replaced is now stored as a revision.
+		const hasAutosavedRevision = () =>
+			page.evaluate( async () => {
+				const postId = window.wp.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				const revisions = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }/revisions?context=edit`,
+				} );
+				return revisions.some( ( revision ) =>
+					revision.content.raw.includes(
+						'Original content - Updated content - Autosaved'
+					)
+				);
+			} );
+		await expect.poll( hasAutosavedRevision ).toBe( true );
+
+		// Undo the restore.
+		await restoredNotice.getByRole( 'button', { name: 'Undo' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Restore undone.' } )
+		).toBeVisible();
+
+		// Verify the content from before the restore is back, and is still
+		// there after a reload.
+		const contentBeforeRestore = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Original content - Updated content - Autosaved',
+				},
+			},
+		];
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( contentBeforeRestore );
+		await page.reload();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( contentBeforeRestore );
 	} );
 
 	test( 'should show revision changes in the code editor (@webkit)', async ( {
@@ -385,6 +439,83 @@ test.describe( 'Post revisions', () => {
 		await expect( titleBlock ).toBeVisible();
 		await expect( titleBlock ).not.toHaveClass( /has-warning/ );
 	} );
+
+	test( 'should move focus past paragraph blocks with Tab', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>First paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Second paragraph</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>First paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Second paragraph, changed</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		// Enter revisions mode.
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const firstBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			exact: true,
+		} );
+		const modifiedBlock = editor.canvas.getByRole( 'document', {
+			name: 'Modified block: Paragraph',
+		} );
+		await expect( modifiedBlock ).toHaveText( 'Second paragraph, changed' );
+
+		// Record whether the canvas root ever becomes an editing host. It
+		// does so asynchronously after a block is selected, so checking the
+		// attribute once could pass before it changes.
+		await editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+			window.__becameEditable = false;
+			new window.MutationObserver( () => {
+				if ( body.contentEditable === 'true' ) {
+					window.__becameEditable = true;
+				}
+			} ).observe( body, { attributeFilter: [ 'contenteditable' ] } );
+		} );
+
+		// Selecting a paragraph must not move focus to the canvas root, so
+		// Tab can continue to the next block and then leave the canvas.
+		await firstBlock.focus();
+		await expect( firstBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect( modifiedBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			page
+				.getByRole( 'navigation', { name: 'Document changes' } )
+				.getByRole( 'button', { name: 'Go to modified block' } )
+		).toBeFocused();
+
+		// A click also places a collapsed selection in the paragraph text.
+		await firstBlock.click();
+		await expect( firstBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect( modifiedBlock ).toBeFocused();
+
+		expect(
+			await editor.canvas
+				.locator( 'body' )
+				.evaluate( () => window.__becameEditable )
+		).toBe( false );
+	} );
 } );
 
 test.describe( 'Post revisions with classic meta boxes', () => {
@@ -503,6 +634,7 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			},
 		} );
 
+		await admin.editPost( post.id );
 		await admin.visitAdminPage(
 			'post.php',
 			`post=${ post.id }&action=edit&revision=99999999`

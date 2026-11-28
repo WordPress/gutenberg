@@ -68,7 +68,7 @@ In particular, it should…
 
 ## Benchmarks
 
-The following results were produced under Node v10.15.3 (LTS) on a MacBook Pro (Late 2016) 2.9 GHz Intel Core i7.
+The following results are historical: they were produced under Node v10.15.3 (LTS) on a MacBook Pro (Late 2016) 2.9 GHz Intel Core i7, and the script that generated them has since been removed.
 
 > `@wordpress/is-shallow-equal (type specific) (object, equal) x 4,519,009 ops/sec ±1.09% (90 runs sampled)` >`@wordpress/is-shallow-equal (type specific) (object, same) x 795,527,700 ops/sec ±0.24% (93 runs sampled)` >`@wordpress/is-shallow-equal (type specific) (object, unequal) x 4,841,640 ops/sec ±0.94% (93 runs sampled)` >`@wordpress/is-shallow-equal (type specific) (array, equal) x 106,393,795 ops/sec ±0.16% (94 runs sampled)` >`@wordpress/is-shallow-equal (type specific) (array, same) x 800,741,511 ops/sec ±0.22% (95 runs sampled)` >`@wordpress/is-shallow-equal (type specific) (array, unequal) x 49,178,977 ops/sec ±1.99% (82 runs sampled)`
 >
@@ -83,15 +83,6 @@ The following results were produced under Node v10.15.3 (LTS) on a MacBook Pro (
 > `shallow-equals (object, equal) x 8,380,550 ops/sec ±0.31% (90 runs sampled)` >`shallow-equals (object, same) x 27,583,073 ops/sec ±0.60% (91 runs sampled)` >`shallow-equals (object, unequal) x 8,954,268 ops/sec ±0.71% (92 runs sampled)` >`shallow-equals (array, equal) x 104,437,640 ops/sec ±0.22% (96 runs sampled)` >`shallow-equals (array, same) x 141,850,542 ops/sec ±0.25% (93 runs sampled)` >`shallow-equals (array, unequal) x 47,964,211 ops/sec ±1.51% (84 runs sampled)`
 >
 > `fbjs/lib/shallowEqual (object, equal) x 3,366,709 ops/sec ±0.35% (93 runs sampled)` >`fbjs/lib/shallowEqual (object, same) x 794,825,194 ops/sec ±0.24% (94 runs sampled)` >`fbjs/lib/shallowEqual (object, unequal) x 3,612,268 ops/sec ±0.37% (94 runs sampled)` >`fbjs/lib/shallowEqual (array, equal) x 1,613,800 ops/sec ±0.23% (90 runs sampled)` >`fbjs/lib/shallowEqual (array, same) x 794,861,384 ops/sec ±0.24% (93 runs sampled)` >`fbjs/lib/shallowEqual (array, unequal) x 1,648,398 ops/sec ±0.77% (92 runs sampled)`
-
-You can run the benchmarks yourselves by cloning the repository, installing dependencies, and running the `benchmark/index.js` script:
-
-```
-git clone https://github.com/WordPress/gutenberg.git
-npm install
-npm run build
-node ./packages/is-shallow-equal/benchmark
-```
 
 ## Contributing to this package
 

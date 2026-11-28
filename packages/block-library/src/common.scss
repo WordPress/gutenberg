@@ -50,6 +50,16 @@
 	text-align: right;
 }
 
+// A text gradient makes the letters transparent. A block instance's text or
+// link color, or a color applied to selected text, fills them again. The
+// :root prefix beats a gradient from global styles, while the block
+// instance's own gradient is inline and still wins.
+:root .has-text-color,
+:root .has-inline-color,
+:root .has-link-color a {
+	-webkit-text-fill-color: currentColor;
+}
+
 // Fit Text
 .has-fit-text {
 	white-space: nowrap !important;
@@ -281,3 +291,17 @@ html :where(.is-position-sticky) {
 	}
 }
 /*!rtl:end:ignore*/
+
+// Translate axes are set separately by each style layer. They must not pass to
+// nested blocks, which would otherwise inherit an ancestor's offset.
+@property --wp--style--translate-x {
+	syntax: "<length-percentage>";
+	inherits: false;
+	initial-value: 0;
+}
+
+@property --wp--style--translate-y {
+	syntax: "<length-percentage>";
+	inherits: false;
+	initial-value: 0;
+}

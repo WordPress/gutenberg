@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
 import {
 	useContext,
@@ -7,7 +8,7 @@ import {
 } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { Context } from './context';
 
 export const Popover = forwardRef<
@@ -61,19 +62,27 @@ export const Popover = forwardRef<
 
 	const renderMenu = useCallback(
 		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
-			<Styled.MenuMotionRoot>
-				<Styled.MenuSurface
+			<div className={ styles[ 'menu-motion-root' ] }>
+				<div
 					{ ...htmlProps }
-					variant={ menuContext.variant }
+					className={ clsx(
+						styles[ 'menu-surface' ],
+						htmlProps.className,
+						{
+							[ styles[ 'is-toolbar' ] ]:
+								menuContext.variant === 'toolbar',
+						}
+					) }
 				/>
-			</Styled.MenuMotionRoot>
+			</div>
 		),
 		[ menuContext.variant ]
 	);
 
 	return (
-		<Styled.Menu
+		<Ariakit.Menu
 			{ ...otherProps }
+			className={ clsx( styles.menu, otherProps.className ) }
 			ref={ ref }
 			modal={ modal }
 			store={ menuContext.store }

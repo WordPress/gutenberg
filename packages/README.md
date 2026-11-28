@@ -60,7 +60,7 @@ When creating a new package, you need to provide at least the following. Package
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
     	"engines": {
-    		"node": ">=18.12.0"
+    		"node": ">=22.13.0"
     	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
@@ -113,7 +113,7 @@ When creating a new package, you need to provide at least the following. Package
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 1. `CHANGELOG.md` file containing at least:
 
-    ```
+    ```md
     <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
     ## Unreleased
@@ -267,13 +267,17 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
+Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries are optional for trivial changes or work with no consumer impact, such as tests and behavior-preserving refactors. Put new entries under `## Unreleased` at the top of the file, creating the heading if needed.
 
-Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
+### Writing concise entries
+
+-   Prefer one short sentence naming the affected API or component and what changed for consumers.
+-   Omit descriptions of behavior that remains unchanged and internal implementation details. Avoid repeating the same change across subsections.
+-   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
 ### Changelog Entry Format
 
-Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period.
+Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
 
 Example:
 
@@ -405,6 +409,8 @@ Ensure that the `build-types` directory will be included in the published packag
 ## Supported Node.js versions
 
 WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required version of Node.js is specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
+
+When type-checking a published Node.js tool, use the `@types/node` major that matches its oldest supported Node.js major, and add the package to the matching group in [`syncpack.config.mjs`](../syncpack.config.mjs). Repository-only tools can use the development Node.js version. The [`@wordpress/build` consumer test](../.github/workflows/wp-build-consumer.yml) also builds a small plugin on the exact minimum runtime. It catches calls to APIs added later in the same major on the code paths that build runs, including JavaScript outside the type check.
 
 ## Optimizing for bundlers
 

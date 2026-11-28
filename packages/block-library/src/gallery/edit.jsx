@@ -1,14 +1,7 @@
 import clsx from 'clsx';
 import {
-	SelectControl as WCSelectControl,
-	ToggleControl,
-	RangeControl,
 	MenuGroup,
 	MenuItem,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
 	Button,
 } from '@wordpress/components';
@@ -23,7 +16,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -37,46 +30,23 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import {
-	defaultColumnsNumber,
-	isGalleryFlexLayout,
-	isObject,
-	pickRelevantMediaFiles,
-} from './shared';
+import { getImageAttributes, isGalleryFlexLayout } from './shared';
 import { getHrefAndDestination } from './utils';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import {
-	getUpdatedLinkTargetSettings,
-	getImageSizeAttributes,
-} from '../image/utils';
+import { getDefaultLinkDestination } from '../image/utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_LIGHTBOX,
-	DEFAULT_MEDIA_SIZE_SLUG,
-	MAX_COLUMNS,
 } from './constants';
-import useImageSizes from './use-image-sizes';
-import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
+import useApplyGallerySettings from './use-apply-gallery-settings';
 import GalleryStyles from './gallery-styles';
+import GalleryControls from './controls';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
-import { SortImagesControl, SourceOrderControl } from './order-controls';
-import {
-	getDynamicSource,
-	ATTACHED_MEDIA,
-	DEFAULT_ORDERBY,
-	DEFAULT_ORDER,
-} from './dynamic-source';
-import { hasSortableImages, sortImageBlocks } from './order-images';
-import {
-	getViewportGalleryStyle,
-	getUpdatedGalleryStyle,
-	isValidGalleryColumns,
-} from './responsive-styles';
+import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
 
 const LINK_OPTIONS = [
 	{
@@ -105,20 +75,6 @@ const LINK_OPTIONS = [
 		noticeText: __( 'None' ),
 	},
 ];
-const NAVIGATION_BUTTON_TYPE_OPTIONS = [
-	{
-		label: __( 'Icon' ),
-		value: 'icon',
-	},
-	{
-		label: __( 'Text' ),
-		value: 'text',
-	},
-	{
-		label: __( 'Both' ),
-		value: 'both',
-	},
-];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PLACEHOLDER_TEXT = __(
@@ -134,11 +90,8 @@ export default function GalleryEdit( props ) {
 		attributes,
 		className,
 		clientId,
-		isSelected,
 		insertBlocksAfter,
-		isContentLocked,
 		context,
-		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const postId = context?.postId;
@@ -151,13 +104,7 @@ export default function GalleryEdit( props ) {
 	// `'disabled'`, where structural affordances are hidden.
 	const blockEditingMode = useBlockEditingMode();
 
-	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
-		useSettings(
-			'blocks.core/image.lightbox',
-			'dimensions.aspectRatios.default',
-			'dimensions.aspectRatios.theme',
-			'dimensions.defaultAspectRatios'
-		);
+	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
 
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
@@ -165,307 +112,84 @@ export default function GalleryEdit( props ) {
 			)
 		: LINK_OPTIONS;
 
-	const {
-		align,
-		navigationButtonType,
-		columns,
-		imageCrop,
-		randomOrder,
-		linkTarget,
-		linkTo,
-		sizeSlug,
-		aspectRatio,
-		layout,
-	} = attributes;
+	const { layout } = attributes;
+	const isDynamic = !! attributes.dynamicContent;
+	// The site default only applies to images being added, which a dynamic
+	// gallery never has, so match the server render.
+	const linkTo =
+		attributes.linkTo ??
+		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkDestination() );
+	const galleryAttributes = { ...attributes, linkTo };
 	const isFlexLayout = isGalleryFlexLayout( layout );
-	const previousLayoutRef = useRef( layout );
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceInnerBlocks,
-		updateBlockAttributes,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+	const { getBlocks } = useSelect( blockEditorStore );
+	const { replaceInnerBlocks, updateBlockAttributes, selectBlock } =
+		useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	useEffect( () => {
-		// Variations replace the whole layout object. Carry Grid-only settings
-		// across a layout type change so switching back restores them.
-		const previousLayout = previousLayoutRef.current;
-		previousLayoutRef.current = layout;
+	const { innerBlockImages, multiGallerySelection, selectedStyleState } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockName,
+					getMultiSelectedBlockClientIds,
+					getBlocks: _getBlocks,
+					getSelectedBlockStyleState,
+				} = select( blockEditorStore );
+				const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
-		if (
-			! isObject( previousLayout ) ||
-			! isObject( layout ) ||
-			previousLayout.type === layout.type
-		) {
-			return;
-		}
-
-		const nextLayout = { ...layout };
-		let hasPreservedGridSetting = false;
-
-		if (
-			! Object.hasOwn( layout, 'columnCount' ) &&
-			Number.isInteger( previousLayout.columnCount ) &&
-			previousLayout.columnCount > 0
-		) {
-			nextLayout.columnCount = previousLayout.columnCount;
-			hasPreservedGridSetting = true;
-		}
-
-		if (
-			! Object.hasOwn( layout, 'minimumColumnWidth' ) &&
-			typeof previousLayout.minimumColumnWidth === 'string'
-		) {
-			nextLayout.minimumColumnWidth = previousLayout.minimumColumnWidth;
-			hasPreservedGridSetting = true;
-		}
-
-		if ( hasPreservedGridSetting ) {
-			previousLayoutRef.current = nextLayout;
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: nextLayout } );
-		}
-	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
-
-	const {
-		getBlock,
-		getSettings,
-		innerBlockImages,
-		multiGallerySelection,
-		selectedStyleState,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getMultiSelectedBlockClientIds,
-				getSettings: _getSettings,
-				getBlock: _getBlock,
-				getSelectedBlockStyleState,
-			} = select( blockEditorStore );
-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
-
-			return {
-				getBlock: _getBlock,
-				getSettings: _getSettings,
-				innerBlockImages:
-					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
-				multiGallerySelection:
-					multiSelectedClientIds.length &&
-					multiSelectedClientIds.every(
-						( _clientId ) =>
-							getBlockName( _clientId ) === 'core/gallery'
-					),
-				selectedStyleState: getSelectedBlockStyleState( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					innerBlockImages: _getBlocks( clientId ),
+					multiGallerySelection:
+						multiSelectedClientIds.length &&
+						multiSelectedClientIds.every(
+							( _clientId ) =>
+								getBlockName( _clientId ) === 'core/gallery'
+						),
+					selectedStyleState: getSelectedBlockStyleState( clientId ),
+				};
+			},
+			[ clientId ]
+		);
 	const isViewportStyleState =
 		selectedStyleState?.viewport &&
 		selectedStyleState.viewport !== 'default';
-	const viewportStyle = isViewportStyleState
-		? getViewportGalleryStyle(
-				attributes.style,
-				selectedStyleState.viewport
-			)
-		: {};
-	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
-	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
-	// Normalized so a Gallery with no aspect ratio and one explicitly set to
-	// Original compare equal, and a viewport override matching either is
-	// dropped rather than stored.
-	const baseAspectRatio = aspectRatio || 'auto';
-	const hasViewportColumns =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'columns' ) &&
-		isValidGalleryColumns( viewportStyle.columns );
-	const hasViewportImageCrop =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
-		typeof viewportStyle.imageCrop === 'boolean';
-	const hasViewportAspectRatio =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'aspectRatio' ) &&
-		typeof viewportStyle.aspectRatio === 'string' &&
-		!! viewportStyle.aspectRatio;
-	const activeColumns = hasViewportColumns
-		? viewportStyle.columns
-		: baseColumns;
-	const activeImageCrop = hasViewportImageCrop
-		? viewportStyle.imageCrop
-		: baseImageCrop;
-	const activeAspectRatio = hasViewportAspectRatio
-		? viewportStyle.aspectRatio
-		: baseAspectRatio;
-
-	const images = useMemo(
-		() =>
-			innerBlockImages?.map( ( block ) => ( {
-				clientId: block.clientId,
-				id: block.attributes.id,
-				url: block.attributes.url,
-				attributes: block.attributes,
-				fromSavedContent: Boolean( block.originalContent ),
-			} ) ),
-		[ innerBlockImages ]
-	);
 
 	const imageData = useGetMedia( innerBlockImages );
+	const mediaById = useMemo(
+		() => new Map( imageData.map( ( media ) => [ media.id, media ] ) ),
+		[ imageData ]
+	);
 
-	const newImages = useGetNewImages( images, imageData );
-
-	const hasImages = !! images.length;
-	const isDynamic = !! attributes.dynamicContent;
+	const hasImages = !! innerBlockImages.length;
 
 	// The static "Order by" control shows the last sort applied from it, for as
 	// long as the images stay in the sequence that sort produced. Any other
 	// change to the images (a drag, an addition, a removal) drops it back to
 	// "Custom"; it never reports an order the user didn't choose. Nothing is
-	// stored, so this is local state rather than an attribute.
+	// stored, so this is local state rather than an attribute. It lives here,
+	// not in the Settings panel, which unmounts when the block is deselected.
 	const [ appliedSort, setAppliedSort ] = useState( null );
-	const currentOrder =
-		appliedSort &&
-		appliedSort.clientIds.length === innerBlockImages.length &&
-		appliedSort.clientIds.every(
-			( id, index ) => innerBlockImages[ index ].clientId === id
-		)
-			? appliedSort.order
-			: null;
-	const canSortImages = hasSortableImages( innerBlockImages, imageData );
 
 	// Dynamic mode (resolving images from a source instead of inner blocks):
 	// source resolution, the editor-preview blocks, and the mode/ordering
 	// actions.
 	const dynamic = useDynamicGallery( {
-		attributes,
+		attributes: galleryAttributes,
 		setAttributes,
 		clientId,
 		postId,
 		postType,
 	} );
 
-	// State that drives counts/size options should reflect the dynamic media
-	// when the gallery is in dynamic mode.
-	const displayedImageCount = isDynamic
-		? dynamic.dynamicMedia.length
-		: images.length;
-
-	// Check if there is at least one image with lightbox enabled. In dynamic
-	// mode the images inherit the gallery's link setting, so the lightbox is on
-	// when the gallery links images to the lightbox.
-	let hasLightboxImages;
-	if ( isDynamic ) {
-		hasLightboxImages = linkTo === LINK_DESTINATION_LIGHTBOX;
-	} else if ( lightboxSetting?.enabled ) {
-		hasLightboxImages =
-			images.filter(
-				( image ) =>
-					image.attributes?.lightbox?.enabled === undefined ||
-					image.attributes?.lightbox?.enabled === true
-			).length > 0;
-	} else {
-		hasLightboxImages =
-			images.filter( ( image ) => image.attributes.lightbox?.enabled )
-				.length > 0;
-	}
-
-	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-	const aspectRatioOptions = [
-		{
-			label: _x(
-				'Original',
-				'Aspect ratio option for dimensions control'
-			),
-			value: 'auto',
-		},
-		...( showDefaultRatios ? defaultOptions || [] : [] ),
-		...( themeOptions || [] ),
-	];
-
-	useEffect( () => {
-		newImages?.forEach( ( newImage ) => {
-			// Update the images data without creating new undo levels.
-			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( newImage.attributes ),
-				id: newImage.id,
-				align: undefined,
-			} );
-		} );
-	}, [ newImages ] );
-
-	const imageSizeOptions = useImageSizes(
-		isDynamic ? dynamic.dynamicMedia : imageData,
-		isSelected,
-		getSettings
+	useApplyGallerySettings( innerBlockImages, mediaById, ( imageAttributes ) =>
+		getImageAttributes(
+			galleryAttributes,
+			imageAttributes,
+			mediaById.get( imageAttributes.id )
+		)
 	);
-
-	/**
-	 * Determines the image attributes that should be applied to an image block
-	 * after the gallery updates.
-	 *
-	 * The gallery will receive the full collection of images when a new image
-	 * is added. As a result we need to reapply the image's original settings if
-	 * it already existed in the gallery. If the image is in fact new, we need
-	 * to apply the gallery's current settings to the image.
-	 *
-	 * @param {Object} imageAttributes Media object for the actual image.
-	 * @return {Object}                Attributes to set on the new image block.
-	 */
-	function buildImageAttributes( imageAttributes ) {
-		const image = imageAttributes.id
-			? imageData.find( ( { id } ) => id === imageAttributes.id )
-			: null;
-
-		let newClassName;
-		if ( imageAttributes.className && imageAttributes.className !== '' ) {
-			newClassName = imageAttributes.className;
-		}
-
-		let newLinkTarget;
-		if ( imageAttributes.linkTarget || imageAttributes.rel ) {
-			// When transformed from image blocks, the link destination and rel attributes are inherited.
-			newLinkTarget = {
-				linkTarget: imageAttributes.linkTarget,
-				rel: imageAttributes.rel,
-			};
-		} else {
-			// When an image is added, update the link destination and rel attributes according to the gallery settings
-			newLinkTarget = getUpdatedLinkTargetSettings(
-				linkTarget,
-				attributes
-			);
-		}
-
-		return {
-			...pickRelevantMediaFiles( image, sizeSlug ),
-			...getHrefAndDestination(
-				image,
-				linkTo,
-				imageAttributes?.linkDestination
-			),
-			...newLinkTarget,
-			className: newClassName,
-			sizeSlug,
-			caption:
-				imageAttributes.caption.length > 0
-					? imageAttributes.caption
-					: image.caption?.raw,
-			alt: imageAttributes.alt || image.alt_text,
-			aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
-			scale: aspectRatio && aspectRatio !== 'auto' ? 'cover' : undefined,
-		};
-	}
 
 	function isValidFileType( file ) {
 		const mediaTypeSelector = file.type;
@@ -482,17 +206,13 @@ export default function GalleryEdit( props ) {
 			Object.prototype.toString.call( selectedImages ) ===
 			'[object FileList]';
 
-		const imageArray = newFileUploads
-			? Array.from( selectedImages ).map( ( file ) => {
-					if ( ! file.url ) {
-						return {
-							blob: createBlobURL( file ),
-						};
-					}
-
-					return file;
-				} )
-			: selectedImages;
+		// Uploaded files become blobs before validation, so only picked or
+		// dropped files can be rejected.
+		const imageArray = Array.from( selectedImages, ( file ) =>
+			file.url || ( ! newFileUploads && ! isValidFileType( file ) )
+				? file
+				: { blob: file.blob || createBlobURL( file ) }
+		);
 
 		if ( ! imageArray.every( isValidFileType ) ) {
 			createErrorNotice(
@@ -503,17 +223,9 @@ export default function GalleryEdit( props ) {
 			);
 		}
 
-		const processedImages = imageArray
-			.filter( ( file ) => file.url || isValidFileType( file ) )
-			.map( ( file ) => {
-				if ( ! file.url ) {
-					return {
-						blob: file.blob || createBlobURL( file ),
-					};
-				}
-
-				return file;
-			} );
+		const processedImages = imageArray.filter(
+			( file ) => file.url || isValidFileType( file )
+		);
 
 		// Because we are reusing existing innerImage blocks any reordering
 		// done in the media library will be lost so we need to reapply that ordering
@@ -526,19 +238,18 @@ export default function GalleryEdit( props ) {
 			{}
 		);
 
+		const selectedIds = new Set( processedImages.map( ( img ) => img.id ) );
 		const existingImageBlocks = ! newFileUploads
 			? innerBlockImages.filter( ( block ) =>
-					processedImages.find(
-						( img ) => img.id === block.attributes.id
-					)
+					selectedIds.has( block.attributes.id )
 				)
 			: innerBlockImages;
 
+		const existingIds = new Set(
+			existingImageBlocks.map( ( block ) => block.attributes.id )
+		);
 		const newImageList = processedImages.filter(
-			( img ) =>
-				! existingImageBlocks.find(
-					( existingImg ) => img.id === existingImg.attributes.id
-				)
+			( img ) => ! existingIds.has( img.id )
 		);
 
 		const newBlocks = newImageList.map( ( image ) => {
@@ -568,74 +279,38 @@ export default function GalleryEdit( props ) {
 		}
 	}
 
-	function selectRandomOrder() {
-		setAttributes( { randomOrder: true } );
-	}
-
-	// Choosing any other order turns "Random" off. Called straight after the
-	// edit that applies the order, and marked non-persistent so the two writes
-	// share one undo level: a single undo restores both the order and Random.
-	function clearRandomOrderAfterEdit() {
-		if ( randomOrder ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { randomOrder: false } );
-		}
-	}
-
-	// Reorders the inner image blocks in place. Left persistent on purpose so
-	// the sort is a single undoable step.
-	function sortImages( order ) {
-		const sortedBlocks = sortImageBlocks(
-			getBlock( clientId ).innerBlocks,
-			imageData,
-			order
-		);
-		replaceInnerBlocks( clientId, sortedBlocks );
-		clearRandomOrderAfterEdit();
-		setAppliedSort( {
-			order,
-			clientIds: sortedBlocks.map( ( block ) => block.clientId ),
-		} );
-	}
-
-	// "Custom" is the order arranged in the editor: it turns Random off and
-	// forgets any sort applied earlier, so the control reads "Custom" from
-	// here on rather than that sort.
-	function selectCustomOrder() {
-		setAttributes( { randomOrder: false } );
-		setAppliedSort( null );
-	}
-
-	function changeSourceOrder( { orderby, order } ) {
-		dynamic.setSourceOrder( orderby, order );
-		clearRandomOrderAfterEdit();
-	}
-
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	function updateInnerImages( getAttributes ) {
+		const images = getBlocks( clientId );
+		updateBlockAttributes(
+			images.map( ( block ) => block.clientId ),
+			Object.fromEntries(
+				images.map( ( block ) => [
+					block.clientId,
+					getAttributes(
+						block,
+						mediaById.get( block.attributes.id )
+					),
+				] )
+			),
+			{ uniqueByBlock: true }
+		);
+	}
+
 	function setLinkTo( value ) {
 		setAttributes( { linkTo: value } );
-		const changedAttributes = {};
-		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
-			const image = block.attributes.id
-				? imageData.find( ( { id } ) => id === block.attributes.id )
-				: null;
-
-			changedAttributes[ block.clientId ] = getHrefAndDestination(
-				image,
+		updateInnerImages( ( block, media ) =>
+			getHrefAndDestination(
+				media,
 				value,
 				false,
 				block.attributes,
 				lightboxSetting
-			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, {
-			uniqueByBlock: true,
-		} );
+			)
+		);
 		const linkToText = [ ...linkOptions ].find(
 			( linkType ) => linkType.value === value
 		);
@@ -653,166 +328,13 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
-	function setGallerySettings( settings ) {
-		if ( ! isViewportStyleState ) {
-			setAttributes( settings );
-			return;
-		}
-
-		setAttributes( {
-			style: getUpdatedGalleryStyle( {
-				style: attributes.style,
-				viewport: selectedStyleState.viewport,
-				baseSettings: {
-					columns: baseColumns,
-					imageCrop: baseImageCrop,
-					aspectRatio: baseAspectRatio,
-				},
-				settings,
-			} ),
-		} );
-	}
-
-	function setColumnsNumber( value ) {
-		setGallerySettings( { columns: value } );
-	}
-
-	function toggleImageCrop() {
-		setGallerySettings( { imageCrop: ! activeImageCrop } );
-	}
-
-	function toggleOpenInNewTab( openInNewTab ) {
-		const newLinkTarget = openInNewTab ? '_blank' : undefined;
-		setAttributes( { linkTarget: newLinkTarget } );
-		const changedAttributes = {};
-		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
-			changedAttributes[ block.clientId ] = getUpdatedLinkTargetSettings(
-				newLinkTarget,
-				block.attributes
-			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, {
-			uniqueByBlock: true,
-		} );
-		const noticeText = openInNewTab
-			? __( 'All gallery images updated to open in new tab' )
-			: __( 'All gallery images updated to not open in new tab' );
-		createSuccessNotice( noticeText, {
-			id: 'gallery-attributes-openInNewTab',
-			type: 'snackbar',
-		} );
-	}
-
-	function updateImagesSize( newSizeSlug ) {
-		setAttributes( { sizeSlug: newSizeSlug } );
-		const changedAttributes = {};
-		const blocks = [];
-		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-			blocks.push( block.clientId );
-			const image = block.attributes.id
-				? imageData.find( ( { id } ) => id === block.attributes.id )
-				: null;
-			changedAttributes[ block.clientId ] = getImageSizeAttributes(
-				image,
-				newSizeSlug
-			);
-		} );
-		updateBlockAttributes( blocks, changedAttributes, {
-			uniqueByBlock: true,
-		} );
-		const imageSize = imageSizeOptions.find(
-			( size ) => size.value === newSizeSlug
-		);
-
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: image size settings */
-				__( 'All gallery image sizes updated to: %s' ),
-				imageSize?.label ?? newSizeSlug
-			),
-			{
-				id: 'gallery-attributes-sizeSlug',
-				type: 'snackbar',
-			}
-		);
-	}
-
-	/**
-	 * Sets the Gallery's aspect ratio.
-	 *
-	 * The base value is added to the img element as an inline
-	 * style. A viewport value is instead rendered
-	 * from the Gallery's responsive CSS, which overrides that inline style.
-	 *
-	 * @param {string|undefined} value Aspect ratio to set. In a viewport state
-	 *                                 `'auto'` is an override that cancels the
-	 *                                 base ratio, while `undefined` removes the
-	 *                                 override so the base value applies again.
-	 */
-	function setAspectRatio( value ) {
-		if ( isViewportStyleState ) {
-			setGallerySettings( { aspectRatio: value } );
-		} else {
-			const cleanValue = ! value || value === 'auto' ? undefined : value;
-			setAttributes( { aspectRatio: value ?? 'auto' } );
-
-			// Update all inner image blocks with the new aspect ratio
-			const changedAttributes = {};
-			const blocks = [];
-
-			getBlock( clientId ).innerBlocks.forEach( ( block ) => {
-				blocks.push( block.clientId );
-				changedAttributes[ block.clientId ] = {
-					aspectRatio: cleanValue,
-					scale: cleanValue ? 'cover' : undefined,
-				};
-			} );
-
-			updateBlockAttributes( blocks, changedAttributes, true );
-		}
-
-		const noticeValue = value ?? baseAspectRatio;
-		const aspectRatioText = aspectRatioOptions.find(
-			( option ) => option.value === noticeValue
-		);
-		const noticeText = isViewportStyleState
-			? sprintf(
-					/* translators: 1: viewport name, 2: aspect ratio setting */
-					__(
-						'Gallery images in the %1$s viewport updated to aspect ratio: %2$s'
-					),
-					selectedStyleState.viewport.replace( '@', '' ),
-					aspectRatioText?.label || noticeValue
-				)
-			: sprintf(
-					/* translators: %s: aspect ratio setting */
-					__( 'All gallery images updated to aspect ratio: %s' ),
-					aspectRatioText?.label || noticeValue
-				);
-
-		createSuccessNotice( noticeText, {
-			id: 'gallery-attributes-aspectRatio',
-			type: 'snackbar',
-		} );
-	}
-
-	useEffect( () => {
-		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
-		if ( ! linkTo ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				linkTo:
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE,
-			} );
-		}
-	}, [ linkTo ] );
-
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
-	const imagesUploading = images.some(
-		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+	const hasImageIds =
+		hasImages &&
+		innerBlockImages.some( ( block ) => !! block.attributes.id );
+	const imagesUploading = innerBlockImages.some(
+		( block ) =>
+			! block.attributes.id &&
+			block.attributes.url?.indexOf( 'blob:' ) === 0
 	);
 
 	const mediaPlaceholderProps = {
@@ -825,23 +347,7 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
-			`wp-block-gallery-${ clientId }`,
-			// In dynamic mode there are no inner blocks and the gallery isn't
-			// rendered through the `Gallery` component, so the classes that
-			// component normally composes onto the `<figure>` (see `gallery.jsx`)
-			// must be added here to keep the preview's flex/crop layout matching
-			// the static gallery and the frontend.
-			isDynamic && [
-				layoutClassNames,
-				'blocks-gallery-grid',
-				{
-					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]:
-						isFlexLayout && columns !== undefined,
-					'columns-default': isFlexLayout && columns === undefined,
-					'is-cropped': isFlexLayout && imageCrop,
-				},
-			]
+			`wp-block-gallery-${ clientId }`
 		),
 	} );
 
@@ -862,8 +368,6 @@ export default function GalleryEdit( props ) {
 		// still renders the (empty) inner blocks.
 		allowedBlocks: isDynamic ? EMPTY_ARRAY : undefined,
 	} );
-
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! hasImages && ! isDynamic ) {
 		return (
@@ -906,335 +410,96 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
-	const hasLinkTo = linkTo && linkTo !== 'none';
-	// Columns and crop to fit are Flex-only, so a Gallery in another layout has
-	// viewport settings to show only when aspect ratios are available. Without
-	// this the viewport Settings panel would render empty.
-	const hasViewportSettings = isFlexLayout || aspectRatioOptions.length > 1;
-
 	return (
 		<>
 			<InspectorControls
-				group={
-					isViewportStyleState && hasViewportSettings
-						? 'viewport'
-						: 'default'
-				}
+				group={ isViewportStyleState ? 'style-state' : 'default' }
 			>
-				{ ! isViewportStyleState && (
+				{ ! isViewportStyleState && ! multiGallerySelection && (
 					<GallerySourcePanel
 						dynamic={ dynamic }
 						hasImages={ hasImages }
 					/>
 				) }
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						if ( isViewportStyleState ) {
-							setGallerySettings( {
-								columns: undefined,
-								imageCrop: undefined,
-								aspectRatio: undefined,
-							} );
-							return;
-						}
-
-						setAttributes( {
-							navigationButtonType: 'icon',
-							randomOrder: false,
-							...( isFlexLayout && {
-								columns: undefined,
-								imageCrop: true,
-							} ),
-						} );
-
-						setAspectRatio( 'auto' );
-
-						if ( isDynamic ) {
-							dynamic.setSourceOrder( undefined, undefined );
-						}
-
-						if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
-							updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
-						}
-
-						if ( linkTarget ) {
-							toggleOpenInNewTab( false );
-						}
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					{ isFlexLayout && displayedImageCount > 1 && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Columns' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportColumns
-									: !! activeColumns &&
-										activeColumns !== displayedImageCount
-							}
-							onDeselect={ () => setColumnsNumber( undefined ) }
-						>
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={
-									activeColumns
-										? activeColumns
-										: defaultColumnsNumber(
-												displayedImageCount
-											)
-								}
-								onChange={ setColumnsNumber }
-								min={ 1 }
-								max={ Math.min(
-									MAX_COLUMNS,
-									displayedImageCount
-								) }
-								required
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState && (
-						// "Random" is stored in both modes. Beyond that, a
-						// dynamic gallery's order is a stored query setting,
-						// while a static gallery's orders are one-off actions.
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Order by' ) }
-							hasValue={ () =>
-								!! randomOrder ||
-								( isDynamic &&
-									( dynamic.sourceOrderby !==
-										DEFAULT_ORDERBY ||
-										dynamic.sourceOrder !==
-											DEFAULT_ORDER ) )
-							}
-							onDeselect={ () => {
-								if ( isDynamic ) {
-									// Two writes, folded into one undo level.
-									dynamic.setSourceOrder(
-										undefined,
-										undefined
-									);
-									clearRandomOrderAfterEdit();
-								} else {
-									selectCustomOrder();
-								}
-							} }
-						>
-							{ isDynamic ? (
-								<SourceOrderControl
-									order={ {
-										orderby: dynamic.sourceOrderby,
-										order: dynamic.sourceOrder,
-									} }
-									isRandom={ !! randomOrder }
-									onChange={ changeSourceOrder }
-									onSelectRandom={ selectRandomOrder }
-								/>
-							) : (
-								<SortImagesControl
-									currentOrder={ currentOrder }
-									isRandom={ !! randomOrder }
-									canSort={ canSortImages }
-									onSort={ sortImages }
-									onSelectCustom={ selectCustomOrder }
-									onSelectRandom={ selectRandomOrder }
-								/>
-							) }
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState &&
-						imageSizeOptions?.length > 0 && (
-							<ToolsPanelItem
-								isShownByDefault
-								label={ __( 'Resolution' ) }
-								hasValue={ () =>
-									sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
-								}
-								onDeselect={ () =>
-									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
-								}
-							>
-								<WCSelectControl
-									label={ __( 'Resolution' ) }
-									help={ __(
-										'Select the size of the source images.'
-									) }
-									value={ sizeSlug }
-									options={ imageSizeOptions }
-									onChange={ updateImagesSize }
-									hideCancelButton
-								/>
-							</ToolsPanelItem>
-						) }
-					{ ! isViewportStyleState && hasLinkTo && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Open images in new tab' ) }
-							hasValue={ () => !! linkTarget }
-							onDeselect={ () => toggleOpenInNewTab( false ) }
-						>
-							<ToggleControl
-								label={ __( 'Open images in new tab' ) }
-								checked={ linkTarget === '_blank' }
-								onChange={ toggleOpenInNewTab }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ aspectRatioOptions.length > 1 && (
-						<ToolsPanelItem
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportAspectRatio
-									: activeAspectRatio !== 'auto'
-							}
-							label={ __( 'Aspect ratio' ) }
-							onDeselect={ () =>
-								// In a viewport state this clears the override
-								// so the base ratio applies again, rather than
-								// overriding it with Original.
-								setAspectRatio(
-									isViewportStyleState ? undefined : 'auto'
-								)
-							}
-							isShownByDefault
-						>
-							<WCSelectControl
-								label={ __( 'Aspect ratio' ) }
-								help={ __(
-									'Set a consistent aspect ratio for all images in the gallery.'
-								) }
-								value={ activeAspectRatio }
-								options={ aspectRatioOptions }
-								onChange={ setAspectRatio }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ isFlexLayout && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Crop images to fit' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportImageCrop
-									: ! activeImageCrop
-							}
-							onDeselect={ () =>
-								setGallerySettings( {
-									imageCrop: isViewportStyleState
-										? undefined
-										: true,
-								} )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Crop images to fit' ) }
-								checked={ activeImageCrop }
-								onChange={ toggleImageCrop }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState &&
-						lightboxSetting?.allowEditing &&
-						hasLightboxImages && (
-							<ToolsPanelItem
-								label={ __( 'Navigation button type' ) }
-								isShownByDefault
-								hasValue={ () =>
-									navigationButtonType !== 'icon'
-								}
-								onDeselect={ () =>
-									setAttributes( {
-										navigationButtonType: 'icon',
-									} )
-								}
-							>
-								<ToggleGroupControl
-									label={ __( 'Navigation button type' ) }
-									value={ navigationButtonType }
-									onChange={ ( value ) =>
-										setAttributes( {
-											navigationButtonType: value,
-										} )
-									}
-									isBlock
-									help={ __(
-										'Adjust the appearance of buttons in the lightbox.'
-									) }
-								>
-									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
-										( option ) => (
-											<ToggleGroupControlOption
-												key={ option.value }
-												value={ option.value }
-												label={ option.label }
-											/>
-										)
-									) }
-								</ToggleGroupControl>
-							</ToolsPanelItem>
-						) }
-				</ToolsPanel>
-			</InspectorControls>
-			<BlockControls group="block">
-				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ linkOptions.map( ( linkItem ) => {
-								const isOptionSelected =
-									linkTo === linkItem.value;
-								return (
-									<MenuItem
-										key={ linkItem.value }
-										isSelected={ isOptionSelected }
-										className={ clsx(
-											'components-dropdown-menu__menu-item',
-											{
-												'is-active': isOptionSelected,
-											}
-										) }
-										iconPosition="left"
-										icon={ linkItem.icon }
-										onClick={ () => {
-											setLinkTo( linkItem.value );
-											onClose();
-										} }
-										role="menuitemradio"
-										info={ linkItem.infoText }
-									>
-										{ linkItem.label }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</ToolbarDropdownMenu>
-			</BlockControls>
-			<>
-				{ ! multiGallerySelection && ! isDynamic && (
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							handleUpload={ false }
-							onSelect={ updateImages }
-							name={ __( 'Add' ) }
-							multiple
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
-							addToGallery={ hasImageIds }
-							variant="toolbar"
-						/>
-					</BlockControls>
-				) }
-				<GalleryStyles
-					style={ attributes.style }
+				<GalleryControls
+					attributes={ galleryAttributes }
+					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isFlexLayout={ isFlexLayout }
+					viewport={
+						isViewportStyleState
+							? selectedStyleState.viewport
+							: undefined
+					}
+					innerBlockImages={ innerBlockImages }
+					mediaById={ mediaById }
+					dynamic={ dynamic }
+					updateInnerImages={ updateInnerImages }
+					appliedSort={ appliedSort }
+					setAppliedSort={ setAppliedSort }
+					multiGallerySelection={ multiGallerySelection }
 				/>
-			</>
+			</InspectorControls>
+			{ ! multiGallerySelection && (
+				<BlockControls group="block">
+					<ToolbarDropdownMenu
+						icon={ linkIcon }
+						label={ __( 'Link' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ linkOptions.map( ( linkItem ) => {
+									const isOptionSelected =
+										linkTo === linkItem.value;
+									return (
+										<MenuItem
+											key={ linkItem.value }
+											isSelected={ isOptionSelected }
+											className={ clsx(
+												'components-dropdown-menu__menu-item',
+												{
+													'is-active':
+														isOptionSelected,
+												}
+											) }
+											iconPosition="left"
+											icon={ linkItem.icon }
+											onClick={ () => {
+												setLinkTo( linkItem.value );
+												onClose();
+											} }
+											role="menuitemradio"
+											info={ linkItem.infoText }
+										>
+											{ linkItem.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				</BlockControls>
+			) }
+			{ ! multiGallerySelection && ! isDynamic && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						handleUpload={ false }
+						onSelect={ updateImages }
+						name={ __( 'Add' ) }
+						multiple
+						mediaIds={ innerBlockImages
+							.filter( ( block ) => block.attributes.id )
+							.map( ( block ) => block.attributes.id ) }
+						addToGallery={ hasImageIds }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
+			<GalleryStyles
+				style={ attributes.style }
+				clientId={ clientId }
+				isFlexLayout={ isFlexLayout }
+			/>
 			{ isDynamic ? (
 				<GalleryDynamicView
 					{ ...props }
@@ -1246,12 +511,12 @@ export default function GalleryEdit( props ) {
 			) : (
 				<Gallery
 					{ ...props }
-					isContentLocked={ isContentLocked }
-					images={ images }
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
-				/>
+				>
+					{ innerBlocksProps.children }
+				</Gallery>
 			) }
 		</>
 	);

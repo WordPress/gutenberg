@@ -1,13 +1,11 @@
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
-	SelectControl as WCSelectControl,
 	Button,
-	Popover,
+	Popover as WCPopover,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { SelectControl, Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
@@ -57,6 +55,7 @@ function Edit( { isActive, value, onChange, contentRef }: FormatEditProps ) {
 	return (
 		<>
 			<RichTextToolbarButton
+				name="language"
 				icon={ languageIcon }
 				label={ title }
 				title={ title }
@@ -96,9 +95,13 @@ function InlineLanguageUI( {
 
 	const [ lang, setLang ] = useState( '' );
 	const [ dir, setDir ] = useState< 'ltr' | 'rtl' >( 'ltr' );
+	const directionItems = [
+		{ label: __( 'Left to right' ), value: 'ltr' },
+		{ label: __( 'Right to left' ), value: 'rtl' },
+	];
 
 	return (
-		<Popover
+		<WCPopover
 			className="block-editor-format-toolbar__language-popover"
 			anchor={ popoverAnchor }
 			onClose={ onClose }
@@ -130,20 +133,18 @@ function InlineLanguageUI( {
 						'A valid language attribute, like "en" or "fr".'
 					) }
 				/>
-				<WCSelectControl
+				<SelectControl
 					label={ __( 'Text direction' ) }
-					value={ dir }
-					options={ [
-						{
-							label: __( 'Left to right' ),
-							value: 'ltr',
-						},
-						{
-							label: __( 'Right to left' ),
-							value: 'rtl',
-						},
-					] }
-					onChange={ ( val ) => setDir( val ) }
+					value={
+						directionItems.find( ( item ) => item.value === dir ) ??
+						null
+					}
+					items={ directionItems }
+					onValueChange={ ( item ) => {
+						if ( item?.value === 'ltr' || item?.value === 'rtl' ) {
+							setDir( item.value );
+						}
+					} }
 				/>
 				<Stack justify="right">
 					<Button
@@ -154,6 +155,6 @@ function InlineLanguageUI( {
 					/>
 				</Stack>
 			</Stack>
-		</Popover>
+		</WCPopover>
 	);
 }

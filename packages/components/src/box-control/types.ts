@@ -133,6 +133,7 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 	) => void;
 	selectedUnits: BoxControlValue;
 	setSelectedUnits: React.Dispatch< React.SetStateAction< BoxControlValue > >;
+	units?: UnitControlProps[ 'units' ];
 	values: BoxControlValue;
 	/**
 	 * Collection of sides to allow control of. If omitted or empty, all sides will be available.

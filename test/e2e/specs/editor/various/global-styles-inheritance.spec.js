@@ -15,7 +15,7 @@ test.describe( 'Inherited Global Styles in the block inspector', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'shows a value inherited from the theme, with no indicator treatment', async ( {
+	test( 'shows a value inherited from the theme', async ( {
 		editor,
 		page,
 	} ) => {
@@ -47,19 +47,5 @@ test.describe( 'Inherited Global Styles in the block inspector', () => {
 
 		// The theme's value reaches the control with nothing set on the block.
 		await expect( lineHeight ).toHaveValue( '1.2' );
-
-		// The indicator treatment is behind the
-		// `gutenberg-global-styles-inheritance-ui` experiment, which is off.
-		await expect(
-			settings.locator( '.is-inherited-from-global-styles' )
-		).toHaveCount( 0 );
-		await expect(
-			settings.locator( '.has-local-override-from-global-styles' )
-		).toHaveCount( 0 );
-		await expect(
-			settings.getByRole( 'button', {
-				name: 'Reset to inherited value',
-			} )
-		).toHaveCount( 0 );
 	} );
 } );

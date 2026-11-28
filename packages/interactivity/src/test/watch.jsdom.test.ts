@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
 	getContext,
 	getElement,
+	getServerContext,
 	getScope,
 	resetScope,
 	setScope,
@@ -310,6 +311,154 @@ describe( 'watch', () => {
 		} finally {
 			resetScope();
 		}
+	} );
+
+	it( 'runs returned cleanups without the scope of the code that reruns or disposes them', () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+
+		const source = signal( 0 );
+		const context = { name: 'element-x' };
+		const actingScope = createTestScope();
+		actingScope.context = { undefined: context };
+		const cleanupReadings: Array< {
+			contextError: ReturnType< typeof describeError > | undefined;
+			elementError: ReturnType< typeof describeError > | undefined;
+			serverContextError: ReturnType< typeof describeError > | undefined;
+		} > = [];
+		const dispose = watch( () => {
+			void source.value;
+			return () => {
+				cleanupReadings.push( {
+					contextError: captureError( () => getContext() ),
+					elementError: captureError( () => getElement() ),
+					serverContextError: captureError( () =>
+						getServerContext()
+					),
+				} );
+			};
+		} );
+		const actionContexts: unknown[] = [];
+
+		runWithScope( actingScope, () => {
+			source.value = 1;
+			actionContexts.push( getContext() );
+			dispose();
+			actionContexts.push( getContext() );
+		} );
+
+		expect( cleanupReadings ).toHaveLength( 2 );
+		for ( const reading of cleanupReadings ) {
+			expect( reading ).toEqual( {
+				contextError: {
+					constructor: 'Error',
+					message: expect.stringContaining(
+						'Cannot call `getContext()` when there is no scope.'
+					),
+				},
+				elementError: {
+					constructor: 'Error',
+					message: expect.stringContaining(
+						'Cannot call `getElement()` when there is no scope.'
+					),
+				},
+				serverContextError: {
+					constructor: 'Error',
+					message: expect.stringContaining(
+						'Cannot call `getServerContext()` when there is no scope.'
+					),
+				},
+			} );
+		}
+		expect( actionContexts ).toEqual( [ context, context ] );
+	} );
+
+	it( 'restores the caller scope after normal and throwing cleanups', () => {
+		const context = { name: 'element-x' };
+		const actingScope = createTestScope();
+		actingScope.context = { undefined: context };
+		const reRunSource = signal( 0 );
+		const throwingReRunSource = signal( 0 );
+		const disposeSource = signal( 0 );
+		const throwingDisposeSource = signal( 0 );
+		const reRunError = new Error( 're-run cleanup failed' );
+		const disposeError = new Error( 'dispose cleanup failed' );
+		const reRunCleanup = watch( () => {
+			void reRunSource.value;
+			return () => undefined;
+		} );
+		watch( () => {
+			void throwingReRunSource.value;
+			return () => {
+				throw reRunError;
+			};
+		} );
+		const disposeCleanup = watch( () => {
+			void disposeSource.value;
+			return () => undefined;
+		} );
+		const throwingDisposeCleanup = watch( () => {
+			void throwingDisposeSource.value;
+			return () => {
+				throw disposeError;
+			};
+		} );
+		const readings: unknown[] = [];
+
+		runWithScope( actingScope, () => {
+			reRunSource.value = 1;
+			readings.push( getContext() );
+
+			let reRunCaught: unknown;
+			try {
+				throwingReRunSource.value = 1;
+			} catch ( error ) {
+				reRunCaught = error;
+			}
+			expect( reRunCaught ).toBe( reRunError );
+			readings.push( getContext() );
+
+			disposeCleanup();
+			readings.push( getContext() );
+
+			let disposeCaught: unknown;
+			try {
+				throwingDisposeCleanup();
+			} catch ( error ) {
+				disposeCaught = error;
+			}
+			expect( disposeCaught ).toBe( disposeError );
+			readings.push( getContext() );
+		} );
+
+		reRunCleanup();
+		expect( readings ).toEqual( [ context, context, context, context ] );
+	} );
+
+	it( 'keeps the captured scope of a withScope-wrapped cleanup', () => {
+		const source = signal( 0 );
+		const capturedContext = { name: 'captured' };
+		const capturedScope = createTestScope();
+		capturedScope.context = { undefined: capturedContext };
+		const actingScope = createTestScope();
+		actingScope.context = { undefined: { name: 'acting' } };
+		let cleanupContext: unknown;
+		const wrappedCleanup = runWithScope( capturedScope, () =>
+			withScope( () => {
+				cleanupContext = getContext();
+			} )
+		);
+
+		const dispose = watch( () => {
+			void source.value;
+			return wrappedCleanup;
+		} );
+
+		runWithScope( actingScope, () => {
+			source.value = 1;
+		} );
+
+		expect( cleanupContext ).toBe( capturedContext );
+		dispose();
 	} );
 
 	it( 'keeps data-wp-watch callbacks scoped', async () => {

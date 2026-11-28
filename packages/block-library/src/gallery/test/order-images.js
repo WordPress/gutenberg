@@ -37,17 +37,26 @@ function createAttachment( id, title, date ) {
 	return { id, title: { raw: title, rendered: title }, date };
 }
 
+/**
+ * Maps attachment records by id.
+ *
+ * @param {Array} media Attachment records.
+ */
+function byId( media ) {
+	return new Map( media.map( ( item ) => [ item.id, item ] ) );
+}
+
 // Listed oldest to newest, so the date order reads top to bottom: 2, 3, 1, 4.
 // The ids deliberately don't follow the dates, so a sort keyed on the id (or
 // on the position in this list) can't pass the date tests by accident. The
 // title order is different again: apple, Beach, IMG_2, IMG_10 (2, 1, 4, 3),
 // which requires the compare to ignore case and treat numbers naturally.
-const ATTACHMENTS = [
+const ATTACHMENTS = byId( [
 	createAttachment( 2, 'apple', '2024-01-15T10:00:00' ),
 	createAttachment( 3, 'IMG_10', '2024-02-01T10:00:00' ),
 	createAttachment( 1, 'Beach', '2024-03-01T10:00:00' ),
 	createAttachment( 4, 'IMG_2', '2024-04-01T10:00:00' ),
-];
+] );
 
 const getImageIds = ( blocks ) =>
 	blocks.map( ( { attributes } ) => attributes.id );
@@ -108,10 +117,10 @@ describe( 'sortImageBlocks', () => {
 	} );
 
 	it( 'keeps the existing order of images with equal keys', () => {
-		const media = [
+		const media = byId( [
 			createAttachment( 1, 'Same', '2024-01-01T00:00:00' ),
 			createAttachment( 2, 'Same', '2024-01-01T00:00:00' ),
-		];
+		] );
 		const blocks = createImageBlocks( 2, 1 );
 		expect(
 			getImageIds( sortImageBlocks( blocks, media, NEWEST_FIRST ) )
@@ -122,10 +131,10 @@ describe( 'sortImageBlocks', () => {
 	} );
 
 	it( 'falls back to the rendered title when there is no raw title', () => {
-		const media = [
+		const media = byId( [
 			{ id: 1, title: { rendered: 'b' }, date: '' },
 			{ id: 2, title: { rendered: 'a' }, date: '' },
-		];
+		] );
 		expect(
 			getImageIds(
 				sortImageBlocks(
@@ -146,9 +155,9 @@ describe( 'hasSortableImages', () => {
 	} );
 
 	it( 'is false while the attachment records have not resolved', () => {
-		expect( hasSortableImages( createImageBlocks( 1, 2 ), [] ) ).toBe(
-			false
-		);
+		expect(
+			hasSortableImages( createImageBlocks( 1, 2 ), new Map() )
+		).toBe( false );
 	} );
 
 	it( 'does not count images without an id or attachment record', () => {

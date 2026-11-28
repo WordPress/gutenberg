@@ -4,8 +4,11 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu, VisuallyHidden } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+	VisuallyHidden,
+} from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 
 function buildInterstitialMarkup() {

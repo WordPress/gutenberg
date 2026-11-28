@@ -20,16 +20,15 @@ const mockSheet = (
 	element: StyleElement,
 	{ disabled, mediaText }: { disabled: boolean; mediaText: string }
 ) => {
-	if ( element.sheet ) {
-		Object.assign( element.sheet, { disabled, media: { mediaText } } );
-	} else {
-		Object.defineProperty( element, 'sheet', {
-			value: {
-				disabled,
-				media: { mediaText },
-			},
-		} );
-	}
+	// `media` is read-only on a real CSSStyleSheet, so the whole sheet is
+	// replaced with a stub rather than assigned over.
+	Object.defineProperty( element, 'sheet', {
+		configurable: true,
+		value: {
+			disabled,
+			media: { mediaText },
+		},
+	} );
 };
 
 /**

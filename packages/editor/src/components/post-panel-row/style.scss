@@ -29,6 +29,8 @@
 	.components-button {
 		max-width: 100%;
 		text-align: left;
+		word-break: normal;
+		overflow-wrap: anywhere;
 		white-space: normal;
 		text-wrap: balance; // Fallback for Safari.
 		text-wrap: pretty;

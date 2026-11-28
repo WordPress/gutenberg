@@ -29,6 +29,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `true`
 - [`splitting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#splitting): `true`
 - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundClip`: `true`
   - `backgroundImage`: `true`
   - `backgroundSize`: `true`
   - `gradient`: `true`
@@ -39,6 +40,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `minHeight`: `true`
   - `minWidth`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
+  - `rotate`: `true`
+  - `translate`: `true`
+  - `scale`: `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`

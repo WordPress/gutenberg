@@ -8,8 +8,29 @@
 	border-bottom: none;
 }
 
+// An empty <hr> has no intrinsic width, so it collapses to zero inside flex
+// layouts.
+// Stretch inside a Stack, like in a regular Group.
+:where(.is-layout-flex.is-vertical) > .wp-block-separator {
+	align-self: stretch;
+}
+
+// Fill the free space inside a Row.
+:where(.is-layout-flex:not(.is-vertical)) > .wp-block-separator {
+	flex-grow: 1;
+}
+
+// Dimensions > Width (which adds a `wp-container-content-*` class) replaces the
+// fill. Its own styles load later, so Grow still applies.
+:root :where(.wp-block-separator[class*="wp-container-content-"]) {
+	flex-grow: 0;
+}
+
 // Dots block style variation
 :root :where(.wp-block-separator.is-style-dots) {
+	// The dots have a width of their own, so they don't fill Rows and Stacks.
+	align-self: auto;
+	flex-grow: 0;
 	text-align: center;
 	line-height: 1;
 	height: auto;

@@ -1,7 +1,7 @@
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalText as WCText,
 	ExternalLink,
 	FlexBlock,
@@ -32,7 +32,7 @@ export function ConnectorItem( {
 }: ConnectorItemProps ) {
 	const headingId = useId();
 	return (
-		<Item className={ className } role="listitem">
+		<WCItem className={ className } role="listitem">
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
 					{ logo }
@@ -55,7 +55,7 @@ export function ConnectorItem( {
 				</HStack>
 				{ children }
 			</VStack>
-		</Item>
+		</WCItem>
 	);
 }
 
@@ -129,25 +129,9 @@ function useConnectorSettingsSave< TValue >(
 	};
 }
 
-function ConnectorSettingsFrame( {
-	readOnly,
-	children,
-}: {
-	readOnly: boolean;
-	children: ReactNode;
-} ) {
+function ConnectorSettingsFrame( { children }: { children: ReactNode } ) {
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-						}
-					: undefined
-			}
-		>
+		<VStack spacing={ 4 } className="connector-settings">
 			{ children }
 		</VStack>
 	);
@@ -280,7 +264,7 @@ export function DefaultConnectorSettings( {
 	};
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -382,7 +366,7 @@ export function ApplicationPasswordConnectorSettings( {
 	}
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'Username' ) }
 				value={ username }

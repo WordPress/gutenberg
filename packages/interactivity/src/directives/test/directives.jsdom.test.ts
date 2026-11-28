@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { hydrate } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives.
-import { hydratedIslands, toVdom } from '../../vdom';
+import { toVdom } from '../../vdom';
 import { store } from '../../store';
 
 let namespaceCount = 0;
@@ -26,8 +26,6 @@ async function hydrateRegion( region: HTMLElement ) {
 
 beforeEach( () => {
 	document.body.innerHTML = '';
-	// @ts-expect-error `_values` is an internal property, accessed here for testing.
-	hydratedIslands._values = new WeakMap();
 } );
 
 afterEach( () => {

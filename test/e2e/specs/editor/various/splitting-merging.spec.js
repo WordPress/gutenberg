@@ -492,7 +492,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should not split with line break in front (-firefox)', async ( {
+	test( 'should not split with line break in front', async ( {
 		editor,
 		page,
 		pageUtils,

@@ -1,38 +1,80 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
+// Sass treats hyphens and underscores in identifiers as equivalent.
+const FONT_FAMILY_VARIABLE =
+	/\$font[-_]family[-_](body|headings|mono)(?![\w-])/;
+
+const FONT_FAMILY_VARIABLE_REPLACEMENTS = {
+	body: 'var(--wpds-typography-font-family-body)',
+	headings: 'var(--wpds-typography-font-family-heading)',
+	mono: 'var(--wpds-typography-font-family-mono)',
+};
+
+const FONT_SIZE_VARIABLE =
+	/\$(?:font[-_]size[-_](x[-_]small|small|medium|large|x[-_]large|2x[-_]large)|default[-_]font[-_]size)(?![\w-])/;
+
+const FONT_SIZE_VARIABLE_REPLACEMENTS = {
+	'x-small': 'var(--wpds-typography-font-size-xs)',
+	small: 'var(--wpds-typography-font-size-sm)',
+	medium: 'var(--wpds-typography-font-size-md)',
+	large: 'var(--wpds-typography-font-size-lg)',
+	'x-large': 'var(--wpds-typography-font-size-xl)',
+	'2x-large': 'var(--wpds-typography-font-size-2xl)',
+};
+
+const FONT_LINE_HEIGHT_VARIABLE =
+	/\$font[-_]line[-_]height[-_](x[-_]small|small|medium|large|x[-_]large|2x[-_]large)(?![\w-])/;
+
+const FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS = {
+	'x-small': 'var(--wpds-typography-line-height-xs)',
+	small: 'var(--wpds-typography-line-height-sm)',
+	medium: 'var(--wpds-typography-line-height-md)',
+	large: 'var(--wpds-typography-line-height-lg)',
+	'x-large': 'var(--wpds-typography-line-height-xl)',
+	'2x-large': 'var(--wpds-typography-line-height-2xl)',
+};
+
+// System colors that Chromium does not map to the forced colors palette.
+// Matches the keyword only: the prefix skips over quoted strings and whole
+// `url()` arguments, and the lookarounds reject longer identifiers.
+const SELECTED_ITEM_SYSTEM_COLOR =
+	/^(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|url\([^)]*\)|(?!url\()[^"'])*?(?<=^|[\s,(])(SelectedItem(?:Text)?)(?=$|[\s,)!;])/i;
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
 	plugins: [
 		'stylelint-plugin-logical-css',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	reportNeedlessDisables: true,
 	rules: {
-		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
-		'declaration-property-value-allowed-list': [
-			{
-				'flex-direction': '/^(?!(row|column)-reverse).*$/',
-			},
-			{
-				message: ( property, value ) =>
-					`Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`,
-			},
-		],
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [
 					'/--wp-components-color-/',
 					'/\\$font-weight-regular/',
 					'/\\$font-weight-medium/',
+					`/${ FONT_FAMILY_VARIABLE.source }/`,
+					`/${ FONT_SIZE_VARIABLE.source }/`,
+					`/${ FONT_LINE_HEIGHT_VARIABLE.source }/`,
+					`/${ SELECTED_ITEM_SYSTEM_COLOR.source }/i`,
 				],
 				cursor: [ 'pointer' ],
+				'flex-direction': [ '/^(row|column)-reverse/' ],
 			},
 			{
 				message: ( property, value ) => {
+					switch ( property ) {
+						case 'flex-direction':
+							return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
+						case 'cursor':
+							return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					}
+					// The remaining patterns apply to every property, so tell them apart by value.
 					if (
 						value.includes( '$font-weight-regular' ) ||
 						value.includes( '$font-weight-medium' )
@@ -44,10 +86,34 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					if ( property === 'cursor' ) {
-						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					const [ , selectedItem ] =
+						value.match( SELECTED_ITEM_SYSTEM_COLOR ) ?? [];
+					if ( selectedItem ) {
+						const replacement = /text$/i.test( selectedItem )
+							? 'HighlightText'
+							: 'Highlight';
+						return `Avoid the \`${ selectedItem }\` system color. Chromium does not map it to the forced colors palette (https://issues.chromium.org/issues/40857613). Use \`${ replacement }\` instead.`;
 					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+					const [ , fontFamily ] =
+						value.match( FONT_FAMILY_VARIABLE ) ?? [];
+					if ( fontFamily ) {
+						return `Avoid using the \`$font-family-${ fontFamily }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamily ] }\` instead.`;
+					}
+					const fontSizeMatch = value.match( FONT_SIZE_VARIABLE );
+					if ( fontSizeMatch ) {
+						const size = fontSizeMatch[ 1 ]?.replace( /_/g, '-' );
+						const variable = size
+							? `$font-size-${ size }`
+							: '$default-font-size';
+						return `Avoid using the \`${ variable }\` Sass variable. Use \`${ FONT_SIZE_VARIABLE_REPLACEMENTS[ size ?? 'medium' ] }\` instead.`;
+					}
+					const [ , lineHeight ] =
+						value.match( FONT_LINE_HEIGHT_VARIABLE ) ?? [];
+					if ( lineHeight ) {
+						const size = lineHeight.replace( /_/g, '-' );
+						return `Avoid using the \`$font-line-height-${ size }\` Sass variable. Use \`${ FONT_LINE_HEIGHT_VARIABLE_REPLACEMENTS[ size ] }\` instead.`;
+					}
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are being removed from the components package.`;
 				},
 			},
 		],

@@ -5,8 +5,10 @@ import { moreVertical } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { keyboardShortcut } from '@wordpress/keycodes';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
 import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';

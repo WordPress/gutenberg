@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBackgroundProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
@@ -45,6 +46,8 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getCellRowspan,
+	getCellColumnRange,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -100,8 +103,14 @@ function TableEdit( {
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
-	const colorProps = useColorProps( attributes );
+	// Mirror of save: `has-link-color` belongs on the figure only.
+	const colorProps = useColorProps( {
+		...attributes,
+		style: { ...attributes.style, elements: undefined },
+	} );
 	const borderProps = useBorderProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
+	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
 	const tableRef = useRef();
@@ -187,10 +196,16 @@ function TableEdit( {
 		}
 
 		// Convert the cell selection to a column selection so that alignment
-		// is applied to the entire column.
+		// is applied to the entire column. Use the logical columns the cell
+		// covers, so that merged cells align every column under them.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
 		const columnSelection = {
 			type: 'column',
-			columnIndex: selectedCell.columnIndex,
+			columnIndex,
+			colspan,
 		};
 
 		const newAttributes = updateSelectedCell(
@@ -242,7 +257,13 @@ function TableEdit( {
 		}
 
 		const { sectionName, rowIndex } = selectedCell;
-		const newRowIndex = rowIndex + delta;
+
+		// Insert after all the rows the selected cell covers, so that a row
+		// inserted after a cell with rowspan lands outside of its span.
+		const newRowIndex =
+			delta > 0
+				? rowIndex + getCellRowspan( attributes, selectedCell )
+				: rowIndex;
 
 		setAttributes(
 			insertRow( attributes, {
@@ -297,18 +318,28 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
-		const newColumnIndex = columnIndex + delta;
+		const { sectionName, rowIndex } = selectedCell;
+
+		// Use the logical columns the selected cell covers, so that a column
+		// inserted after a cell with colspan lands after all of its columns.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		const newColumnIndex = delta > 0 ? columnIndex + colspan : columnIndex;
 
 		setAttributes(
 			insertColumn( attributes, {
 				columnIndex: newColumnIndex,
 			} )
 		);
-		// Select the first cell of the new column.
+		// Select the cell in the new column. The selected cell's `columnIndex`
+		// is its index in the row, not a logical column, and the new cell is
+		// inserted right before or after the selected one in its row.
 		setSelectedCell( {
-			rowIndex: 0,
-			columnIndex: newColumnIndex,
+			sectionName,
+			rowIndex,
+			columnIndex: selectedCell.columnIndex + delta,
 			type: 'cell',
 		} );
 	}
@@ -335,19 +366,39 @@ function TableEdit( {
 			return;
 		}
 
-		const { sectionName, columnIndex } = selectedCell;
+		// Delete every logical column the selected cell covers, from the last
+		// one, so that the indexes of the remaining ones don't shift.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		let newAttributes = attributes;
+		for (
+			let index = columnIndex + colspan - 1;
+			index >= columnIndex;
+			index--
+		) {
+			newAttributes = {
+				...newAttributes,
+				...deleteColumn( newAttributes, { columnIndex: index } ),
+			};
+		}
 
 		setSelectedCell();
-		setAttributes(
-			deleteColumn( attributes, { sectionName, columnIndex } )
-		);
+		setAttributes( newAttributes );
 	}
 
-	useEffect( () => {
+	// Clear the selected cell when the block is deselected. Only react to the
+	// block going from selected to deselected: a cell receives focus (and is
+	// set as the selected cell) before the block itself becomes selected.
+	const [ prevIsSingleSelected, setPrevIsSingleSelected ] =
+		useState( isSingleSelected );
+	if ( isSingleSelected !== prevIsSingleSelected ) {
+		setPrevIsSingleSelected( isSingleSelected );
 		if ( ! isSingleSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSingleSelected ] );
+	}
 
 	useEffect( () => {
 		if ( hasTableCreated ) {
@@ -526,8 +577,10 @@ function TableEdit( {
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
+						backgroundProps.className,
 						{
 							'has-fixed-layout': hasFixedLayout,
+							[ `has-text-align-${ textAlign }` ]: textAlign,
 							// This is required in the editor only to overcome
 							// the fact the editor rewrites individual border
 							// widths into a shorthand format.
@@ -536,7 +589,11 @@ function TableEdit( {
 							),
 						}
 					) }
-					style={ { ...colorProps.style, ...borderProps.style } }
+					style={ {
+						...colorProps.style,
+						...borderProps.style,
+						...backgroundProps.style,
+					} }
 				>
 					{ renderedSections }
 				</table>

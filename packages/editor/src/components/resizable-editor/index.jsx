@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import { useDispatch } from '@wordpress/data';
-import { useRef, useCallback, useState } from '@wordpress/element';
+import { useRef, useCallback, useState, useEffect } from '@wordpress/element';
 import {
 	ResizableBox,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion, useResizeObserver } from '@wordpress/compose';
 import ResizeHandle from './resize-handle';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -44,7 +44,16 @@ function ResizableEditor( {
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const disableMotion = useReducedMotion();
-	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
+	const { setCanvasWidth, setPhysicalCanvasWidth } = unlock(
+		useDispatch( editorStore )
+	);
+	const measuredRef = useResizeObserver( ( entries ) => {
+		setPhysicalCanvasWidth( entries[ 0 ].contentRect.width );
+	} );
+	useEffect(
+		() => () => setPhysicalCanvasWidth( undefined ),
+		[ setPhysicalCanvasWidth ]
+	);
 
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback(
@@ -94,6 +103,7 @@ function ResizableEditor( {
 			} ) }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
+				measuredRef( api?.resizable );
 			} }
 			size={ {
 				width,

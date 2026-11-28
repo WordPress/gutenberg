@@ -18,7 +18,7 @@
  * as a plain function yet. Once `@wordpress/theme` does, this script and its
  * output are meant to be replaced by that.
  *
- * Usage: npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
+ * Usage: npm run wpds:admin-scheme-tokens --workspace=@wordpress/monorepo-tools
  */
 
 import { writeFileSync } from 'node:fs';
@@ -68,7 +68,7 @@ function deriveTokens( primary ) {
 		const { ramp } =
 			rampName === 'background'
 				? bgRamp
-				: buildAccentRamp( seed, bgRamp );
+				: buildAccentRamp( rampName, seed, bgRamp );
 		const primitive = rampName === 'background' ? 'bg' : rampName;
 
 		for ( const [ step, value ] of Object.entries( ramp ) ) {
@@ -110,7 +110,7 @@ const css = `/**
  *
  * GENERATED FILE. Do not edit. Regenerate with:
  *
- *     npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools
+ *     npm run wpds:admin-scheme-tokens --workspace=@wordpress/monorepo-tools
  *
  * React admin screens derive these values at runtime through ThemeProvider.
  * PHP-rendered screens have no provider, so without this file every token

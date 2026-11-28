@@ -146,7 +146,7 @@ test.describe( 'Collaboration - stale autosave notice', () => {
 		} );
 
 		await expect(
-			page.locator( '.components-notice__content' ).filter( {
+			page.locator( '.notices-inline-notices__notice' ).filter( {
 				hasText:
 					'There is an autosave of this post that is more recent than the version below.',
 			} )

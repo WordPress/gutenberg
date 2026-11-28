@@ -31,16 +31,10 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			$method->setAccessible( true );
 		}
 		// Invoke the private method.
-		$result = $method->invoke( $reflection, $navigation_link_block );
+		$result = $method->invoke( null, $navigation_link_block );
 
-		if ( is_wp_version_compatible( '7.0' ) ) {
-			$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-		} else {
-			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
-			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
-			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-			$this->assertEquals( $expected, $result );
-		}
+		$expected = '<li class="wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
+		$this->assertEqualHTML( $expected, $result );
 	}
 
 	/**
@@ -67,10 +61,10 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			$method->setAccessible( true );
 		}
 		// Invoke the private method.
-		$result = $method->invoke( $reflection, $site_title_block );
+		$result = $method->invoke( null, $site_title_block );
 
 		$expected = '<li class="wp-block-navigation-item"><h1 class="wp-block-site-title"><a href="http://' . WP_TESTS_DOMAIN . '" target="_self" rel="home">Test Blog</a></h1></li>';
-		$this->assertEquals( $expected, $result );
+		$this->assertEqualHTML( $expected, $result );
 	}
 
 	/**
@@ -107,10 +101,10 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			$method->setAccessible( true );
 		}
 		// Invoke the private method.
-		$result = $method->invoke( $reflection, $heading_block );
+		$result = $method->invoke( null, $heading_block );
 
 		$expected = '<div class="wp-block-testsuite-sample-block">Hello World</div>';
-		$this->assertEquals( $expected, $result );
+		$this->assertEqualHTML( $expected, $result );
 
 		unregister_block_type( 'testsuite/sample-block' );
 	}
@@ -163,10 +157,10 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			$method->setAccessible( true );
 		}
 		// Invoke the private method.
-		$result = $method->invoke( $reflection, $heading_block );
+		$result = $method->invoke( null, $heading_block );
 
 		$expected = '<li class="wp-block-navigation-item"><div class="wp-block-testsuite-sample-block">Hello World</div></li>';
-		$this->assertEquals( $expected, $result );
+		$this->assertEqualHTML( $expected, $result );
 
 		remove_filter( 'block_core_navigation_listable_blocks', $filter_needs_list_item_wrapper_function, 10, 1 );
 
@@ -188,9 +182,9 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		}
 		$attributes = array( 'ref' => 0 );
 
-		$actual   = $method->invoke( $reflection, $attributes );
+		$actual   = $method->invoke( null, $attributes );
 		$expected = new WP_Block_List( array(), $attributes );
-		$this->assertEquals( $actual, $expected );
+		$this->assertEquals( $expected, $actual );
 		$this->assertCount( 0, $actual );
 	}
 

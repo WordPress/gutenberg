@@ -1,10 +1,8 @@
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
-import { chevronRight } from '@wordpress/icons';
-import { Icon } from '../icon';
 import { useRegisterTab } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { TabProps } from './types';
 
 /**
@@ -26,11 +24,19 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >(
 				className={ clsx( styles.tab, className ) }
 				{ ...otherProps }
 			>
-				<span className={ styles[ 'tab-children' ] }>{ children }</span>
-				<Icon
-					icon={ chevronRight }
-					className={ styles[ 'tab-chevron' ] }
-				/>
+				<span className={ styles[ 'tab-children' ] }>
+					{ children }
+					{ /* Keep the SVG out of the layout before the tab styles load. */ }
+					<svg
+						aria-hidden="true"
+						focusable="false"
+						width="0"
+						height="0"
+						className={ styles[ 'focus-ring' ] }
+					>
+						<rect />
+					</svg>
+				</span>
 			</_Tabs.Tab>
 		);
 	}

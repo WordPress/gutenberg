@@ -260,6 +260,46 @@ function validateEntryLinks(
 }
 
 /**
+ * Rejects blank lines inside an Unreleased list, whether between entries or
+ * within an entry. One blank line would make the whole list loose.
+ *
+ * @param unreleased Unreleased section.
+ * @param filePath   Path for error messages.
+ * @return Error messages.
+ */
+function validateEntrySpacing(
+	unreleased: UnreleasedSection,
+	filePath: string
+): string[] {
+	const errors: string[] = [];
+	let inEntry = false;
+
+	for ( let i = 1; i < unreleased.lines.length; i++ ) {
+		const line = unreleased.lines[ i ];
+		if ( line.trim() === '' ) {
+			continue;
+		}
+		const isTopLevel = /^-\s+/.test( line );
+		if ( ! isTopLevel && ! /^\s/.test( line ) ) {
+			inEntry = false;
+			continue;
+		}
+		if ( inEntry && unreleased.lines[ i - 1 ].trim() === '' ) {
+			errors.push(
+				`${ filePath }:${
+					unreleased.start + i + 1
+				}: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.`
+			);
+		}
+		if ( isTopLevel ) {
+			inEntry = true;
+		}
+	}
+
+	return errors;
+}
+
+/**
  * Markdown link for a Gutenberg pull request.
  *
  * @param pr Pull request number.
@@ -350,6 +390,7 @@ export function validateChangelog(
 		...validateSubsectionHeadings( unreleased, filePath ),
 		...validateSectionTitles( unreleased, filePath ),
 		...validateEntryLinks( unreleased, filePath ),
+		...validateEntrySpacing( unreleased, filePath ),
 		...placementErrors,
 		...( options.requirePr
 			? validateRequiredPrLink( unreleased, filePath, options.requirePr )
