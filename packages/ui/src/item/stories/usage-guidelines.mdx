@@ -1,0 +1,64 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as ItemStories from './index.story';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Item usage guidelines
+
+## Choose the row by what users can activate
+
+The kind of row tells users, and assistive technology, what is interactive.
+
+-   **Use `Item.LinkRow` when the whole row takes users somewhere.** Add `Item.Chevron` to show it. For a link that opens in a new tab, set `openInNewTab`: the chevron becomes the new-tab arrow, and the row tells assistive technology.
+-   **Use `Item.ButtonRow` when the whole row runs a command or opens a popup.**
+-   **Use `Item.ContentRow` when only the controls inside the row are interactive.** Clicking the label does nothing.
+
+`Item.LinkRow` and `Item.ButtonRow` need an `Item.Label`, unless the row has an `aria-label` or `aria-labelledby` of its own. That name replaces the label, so include the visible label text in it. The label is the accessible name of the link or button, so assistive technology does not read it on its own: do not render it as a heading.
+
+## Put static content in `Item.Meta` and controls in `Item.Actions`
+
+-   **Keep `Item.Media`, `Item.Label`, `Item.Description`, and `Item.Meta` static.** In a link or button row, the link or button covers these parts, so an interactive element inside them cannot be reached with a pointer. `Item.Media` is also hidden from assistive technology.
+-   **Put every control of the row in `Item.Actions`.** This includes the trigger of an infotip. Controls there sit above the link or button of the row, so nothing interactive is nested.
+-   **Name each control for the row it acts on.** The row does not add its label to the name of a control. Use "Reset background color", not "Reset".
+-   **Leave `Item.Chevron` out of a row that has `Item.Actions`.** Next to a control, the chevron reads as belonging to that control.
+-   **Use `compact` controls in a comfortable row and `small` controls in a compact row.** A default-size control makes a row with one line of text as tall as a row with two.
+
+## Choose between joined rows, detached rows, and separate groups
+
+### Joined rows
+
+Use the default `joined` variant for uniform rows that users scan as a set, such as navigation or a list of settings.
+
+<Canvas of={ UsageGuidelinesStories.Joined } />
+
+### Detached rows
+
+Use `variant="detached"` when each row is a self-contained object with its own status and actions, such as a connector or a plugin. The rows are still one list.
+
+<Canvas of={ ItemStories.Detached } />
+
+### Separate groups
+
+Use one `Item.Group` per section when the rows belong to different sections. Give each group a heading and reference it with `aria-labelledby`.
+
+<Canvas of={ UsageGuidelinesStories.SeparateGroups } />
+
+Do not use several groups of one row each to get the look of detached rows. Assistive technology would announce several lists of one item, not one list.
+
+## Use a row without a group only for a single item
+
+-   **Use a row outside `Item.Group` for something that is always a single item.** It draws its own frame and has no list semantics.
+-   **Keep `Item.Group` for a list that can happen to hold one item.** It stays a list when more items arrive.
+
+## Hide a row by not rendering it
+
+To hide a row or a part, do not render it. The components set their own `display`, which overrides the `hidden` attribute, as other `@wordpress/ui` components do.
+
+## Use `Card.FullBleed` to put rows in a card
+
+In a `Card`, place a joined group, or a single row, in a `Card.FullBleed` inside `Card.Content`. The rows then run from edge to edge, and the card is the frame. The group keeps only a line above its first row, which separates it from the card header.
+
+Without `Card.FullBleed`, a group in `Card.Content` keeps its own frame inside the padding of the card. Put a detached group there, since each of its rows has a frame of its own.
+
+If the card would hold nothing but the group, do not use a `Card`. A group already draws that surface.

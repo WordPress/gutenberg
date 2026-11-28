@@ -3,6 +3,13 @@ import { forwardRef } from '@wordpress/element';
 import styles from './style.module.css';
 import type { FullBleedProps } from './types';
 
+const FULL_BLEED_PROPS = {
+	className: styles.fullbleed,
+	// A hook for components that draw a frame of their own, such as
+	// `Item.Group`. Edge to edge in a card, they drop that frame.
+	'data-wp-ui-card-fullbleed': '',
+};
+
 /**
  * A container that breaks out of the card's padding to span edge-to-edge.
  * Useful for full-width images, dividers, or embedded content.
@@ -33,10 +40,7 @@ export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
 			defaultTagName: 'div',
 			render,
 			ref,
-			props: mergeProps< 'div' >(
-				{ className: styles.fullbleed },
-				props
-			),
+			props: mergeProps< 'div' >( FULL_BLEED_PROPS, props ),
 		} );
 
 		return element;

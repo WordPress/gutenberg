@@ -7,7 +7,7 @@ import { Link } from '../link';
 import * as Menu from '../menu';
 import * as Tooltip from '../tooltip';
 import { useBreadcrumbItemRenderContext } from './context';
-import { enforceRenderProps } from './enforce-render-props';
+import { enforceRenderProps } from '../utils/enforce-render-props';
 import { Item } from './item';
 import {
 	getMeasurementProps,

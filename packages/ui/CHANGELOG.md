@@ -6,6 +6,10 @@
 
 -   `Avatar`: Replace the compound API with a single component requiring `name`. Pass the image URL in `src` and its optional CORS setting in `crossOrigin`. Initials are the only fallback. The default avatar has the image role. Custom `render` elements keep their own role. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 
+### New Features
+
+-   `Item`: Add a row for lists of items and settings, composed from its parts. `Item.LinkRow`, `Item.ButtonRow` and `Item.ContentRow` say what the row does. `Item.Group` lists any mix of them, joined in one frame or detached in a frame each. Controls in `Item.Actions` are never nested inside the link or button of a row ([#86676](https://github.com/WordPress/gutenberg/pull/86676)).
+
 ### Enhancements
 
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))

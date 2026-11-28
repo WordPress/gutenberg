@@ -6,6 +6,8 @@
 			--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
 			--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
 			--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+			/* The radius of the corners inside the border of the card. */
+			--_wp-ui-card-inner-radius: calc(var(--wpds-border-radius-lg) - 1px);
 
 			display: flex;
 			flex-direction: column;
@@ -36,6 +38,23 @@
 		}
 
 		.fullbleed {
+			/*
+			 * The radius that content needs at its top and at its bottom
+			 * corners to follow the corners of the card. Zero unless the
+			 * `FullBleed` is flush with that edge of the card. Content that
+			 * draws inside its own box, such as a focus ring, reads these
+			 * so the card does not clip it at an angle.
+			 */
+			--_wp-ui-card-fullbleed-radius-block-start: 0px;
+			--_wp-ui-card-fullbleed-radius-block-end: 0px;
+			/*
+			 * Whether the `FullBleed` is flush with the top edge of the card,
+			 * as 1 or 0. Content that draws a line to separate itself from
+			 * what precedes it, such as `Item.Group`, leaves the line out at
+			 * the top edge, where the border of the card already draws one.
+			 */
+			--_wp-ui-card-fullbleed-flush-block-start: 0;
+
 			margin-inline: calc(-1 * var(--wp-ui-card-padding));
 			width: calc(100% + 2 * var(--wp-ui-card-padding));
 		}
@@ -47,11 +66,16 @@
 		 * (which would pull FullBleed up into the header gap).
 		 */
 		.root > :is(.header, .content):first-child > .fullbleed:first-child {
+			--_wp-ui-card-fullbleed-radius-block-start: var(--_wp-ui-card-inner-radius);
+			--_wp-ui-card-fullbleed-flush-block-start: 1;
+
 			margin-block-start: calc(-1 * var(--wp-ui-card-padding));
 		}
 
 		/* When FullBleed sits at the end of the last card section, extend it flush to the card's bottom edge. */
 		:is(.header, .content):last-child > .fullbleed:last-child {
+			--_wp-ui-card-fullbleed-radius-block-end: var(--_wp-ui-card-inner-radius);
+
 			margin-block-end: calc(-1 * var(--wp-ui-card-padding));
 		}
 
