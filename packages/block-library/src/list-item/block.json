@@ -17,6 +17,13 @@
 			"source": "rich-text",
 			"selector": "li",
 			"role": "content"
+		},
+		"value": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "li",
+			"attribute": "value",
+			"role": "content"
 		}
 	},
 	"supports": {
