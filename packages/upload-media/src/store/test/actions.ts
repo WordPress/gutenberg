@@ -42,6 +42,9 @@ vi.mock(
 			vipsHasTransparency: vi.fn( () => Promise.resolve( false ) ),
 			vipsConvertImageFormat: vi.fn(),
 			terminateVipsWorker: vi.fn(),
+			maybeRecycleVipsWorker: vi.fn( () => false ),
+			isVipsWorkerRecycleDue: vi.fn( () => false ),
+			isVipsOperation: vi.fn( () => false ),
 		} ) as unknown as typeof import( '../utils' )
 );
 

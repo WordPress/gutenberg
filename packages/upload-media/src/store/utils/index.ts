@@ -1,6 +1,7 @@
 import { exceedsClientProcessingMemory } from '../../feature-detection';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
+import { OperationType } from '../types';
 import type { ImageSizeCrop, QueueItemId } from '../types';
 
 /**
@@ -394,43 +395,77 @@ export function terminateVipsWorker(): void {
 }
 
 /**
- * Tracks the number of completed vips image processing operations across
- * both the success path (`finishOperation`) and the failure path
- * (`cancelItem`). Used to periodically recycle the WASM worker to reclaim
- * memory, since WASM linear memory can only grow and never shrink.
+ * Completed vips operations and the bytes they read since the worker was
+ * last recycled. WASM memory only grows, and wasm-vips does not reuse every
+ * block it frees, so the worker is replaced once either budget is spent.
  */
 let completedVipsOperations = 0;
+let completedVipsInputBytes = 0;
 
 /**
  * Maximum number of vips operations before recycling the worker.
- * Each operation can consume 50-100MB+ of WASM memory for large images.
- * The threshold is unchanged now that wasm-vips memory can grow to 2 GiB: a
- * grown heap is only handed back when the worker is recycled, so a lower
- * ceiling on accumulation still matters.
  */
 const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
 
 /**
- * Records that a vips operation has completed and recycles the worker if
- * the threshold has been reached and no other vips operations are in
- * flight. Call this from both success and failure paths so that a burst
- * of failures can't bypass the recycle budget.
+ * Maximum input bytes vips may read before recycling the worker. With camera
+ * JPEGs (about 15 MB each, several sub-sizes per image) wasm-vips fails to
+ * allocate long before the operation count is reached.
+ */
+const MAX_VIPS_INPUT_BYTES_BEFORE_RECYCLE = 64 * 1024 * 1024;
+
+/**
+ * Whether an operation runs in the vips worker.
  *
- * @param activeImageProcessingCount Number of vips operations currently
- *                                   in flight. Recycling is deferred while
- *                                   any are running so an in-flight worker
- *                                   isn't killed mid-operation.
+ * @param operation Operation type.
+ * @return Whether the operation uses vips.
+ */
+export function isVipsOperation( operation?: OperationType ): boolean {
+	return (
+		operation === OperationType.ResizeCrop ||
+		operation === OperationType.Rotate ||
+		operation === OperationType.TranscodeImage ||
+		operation === OperationType.DetectUltraHdr
+	);
+}
+
+/**
+ * Whether the vips worker has used up its budget and should be recycled as
+ * soon as it is idle. New vips operations wait while this is true and the
+ * worker is busy, so the worker gets a chance to drain.
+ *
+ * @return Whether a recycle is due.
+ */
+export function isVipsWorkerRecycleDue(): boolean {
+	return (
+		completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE ||
+		completedVipsInputBytes >= MAX_VIPS_INPUT_BYTES_BEFORE_RECYCLE
+	);
+}
+
+/**
+ * Records that a vips operation has completed and recycles the worker if
+ * its budget is spent and it is idle. Call this from both success and
+ * failure paths so that a burst of failures can't bypass the budget.
+ *
+ * @param hasActiveVipsOperations Whether any vips operation is in flight.
+ *                                The worker is never killed mid-operation.
+ * @param inputBytes              Size of the file the operation read.
+ * @return Whether the worker was recycled.
  */
 export function maybeRecycleVipsWorker(
-	activeImageProcessingCount: number
-): void {
+	hasActiveVipsOperations: boolean,
+	inputBytes = 0
+): boolean {
 	completedVipsOperations++;
+	completedVipsInputBytes += inputBytes;
 
-	if (
-		completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE &&
-		activeImageProcessingCount === 0
-	) {
-		terminateVipsWorker();
-		completedVipsOperations = 0;
+	if ( ! isVipsWorkerRecycleDue() || hasActiveVipsOperations ) {
+		return false;
 	}
+
+	terminateVipsWorker();
+	completedVipsOperations = 0;
+	completedVipsInputBytes = 0;
+	return true;
 }

@@ -36,6 +36,8 @@ import {
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
 	maybeRecycleVipsWorker,
+	isVipsWorkerRecycleDue,
+	isVipsOperation,
 } from './utils';
 import {
 	convertGifToVideo,
@@ -361,6 +363,15 @@ export function processItem( id: QueueItemId ) {
 			if ( activeCount >= settings.maxConcurrentImageProcessing ) {
 				return;
 			}
+
+			// Let the worker drain so it can be recycled before it runs
+			// out of memory. finishOperation() resumes the queue.
+			if (
+				isVipsWorkerRecycleDue() &&
+				select.hasActiveVipsOperations()
+			) {
+				return;
+			}
 		}
 
 		/*
@@ -630,6 +641,15 @@ export function finishOperation(
 			item: updates,
 		} );
 
+		// Count vips operations on both the success and the failure path
+		// (see cancelItem()), before starting anything new in the worker.
+		const wasRecycled =
+			isVipsOperation( previousOperation ) &&
+			maybeRecycleVipsWorker(
+				select.hasActiveVipsOperations(),
+				item?.file.size
+			);
+
 		dispatch.processItem( id );
 
 		/*
@@ -649,6 +669,7 @@ export function finishOperation(
 		 * Trigger processing for them.
 		 */
 		if (
+			wasRecycled ||
 			previousOperation === OperationType.ResizeCrop ||
 			previousOperation === OperationType.Rotate
 		) {
@@ -667,17 +688,6 @@ export function finishOperation(
 			for ( const pendingItem of pendingItems ) {
 				dispatch.processItem( pendingItem.id );
 			}
-		}
-
-		// Track vips operations across success and failure paths so a
-		// burst of failures can't bypass the recycle budget; the cancel
-		// path calls the same helper.
-		if (
-			previousOperation === OperationType.ResizeCrop ||
-			previousOperation === OperationType.Rotate ||
-			previousOperation === OperationType.TranscodeImage
-		) {
-			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
 		}
 	};
 }
