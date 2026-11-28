@@ -27,7 +27,9 @@ async function writeDockerFiles( config ) {
 
 	await writeFile(
 		config.dockerComposeConfigPath,
-		yaml.dump( dockerComposeConfig )
+		// Quote every string so values such as `HOST:CONTAINER` port
+		// mappings stay strings for YAML 1.1 parsers too.
+		yaml.dump( dockerComposeConfig, { forceQuotes: true } )
 	);
 
 	// Write four Dockerfiles for each service we provided.
