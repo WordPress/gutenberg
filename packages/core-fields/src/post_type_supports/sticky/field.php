@@ -8,8 +8,8 @@
 
 return array(
 	'type'          => 'boolean',
-	'label'         => __( 'Sticky', 'gutenberg' ),
-	'description'   => __( 'Pin this post to the top of the blog.', 'gutenberg' ),
+	'label'         => __( 'Sticky' ),
+	'description'   => __( 'Pin this post to the top of the blog.' ),
 	'enableSorting' => false,
 	'enableHiding'  => false,
 	'filterBy'      => false,

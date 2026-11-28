@@ -38,7 +38,7 @@ usort(
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Format', 'gutenberg' ),
+	'label'         => __( 'Format' ),
 	'Edit'          => 'radio',
 	'elements'      => $elements,
 	'enableSorting' => false,

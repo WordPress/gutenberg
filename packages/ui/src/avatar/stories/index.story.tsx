@@ -1,23 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { forwardRef } from '@wordpress/element';
-import * as Avatar from '../index';
+import { Avatar } from '../index';
+import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
+import * as Tooltip from '../../tooltip';
 
-// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
-// Used under the Unsplash License: https://unsplash.com/license
-const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
+// Served from `storybook/static`.
+const IMAGE_SRC = 'profile-picture.svg';
 
-const meta: Meta< typeof Avatar.Root > = {
+const meta: Meta< typeof Avatar > = {
 	title: 'Components/@wordpress-ui/Avatar',
 	id: 'design-system-components-avatar',
-	component: Avatar.Root,
-	subcomponents: {
-		'Avatar.Image': Avatar.Image,
-		'Avatar.Fallback': Avatar.Fallback,
-		'Avatar.Initials': Avatar.Initials,
-	},
+	component: Avatar,
+	args: { name: 'Alex Morgan' },
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -25,229 +20,107 @@ const meta: Meta< typeof Avatar.Root > = {
 			notes: 'API and design may change.',
 		},
 	},
-	args: {
-		size: 'md',
-		role: 'img',
-		'aria-label': 'Alex Morgan',
-	},
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image src={ IMAGE_SRC } alt="" />
-		</Avatar.Root>
-	),
 };
 export default meta;
 
-type Story = StoryObj< typeof Avatar.Root >;
+type Story = StoryObj< typeof Avatar >;
 
-export const Default: Story = {};
-
-/** Square avatars use the theme's corner radius for buttons and controls. */
-export const Square: Story = {
-	args: { shape: 'square' },
+export const Default: Story = {
+	args: { src: IMAGE_SRC },
 };
 
-/** Supply initials as fallback content. */
-export const FallbackOnly: Story = {
+/** The assigned color sets the activity ring; the initials fill adapts to contrast with it. */
+export const WithColor: Story = {
+	args: { color: '#008a20' },
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback>AM</Avatar.Fallback>
-		</Avatar.Root>
+		<Stack gap="md" align="center">
+			<Avatar { ...args } src={ IMAGE_SRC } active />
+			<Avatar { ...args } active />
+			<Avatar { ...args } />
+		</Stack>
 	),
 };
 
-/** Omit fallback content to display the borderless person silhouette. */
-export const IconFallback: Story = {
+/** Activity changes the ring without changing the avatar's footprint. */
+export const Activity: Story = {
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback />
-		</Avatar.Root>
+		<Stack gap="md" align="center">
+			<Avatar { ...args } active={ false } />
+			<Avatar { ...args } active />
+			<Avatar { ...args } src={ IMAGE_SRC } active={ false } />
+			<Avatar { ...args } src={ IMAGE_SRC } active />
+		</Stack>
 	),
 };
 
-/** Derive complete initials from a display name, or use the person silhouette. */
-export const Initials: StoryObj< typeof Avatar.Initials > = {
-	args: { name: 'Alex Morgan' },
-	argTypes: {
-		name: { control: 'text' },
-		locale: { control: 'text' },
-	},
-	render: ( { name, locale, delay } ) => (
-		<Avatar.Root role="img" aria-label={ name || 'Unknown person' }>
-			<Avatar.Initials name={ name } locale={ locale } delay={ delay } />
-		</Avatar.Root>
-	),
-};
-
-/** Missing images display the fallback immediately despite a delay. */
-export const MissingImage: Story = {
+/** Single-word names display one larger initial. Hyphens and apostrophes stay within words. */
+export const Initials: Story = {
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Initials name="Alex Morgan" delay={ 300 } />
-			<Avatar.Image alt="" />
-		</Avatar.Root>
-	),
-};
-
-/** Decorative avatars retain their layout inside an admin tree item. */
-export const InTree: Story = {
-	render: ( args ) => (
-		<div role="tree">
-			<div role="treeitem">
-				<Stack align="center" gap="sm">
-					<Avatar.Root { ...args } aria-hidden="true">
-						<Avatar.Initials name="Alex Morgan" />
-					</Avatar.Root>
-					<Text>Alex Morgan</Text>
-				</Stack>
-			</div>
-		</div>
-	),
-};
-
-/** An image that fails to load leaves the fallback visible. */
-export const FailedImage: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				src="data:image/png;base64,invalid"
-				alt=""
-				keepMounted
-			/>
-		</Avatar.Root>
-	),
-};
-
-export const Sizes: Story = {
-	name: 'Sizes and shapes',
-	render: ( args ) => (
-		<Stack direction="column" gap="lg">
-			{ ( [ 'circle', 'square' ] as const ).map( ( shape ) => (
-				<Stack key={ shape } direction="column" gap="md">
-					<Stack gap="md" align="center">
-						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-							( size ) => (
-								<Avatar.Root
-									{ ...args }
-									key={ size }
-									size={ size }
-									shape={ shape }
-								>
-									<Avatar.Fallback delay={ 300 }>
-										AM
-									</Avatar.Fallback>
-									<Avatar.Image src={ IMAGE_SRC } alt="" />
-								</Avatar.Root>
-							)
-						) }
-					</Stack>
-					<Stack gap="md" align="center">
-						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-							( size ) => (
-								<Avatar.Root
-									{ ...args }
-									key={ size }
-									size={ size }
-									shape={ shape }
-								>
-									<Avatar.Fallback>AM</Avatar.Fallback>
-								</Avatar.Root>
-							)
-						) }
-					</Stack>
-					<Stack gap="md" align="center">
-						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-							( size ) => (
-								<Avatar.Root
-									{ ...args }
-									key={ size }
-									size={ size }
-									shape={ shape }
-								>
-									<Avatar.Fallback />
-								</Avatar.Root>
-							)
-						) }
-					</Stack>
-				</Stack>
+		<Stack gap="md" align="center">
+			{ [
+				'Alex Morgan',
+				'Alex',
+				'Jean-Luc',
+				"O'Connor",
+				'👩🏽‍💻',
+				'李 小龙',
+			].map( ( name ) => (
+				<Avatar { ...args } key={ name } name={ name } />
 			) ) }
 		</Stack>
 	),
 };
 
-/** Hide the avatar from assistive technology when the name is shown beside it. */
-export const WithVisibleName: Story = {
-	args: { size: 'sm' },
+/** Size describes the intended image size on high-DPI screens, with ring space reserved outside it. */
+export const Sizes: Story = {
 	render: ( args ) => (
-		<Stack direction="column" gap="md">
-			<Stack gap="sm" align="center">
-				<Avatar.Root { ...args } aria-hidden="true">
-					<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-					<Avatar.Image src={ IMAGE_SRC } alt="" />
-				</Avatar.Root>
-				<Text>Alex Morgan</Text>
-			</Stack>
-			<Stack gap="sm" align="center">
-				<Avatar.Root { ...args } aria-hidden="true">
-					<Avatar.Fallback>AM</Avatar.Fallback>
-				</Avatar.Root>
-				<Text>Alex Morgan</Text>
-			</Stack>
-			<Stack gap="sm" align="center">
-				<Avatar.Root { ...args } aria-hidden="true">
-					<Avatar.Fallback />
-				</Avatar.Root>
-				<Text>Alex Morgan</Text>
-			</Stack>
+		<Stack gap="md" align="center">
+			{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map( ( size ) => (
+				<Avatar { ...args } key={ size } size={ size } />
+			) ) }
 		</Stack>
 	),
 };
 
-/** Use `keepMounted` to let the browser load the image lazily. */
-export const LazyImage: Story = {
+/** Use a circle for a person's portrait and a square to preserve the corners of a site logo. */
+export const Shapes: Story = {
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image src={ IMAGE_SRC } alt="" keepMounted loading="lazy" />
-		</Avatar.Root>
+		<Stack gap="md" align="center">
+			<Avatar { ...args } src={ IMAGE_SRC } shape="circle" />
+			<Avatar
+				{ ...args }
+				name="WordPress"
+				src="wordpress-wmark.svg"
+				shape="square"
+			/>
+		</Stack>
 	),
 };
 
-const ProfileImage = forwardRef<
-	HTMLImageElement,
-	React.ComponentProps< 'img' >
->( function UnforwardedProfileImage( props, ref ) {
-	return <img alt="" { ...props } ref={ ref } />;
-} );
-
-/**
- * When passing a custom image component through `render`, forward the ref and
- * image props, including `onLoad` and `onError`, to the underlying image element.
- */
-export const CustomImage: Story = {
+/** Render the Avatar as the button so the focus ring follows its shape. */
+export const Interactive: Story = {
+	args: { color: '#008a20', active: true },
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				keepMounted
-				render={ <ProfileImage src={ IMAGE_SRC } alt="" /> }
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<Avatar
+						{ ...args }
+						render={ <Button variant="unstyled" /> }
+					/>
+				}
 			/>
-		</Avatar.Root>
+			<Tooltip.Popup>{ args.name }</Tooltip.Popup>
+		</Tooltip.Root>
 	),
 };
 
-/** Pass a Gravatar URL to `Avatar.Image` through its `src` prop. */
-export const Gravatar: Story = {
+/** Hide the avatar from assistive technology when nearby text identifies the person. */
+export const WithVisibleName: Story = {
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image
-				src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=identicon&f=y&s=96"
-				alt=""
-				keepMounted
-			/>
-		</Avatar.Root>
+		<Stack gap="sm" align="center">
+			<Avatar { ...args } aria-hidden="true" />
+			<Text>{ args.name }</Text>
+		</Stack>
 	),
 };

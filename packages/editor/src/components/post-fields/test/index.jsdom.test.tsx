@@ -12,8 +12,8 @@ vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 /**
- * Leaves the requests other than the fields' pending, such as those of the
- * post type `registerPostTypeSchema` makes, which these tests do not need.
+ * Leaves the requests other than the fields' pending, which these tests do
+ * not need.
  *
  * @return A promise that never settles.
  */

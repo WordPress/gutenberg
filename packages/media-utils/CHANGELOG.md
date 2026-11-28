@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Show the image preview for attachments with `media_type` `image` and an empty `mime_type` ([#87207](https://github.com/WordPress/gutenberg/pull/87207)).
+-   `MediaEdit`: Keep the compact control the same height after selecting media ([#87542](https://github.com/WordPress/gutenberg/pull/87542)).
+
+## 6.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `MediaUploadModal`: Query filters on attachment taxonomy fields by the taxonomy. ([#86458](https://github.com/WordPress/gutenberg/pull/86458))
+-   `MediaUploadModal`: Add a `fields` prop for fields registered for attachments, shown alongside the modal's own as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
+
+## 6.1.0 (2026-11-04)
+
+### Enhancements
+
+-   `MediaEdit`: Use design system's outline focus ring instead of previous box-shadow based implementation & only animate on items reorder. ([#84940](https://github.com/WordPress/gutenberg/pull/84940)).
+
+## 6.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

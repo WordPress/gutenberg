@@ -8,8 +8,8 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Excerpt', 'gutenberg' ),
-	'placeholder'   => __( 'Add an excerpt', 'gutenberg' ),
+	'label'         => __( 'Excerpt' ),
+	'placeholder'   => __( '(no excerpt)' ),
 	'Edit'          => array(
 		'control' => 'textarea',
 		'rows'    => 4,

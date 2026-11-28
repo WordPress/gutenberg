@@ -6,7 +6,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/ui';
 import { getItemTitle } from '../../shared/title/get-item-title';
-import { unlock } from '../../lock-unlock';
+import { isTemplateSwitchable } from './is-template-switchable';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import type { PostWithTemplate } from './types';
 
@@ -21,30 +21,26 @@ type TemplateEditComponentProps = Pick<
 
 const EMPTY_ARRAY: [] = [];
 
-/**
- * Whether the post is the front page or the posts page, which are assigned
- * a template by the reading settings rather than by this field.
- *
- * @param postType The post type.
- * @param postId   The post id.
- * @return Whether the template can be switched.
- */
+// The value of the default template option. The post stores the default
+// template as an empty string, but the select treats an empty value as no
+// selection and shows its placeholder. Template slugs can't start with a
+// slash, so this can't clash with a real template.
+const DEFAULT_TEMPLATE_VALUE = '//default';
+
+function toItemValue( template: string | undefined ) {
+	return template || DEFAULT_TEMPLATE_VALUE;
+}
+
+function fromItemValue( itemValue: string | null | undefined ) {
+	return ! itemValue || itemValue === DEFAULT_TEMPLATE_VALUE ? '' : itemValue;
+}
+
 function useCanSwitchTemplate(
 	postType: string,
 	postId: number | string
 ): boolean {
 	return useSelect(
-		( select ) => {
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreStore )
-			);
-			const singlePostId = String( postId );
-			const isPostsPage = getPostsPageId() === singlePostId;
-			const isFrontPage =
-				postType === 'page' && getHomePage()?.postId === singlePostId;
-
-			return ! isPostsPage && ! isFrontPage;
-		},
+		( select ) => isTemplateSwitchable( select, postType, postId ),
 		[ postId, postType ]
 	);
 }
@@ -60,7 +56,7 @@ function ClassicTemplateEdit( {
 			Object.entries( data?.available_templates ?? {} ).map(
 				( [ templateSlug, title ] ) => ( {
 					label: title,
-					value: templateSlug,
+					value: toItemValue( templateSlug ),
 				} )
 			),
 		[ data ]
@@ -71,12 +67,14 @@ function ClassicTemplateEdit( {
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={
-				items.find( ( item ) => item.value === value ) ??
+				items.find( ( item ) => item.value === toItemValue( value ) ) ??
 				items[ 0 ] ??
 				null
 			}
 			items={ items }
-			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+			onValueChange={ ( item ) =>
+				onChange( fromItemValue( item?.value ) )
+			}
 			disabled={ ! canSwitchTemplate }
 		/>
 	);
@@ -111,7 +109,7 @@ function BlockThemeTemplateEdit( {
 	const value = field.getValue( { item: data } );
 	const items = useMemo(
 		() => [
-			{ label: defaultTemplateLabel, value: '' },
+			{ label: defaultTemplateLabel, value: DEFAULT_TEMPLATE_VALUE },
 			...templates.map( ( template ) => ( {
 				label: getItemTitle( template ),
 				value: template.slug,
@@ -124,12 +122,14 @@ function BlockThemeTemplateEdit( {
 			label={ __( 'Template' ) }
 			hideLabelFromVision
 			value={
-				items.find( ( item ) => item.value === value ) ??
+				items.find( ( item ) => item.value === toItemValue( value ) ) ??
 				items[ 0 ] ??
 				null
 			}
 			items={ items }
-			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+			onValueChange={ ( item ) =>
+				onChange( fromItemValue( item?.value ) )
+			}
 			disabled={ ! canSwitchTemplate }
 		/>
 	);

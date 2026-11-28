@@ -135,6 +135,72 @@ describe( 'ControlWithError', () => {
 		} );
 	} );
 
+	describe( 'Touched state', () => {
+		it( 'should not mark an empty required control as touched on blur', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ValidatedInputControl label="Email" type="email" required />
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'textbox', {
+				name: /^Email/,
+			} );
+
+			await user.click( input );
+			await user.tab();
+
+			expect(
+				screen.queryByText( input.validationMessage )
+			).not.toBeInTheDocument();
+			expect( input ).not.toHaveAttribute( 'data-validity-visible' );
+
+			await user.type( input, 'a' );
+
+			const typeMismatchMessage = input.validationMessage;
+			expect( input.validity.typeMismatch ).toBe( true );
+			expect(
+				screen.queryByText( typeMismatchMessage )
+			).not.toBeInTheDocument();
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( typeMismatchMessage ) ).toBeVisible();
+			} );
+			expect( input ).toHaveAttribute( 'data-validity-visible' );
+
+			await user.clear( input );
+			await user.tab();
+
+			expect( input.validity.valueMissing ).toBe( true );
+			const valueMissingMessage = input.validationMessage;
+			await waitFor( () => {
+				expect( screen.getByText( valueMissingMessage ) ).toBeVisible();
+			} );
+		} );
+
+		it( 'should mark a required number control with unparseable input as touched on blur', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ValidatedInputControl label="Count" type="number" required />
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'spinbutton', {
+				name: /^Count/,
+			} );
+
+			await user.type( input, '-' );
+			expect( input.validity.badInput ).toBe( true );
+			const badInputMessage = input.validationMessage;
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( badInputMessage ) ).toBeVisible();
+			} );
+		} );
+	} );
+
 	describe( 'aria-describedby', () => {
 		it( 'should connect the error message to the input via aria-describedby', async () => {
 			const user = userEvent.setup();
@@ -309,6 +375,86 @@ describe( 'ControlWithError', () => {
 			} );
 
 			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+
+			await waitFor( () => {
+				expect( input ).not.toHaveAttribute( 'aria-describedby' );
+			} );
+		} );
+
+		it( 'should connect the error message to the interactive target when provided', async () => {
+			const user = userEvent.setup();
+
+			const LabeledInput = forwardRef<
+				HTMLInputElement,
+				React.InputHTMLAttributes< HTMLInputElement > & {
+					label?: string;
+				}
+			>( function UnforwardedLabeledInput(
+				{ label, required: _required, ...restProps },
+				ref
+			) {
+				return (
+					<input ref={ ref } aria-label={ label } { ...restProps } />
+				);
+			} );
+
+			function TestComponent() {
+				const [ value, setValue ] = useState( '' );
+				const validityTargetRef = useRef< HTMLInputElement >( null );
+				const interactiveTargetRef = useRef< HTMLInputElement >( null );
+
+				return (
+					<form>
+						<ControlWithError
+							required
+							getValidityTarget={ () =>
+								validityTargetRef.current
+							}
+							getInteractiveTarget={ () =>
+								interactiveTargetRef.current
+							}
+						>
+							<LabeledInput
+								ref={ interactiveTargetRef }
+								label="Name"
+								value={ value }
+								onChange={ ( event ) =>
+									setValue( event.target.value )
+								}
+							/>
+						</ControlWithError>
+						<input
+							ref={ validityTargetRef }
+							aria-label="Delegate"
+							required
+							tabIndex={ -1 }
+							value={ value }
+							onChange={ () => {} }
+						/>
+						<button type="submit">Submit</button>
+					</form>
+				);
+			}
+
+			await render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: /^Name/ } );
+			const delegate = screen.getByRole( 'textbox', {
+				name: 'Delegate',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					'Please fill out this field.'
+				);
+			} );
+			expect( delegate ).not.toHaveAttribute( 'aria-describedby' );
+
+			await user.type( input, 'Ada' );
 
 			await waitFor( () => {
 				expect( input ).not.toHaveAttribute( 'aria-describedby' );

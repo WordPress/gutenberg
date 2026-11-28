@@ -6,6 +6,8 @@ import { speak } from '@wordpress/a11y';
 import { createPortal, useState } from '@wordpress/element';
 import { SVG, Path } from '@wordpress/primitives';
 import Snackbar from '../index';
+import '../../button/style.scss';
+import '../style.scss';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -70,12 +72,105 @@ describe( 'Snackbar', () => {
 		expect( removeNotice ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'should auto-dismiss after 6 seconds when it has no action', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
+		await render(
+			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
+				Message
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 5999 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+
+		await act( async () => vi.advanceTimersByTime( 1 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should auto-dismiss after 10 seconds when it has an action', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const onDismiss = vi.fn();
+		await render(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+				onDismiss={ onDismiss }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 9999 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+
+		await act( async () => vi.advanceTimersByTime( 1 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not restart auto-dismissal when rerendered with a new actions array', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		const { rerender } = await render(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 9000 ) );
+		await rerender(
+			<Snackbar
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+		await act( async () => vi.advanceTimersByTime( 1000 ) );
+
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not auto-dismiss a snackbar with an action when the `explicitDismiss` prop is set to `true`', async () => {
+		vi.useFakeTimers();
+		const onRemove = vi.fn();
+		await render(
+			<Snackbar
+				explicitDismiss
+				actions={ [ { label: 'View post', url: '#' } ] }
+				onRemove={ onRemove }
+			>
+				Post published.
+			</Snackbar>
+		);
+
+		await act( async () => vi.advanceTimersByTime( 10000 ) );
+
+		expect( onRemove ).not.toHaveBeenCalled();
+	} );
+
 	it( 'should be dismissible by clicking the snackbar', async () => {
 		const onRemove = vi.fn();
 		const onDismiss = vi.fn();
+		const onActionClick = vi.fn();
 
 		await render(
-			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
+			<Snackbar
+				onRemove={ onRemove }
+				onDismiss={ onDismiss }
+				actions={ [ { label: 'View post', onClick: onActionClick } ] }
+			>
 				Message
 			</Snackbar>
 		);
@@ -88,10 +183,45 @@ describe( 'Snackbar', () => {
 			'Dismiss this notice'
 		);
 
-		await userEvent.click( snackbar );
+		// Click the message side of the snackbar, away from the action.
+		await userEvent.click( snackbar, { position: { x: 10, y: 10 } } );
 
 		expect( onRemove ).toHaveBeenCalledTimes( 1 );
 		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
+		expect( onActionClick ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should run the action when clicking just outside the action text', async () => {
+		const onDismiss = vi.fn();
+		const onActionClick = vi.fn();
+
+		await render(
+			<Snackbar
+				onDismiss={ onDismiss }
+				actions={ [ { label: 'View post', onClick: onActionClick } ] }
+			>
+				Message
+			</Snackbar>
+		);
+
+		const snackbar = screen.getByTestId( testId );
+		const action = screen.getByRole( 'button', { name: 'View post' } );
+		const snackbarBounds = snackbar.getBoundingClientRect();
+		const actionBounds = action.getBoundingClientRect();
+
+		// Click above the action's own box, in the snackbar's padding.
+		await userEvent.click( snackbar, {
+			position: {
+				x:
+					actionBounds.left -
+					snackbarBounds.left +
+					actionBounds.width / 2,
+				y: actionBounds.top - snackbarBounds.top - 4,
+			},
+		} );
+
+		expect( onActionClick ).toHaveBeenCalledTimes( 1 );
+		expect( onDismiss ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
@@ -390,6 +520,37 @@ describe( 'Snackbar', () => {
 
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		it.each( [
+			[ 'Enter', '{Enter}' ],
+			[ 'Space', ' ' ],
+		] )(
+			'should call `onClick` when the action button is activated with %s',
+			async ( _keyName, key ) => {
+				const onClick = vi.fn();
+				const onDismiss = vi.fn();
+				const onRemove = vi.fn();
+
+				await render(
+					<Snackbar
+						actions={ [ { label: 'Undo', onClick } ] }
+						onDismiss={ onDismiss }
+						onRemove={ onRemove }
+					>
+						Post trashed.
+					</Snackbar>
+				);
+
+				within( screen.getByTestId( testId ) )
+					.getByRole( 'button', { name: 'Undo' } )
+					.focus();
+				await userEvent.keyboard( key );
+
+				expect( onClick ).toHaveBeenCalledTimes( 1 );
+				expect( onRemove ).toHaveBeenCalledTimes( 1 );
+				expect( onDismiss ).not.toHaveBeenCalled();
+			}
+		);
 
 		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', async () => {
 			await render(

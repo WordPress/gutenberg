@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as editWidgetsStore } from '../../store';
@@ -23,21 +22,17 @@ export default function UnsavedChangesWarning() {
 		/**
 		 * Warns the user if there are unsaved changes before leaving the editor.
 		 *
-		 * @param {Event} event `beforeunload` event.
-		 *
-		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
+		 * @param {BeforeUnloadEvent} event `beforeunload` event.
 		 */
 		const warnIfUnsavedChanges = ( event ) => {
 			if ( isDirty ) {
-				event.returnValue = __(
-					'You have unsaved changes. If you proceed, they will be lost.'
-				);
-				return event.returnValue;
+				event.preventDefault();
+				// Chrome before 119 ignores `preventDefault()`.
+				event.returnValue = true;
 			}
 		};
 
 		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
-
 		return () => {
 			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
 		};

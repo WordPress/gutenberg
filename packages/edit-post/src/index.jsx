@@ -14,16 +14,15 @@ import {
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
+	registerCoreBlockBindingsSources,
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const {
-	BackButton: __experimentalMainDashboardButton,
-	registerCoreBlockBindingsSources,
-} = unlock( editorPrivateApis );
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 const { enablePreloadMultiUse, clearPreloadedData } = unlock(
 	apiFetch.privateApis
@@ -70,6 +69,7 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: false,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,
@@ -113,7 +113,7 @@ export function initializeEditor(
 	// `finished` by the time React mounts — no `setTimeout(0)`
 	// resolution dance on first render. Multi-use lets a single
 	// preloaded URL back several selectors (e.g. /wp/v2/settings GET +
-	// OPTIONS serves `getEntitiesConfig`, `canUser`, `getEntityRecord`).
+	// OPTIONS serves `getEntityConfig`, `canUser`, `getEntityRecord`).
 	enablePreloadMultiUse();
 	const preloadedResolutions = preloadResolutions( postType, postId );
 
@@ -168,9 +168,9 @@ async function preloadResolutions( postType, postId ) {
 	try {
 		await Promise.all( [
 			core.getCurrentUser(),
-			core.getEntitiesConfig( 'postType' ),
-			core.getEntitiesConfig( 'taxonomy' ),
-			core.getEntitiesConfig( 'root' ),
+			core.getEntityConfig( 'postType', postType ),
+			core.getEntityConfig( 'taxonomy', 'category' ),
+			core.getEntityConfig( 'root', 'site' ),
 			core.getEntityRecords( 'root', 'taxonomy' ),
 			core.getCurrentTheme(),
 			// Forward-resolver alias of `getCurrentTheme` with its own
@@ -189,11 +189,11 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
-			// The DataForm-based inspector requests the entity form config
-			// when the document sidebar mounts. The args must match the
-			// `useViewConfig` call in `@wordpress/views` exactly for the
-			// resolution (and its preload entry) to be shared.
-			...( postType && window?.__experimentalDataFormInspector
+			// The inspector requests the entity form config when the document
+			// sidebar mounts. The args must match the `useViewConfig` call in
+			// `@wordpress/views` exactly for the resolution (and its preload
+			// entry) to be shared.
+			...( postType
 				? [
 						unlock( core ).getViewConfig( 'postType', postType, {
 							fields: 'form',
@@ -204,6 +204,16 @@ async function preloadResolutions( postType, postId ) {
 						// the kickoff short.
 						unlock( core )
 							.getFieldsConfig( 'postType', postType )
+							.catch( () => {} ),
+					]
+				: [] ),
+			// The actions of the post type, which the actions menu of the
+			// document sidebar reads with `useEntityActions`. It reports a failure
+			// of its own, so this must not cut the rest of the kickoff short.
+			...( postType
+				? [
+						unlock( core )
+							.getEntityActionsConfig( 'postType', postType )
 							.catch( () => {} ),
 					]
 				: [] ),
@@ -261,15 +271,6 @@ async function preloadResolutions( postType, postId ) {
 					slug += '-' + post.slug;
 				}
 				tasks.push( core.getDefaultTemplateId( { slug } ) );
-
-				if ( post.author ) {
-					tasks.push(
-						core.getUser( post.author, {
-							context: 'view',
-							_fields: 'id,name',
-						} )
-					);
-				}
 			}
 		}
 

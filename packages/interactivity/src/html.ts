@@ -26,6 +26,36 @@ export const emptyHTML =
 	( globalThis as { trustedTypes?: TrustedTypePolicyFactory } ).trustedTypes
 		?.emptyHTML ?? '';
 
+/** Void and text-only elements on which `data-wp-html` cannot own content. */
+export const unsupportedHtmlElements = new Set( [
+	'area',
+	'base',
+	'basefont',
+	'bgsound',
+	'br',
+	'col',
+	'embed',
+	'frame',
+	'hr',
+	'img',
+	'input',
+	'keygen',
+	'link',
+	'meta',
+	'param',
+	'source',
+	'track',
+	'wbr',
+	'textarea',
+	'title',
+	'script',
+	'style',
+	'iframe',
+	'xmp',
+	'noembed',
+	'noframes',
+] );
+
 declare const dangerousHTMLBrand: unique symbol;
 
 /**
@@ -53,8 +83,9 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
 
 /**
  * Marks a string (or native `TrustedHTML`) as trusted so the `data-wp-html`
- * directive renders it as markup. Any value other than a token empties the
- * bound element.
+ * directive renders it as markup. Other values empty the bound element,
+ * except pending values and the server's token representation, which keep
+ * its content.
  *
  * This function never sanitizes or otherwise processes the HTML passed
  * here, the same responsibility you take on using `dangerouslySetInnerHTML`

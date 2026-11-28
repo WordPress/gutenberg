@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Hide the decorative author avatar from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+
+## 0.25.0 (2026-11-18)
+
+## 0.24.0 (2026-11-04)
+
+## 0.23.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

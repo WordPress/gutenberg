@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactElement, ReactNode } from 'react';
+import type { Tooltip } from '@wordpress/ui';
 import type { BaseControlProps } from '../base-control/types';
-import type { TooltipProps } from '../tooltip/types';
 
 export type ToggleGroupControlOptionBaseProps = {
 	children: ReactNode;
@@ -56,7 +56,10 @@ export type WithToolTipProps = {
 	/**
 	 * React children
 	 */
-	children: TooltipProps[ 'children' ];
+	children: Extract<
+		ComponentProps< typeof Tooltip.Trigger >[ 'render' ],
+		ReactElement
+	>;
 	/**
 	 * Label for the Tooltip component.
 	 */

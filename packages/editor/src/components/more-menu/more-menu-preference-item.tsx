@@ -2,8 +2,10 @@ import { speak } from '@wordpress/a11y';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import type { ComponentProps, ReactNode } from 'react';
 
 type MoreMenuPreferenceItemProps = {

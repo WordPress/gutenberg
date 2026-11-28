@@ -4,7 +4,8 @@ import type {
 	RefCallback,
 	SyntheticEvent,
 } from 'react';
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useRef, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import useConstrainedTabbing from '../use-constrained-tabbing';
 import { useFocusOnMount } from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
@@ -89,20 +90,30 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 	// so portaled descendants that handle Escape and call
 	// `event.stopPropagation()` correctly prevent the dialog from closing.
 	// See https://github.com/WordPress/gutenberg/issues/78432.
-	const onKeyDown = useCallback( ( event: KeyboardEvent< HTMLElement > ) => {
-		// Let the consumer-provided handler (if any) run first so it can
-		// call `preventDefault()` to opt out of close-on-Escape.
-		currentOptions.current?.onKeyDown?.( event );
-		if (
-			event.key === 'Escape' &&
-			! event.defaultPrevented &&
-			currentOptions.current?.onClose
-		) {
-			event.preventDefault();
-			event.stopPropagation();
-			currentOptions.current.onClose();
-		}
-	}, [] );
+	const closeOnEscape = useMemo(
+		() =>
+			withIgnoreIMEEvents( ( event: KeyboardEvent< HTMLElement > ) => {
+				if (
+					event.key === 'Escape' &&
+					! event.defaultPrevented &&
+					currentOptions.current?.onClose
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+					currentOptions.current.onClose();
+				}
+			} ),
+		[]
+	);
+	const onKeyDown = useCallback(
+		( event: KeyboardEvent< HTMLElement > ) => {
+			// Let the consumer-provided handler (if any) run first so it can
+			// call `preventDefault()` to opt out of close-on-Escape.
+			currentOptions.current?.onKeyDown?.( event );
+			closeOnEscape( event );
+		},
+		[ closeOnEscape ]
+	);
 
 	return [
 		useMergeRefs( [

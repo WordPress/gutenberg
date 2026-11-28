@@ -2,9 +2,35 @@
 
 ## Unreleased
 
+## 6.2.0 (2026-11-18)
+
+### Enhancements
+
+-   `InlineNotices`: Keep the component mounted when there are no notices so it can announce the first new message. It now renders a list element and live regions even when empty. Notices present on mount stay silent ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
+
+## 6.1.0 (2026-11-04)
+
+## 6.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   `createNotice`: Add a `details` option, for longer plain text that supplements the message. `InlineNotices` shows it behind a "Show details" disclosure, with a button to copy the message and the details together. Web addresses in the details are links that open in a new tab ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Enhancements
+
+-   `InlineNotices`: Render notices with the `@wordpress/ui` `Notice`. The markup changes: the `.components-notice*` classes are gone, each notice has the `notices-inline-notices__notice` class, and each list has the `notices-inline-notices__list` class. Each notice still announces its message when it is created ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Deprecations
+
+-   `createNotice`: Deprecate the `__unstableHTML` option. Pass the message as plain text, and any longer account as `details` ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Bug Fixes
+
+-   `InlineNotices`: Render nothing when every child renders nothing ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ## 5.57.0 (2026-10-07)
 

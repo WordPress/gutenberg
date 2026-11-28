@@ -9,7 +9,13 @@
  */
 
 import { describe, expect, test, vi } from 'vitest';
-import { privateApis, store, watch, withScope } from '@wordpress/interactivity';
+import {
+	getContext,
+	privateApis,
+	store,
+	watch,
+	withScope,
+} from '@wordpress/interactivity';
 import { actions, state } from '../index';
 import {
 	hydrateHtml,
@@ -27,6 +33,20 @@ await vi.hoisted( async () => {
 const { getScope } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
+
+/**
+ * Returns the error produced by reading directive context without a scope.
+ *
+ * @return The thrown error message, or `undefined` when a scope is present.
+ */
+function readContextError() {
+	try {
+		getContext();
+	} catch ( error ) {
+		return error instanceof Error ? error.message : String( error );
+	}
+	return undefined;
+}
 
 /**
  * Navigates to a cached page without any router region.
@@ -207,6 +227,34 @@ describe( 'the derived initiator of a navigation started by a watcher', () => {
 		expect( state.initiator ).toBeNull();
 	} );
 
+	test( 'is `null` for a navigation started by a `watch()` cleanup', async () => {
+		await nextFrames();
+		let hasStarted = false;
+		let cleanupInitiator: string | null | undefined;
+		let cleanupNavigation: Promise< void > | undefined;
+		const stop = watch( () => {
+			void state.navigating;
+			return () => {
+				if ( state.navigating && ! hasStarted ) {
+					hasStarted = true;
+					cleanupNavigation = navigateTo( '/from-watcher-cleanup' );
+					cleanupInitiator = state.initiator;
+				}
+			};
+		} );
+
+		const trigger = hydrateTrigger( 'r1' );
+		await trigger.runInScope( () =>
+			navigateTo( '/watch-cleanup-trigger' )
+		);
+		await cleanupNavigation;
+		await nextFrames();
+		stop();
+
+		expect( cleanupInitiator ).toBeNull();
+		expect( state.initiator ).toBeNull();
+	} );
+
 	test( 'is the captured region for a `watch()` callback wrapped with `withScope()`', async () => {
 		await nextFrames();
 		const watcherRegion = hydrateTrigger( 'watcher-region' );
@@ -310,5 +358,83 @@ describe( 'router regions', () => {
 				document.getElementById( `parent-${ i + 1 }` )
 			).toHaveTextContent( `attached-${ i }` );
 		} );
+	} );
+} );
+
+describe( 'attached navigation initiator', () => {
+	test( 'keeps the navigating region as initiator when it attaches a region', async () => {
+		await nextFrames();
+		const trigger = hydrateTrigger( 'attached-r1' );
+		let inFlightInitiator: string | null | undefined;
+		let callbackRan = false;
+		const href = 'http://localhost/attach-from-r1';
+		const region = `<div data-wp-interactive="test/attach-initiator" data-wp-router-region='${ JSON.stringify(
+			{ id: 'attached-initiator', attachTo: 'body' }
+		) }'><p>attached</p></div>`;
+
+		const navigation = trigger.runInScope( () => {
+			callbackRan = true;
+			const result = actions.navigate( href, {
+				...quiet,
+				html: pageHtml( region ),
+			} );
+			inFlightInitiator = state.initiator;
+			return result;
+		} );
+		await navigation;
+		await nextFrames();
+
+		expect( callbackRan ).toBe( true );
+		expect( inFlightInitiator ).toBe( 'attached-r1' );
+		expect( state.initiator ).toBe( 'attached-r1' );
+	} );
+} );
+
+describe( 'watch cleanups during ordinary region updates', () => {
+	test( 'runs without a directive scope on dependency changes and unmount', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+
+		const namespace = 'test/ordinary-watch-cleanup';
+		const interactivityStore = store( namespace, {
+			state: { value: 0 },
+		} );
+		const dependency = interactivityStore.state;
+		const contextErrors: Array< string | undefined > = [];
+		store( namespace, {
+			callbacks: {
+				watch() {
+					void dependency.value;
+					return () => contextErrors.push( readContextError() );
+				},
+			},
+			actions: {
+				update() {
+					dependency.value++;
+				},
+			},
+		} );
+		const region = hydrateHtml(
+			`<div data-wp-interactive="${ namespace }" data-wp-router-region="ordinary-watch-cleanup"><div data-wp-context='{"owner":"watcher"}' data-wp-watch="callbacks.watch"></div><button data-wp-on--click="actions.update"></button></div>`
+		);
+		await nextFrames();
+
+		region.querySelector( 'button' )!.click();
+		await nextFrames();
+		expect( contextErrors ).toEqual( [
+			expect.stringContaining(
+				'Cannot call `getContext()` when there is no scope.'
+			),
+		] );
+
+		await navigateTo( '/ordinary-watch-cleanup-unmount' );
+		await nextFrames();
+		expect( contextErrors ).toEqual( [
+			expect.stringContaining(
+				'Cannot call `getContext()` when there is no scope.'
+			),
+			expect.stringContaining(
+				'Cannot call `getContext()` when there is no scope.'
+			),
+		] );
 	} );
 } );

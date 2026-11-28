@@ -8,7 +8,7 @@
 
 return array(
 	'type'          => 'text',
-	'label'         => __( 'Comments', 'gutenberg' ),
+	'label'         => __( 'Comments' ),
 	'Edit'          => 'radio',
 	'enableSorting' => false,
 	'enableHiding'  => false,
@@ -16,13 +16,13 @@ return array(
 	'elements'      => array(
 		array(
 			'value'       => 'open',
-			'label'       => __( 'Open', 'gutenberg' ),
-			'description' => __( 'Visitors can add new comments and replies.', 'gutenberg' ),
+			'label'       => __( 'Open' ),
+			'description' => __( 'Visitors can add new comments and replies.' ),
 		),
 		array(
 			'value'       => 'closed',
-			'label'       => __( 'Closed', 'gutenberg' ),
-			'description' => __( 'Visitors cannot add new comments or replies. Existing comments remain visible.', 'gutenberg' ),
+			'label'       => __( 'Closed' ),
+			'description' => __( 'Visitors cannot add new comments or replies. Existing comments remain visible.' ),
 		),
 	),
 );

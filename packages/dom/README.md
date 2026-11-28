@@ -327,7 +327,7 @@ _Parameters_
 
 - _HTML_ `string`: The HTML to clean up.
 - _schema_ `Schema`: Schema for the HTML.
-- _inline_ `boolean`: Whether to clean for inline mode.
+- _inline_ `[boolean]`: Whether to clean for inline mode.
 
 _Returns_
 
@@ -357,7 +357,7 @@ _Returns_
 
 ### safeHTML
 
-Strips scripts and on\* attributes from HTML.
+Strips scripts, on\* attributes, script URLs and other active content from HTML, and sandboxes iframes that the same-origin policy doesn't isolate.
 
 _Parameters_
 

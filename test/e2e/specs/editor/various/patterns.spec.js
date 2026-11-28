@@ -464,6 +464,122 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
+	test( 'returns selection to pattern when exiting editing with a non-content block selected, but preserves content block selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"categories":["banner","header"],"patternName":"core/block/49","name":"HTML Heading"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:html -->
+<div style="padding:12px;background:red;">
+<!-- wp:heading -->
+<h2 class="wp-block-heading">heading</h2>
+<!-- /wp:heading -->
+</div>
+<!-- /wp:html --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->` );
+
+		const [ patternClientId, headingClientId ] = await page.evaluate(
+			() => {
+				const { getClientIdsWithDescendants, getBlockName } =
+					window.wp.data.select( 'core/block-editor' );
+				const clientIds = getClientIdsWithDescendants();
+				return [
+					clientIds[ 0 ],
+					clientIds.find(
+						( id ) => getBlockName( id ) === 'core/heading'
+					),
+				];
+			}
+		);
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// Select the unsynced pattern.
+		await listView
+			.getByRole( 'gridcell', { name: 'HTML Heading', exact: true } )
+			.click();
+
+		// Open settings sidebar and enter pattern editing mode.
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		// Expand the pattern and inner group in List View to access the HTML block.
+		await listView
+			.getByRole( 'gridcell', { name: 'HTML Heading' } )
+			.getByTestId( 'list-view-expander' )
+			// eslint-disable-next-line playwright/no-force-option
+			.click( { force: true } );
+		await listView
+			.getByRole( 'gridcell', { name: 'Group' } )
+			.getByTestId( 'list-view-expander' )
+			// eslint-disable-next-line playwright/no-force-option
+			.click( { force: true } );
+
+		// Select the HTML block (a non-content block).
+		await listView
+			.getByRole( 'gridcell', { name: 'Custom HTML', exact: true } )
+			.click();
+
+		// Exit pattern editing via the inspector sidebar.
+		await editorSettings
+			.getByRole( 'button', { name: 'Exit pattern' } )
+			.click();
+
+		// Selection returns to the unsynced pattern because the HTML block cannot be edited in content-only mode.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					return window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientId();
+				} )
+			)
+			.toBe( patternClientId );
+
+		// Enter pattern editing mode again.
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		// Expand the HTML block in List View to select the Heading block.
+		await listView
+			.getByRole( 'gridcell', { name: 'Custom HTML' } )
+			.getByTestId( 'list-view-expander' )
+			// eslint-disable-next-line playwright/no-force-option
+			.click( { force: true } );
+		await listView
+			.getByRole( 'gridcell', { name: 'heading', exact: true } )
+			.click();
+
+		// Exit pattern editing via the inspector sidebar.
+		await editorSettings
+			.getByRole( 'button', { name: 'Exit pattern' } )
+			.click();
+
+		// The heading block remains selected because it is a content block.
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					return window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientId();
+				} )
+			)
+			.toBe( headingClientId );
+	} );
+
 	test( 'shows the source block in the inspector when editing a pattern', async ( {
 		editor,
 		page,
@@ -1404,10 +1520,9 @@ test.describe( 'Synced pattern - entity navigation', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
@@ -1630,5 +1745,67 @@ test.describe( 'Synced pattern - read-only access', () => {
 		).toBeVisible();
 
 		await context.close();
+	} );
+} );
+
+test.describe( 'Synced pattern - inserter categories', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		const editorUser = await requestUtils.createUser( {
+			username: 'patterneditor',
+			email: 'patterneditor@example.com',
+			password: 'patterneditorpassword',
+			roles: [ 'editor' ],
+		} );
+		await requestUtils.createBlock( {
+			title: 'Editor pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Editor pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+			author: editorUser.id,
+		} );
+		await requestUtils.createBlock( {
+			title: 'Administrator pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Administrator pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	test( 'lists every pattern under "Site patterns" and can filter them to the current user\'s', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
+
+		await page.getByRole( 'tab', { name: 'Site patterns' } ).click();
+		await expect(
+			page.getByRole( 'option', { name: 'Editor pattern' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'option', { name: 'Administrator pattern' } )
+		).toBeVisible();
+
+		await page.getByRole( 'button', { name: 'Filter patterns' } ).click();
+		await page
+			.getByRole( 'group', { name: 'Author' } )
+			.getByRole( 'menuitemradio', { name: 'My patterns' } )
+			.click();
+		await expect(
+			page.getByRole( 'option', { name: 'Administrator pattern' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'option', { name: 'Editor pattern' } )
+		).toBeHidden();
 	} );
 } );

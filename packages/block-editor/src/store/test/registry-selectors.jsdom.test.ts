@@ -130,27 +130,25 @@ describe( 'selectors', () => {
 				select( store ).__experimentalGetAllowedPatterns( 'block2' )
 			).toHaveLength( 0 );
 		} );
-		it( 'should return empty array if only patterns hidden from UI exist', () => {
-			expect(
-				select( store ).__experimentalGetAllowedPatterns(
-					// @ts-expect-error The test passes a state where the root client ID goes.
-					{
-						blocks: { byClientId: new Map() },
-						blockListSettings: new Map(),
-						settings: {
-							__experimentalBlockPatterns: [
-								{
-									name: 'pattern-c',
-									title: 'pattern hidden from UI',
-									inserter: false,
-									content:
-										'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-								},
-							],
-						},
-					}
-				)
-			).toHaveLength( 0 );
+		it( 'should return empty array if only patterns hidden from UI exist', async () => {
+			const patterns =
+				select( store ).getSettings().__experimentalBlockPatterns!;
+
+			try {
+				await dispatch( store ).updateSettings( {
+					__experimentalBlockPatterns: patterns.filter(
+						( { inserter } ) => inserter === false
+					),
+				} );
+
+				expect(
+					select( store ).__experimentalGetAllowedPatterns( null )
+				).toHaveLength( 0 );
+			} finally {
+				await dispatch( store ).updateSettings( {
+					__experimentalBlockPatterns: patterns,
+				} );
+			}
 		} );
 	} );
 
@@ -483,6 +481,53 @@ describe( 'selectors', () => {
 
 			unregisterBlockVariation( 'core/test-block-a', 'foo' );
 			expect( getItemIds() ).not.toContain( 'core/test-block-a/foo' );
+		} );
+	} );
+
+	describe( '__experimentalGetAllowedBlocks', () => {
+		const DEPRECATION_MESSAGE =
+			'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks is deprecated since version 6.2 and will be removed in version 6.4. Please use wp.data.select( "core/block-editor" ).getAllowedBlocks instead.';
+
+		beforeAll( async () => {
+			await dispatch( store ).resetBlocks( [
+				partial< Block >( {
+					clientId: 'parent-block',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				} ),
+			] );
+			await dispatch( store ).updateBlockListSettings( 'parent-block', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+		} );
+
+		afterAll( async () => {
+			await dispatch( store ).resetBlocks( [] );
+			await dispatch( store ).updateBlockListSettings(
+				'parent-block',
+				{}
+			);
+		} );
+
+		it( 'should return undefined when root client ID is null or missing', () => {
+			expect(
+				select( store ).__experimentalGetAllowedBlocks( null )
+			).toBeUndefined();
+			expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
+		} );
+
+		it( 'should delegate to getAllowedBlocks and return allowed blocks for a root client ID', () => {
+			const allowed =
+				select( store ).__experimentalGetAllowedBlocks(
+					'parent-block'
+				);
+			expect( allowed ).toEqual(
+				select( store ).getAllowedBlocks( 'parent-block' )
+			);
+			expect(
+				allowed?.map( ( b ) => ( typeof b === 'string' ? b : b.name ) )
+			).toEqual( [ 'core/test-block-b' ] );
+			expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 		} );
 	} );
 } );

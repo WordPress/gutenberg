@@ -10,6 +10,10 @@ export type ColorObject = {
 };
 
 export type PaletteObject = {
+	/**
+	 * A stable identifier, unique among palettes, that keeps focus on the palette when palettes are reordered or removed.
+	 */
+	slug?: string;
 	name: string;
 	colors: ColorObject[];
 };

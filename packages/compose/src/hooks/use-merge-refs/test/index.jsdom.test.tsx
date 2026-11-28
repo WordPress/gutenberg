@@ -61,9 +61,7 @@ describe( 'useMergeRefs', () => {
 		const ref1 = useCallback( refCallback1, [] );
 		const ref2 = useCallback( refCallback2, [ count ] );
 		const mergedRefs = useMergeRefs( [
-			// @ts-expect-error `false` disables a ref at runtime.
 			! disable1 && ref1,
-			// @ts-expect-error `false` disables a ref at runtime.
 			! disable2 && ref2,
 		] );
 
@@ -468,9 +466,7 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 		const ref1 = useCallback( refCallback1, [] );
 		const ref2 = useCallback( refCallback2, [ count ] );
 		const mergedRefs = useMergeRefs( [
-			// @ts-expect-error `false` disables a ref at runtime.
 			! disable1 && ref1,
-			// @ts-expect-error `false` disables a ref at runtime.
 			! disable2 && ref2,
 		] );
 

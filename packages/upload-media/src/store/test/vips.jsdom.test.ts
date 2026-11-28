@@ -15,6 +15,7 @@ import type { ImageSizeCrop } from '../types';
 import {
 	vipsConvertImageFormat,
 	vipsCompressImage,
+	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
 	vipsResizeImage,
 	vipsRotateImage,
@@ -23,6 +24,7 @@ import {
 
 const mockConvertImageFormat = vi.mocked( vipsWorker.vipsConvertImageFormat );
 const mockCompressImage = vi.mocked( vipsWorker.vipsCompressImage );
+const mockEncodePixelsAsJpeg = vi.mocked( vipsWorker.vipsEncodePixelsAsJpeg );
 const mockHasTransparency = vi.mocked( vipsWorker.vipsHasTransparency );
 const mockResizeImage = vi.mocked( vipsWorker.vipsResizeImage );
 const mockRotateImage = vi.mocked( vipsWorker.vipsRotateImage );
@@ -360,6 +362,63 @@ describe( 'vips utilities', () => {
 			// Test orientation 8 (90° CCW rotation)
 			await vipsRotateImage( 'item-2', jpegFile, 8 );
 			expect( mockRotateImage.mock.calls[ 1 ][ 3 ] ).toBe( 8 );
+		} );
+	} );
+
+	describe( 'vipsEncodeCanvasAsJpeg', () => {
+		const heicFile = new File( [ 'heic-content' ], 'photo.heic', {
+			type: 'image/heic',
+		} );
+
+		function createCanvas( width: number, height: number ) {
+			const getImageData = vi.fn( () => ( {
+				data: new Uint8ClampedArray( 4 ),
+			} ) );
+			const canvas = {
+				width,
+				height,
+				getContext: () => ( { getImageData } ),
+			} as unknown as OffscreenCanvas;
+			return { canvas, getImageData };
+		}
+
+		it( 'encodes the pixels with the source file as the metadata source', async () => {
+			mockEncodePixelsAsJpeg.mockResolvedValue( new ArrayBuffer( 8 ) );
+			const { canvas } = createCanvas( 4000, 3000 );
+
+			const result = await vipsEncodeCanvasAsJpeg(
+				'item-1',
+				canvas,
+				heicFile,
+				0.8
+			);
+
+			expect( result?.type ).toBe( 'image/jpeg' );
+			expect( mockEncodePixelsAsJpeg ).toHaveBeenCalledTimes( 1 );
+			const [ id, , width, height, options ] =
+				mockEncodePixelsAsJpeg.mock.calls[ 0 ];
+			expect( id ).toBe( 'item-1' );
+			expect( width ).toBe( 4000 );
+			expect( height ).toBe( 3000 );
+			expect( options?.quality ).toBe( 0.8 );
+			expect( options?.metadataSource?.byteLength ).toBe( heicFile.size );
+		} );
+
+		it( 'declines without copying pixels when the image exceeds the interlaced budget', async () => {
+			// 15000 * 15000 * 4 bytes is ~0.84 GiB: over the 0.75 GiB
+			// interlaced budget but under the 1.5 GiB baseline one.
+			const { canvas, getImageData } = createCanvas( 15000, 15000 );
+
+			const result = await vipsEncodeCanvasAsJpeg(
+				'item-1',
+				canvas,
+				heicFile,
+				0.8
+			);
+
+			expect( result ).toBeNull();
+			expect( getImageData ).not.toHaveBeenCalled();
+			expect( mockEncodePixelsAsJpeg ).not.toHaveBeenCalled();
 		} );
 	} );
 

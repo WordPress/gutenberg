@@ -2,19 +2,126 @@
 
 ## Unreleased
 
-### Breaking Changes
+### New Features
 
--   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Inserter: Add a Files tab to the media library in the Media tab, which lists documents and other non-media files and inserts them as File blocks ([#84082](https://github.com/WordPress/gutenberg/pull/84082)).
 
 ### Enhancements
 
+-   Code editor: Use the design system focus ring on the title and content fields, and remove the title's doubled focus ring ([#85468](https://github.com/WordPress/gutenberg/pull/85468)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep the form to add a term usable after creating a term fails, instead of ignoring every later attempt ([#87498](https://github.com/WordPress/gutenberg/pull/87498)).
+-   `PostTaxonomiesHierarchicalTermSelector`: Keep categories checked while a new one is being created, and match category names containing HTML entities when searching or adding ([#87517](https://github.com/WordPress/gutenberg/pull/87517)).
+-   Notes: Keep note forms open when Escape is pressed during IME composition ([#87352](https://github.com/WordPress/gutenberg/pull/87352)).
+-   Document Overview, Notes: Use `Highlight` and `HighlightText` for the pressed header buttons and reactions in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
+-   Undo: Clicking below the content of an empty post no longer creates an undo level or marks the post as having unsaved changes ([#87340](https://github.com/WordPress/gutenberg/pull/87340)).
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+-   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `PostTaxonomiesFlatTermSelector`, `PostTaxonomiesHierarchicalTermSelector`: Prevent saving the post while a new term is being created, so the term isn't left out of the saved post ([#87321](https://github.com/WordPress/gutenberg/pull/87321)).
+-   `DocumentOutline`: Show the post title when the editor canvas is iframed or the template is shown, and focus it on click ([#87280](https://github.com/WordPress/gutenberg/pull/87280)).
+-   `PluginMoreMenuItem`, `PluginSidebarMoreMenuItem`: Make SVG icons without their own fill follow the text color again, so they no longer stay black on a highlighted item ([#87399](https://github.com/WordPress/gutenberg/pull/87399)).
+-   Show `auto` as the canvas height in the viewport status in the editor footer for patterns, template parts and navigation menus ([#87375](https://github.com/WordPress/gutenberg/pull/87375)).
+-   `ErrorBoundary`: Make "Copy contents" on the crash screen copy the post content, including unsaved changes, instead of an empty string ([#87421](https://github.com/WordPress/gutenberg/pull/87421)).
+-   Sidebar: Make the tab bar 48px tall, like the inserter's, with the selected tab's indicator over its bottom border ([#87333](https://github.com/WordPress/gutenberg/pull/87333)).
+-   `DocumentOutline`: Render the outline items as buttons instead of links, so selecting one no longer changes the page URL or adds a browser history entry ([#87483](https://github.com/WordPress/gutenberg/pull/87483)).
+-   `DocumentTools`: Fix arrow key navigation in the toolbar below the medium breakpoint ([#84175](https://github.com/WordPress/gutenberg/pull/84175)).
+-   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
+## 16.2.0 (2026-11-18)
+
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
+### Enhancements
+
+-   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
+-   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
+-   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+-   RTC: Add an optional outline around the blocks a collaborator is working in. Turn it on in Preferences > General > Interface > "Outline collaborators' blocks" ([#86272](https://github.com/WordPress/gutenberg/pull/86272)).
+
+### Bug Fixes
+
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
+-   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
+-   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
+-   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
+-   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
+-   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
+-   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
+-   PostSchedule: Mark the posts of the month in the site's timezone, including posts at the first and last second of the month ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
+-   Notes: Keep the editor canvas from jumping when a new note is added ([#86283](https://github.com/WordPress/gutenberg/pull/86283)).
+-   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+-   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
+-   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Editor: Escape Openverse metadata in image captions.
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+
+## 16.1.0 (2026-11-04)
+
+### New Features
+
+-   Notes: Add search and a status filter to the "All notes" sidebar ([#84060](https://github.com/WordPress/gutenberg/pull/84060)).
+
+### Enhancements
+
+-   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
+-   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
+-   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
+-   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
+-   Notes: Show which reactions you added in forced colors mode, where the reaction pills you pressed looked the same as the others ([#85904](https://github.com/WordPress/gutenberg/pull/85904)).
+-   Notes: List a note shared by duplicated or split blocks once, and resolve or delete it on every block ([#85906](https://github.com/WordPress/gutenberg/pull/85906)).
+
+## 16.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   The editor stylesheet no longer includes the styles of `@wordpress/fields`. A plugin that renders `MediaEdit` loads `@wordpress/fields/build-style/style.css` with its own script, as the package README describes ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action. When the actions cannot be loaded, a notice says so ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
+### New Features
+
+-   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger fades in on hover or focus in the note's top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
+
+### Enhancements
+
+-   The document sidebar shows the post summary built with DataForm, the same fields as Quick Edit, for every post type, and the template actions panel below it ([#85081](https://github.com/WordPress/gutenberg/pull/85081)).
+-   `usePostActions` no longer adds the "Set as homepage" and "Set as posts page" actions to pages: they moved to `@wordpress/core-actions`, which registers them on the server for the users who can manage the site settings when the theme has no `front-page` template, so a plugin can remove them with `wp_unregister_entity_actions()`. The pages they apply to come from the `wp:action-set-homepage` and `wp:action-set-posts-page` REST links ([#84932](https://github.com/WordPress/gutenberg/pull/84932)).
 -   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Notes: Mark noted content in the author's color at rest. Inline notes get a tint and an underline that thickens when the note is selected, and block-level notes tint the whole block with an outline around it. Selecting a note outlines its block instead of dimming the rest of the canvas, and hiding notes hides the marks ([#80578](https://github.com/WordPress/gutenberg/pull/80578)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+-   Save failures: Pass the server's message as the notice's `details`, as plain text with links kept as `text (URL)`, rather than building escaped HTML behind `__unstableHTML`. For a PHP fatal error, the PHP error and its stack trace from `data.error` follow the message. The notice shows it behind "Show details" and offers to copy it with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+-   Notes: Once a post has a note, replace the avatars in the block toolbar with an "Add note" button, whose label says how many notes the block has ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Deprecations
 
 -   `registerEntityField` and `unregisterEntityField`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the fields of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for their JavaScript parts ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, are deprecated. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
 ### Bug Fixes
 
@@ -26,12 +133,15 @@
 -   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 -   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
 -   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
+-   Post slug: Show the slug of the current title instead of the server-generated slug, which could be `auto-draft` or the slug of an outdated title. A post without a slug or a title shows `None` and its plain `?p=ID` permalink: `getEditedPostSlug` now returns an empty string instead of the post ID, `getPermalinkParts` uses it as the post name, and `getPermalink` returns the post's `link` ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
+-   `PostURL`: Only clean and save the slug when the field loses focus if its value changed, so focusing the field no longer strips characters such as emoji that WordPress kept in the slug ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
 
 ### Internal
 
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 -   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   The `core/editor` store no longer holds the actions of an entity: its private `registerEntityAction`, `unregisterEntityAction` and `getEntityActions` are gone ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
 ## 15.2.0 (2026-10-07)
 
@@ -296,6 +406,12 @@
 
 ## 14.34.0 (2025-10-29)
 
+## 14.33.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)
@@ -324,6 +440,12 @@
 
 ## 14.20.0 (2025-03-13)
 
+## 14.19.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.19.0 (2025-02-28)
 
 ## 14.18.0 (2025-02-12)
@@ -350,6 +472,12 @@
 
 ## 14.9.0 (2024-10-03)
 
+## 14.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)
@@ -369,6 +497,12 @@
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)
+
+## 14.0.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 14.0.0 (2024-05-31)
 
@@ -395,6 +529,12 @@
 
 ## 13.29.0 (2024-02-21)
 
+## 13.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.28.0 (2024-02-09)
 
 ## 13.27.0 (2024-01-24)
@@ -417,6 +557,12 @@
 
 ## 13.20.0 (2023-10-05)
 
+## 13.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.19.0 (2023-09-20)
 
 ## 13.18.0 (2023-08-31)
@@ -430,6 +576,12 @@
 ## 13.14.0 (2023-07-05)
 
 ## 13.13.0 (2023-06-23)
+
+## 13.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.12.0 (2023-06-07)
 
@@ -448,6 +600,12 @@
 ## 13.5.0 (2023-03-01)
 
 ## 13.4.0 (2023-02-15)
+
+## 13.3.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.3.0 (2023-02-01)
 

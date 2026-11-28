@@ -21,12 +21,14 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"js-yaml": "^5.5.0",
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"setup": "node ./setup-skills.mjs"
+		"setup": "node ./setup-skills.mjs",
+		"validate": "node ./validate-skills.mjs"
 	}
 }

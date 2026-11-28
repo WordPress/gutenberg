@@ -44,6 +44,13 @@ Private exports:
 - `Menu`
 - `kebabCase`
 
+## dom
+
+Private exports:
+- `isStyleTransformAxisAligned`: whether a computed style's transform keeps the element's edges parallel to its parent's axes.
+- `getViewportVectorTransform`: maps movements and directions from an element's axes to the viewport, including ancestor transforms.
+- `getBorderBoxPointTransform`: maps a point on an element's border box to where its own transform paints it.
+
 ## commands
 
 Private exports:
@@ -179,7 +186,6 @@ Private selectors:
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
 - `getZoomLevel`
-- `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
 - `isBlockSubtreeDisabled`
 - `isDragging`
@@ -199,10 +205,12 @@ Private exports:
 ### `core` store
 
 Private actions:
+- `receiveEntityActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
+- `getEntityActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`
@@ -289,18 +297,15 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
 - `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
-- `getEntityActions`
 - `getInserter`
 - `getInserterSidebarToggleRef`
 - `getListViewToggleRef`
