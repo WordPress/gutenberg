@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Ship `wp-theme` and `wp-theme-setup` agent skills with the package, including the design tokens reference, for agents styling with the design tokens and setting up linters and build-time fallbacks ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
+
 ### Enhancements
 
 -   Swap the values of `--wpds-color-background-interactive-neutral-strong` and `--wpds-color-background-interactive-neutral-strong-active`, so solid neutral controls have a stronger resting fill and a softer fill wherever the active token is used ([#87429](https://github.com/WordPress/gutenberg/pull/87429)).

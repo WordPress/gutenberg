@@ -218,6 +218,44 @@ description: |
 		] );
 	} );
 
+	test( 'accepts an optional compatibility field', () => {
+		const source = VALID_SOURCE.replace(
+			'description: Use when writing tests.',
+			'description: Use when writing tests.\ncompatibility: Requires Node.js 22 or later.'
+		);
+		expect( messagesFor( source ) ).toEqual( [] );
+	} );
+
+	test( 'rejects a compatibility field that is empty or not a string', () => {
+		for ( const value of [ "''", '[ node ]', '42' ] ) {
+			const source = VALID_SOURCE.replace(
+				'description: Use when writing tests.',
+				`description: Use when writing tests.\ncompatibility: ${ value }`
+			);
+			expect( messagesFor( source ) ).toEqual( [
+				{
+					line: 4,
+					message: expect.stringContaining( '"compatibility" field' ),
+				},
+			] );
+		}
+	} );
+
+	test( 'rejects a compatibility field longer than 500 characters', () => {
+		const source = VALID_SOURCE.replace(
+			'description: Use when writing tests.',
+			`description: Use when writing tests.\ncompatibility: ${ 'a'.repeat(
+				501
+			) }`
+		);
+		expect( messagesFor( source ) ).toEqual( [
+			{
+				line: 4,
+				message: expect.stringContaining( '500 characters or fewer' ),
+			},
+		] );
+	} );
+
 	test( 'rejects unknown fields', () => {
 		const source = VALID_SOURCE.replace(
 			'description:',
@@ -269,6 +307,23 @@ describe( 'validateSkills', () => {
 		await expect( validateSkills( { repositoryRoot } ) ).resolves.toEqual(
 			[]
 		);
+	} );
+
+	test( 'validates the skills that packages ship', async () => {
+		const repositoryRoot = await createRepository( {
+			'.agents/skills/testing/SKILL.md': VALID_SOURCE,
+			'packages/ui/skills/testing/SKILL.md': VALID_SOURCE,
+			'packages/ui/skills/renamed/SKILL.md': VALID_SOURCE,
+			'packages/theme/README.md': '',
+		} );
+
+		await expect( validateSkills( { repositoryRoot } ) ).resolves.toEqual( [
+			{
+				file: 'packages/ui/skills/renamed/SKILL.md',
+				line: 2,
+				message: expect.stringContaining( 'match the skill' ),
+			},
+		] );
 	} );
 
 	test( 'reports each problem with its file', async () => {

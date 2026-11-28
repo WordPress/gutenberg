@@ -6,6 +6,10 @@
 
 -   `Avatar`: Replace the compound API with a single component requiring `name`. Pass the image URL in `src` and its optional CORS setting in `crossOrigin`. Initials are the only fallback. The default avatar has the image role. Custom `render` elements keep their own role. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 
+### New Features
+
+-   Ship `wp-ui`, `wp-ui-migration` and `wp-ui-setup` agent skills with the package, for agents building with the components, migrating from `@wordpress/components` and setting up a project ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
+
 ### Enhancements
 
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
