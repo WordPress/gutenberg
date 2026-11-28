@@ -7,6 +7,7 @@ import {
 	getDuotoneFilter,
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
+	resolveDuotoneColors,
 } from './utils/duotone';
 import { transformToStylesWithTextClipBase } from './core/render';
 import { resolveStyle } from './resolve-style';
@@ -21,6 +22,7 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
+	resolveDuotoneColors,
 	resolveStyle,
 	getVariationStyle,
 	transformToStylesWithTextClipBase,

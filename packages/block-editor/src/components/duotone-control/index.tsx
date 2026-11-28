@@ -10,8 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { Icon, filter } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { KeyboardEvent } from 'react';
+import { unlock } from '../../lock-unlock';
 import type { DuotoneControlProps } from './types';
+
+const { resolveDuotoneColors } = unlock( globalStylesEnginePrivateApis );
 
 function DuotoneControl( {
 	id: idProp,
@@ -23,13 +27,25 @@ function DuotoneControl( {
 	selectedSlug,
 	onChange,
 }: DuotoneControlProps ) {
+	// Resolve CSS custom properties in duotone presets using the color palette.
+	// This ensures previews in the picker render correctly with actual colors instead of vars.
+	const resolvedDuotonePalette =
+		duotonePalette?.map( ( preset ) => ( {
+			...preset,
+			colors: resolveDuotoneColors( preset.colors, colorPalette ),
+		} ) ) || [];
+
 	let toolbarIcon;
 	if ( value === 'unset' ) {
 		toolbarIcon = (
 			<ColorIndicator className="block-editor-duotone-control__unset-indicator" />
 		);
 	} else if ( value ) {
-		toolbarIcon = <DuotoneSwatch values={ value } />;
+		toolbarIcon = (
+			<DuotoneSwatch
+				values={ resolveDuotoneColors( value, colorPalette ) }
+			/>
+		);
 	} else {
 		toolbarIcon = <Icon icon={ filter } />;
 	}
@@ -74,7 +90,7 @@ function DuotoneControl( {
 						aria-label={ actionLabel }
 						aria-describedby={ descriptionId }
 						colorPalette={ colorPalette }
-						duotonePalette={ duotonePalette }
+						duotonePalette={ resolvedDuotonePalette } // Use resolved palette here.
 						disableCustomColors={ disableCustomColors }
 						disableCustomDuotone={ disableCustomDuotone }
 						value={ value }

@@ -1,13 +1,26 @@
 import { colord } from 'colord';
 
+type PaletteColor = {
+	slug: string;
+	color: string;
+};
+
 /**
  * Convert a list of colors to an object of R, G, and B values.
  *
- * @param colors Array of RBG color strings.
+ * @param colors  Array of RBG color strings.
+ * @param palette Optional color palette, used to resolve preset CSS variables in `colors`.
  *
  * @return R, G, and B values.
  */
-export function getValuesFromColors( colors: string[] = [] ) {
+export function getValuesFromColors(
+	colors: string[] = [],
+	palette: PaletteColor[] = []
+) {
+	// Resolve vars first if palette provided.
+	const resolvedColors =
+		palette.length > 0 ? resolveDuotoneColors( colors, palette ) : colors;
+
 	const values: { r: number[]; g: number[]; b: number[]; a: number[] } = {
 		r: [],
 		g: [],
@@ -15,8 +28,11 @@ export function getValuesFromColors( colors: string[] = [] ) {
 		a: [],
 	};
 
-	colors.forEach( ( color ) => {
-		const rgbColor = colord( color ).toRgb();
+	resolvedColors.forEach( ( color ) => {
+		// Handle empty as transparent.
+		const rgbColor = color
+			? colord( color ).toRgb()
+			: { r: 0, g: 0, b: 0, a: 0 };
 		values.r.push( rgbColor.r / 255 );
 		values.g.push( rgbColor.g / 255 );
 		values.b.push( rgbColor.b / 255 );
@@ -89,4 +105,51 @@ export function getDuotoneFilter( id: string, colors: string[] ) {
 		</filter>
 	</defs>
 </svg>`;
+}
+
+/**
+ * Resolves a preset color CSS custom property to its color value.
+ *
+ * @param color   The color value, possibly a CSS variable.
+ * @param palette The color palette from settings.
+ *
+ * @return The resolved color value, or `null` if the preset is not in the palette.
+ */
+export function resolveCssVariable(
+	color: string,
+	palette: PaletteColor[]
+): string | null {
+	const match = color.match(
+		/^var\(--wp--preset--color--([a-zA-Z0-9-]+)\)$/
+	);
+	if ( ! match ) {
+		return color;
+	}
+
+	const slug = match[ 1 ];
+
+	for ( const item of palette ) {
+		if ( item.slug === slug ) {
+			return item.color;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Resolves duotone colors, handling CSS variables.
+ *
+ * @param colors  Array of color values.
+ * @param palette The color palette.
+ *
+ * @return Array of resolved color values.
+ */
+export function resolveDuotoneColors(
+	colors: string[],
+	palette: PaletteColor[]
+): string[] {
+	return colors
+		.map( ( color ) => resolveCssVariable( color, palette ) )
+		.filter( ( color ): color is string => Boolean( color ) );
 }
