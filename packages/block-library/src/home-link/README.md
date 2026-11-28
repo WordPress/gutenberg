@@ -61,6 +61,12 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `customFontSize`
 - `style`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **dimensions**: `.wp-block-home-link:not(.wp-block-navigation__responsive-container.is-menu-open *)`
+
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
