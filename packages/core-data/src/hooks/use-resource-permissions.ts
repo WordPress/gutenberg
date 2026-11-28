@@ -1,8 +1,9 @@
+import { useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
 import { store as coreStore } from '../';
 import { Status } from './constants';
-import useQuerySelect from './use-query-select';
+import { getResolutionStatus } from './utils';
 
 interface GlobalResourcePermissionsResolution {
 	/** Can the current user create new resources of this type? */
@@ -15,13 +16,23 @@ interface SpecificResourcePermissionsResolution {
 	canDelete: boolean;
 }
 interface ResolutionDetails {
-	/** Resolution status */
+	/**
+	 * Resolution status
+	 *
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
+	 */
 	status: Status;
 	/**
 	 * Is the data still being resolved?
+	 *
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
 	 */
 	isResolving: boolean;
-	/** Is the data resolved by now? */
+	/**
+	 * Is the data resolved by now?
+	 *
+	 * @deprecated Use the `canUser` selector with `useSelect` instead.
+	 */
 	hasResolved: boolean;
 }
 
@@ -44,6 +55,9 @@ function useResourcePermissions< IdType = void >(
 /**
  * Resolves resource permissions.
  *
+ * Note: New code should call the `canUser` selector with `useSelect` instead,
+ * checking only the actions it needs.
+ *
  * @since 6.1.0 Introduced in WordPress core.
  *
  * @param    resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
@@ -56,11 +70,7 @@ function useResourcePermissions< IdType = void >(
  * import { useResourcePermissions } from '@wordpress/core-data';
  *
  * function PagesList() {
- *   const { canCreate, isResolving } = useResourcePermissions( { kind: 'postType', name: 'page' } );
- *
- *   if ( isResolving ) {
- *     return 'Loading ...';
- *   }
+ *   const { canCreate } = useResourcePermissions( { kind: 'postType', name: 'page' } );
  *
  *   return (
  *     <div>
@@ -79,16 +89,11 @@ function useResourcePermissions< IdType = void >(
  * import { useResourcePermissions } from '@wordpress/core-data';
  *
  * function Page({ pageId }) {
- *   const {
- *     canCreate,
- *     canUpdate,
- *     canDelete,
- *     isResolving
- *   } = useResourcePermissions( { kind: 'postType', name: 'page', id: pageId } );
- *
- *   if ( isResolving ) {
- *     return 'Loading ...';
- *   }
+ *   const { canCreate, canUpdate, canDelete } = useResourcePermissions( {
+ *     kind: 'postType',
+ *     name: 'page',
+ *     id: pageId,
+ *   } );
  *
  *   return (
  *     <div>
@@ -105,10 +110,10 @@ function useResourcePermissions< IdType = void >(
  * ```
  *
  * In the above example, when `PagesList` is rendered into an
- * application, the appropriate permissions and the resolution details will be retrieved from
+ * application, the appropriate permissions will be retrieved from
  * the store state using `canUser()`, or resolved if missing.
  *
- * @return Resource permissions and resolution details.
+ * @return Resource permissions.
  * @template IdType
  */
 function useResourcePermissions< IdType = void >(
@@ -128,17 +133,23 @@ function useResourcePermissions< IdType = void >(
 		);
 	}
 
-	return useQuerySelect(
-		( resolve ) => {
+	return useSelect(
+		( select ) => {
 			const hasId = isEntity ? !! resource.id : !! id;
-			const { canUser } = resolve( coreStore );
+			const { canUser, getResolutionState } = select( coreStore );
+			const check = ( ...args: Parameters< typeof canUser > ) => ( {
+				data: canUser( ...args ),
+				...getResolutionStatus(
+					getResolutionState( 'canUser', args )?.status
+				),
+			} );
 			const collectionResource = isEntity
 				? { kind: resource.kind, name: resource.name }
 				: resource;
-			const create = canUser( 'create', collectionResource );
+			const create = check( 'create', collectionResource );
 
 			if ( ! hasId ) {
-				const read = canUser( 'read', collectionResource );
+				const read = check( 'read', collectionResource );
 
 				const isResolving = create.isResolving || read.isResolving;
 				const hasResolved = create.hasResolved && read.hasResolved;
@@ -158,9 +169,10 @@ function useResourcePermissions< IdType = void >(
 				};
 			}
 
-			const read = canUser( 'read', resource, id );
-			const update = canUser( 'update', resource, id );
-			const _delete = canUser( 'delete', resource, id );
+			const recordId = id as string | number | undefined;
+			const read = check( 'read', resource, recordId );
+			const update = check( 'update', resource, recordId );
+			const _delete = check( 'delete', resource, recordId );
 			const isResolving =
 				read.isResolving ||
 				create.isResolving ||
@@ -189,7 +201,7 @@ function useResourcePermissions< IdType = void >(
 			};
 		},
 		[ resourceAsString, id ]
-	);
+	) as ResourcePermissionsResolution< IdType >;
 }
 
 export default useResourcePermissions;

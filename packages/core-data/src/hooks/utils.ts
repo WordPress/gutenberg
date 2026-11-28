@@ -3,7 +3,7 @@ import { Status } from './constants';
 
 /**
  * Normalizes a resolution status from the store into the resolution info
- * shared by the entity record hooks and `useQuerySelect`.
+ * shared by the core-data hooks.
  *
  * @param resolutionStatus Status returned by the `getResolutionState` selector.
  * @return Resolution info object.
