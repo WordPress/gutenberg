@@ -211,11 +211,11 @@ const cloneRouterRegionContent = ( vdom: any ) => {
 const regionsToAttachByParent = new WeakMap< Element, string[] >();
 
 /**
- * Map of root fragments by parent element, used to render router regions with
- * the `attachTo` property. Those elements with the same parent are rendered
- * together in the corresponding root fragment.
+ * Root fragments of the attached router regions, by parent element and region
+ * id. Each region renders in a root element of its own, so regions sharing a
+ * parent never share a render tree.
  */
-const rootFragmentsByParent = new WeakMap< Element, any >();
+const rootFragmentsByParent = new WeakMap< Element, Map< string, any > >();
 
 /**
  * Set of router regions using the `attachTo` property that are present in the
@@ -449,31 +449,33 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
-		// Renders regions attached to the same parent in the same fragment.
+		// Renders the regions attached to each parent, every one in its own root.
 		parentsToUpdate.forEach( ( parent ) => {
-			const ids = regionsToAttachByParent.get( parent );
-			const vdoms = ids.map( ( id ) => regions[ id ] );
-
 			if ( ! rootFragmentsByParent.has( parent ) ) {
-				// Root elements sharing this parent's attachment fragment.
-				const roots = vdoms.map( ( { props, type } ) => {
+				rootFragmentsByParent.set( parent, new Map() );
+			}
+			const fragments = rootFragmentsByParent.get( parent );
+			for ( const id of regionsToAttachByParent.get( parent ) ) {
+				const vdom = regions[ id ];
+				// Regions missing from the destination page render nothing
+				// through their cleared signal.
+				if ( ! vdom ) {
+					continue;
+				}
+				if ( ! fragments.has( id ) ) {
+					const { props, type } = vdom;
 					const elementType =
 						typeof type === 'function' ? props.type : type;
 
 					// Creates an element with the obtained type where the
 					// region will be rendered. The type should match the one of
 					// the root vnode.
-					const region = document.createElement( elementType );
-					parent.appendChild( region );
-					return region;
-				} );
-				rootFragmentsByParent.set(
-					parent,
-					getRegionRootFragment( roots )
-				);
+					const root = document.createElement( elementType );
+					parent.appendChild( root );
+					fragments.set( id, getRegionRootFragment( root ) );
+				}
+				runWithoutScope( () => render( vdom, fragments.get( id ) ) );
 			}
-			const fragment = rootFragmentsByParent.get( parent );
-			runWithoutScope( () => render( vdoms, fragment ) );
 		} );
 	} );
 

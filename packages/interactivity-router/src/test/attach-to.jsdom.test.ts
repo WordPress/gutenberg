@@ -444,6 +444,58 @@ describe( 'attachment targets', () => {
 		} );
 	}
 
+	test( 'renders regions sharing a parent whichever of them each page includes', async () => {
+		/**
+		 * Navigates to a page printing only the given regions, attached to body.
+		 *
+		 * @param letter Destination name.
+		 * @param ids    Ids of the regions the page prints.
+		 */
+		const navigateWith = async ( letter: string, ids: string[] ) => {
+			await actions.navigate( pageUrl( letter ), {
+				...quiet,
+				html: pageHtml(
+					regionHtml( 's', `<p>${ letter }</p>` ) +
+						ids
+							.map( ( id ) =>
+								regionHtml(
+									id,
+									`<p data-shared>${ id }</p>`,
+									'body'
+								)
+							)
+							.join( '' )
+				).replace( '<title>t</title>', `<title>${ letter }</title>` ),
+			} );
+			await nextFrames();
+		};
+		const shared = () =>
+			[ ...document.querySelectorAll( '[data-shared]' ) ].map(
+				( element ) => element.textContent
+			);
+
+		await navigateWith( 'B', [ 'a' ] );
+		expectPage( 'B' );
+		expect( shared() ).toEqual( [ 'a' ] );
+
+		// A region the destination lacks must not shift the others.
+		await navigateWith( 'C', [ 'b' ] );
+		expectPage( 'C' );
+		expect( shared() ).toEqual( [ 'b' ] );
+
+		await navigateWith( 'D', [ 'a', 'b' ] );
+		expectPage( 'D' );
+		expect( shared().sort() ).toEqual( [ 'a', 'b' ] );
+
+		await navigateWith( 'E', [ 'b' ] );
+		expectPage( 'E' );
+		expect( shared() ).toEqual( [ 'b' ] );
+
+		await navigateWith( 'F', [ 'a', 'b' ] );
+		expectPage( 'F' );
+		expect( shared().sort() ).toEqual( [ 'a', 'b' ] );
+	} );
+
 	for ( const selector of [ '#missing', '.target' ] ) {
 		test( `resolves cached ${ selector } attachments again when the live target becomes usable`, async () => {
 			await navigate( 'B', selector );
