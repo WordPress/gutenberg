@@ -1182,6 +1182,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/comment-date/edit.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/comment-edit-link/deprecated.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
