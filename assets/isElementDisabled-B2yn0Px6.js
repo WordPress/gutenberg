@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function isElementDisabled(e){return e==null||e.hasAttribute(`disabled`)||e.getAttribute(`aria-disabled`)===`true`}function init_isElementDisabled(){return(init_isElementDisabled=e((()=>{})))()}export{isElementDisabled as n,init_isElementDisabled as t};

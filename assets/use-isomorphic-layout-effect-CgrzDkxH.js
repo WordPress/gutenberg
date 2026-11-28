@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{n as t,t as n}from"./react-Cd8OJmTE.js";var r;function init_use_isomorphic_layout_effect(){return(init_use_isomorphic_layout_effect=e((()=>{t(),r=typeof window<`u`?n.useLayoutEffect:n.useEffect})))()}export{r as n,init_use_isomorphic_layout_effect as t};

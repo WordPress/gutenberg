@@ -1,0 +1,1 @@
+import{n as e,o as t}from"./rolldown-runtime-Db01ssZC.js";import{t as n}from"./react-CfMABiEl.js";function useCSPContext(){return r.useContext(i)??a}var r,i,a;function init_CSPContext(){return(init_CSPContext=e((()=>{r=t(n(),1),i=r.createContext(void 0),a={disableStyleElements:!1}})))()}export{useCSPContext as n,init_CSPContext as t};

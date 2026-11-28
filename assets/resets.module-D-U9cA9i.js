@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";var t;function init_resets_module(){return(init_resets_module=e((()=>{t={"box-sizing":`_box-sizing_12s1j_5`}})))()}export{t as n,init_resets_module as t};

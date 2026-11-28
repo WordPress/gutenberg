@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";var t,n,r;function init_field_module(){return(init_field_module=e((()=>{t=`_label_eehm8_5`,n=`_description_eehm8_22`,r={label:t,"is-plain":`_is-plain_eehm8_15`,description:n}})))()}export{init_field_module as n,r as t};
