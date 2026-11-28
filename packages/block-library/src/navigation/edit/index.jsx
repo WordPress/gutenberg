@@ -10,6 +10,7 @@ import {
 	withColors,
 	ContrastChecker,
 	getColorClassName,
+	getDimensionsClassesAndStyles,
 	Warning,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
@@ -657,6 +658,7 @@ function Navigation( {
 		style: {
 			color: ! textColor?.slug && textColor?.color,
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+			...getDimensionsClassesAndStyles( attributes ).style,
 		},
 	} );
 

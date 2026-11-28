@@ -89,6 +89,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 
 ## Context
 
@@ -117,6 +120,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **css**: `.wp-block-navigation:not(.wp-block-navigation__container)`
+- **dimensions**: `.wp-block-navigation:not(.wp-block-navigation__container):not(.wp-block-navigation__responsive-container.is-menu-open *)`
 
 ## Block Markup
 
