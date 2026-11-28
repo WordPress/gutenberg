@@ -6,6 +6,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { __, _x } from '@wordpress/i18n';
 import {
 	store as blockEditorStore,
@@ -212,7 +213,14 @@ export default function MaybeUploadMediaPanel() {
 	}
 
 	return (
-		<PanelBody initialOpen title={ panelBodyTitle }>
+		<PanelBody
+			initialOpen={ applyFilters(
+				'editor.PrePublishPanel.suggestionInitialOpen',
+				true,
+				'external-media'
+			) }
+			title={ panelBodyTitle }
+		>
 			<p>
 				{ __(
 					'Upload external images to the Media Library. Images from different domains may load slowly, display incorrectly, or be removed unexpectedly.'

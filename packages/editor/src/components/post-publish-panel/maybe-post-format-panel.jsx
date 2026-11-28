@@ -1,5 +1,6 @@
 import { Button, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { POST_FORMATS } from '../post-format';
@@ -28,15 +29,22 @@ const PostFormatSuggestion = ( {
 
 export default function PostFormatPanel() {
 	const { currentPostFormat, suggestion } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } =
-			select( editorStore );
+		const {
+			getCurrentPostId,
+			getEditedPostAttribute,
+			getSuggestedPostFormat,
+		} = select( editorStore );
 		const supportedFormats =
 			select( coreStore ).getThemeSupports().formats ?? [];
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
 			suggestion: getSuggestion(
 				supportedFormats,
-				getSuggestedPostFormat()
+				applyFilters(
+					'editor.PrePublishPanel.suggestedPostFormat',
+					getSuggestedPostFormat(),
+					getCurrentPostId()
+				)
 			),
 		};
 	}, [] );
@@ -57,7 +65,14 @@ export default function PostFormatPanel() {
 	}
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+		<PanelBody
+			initialOpen={ applyFilters(
+				'editor.PrePublishPanel.suggestionInitialOpen',
+				false,
+				'post-format'
+			) }
+			title={ panelBodyTitle }
+		>
 			<p>
 				{ __(
 					'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.'

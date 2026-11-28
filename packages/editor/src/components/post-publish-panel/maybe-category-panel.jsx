@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
@@ -67,9 +68,16 @@ function MaybeCategoryPanel() {
 
 	// We only want to show the category panel:
 	// if the post type supports categories,
-	// if the site has categories other than the default category,
+	// if the site has categories other than the default category (or a filter shows it anyway),
 	// and if the post has no other categories than the default category.
-	if ( ! shouldShowPanel || ! hasSiteCategories ) {
+	if (
+		! shouldShowPanel ||
+		! applyFilters(
+			'editor.PrePublishPanel.showSuggestion',
+			hasSiteCategories,
+			'category'
+		)
+	) {
 		return null;
 	}
 
@@ -81,7 +89,14 @@ function MaybeCategoryPanel() {
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+		<PanelBody
+			initialOpen={ applyFilters(
+				'editor.PrePublishPanel.suggestionInitialOpen',
+				false,
+				'category'
+			) }
+			title={ panelBodyTitle }
+		>
 			<p>
 				{ __(
 					'Categories provide a helpful way to group related posts together and to quickly tell readers what a post is about.'
