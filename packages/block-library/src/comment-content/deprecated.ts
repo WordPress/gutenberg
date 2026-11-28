@@ -1,4 +1,4 @@
-import type { CSSDirection } from '@wordpress/blocks';
+import type { AxialDirection } from '@wordpress/blocks';
 import migrateTextAlign from '../utils/migrate-text-align';
 import type { CommentContentAttributes } from './types';
 
