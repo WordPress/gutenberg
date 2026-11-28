@@ -146,7 +146,6 @@ module.exports = function cli() {
 				describe:
 					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental), "php" uses the PHP installed on this computer (experimental).',
 				choices: getAvailableRuntimes(),
-				default: 'docker',
 			} );
 			args.option( 'auto-port', {
 				type: 'boolean',
