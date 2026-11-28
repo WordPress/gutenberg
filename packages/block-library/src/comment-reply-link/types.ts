@@ -5,9 +5,6 @@ export interface CommentReplyLinkAttributes extends StyledBlockAttributes {
 	textAlign?: string;
 }
 
-export interface CommentReplyLinkBlockContext extends Record<
-	string,
-	unknown
-> {
+export interface CommentReplyLinkBlockContext {
 	commentId?: string | number;
 }
