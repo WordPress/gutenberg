@@ -216,4 +216,42 @@ END;
 
 		$this->assertSame( $expected, $output, 'Unexpected parsed post content' );
 	}
+
+	/**
+	 * Tests that context available to the `core/post-template` block reaches the blocks inside it,
+	 * and that the post of the current iteration wins over any outer post context.
+	 */
+	public function test_rendering_post_template_passes_context_to_inner_blocks() {
+		$logs = array();
+		register_block_type(
+			'test/context-logger',
+			array(
+				'uses_context'    => array( 'queryId', 'postId' ),
+				'render_callback' => static function ( $attributes, $content, $block ) use ( &$logs ) {
+					$logs[] = array(
+						'queryId' => $block->context['queryId'] ?? null,
+						'postId'  => $block->context['postId'] ?? null,
+					);
+					return '';
+				},
+			)
+		);
+
+		$content  = '<!-- wp:query {"queryId":7,"query":{"inherit":false}} -->';
+		$content .= '<!-- wp:post-template -->';
+		$content .= '<!-- wp:test/context-logger /-->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$parsed_blocks = parse_blocks( $content );
+		( new WP_Block( $parsed_blocks[0], array( 'postId' => 999999 ) ) )->render();
+
+		unregister_block_type( 'test/context-logger' );
+
+		$post_ids = wp_list_pluck( $logs, 'postId' );
+		$this->assertContains( self::$post->ID, $post_ids, 'The inner block should receive the post of each iteration.' );
+		$this->assertContains( self::$other_post->ID, $post_ids, 'The inner block should receive the post of each iteration.' );
+		$this->assertNotContains( 999999, $post_ids, 'The outer post ID should not override the post of the iteration.' );
+		$this->assertSame( array( 7 ), array_values( array_unique( wp_list_pluck( $logs, 'queryId' ) ) ), 'The inner block should receive the query ID.' );
+	}
 }
