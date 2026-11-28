@@ -34,20 +34,21 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useMemo } from '@wordpress/element';
 import {
 	MIN_EXCERPT_LENGTH,
 	MAX_EXCERPT_LENGTH,
 	DEFAULT_EXCERPT_LENGTH,
 } from './constants';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import getCategorySuggestions from './category-suggestions';
 
 /**
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
-	_fields: 'id,name',
+	_fields: 'id,name,parent',
 	context: 'view',
 };
 const USERS_LIST_QUERY = {
@@ -150,29 +151,29 @@ function Controls( { attributes, setAttributes } ) {
 			value: slug,
 			label: name,
 		} ) );
-	const categorySuggestions =
-		categoriesList?.reduce( ( accumulator, category ) => {
-			accumulator[ category.name ] = category;
-			return accumulator;
-		}, {} ) ?? {};
+	const { categorySuggestions, selectedCategories, categoriesById } = useMemo(
+		() => getCategorySuggestions( categoriesList ?? [], categories ?? [] ),
+		[ categoriesList, categories ]
+	);
 	const selectCategories = ( tokens ) => {
 		const hasNoSuggestion = tokens.some(
 			( token ) =>
-				typeof token === 'string' && ! categorySuggestions[ token ]
+				typeof token === 'string' &&
+				! Object.hasOwn( categorySuggestions, token )
 		);
 		if ( hasNoSuggestion ) {
 			return;
 		}
-		// Categories that are already will be objects, while new additions will be strings (the name).
-		// allCategories normalizes the array so that they are all objects.
+		// Existing tokens carry IDs; new tokens carry their unique display labels.
+		// Always save the original category objects, not the display labels.
 		const allCategories = tokens.map( ( token ) => {
 			return typeof token === 'string'
 				? categorySuggestions[ token ]
-				: token;
+				: categoriesById.get( String( token.id ) );
 		} );
 		// We do nothing if the category is not selected
 		// from suggestions.
-		if ( allCategories.includes( null ) ) {
+		if ( allCategories.includes( undefined ) ) {
 			return false;
 		}
 		setAttributes( { categories: allCategories } );
@@ -492,7 +493,7 @@ function Controls( { attributes, setAttributes } ) {
 						}
 						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
-						selectedCategories={ categories }
+						selectedCategories={ selectedCategories }
 						onAuthorChange={ ( value ) =>
 							setAttributes( {
 								selectedAuthor:
