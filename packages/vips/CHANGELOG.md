@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Replace the worker and retry the call once when wasm-vips crashes in it, for example when it runs out of memory, and no longer throw (and leak memory) when `getUltraHdrInfo` probes a plain JPEG ([#87203](https://github.com/WordPress/gutenberg/pull/87203)).
+
 ## 5.2.0 (2026-11-18)
 
 ## 5.1.0 (2026-11-04)

@@ -507,6 +507,65 @@ test.describe( 'Client-side media processing', () => {
 		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
 	} );
 
+	test( 'uploads a gallery of large camera JPEGs without losing any', async ( {
+		page,
+		editor,
+		requestUtils,
+		mediaProcessingUtils,
+	} ) => {
+		// Twelve 24 MP, 4:2:0 JPEGs of about 15 MB each, like a camera's.
+		// Probing them for an UltraHDR gain map by calling a loader that
+		// throws for plain JPEGs used to break wasm-vips mid-batch.
+		const { default: Vips } = await import( wasmVipsEntry );
+		const vips = await Vips( {} );
+		const noise = () =>
+			vips.Image.gaussnoise( 6000, 4000, { mean: 128, sigma: 30 } );
+		const jpeg = noise()
+			.bandjoin( [ noise(), noise() ] )
+			.cast( 'uchar' )
+			.copy( { interpretation: 'srgb' } )
+			.jpegsaveBuffer( { Q: 90, subsample_mode: 'on' } );
+		const tmpDirectory = await fs.mkdtemp(
+			path.join( os.tmpdir(), 'gutenberg-test-large-gallery-' )
+		);
+		const tmpFiles = [];
+		for ( let i = 0; i < 12; i++ ) {
+			const tmpFile = path.join( tmpDirectory, `${ randomUUID() }.jpg` );
+			await fs.writeFile( tmpFile, jpeg );
+			tmpFiles.push( tmpFile );
+		}
+
+		await editor.insertBlock( { name: 'core/gallery' } );
+		const galleryBlock = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i]'
+		);
+		await galleryBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFiles );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty( 300_000 );
+
+		const media = await requestUtils.rest( {
+			path: '/wp/v2/media',
+			params: { per_page: 100 },
+		} );
+		expect( media ).toHaveLength( tmpFiles.length );
+		const imageIds = ( await editor.getBlocks() )[ 0 ].innerBlocks.map(
+			( block ) => block.attributes.id
+		);
+		expect( imageIds.sort() ).toEqual(
+			media.map( ( attachment ) => attachment.id ).sort()
+		);
+		const errorNotices = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/notices' )
+				.getNotices()
+				.filter( ( notice ) => notice.status === 'error' )
+				.map( ( notice ) => notice.content )
+		);
+		expect( errorNotices ).toEqual( [] );
+	} );
+
 	test( 'rejects an unsupported file type', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -1072,42 +1131,27 @@ test.describe( 'Client-side media processing', () => {
 			}
 		} );
 
-		// The failure must surface to the user rather than dying silently
-		// inside the queue.
-		const errorSnackbar = page
-			.locator( '.components-snackbar' )
-			.filter( { hasText: /cannot generate responsive image sizes/i } );
-		await expect( errorSnackbar ).toBeVisible( { timeout: 30_000 } );
+		// The crashed worker is replaced by a fresh one that retries the
+		// pending work, so the upload completes with all its sub-sizes.
+		await mediaProcessingUtils.waitForUploadQueueEmpty( 60_000 );
+		expect(
+			await page.evaluate( () => window.__capturedBlobWorkers.length )
+		).toBe( 2 );
 
-		// The failed item must leave the queue instead of hanging forever…
-		await mediaProcessingUtils.waitForUploadQueueEmpty( 30_000 );
-
-		// …which releases the save lock so the post is saveable again.
-		await expect
-			.poll(
-				() =>
-					page.evaluate( () =>
-						window.wp.data
-							.select( 'core/editor' )
-							.isPostSavingLocked()
-					),
-				{ timeout: 10_000 }
-			)
-			.toBe( false );
-
-		/*
-		 * Emptying the queue also terminates the dead worker, so the next
-		 * upload lazily creates a fresh one and completes normally. Clear
-		 * the canvas first so the failed upload's leftover image block
-		 * doesn't collide with the helper's block locator.
-		 */
-		await editor.setContent( '' );
-		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
-			editor,
+		const media = await mediaProcessingUtils.getMediaDetails(
 			requestUtils,
-			'1024x768_e2e_test_image_size.jpeg'
+			await mediaProcessingUtils.getSelectedBlockImageId()
 		);
-		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.sizes.thumbnail ).toBeDefined();
+		expect( media.media_details.sizes.large ).toBeDefined();
+
+		const errorNotices = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/notices' )
+				.getNotices()
+				.filter( ( notice ) => notice.status === 'error' )
+		);
+		expect( errorNotices ).toEqual( [] );
 	} );
 
 	test( 'shows the Resolution control when a URL-keyed cache stands in front of the REST API', async ( {
