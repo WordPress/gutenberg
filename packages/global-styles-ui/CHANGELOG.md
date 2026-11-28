@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Show the Transform panel on block screens for blocks that support a rotation ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Show the States menu on the Navigation Overlay Close block screen ([#87520](https://github.com/WordPress/gutenberg/pull/87520)).
 
 ## 2.2.0 (2026-11-18)
 

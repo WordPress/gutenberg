@@ -235,6 +235,80 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			await expect( openMenuButton ).toBeVisible();
 		} );
 
+		test( 'As a user I want to set a hover color on the close button and see it on the frontend', async ( {
+			editor,
+			page,
+		} ) => {
+			// A new overlay already has a close button.
+			await editor.selectBlocks(
+				editor.canvas.locator(
+					'[data-type="core/navigation-overlay-close"]'
+				)
+			);
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			await settings
+				.getByRole( 'button', { name: 'State: Default' } )
+				.click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Hover', exact: true } )
+				.click();
+			await page.keyboard.press( 'Escape' );
+
+			// While a state is selected, the inspector shows only the style
+			// panels, without tabs.
+			await settings
+				.locator( '.components-tools-panel' )
+				.filter( {
+					has: page.getByRole( 'heading', { name: 'Background' } ),
+				} )
+				.getByRole( 'button', { name: 'Color', exact: true } )
+				.click();
+			await page
+				.getByRole( 'option', { name: 'Luminous vivid orange' } )
+				.click();
+
+			// The color is stored for the hover state only.
+			const closeBlockStyle = await page.evaluate(
+				() =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlock().attributes.style
+			);
+			expect( closeBlockStyle?.[ ':hover' ]?.color?.background ).toBe(
+				'var:preset|color|luminous-vivid-orange'
+			);
+			expect( closeBlockStyle?.color ).toBeUndefined();
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.filter( { hasText: 'Back' } )
+				.click();
+
+			await editor.saveSiteEditorEntities();
+
+			await page.goto( '/' );
+
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			const closeButton = page.getByRole( 'button', { name: 'Close' } );
+			await expect( closeButton ).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)'
+			);
+
+			await closeButton.hover();
+			await expect( closeButton ).toHaveCSS(
+				'background-color',
+				'rgb(255, 105, 0)'
+			);
+		} );
+
 		test( 'As a site builder, I want to insert a core navigation overlay pattern with CTA and see it on the frontend', async ( {
 			page,
 			editor,

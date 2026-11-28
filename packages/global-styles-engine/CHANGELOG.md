@@ -8,6 +8,10 @@
 -   Add the `transform.translate` setting ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 -   Add the `transform.scale` setting ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 
+### Enhancements
+
+-   Render the `:hover`, `:focus`, `:focus-visible` and `:active` styles of the Navigation Overlay Close block (`core/navigation-overlay-close`) ([#87520](https://github.com/WordPress/gutenberg/pull/87520)).
+
 ### Bug Fixes
 
 -   Type Definitions: Add `customFontSize` and `lineHeight` to `TypographySettings`, `gradient` to `GlobalStylesStyles[ 'color' ]`, and `':hover'` state to `GlobalStylesStyles[ 'blocks' ]` ([#87122](https://github.com/WordPress/gutenberg/pull/87122)).

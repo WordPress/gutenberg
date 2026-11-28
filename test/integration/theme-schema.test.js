@@ -347,6 +347,47 @@ describe( 'theme.json schema', () => {
 		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
 	} );
 
+	test( 'accepts pseudo-selectors in Navigation Overlay Close block styles', () => {
+		const hover = { ':hover': { color: { background: 'blue' } } };
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/navigation-overlay-close': {
+						...hover,
+						variations: { outline: hover },
+					},
+					'core/group': {
+						variations: {
+							dark: {
+								blocks: {
+									'core/navigation-overlay-close': hover,
+								},
+							},
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects unsupported pseudo-selectors in Navigation Overlay Close block styles', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/navigation-overlay-close': {
+						':visited': { color: { text: 'green' } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
 	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(

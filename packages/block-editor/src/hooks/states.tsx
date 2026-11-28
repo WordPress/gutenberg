@@ -48,6 +48,12 @@ function getDeviceStateOptions(
 export const VALID_BLOCK_PSEUDO_STATES: Record< string, string[] > = {
 	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-overlay-close': [
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
 };
 
 function getPseudoStateOptions( name: string ): StyleStateOption[] {

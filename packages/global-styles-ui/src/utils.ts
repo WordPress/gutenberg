@@ -63,6 +63,12 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
 		{ value: ':active', label: __( 'Active' ) },
 	],
+	'core/navigation-overlay-close': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
 };
 
 /**
