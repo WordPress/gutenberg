@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // The visual canvas injects its styles into an iframe, so keep its added and
@@ -48,10 +49,8 @@ $revision-code-diff-marker-width: 3ch;
 	color: $gray-900;
 
 	&:focus-visible {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
-		outline: none;
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }
 
