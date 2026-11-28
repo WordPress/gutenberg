@@ -374,6 +374,100 @@ describe( 'private actions', () => {
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
+		it.each( [
+			[
+				'the storage limit',
+				{ code: ErrorCode.STORAGE_LIMIT_REACHED },
+				ErrorCode.STORAGE_LIMIT_REACHED,
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+			],
+			[
+				'the upload limit',
+				{ code: ErrorCode.SIZE_ABOVE_LIMIT },
+				ErrorCode.SIZE_ABOVE_LIMIT,
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+			],
+			[
+				'another failure',
+				new Error( 'Network request failed' ),
+				ErrorCode.GENERAL,
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved.',
+			],
+		] )(
+			'should warn when %s left a sub-size out',
+			async ( _cause, subSizeError, code, message ) => {
+				const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+				const finishOperation = vi.fn();
+				const select = {
+					getItem: () => ( {
+						attachment: { id: 42 },
+						sourceFile: { name: 'photo.jpg' },
+						subSizeError,
+					} ),
+					getSettings: () => ( { mediaFinalize } ),
+				};
+				const dispatch = Object.assign( vi.fn(), { finishOperation } );
+
+				const thunk = finalizeItem( 'test-id' );
+				await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: Type.AddWarning,
+					warning: { id: 'test-id', code, message },
+				} );
+				expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			}
+		);
+
+		it( 'should name the HEIC file the user picked in the warning', async () => {
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					sourceFile: { name: 'photo.jpg' },
+					originalHeicFile: { name: 'photo.heic' },
+					subSizeError: new Error( 'Network request failed' ),
+				} ),
+				getSettings: () => ( {
+					mediaFinalize: vi.fn().mockResolvedValue( undefined ),
+				} ),
+			};
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+			} );
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: Type.AddWarning,
+				warning: {
+					id: 'test-id',
+					code: ErrorCode.GENERAL,
+					message:
+						'"photo.heic" was uploaded, but some of the image sizes could not be saved.',
+				},
+			} );
+		} );
+
+		it( 'should not warn when every sub-size was saved', async () => {
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+			} );
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should not call mediaFinalize when no callback is provided', async () => {
 			const finishOperation = vi.fn();
 			const select = {

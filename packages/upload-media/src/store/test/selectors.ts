@@ -9,6 +9,7 @@ import {
 import {
 	getActiveUploadCount,
 	getFailureCount,
+	getWarnings,
 	getActiveImageProcessingCount,
 	getActiveVideoProcessingCount,
 	getFailedItems,
@@ -32,6 +33,7 @@ describe( 'selectors', () => {
 				queue: [],
 				queueStatus: 'active',
 				failureCount: 3,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -44,12 +46,35 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getWarnings', () => {
+		it( 'should return the upload warnings', () => {
+			const warnings = [
+				{ id: '1', code: 'GENERAL', message: 'Missing sizes' },
+			];
+			const state: State = {
+				queue: [],
+				queueStatus: 'active',
+				failureCount: 0,
+				warnings,
+				blobUrls: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+			};
+
+			expect( getWarnings( state ) ).toBe( warnings );
+		} );
+	} );
+
 	describe( 'getItems', () => {
 		it( 'should return empty array by default', () => {
 			const state: State = {
 				queue: [],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -78,6 +103,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -106,6 +132,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -136,6 +163,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -171,6 +199,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -210,6 +239,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -232,6 +262,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -263,6 +294,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -322,6 +354,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -349,6 +382,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -384,6 +418,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -416,6 +451,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -489,6 +525,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -515,6 +552,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),

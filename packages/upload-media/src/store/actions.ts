@@ -10,6 +10,7 @@ import type {
 	OnErrorHandler,
 	OnSuccessHandler,
 	QueueItemId,
+	RecordSubSizeErrorAction,
 	RetryItemAction,
 	ScheduleRetryAction,
 	State,
@@ -30,7 +31,12 @@ import type {
 import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
 import { cancelGifToVideoOperations } from './utils/video-conversion';
 import { debug } from './utils/debug-logger';
-import { ErrorCode, UploadError } from '../upload-error';
+import {
+	ErrorCode,
+	UploadError,
+	isSizeAboveLimitError,
+	isStorageLimitError,
+} from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -287,6 +293,33 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					item.additionalData?.image_size === 'animated_video' ||
 					item.additionalData?.image_size === 'animated_video_poster';
 
+				/*
+				 * Remember that a sub-size or a copy of the original is
+				 * missing, so the parent can warn about it once it has
+				 * uploaded. The attachment is complete without an optional
+				 * companion.
+				 */
+				if ( ! silent && error && ! isOptionalCompanion ) {
+					dispatch< RecordSubSizeErrorAction >( {
+						type: Type.RecordSubSizeError,
+						id: parentId,
+						error,
+					} );
+				}
+
+				/*
+				 * A limit rejected the sub-sizes: the site's storage limit,
+				 * or its upload limit for a sub-size larger than the
+				 * original. The original fit and is already stored, so the
+				 * attachment is kept even when no sub-size made it, as it is
+				 * when the server generates the sub-sizes itself.
+				 */
+				const isLimitFailure =
+					isStorageLimitError( error ) ||
+					isStorageLimitError( parentItem.subSizeError ) ||
+					isSizeAboveLimitError( error ) ||
+					isSizeAboveLimitError( parentItem.subSizeError );
+
 				if ( select.hasPendingItemsByParentId( parentId ) ) {
 					// Other children remain — just notify the parent so
 					// it can re-check the Finalize gate.
@@ -298,12 +331,14 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					}
 				} else if (
 					( parentItem.subSizes && parentItem.subSizes.length > 0 ) ||
-					isOptionalCompanion
+					isOptionalCompanion ||
+					isLimitFailure
 				) {
 					/*
 					 * Partial success: at least one child sideload succeeded
-					 * (its sub-size is already accumulated on the parent), or
-					 * the failed child was an optional companion. Keep the
+					 * (its sub-size is already accumulated on the parent), the
+					 * failed child was an optional companion, or a limit
+					 * rejected it (storage space or the upload size). Keep the
 					 * parent attachment and finalize with whichever sub-sizes
 					 * did succeed — matching WordPress core's best-effort
 					 * behavior when individual sub-size generations fail.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Skip uploading a generated sub-size that is larger than the site's upload limit, instead of sending a request the server rejects ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
 ### Internal
 
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
@@ -11,6 +14,10 @@
 ### New Features
 
 -   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
+### Bug Fixes
+
+-   Keep an image whose sub-sizes a multisite storage limit rejected, instead of deleting it, and list uploads that are missing sub-sizes so the editor can warn about them ([#86834](https://github.com/WordPress/gutenberg/pull/86834)).
 
 ## 0.44.0 (2026-11-04)
 

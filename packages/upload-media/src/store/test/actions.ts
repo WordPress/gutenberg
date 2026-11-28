@@ -675,6 +675,38 @@ describe( 'actions', () => {
 					.resumeItemByPostId
 			).toBeUndefined();
 		} );
+
+		it( 'cancels sideload item when file exceeds maxUploadFileSize', async () => {
+			const mediaSideload = vi.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxUploadFileSize: 1,
+			} );
+
+			// jpegFile is 3 bytes ('foo'), which exceeds maxUploadFileSize of 1.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: 'fake-parent-id',
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// mediaSideload should NOT be called since we cancel before sending.
+			expect( mediaSideload ).not.toHaveBeenCalled();
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			const sideloadItem = items.find(
+				( item: QueueItem ) => item.parentId === 'fake-parent-id'
+			);
+
+			// Item should be removed by cancelItem.
+			expect( sideloadItem ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'cancelItem', () => {
@@ -889,15 +921,19 @@ describe( 'actions', () => {
 				parentSubSizes,
 				parentOnError,
 				imageSize = 'medium',
+				parentOperations = [ OperationType.Finalize ],
 			}: {
 				parentSubSizes?: { name: string; id: number }[];
 				parentOnError?: Mock;
 				imageSize?: string;
+				// The first operation is the one the simulated upload
+				// below finishes, so it is gone by the time the child fails.
+				parentOperations?: OperationType[];
 			} = {} ) => {
 				unlock( registry.dispatch( uploadStore ) ).addItem( {
 					file: jpegFile,
 					onError: parentOnError,
-					operations: [ OperationType.Finalize ],
+					operations: parentOperations,
 				} );
 				const parent = unlock(
 					registry.select( uploadStore )
@@ -1034,6 +1070,168 @@ describe( 'actions', () => {
 				).toBeDefined();
 			} );
 
+			it( 'keeps the parent attachment when the storage limit rejects every sub-size', async () => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+				} );
+
+				const storageError = new UploadError( {
+					code: ErrorCode.STORAGE_LIMIT_REACHED,
+					message: 'Not enough space to upload. 2 KB needed.',
+					file: jpegFile,
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, storageError );
+
+				// The original fit and is stored, so it stays, as it does
+				// when the server generates the sub-sizes.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toEqual(
+					expect.objectContaining( { subSizeError: storageError } )
+				);
+			} );
+
+			it( 'finalizes the kept attachment and warns that it is missing image sizes', async () => {
+				const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaFinalize,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					parentOperations: [
+						OperationType.Upload,
+						OperationType.Finalize,
+					],
+				} );
+
+				await registry.dispatch( uploadStore ).cancelItem(
+					child!.id,
+					new UploadError( {
+						code: ErrorCode.STORAGE_LIMIT_REACHED,
+						message: 'Not enough space to upload. 2 KB needed.',
+						file: jpegFile,
+					} )
+				);
+				await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+				await vi.waitFor( () =>
+					expect(
+						unlock( registry.select( uploadStore ) ).getItem(
+							parent.id
+						)
+					).toBeUndefined()
+				);
+
+				expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getWarnings()
+				).toEqual( [
+					{
+						id: parent.id,
+						code: ErrorCode.STORAGE_LIMIT_REACHED,
+						message:
+							'"example.jpg" was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
+					},
+				] );
+				expect(
+					unlock( registry.select( uploadStore ) ).getFailureCount()
+				).toBe( 0 );
+			} );
+
+			it( 'keeps the parent attachment when the upload limit rejects every sub-size', async () => {
+				const mediaDelete = vi.fn().mockResolvedValue( undefined );
+				const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+				const parentOnError = vi.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+					mediaFinalize,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					parentOperations: [
+						OperationType.Upload,
+						OperationType.Finalize,
+					],
+				} );
+
+				await registry.dispatch( uploadStore ).cancelItem(
+					child!.id,
+					new UploadError( {
+						code: ErrorCode.SIZE_ABOVE_LIMIT,
+						message:
+							'image-1536x1536.jpg: This file exceeds the maximum upload size for this site.',
+						file: jpegFile,
+					} )
+				);
+				await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+				await vi.waitFor( () =>
+					expect(
+						unlock( registry.select( uploadStore ) ).getItem(
+							parent.id
+						)
+					).toBeUndefined()
+				);
+
+				// The original fit under the limit, so it stays even though
+				// every sub-size was skipped.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getWarnings()
+				).toEqual( [
+					{
+						id: parent.id,
+						code: ErrorCode.SIZE_ABOVE_LIMIT,
+						message:
+							'"example.jpg" was uploaded, but some of the image sizes could not be saved because they are larger than this site’s upload limit.',
+					},
+				] );
+				expect(
+					unlock( registry.select( uploadStore ) ).getFailureCount()
+				).toBe( 0 );
+			} );
+
+			it( 'records the failure on the parent when only some sub-sizes fail', async () => {
+				const { parent, child } = setUpParentAndChild( {
+					parentSubSizes: [ { name: 'medium', id: 99 } ],
+				} );
+
+				const networkError = new UploadError( {
+					code: 'GENERAL',
+					message: 'sideload of large size failed',
+					file: jpegFile,
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, networkError );
+
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toEqual(
+					expect.objectContaining( { subSizeError: networkError } )
+				);
+			} );
+
 			it( 'falls back to a generic message when the underlying error has no message', async () => {
 				const mediaDelete = vi.fn().mockResolvedValue( undefined );
 				const parentOnError = vi.fn();
@@ -1077,9 +1275,14 @@ describe( 'actions', () => {
 					);
 
 				// The optional companion failing must not delete or cancel the
-				// already-uploaded GIF attachment.
+				// already-uploaded GIF attachment, nor mark it as incomplete.
 				expect( mediaDelete ).not.toHaveBeenCalled();
 				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)?.subSizeError
+				).toBeUndefined();
 				expect(
 					unlock( registry.select( uploadStore ) ).getItem(
 						parent.id

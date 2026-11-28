@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import {
 	cloneFile,
@@ -25,7 +25,13 @@ import {
 import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { ErrorCode, UploadError } from '../upload-error';
+import {
+	ErrorCode,
+	UploadError,
+	isSizeAboveLimitError,
+	isStorageLimitError,
+} from '../upload-error';
+import { getIncompleteUploadMessage } from '../error-messages';
 import { debug, measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
@@ -49,6 +55,7 @@ import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
+	AddWarningAction,
 	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
@@ -1141,6 +1148,26 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		// If the resized file exceeds maxUploadFileSize, cancel with a user-facing error
+		const maxUploadFileSize = select.getSettings().maxUploadFileSize;
+		if ( maxUploadFileSize && item.file.size > maxUploadFileSize ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: ErrorCode.SIZE_ABOVE_LIMIT,
+					message: sprintf(
+						// translators: %s: file name.
+						__(
+							'%s: This file exceeds the maximum upload size for this site.'
+						),
+						item.file.name
+					),
+					file: item.file,
+				} )
+			);
+			return;
+		}
+
 		const startTime = performance.now();
 
 		mediaSideload( {
@@ -2038,6 +2065,29 @@ export function finalizeItem( id: QueueItemId ) {
 				);
 				return;
 			}
+		}
+
+		// The attachment is kept, but a file it should have is missing.
+		// Nothing else reports that: the item's own callbacks see a success.
+		if ( item.subSizeError ) {
+			let code: string = ErrorCode.GENERAL;
+			if ( isStorageLimitError( item.subSizeError ) ) {
+				code = ErrorCode.STORAGE_LIMIT_REACHED;
+			} else if ( isSizeAboveLimitError( item.subSizeError ) ) {
+				code = ErrorCode.SIZE_ABOVE_LIMIT;
+			}
+			dispatch< AddWarningAction >( {
+				type: Type.AddWarning,
+				warning: {
+					id,
+					code,
+					// A HEIC upload's source file is the converted JPEG.
+					message: getIncompleteUploadMessage(
+						code,
+						( item.originalHeicFile ?? item.sourceFile ).name
+					),
+				},
+			} );
 		}
 
 		dispatch.finishOperation( id, updates );
