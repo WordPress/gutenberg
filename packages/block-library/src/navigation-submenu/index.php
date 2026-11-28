@@ -85,7 +85,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	// Don't render the block's subtree if it has no label.
-	if ( empty( $attributes['label'] ) ) {
+	// A label made only of whitespace, non-breaking spaces or empty tags counts as empty.
+	if ( empty( $attributes['label'] ) || preg_match( '/^[\s\x{00A0}]*$/u', html_entity_decode( wp_strip_all_tags( $attributes['label'] ) ) ) ) {
 		return '';
 	}
 
