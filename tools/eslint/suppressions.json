@@ -4812,24 +4812,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/read-more/edit.jsx": {
+	"packages/block-library/src/read-more/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/read-more/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/read-more/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
