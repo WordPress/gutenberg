@@ -42,7 +42,6 @@ export type RichTextBaseProps<
 	 */
 	onChange: ( value: V | string, meta: RichTextChangeMeta ) => void;
 	__unstableDisableFormats?: boolean;
-	__unstableIsSelected?: boolean;
 	__unstableDependencies?: readonly unknown[];
 	__unstableAfterParse?: RecordFormatsHandler;
 	__unstableBeforeSerialize?: RecordFormatsHandler;

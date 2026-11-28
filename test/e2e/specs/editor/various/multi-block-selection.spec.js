@@ -1137,6 +1137,77 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should select by dragging from inside a multi block selection', async ( {
+		page,
+		editor,
+	} ) => {
+		for ( const content of [ 'One two three', 'Second', 'Third' ] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.boundingBox();
+		// Click past the text so the caret lands at the end.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { offset } ) => offset
+					);
+				} )
+			)
+			.toEqual( [ 11, 6 ] );
+
+		// Press inside the selection, after the "S" of "Second", and drag
+		// past the end of "Third".
+		const second = await editor.canvas
+			.getByText( 'Second', { exact: true } )
+			.boundingBox();
+		const third = await editor.canvas
+			.getByText( 'Third', { exact: true } )
+			.boundingBox();
+		await page.mouse.move( second.x + 10, second.y + second.height / 2 );
+		await page.mouse.down();
+		await page.mouse.move(
+			third.x + third.width + 2,
+			third.y + third.height / 2,
+			{ steps: 10 }
+		);
+		await page.mouse.up();
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectionStart,
+						getSelectionEnd,
+						getBlockIndex,
+					} = window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { clientId, attributeKey, offset } ) => [
+							getBlockIndex( clientId ),
+							attributeKey,
+							offset,
+						]
+					);
+				} )
+			)
+			.toEqual( [
+				[ 1, 'content', 1 ],
+				[ 2, 'content', 5 ],
+			] );
+	} );
+
 	test( 'should select the whole paragraph on triple click', async ( {
 		page,
 		editor,

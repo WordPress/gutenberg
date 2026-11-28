@@ -185,6 +185,12 @@ export default function useClickSelection() {
 						// when a drag takes place.
 						clickCollapseClientId = clickedClientId;
 					} else {
+						// A press inside a selection doesn't move it, so clear
+						// it for the press to place the caret.
+						// A mounted element's window has a selection.
+						node.ownerDocument
+							.defaultView!.getSelection()!
+							.removeAllRanges();
 						// A click outside blocks passes no client ID, as before.
 						selectBlock( clickedClientId as string );
 					}
