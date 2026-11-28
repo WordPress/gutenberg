@@ -11,6 +11,10 @@ const DEFAULT_THEME_COLORS: AdminThemeColors = {
 /*
  * Exported from this module only, not from the package, so tooling in this
  * repository can read the list of bundled schemes without duplicating it.
+ *
+ * The Blue and Sunrise background seeds are tuned so that the sidebar color
+ * they derive (`--wpds-color-background-surface-neutral-weak`) stays close to
+ * Core's `$base-color` for those schemes.
  */
 export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'modern', DEFAULT_THEME_COLORS ],
@@ -18,9 +22,9 @@ export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'midnight', { primary: '#cf4339', background: '#3d4042' } ],
 	[ 'coffee', { primary: '#916745', background: '#5b534d' } ],
 	[ 'ocean', { primary: '#567958', background: '#5f787f' } ],
-	[ 'blue', { primary: '#437aa8', background: '#3876a8' } ],
+	[ 'blue', { primary: '#437aa8', background: '#24567e' } ],
 	[ 'ectoplasm', { primary: '#646c3e', background: '#4f386e' } ],
-	[ 'sunrise', { primary: '#ad631e', background: '#cc4541' } ],
+	[ 'sunrise', { primary: '#ad631e', background: '#933330' } ],
 	[ 'light', { primary: '#007cba', background: '#eaeeed' } ],
 ] );
 

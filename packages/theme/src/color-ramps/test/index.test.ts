@@ -68,7 +68,7 @@ describe( 'buildRamps', () => {
 	} );
 
 	it.each( [
-		{ scheme: 'Blue', background: '#3876a8' },
+		{ scheme: 'former Blue', background: '#3876a8' },
 		{ scheme: 'Ocean', background: '#5f787f' },
 	] )(
 		'keeps weak neutral text at 4.5:1 or higher in the $scheme scheme',
