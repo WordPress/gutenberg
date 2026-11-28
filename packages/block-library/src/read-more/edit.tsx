@@ -9,14 +9,16 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import type { ReadMoreAttributes } from './types';
 
 export default function ReadMore( {
 	attributes: { content, linkTarget },
 	setAttributes,
 	insertBlocksAfter,
-} ) {
+}: BlockEditProps< ReadMoreAttributes > ) {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -61,7 +63,7 @@ export default function ReadMore( {
 					insertBlocksAfter
 						? () =>
 								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
+									createBlock( getDefaultBlockName()! )
 								)
 						: undefined
 				}
