@@ -19,3 +19,10 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
+
+// A minimum wider than the open overlay would make it scroll sideways.
+// Beats the inline block style; the Global Styles selector already skips the overlay.
+.wp-block-navigation__responsive-container.is-menu-open .wp-block-page-list {
+	min-width: auto !important;
+	min-height: auto !important;
+}
