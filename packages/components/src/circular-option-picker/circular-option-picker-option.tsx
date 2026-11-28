@@ -1,11 +1,13 @@
+import type * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useContext, useEffect } from '@wordpress/element';
+import { useInstanceId, useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
+import { useCompositeContext } from '../composite/context';
 import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
@@ -42,16 +44,17 @@ function UnforwardedOptionAsOption(
 ) {
 	const { id, isSelected, label, ...additionalProps } = props;
 
-	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
+	const store = useCompositeContext().store as
+		Ariakit.CompositeStore | undefined;
 
-	useEffect( () => {
-		if ( isSelected && ! activeId ) {
-			// The setTimeout call is necessary to make sure that this update
-			// doesn't get overridden by `Composite`'s internal logic, which picks
-			// an initial active item if one is not specifically set.
-			window.setTimeout( () => setActiveId?.( id ), 0 );
+	// Make the selected option the initial active item. A layout effect runs
+	// before `Composite` falls back to its first item. Later selection changes
+	// do not move the active item, so Ariakit keeps the user's position.
+	useIsomorphicLayoutEffect( () => {
+		if ( isSelected && ! store?.getState().activeId ) {
+			store?.setActiveId( id );
 		}
-	}, [ isSelected, setActiveId, activeId, id ] );
+	}, [ isSelected, store, id ] );
 
 	return (
 		<Composite.Item

@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `CircularOptionPicker`: In a `Popover` or `Dropdown` that focuses its first tabbable element as it opens, focus the selected option instead of the first one, so the arrow keys move from the focused option ([#86751](https://github.com/WordPress/gutenberg/pull/86751)).
 -   `ColorPalette`, `GradientPicker`: Keep focus on a palette or origin with a stable, unique `slug` when the groups are reordered or removed ([#86782](https://github.com/WordPress/gutenberg/pull/86782)).
 -   `MenuItem`: Give the `info` text of pressed items the same color as the label, so it stays readable on the pressed fill, including in forced colors mode ([#87153](https://github.com/WordPress/gutenberg/pull/87153)).
 -   `ConfirmDialog`: Ignore Enter key presses during IME composition ([#87378](https://github.com/WordPress/gutenberg/pull/87378)).

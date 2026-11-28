@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import type { ReactNode } from 'react';
+import { useFocusOnMount } from '@wordpress/compose';
 import CircularOptionPicker from '..';
 
 const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
@@ -201,6 +203,58 @@ describe( 'CircularOptionPicker', () => {
 			);
 			expect( console ).toHaveWarnedWith( AS_BUTTONS_DEPRECATION );
 		} );
+	} );
+
+	it( 'starts keyboard navigation at the initially selected option', async () => {
+		await render(
+			<CircularOptionPicker
+				aria-label="Colors"
+				options={ [
+					<CircularOptionPicker.Option key="red" aria-label="Red" />,
+					<CircularOptionPicker.Option
+						key="blue"
+						aria-label="Blue"
+						isSelected
+					/>,
+				] }
+			/>
+		);
+
+		await userEvent.tab();
+		expect( getOption( 'Blue' ) ).toHaveFocus();
+	} );
+
+	it( 'focuses the selected option when `useFocusOnMount` focuses the first tabbable element', async () => {
+		function FocusOnMount( { children }: { children: ReactNode } ) {
+			return <div ref={ useFocusOnMount() }>{ children }</div>;
+		}
+		await render(
+			<FocusOnMount>
+				<CircularOptionPicker
+					aria-label="Colors"
+					loop={ false }
+					options={ [
+						<CircularOptionPicker.Option
+							key="red"
+							aria-label="Red"
+						/>,
+						<CircularOptionPicker.Option
+							key="blue"
+							aria-label="Blue"
+							isSelected
+						/>,
+						<CircularOptionPicker.Option
+							key="green"
+							aria-label="Green"
+						/>,
+					] }
+				/>
+			</FocusOnMount>
+		);
+
+		await waitFor( () => expect( getOption( 'Blue' ) ).toHaveFocus() );
+		await userEvent.keyboard( '{ArrowRight}' );
+		expect( getOption( 'Green' ) ).toHaveFocus();
 	} );
 
 	describe( 'when `loop` is not set', () => {
