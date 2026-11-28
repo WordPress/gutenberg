@@ -34,6 +34,7 @@
 -   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
 -   Post Excerpt: Add the post title to the "Read more" link for screen readers, as the Read More block does ([#80454](https://github.com/WordPress/gutenberg/pull/80454)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting, deleting or aligning a column, so the action applies to the right cells and the table stays aligned ([#86811](https://github.com/WordPress/gutenberg/pull/86811)).
+-   Spacer: Clear the unused height when editing a fixed-width spacer in a Row so it does not make the Row taller on the front end ([#85514](https://github.com/WordPress/gutenberg/pull/85514)).
 
 ### Internal
 
