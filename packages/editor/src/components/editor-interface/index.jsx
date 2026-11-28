@@ -13,10 +13,12 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback, useLayoutEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 import { ThemeProvider } from '@wordpress/theme';
 import { Stack } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import PostsPageNotice from '../posts-page-notice';
 import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -50,8 +52,13 @@ const interfaceLabels = {
 };
 
 function Notices() {
-	const isValidTemplate = useSelect( ( select ) => {
-		return select( blockEditorStore ).isValidTemplate();
+	const { isValidTemplate, isPostsPage } = useSelect( ( select ) => {
+		return {
+			isValidTemplate: select( blockEditorStore ).isValidTemplate(),
+			isPostsPage:
+				unlock( select( coreStore ) ).getPostsPageId() ===
+				String( select( editorStore ).getCurrentPostId() ),
+		};
 	}, [] );
 
 	return (
@@ -61,6 +68,7 @@ function Notices() {
 				pinnedNoticesClassName="editor-notices__pinned"
 				dismissibleNoticesClassName="editor-notices__dismissible"
 			>
+				{ isPostsPage && <PostsPageNotice /> }
 				{ ! isValidTemplate && <TemplateValidationNotice /> }
 			</InlineNotices>
 		</ThemeProvider>
