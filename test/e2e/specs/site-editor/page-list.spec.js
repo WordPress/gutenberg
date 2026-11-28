@@ -741,4 +741,158 @@ test.describe( 'Page List', () => {
 			).toBeChecked();
 		} );
 	} );
+
+	test.describe( 'Quick Edit Status Side Effects', () => {
+		// Far enough ahead to tell the scheduled date from the one a save
+		// gives a post whose date was cleared.
+		const SCHEDULED_DATE = '2099-01-01T10:00:00';
+		let scheduledPage;
+		let passwordPage;
+
+		test.beforeEach( async ( { admin, page, requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+			scheduledPage = await requestUtils.createPage( {
+				title: 'Scheduled Page',
+				status: 'future',
+				date: SCHEDULED_DATE,
+			} );
+			passwordPage = await requestUtils.createPage( {
+				title: 'Password Page',
+				status: 'publish',
+				password: 'secret',
+			} );
+			await admin.visitSiteEditor( { postType: 'page' } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		const getPage = ( requestUtils, id ) =>
+			requestUtils.rest( {
+				path: `/wp/v2/pages/${ id }`,
+				params: { context: 'edit' },
+			} );
+
+		const getModal = ( page ) =>
+			page.locator( '.dataviews-action-modal__quick-edit' );
+
+		const openField = async ( page, label ) => {
+			const editButton = getModal( page ).getByRole( 'button', {
+				name: `Edit ${ label }`,
+			} );
+			await editButton.locator( '..' ).hover();
+			await editButton.click();
+		};
+
+		const pickStatus = async ( page, status ) => {
+			await openField( page, 'Status' );
+			await page.getByRole( 'radio', { name: status } ).click();
+			await page.keyboard.press( 'Escape' );
+		};
+
+		const save = async ( page ) => {
+			await getModal( page )
+				.getByRole( 'button', { name: 'Done' } )
+				.click();
+			await expect( getModal( page ) ).toBeHidden();
+		};
+
+		const openBulkEdit = async ( page, titles ) => {
+			// The extensible site editor keeps the selection in the URL, so
+			// a checkbox only flips once the route has re-rendered.
+			for ( const title of titles ) {
+				const checkbox = page.getByRole( 'checkbox', {
+					name: `Select ${ title }`,
+				} );
+				await checkbox.click();
+				await expect( checkbox ).toBeChecked();
+			}
+			await page
+				.getByRole( 'button', { name: 'Bulk edit', exact: true } )
+				.click();
+		};
+
+		test( 'drops the future date of a scheduled page that becomes a draft', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await page
+				.getByRole( 'row', { name: /Scheduled Page/ } )
+				.getByRole( 'button', { name: 'Quick edit' } )
+				.click();
+			await pickStatus( page, 'Draft' );
+			await save( page );
+
+			const saved = await getPage( requestUtils, scheduledPage.id );
+			expect( saved.status ).toBe( 'draft' );
+			expect( saved.date ).not.toBe( SCHEDULED_DATE );
+		} );
+
+		test( 'drops the password of a page that becomes private', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await page
+				.getByRole( 'row', { name: /Password Page/ } )
+				.getByRole( 'button', { name: 'Quick edit' } )
+				.click();
+			await pickStatus( page, 'Private' );
+			await save( page );
+
+			const saved = await getPage( requestUtils, passwordPage.id );
+			expect( saved.status ).toBe( 'private' );
+			expect( saved.password ).toBe( '' );
+		} );
+
+		test( 'applies the side effects to every page of a bulk edit', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await openBulkEdit( page, [ 'Scheduled Page', 'Password Page' ] );
+			await pickStatus( page, 'Private' );
+			await save( page );
+
+			const [ savedScheduled, savedPassword ] = await Promise.all( [
+				getPage( requestUtils, scheduledPage.id ),
+				getPage( requestUtils, passwordPage.id ),
+			] );
+			expect( savedScheduled.status ).toBe( 'private' );
+			expect( savedScheduled.date ).not.toBe( SCHEDULED_DATE );
+			expect( savedPassword.status ).toBe( 'private' );
+			expect( savedPassword.password ).toBe( '' );
+		} );
+
+		test( 'keeps a date picked after the status in a bulk edit', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await openBulkEdit( page, [ 'Scheduled Page', 'Password Page' ] );
+			// The status drops the scheduled date, and the date picked after
+			// it replaces that, as when editing the page alone.
+			await pickStatus( page, 'Draft' );
+			await openField( page, 'Date' );
+			await setPublishDate( page, {
+				year: 2030,
+				month: 5,
+				day: 1,
+				hours: 9,
+				minutes: 30,
+			} );
+			await page.keyboard.press( 'Escape' );
+			await save( page );
+
+			const [ savedScheduled, savedPassword ] = await Promise.all( [
+				getPage( requestUtils, scheduledPage.id ),
+				getPage( requestUtils, passwordPage.id ),
+			] );
+			for ( const saved of [ savedScheduled, savedPassword ] ) {
+				expect( saved.status ).toBe( 'draft' );
+				expect( saved.date ).toBe( '2030-05-01T09:30:00' );
+			}
+		} );
+	} );
 } );
