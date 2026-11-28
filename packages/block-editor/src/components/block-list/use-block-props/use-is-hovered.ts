@@ -3,7 +3,7 @@ import {
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { unlock } from '../../../lock-unlock';
-import { isBlockElementOutsideFields } from '../../../utils/dom';
+import { isOutsideFields } from '../../../utils/dom';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
@@ -59,15 +59,14 @@ export function useIsHovered( {
 				// editability check can force a style recalculation, so it
 				// runs once the pointer rests, which also keeps the
 				// outline from flashing on blocks it merely passes over.
-				// The block's own element is only editable inside an
-				// editing host, and a press on it still drags the block.
+				// Outside its fields, a block is only editable inside an
+				// editing host, and a press there still drags the block.
 				// Mouse events target elements.
 				const target = event.target as HTMLElement;
 				timeoutId = setTimeout( () => {
 					node.classList.toggle(
 						'is-hovered-draggable',
-						! target.isContentEditable ||
-							isBlockElementOutsideFields( target )
+						! target.isContentEditable || isOutsideFields( target )
 					);
 				}, 100 );
 			}

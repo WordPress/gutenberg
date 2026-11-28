@@ -5,7 +5,7 @@ import { setContentEditableWrapper } from './utils';
 import {
 	getBlockClientId,
 	getSelectionEditableElement,
-	isBlockElementOutsideFields,
+	isOutsideFields,
 } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
@@ -45,10 +45,10 @@ export default function useClickSelection() {
 				// away, focuses it again before mousedown.
 				isFocusedOnPointerDown = node.matches( ':focus' );
 
-				// A press on a block's own element outside its fields, such as
-				// a list item's bullet: stop editing so the browser drags the
+				// A press on a block outside its fields, such as a list item's
+				// bullet or a placeholder: stop editing so the browser drags the
 				// block instead of placing a caret.
-				if ( isBlockElementOutsideFields( event.target as Element ) ) {
+				if ( isOutsideFields( event.target as Element ) ) {
 					setContentEditableWrapper( node, false );
 				}
 			}

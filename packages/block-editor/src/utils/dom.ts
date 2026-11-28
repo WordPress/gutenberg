@@ -143,6 +143,22 @@ export function isBlockElementOutsideFields( element: Element | null ) {
 }
 
 /**
+ * Whether an element is part of a block but outside its fields, such as a
+ * list item's bullet or a placeholder's button. Fields keep their own
+ * `contentEditable`, so only the editing host is editable around the element.
+ *
+ * @param element Element.
+ *
+ * @return Whether the element is part of a block but outside its fields.
+ */
+export function isOutsideFields( element: Element ) {
+	return (
+		!! element.closest( BLOCK_SELECTOR ) &&
+		! element.closest( '[contenteditable]' )?.closest( BLOCK_SELECTOR )
+	);
+}
+
+/**
  * Calculates the union of two rectangles.
  *
  * @param rect1 First rectangle.
