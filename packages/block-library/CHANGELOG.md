@@ -34,6 +34,7 @@
 -   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
 -   Post Excerpt: Add the post title to the "Read more" link for screen readers, as the Read More block does ([#80454](https://github.com/WordPress/gutenberg/pull/80454)).
 -   Table: Account for merged cells (`colspan` and `rowspan`) when inserting, deleting or aligning a column, so the action applies to the right cells and the table stays aligned ([#86811](https://github.com/WordPress/gutenberg/pull/86811)).
+-   Audio: Let the player shrink to fit a content area narrower than 300px, so the page does not scroll horizontally on small screens or at high zoom. Left and right aligned players keep their 300px width when there is room ([#86264](https://github.com/WordPress/gutenberg/pull/86264)).
 
 ### Internal
 

@@ -13,9 +13,14 @@
 	// Show full-width when not aligned.
 	audio {
 		width: 100%;
-
-		// The browser natively applies a 300px width to the audio block.
-		// We restore this as a min-width instead, for alignments.
-		min-width: 300px;
 	}
+}
+
+// A floated block shrinks to fit its content, so the full-width player would
+// collapse. Restore the browser's native 300px player width on the block, and
+// let it shrink in a narrower container so the page does not scroll
+// horizontally. Zero specificity lets themes set their own width.
+:where(.wp-block-audio.alignleft, .wp-block-audio.alignright) {
+	width: 300px;
+	max-width: 100%;
 }
