@@ -511,6 +511,9 @@ function CoverEdit( {
 	// setAttributes for CSS backgrounds, which never fire load events).
 	const [ isSwappingMedia, setIsSwappingMedia ] = useState( false );
 
+	// Shared by the toolbar and the inspector, which both offer the embed.
+	const [ isEmbedUrlInputOpen, setIsEmbedUrlInputOpen ] = useState( false );
+
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
@@ -754,6 +757,8 @@ function CoverEdit( {
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
 			onSelectEmbedUrl={ onSelectEmbedUrl }
+			isEmbedUrlInputOpen={ isEmbedUrlInputOpen }
+			setIsEmbedUrlInputOpen={ setIsEmbedUrlInputOpen }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			onClearMedia={ onClearMedia }
@@ -778,6 +783,7 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
+			onOpenEmbedUrlInput={ () => setIsEmbedUrlInputOpen( true ) }
 			featuredImage={ media }
 			isSelected={ isSelected }
 		/>

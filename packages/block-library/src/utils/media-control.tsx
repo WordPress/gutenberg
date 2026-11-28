@@ -138,6 +138,7 @@ export function MediaControlPreview( {
  * @param props.emptyLabel            Label when no media (default: 'Add media')
  * @param props.useFeaturedImage      Whether the featured image is in use
  * @param props.onToggleFeaturedImage Callback toggling the featured image
+ * @param props.children              Extra items for the dropdown, as in `MediaReplaceFlow`
  * @return Media control component
  */
 export function MediaControl( {
@@ -154,6 +155,7 @@ export function MediaControl( {
 	emptyLabel = __( 'Media' ),
 	useFeaturedImage,
 	onToggleFeaturedImage,
+	children,
 }: MediaControlProps ) {
 	const { getSettings } = useSelect( blockEditorStore );
 	const onFilesDrop = ( filesList: File[] ) => {
@@ -208,7 +210,9 @@ export function MediaControl( {
 					</Button>
 				) }
 				onReset={ onReset }
-			/>
+			>
+				{ children }
+			</MediaReplaceFlow>
 			{ mediaUrl && onReset && (
 				<Button
 					label={ __( 'Reset' ) }

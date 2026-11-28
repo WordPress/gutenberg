@@ -1,4 +1,4 @@
-import type { CSSProperties, ElementType, JSX } from 'react';
+import type { CSSProperties, ElementType, JSX, ReactNode } from 'react';
 import type WaveformPlayerLib from '@arraypress/waveform-player/no-autoinit';
 import type {
 	BlockStyle,
@@ -237,6 +237,7 @@ export interface MediaControlProps {
 	emptyLabel?: string;
 	useFeaturedImage?: boolean;
 	onToggleFeaturedImage?: () => void;
+	children?: ReactNode | ( ( props: { onClose: () => void } ) => ReactNode );
 }
 
 /**

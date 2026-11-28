@@ -1,5 +1,6 @@
 import {
 	FocalPointPicker,
+	MenuItem,
 	RangeControl,
 	TextareaControl as WCTextareaControl,
 	ToggleControl,
@@ -20,7 +21,9 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { getFilename } from '@wordpress/url';
 import { Link } from '@wordpress/ui';
+import { link } from '@wordpress/icons';
 import { ALLOWED_MEDIA_TYPES, mediaPosition } from '../shared';
+import { getAllowedVideoProviders } from '../embed-video-utils';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
@@ -41,6 +44,7 @@ export default function CoverInspectorControls( {
 	toggleUseFeaturedImage,
 	updateDimRatio,
 	onClearMedia,
+	onOpenEmbedUrlInput,
 	featuredImage,
 	isSelected,
 } ) {
@@ -54,6 +58,7 @@ export default function CoverInspectorControls( {
 		alt,
 		tagName,
 		poster,
+		allowedVideoProviders,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -64,6 +69,8 @@ export default function CoverInspectorControls( {
 	} = currentSettings;
 
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+	const hasAllowedVideoProviders =
+		getAllowedVideoProviders( allowedVideoProviders ).length > 0;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
 	const { imageSizes, hasSelectedStyleState } = useSelect(
@@ -182,7 +189,21 @@ export default function CoverInspectorControls( {
 						useFeaturedImage={ useFeaturedImage }
 						onToggleFeaturedImage={ toggleUseFeaturedImage }
 						emptyLabel={ __( 'Add media' ) }
-					/>
+					>
+						{ ( { onClose } ) =>
+							hasAllowedVideoProviders ? (
+								<MenuItem
+									icon={ link }
+									onClick={ () => {
+										onOpenEmbedUrlInput();
+										onClose();
+									} }
+								>
+									{ __( 'Embed video from URL' ) }
+								</MenuItem>
+							) : null
+						}
+					</MediaControl>
 				</ToolsPanelItem>
 			</ToolsPanel>
 		</InspectorControls>
