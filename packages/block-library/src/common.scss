@@ -60,6 +60,18 @@
 	-webkit-text-fill-color: currentColor;
 }
 
+// Forced colors mode keeps the alpha channel of an author background color, so
+// the transparent background the highlight format adds stays transparent while
+// the text gets the mark text color, which can make it invisible. Restore the
+// browser's default mark colors instead. The element and class selector, plus
+// !important, are needed to beat the inline style and the preset color classes.
+@media (forced-colors: active) {
+	mark.has-inline-color {
+		background-color: Mark !important;
+		color: MarkText !important;
+	}
+}
+
 // Fit Text
 .has-fit-text {
 	white-space: nowrap !important;
