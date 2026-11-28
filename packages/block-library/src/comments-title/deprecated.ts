@@ -1,4 +1,5 @@
 import migrateTextAlign from '../utils/migrate-text-align';
+import type { CommentsTitleDeprecatedAttributes } from './types';
 
 const v2 = {
 	attributes: {
@@ -62,12 +63,12 @@ const v2 = {
 			clientNavigation: true,
 		},
 	},
-	migrate: ( oldAttributes ) => {
+	migrate: ( oldAttributes: CommentsTitleDeprecatedAttributes ) => {
 		const { singleCommentLabel, multipleCommentsLabel, ...newAttributes } =
 			oldAttributes;
 		return migrateTextAlign( newAttributes );
 	},
-	isEligible( attributes ) {
+	isEligible( attributes: CommentsTitleDeprecatedAttributes ) {
 		return (
 			!! attributes.textAlign ||
 			!! attributes.className?.match(
@@ -146,13 +147,16 @@ const v1 = {
 			clientNavigation: true,
 		},
 	},
-	migrate: ( oldAttributes ) => {
+	migrate: ( oldAttributes: CommentsTitleDeprecatedAttributes ) => {
 		const { singleCommentLabel, multipleCommentsLabel, ...newAttributes } =
 			oldAttributes;
 		return migrateTextAlign( newAttributes );
 	},
-	isEligible: ( { multipleCommentsLabel, singleCommentLabel } ) =>
-		multipleCommentsLabel || singleCommentLabel,
+	isEligible: ( {
+		multipleCommentsLabel,
+		singleCommentLabel,
+	}: CommentsTitleDeprecatedAttributes ) =>
+		!! ( multipleCommentsLabel || singleCommentLabel ),
 	save: () => null,
 };
 

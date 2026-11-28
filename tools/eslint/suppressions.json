@@ -1189,29 +1189,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/comments-title/deprecated.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comments-title/edit.jsx": {
+	"packages/block-library/src/comments-title/edit.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comments-title/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/comments-title/init.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

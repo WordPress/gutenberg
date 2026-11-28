@@ -13,13 +13,22 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import type { BlockEditProps } from '@wordpress/blocks';
 import {
 	usePostCommentsCount,
 	useToolsPanelDropdownMenuProps,
 } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+import type {
+	CommentsTitleAttributes,
+	CommentsTitleBlockContext,
+} from './types';
 
-export default function Edit( props ) {
+export default function Edit(
+	props: BlockEditProps< CommentsTitleAttributes > & {
+		context: CommentsTitleBlockContext;
+	}
+) {
 	useDeprecatedTextAlign( props );
 	const { attributes, setAttributes, context } = props;
 	const {
@@ -29,8 +38,13 @@ export default function Edit( props ) {
 		levelOptions,
 	} = attributes;
 	const { postId, postType } = context;
-	const TagName = 'h' + level;
-	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
+	const TagName = ( 'h' + level ) as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+	const [ rawTitle ] = useEntityProp< string >(
+		'postType',
+		postType!,
+		'title',
+		postId
+	);
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps();
 
@@ -41,7 +55,16 @@ export default function Edit( props ) {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings ?? {};
+		return (
+			( getSettings().__experimentalDiscussionSettings as
+				| {
+						threadCommentsDepth?: number;
+						threadComments?: boolean;
+						commentsPerPage?: number;
+						pageComments?: boolean;
+				  }
+				| undefined ) ?? {}
+		);
 	}, [] );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -52,13 +75,13 @@ export default function Edit( props ) {
 		// Match the number of comments that will be shown in the comment-template/edit.js placeholder
 
 		const nestedCommentsNumber = threadComments
-			? Math.min( threadCommentsDepth, 3 ) - 1
+			? Math.min( threadCommentsDepth!, 3 ) - 1
 			: 0;
 		const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
 
 		const commentsNumber =
-			parseInt( nestedCommentsNumber ) +
-			parseInt( topLevelCommentsNumber );
+			parseInt( String( nestedCommentsNumber ) ) +
+			parseInt( String( topLevelCommentsNumber ) );
 
 		commentsCount = Math.min( commentsNumber, 3 );
 	} else {
@@ -135,7 +158,7 @@ export default function Edit( props ) {
 				placeholder = sprintf(
 					/* translators: %s: Post title. */
 					__( 'One response to "%s"' ),
-					postTitle
+					postTitle!
 				);
 			} else {
 				placeholder = sprintf(
@@ -145,8 +168,8 @@ export default function Edit( props ) {
 						'%1$s responses to "%2$s"',
 						commentsCount
 					),
-					commentsCount,
-					postTitle
+					String( commentsCount ),
+					postTitle!
 				);
 			}
 		} else if ( commentsCount === 1 ) {
@@ -155,16 +178,16 @@ export default function Edit( props ) {
 			placeholder = sprintf(
 				/* translators: %s: Number of comments. */
 				_n( '%s response', '%s responses', commentsCount ),
-				commentsCount
+				String( commentsCount )
 			);
 		}
 	} else if ( showPostTitle ) {
 		if ( commentsCount === 1 ) {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Response to "%s"' ), postTitle );
+			placeholder = sprintf( __( 'Response to "%s"' ), postTitle! );
 		} else {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Responses to "%s"' ), postTitle );
+			placeholder = sprintf( __( 'Responses to "%s"' ), postTitle! );
 		}
 	} else if ( commentsCount === 1 ) {
 		placeholder = __( 'Response' );
