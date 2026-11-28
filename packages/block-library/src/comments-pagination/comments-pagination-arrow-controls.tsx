@@ -3,8 +3,12 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
+import type { CommentsPaginationArrowControlsProps } from './types';
 
-export function CommentsPaginationArrowControls( { value, onChange } ) {
+export function CommentsPaginationArrowControls( {
+	value,
+	onChange,
+}: CommentsPaginationArrowControlsProps ) {
 	return (
 		<ToggleGroupControl
 			label={ __( 'Arrow' ) }
