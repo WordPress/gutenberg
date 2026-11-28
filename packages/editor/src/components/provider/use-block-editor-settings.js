@@ -25,6 +25,7 @@ import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../global-styles';
+import filterInserterItems from './filter-inserter-items';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -132,6 +133,7 @@ const {
 	reusableBlocksSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
+	filterInserterItemsSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
@@ -441,6 +443,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ filterInserterItemsSelectKey ]: filterInserterItems,
 			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
