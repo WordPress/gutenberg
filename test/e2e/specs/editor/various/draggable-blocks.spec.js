@@ -18,7 +18,7 @@ async function dragTo( page, x, y ) {
 	}
 }
 
-test.describe( 'Draggable block', () => {
+test.describe( 'Draggable block (@webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -335,7 +335,7 @@ test.describe( 'Draggable block', () => {
 <!-- /wp:group -->` );
 	} );
 
-	test( 'can drag and drop to an empty parent block like Group or Columns', async ( {
+	test( 'can drag and drop to an empty parent block like Group or Columns (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -506,7 +506,10 @@ test.describe( 'Draggable block', () => {
 		await page.mouse.up();
 	} );
 
-	test( 'can directly drag an image', async ( { page, editor } ) => {
+	test( 'can directly drag an image (@firefox)', async ( {
+		page,
+		editor,
+	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -552,7 +555,7 @@ test.describe( 'Draggable block', () => {
 	for ( const caretIn of [ undefined, '1', '2' ] ) {
 		test( `can drag a list item by its bullet${
 			caretIn ? ` with the caret in item ${ caretIn }` : ''
-		} (@webkit)`, async ( { page, editor } ) => {
+		}`, async ( { page, editor } ) => {
 			await editor.insertBlock( {
 				name: 'core/list',
 				innerBlocks: [
@@ -636,7 +639,7 @@ test.describe( 'Draggable block', () => {
 		} );
 	}
 
-	test( 'stops editing the canvas after a press on a bullet when another block is selected (@webkit)', async ( {
+	test( 'stops editing the canvas after a press on a bullet when another block is selected', async ( {
 		page,
 		editor,
 		pageUtils,
